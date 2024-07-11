@@ -12,6 +12,10 @@ functionality:
       __merge__: file_multiomics_rna_h5ad.yaml
       required: True
       direction: input
+    - name: --multiomics_atac
+      __merge__: file_multiomics_atac_h5ad.yaml
+      required: false
+      direction: input
     - name: --output
       __merge__: file_prediction.yaml
       required: true

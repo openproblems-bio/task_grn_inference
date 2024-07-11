@@ -4,7 +4,8 @@ import anndata as ad
 ## VIASH START
 par = {
   "multiomics_rna": "resources/grn-benchmark/multiomics_rna.h5ad",
-  "output": "output/prediction.csv",
+  "multiomics_atac": "resources/grn-benchmark/multiomics_atac.h5ad",
+    "output": "output/prediction.csv",
 }
 ## VIASH END
 

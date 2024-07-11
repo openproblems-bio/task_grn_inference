@@ -1,0 +1,16 @@
+type: file
+example: resources/grn-benchmark/multiomics_atac.h5ad
+info:
+  label: multiomics atac
+  summary: "Peak data for multiomics data."
+  file_type: h5ad
+  slots:
+    obs:
+      - name: cell_type
+        type: string
+        description: "The annotated cell type of each cell based on RNA expression."
+        required: true
+      - name: donor_id
+        type: string
+        description: "Donor id"
+        required: true

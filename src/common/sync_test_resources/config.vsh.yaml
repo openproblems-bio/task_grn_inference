@@ -5,13 +5,13 @@ functionality:
   description: Synchronise the test resources from s3 to resources_test
   usage: |
     sync_test_resources
-    sync_test_resources --input s3://openproblems-bio/public/neurips-2023-competition/workflow-resources/ --output resources
+    sync_test_resources --input s3://openproblems-bio/public/grn-benchmark/workflow-resources/ --output resources
   arguments:
     - name: "--input"
       alternatives: ["-i"]
       type: string
       description: "Path to the S3 bucket to sync from."
-      default: "s3://openproblems-bio/public/neurips-2023-competition/workflow-resources/"
+      default: "s3://openproblems-bio/public/grn-benchmark/workflow-resources/"
     - name: "--output"
       alternatives: ["-o"]
       type: file
