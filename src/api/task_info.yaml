@@ -1,0 +1,141 @@
+name: perturbation_prediction
+label: Perturbation Prediction
+summary: Predicting how small molecules change gene expression in different cell types.
+readme: |
+  ## Installation
+
+  You need to have Docker, Java, and Viash installed. Follow
+  [these instructions](https://openproblems.bio/documentation/fundamentals/requirements)
+  to install the required dependencies.
+
+  ## Add a method
+
+  To add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.
+
+  ## Frequently used commands
+  
+  To get started, you can run the following commands:
+
+  ```bash
+  git clone git@github.com:openproblems-bio/task_perturbation_prediction.git
+
+  cd task_perturbation_prediction
+  
+  # download resources
+  scripts/download_resources.sh
+  ```
+
+  To run the benchmark, you first need to build the components. Afterwards, you can run the benchmark:
+  
+  ```bash
+  viash ns build --parallel --setup cachedbuild
+
+  scripts/run_benchmark.sh
+  ```
+
+  After adding a component, it is recommended to run the tests to ensure that the component is working correctly:
+
+  ```bash
+  viash ns test --parallel
+  ```
+  
+  Optionally, you can provide the `--query` argument to test only a subset of components:
+
+  ```bash
+  viash ns test --parallel --query "component_name"
+  ```
+motivation: |
+  Human biology can be complex, in part due to the function and interplay of the body's
+  approximately 37 trillion cells, which are organized into tissues, organs, and systems.
+  However, recent advances in single-cell technologies have provided unparalleled insight
+  into the function of cells and tissues at the level of DNA, RNA, and proteins. Yet
+  leveraging single-cell methods to develop medicines requires mapping causal links
+  between chemical perturbations and the downstream impact on cell state. These experiments
+  are costly and labor intensive, and not all cells and tissues are amenable to
+  high-throughput transcriptomic screening. If data science could help accurately predict
+  chemical perturbations in new cell types, it could accelerate and expand the development
+  of new medicines.
+
+  Several methods have been developed for drug perturbation prediction, most of which are
+  variations on the autoencoder architecture (Dr.VAE, scGEN, and ChemCPA). However, these
+  methods lack proper benchmarking datasets with diverse cell types to determine how well
+  they generalize. The largest available training dataset is the NIH-funded Connectivity
+  Map (CMap), which comprises over 1.3M small molecule perturbation measurements. However,
+  the CMap includes observations of only 978 genes, less than 5% of all genes. Furthermore,
+  the CMap data is comprised almost entirely of measurements in cancer cell lines, which
+  may not accurately represent human biology.
+description: |
+  This task aims to predict how small molecules change gene expression in different cell
+  types. This task was a [Kaggle competition](https://www.kaggle.com/competitions/open-problems-single-cell-perturbations/overview)
+  as part of the [NeurIPS 2023 competition track](https://neurips.cc/virtual/2023/competition/66586).
+
+  The task is to predict the gene expression profile of a cell after a small molecule
+  perturbation. For this competition, we designed and generated a novel single-cell
+  perturbational dataset in human peripheral blood mononuclear cells (PBMCs). We
+  selected 144 compounds from the Library of Integrated Network-Based Cellular Signatures
+  (LINCS) Connectivity Map dataset ([PMID: 29195078](https://pubmed.ncbi.nlm.nih.gov/29195078/))
+  and measured single-cell gene
+  expression profiles after 24 hours of treatment. The experiment was repeated in three
+  healthy human donors, and the compounds were selected based on diverse transcriptional
+  signatures observed in CD34+ hematopoietic stem cells (data not released). We performed
+  this experiment in human PBMCs because the cells are commercially available with
+  pre-obtained consent for public release and PBMCs are a primary, disease-relevant tissue
+  that contains multiple mature cell types (including T-cells, B-cells, myeloid cells,
+  and NK cells) with established markers for annotation of cell types. To supplement this
+  dataset, we also measured cells from each donor at baseline with joint scRNA and
+  single-cell chromatin accessibility measurements using the 10x Multiome assay. We hope
+  that the addition of rich multi-omic data for each donor and cell type at baseline will
+  help establish biological priors that explain the susceptibility of particular genes to
+  exhibit perturbation responses in difference biological contexts.
+
+authors:
+  - name: Artur Szałata
+    roles: [ author ]
+    info:
+      github: szalata
+      orcid: "000-0001-8413-234X"
+  - name: Robrecht Cannoodt
+    roles: [ author ]
+    info:
+      github: rcannood
+      orcid: "0000-0003-3641-729X"
+  - name: Daniel Burkhardt
+    roles: [ author ]
+    info:
+      github: dburkhardt
+      orcid: 0000-0001-7744-1363
+  - name: Malte D. Luecken
+    roles: [ author ]
+    info:
+      github: LuckyMD
+      orcid: 0000-0001-7464-7921
+  - name: Tin M. Tunjic
+    roles: [ contributor ]
+    info:
+      github: ttunja
+      orcid: 0000-0001-8842-6548
+  - name: Mengbo Wang
+    roles: [ contributor ]
+    info:
+      github: wangmengbo
+      orcid: 0000-0002-0266-9993
+  - name: Andrew Benz
+    roles: [ author ]
+    info:
+      github: andrew-benz
+      orcid: 0009-0002-8118-1861
+  - name: Tianyu Liu
+    roles: [ contributor ]
+    info:
+      github: HelloWorldLTY
+      orcid: 0000-0002-9412-6573
+  - name: Jalil Nourisa
+    roles: [ contributor ]
+    info:
+      github: janursa
+      orcid: 0000-0002-7539-4396
+  - name: Rico Meinl
+    roles: [ contributor ]
+    info:
+      github: ricomnl
+      orcid: 0000-0003-4356-6058

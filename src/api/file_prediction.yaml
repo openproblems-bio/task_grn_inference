@@ -1,0 +1,43 @@
+type: file
+example: resources/grn-benchmark/collectri.csv
+info:
+  label: GRN
+  summary: "GRN prediction"
+  file_type: csv
+  columns: 
+    - name: source
+      description: "Source of regulation" 
+      type: string
+      required: true
+    - name: target
+      description: "Target of regulation" 
+      type: string
+      required: true
+    - name: weight
+      description: "Weight of regulation" 
+      type: float
+      required: true
+  
+   
+
+
+
+
+
+
+
+  # slots:
+  #   layers:
+  #     - name: grn_layer
+  #       type: double
+  #       description: "Predicted grn links"
+  #       required: true
+  #   uns:
+  #     - type: string
+  #       name: dataset_id
+  #       description: A unique identifier for the dataset.
+  #       required: true
+  #     - type: string
+  #       name: method_id
+  #       description: A unique identifier for the method used to generate the grn.
+  #       required: true

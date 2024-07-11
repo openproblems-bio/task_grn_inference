@@ -1,0 +1,23 @@
+functionality:
+  namespace: "methods"
+  info:
+    type: method
+    type_info:
+      label: Method
+      summary: A GRN inference method
+      description: |
+        A method for inferring GRN from expression data.
+  arguments:
+    - name: --multiomics_rna
+      __merge__: file_multiomics_rna_h5ad.yaml
+      required: True
+      direction: input
+    - name: --output
+      __merge__: file_prediction.yaml
+      required: true
+      direction: output
+    - name: "--output_model"
+      __merge__: file_model.yaml
+      direction: output
+      required: false
+      must_exist: false

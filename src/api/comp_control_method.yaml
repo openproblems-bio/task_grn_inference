@@ -1,0 +1,36 @@
+functionality:
+  namespace: "control_methods"
+  info:
+    type: control_method
+    type_info:
+      label: Control Method
+      summary: A control method.
+      description: |
+        A control method to serve as a quality control for the perturbation prediction benchmark.
+  arguments:
+    - name: --de_train_h5ad
+      __merge__: file_de_train_h5ad.yaml
+      required: false
+      direction: input
+    - name: --de_test_h5ad
+      __merge__: file_de_test_h5ad.yaml
+      required: true
+      direction: input
+    - name: --id_map
+      __merge__: file_id_map.yaml
+      required: true
+      direction: input
+    - name: --layer
+      type: string
+      direction: input
+      default: clipped_sign_log10_pval
+      description: Which layer to use for prediction.
+    - name: --output
+      __merge__: file_prediction.yaml
+      required: true
+      direction: output
+  test_resources:
+    - type: python_script
+      path: /src/common/component_tests/run_and_check_output.py
+    - path: /resources/neurips-2023-data
+      dest: resources/neurips-2023-data

@@ -1,0 +1,31 @@
+functionality:
+  namespace: "metrics"
+  info:
+    type: metric
+    type_info:
+      label: Metric
+      summary: A metric to evaluate the performance of the inferred GRN
+  arguments:
+    - name: --perturbation_h5ad
+      __merge__: file_perturbation_h5ad.yaml
+      required: true
+      direction: input
+    - name: --layer
+      type: string
+      direction: input
+      default: lognorm
+      description: In which layer to find the normalized data
+    - name: --prediction
+      __merge__: file_prediction.yaml
+      required: true
+      direction: input
+    - name: --output
+      __merge__: file_score.yaml
+      direction: output
+      required: true
+
+  test_resources:
+    - type: python_script
+      path: /src/common/component_tests/run_and_check_output.py
+    - path: /resources/grn-benchmark
+      dest: resources/grn-benchmark

@@ -1,0 +1,46 @@
+__merge__: ../../api/comp_method.yaml
+
+functionality:
+  name: jn_ap_op2
+  info:
+    label: JN-AP-OP2
+    neurips2023_rank: 20
+    summary: "Deep learning architecture composed of 2 modules: a sample-centric MLP and a gene-centric MLP"
+    description: |
+      We first encode each sample using leave-one-out encoder based on compound and cell type. This produces X with the dimension of n_samples, n_genes, n_encode,
+      where n_encode is 2. Then, X is passed to a MLP1 sample-wise with input of n_samples, n_genes*n_encode, which outputs the same dimension data.
+      The purpose of this MLP is to learn inter-gene relationships. Then, we group the output of MLP1 with X (original encoded data) and feed it
+      to MLP2 which receives n_smaples*n_genes, (n_encode + n_encode) and results n_samples*n_genes. This MLP2 trains on each (compound, cell_type, gene)
+      combination. This is to overcome the underdetermination problem due to lack of sufficient (compound, cell_type) samples. 
+    documentation_url: https://www.kaggle.com/competitions/open-problems-single-cell-perturbations/discussion/461159
+    repository_url: https://github.com/AntoinePassemiers/Open-Challenges-Single-Cell-Perturbations
+  arguments:
+    - type: integer
+      name: --n_replica
+      default: 10
+      info:
+        test_default: 1
+    - type: string
+      name: --submission_names
+      multiple: true
+      default: [dl40, dl200]
+      info:
+        test_default: [dl40]
+  resources:
+    - type: python_script
+      path: script.py
+    - path: helper.py
+platforms:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_pytorch_nvidia:1.0.4
+    setup:
+      - type: python
+        packages: 
+          - fastparquet
+          - pandas
+          - category_encoders
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [ hightime, midmem, highcpu, gpu ]

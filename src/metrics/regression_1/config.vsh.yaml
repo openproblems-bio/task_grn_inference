@@ -1,0 +1,30 @@
+__merge__: ../../api/comp_metric.yaml
+functionality:
+  name: regression_1
+  info:
+    metrics:
+      - name: regression_1
+        label: Regression 1
+        summary: Calculates R2 score for regression 1
+        description: |
+         Calculates R2 score using regression approach 1.
+        repository_url: null
+        documentation_url: null
+        min: "-inf"
+        max: 1
+        maximize: true
+  
+  resources:
+    - type: python_script
+      path: script.py
+platforms:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_images/python:1.1.0
+    setup:
+      - type: python
+        packages: 
+        - anndata~=0.8.0
+        - lightgbm
+  - type: nextflow
+    directives:
+      label: [ midtime, highmem, highcpu ]
