@@ -415,9 +415,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata~=0.8.0" "lightgbm"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2024-07-12T20:52:56+02:00"
+LABEL org.opencontainers.image.created="2024-07-12T21:14:18+02:00"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/openproblems-v2"
-LABEL org.opencontainers.image.revision="bebb1fedbbd90e0c156e68ab103050d458c72e33"
+LABEL org.opencontainers.image.revision="5ee7f182940db8dd4323e7f0a4c5b1ce4e6e8333"
 LABEL org.opencontainers.image.version="dev"
 
 VIASHDOCKER

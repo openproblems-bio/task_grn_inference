@@ -8,6 +8,7 @@ import random
 from concurrent.futures import ThreadPoolExecutor
 import pandas as pd
 import anndata as ad
+import os
 
 
 class lightgbm_wrapper:
@@ -178,6 +179,8 @@ def main(par):
     manipulate = None 
     ## read and process input data
     print('Reading input files', flush=True)
+    print('----------------work dir------------', os.getcwd())
+    print('----------------path exist------------', os.path.exists('/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/'))
     perturbation_data = ad.read_h5ad(par['perturbation_data'])
     gene_names = perturbation_data.var.index.to_numpy()
     net = pd.read_csv(par['prediction'])

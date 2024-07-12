@@ -198,5 +198,5 @@ info:
   output: "bin"
   executable: "bin/regression_1"
   viash_version: "0.8.0"
-  git_commit: "bebb1fedbbd90e0c156e68ab103050d458c72e33"
+  git_commit: "5ee7f182940db8dd4323e7f0a4c5b1ce4e6e8333"
   git_remote: "git@github.com:openproblems-bio/task-grn-benchmark.git"
