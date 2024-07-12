@@ -178,7 +178,7 @@ def main(par):
     manipulate = None 
     ## read and process input data
     print('Reading input files', flush=True)
-    perturbation_data = ad.read_h5ad(par['perturbation'])
+    perturbation_data = ad.read_h5ad(par['perturbation_data'])
     gene_names = perturbation_data.var.index.to_numpy()
     net = pd.read_csv(par['prediction'])
 

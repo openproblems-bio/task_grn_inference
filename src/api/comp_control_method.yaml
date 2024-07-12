@@ -6,25 +6,21 @@ functionality:
       label: Control Method
       summary: A control method.
       description: |
-        A control method to serve as a quality control for the perturbation prediction benchmark.
+        A control method to serve as a quality control for the GRN inference benchmark.
   arguments:
-    - name: --de_train_h5ad
-      __merge__: file_de_train_h5ad.yaml
-      required: false
-      direction: input
-    - name: --de_test_h5ad
-      __merge__: file_de_test_h5ad.yaml
-      required: true
-      direction: input
-    - name: --id_map
-      __merge__: file_id_map.yaml
+    - name: --perturbation_data
+      __merge__: file_perturbation_h5ad.yaml
       required: true
       direction: input
     - name: --layer
       type: string
       direction: input
-      default: clipped_sign_log10_pval
-      description: Which layer to use for prediction.
+      default: lognorm
+      description: Which layer of pertubation data to use to find tf-gene relationships.
+    - name: --prior_data
+      __merge__: file_prior.yaml
+      direction: input
+      description: Prior information used for grn inference.
     - name: --output
       __merge__: file_prediction.yaml
       required: true
@@ -32,5 +28,5 @@ functionality:
   test_resources:
     - type: python_script
       path: /src/common/component_tests/run_and_check_output.py
-    - path: /resources/neurips-2023-data
-      dest: resources/neurips-2023-data
+    - path: /resources/grn-benchmark
+      dest: resources/grn-benchmark

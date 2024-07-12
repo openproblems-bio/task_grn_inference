@@ -7,7 +7,7 @@ import os
 par = {
   'perturbation_data': r'resources/grn-benchmark/perturbation_data.h5ad',
   'layer': r'lognorm',
-  'prediction': r'resources/grn-benchmark/collectri.csv',
+  'prediction': r'resources/grn-benchmark/positive_control.csv',
   'score': r'output/score.csv',
   'reg_type': r'ridge',
   'subsample': 200
