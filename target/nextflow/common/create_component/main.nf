@@ -2908,7 +2908,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/target/nextflow/common/create_component",
     "viash_version" : "0.8.0",
-    "git_commit" : "00cc87d9dff1d82dd29f5e9210e1a1abdb74bdf2",
+    "git_commit" : "2950eb11f0291e58a2caa1764812eafe3e52b788",
     "git_remote" : "git@github.com:openproblems-bio/task-grn-benchmark.git"
   }
 }'''))
@@ -3123,7 +3123,7 @@ import anndata as ad
 par = {
   "multiomics_rna": "resources/grn-benchmark/multiomics_rna.h5ad",
   "multiomics_atac": "resources/grn-benchmark/multiomics_atac.h5ad",
-    "output": "prediction.csv",
+    "output": "output/prediction.csv",
 }
 ## VIASH END
 

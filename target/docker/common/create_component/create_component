@@ -443,9 +443,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "ruamel.yaml"
 
 LABEL org.opencontainers.image.description="Companion container for running component common create_component"
-LABEL org.opencontainers.image.created="2024-07-11T22:37:06+02:00"
+LABEL org.opencontainers.image.created="2024-07-12T20:29:28+02:00"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/openproblems-v2"
-LABEL org.opencontainers.image.revision="00cc87d9dff1d82dd29f5e9210e1a1abdb74bdf2"
+LABEL org.opencontainers.image.revision="2950eb11f0291e58a2caa1764812eafe3e52b788"
 LABEL org.opencontainers.image.version="dev"
 
 VIASHDOCKER
@@ -1174,7 +1174,7 @@ def create_python_script(par, config, type):
     |par = {
     |  "multiomics_rna": "resources/grn-benchmark/multiomics_rna.h5ad",
     |  "multiomics_atac": "resources/grn-benchmark/multiomics_atac.h5ad",
-    "output": "prediction.csv",
+    "output": "output/prediction.csv",
     |}
     |## VIASH END
     |

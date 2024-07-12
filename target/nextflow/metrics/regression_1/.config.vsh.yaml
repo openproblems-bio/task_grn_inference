@@ -4,7 +4,7 @@ functionality:
   version: "dev"
   arguments:
   - type: "file"
-    name: "--perturbation_h5ad"
+    name: "--perturbation_data"
     info:
       label: "perturbation"
       summary: "Perturbation dataset for benchmarking."
@@ -55,7 +55,7 @@ functionality:
           description: "Normalized values using shifted logarithm "
           required: true
     example:
-    - "resources/grn-benchmark/perturbation.h5ad"
+    - "resources/grn-benchmark/perturbation_data.h5ad"
     must_exist: true
     create_parent: true
     required: true
@@ -103,29 +103,16 @@ functionality:
     multiple_sep: ":"
     dest: "par"
   - type: "file"
-    name: "--output"
+    name: "--score"
     info:
       label: "Score"
       summary: "File indicating the score of a metric."
-      file_type: "h5ad"
-      slots:
-        uns:
-        - type: "string"
-          name: "metric_ids"
-          description: "One or more unique metric identifiers"
-          multiple: true
-          required: true
-        - type: "double"
-          name: "metric_values"
-          description: "The metric values obtained for the given prediction. Must\
-            \ be of same length as 'metric_ids'."
-          multiple: true
-          required: true
+      file_type: "csv"
     example:
-    - "resources/grn-benchmark/score.h5ad"
+    - "resources/grn-benchmark/score.csv"
     must_exist: true
     create_parent: true
-    required: true
+    required: false
     direction: "output"
     multiple: false
     multiple_sep: ":"
@@ -140,18 +127,15 @@ functionality:
     is_executable: true
   - type: "file"
     path: "resources/grn-benchmark"
-    dest: "resources/grn-benchmark"
+    dest: "/resources/grn-benchmark"
   info:
     metrics:
     - name: "regression_1"
       label: "Regression 1"
       summary: "Calculates R2 score for regression 1"
-      description: "Calculates R2 score using regression approach 1.\n"
+      description: "Calculates R2 score using regression approach 1."
       repository_url: null
       documentation_url: null
-      min: "-inf"
-      max: 1
-      maximize: true
     type: "metric"
     type_info:
       label: "Metric"
@@ -207,10 +191,10 @@ platforms:
   debug: false
   container: "docker"
 info:
-  config: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/src/metrics/regression_1/config.vsh.yaml"
+  config: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/src/metrics/_regression_1/config.vsh.yaml"
   platform: "nextflow"
   output: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/target/nextflow/metrics/regression_1"
   executable: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/target/nextflow/metrics/regression_1/regression_1"
   viash_version: "0.8.0"
-  git_commit: "00cc87d9dff1d82dd29f5e9210e1a1abdb74bdf2"
+  git_commit: "2950eb11f0291e58a2caa1764812eafe3e52b788"
   git_remote: "git@github.com:openproblems-bio/task-grn-benchmark.git"

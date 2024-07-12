@@ -1,6 +1,6 @@
 functionality:
-  name: "regression_1"
-  namespace: "metrics"
+  name: "positive_control"
+  namespace: "control_methods"
   version: "dev"
   arguments:
   - type: "file"
@@ -65,7 +65,7 @@ functionality:
     dest: "par"
   - type: "string"
     name: "--layer"
-    description: "In which layer to find the normalized data"
+    description: "Which layer of pertubation data to use to find tf-gene relationships."
     info: null
     default:
     - "lognorm"
@@ -75,7 +75,29 @@ functionality:
     multiple_sep: ":"
     dest: "par"
   - type: "file"
-    name: "--prediction"
+    name: "--prior_data"
+    description: "Prior information used for grn inference."
+    info:
+      label: "prior data"
+      summary: "Prior data used for grn benchmark"
+      file_type: "h5ad"
+      slots:
+        uns:
+        - type: "list"
+          name: "tf_list"
+          description: "List of known tfs obtained from https://resources.aertslab.org/cistarget."
+          required: true
+    example:
+    - "resources/grn-benchmark/prior_data.h5ad"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--output"
     info:
       label: "GRN"
       summary: "GRN prediction"
@@ -98,21 +120,6 @@ functionality:
     must_exist: true
     create_parent: true
     required: true
-    direction: "input"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
-  - type: "file"
-    name: "--score"
-    info:
-      label: "Score"
-      summary: "File indicating the score of a metric."
-      file_type: "csv"
-    example:
-    - "resources/grn-benchmark/score.csv"
-    must_exist: true
-    create_parent: true
-    required: false
     direction: "output"
     multiple: false
     multiple_sep: ":"
@@ -127,25 +134,24 @@ functionality:
     is_executable: true
   - type: "file"
     path: "resources/grn-benchmark"
-    dest: "/resources/grn-benchmark"
+    dest: "resources/grn-benchmark"
   info:
-    metrics:
-    - name: "regression_1"
-      label: "Regression 1"
-      summary: "Calculates R2 score for regression 1"
-      description: "Calculates R2 score using regression approach 1."
-      repository_url: null
-      documentation_url: null
-    type: "metric"
+    label: "Positive control"
+    summary: "Source-target links based on perturbation data"
+    description: "By directly training on perturbation data, positive control is expected\
+      \ to learn more accurate tf-gene connections.\n"
+    type: "control_method"
     type_info:
-      label: "Metric"
-      summary: "A metric to evaluate the performance of the inferred GRN"
+      label: "Control Method"
+      summary: "A control method."
+      description: "A control method to serve as a quality control for the GRN inference\
+        \ benchmark.\n"
   status: "enabled"
   set_wd_to_resources_dir: false
 platforms:
 - type: "docker"
   id: "docker"
-  image: "ghcr.io/openproblems-bio/base_images/python:1.1.0"
+  image: "ghcr.io/openproblems-bio/base_python:1.0.4"
   target_organization: "openproblems-bio"
   target_registry: "ghcr.io"
   namespace_separator: "/"
@@ -156,9 +162,6 @@ platforms:
   setup:
   - type: "python"
     user: false
-    packages:
-    - "anndata~=0.8.0"
-    - "lightgbm"
     upgrade: true
   entrypoint: []
   cmd: null
@@ -191,10 +194,10 @@ platforms:
   debug: false
   container: "docker"
 info:
-  config: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/src/metrics/_regression_1/config.vsh.yaml"
-  platform: "docker"
-  output: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/target/docker/metrics/regression_1"
-  executable: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/target/docker/metrics/regression_1/regression_1"
+  config: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/src/control_methods/positive_control/config.vsh.yaml"
+  platform: "nextflow"
+  output: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/target/nextflow/control_methods/positive_control"
+  executable: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/target/nextflow/control_methods/positive_control/positive_control"
   viash_version: "0.8.0"
   git_commit: "2950eb11f0291e58a2caa1764812eafe3e52b788"
   git_remote: "git@github.com:openproblems-bio/task-grn-benchmark.git"

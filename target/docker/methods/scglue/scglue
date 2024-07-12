@@ -410,13 +410,12 @@ FROM ghcr.io/openproblems-bio/base_python:1.0.4
 ENTRYPOINT []
 
  
-RUN pip install --upgrade pip && \
-  pip install --upgrade --no-cache-dir "fastparquet"
+RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component methods scglue"
-LABEL org.opencontainers.image.created="2024-07-11T22:37:06+02:00"
+LABEL org.opencontainers.image.created="2024-07-12T20:29:30+02:00"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/openproblems-v2"
-LABEL org.opencontainers.image.revision="00cc87d9dff1d82dd29f5e9210e1a1abdb74bdf2"
+LABEL org.opencontainers.image.revision="2950eb11f0291e58a2caa1764812eafe3e52b788"
 LABEL org.opencontainers.image.version="dev"
 
 VIASHDOCKER

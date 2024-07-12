@@ -725,7 +725,7 @@ def create_python_script(par, config, type):
     |par = {
     |  "multiomics_rna": "resources/grn-benchmark/multiomics_rna.h5ad",
     |  "multiomics_atac": "resources/grn-benchmark/multiomics_atac.h5ad",
-    "output": "prediction.csv",
+    "output": "output/prediction.csv",
     |}
     |## VIASH END
     |

@@ -6,11 +6,9 @@ functionality:
       - name: regression_1
         label: Regression 1
         summary: Calculates R2 score for regression 1
-        description: |
-         Calculates R2 score using regression approach 1.
+        description: Calculates R2 score using regression approach 1.
         repository_url: null
         documentation_url: null
-  
   resources:
     - type: python_script
       path: script.py

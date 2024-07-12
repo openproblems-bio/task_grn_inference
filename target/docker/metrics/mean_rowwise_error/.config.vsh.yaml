@@ -1,5 +1,5 @@
 functionality:
-  name: "regression_1"
+  name: "mean_rowwise_error"
   namespace: "metrics"
   version: "dev"
   arguments:
@@ -118,8 +118,8 @@ functionality:
     multiple_sep: ":"
     dest: "par"
   resources:
-  - type: "python_script"
-    path: "script.py"
+  - type: "r_script"
+    path: "script.R"
     is_executable: true
   test_resources:
   - type: "python_script"
@@ -130,10 +130,16 @@ functionality:
     dest: "/resources/grn-benchmark"
   info:
     metrics:
-    - name: "regression_1"
-      label: "Regression 1"
-      summary: "Calculates R2 score for regression 1"
-      description: "Calculates R2 score using regression approach 1."
+    - name: "mean_rowwise_rmse"
+      label: "Mean Rowwise RMSE"
+      summary: "The mean of the root mean squared error (RMSE) of each row in the\
+        \ matrix."
+      description: "We use the **Mean Rowwise Root Mean Squared Error** to score submissions,\
+        \ computed as follows:\n\n$$\n\\textrm{MRRMSE} = \\frac{1}{R}\\sum_{i=1}^R\\\
+        left(\\frac{1}{n} \\sum_{j=1}^{n} (y_{ij} - \\widehat{y}_{ij})^2\\right)^{1/2}\n\
+        $$\n\nwhere $(R)$ is the number of scored rows, and $(y_{ij})$ and $(\\widehat{y}_{ij})$\
+        \ are the actual and predicted values, respectively, for row $(i)$ and column\
+        \ $(j)$, and $(n)$ bis the number of columns.\n"
       repository_url: null
       documentation_url: null
     type: "metric"
@@ -145,7 +151,7 @@ functionality:
 platforms:
 - type: "docker"
   id: "docker"
-  image: "ghcr.io/openproblems-bio/base_images/python:1.1.0"
+  image: "ghcr.io/openproblems-bio/base_r:1.0.4"
   target_organization: "openproblems-bio"
   target_registry: "ghcr.io"
   namespace_separator: "/"
@@ -154,12 +160,10 @@ platforms:
   setup_strategy: "ifneedbepullelsecachedbuild"
   target_image_source: "https://github.com/openproblems-bio/openproblems-v2"
   setup:
-  - type: "python"
-    user: false
+  - type: "r"
     packages:
-    - "anndata~=0.8.0"
-    - "lightgbm"
-    upgrade: true
+    - "proxyC"
+    bioc_force_install: false
   entrypoint: []
   cmd: null
 - type: "nextflow"
@@ -191,10 +195,10 @@ platforms:
   debug: false
   container: "docker"
 info:
-  config: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/src/metrics/_regression_1/config.vsh.yaml"
+  config: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/src/metrics/regression_1/config.vsh.yaml"
   platform: "docker"
-  output: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/target/docker/metrics/regression_1"
-  executable: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/target/docker/metrics/regression_1/regression_1"
+  output: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/target/docker/metrics/mean_rowwise_error"
+  executable: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/target/docker/metrics/mean_rowwise_error/mean_rowwise_error"
   viash_version: "0.8.0"
   git_commit: "2950eb11f0291e58a2caa1764812eafe3e52b788"
   git_remote: "git@github.com:openproblems-bio/task-grn-benchmark.git"
