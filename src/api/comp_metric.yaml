@@ -6,7 +6,7 @@ functionality:
       label: Metric
       summary: A metric to evaluate the performance of the inferred GRN
   arguments:
-    - name: --perturbation_h5ad
+    - name: --perturbation_data
       __merge__: file_perturbation_h5ad.yaml
       required: true
       direction: input
@@ -19,13 +19,30 @@ functionality:
       __merge__: file_prediction.yaml
       required: true
       direction: input
-    - name: --output
+    - name: --score
       __merge__: file_score.yaml
       direction: output
       required: false
+    - name: --reg_type
+      desciption: Regression type
+      type: string
+      direction: input
+      default: GB
+      info:
+        test_default: 200
+      required: false
+    - name: --subsample
+      desciption: Number of samples randomly drawn from pertubation data
+      direction: input
+      type: integer
+      default: -1
+      info:
+        test_default: 200
+      required: false
+    
 
   test_resources:
     - type: python_script
       path: /src/common/component_tests/run_and_check_output.py
     - path: /resources/grn-benchmark
-      dest: resources/grn-benchmark
+      dest: /resources/grn-benchmark

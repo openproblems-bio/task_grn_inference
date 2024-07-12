@@ -10,9 +10,6 @@ functionality:
          Calculates R2 score using regression approach 1.
         repository_url: null
         documentation_url: null
-        min: "-inf"
-        max: 1
-        maximize: true
   
   resources:
     - type: python_script

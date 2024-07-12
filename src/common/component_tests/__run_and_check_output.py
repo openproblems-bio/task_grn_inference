@@ -7,8 +7,8 @@ import re
 
 ## VIASH START
 meta = {
-    "executable": "target/docker/metrics/regression_1/script",
-    "config": "target/docker/metrics/regression_1/config.vsh.yaml",
+    "executable": "python",
+    "config": "src/api/comp_metric.yaml",
     "resources_dir": "resources"
 }
 ## VIASH END
@@ -60,7 +60,6 @@ def run_and_check_outputs(arguments, cmd):
         exit(out.returncode)
 
     print(">> Checking whether output file exists", flush=True)
-
     for arg in arguments:
         if arg["type"] == "file" and arg["direction"] == "output" and arg["required"]:
             assert not arg["must_exist"] or path.exists(arg["value"]), f"Output file '{arg['value']}' does not exist"
@@ -86,12 +85,13 @@ def run_and_check_outputs(arguments, cmd):
                     df = pd.read_csv(arg["value"])
                 else:
                     df = pd.read_parquet(arg["value"])
-                print(f"  {df.columns}")
+                print(f"  {df}")
                 
                 check_df_columns(df, arg)
 
 
     print("All checks succeeded!", flush=True)
+
 
 
 # read viash config
@@ -147,7 +147,6 @@ else:
 for argset_name, argset_args in argument_sets.items():
     print(f">> Running test '{argset_name}'", flush=True)
     # construct command
-
     cmd = [ meta["executable"] ]
     for arg in argset_args:
         if "value" in arg:

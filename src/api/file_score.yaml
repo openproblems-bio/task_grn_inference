@@ -1,26 +1,17 @@
 type: file
-example: resources/grn-benchmark/score.h5ad
+example: resources/grn-benchmark/score.csv
 info:
   label: Score
   summary: "File indicating the score of a metric."
-  file_type: h5ad
-  slots:
-    uns:
-      # - type: string
-      #   name: dataset_id
-      #   description: "A unique identifier for the dataset"
-      #   required: true
-      # - type: string
-      #   name: method_id
-      #   description: "A unique identifier for the method"
-      #   required: true
-      - type: string
-        name: metric_ids
-        description: "One or more unique metric identifiers"
-        multiple: true
-        required: true
-      - type: double
-        name: metric_values
-        description: "The metric values obtained for the given prediction. Must be of same length as 'metric_ids'."
-        multiple: true
-        required: true
+  file_type: csv
+  # columns:
+  #   - type: string
+  #     name: metric_ids
+  #     description: "One or more unique metric identifiers"
+  #     multiple: true
+  #     required: true
+  #   - type: double
+  #     name: metric_values
+  #     description: "The metric values obtained for the given prediction. Must be of same length as 'metric_ids'."
+  #     multiple: true
+  #     required: true
