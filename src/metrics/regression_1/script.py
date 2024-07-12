@@ -12,11 +12,10 @@ par = {
   'reg_type': r'ridge',
   'subsample': 200
 }
-meta = {
-    "resources_dir": "src/metrics/regression_1",
-}
+# meta = {
+#     "resources_dir": "src/metrics/regression_1",
+# }
 sys.path.append(meta["resources_dir"])
-
 from main import main 
 
 output = main(par) 
