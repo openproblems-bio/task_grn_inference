@@ -5,13 +5,15 @@ import anndata as ad
 par = {
   "multiomics_rna": "resources/grn-benchmark/multiomics_rna.h5ad",
   "multiomics_atac": "resources/grn-benchmark/multiomics_atac.h5ad",
-    "output": "output/prediction.csv",
+  "prediction": "output/prediction.csv",
 }
 ## VIASH END
 
 print('Reading input files', flush=True)
 multiomics_rna = ad.read_h5ad(par["multiomics_rna"])
-    
+multiomics_atac = ad.read_h5ad(par["multiomics_atac"])
+
+
 print('Preprocess data', flush=True)
 # ... preprocessing ...
 
@@ -26,4 +28,6 @@ output = pd.DataFrame(
   # ... TODO: fill in data ...
   columns=['source', 'target', 'weight']
 )
-output.to_csv(par["output"])
+output.to_csv(par["prediction"])
+
+
