@@ -179,8 +179,7 @@ def main(par):
     manipulate = None 
     ## read and process input data
     print('Reading input files', flush=True)
-    print('----------------work dir------------', os.getcwd())
-    print('----------------path exist------------', os.path.exists('/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/'))
+    
     perturbation_data = ad.read_h5ad(par['perturbation_data'])
     gene_names = perturbation_data.var.index.to_numpy()
     net = pd.read_csv(par['prediction'])
@@ -192,7 +191,7 @@ def main(par):
     
     # process pert data
     pert_df = pd.DataFrame(perturbation_data.layers[par['layer']], columns=gene_names)
-    if subsample is not None:
+    if subsample != -1:
         pert_df = pert_df.sample(n=subsample)
     pert_df = pert_df.T # make it gene*sample
 

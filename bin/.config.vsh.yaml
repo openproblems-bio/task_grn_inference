@@ -65,7 +65,7 @@ functionality:
     dest: "par"
   - type: "string"
     name: "--layer"
-    description: "In which layer to find the normalized data"
+    description: "Which layer of pertubation data to use to find tf-gene relationships."
     info: null
     default:
     - "lognorm"
@@ -112,8 +112,30 @@ functionality:
     - "resources/grn-benchmark/score.csv"
     must_exist: true
     create_parent: true
-    required: false
+    required: true
     direction: "output"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--reg_type"
+    description: "name of regretion to use"
+    info: null
+    default:
+    - "ridge"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "integer"
+    name: "--subsample"
+    description: "number of samples randomly drawn from perturbation data"
+    info: null
+    default:
+    - -1
+    required: false
+    direction: "input"
     multiple: false
     multiple_sep: ":"
     dest: "par"
@@ -129,25 +151,23 @@ functionality:
     is_executable: true
   - type: "file"
     path: "resources/grn-benchmark"
-    dest: "/resources/grn-benchmark"
+    dest: "resources/grn-benchmark"
   info:
-    metrics:
-    - name: "regression_1"
-      label: "Regression 1"
-      summary: "Calculates R2 score for regression 1"
-      description: "Calculates R2 score using regression approach 1."
-      repository_url: null
-      documentation_url: null
-    type: "metric"
+    label: "Regression 1"
+    summary: "Source-target links based on random assignment"
+    description: "Randomly assigns regulatory links to tf-target links with a given\
+      \ tf and target list. This is to perform near random.\n"
+    type: "metrics"
     type_info:
-      label: "Metric"
+      label: "Label"
       summary: "A metric to evaluate the performance of the inferred GRN"
+      description: "A metric to evaluate the performance of the inferred GRN\n"
   status: "enabled"
   set_wd_to_resources_dir: false
 platforms:
 - type: "docker"
   id: "docker"
-  image: "ghcr.io/openproblems-bio/base_images/python:1.1.0"
+  image: "ghcr.io/openproblems-bio/base_python:1.0.4"
   target_organization: "openproblems-bio"
   target_registry: "ghcr.io"
   namespace_separator: "/"
@@ -159,7 +179,6 @@ platforms:
   - type: "python"
     user: false
     packages:
-    - "anndata~=0.8.0"
     - "lightgbm"
     upgrade: true
   entrypoint: []
@@ -194,9 +213,8 @@ platforms:
   container: "docker"
 info:
   config: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/src/metrics/regression_1/config.vsh.yaml"
-  platform: "docker"
   output: "bin"
   executable: "bin/regression_1"
   viash_version: "0.8.0"
-  git_commit: "5ee7f182940db8dd4323e7f0a4c5b1ce4e6e8333"
+  git_commit: "d0ed2d29e0a93551d5ffa2b5d867fb4e5c8cd97d"
   git_remote: "git@github.com:openproblems-bio/task-grn-benchmark.git"

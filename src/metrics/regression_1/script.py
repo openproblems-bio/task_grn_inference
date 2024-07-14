@@ -1,20 +1,21 @@
-import anndata as ad
 import pandas as pd
+import anndata as ad
 import sys
-import os
+import numpy as np
 
-
+## VIASH START
 par = {
-  'perturbation_data': r'resources/grn-benchmark/perturbation_data.h5ad',
-  'layer': r'lognorm',
-  'prediction': r'resources/grn-benchmark/negative_control.csv',
+  "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
+  "layer": "lognorm",
+  "prediction": "resources/grn-benchmark/negative_control.csv",
   'score': r'output/score.csv',
-  'reg_type': r'ridge',
-  'subsample': 200
 }
-# meta = {
-#     "resources_dir": "src/metrics/regression_1",
-# }
+## VIASH END
+print('Reading input data')
+perturbation_data = ad.read_h5ad(par["perturbation_data"])
+et = pd.read_csv(par['prediction'])
+gene_names = perturbation_data.var_names.to_numpy()
+
 sys.path.append(meta["resources_dir"])
 from main import main 
 

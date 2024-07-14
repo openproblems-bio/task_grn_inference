@@ -1,10 +1,12 @@
 functionality:
   namespace: "metrics"
   info:
-    type: metric
+    type: metrics
     type_info:
-      label: Metric
+      label: Label
       summary: A metric to evaluate the performance of the inferred GRN
+      description: |
+        A metric to evaluate the performance of the inferred GRN
   arguments:
     - name: --perturbation_data
       __merge__: file_perturbation_h5ad.yaml
@@ -14,33 +16,28 @@ functionality:
       type: string
       direction: input
       default: lognorm
-      description: In which layer to find the normalized data
+      description: Which layer of pertubation data to use to find tf-gene relationships.
     - name: --prediction
       __merge__: file_prediction.yaml
       required: true
       direction: input
     - name: --score
       __merge__: file_score.yaml
+      required: true
       direction: output
-      required: false
-    # - name: --reg_type
-    #   desciption: Regression type
-    #   type: string
-    #   direction: input
-    #   default: GB
-    #   required: false
-    # - name: --subsample
-    #   desciption: Number of samples randomly drawn from pertubation data
-    #   direction: input
-    #   type: integer
-    #   default: -1
-    #   info:
-    #     test_default: 200
-    #   required: false
-    
-
+    - name: --reg_type
+      type: string
+      direction: input
+      default: ridge
+      description: name of regretion to use
+    - name: --subsample
+      type: integer
+      direction: input
+      default: -1
+      description: number of samples randomly drawn from perturbation data
+      
   test_resources:
     - type: python_script
       path: /src/common/component_tests/run_and_check_output.py
     - path: /resources/grn-benchmark
-      dest: /resources/grn-benchmark
+      dest: resources/grn-benchmark
