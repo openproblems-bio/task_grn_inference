@@ -425,9 +425,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2024-07-14T16:47:40+02:00"
+LABEL org.opencontainers.image.created="2024-07-15T16:10:41+02:00"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/openproblems-v2"
-LABEL org.opencontainers.image.revision="d0ed2d29e0a93551d5ffa2b5d867fb4e5c8cd97d"
+LABEL org.opencontainers.image.revision="32c058622e92018b8971f60e8aa07681e01184b3"
 LABEL org.opencontainers.image.version="dev"
 
 VIASHDOCKER

@@ -17,11 +17,13 @@ functionality:
       direction: input
       default: lognorm
       description: Which layer of pertubation data to use to find tf-gene relationships.
+      required: true
     - name: --prior_data
       __merge__: file_prior.yaml
       direction: input
       description: Prior information used for grn inference.
-    - name: --output
+      required: true
+    - name: --prediction
       __merge__: file_prediction.yaml
       required: true
       direction: output

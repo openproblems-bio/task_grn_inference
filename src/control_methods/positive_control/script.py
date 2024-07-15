@@ -9,7 +9,7 @@ par = {
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
   "layer": "lognorm",
   "prior_data":  "resources/grn-benchmark/prior_data.h5ad",
-  "output": "resources/grn-benchmark/positive_control.csv",
+  "prediction": "resources/grn-benchmark/positive_control.csv",
 }
 ## VIASH END
 print('Reading input data')
@@ -31,5 +31,5 @@ pivoted_net = net.reset_index().melt(id_vars='index', var_name='source', value_n
 pivoted_net = pivoted_net.rename(columns={'index': 'target'})
 pivoted_net = pivoted_net[pivoted_net['weight'] != 0]
 print('Saving')
-pivoted_net.to_csv(par["output"])
+pivoted_net.to_csv(par["prediction"])
 

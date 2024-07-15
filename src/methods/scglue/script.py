@@ -25,8 +25,8 @@ print('Generate predictions', flush=True)
 
 print('Write output to file', flush=True)
 output = pd.DataFrame(
-  # ... TODO: fill in data ...
-  columns=['source', 'target', 'weight']
+  data = {'source':['tf1'], 'target':['g1'], 'weight':[1]}
+  # columns=['source', 'target', 'weight']
 )
 output.to_csv(par["prediction"])
 
