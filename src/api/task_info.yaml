@@ -55,4 +55,10 @@ authors:
     info:
       github: janursa
       orcid: 0000-0002-7539-4396
+  - name: Robrecht Cannoodt
+    roles: [ author ]
+    info:
+      github: rcannood
+      orcid: "0000-0003-3641-729X"
+
 
