@@ -1,5 +1,6 @@
 import pandas as pd
 import anndata as ad
+import sys
 
 ## VIASH START
 par = {
@@ -8,26 +9,12 @@ par = {
   "prediction": "output/prediction.csv",
 }
 ## VIASH END
-
-print('Reading input files', flush=True)
-multiomics_rna = ad.read_h5ad(par["multiomics_rna"])
-multiomics_atac = ad.read_h5ad(par["multiomics_atac"])
-
-
-print('Preprocess data', flush=True)
-# ... preprocessing ...
-
-print('Train model', flush=True)
-# ... train model ...
-
-print('Generate predictions', flush=True)
-# ... generate predictions ...
+sys.path.append(meta["resources_dir"])
+from main import main 
+prediction = main(par)
 
 print('Write output to file', flush=True)
-output = pd.DataFrame(
-  data = {'source':['tf1'], 'target':['g1'], 'weight':[1]}
-  # columns=['source', 'target', 'weight']
-)
-output.to_csv(par["prediction"])
+prediction.to_csv(par["prediction"])
+
 
 

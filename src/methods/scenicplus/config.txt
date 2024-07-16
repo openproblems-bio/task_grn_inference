@@ -1,0 +1,7 @@
+- type: python
+        packages:
+          # - tensorflow~=2.14.0
+          - tensorflow-io-gcs-filesystem>=0.31.0
+          - scikit-learn~=1.2.2
+          - fastparquet~=2023.10.1
+          - git+https://github.com/scapeML/scape.git

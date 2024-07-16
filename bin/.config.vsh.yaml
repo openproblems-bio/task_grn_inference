@@ -1,13 +1,13 @@
 functionality:
-  name: "regression_1"
-  namespace: "metrics"
+  name: "scglue"
+  namespace: "methods"
   version: "dev"
   arguments:
   - type: "file"
-    name: "--perturbation_data"
+    name: "--multiomics_rna"
     info:
-      label: "perturbation"
-      summary: "Perturbation dataset for benchmarking."
+      label: "multiomics rna"
+      summary: "RNA expression for multiomics data."
       file_type: "h5ad"
       slots:
         obs:
@@ -15,47 +15,12 @@ functionality:
           type: "string"
           description: "The annotated cell type of each cell based on RNA expression."
           required: true
-        - name: "sm_name"
-          type: "string"
-          description: "The primary name for the (parent) compound (in a standardized\
-            \ representation)\nas chosen by LINCS. This is provided to map the data\
-            \ in this experiment to \nthe LINCS Connectivity Map data.\n"
-          required: true
         - name: "donor_id"
           type: "string"
           description: "Donor id"
           required: true
-        - name: "plate_name"
-          type: "string"
-          description: "Plate name 6 levels"
-          required: true
-        - name: "row"
-          type: "string"
-          description: "Row name on the plate"
-          required: true
-        - name: "well"
-          type: "string"
-          description: "Well name on the plate"
-          required: true
-        - name: "cell_count"
-          type: "string"
-          description: "Number of single cells pseudobulked"
-          required: true
-        layers:
-        - name: "n_counts"
-          type: "double"
-          description: "Pseudobulked values using mean approach"
-          required: true
-        - name: "pearson"
-          type: "double"
-          description: "Normalized values using pearson residuals"
-          required: true
-        - name: "lognorm"
-          type: "double"
-          description: "Normalized values using shifted logarithm "
-          required: true
     example:
-    - "resources/grn-benchmark/perturbation_data.h5ad"
+    - "resources/grn-benchmark/multiomics_rna.h5ad"
     must_exist: true
     create_parent: true
     required: true
@@ -63,12 +28,26 @@ functionality:
     multiple: false
     multiple_sep: ":"
     dest: "par"
-  - type: "string"
-    name: "--layer"
-    description: "Which layer of pertubation data to use to find tf-gene relationships."
-    info: null
-    default:
-    - "lognorm"
+  - type: "file"
+    name: "--multiomics_atac"
+    info:
+      label: "multiomics atac"
+      summary: "Peak data for multiomics data."
+      file_type: "h5ad"
+      slots:
+        obs:
+        - name: "cell_type"
+          type: "string"
+          description: "The annotated cell type of each cell based on RNA expression."
+          required: true
+        - name: "donor_id"
+          type: "string"
+          description: "Donor id"
+          required: true
+    example:
+    - "resources/grn-benchmark/multiomics_atac.h5ad"
+    must_exist: true
+    create_parent: true
     required: false
     direction: "input"
     multiple: false
@@ -98,44 +77,7 @@ functionality:
     must_exist: true
     create_parent: true
     required: true
-    direction: "input"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
-  - type: "file"
-    name: "--score"
-    info:
-      label: "Score"
-      summary: "File indicating the score of a metric."
-      file_type: "csv"
-    example:
-    - "resources/grn-benchmark/score.csv"
-    must_exist: true
-    create_parent: true
-    required: true
     direction: "output"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
-  - type: "string"
-    name: "--reg_type"
-    description: "name of regretion to use"
-    info: null
-    default:
-    - "ridge"
-    required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
-  - type: "integer"
-    name: "--subsample"
-    description: "number of samples randomly drawn from perturbation data"
-    info: null
-    default:
-    - -1
-    required: false
-    direction: "input"
     multiple: false
     multiple_sep: ":"
     dest: "par"
@@ -153,42 +95,58 @@ functionality:
     path: "resources/grn-benchmark"
     dest: "resources/grn-benchmark"
   info:
-    label: "Regression 1"
-    summary: "Calculates R2 score for regression 1"
-    description: "Calculates R2 score using regression approach 1.\n"
-    type: "metrics"
+    label: "Scglue"
+    summary: "FILL IN: A one sentence summary of this method."
+    description: "FILL IN: A (multi-line) description of how this method works.\n"
+    documentation_url: "https://url.to/the/documentation"
+    repository_url: "https://github.com/organisation/repository"
+    type: "methods"
     type_info:
-      label: "Label"
-      summary: "A metric to evaluate the performance of the inferred GRN"
-      description: "A metric to evaluate the performance of the inferred GRN\n"
+      label: "Method"
+      summary: "A GRN inference method"
+      description: "A method for inferring GRN from expression data.\n"
   status: "enabled"
   set_wd_to_resources_dir: false
 platforms:
 - type: "docker"
   id: "docker"
-  image: "ghcr.io/openproblems-bio/base_python:1.0.4"
-  target_organization: "openproblems-bio"
+  image: "nvcr.io/nvidia/pytorch:24.06-py3"
+  target_organization: "openproblems-bio/task_perturbation_prediction"
   target_registry: "ghcr.io"
   namespace_separator: "/"
   resolve_volume: "Automatic"
   chown: true
   setup_strategy: "ifneedbepullelsecachedbuild"
-  target_image_source: "https://github.com/openproblems-bio/openproblems-v2"
+  target_image_source: "https://github.com/openproblems-bio/task_perturbation_prediction"
   setup:
   - type: "python"
     user: false
     packages:
-    - "lightgbm"
+    - "scglue==0.3.2"
+    - "pyscenic==0.12.1"
+    - "numpy==1.23.4"
+    - "scanpy"
+    - "networkx"
+    - "pyarrow"
+    - "cytoolz"
+    - "scikit-misc"
+    - "cuda-python"
     upgrade: true
+  - type: "apt"
+    packages:
+    - "bedtools"
+    interactive: false
   entrypoint: []
   cmd: null
+- type: "native"
+  id: "native"
 - type: "nextflow"
   id: "nextflow"
   directives:
     label:
     - "midtime"
-    - "highmem"
-    - "highcpu"
+    - "midmem"
+    - "midcpu"
     tag: "$id"
   auto:
     simplifyInput: true
@@ -206,14 +164,15 @@ platforms:
       lowtime: "time = 1.h"
       midtime: "time = 4.h"
       hightime: "time = 8.h"
+      veryhightime: "time = 24.h"
     script:
     - "process.errorStrategy = 'ignore'"
   debug: false
   container: "docker"
 info:
-  config: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/src/metrics/regression_1/config.vsh.yaml"
+  config: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/src/methods/scglue/config.vsh.yaml"
   output: "bin"
-  executable: "bin/regression_1"
-  viash_version: "0.8.0"
-  git_commit: "32c058622e92018b8971f60e8aa07681e01184b3"
+  executable: "bin/scglue"
+  viash_version: "0.8.6"
+  git_commit: "5bde753316ef3f02c3e3ecae126311e7ec47bf0b"
   git_remote: "git@github.com:openproblems-bio/task-grn-benchmark.git"
