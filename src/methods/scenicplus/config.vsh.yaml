@@ -1,18 +1,18 @@
 __merge__: ../../api/comp_method.yaml
 
 functionality:
-  name: dummy
+  name: scenicplus
   info:
-    label: dummy
-    summary: "FILL IN: A one sentence summary of this method."
+    label: scenicplus
+    summary: "GRN inference using scenicplus"
     description: |
-      FILL IN: A (multi-line) description of how this method works.
-    documentation_url: https://url.to/the/documentation
-    repository_url: https://github.com/organisation/repository
+      GRN inference using scenicplus
+    documentation_url: https://scenicplus.readthedocs.io/en/latest/pbmc_multiome_tutorial.html
 
   resources:
     - type: python_script
       path: script.py
+    - path: main.py
 
 platforms:
   - type: docker
@@ -20,6 +20,9 @@ platforms:
     setup:
       - type: python
         packages: [  ]
+      - type: python
+        git: [ https://github.com/aertslab/scenicplus ]
+
 
   - type: native
   - type: nextflow

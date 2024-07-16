@@ -1,6 +1,6 @@
 resources/
 output/
-bin/
+bin*
 __pycache__/
 
 .$*

@@ -1,4 +1,4 @@
-__merge__: ../../api/comp_method.yaml
+# __merge__: ../../api/comp_method.yaml
 
 functionality:
   name: scglue
@@ -8,11 +8,57 @@ functionality:
     description: |
       GRN inference using scglue. 
     documentation_url: https://scglue.readthedocs.io/
+  arguments:
+    - name: --multiomics_rna
+      __merge__: ../../api/file_multiomics_rna_h5ad.yaml
+      required: True
+      direction: input
+    - name: --multiomics_atac
+      __merge__: ../../api/file_multiomics_atac_h5ad.yaml
+      required: false
+      direction: input
+    - name: --prediction
+      __merge__: ../../api/file_prediction.yaml
+      required: true
+      direction: output
 
+    - name: --annotation_file
+      type: file
+      example: resources/grn-benchmark/gencode.v45.annotation.gtf.gz
+      info:
+        label: annotation
+        summary: "annotation file"
+        file_type: gtf.gz
+        columns: 
+          - name: gene_name
+            type: string
+            required: false
+          - name: annotation
+            type: string
+            required: false
+      required: true
+      direction: input
+    - name: --motif_file
+      type: file
+      example: resources/grn-benchmark/JASPAR2022-hg38.bed.gz
+      info:
+        label: tfmotif
+        summary: "Tf motif info"
+        file_type: bed.gz
+        columns: 
+          - name: tf_name
+            type: string
+            required: false
+          - name: region
+            type: string
+            required: false
+      required: true
+      direction: input
   resources:
     - type: python_script
       path: script.py
     - path: main.py
+    - path: gencode.v45.annotation.gtf.gz
 
 platforms:
   - type: docker

@@ -1,3 +1,4 @@
+import sys
 import anndata as ad
 import networkx as nx
 import scanpy as sc
@@ -10,7 +11,7 @@ import numpy as np
 from ast import literal_eval
 
 
-def preprocess(rna, atac):
+def preprocess(rna, atac, par):
     rna.layers["counts"] = rna.X.copy()
     sc.pp.highly_variable_genes(rna, n_top_genes=2000, flavor="seurat_v3")
     sc.pp.normalize_total(rna)
@@ -23,9 +24,11 @@ def preprocess(rna, atac):
     scglue.data.lsi(atac, n_components=100, n_iter=15)
     sc.pp.neighbors(atac, use_rep="X_lsi", metric="cosine")
     sc.tl.umap(atac)
+
+
     
     scglue.data.get_gene_annotation(
-        rna, gtf=f"{input_dir}/gencode.v45.annotation.gtf.gz",
+        rna, gtf=par['annotation_file'],
         gtf_by="gene_name"
     )
     
@@ -64,7 +67,7 @@ def preprocess(rna, atac):
     atac.write(f'{temp_dir}/atac.h5ad')
     nx.write_graphml(guidance, f'{temp_dir}/guidance.graphml.gz')
 
-def training():
+def training(par):
     rna = ad.read_h5ad(f"{temp_dir}/rna.h5ad")
     atac = ad.read_h5ad(f"{temp_dir}/atac.h5ad")
     guidance = nx.read_graphml(f"{temp_dir}/guidance.graphml.gz")
@@ -103,7 +106,7 @@ def training():
     nx.write_graphml(guidance, f"{temp_dir}/guidance.graphml.gz")
     
 
-def cis_inference():
+def cis_inference(par):
     ''' Infers gene2peak connections
     '''
     rna = ad.read_h5ad(f"{temp_dir}/rna-emb.h5ad")
@@ -146,7 +149,7 @@ def cis_inference():
 
 
 
-    motif_bed = scglue.genomics.read_bed(f"{input_dir}/JASPAR2022-hg38.bed.gz") ## http://download.gao-lab.org/GLUE/cisreg/JASPAR2022-hg38.bed.gz
+    motif_bed = scglue.genomics.read_bed(par['motif_file']) ## http://download.gao-lab.org/GLUE/cisreg/JASPAR2022-hg38.bed.gz
     tfs = pd.Index(motif_bed["name"]).intersection(rna.var_names)
     rna[:, np.union1d(genes, tfs)].write_loom(f"{temp_dir}/rna.loom")
     np.savetxt(f"{temp_dir}/tfs.txt", tfs, fmt="%s")
@@ -243,10 +246,10 @@ def main(par):
     rna = ad.read_h5ad(par['multiomics_rna'])
     atac = ad.read_h5ad(par['multiomics_atac'])
     print('Preprocess data', flush=True)
-    preprocess(rna, atac)
+    preprocess(rna, atac, par)
     print('Train a model', flush=True)
-    # training()
-    # cis_inference()
+    # training(par)
+    # cis_inference(par)
     print('Curate predictions', flush=True)
     # df = pd.read_csv(
     #     f"{temp_dir}/pruned_grn.csv", header=None, skiprows=3,
