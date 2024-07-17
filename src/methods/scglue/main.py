@@ -174,7 +174,7 @@ def cis_inference(par):
         print("Command failed with return code", result.returncode)
 
 
-    ## Generate TF cis-regulatory ranking bridged by ATAC peaks
+    print("Generate TF cis-regulatory ranking bridged by ATAC peaks", flush=True)
     peak_bed = scglue.genomics.Bed(atac.var.loc[peaks])
     peak2tf = scglue.genomics.window_graph(peak_bed, motif_bed, 0, right_sorted=True)
     peak2tf = peak2tf.edge_subgraph(e for e in peak2tf.edges if e[1] in tfs)
@@ -218,6 +218,7 @@ def cis_inference(par):
 
     # Construct the command 
     #TODO: be sure that obs_id is in obs and name is in var
+    print("Run pscenic ctx", flush=True)
     command = (
         f" pyscenic ctx {par['temp_dir']}/draft_grn.csv {par['temp_dir']}/glue.genes_vs_tracks.rankings.feather "
         f" {par['temp_dir']}/supp.genes_vs_tracks.rankings.feather  --annotations_fname {par['temp_dir']}/ctx_annotation.tsv "

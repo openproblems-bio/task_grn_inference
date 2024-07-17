@@ -24,7 +24,7 @@ functionality:
 
     - name: --annotation_file
       type: file
-      example: resources/grn-benchmark/gencode.v45.annotation.gtf.gz
+      example: resources/grn-benchmark/supp/gencode.v45.annotation.gtf.gz
       info:
         label: annotation
         summary: "annotation file"
@@ -40,7 +40,7 @@ functionality:
       direction: input
     - name: --motif_file
       type: file
-      example: resources/grn-benchmark/JASPAR2022-hg38.bed.gz
+      example: resources/grn-benchmark/supp/JASPAR2022-hg38.bed.gz
       info:
         label: tfmotif
         summary: "Tf motif info"

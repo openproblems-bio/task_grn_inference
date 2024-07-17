@@ -1,4 +1,4 @@
-__merge__: ../../api/comp_method.yaml
+# __merge__: ../../api/comp_method.yaml
 
 functionality:
   name: figr
@@ -8,17 +8,57 @@ functionality:
     description: |
       GRN inference using figr.
     documentation_url: https://buenrostrolab.github.io/FigR/articles/FigR_shareseq.html
+  arguments:
+    - name: --multiomics_rna
+      __merge__: ../../api/file_multiomics_rna_h5ad.yaml
+      required: True
+      direction: input
+    - name: --multiomics_atac
+      __merge__: ../../api/file_multiomics_atac_h5ad.yaml
+      required: false
+      direction: input
+    - name: --prediction
+      __merge__: ../../api/file_prediction.yaml
+      required: true
+      direction: output
+    
+    - name: --cell_topic
+      type: file
+      example: resources/grn-benchmark/supp/cell_topic.csv
+      info:
+        label: Cell topic probability database
+        summary: "annotation file"
+        file_type: csv
+        columns: 
+          - name: topic
+            type: string
+            required: false
 
+
+    - name: --temp_dir
+      type: string
+      direction: input
+    - name: --num_workers
+      type: integer
+      direction: input
+      default: 4
+    - name: --n_topics
+      type: integer 
+      direction: input
+      default: 48
   resources:
-    - type: r_script
-      path: script.R
+    - type: python_script
+      path: script.py
+    - path: format_data.py
+    - path: format_data_r.R
+    - path: r_script.R
 
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_r:1.0.2
-    setup:
-      - type: r
-        packages: tidyverse
+    # setup:
+    #   - type: r
+    #     packages: [dplyr, FNN, chromVAR, doParallel, BuenColors, FigR, BSgenome.Hsapiens.UCSC.hg38]
 
   - type: native
   - type: nextflow
