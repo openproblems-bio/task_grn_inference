@@ -8,6 +8,8 @@ par = {
   "multiomics_atac": "resources/grn-benchmark/multiomics_atac.h5ad",
   "motif_file": "resources/grn-benchmark/JASPAR2022-hg38.bed.gz",
   "annotation_file": "resources/grn-benchmark/gencode.v45.annotation.gtf.gz",
+  "temp_dir": 'output/temp_scglue/',
+  "num_workers": 4,
   "prediction": "output/prediction.csv",
 }
 ## VIASH END

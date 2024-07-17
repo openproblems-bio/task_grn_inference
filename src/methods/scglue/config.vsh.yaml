@@ -54,11 +54,18 @@ functionality:
             required: false
       required: true
       direction: input
+    - name: --temp_dir
+      type: string
+      direction: input
+    - name: --num_workers
+      type: integer
+      direction: input
+      default: 4
+      
   resources:
     - type: python_script
       path: script.py
     - path: main.py
-    - path: gencode.v45.annotation.gtf.gz
 
 platforms:
   - type: docker
