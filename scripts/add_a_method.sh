@@ -8,7 +8,7 @@ echo "Please run the script step-by-step."
 # scripts/download_resources.sh
 
 # create a new component
-method_id="scglue"
+method_id="dummy"
 method_lang="python" # change this to "r" if need be
 
 viash run src/common/create_component/config.vsh.yaml -- \
@@ -34,9 +34,9 @@ viash run src/methods/$method_id/config.vsh.yaml -- \
 
 # run evaluation metric
 viash run src/metrics/regression_1/config.vsh.yaml -- \
-  --perturbation_h5ad "resources/grn-benchmark/perturbation.h5ad" \
+  --perturbation_file "resources/grn-benchmark/perturbation_file.h5ad" \
   --prediction "output/prediction.csv" \
-  --output "output/score.h5ad"
+  --output "output/score.csv"
 
 # print score on kaggle test dataset
-python -c 'import anndata; print(anndata.read_h5ad("output/score.h5ad").uns)'
+python -c 'import pandas as pd; print(pd.read_csv("output/score.csv"))'

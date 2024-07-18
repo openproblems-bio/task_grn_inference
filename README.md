@@ -19,14 +19,7 @@ You need to have Docker, Java, and Viash installed. Follow [these
 instructions](https://openproblems.bio/documentation/fundamentals/requirements)
 to install the required dependencies.
 
-## Add a method
-
-To add a method to the repository, follow the instructions in the
-`scripts/add_a_method.sh` script.
-
-## Frequently used commands
-
-To get started, you can run the following commands:
+## Download resources
 
 ``` bash
 git clone git@github.com:openproblems-bio/task_grn_benchmark.git
@@ -37,28 +30,26 @@ cd task_grn_benchmark
 scripts/download_resources.sh
 ```
 
-To run the benchmark, you first need to build the components.
-Afterwards, you can run the benchmark:
+## Infer a GRN
 
 ``` bash
-viash ns build --parallel --setup cachedbuild
-
-scripts/run_benchmark.sh
+viash run src/methods/dummy/config.vsh.yaml -- --multiomics_rna resources/grn-benchmark/multiomics_rna.h5ad --multiomics_atac resources/grn-benchmark/multiomics_atac.h5ad --prediction output/dummy.csv
 ```
 
-After adding a component, it is recommended to run the tests to ensure
-that the component is working correctly:
+Similarly, run the command for other methods.
+
+## Evaluate a GRN
 
 ``` bash
-viash ns test --parallel
+scripts/benchmark_grn.sh --grn resources/grn-benchmark/models/collectri.csv 
 ```
 
-Optionally, you can provide the `--query` argument to test only a subset
-of components:
+Similarly, run the command for other GRN models.
 
-``` bash
-viash ns test --parallel --query "component_name"
-```
+## Add a method
+
+To add a method to the repository, follow the instructions in the
+`scripts/add_a_method.sh` script.
 
 ## Motivation
 
@@ -207,7 +198,6 @@ Arguments:
 | Name | Type | Description |
 |:---|:---|:---|
 | `--perturbation_data` | `file` | Perturbation dataset for benchmarking. |
-| `--layer` | `string` | (*Optional*) Which layer of pertubation data to use to find tf-gene relationships. Default: `lognorm`. |
 | `--prediction` | `file` | GRN prediction. |
 | `--score` | `file` | (*Output*) File indicating the score of a metric. |
 | `--reg_type` | `string` | (*Optional*) name of regretion to use. Default: `ridge`. |

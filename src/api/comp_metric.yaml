@@ -12,11 +12,6 @@ functionality:
       __merge__: file_perturbation_h5ad.yaml
       required: true
       direction: input
-    - name: --layer
-      type: string
-      direction: input
-      default: lognorm
-      description: Which layer of pertubation data to use to find tf-gene relationships.
     - name: --prediction
       __merge__: file_prediction.yaml
       required: true

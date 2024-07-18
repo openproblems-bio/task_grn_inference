@@ -13,9 +13,9 @@ par = {
   "prediction": "output/prediction.csv",
 }
 ## VIASH END
-meta = {
-  "resources_dir":'resources'
-}
+# meta = {
+#   "resources_dir":'resources'
+# }
 
 sys.path.append(meta["resources_dir"])
 from main import main 

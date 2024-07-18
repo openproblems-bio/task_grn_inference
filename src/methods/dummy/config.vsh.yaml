@@ -6,7 +6,7 @@ functionality:
     label: dummy
     summary: "FILL IN: A one sentence summary of this method."
     description: |
-      FILL IN: A (multi-line) description of how this method works.
+      A dummy method that contains the format of a real GRN inference method.
     documentation_url: https://url.to/the/documentation
     repository_url: https://github.com/organisation/repository
 

@@ -1,13 +1,13 @@
 functionality:
-  name: "scenicplus"
-  namespace: "methods"
+  name: "regression_1"
+  namespace: "metrics"
   version: "dev"
   arguments:
   - type: "file"
-    name: "--multiomics_rna"
+    name: "--perturbation_data"
     info:
-      label: "multiomics rna"
-      summary: "RNA expression for multiomics data."
+      label: "perturbation"
+      summary: "Perturbation dataset for benchmarking."
       file_type: "h5ad"
       slots:
         obs:
@@ -15,40 +15,50 @@ functionality:
           type: "string"
           description: "The annotated cell type of each cell based on RNA expression."
           required: true
+        - name: "sm_name"
+          type: "string"
+          description: "The primary name for the (parent) compound (in a standardized\
+            \ representation)\nas chosen by LINCS. This is provided to map the data\
+            \ in this experiment to \nthe LINCS Connectivity Map data.\n"
+          required: true
         - name: "donor_id"
           type: "string"
           description: "Donor id"
           required: true
+        - name: "plate_name"
+          type: "string"
+          description: "Plate name 6 levels"
+          required: true
+        - name: "row"
+          type: "string"
+          description: "Row name on the plate"
+          required: true
+        - name: "well"
+          type: "string"
+          description: "Well name on the plate"
+          required: true
+        - name: "cell_count"
+          type: "string"
+          description: "Number of single cells pseudobulked"
+          required: true
+        layers:
+        - name: "n_counts"
+          type: "double"
+          description: "Pseudobulked values using mean approach"
+          required: true
+        - name: "pearson"
+          type: "double"
+          description: "Normalized values using pearson residuals"
+          required: true
+        - name: "lognorm"
+          type: "double"
+          description: "Normalized values using shifted logarithm "
+          required: true
     example:
-    - "resources/grn-benchmark/multiomics_rna.h5ad"
+    - "resources/grn-benchmark/perturbation_data.h5ad"
     must_exist: true
     create_parent: true
     required: true
-    direction: "input"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
-  - type: "file"
-    name: "--multiomics_atac"
-    info:
-      label: "multiomics atac"
-      summary: "Peak data for multiomics data."
-      file_type: "h5ad"
-      slots:
-        obs:
-        - name: "cell_type"
-          type: "string"
-          description: "The annotated cell type of each cell based on RNA expression."
-          required: true
-        - name: "donor_id"
-          type: "string"
-          description: "Donor id"
-          required: true
-    example:
-    - "resources/grn-benchmark/multiomics_atac.h5ad"
-    must_exist: true
-    create_parent: true
-    required: false
     direction: "input"
     multiple: false
     multiple_sep: ":"
@@ -77,7 +87,55 @@ functionality:
     must_exist: true
     create_parent: true
     required: true
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--score"
+    info:
+      label: "Score"
+      summary: "File indicating the score of a metric."
+      file_type: "csv"
+      columns:
+      - type: "string"
+        name: "accuracy"
+        description: "some explanation"
+        multiple: true
+        required: false
+      - type: "double"
+        name: "completeness"
+        description: "some explanation"
+        multiple: true
+        required: false
+    example:
+    - "resources/grn-benchmark/score.csv"
+    must_exist: true
+    create_parent: true
+    required: true
     direction: "output"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--reg_type"
+    description: "name of regretion to use"
+    info: null
+    default:
+    - "ridge"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "integer"
+    name: "--subsample"
+    description: "number of samples randomly drawn from perturbation data"
+    info: null
+    default:
+    - -1
+    required: false
+    direction: "input"
     multiple: false
     multiple_sep: ":"
     dest: "par"
@@ -95,15 +153,14 @@ functionality:
     path: "resources/grn-benchmark"
     dest: "resources/grn-benchmark"
   info:
-    label: "scenicplus"
-    summary: "GRN inference using scenicplus"
-    description: "GRN inference using scenicplus\n"
-    documentation_url: "https://scenicplus.readthedocs.io/en/latest/pbmc_multiome_tutorial.html"
-    type: "methods"
+    label: "Regression 1"
+    summary: "Calculates R2 score for regression 1"
+    description: "Calculates R2 score using regression approach 1.\n"
+    type: "metrics"
     type_info:
-      label: "Method"
-      summary: "A GRN inference method"
-      description: "A method for inferring GRN from expression data.\n"
+      label: "Label"
+      summary: "A metric to evaluate the performance of the inferred GRN"
+      description: "A metric to evaluate the performance of the inferred GRN\n"
   status: "enabled"
   set_wd_to_resources_dir: false
 platforms:
@@ -120,23 +177,18 @@ platforms:
   setup:
   - type: "python"
     user: false
-    upgrade: true
-  - type: "python"
-    user: false
-    git:
-    - "https://github.com/aertslab/scenicplus"
+    packages:
+    - "lightgbm"
     upgrade: true
   entrypoint: []
   cmd: null
-- type: "native"
-  id: "native"
 - type: "nextflow"
   id: "nextflow"
   directives:
     label:
     - "midtime"
-    - "midmem"
-    - "midcpu"
+    - "highmem"
+    - "highcpu"
     tag: "$id"
   auto:
     simplifyInput: true
@@ -160,9 +212,10 @@ platforms:
   debug: false
   container: "docker"
 info:
-  config: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/src/methods/scenicplus/config.vsh.yaml"
+  config: "/mnt/c/Users/nourisa/Documents/testProjs/ongoing/task-grn-benchmark/src/metrics/regression_1/config.vsh.yaml"
+  platform: "docker"
   output: "bin"
-  executable: "bin/scenicplus"
+  executable: "bin/regression_1"
   viash_version: "0.8.6"
-  git_commit: "5a301da9421f0a5a7526fd64eaa807b396e11ef3"
+  git_commit: "7205b423dc7461a945817976719ed5ecbad3b3ae"
   git_remote: "git@github.com:openproblems-bio/task-grn-benchmark.git"

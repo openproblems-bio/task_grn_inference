@@ -15,16 +15,9 @@ readme: |
 
   You need to have Docker, Java, and Viash installed. Follow
   [these instructions](https://openproblems.bio/documentation/fundamentals/requirements)
-  to install the required dependencies.
+  to install the required dependencies. 
 
-  ## Add a method
-
-  To add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.
-
-  ## Frequently used commands
-  
-  To get started, you can run the following commands:
-
+  ## Download resources
   ```bash
   git clone git@github.com:openproblems-bio/task_grn_benchmark.git
 
@@ -33,27 +26,27 @@ readme: |
   # download resources
   scripts/download_resources.sh
   ```
+  ## Infer a GRN 
 
-  To run the benchmark, you first need to build the components. Afterwards, you can run the benchmark:
+  ```bash
+  viash run src/methods/dummy/config.vsh.yaml -- --multiomics_rna resources/grn-benchmark/multiomics_rna.h5ad --multiomics_atac resources/grn-benchmark/multiomics_atac.h5ad --prediction output/dummy.csv
+
+  ```
+  Similarly, run the command for other methods.
   
+  ## Evaluate a GRN
   ```bash
-  viash ns build --parallel --setup cachedbuild
+  scripts/benchmark_grn.sh --grn resources/grn-benchmark/models/collectri.csv 
 
-  scripts/run_benchmark.sh
   ```
 
-  After adding a component, it is recommended to run the tests to ensure that the component is working correctly:
+  Similarly, run the command for other GRN models.
+ 
+  ## Add a method
 
-  ```bash
-  viash ns test --parallel
-  ```
+  To add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.
+
   
-  Optionally, you can provide the `--query` argument to test only a subset of components:
-
-  ```bash
-  viash ns test --parallel --query "component_name"
-  ```
-
 authors:
   - name: Jalil Nourisa
     roles: [ author ]
