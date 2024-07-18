@@ -11,12 +11,12 @@ library(BSgenome.Hsapiens.UCSC.hg38)
 par <- list(
   multiomics_rna = "resources_test/grn-benchmark/multiomics_r/rna.rds",
   multiomics_atac = "resources_test/grn-benchmark/multiomics_r/atac.rds",
-  temp_dir =  "output/temp_figr/",
+  temp_dir =  "output/figr/",
   cell_topic = "resources/grn-benchmark/supp/cell_topic.csv",
-  num_workers = 4,
+  num_workers = 40,
   n_topics = 48,
-  cisCorr = "output/figr/cisCorr.csv",
-  prediction= "output/prediction.csv"
+  peak_gene = "output/figr/peak_gene.csv",
+  prediction= "output/figr/prediction.csv"
 )
 # meta <- list(
 #   functionality_name = "my_method_r"
@@ -34,6 +34,7 @@ cellknn_func <- function(par) {
   saveRDS(cellkNN, paste0(par$temp_dir, "cellkNN.rds"))
 }
 
+
 ## Step1: Peak-gene association testing
 peak_gene_func <- function(par){
   atac = readRDS(par$multiomics_atac)
@@ -48,7 +49,7 @@ peak_gene_func <- function(par){
 }
 
 ## Step 2: create DORCs and smooth them 
-dorc_genes_func <- functions(par){
+dorc_genes_func <- function(par){
   cisCorr = read.csv(paste0(par$temp_dir, "cisCorr.csv"))
   cisCorr.filt <- cisCorr %>% filter(pvalZ <= 0.05)
 
@@ -71,19 +72,11 @@ dorc_genes_func <- functions(par){
   RNAmat.s <- smoothScoresNN(NNmat = cellkNN[,1:n_topics], mat = rna,nCores = 4)
 
   # get peak gene connection
-  peak_gene_figr = cisCorr.filt
-  # peak_gene_figr_n = peak_gene_figr.groupby('Gene').apply(lambda df:df['PeakRanges'].shape[0])
-  # np.max(peak_gene_figr_n.values), np.median(peak_gene_figr_n.values)
-  # print('In the peak-gene associations: number of  CIS ', peak_gene_figr.PeakRanges.unique().shape[0], ', gene ', peak_gene_figr.Gene.unique().shape[0])
-  # print('number of DORC genes ', (peak_gene_figr_n.values >= 10).sum())
-  # peak_gene_figr = peak_gene_figr[['PeakRanges', 'Gene']]
-  # peak_gene_figr.columns = ['peak','target']
-  # peak_gene_figr.to_csv(f'{out_dir}/infer/figr/peak_gene.csv')
-
   write.csv(cisCorr.filt, paste0(par$temp_dir, "cisCorr.filt.csv"))
   saveRDS(RNAmat.s, paste0(par$temp_dir, "RNAmat.s.RDS"))
   saveRDS(dorcMat.s, paste0(par$temp_dir, "dorcMat.s.RDS"))
 }
+
 ## TF-gene associations
 tf_gene_association_func <- function(par){
   cisCorr.filt = read.csv(paste0(par$temp_dir, "cisCorr.filt.csv"))
@@ -98,19 +91,62 @@ tf_gene_association_func <- function(par){
                       rnaMat = RNAmat.s, 
                       nCores = par$num_workers)
 
-  # write.csv(figR.d, paste0(out_dir, "/infer/figr/grn/figR.d.csv"))
+  write.csv(figR.d, paste0(par$temp_dir, "figR.d.csv"))
 }
 
+extract_peak_gene_func <- function(par) {
+  # Read the CSV file
+  peak_gene_figr <- read.csv(file.path(par$temp_dir, "cisCorr.filt.csv"))
+  
+  # Calculate the number of peak ranges for each gene
+  peak_gene_figr_n <- aggregate(PeakRanges ~ Gene, data = peak_gene_figr, length)
+  
+  # Calculate the max and median values
+  max_peak_gene_figr_n <- max(peak_gene_figr_n$PeakRanges)
+  median_peak_gene_figr_n <- median(peak_gene_figr_n$PeakRanges)
+  
+  # Print the results
+  cat("In the peak-gene associations: number of CIS", length(unique(peak_gene_figr$PeakRanges)), 
+      ", gene", length(unique(peak_gene_figr$Gene)), "\n")
+  cat("Number of DORC genes", sum(peak_gene_figr_n$PeakRanges >= 10), "\n")
+  
+  # Select relevant columns and rename them
+  peak_gene_figr <- peak_gene_figr[, c("PeakRanges", "Gene")]
+  colnames(peak_gene_figr) <- c("peak", "target")
+  
+  # Write the result to a CSV file
+  write.csv(peak_gene_figr, file = par$peak_gene, row.names = FALSE)
+}
 
+filter_figr_grn <- function(par) {
+  # Read the CSV file
+  figr_grn <- read.csv(file.path(par$temp_dir, "figR.d.csv"))
+  
+  # Filter based on enrichment
+  figr_grn <- subset(figr_grn, Enrichment.P < 0.05)
+  
+  # Filter based on correlation
+  figr_grn <- subset(figr_grn, Corr.P < 0.05)
+  
+  # Filter those that have a Score of 0
+  figr_grn <- subset(figr_grn, Score != 0)
+  
+  # Subset columns
+  figr_grn <- figr_grn[, c("Motif", "DORC", "Score")]
+  
+  # Reset row names (equivalent to resetting the index in Python)
+  rownames(figr_grn) <- NULL
+  
+  # Rename columns
+  colnames(figr_grn) <- c("source", "target", "weight")
+  
+  # Write the result to a CSV file
+  write.csv(figr_grn, file = par$prediction, row.names = FALSE)
+}
 
-# filter based on enrichment 
-figr_grn = figr_grn[figr_grn['Enrichment.P']<0.05]
-# filter bsaed on correlatoon
-figr_grn = figr_grn[figr_grn['Corr.P']<0.05]
-# filter thoes that are 0 score 
-figr_grn = figr_grn[figr_grn.Score!=0]
-# subset columns
-figr_grn = figr_grn[['Motif', 'DORC', 'Score']]
-figr_grn = figr_grn.reset_index(drop=True)
-figr_grn.columns = ['source', 'target','weight']
-figr_grn.to_csv(f'{out_dir}/infer/figr/grn/figr_grn.csv')
+cellknn_func(par)
+peak_gene_func(par)
+dorc_genes_func(par)
+tf_gene_association_func(par)
+extract_peak_gene_func(par)
+filter_figr_grn(par)
