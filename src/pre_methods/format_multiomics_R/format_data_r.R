@@ -5,23 +5,12 @@ library(doParallel)
 library(FigR)
 library(optparse)
 
-
-# Define the command line arguments
-option_list <- list(
-  make_option(c("--temp_dir"), type = "character", help = "Temporary directory to write the file"),
-  make_option(c("--cell_topic"), type = "character", help = "Cell topic value")
+# Example usage
+par <- list(
+    temp_dir = 'output/figr',
+    rna_rds = 'resources/grn-benchmark/multiomics_r/rna.rds',
+    atac_rds = 'resources/grn-benchmark/multiomics_r/atac.rds'
 )
-
-# Parse the command line arguments
-opt_parser <- OptionParser(option_list = option_list)
-opt <- parse_args(opt_parser)
-
-# Extract all arguments
-args <- commandArgs(trailingOnly = TRUE)
-args_list <- list()
-for (i in seq(1, length(args), by = 2)) {
-  args_list[[gsub("--", "", args[i])]] <- args[i + 1]
-}
 
 
 ## Load atac-seq and create summarizedexperiment
@@ -46,7 +35,7 @@ colnames(atac) <- annotation_cells$obs_id
 
 dim(atac) #peaks*cells
 
-saveRDS(atac, paste0(par$temp_dir, "/scATAC/atac.rds"))
+saveRDS(atac, par$atac_rds)
 
 
 
@@ -65,16 +54,8 @@ rna <- rna[Matrix::rowSums(rna)!=0,]
 
 dim(rna) # genes*cells
 
-saveRDS(rna, paste0(par$temp_dir, "/scRNA/rna.rds"))
+saveRDS(rna, par$rna_rds)
 
 
-## load cell topic probabilities and create cell-cluster matrix
-cell_topic <- read.csv(paste0(par$cell_topic), row.names = 1)
-print(dim(cell_topic))
-# Derive cell kNN using this
-cellkNN <- get.knn(cell_topic, k=n_topics)$nn.index
-rownames(cellkNN) <- rownames(cell_topic)
-print(dim(cellkNN))
 
-saveRDS(cellkNN, paste0(par$temp_dir, "cellkNN.rds"))
 

@@ -244,16 +244,16 @@ def main(par):
     
     os.makedirs(par['temp_dir'], exist_ok=True)
     print('Reading input files', flush=True)
-    rna = ad.read_h5ad(par['multiomics_rna'])
-    atac = ad.read_h5ad(par['multiomics_atac'])
+    # rna = ad.read_h5ad(par['multiomics_rna'])
+    # atac = ad.read_h5ad(par['multiomics_atac'])
 
-    rna = rna[rna.obs.donor_id=='donor_0',:1000]
-    atac = atac[atac.obs.donor_id=='donor_0', :10000]
+    # rna = rna[rna.obs.donor_id=='donor_0',:1000]
+    # atac = atac[atac.obs.donor_id=='donor_0', :10000]
 
-    print('Preprocess data', flush=True)
-    preprocess(rna, atac, par)
-    print('Train a model', flush=True)
-    training(par)
+    # print('Preprocess data', flush=True)
+    # preprocess(rna, atac, par)
+    # print('Train a model', flush=True)
+    # training(par)
     cis_inference(par)
     print('Curate predictions', flush=True)
     df = pd.read_csv(

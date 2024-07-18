@@ -2,7 +2,7 @@ import pandas as pd
 import anndata as ad
 import sys
 import subprocess
-
+import os
 
 ## VIASH START
 par = {
@@ -17,6 +17,7 @@ par = {
 # meta = {
 #   "resources_dir":'resources'
 # }
+print('\n',par)
 
 sys.path.append(meta["resources_dir"])
 print("Formating input data")

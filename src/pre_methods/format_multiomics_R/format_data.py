@@ -6,6 +6,12 @@ import pandas as pd
 import numpy as np
 from scipy.io import mmwrite
 
+par = {
+  "multiomics_rna": "resources/grn-benchmark/multiomics_rna.h5ad",
+  "multiomics_atac": "resources/grn-benchmark/multiomics_atac.h5ad",
+  "temp_dir": 'output/figr'
+
+}
 
 def format_data(par):
     os.makedirs(f"{par['temp_dir']}/scATAC/", exist_ok=True)
@@ -15,9 +21,6 @@ def format_data(par):
     print('Reading input files', flush=True)
     rna = ad.read_h5ad(par['multiomics_rna'])
     atac = ad.read_h5ad(par['multiomics_atac'])
-
-    rna = rna[rna.obs.donor_id=='donor_0',:1000]
-    atac = atac[atac.obs.donor_id=='donor_0', :10000]
 
     # save sparse matrix
     mmwrite(f"{par['temp_dir']}/scATAC/X_matrix.mtx", atac.X)
@@ -37,8 +40,10 @@ def format_data(par):
     annotation_gene = rna.var.reset_index()
     annotation_gene.to_csv(f"{par['temp_dir']}/scRNA/annotation_gene.csv")
 
+
     annotation_cells = rna.obs.reset_index()[['obs_id','cell_type']]
     annotation_cells.to_csv(f"{par['temp_dir']}/scRNA/annotation_cells.csv")
 
     print('Format data completed', flush=True)
-   
+
+format_data(par)

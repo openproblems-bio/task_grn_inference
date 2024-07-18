@@ -10,13 +10,27 @@ functionality:
     documentation_url: https://buenrostrolab.github.io/FigR/articles/FigR_shareseq.html
   arguments:
     - name: --multiomics_rna
-      __merge__: ../../api/file_multiomics_rna_h5ad.yaml
-      required: True
-      direction: input
+      type: file
+      example: resources/grn-benchmark/multiomics_r/rna.rds
+      info:
+        label: multiomics_rna
+        summary: "Multiomics rna in rds format"
+        file_type: rds
+        columns: 
+          - name: dummpy
+            type: string
+            required: false
     - name: --multiomics_atac
-      __merge__: ../../api/file_multiomics_atac_h5ad.yaml
-      required: false
-      direction: input
+      type: file
+      example: resources/grn-benchmark/multiomics_r/atac.rds
+      info:
+        label: multiomics_atac
+        summary: "Multiomics atac in rds format"
+        file_type: rds
+        columns: 
+          - name: dummpy
+            type: string
+            required: false
     - name: --prediction
       __merge__: ../../api/file_prediction.yaml
       required: true
@@ -34,7 +48,6 @@ functionality:
             type: string
             required: false
 
-
     - name: --temp_dir
       type: string
       direction: input
@@ -47,18 +60,16 @@ functionality:
       direction: input
       default: 48
   resources:
-    - type: python_script
-      path: script.py
-    - path: format_data.py
-    - path: format_data_r.R
-    - path: r_script.R
+    - type: r_script
+      path: script.R
+
 
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_r:1.0.2
-    # setup:
-    #   - type: r
-    #     packages: [dplyr, FNN, chromVAR, doParallel, BuenColors, FigR, BSgenome.Hsapiens.UCSC.hg38]
+    setup:
+      - type: r
+        packages: [dplyr, FNN, chromVAR, doParallel, BuenColors, FigR, BSgenome.Hsapiens.UCSC.hg38]
 
   - type: native
   - type: nextflow
