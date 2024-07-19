@@ -5,6 +5,8 @@
 resources/
 resources_test/
 output/
+target/
+local/
 
 # related to python
 .ipynb_checkpoints
