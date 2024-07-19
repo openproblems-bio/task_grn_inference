@@ -15,7 +15,7 @@ functionality:
       direction: input
 
   resources:
-    - type: r_python
+    - type: r_script
       path: script.R
 
 
