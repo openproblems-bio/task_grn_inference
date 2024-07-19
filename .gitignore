@@ -1,8 +1,24 @@
+# mac os x
 .DS_Store
+
+# related to files
 resources/
+resources_test/
 output/
-bin*
-bin/
+
+# related to python
+.ipynb_checkpoints
 __pycache__/
 
+# ?
 .$*
+bin*
+bin/
+
+# related to nextflow
+work
+.nextflow*
+
+# IDE related
+.idea
+.vscode
