@@ -1,0 +1,152 @@
+functionality:
+  name: "create_component"
+  namespace: "common"
+  version: "build-main"
+  arguments:
+  - type: "string"
+    name: "--type"
+    description: "What kind of component to create. Options are method or metric."
+    info: null
+    default:
+    - "method"
+    required: false
+    choices:
+    - "method"
+    - "metric"
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--language"
+    description: "Which scripting language to use. Options are 'python', 'r'."
+    info: null
+    default:
+    - "python"
+    required: false
+    choices:
+    - "python"
+    - "r"
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--name"
+    description: "Name of the new method, formatted in snake case."
+    info: null
+    example:
+    - "new_comp"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--output"
+    description: "Path to the component directory. Suggested location is `src/<TASK>/<TYPE>s/<NAME>`."
+    info: null
+    default:
+    - "src/methods/${VIASH_PAR_NAME}"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "output"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--api_file"
+    description: "Which API file to use. Defaults to `src/<TASK>/api/comp_<TYPE>.yaml`.\n\
+      In tasks with different subtypes of method, this location might not exist and\
+      \ you might need\nto manually specify a different API file to inherit from.\n"
+    info: null
+    default:
+    - "src/api/comp_method.yaml"
+    must_exist: false
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--viash_yaml"
+    description: "Path to the project config file. Needed for knowing the relative\
+      \ location of a file to the project root.\n"
+    info: null
+    default:
+    - "_viash.yaml"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  resources:
+  - type: "python_script"
+    path: "script.py"
+    is_executable: true
+  - type: "file"
+    path: "read_and_merge_yaml.py"
+  description: "Create a component Viash component.\n\nUsage:\n```\nbin/create_component\
+    \ --task denoising --type method --language r --name foo\nbin/create_component\
+    \ --task denoising --type metric --language python --name bar\n```\n"
+  info: null
+  status: "enabled"
+  set_wd_to_resources_dir: false
+platforms:
+- type: "docker"
+  id: "docker"
+  image: "python:3.10-slim"
+  target_organization: "openproblems-bio/task_grn_inference"
+  target_registry: "ghcr.io"
+  namespace_separator: "/"
+  resolve_volume: "Automatic"
+  chown: true
+  setup_strategy: "ifneedbepullelsecachedbuild"
+  target_image_source: "https://github.com/openproblems-bio/task_grn_inference"
+  setup:
+  - type: "python"
+    user: false
+    pypi:
+    - "ruamel.yaml"
+    upgrade: true
+  entrypoint: []
+  cmd: null
+- type: "native"
+  id: "native"
+- type: "nextflow"
+  id: "nextflow"
+  directives:
+    tag: "$id"
+  auto:
+    simplifyInput: true
+    simplifyOutput: false
+    transcript: false
+    publish: false
+  config:
+    labels:
+      lowmem: "memory = 20.Gb"
+      midmem: "memory = 50.Gb"
+      highmem: "memory = 100.Gb"
+      lowcpu: "cpus = 5"
+      midcpu: "cpus = 15"
+      highcpu: "cpus = 30"
+      lowtime: "time = 1.h"
+      midtime: "time = 4.h"
+      hightime: "time = 8.h"
+      veryhightime: "time = 24.h"
+    script:
+    - "process.errorStrategy = 'ignore'"
+  debug: false
+  container: "docker"
+info:
+  config: "/home/runner/work/task_grn_inference/task_grn_inference/src/common/create_component/config.vsh.yaml"
+  platform: "nextflow"
+  output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/common/create_component"
+  executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/common/create_component/create_component"
+  viash_version: "0.8.6"
+  git_commit: "1b0489d41a7b1ebf53400daa326d679617ebada3"
+  git_remote: "https://github.com/openproblems-bio/task_grn_inference"

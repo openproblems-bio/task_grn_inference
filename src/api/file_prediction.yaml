@@ -1,0 +1,19 @@
+type: file
+example: resources/grn-benchmark/collectri.csv
+info:
+  label: GRN
+  summary: "GRN prediction"
+  file_type: csv
+  columns: 
+    - name: source
+      description: "Source of regulation" 
+      type: string
+      required: true
+    - name: target
+      description: "Target of regulation" 
+      type: string
+      required: true
+    - name: weight
+      description: "Weight of regulation" 
+      type: float
+      required: true

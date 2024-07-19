@@ -1,0 +1,17 @@
+type: file
+example: resources/grn-benchmark/score.csv
+info:
+  label: Score
+  summary: "File indicating the score of a metric."
+  file_type: csv
+  columns:
+    - type: string
+      name: accuracy
+      description: "some explanation"
+      multiple: true
+      required: false
+    - type: double
+      name: completeness
+      description: "some explanation"
+      multiple: true
+      required: false

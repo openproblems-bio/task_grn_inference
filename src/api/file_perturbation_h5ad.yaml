@@ -1,0 +1,54 @@
+type: file
+example: resources/grn-benchmark/perturbation_data.h5ad
+info:
+  label: perturbation
+  summary: "Perturbation dataset for benchmarking."
+  file_type: h5ad
+  slots:
+    obs:
+      - name: cell_type
+        type: string
+        description: "The annotated cell type of each cell based on RNA expression."
+        required: true
+      - name: sm_name
+        type: string
+        description: |
+          The primary name for the (parent) compound (in a standardized representation)
+          as chosen by LINCS. This is provided to map the data in this experiment to 
+          the LINCS Connectivity Map data.
+        required: true
+      - name: donor_id
+        type: string
+        description: "Donor id"
+        required: true
+      - name: plate_name
+        type: string
+        description: "Plate name 6 levels"
+        required: true
+      - name: row
+        type: string
+        description: "Row name on the plate"
+        required: true
+      - name: well
+        type: string
+        description: "Well name on the plate"
+        required: true
+      - name: cell_count
+        type: string
+        description: "Number of single cells pseudobulked"
+        required: true
+
+    layers:
+      - name: n_counts
+        type: double
+        description: "Pseudobulked values using mean approach"
+        required: true
+      - name: pearson
+        type: double
+        description: "Normalized values using pearson residuals"
+        required: true
+      - name: lognorm
+        type: double
+        description: "Normalized values using shifted logarithm "
+        required: true
+      

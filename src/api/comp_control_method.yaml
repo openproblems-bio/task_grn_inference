@@ -1,0 +1,34 @@
+functionality:
+  namespace: "control_methods"
+  info:
+    type: control_method
+    type_info:
+      label: Control Method
+      summary: A control method.
+      description: |
+        A control method to serve as a quality control for the GRN inference benchmark.
+  arguments:
+    - name: --perturbation_data
+      __merge__: file_perturbation_h5ad.yaml
+      required: true
+      direction: input
+    - name: --layer
+      type: string
+      direction: input
+      default: lognorm
+      description: Which layer of pertubation data to use to find tf-gene relationships.
+      required: true
+    - name: --prior_data
+      __merge__: file_prior.yaml
+      direction: input
+      description: Prior information used for grn inference.
+      required: true
+    - name: --prediction
+      __merge__: file_prediction.yaml
+      required: true
+      direction: output
+  test_resources:
+    - type: python_script
+      path: /src/common/component_tests/run_and_check_output.py
+    - path: /resources/grn-benchmark
+      dest: resources/grn-benchmark

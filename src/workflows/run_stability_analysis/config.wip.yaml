@@ -1,0 +1,93 @@
+functionality:
+  name: "run_stability_analysis"
+  namespace: "workflows"
+  argument_groups:
+    - name: Inputs
+      arguments:
+        - name: --sc_counts
+          __merge__: ../../api/file_sc_counts.yaml
+          required: true
+          direction: input
+        - name: "--id"
+          type: string
+          description: Unique identifier of the dataset.
+          required: true
+        - name: --layer
+          type: string
+          direction: input
+          default: clipped_sign_log10_pval
+          description: Which layer to use for prediction and evaluation.
+    - name: Bootstrapping arguments
+      description: Define the sampling strategy for the stability analysis.
+      arguments:
+        - name: --bootstrap_num_replicates
+          type: integer
+          default: 10
+          description: Number of bootstrap replicates to run.
+        - name: --bootstrap_obs
+          type: boolean
+          default: true
+          description: Whether to sample observations.
+        - name: --bootstrap_obs_fraction
+          type: double
+          default: 1
+          description: Fraction of the obs of the sc_counts to include in each bootstrap.
+        - name: --bootstrap_obs_replace
+          type: boolean
+          default: true
+          description: Whether to sample with replacement.
+        - name: --bootstrap_var
+          type: boolean
+          default: false
+          description: Whether to sample variables.
+        - name: --bootstrap_var_fraction
+          type: double
+          default: 1
+          description: Fraction of the var of the sc_counts to include in each bootstrap.
+        - name: --bootstrap_var_replace
+          type: boolean
+          default: true
+          description: Whether to sample with replacement.
+    - name: Outputs
+      arguments:
+        - name: "--scores"
+          type: file
+          required: true
+          direction: output
+          description: A yaml file containing the scores of each of the methods
+          default: stability_uns.yaml
+    - name: Arguments
+      arguments:
+        - name: "--method_ids"
+          type: string
+          multiple: true
+          description: A list of method ids to run. If not specified, all methods will be run.
+        - name: "--metric_ids"
+          type: string
+          multiple: true
+          description: A list of metric ids to run. If not specified, all metric will be run.
+  resources:
+    - type: nextflow_script
+      path: main.nf
+      entrypoint: run_wf
+    - type: file
+      path: "../../api/task_info.yaml"
+  dependencies:
+    - name: process_dataset/bootstrap
+    - name: workflows/process_dataset
+    - name: workflows/run_benchmark
+  repositories:
+    - name: openproblemsv2
+      type: github
+      repo: openproblems-bio/openproblems-v2
+      tag: main_build
+platforms:
+  - type: nextflow
+    config:
+      script: |
+        process.errorStrategy = 'ignore'
+        trace {
+            enabled = true
+            overwrite = true
+            file = "${params.publish_dir}/trace.txt"
+        }
