@@ -1,6 +1,6 @@
 // construct list of methods
 methods = [
-  scglue
+  figr
 ]
 
 // construct list of metrics

@@ -9,7 +9,7 @@ par = {
   "prediction": "output/prediction.csv",
 }
 ## VIASH END
-sys.path.append(meta["resources_dir"])
+# sys.path.append(meta["resources_dir"])
 from main import main 
 prediction = main(par)
 

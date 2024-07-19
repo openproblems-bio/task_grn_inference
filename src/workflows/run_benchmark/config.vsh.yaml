@@ -12,17 +12,7 @@ functionality:
           __merge__: ../../api/file_multiomics_atac_h5ad.yaml
           required: false
           direction: input
-        - name: --perturbation_data
-          __merge__: ../../api/file_perturbation_h5ad.yaml
-          required: true
-          direction: input
-        - name: --layer
-          required: true
-          type: string
-          direction: input
-          default: lognorm
-          description: Which layer to use.
-
+        
 
     - name: Outputs
       arguments:
@@ -37,11 +27,6 @@ functionality:
           required: true
           direction: output
           default: method_configs.yaml
-        - name: "--metric_configs"
-          type: file
-          required: true
-          direction: output
-          default: metric_configs.yaml
         - name: "--dataset_uns"
           type: file
           required: true
@@ -58,10 +43,7 @@ functionality:
           type: string
           multiple: true
           description: A list of method ids to run. If not specified, all methods will be run.
-        - name: "--metric_ids"
-          type: string
-          multiple: true
-          description: A list of metric ids to run. If not specified, all metric will be run.
+
 
   resources:
     - type: nextflow_script
@@ -69,6 +51,9 @@ functionality:
       entrypoint: run_wf
     - type: file
       path: "../../api/task_info.yaml"
+  dependencies:
+  - name: common/extract_metadata
+    repository: openproblemsv2
   # dependencies:
   #   # - name: common/extract_metadata
   #   #   repository: openproblemsv2

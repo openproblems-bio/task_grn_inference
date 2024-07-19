@@ -16,12 +16,12 @@ functionality:
 
 platforms:
   - type: docker
-    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    image: janursa/scenicplus:19-08-2024
     setup:
       - type: python
         packages: [  ]
       - type: python
-        git: [ https://github.com/aertslab/scenicplus ]
+        git: [ ]
 
 
   - type: native
