@@ -20,6 +20,7 @@ functionality:
           - name: dummpy
             type: string
             required: false
+      required: true
     - name: --multiomics_atac
       type: file
       example: resources/grn-benchmark/multiomics_r/atac.rds
@@ -31,6 +32,7 @@ functionality:
           - name: dummpy
             type: string
             required: false
+      required: true
     - name: --prediction
       __merge__: ../../api/file_prediction.yaml
       required: true
@@ -47,10 +49,12 @@ functionality:
           - name: topic
             type: string
             required: false
+      required: true
 
     - name: --temp_dir
       type: string
       direction: input
+      default: 'output/figr'
     - name: --num_workers
       type: integer
       direction: input
@@ -66,10 +70,10 @@ functionality:
 
 platforms:
   - type: docker
-    image: ghcr.io/openproblems-bio/base_r:1.0.2
-    setup:
-      - type: r
-        packages: [dplyr, FNN, chromVAR, doParallel, BuenColors, FigR, BSgenome.Hsapiens.UCSC.hg38]
+    image: janursa/figr:19-08-2024
+    # setup:
+    #   - type: r
+    #     packages: [dplyr, FNN, chromVAR, doParallel, BuenColors, FigR, BSgenome.Hsapiens.UCSC.hg38]
 
   - type: native
   - type: nextflow

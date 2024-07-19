@@ -1,0 +1,2 @@
+viash build src/methods/figr/config.vsh.yaml -p docker -o bin_figr
+bin_figr/figr --multiomics_rna resources/grn-benchmark/multiomics_r/rna.rds --multiomics_atac resources/grn-benchmark/multiomics_r/atac.rds --prediction bin_figr/prediction.csv --cell_topic resources/grn-benchmark/supp/cell_topic.csv

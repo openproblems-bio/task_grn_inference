@@ -2,7 +2,6 @@ library(dplyr)
 library(FNN)
 library(chromVAR)
 library(doParallel)
-library(BuenColors)
 library(FigR)
 library(BSgenome.Hsapiens.UCSC.hg38)
 
@@ -33,7 +32,8 @@ cellknn_func <- function(par) {
   print(dim(cellkNN))
   saveRDS(cellkNN, paste0(par$temp_dir, "cellkNN.rds"))
 }
-
+print(par)
+cellknn_func(par)
 
 ## Step1: Peak-gene association testing
 peak_gene_func <- function(par){
@@ -144,9 +144,9 @@ filter_figr_grn <- function(par) {
   write.csv(figr_grn, file = par$prediction, row.names = FALSE)
 }
 
-cellknn_func(par)
-peak_gene_func(par)
-dorc_genes_func(par)
-tf_gene_association_func(par)
-extract_peak_gene_func(par)
-filter_figr_grn(par)
+
+# peak_gene_func(par)
+# dorc_genes_func(par)
+# tf_gene_association_func(par)
+# extract_peak_gene_func(par)
+# filter_figr_grn(par)
