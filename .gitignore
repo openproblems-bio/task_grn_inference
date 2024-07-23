@@ -5,6 +5,7 @@
 resources/
 resources_test/
 output/
+out/
 
 # related to python
 .ipynb_checkpoints
