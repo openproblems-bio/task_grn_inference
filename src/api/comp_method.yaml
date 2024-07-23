@@ -12,8 +12,7 @@ functionality:
       __merge__: file_multiomics_rna_h5ad.yaml
       required: True
       direction: input
-      info:
-        test_default: ../../resources_test/grn-benchmark/multiomics_rna.h5ad
+      
     - name: --multiomics_atac
       __merge__: file_multiomics_atac_h5ad.yaml
       required: false
