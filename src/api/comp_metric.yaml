@@ -25,6 +25,7 @@ functionality:
       direction: input
       default: ridge
       description: name of regretion to use
+      multiple: true
     - name: --subsample
       type: integer
       direction: input
