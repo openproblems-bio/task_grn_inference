@@ -27,10 +27,21 @@ fi
 # Print parsed arguments (for debugging purposes)
 echo "GRN file: $grn"
 echo "Sample value: $sample"
-echo "Sample value: $reg_type"
+echo "Regression model: $reg_type"
 
-# Example operation using the arguments
+# Clean bin/ folder
+rm -r bin
+mkdir bin
+
+# Run regression analysis 1
 echo "Running GRN benchmark with $grn and sample size $sample"
 echo "Regression 1"
-viash build src/metrics/regression_1/config.vsh.yaml -p docker -o bin 
-bin/regression_1 --perturbation_data resources/grn-benchmark/perturbation_data.h5ad --reg_type $reg_type --prediction $grn --score $score
+mkdir -p bin/regression_1
+viash build src/metrics/regression_1/config.vsh.yaml -p docker -o bin/regression_1
+bin/regression_1/regression_1 --perturbation_data resources/grn-benchmark/perturbation_data.h5ad --reg_type $reg_type --prediction $grn --score $score
+
+# Run regression analysis 2
+echo "Regression 2"
+mkdir -p bin/regression_2
+viash build src/metrics/regression_2/config.vsh.yaml -p docker -o bin/regression_2
+bin/regression_2/regression_2 --perturbation_data resources/grn-benchmark/perturbation_data.h5ad --reg_type $reg_type --prediction $grn --score $score
