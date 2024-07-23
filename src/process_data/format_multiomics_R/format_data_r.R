@@ -3,13 +3,12 @@ library(FNN)
 library(chromVAR)
 library(doParallel)
 library(FigR)
-library(optparse)
 
 # Example usage
 par <- list(
-    temp_dir = 'output/figr',
-    rna_rds = 'resources/grn-benchmark/multiomics_r/rna.rds',
-    atac_rds = 'resources/grn-benchmark/multiomics_r/atac.rds'
+    temp_dir = 'resources_test/matrixdata',
+    rna_rds = 'resources_test/grn-benchmark/multiomics_r/rna.rds',
+    atac_rds = 'resources_test/grn-benchmark/multiomics_r/atac.rds'
 )
 
 

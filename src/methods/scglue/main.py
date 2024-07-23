@@ -71,6 +71,7 @@ def preprocess(rna, atac, par):
     nx.write_graphml(guidance, f"{par['temp_dir']}/guidance.graphml.gz")
 
 def training(par):
+    os.makedirs(f"{par['temp_dir']}/glue", exist_ok=True)
     rna = ad.read_h5ad(f"{par['temp_dir']}/rna.h5ad")
     atac = ad.read_h5ad(f"{par['temp_dir']}/atac.h5ad")
     guidance = nx.read_graphml(f"{par['temp_dir']}/guidance.graphml.gz")
@@ -82,6 +83,7 @@ def training(par):
         atac, "NB", use_highly_variable=False,
         use_rep="X_lsi"
     )
+    
 
     glue = scglue.models.fit_SCGLUE(
         {"rna": rna, "atac": atac}, guidance,

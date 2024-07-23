@@ -1,6 +1,7 @@
 import pandas as pd
 import anndata as ad
 import sys
+import os
 
 ## VIASH START
 par = {
@@ -17,8 +18,10 @@ par = {
 #   "resources_dir":'resources'
 # }
 
+
 sys.path.append(meta["resources_dir"])
 from main import main 
+os.makedirs(par['temp_dir'], exist_ok=True)
 prediction = main(par)
 
 print('Write output to file', flush=True)
