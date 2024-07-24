@@ -25,5 +25,5 @@ functionality:
   test_resources:
     - type: python_script
       path: /src/common/component_tests/run_and_check_output.py
-    - path: /resources_test/grn-benchmark
-      dest: resources_test/grn-benchmark
+    - path: /resources/grn-benchmark
+      dest: resources/grn-benchmark

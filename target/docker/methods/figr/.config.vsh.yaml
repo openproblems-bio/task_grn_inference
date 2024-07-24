@@ -127,8 +127,8 @@ functionality:
     path: "src/common/component_tests/run_and_check_output.py"
     is_executable: true
   - type: "file"
-    path: "resources_test/grn-benchmark"
-    dest: "resources_test/grn-benchmark"
+    path: "resources/grn-benchmark"
+    dest: "resources/grn-benchmark"
   info:
     label: "figr"
     summary: "GRN inference using figr"
@@ -191,5 +191,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/methods/figr"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/methods/figr/figr"
   viash_version: "0.8.6"
-  git_commit: "5c3f7701be9b25f1fdb37bea7ebabb0f1f094fb8"
+  git_commit: "c15622e99143e093ecc21e1cd2852060911f1fdc"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
