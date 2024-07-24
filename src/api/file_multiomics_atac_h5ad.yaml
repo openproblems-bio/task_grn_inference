@@ -1,5 +1,5 @@
 type: file
-example: resources_test/grn-benchmark/multiomics_atac.h5ad
+example: resources/grn-benchmark/multiomics_atac.h5ad
 info:
   label: multiomics atac
   summary: "Peak data for multiomics data."

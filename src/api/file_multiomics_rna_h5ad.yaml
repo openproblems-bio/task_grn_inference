@@ -1,5 +1,5 @@
 type: file
-example: resources_test/grn-benchmark/multiomics_rna.h5ad
+example: resources/grn-benchmark/multiomics_rna.h5ad
 info:
   label: multiomics rna
   summary: "RNA expression for multiomics data."
