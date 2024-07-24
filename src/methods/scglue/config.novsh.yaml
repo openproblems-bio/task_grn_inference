@@ -57,7 +57,7 @@ functionality:
     - name: --temp_dir
       type: string
       direction: input
-      default: output
+      default: output/figr/
     - name: --num_workers
       type: integer
       direction: input
