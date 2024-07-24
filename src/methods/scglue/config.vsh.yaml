@@ -70,7 +70,7 @@ functionality:
 
 platforms:
   - type: docker
-    image: janursa/scglue:19-08-2024:
+    image: janursa/scglue:19-08-2024
     # image: nvcr.io/nvidia/pytorch:24.06-py3
     # setup:
     #   - type: python
