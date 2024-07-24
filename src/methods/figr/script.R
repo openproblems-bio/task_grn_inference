@@ -17,6 +17,8 @@ par <- list(
   peak_gene = "output/figr/peak_gene.csv",
   prediction= "output/figr/prediction.csv"
 )
+
+print(par)
 # meta <- list(
 #   functionality_name = "my_method_r"
 # )

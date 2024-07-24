@@ -20,6 +20,7 @@ functionality:
           - name: dummpy
             type: string
             required: false
+        test_default: resources_test/grn-benchmark/multiomics_r/rna.rds
       required: true
     - name: --multiomics_atac
       type: file
@@ -32,6 +33,7 @@ functionality:
           - name: dummpy
             type: string
             required: false
+        test_default: resources_test/grn-benchmark/multiomics_r/atac.rds
       required: true
     - name: --prediction
       __merge__: ../../api/file_prediction.yaml
