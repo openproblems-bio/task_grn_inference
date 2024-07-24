@@ -25,12 +25,16 @@ functionality:
       direction: input
       default: ridge
       description: name of regretion to use
-      multiple: true
+      multiple: false
+      info:
+        test_default: ridge
     - name: --subsample
       type: integer
       direction: input
       default: -1
       description: number of samples randomly drawn from perturbation data
+      info:
+        test_default: 200
       
   test_resources:
     - type: python_script

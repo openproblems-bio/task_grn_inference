@@ -53,7 +53,7 @@ def cv_5(genes_n):
 def run_method_1(
             net: pd.DataFrame, 
             train_df: pd.DataFrame,
-            reg_type: str = 'GRB',
+            reg_type: str = 'GB',
             exclude_missing_genes: bool = False,
             verbose: int = 0) -> None: 
     """
@@ -73,8 +73,8 @@ def run_method_1(
         regr = lightgbm_wrapper(dict(random_state=32, n_estimators=100, min_samples_leaf=2, min_child_samples=1, feature_fraction=0.05, verbosity=-1))
     elif reg_type=='RF':
         regr = lightgbm_wrapper(dict(boosting_type='rf',random_state=32, n_estimators=100,  feature_fraction=0.05, verbosity=-1))
-    
     else:
+        print(f'{reg_type} is not defined')
         raise ValueError("define first")        
     
     n_tfs = net.shape[1]

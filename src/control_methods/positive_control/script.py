@@ -7,9 +7,9 @@ from sklearn.preprocessing import StandardScaler
 ## VIASH START
 par = {
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
-  "layer": "lognorm",
+  "layer": "scgen_pearson",
   "prior_data":  "resources/grn-benchmark/prior_data.h5ad",
-  "prediction": "resources/grn-benchmark/positive_control.csv",
+  "prediction": "output/positive_control.csv",
 }
 ## VIASH END
 print('Reading input data')
