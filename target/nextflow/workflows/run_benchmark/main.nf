@@ -2812,7 +2812,7 @@ meta = [
               }
             },
             "example" : [
-              "resources/grn-benchmark/multiomics_rna.h5ad"
+              "resources_test/grn-benchmark/multiomics_rna.h5ad"
             ],
             "must_exist" : true,
             "create_parent" : true,
@@ -2847,7 +2847,7 @@ meta = [
               }
             },
             "example" : [
-              "resources/grn-benchmark/multiomics_atac.h5ad"
+              "resources_test/grn-benchmark/multiomics_atac.h5ad"
             ],
             "must_exist" : true,
             "create_parent" : true,
@@ -2993,7 +2993,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_benchmark",
     "viash_version" : "0.8.6",
-    "git_commit" : "8352ecf305f085f0cfeb78ae8882e09d7be0aba1",
+    "git_commit" : "6bf5ab2e866b2ec9b93467cc0420bf9816d8cab5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

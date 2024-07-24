@@ -2847,13 +2847,13 @@ meta = [
                 "name" : "pearson",
                 "type" : "double",
                 "description" : "Normalized values using pearson residuals",
-                "required" : true
+                "required" : false
               },
               {
                 "name" : "lognorm",
                 "type" : "double",
                 "description" : "Normalized values using shifted logarithm ",
-                "required" : true
+                "required" : false
               }
             ]
           }
@@ -2947,19 +2947,25 @@ meta = [
         "type" : "string",
         "name" : "--reg_type",
         "description" : "name of regretion to use",
+        "info" : {
+          "test_default" : "ridge"
+        },
         "default" : [
           "ridge"
         ],
         "required" : false,
         "direction" : "input",
-        "multiple" : true,
-        "multiple_sep" : ";",
+        "multiple" : false,
+        "multiple_sep" : ":",
         "dest" : "par"
       },
       {
         "type" : "integer",
         "name" : "--subsample",
         "description" : "number of samples randomly drawn from perturbation data",
+        "info" : {
+          "test_default" : 200
+        },
         "default" : [
           -1
         ],
@@ -3077,7 +3083,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "8352ecf305f085f0cfeb78ae8882e09d7be0aba1",
+    "git_commit" : "6bf5ab2e866b2ec9b93467cc0420bf9816d8cab5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3103,7 +3109,7 @@ par = {
   'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'score': $( if [ ! -z ${VIASH_PAR_SCORE+x} ]; then echo "r'${VIASH_PAR_SCORE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'.split(';')"; else echo None; fi ),
+  'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'subsample': $( if [ ! -z ${VIASH_PAR_SUBSAMPLE+x} ]; then echo "int(r'${VIASH_PAR_SUBSAMPLE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi )
 }
 meta = {

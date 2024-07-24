@@ -178,8 +178,8 @@ function ViashHelp {
   echo "        example: resources/grn-benchmark/perturbation_data.h5ad"
   echo ""
   echo "    --layer"
-  echo "        type: string, required parameter"
-  echo "        default: lognorm"
+  echo "        type: string"
+  echo "        default: scgen_pearson"
   echo "        Which layer of pertubation data to use to find tf-gene relationships."
   echo ""
   echo "    --prior_data"
@@ -415,9 +415,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component control_methods negative_control"
-LABEL org.opencontainers.image.created="2024-07-24T09:59:49Z"
+LABEL org.opencontainers.image.created="2024-07-24T12:02:03Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="8352ecf305f085f0cfeb78ae8882e09d7be0aba1"
+LABEL org.opencontainers.image.revision="6bf5ab2e866b2ec9b93467cc0420bf9816d8cab5"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -742,10 +742,6 @@ if [ -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then
   ViashError '--perturbation_data' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
-if [ -z ${VIASH_PAR_LAYER+x} ]; then
-  ViashError '--layer' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
 if [ -z ${VIASH_PAR_PRIOR_DATA+x} ]; then
   ViashError '--prior_data' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
@@ -773,6 +769,11 @@ fi
 if [ -z ${VIASH_META_TEMP_DIR+x} ]; then
   ViashError 'temp_dir' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
+fi
+
+# filling in defaults
+if [ -z ${VIASH_PAR_LAYER+x} ]; then
+  VIASH_PAR_LAYER="scgen_pearson"
 fi
 
 # check whether required files exist
@@ -957,7 +958,7 @@ pivoted_net = pivoted_net.rename(columns={'index': 'target'})
 pivoted_net = pivoted_net[pivoted_net['weight'] != 0]
 
 print('Saving')
-pivoted_net.to_csv(par["output"])
+pivoted_net.to_csv(par["prediction"])
 VIASHMAIN
 python -B "\$tempscript" &
 wait "\$!"

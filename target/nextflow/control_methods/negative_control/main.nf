@@ -2847,13 +2847,13 @@ meta = [
                 "name" : "pearson",
                 "type" : "double",
                 "description" : "Normalized values using pearson residuals",
-                "required" : true
+                "required" : false
               },
               {
                 "name" : "lognorm",
                 "type" : "double",
                 "description" : "Normalized values using shifted logarithm ",
-                "required" : true
+                "required" : false
               }
             ]
           }
@@ -2874,9 +2874,9 @@ meta = [
         "name" : "--layer",
         "description" : "Which layer of pertubation data to use to find tf-gene relationships.",
         "default" : [
-          "lognorm"
+          "scgen_pearson"
         ],
-        "required" : true,
+        "required" : false,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -3051,7 +3051,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/negative_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "8352ecf305f085f0cfeb78ae8882e09d7be0aba1",
+    "git_commit" : "6bf5ab2e866b2ec9b93467cc0420bf9816d8cab5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3117,7 +3117,7 @@ pivoted_net = pivoted_net.rename(columns={'index': 'target'})
 pivoted_net = pivoted_net[pivoted_net['weight'] != 0]
 
 print('Saving')
-pivoted_net.to_csv(par["output"])
+pivoted_net.to_csv(par["prediction"])
 VIASHMAIN
 python -B "$tempscript"
 '''

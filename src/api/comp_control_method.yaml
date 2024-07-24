@@ -1,3 +1,4 @@
+
 functionality:
   namespace: "control_methods"
   info:
@@ -15,9 +16,9 @@ functionality:
     - name: --layer
       type: string
       direction: input
-      default: lognorm
+      default: scgen_pearson
       description: Which layer of pertubation data to use to find tf-gene relationships.
-      required: true
+      required: false
     - name: --prior_data
       __merge__: file_prior.yaml
       direction: input
