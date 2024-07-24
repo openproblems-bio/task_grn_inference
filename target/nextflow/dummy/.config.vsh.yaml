@@ -1,6 +1,5 @@
 functionality:
-  name: "scglue"
-  namespace: "methods"
+  name: "dummy"
   version: "build-main"
   arguments:
   - type: "file"
@@ -149,8 +148,6 @@ functionality:
   - type: "python_script"
     path: "script.py"
     is_executable: true
-  - type: "file"
-    path: "main.py"
   test_resources:
   - type: "python_script"
     path: "src/common/component_tests/run_and_check_output.py"
@@ -159,21 +156,18 @@ functionality:
     path: "resources/grn-benchmark"
     dest: "resources/grn-benchmark"
   info:
-    label: "scglue"
-    summary: "GRN inference using scglue"
-    description: "GRN inference using scglue. \n"
-    documentation_url: "https://scglue.readthedocs.io/"
-    type: "methods"
-    type_info:
-      label: "Method"
-      summary: "A GRN inference method"
-      description: "A method for inferring GRN from expression data.\n"
+    label: "dummy"
+    summary: "FILL IN: A one sentence summary of this method."
+    description: "A dummy method that contains the format of a real GRN inference\
+      \ method.\n"
+    documentation_url: "https://url.to/the/documentation"
+    repository_url: "https://github.com/organisation/repository"
   status: "enabled"
   set_wd_to_resources_dir: false
 platforms:
 - type: "docker"
   id: "docker"
-  image: "nvcr.io/nvidia/pytorch:24.06-py3"
+  image: "ghcr.io/openproblems-bio/base_python:1.0.4"
   target_organization: "openproblems-bio/task_grn_inference"
   target_registry: "ghcr.io"
   namespace_separator: "/"
@@ -184,21 +178,7 @@ platforms:
   setup:
   - type: "python"
     user: false
-    packages:
-    - "scglue==0.3.2"
-    - "pyscenic==0.12.1"
-    - "numpy==1.23.4"
-    - "scanpy"
-    - "networkx"
-    - "pyarrow"
-    - "cytoolz"
-    - "scikit-misc"
-    - "cuda-python"
     upgrade: true
-  - type: "apt"
-    packages:
-    - "bedtools"
-    interactive: false
   entrypoint: []
   cmd: null
 - type: "native"
@@ -233,10 +213,10 @@ platforms:
   debug: false
   container: "docker"
 info:
-  config: "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/scglue/config.vsh.yaml"
+  config: "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/dummy/config.vsh.yaml"
   platform: "nextflow"
-  output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/methods/scglue"
-  executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/methods/scglue/scglue"
+  output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/dummy"
+  executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/dummy/dummy"
   viash_version: "0.8.6"
-  git_commit: "53b0178b94755027715d23505f681b21592f441e"
+  git_commit: "802934bbaad83fb5aef40293b513fd6acc451405"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
