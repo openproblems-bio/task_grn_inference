@@ -7,9 +7,9 @@ import numpy as np
 from scipy.io import mmwrite
 
 par = {
-  "multiomics_rna": "resources/grn-benchmark/multiomics_rna.h5ad",
-  "multiomics_atac": "resources/grn-benchmark/multiomics_atac.h5ad",
-  "temp_dir": 'output/figr'
+  "multiomics_rna": "resources_test/grn-benchmark/multiomics_rna.h5ad",
+  "multiomics_atac": "resources_test/grn-benchmark/multiomics_atac.h5ad",
+  "temp_dir": 'resources_test/matrixdata'
 
 }
 
@@ -47,3 +47,5 @@ def format_data(par):
     print('Format data completed', flush=True)
 
 format_data(par)
+
+

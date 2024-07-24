@@ -3014,7 +3014,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/figr",
     "viash_version" : "0.8.6",
-    "git_commit" : "1b0489d41a7b1ebf53400daa326d679617ebada3",
+    "git_commit" : "aeb407309603f1746b588b8e98fc6ce281e9bda9",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3075,6 +3075,7 @@ options(.viash_orig_warn)
 rm(.viash_orig_warn)
 
 ## VIASH END
+dir.create(par\\$temp_dir, recursive = TRUE, showWarnings = TRUE)
 
 cellknn_func <- function(par) {
   ## load cell topic probabilities and create cell-cluster matrix
@@ -3084,9 +3085,9 @@ cellknn_func <- function(par) {
   cellkNN <- get.knn(cell_topic, k=par\\$n_topics)\\$nn.index
   rownames(cellkNN) <- rownames(cell_topic)
   print(dim(cellkNN))
+  print(paste0(par\\$temp_dir, "cellkNN.rds"))
   saveRDS(cellkNN, paste0(par\\$temp_dir, "cellkNN.rds"))
 }
-print(par)
 cellknn_func(par)
 
 ## Step1: Peak-gene association testing
@@ -3102,6 +3103,8 @@ peak_gene_func <- function(par){
   write.csv(cisCorr, paste0(par\\$temp_dir, "cisCorr.csv"), row.names = TRUE)
 }
 
+peak_gene_func(par)
+
 ## Step 2: create DORCs and smooth them 
 dorc_genes_func <- function(par){
   cisCorr = read.csv(paste0(par\\$temp_dir, "cisCorr.csv"))
@@ -3115,10 +3118,12 @@ dorc_genes_func <- function(par){
                           dorcTab = cisCorr.filt,
                           geneList = allGenes,
                           nCores = par\\$num_workers)
-
+  print(print(paste0(par\\$temp_dir, "cellkNN.rds")))
   cellkNN = readRDS(paste0(par\\$temp_dir, "cellkNN.rds"))
   # Smooth dorc scores using cell KNNs (k=n_topics)
   n_topics = par\\$n_topics
+  common_cells <- intersect(rownames(cellkNN), colnames(rna))
+  cellkNN = cellkNN[common_cells,]
   dorcMat.s <- smoothScoresNN(NNmat = cellkNN[,1:n_topics], mat = dorcMat, nCores = 4)
 
   # Smooth RNA using cell KNNs
@@ -3130,6 +3135,7 @@ dorc_genes_func <- function(par){
   saveRDS(RNAmat.s, paste0(par\\$temp_dir, "RNAmat.s.RDS"))
   saveRDS(dorcMat.s, paste0(par\\$temp_dir, "dorcMat.s.RDS"))
 }
+dorc_genes_func(par)
 
 ## TF-gene associations
 tf_gene_association_func <- function(par){
@@ -3147,7 +3153,7 @@ tf_gene_association_func <- function(par){
 
   write.csv(figR.d, paste0(par\\$temp_dir, "figR.d.csv"))
 }
-
+tf_gene_association_func(par)
 extract_peak_gene_func <- function(par) {
   # Read the CSV file
   peak_gene_figr <- read.csv(file.path(par\\$temp_dir, "cisCorr.filt.csv"))
@@ -3171,6 +3177,7 @@ extract_peak_gene_func <- function(par) {
   # Write the result to a CSV file
   write.csv(peak_gene_figr, file = par\\$peak_gene, row.names = FALSE)
 }
+extract_peak_gene_func(par)
 
 filter_figr_grn <- function(par) {
   # Read the CSV file
@@ -3199,11 +3206,7 @@ filter_figr_grn <- function(par) {
 }
 
 
-# peak_gene_func(par)
-# dorc_genes_func(par)
-# tf_gene_association_func(par)
-# extract_peak_gene_func(par)
-# filter_figr_grn(par)
+filter_figr_grn(par)
 VIASHMAIN
 Rscript "$tempscript"
 '''

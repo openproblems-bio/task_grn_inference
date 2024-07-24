@@ -186,7 +186,7 @@ function ViashHelp {
   echo "        example: resources/grn-benchmark/score.csv"
   echo ""
   echo "    --reg_type"
-  echo "        type: string"
+  echo "        type: string, multiple values allowed"
   echo "        default: ridge"
   echo "        name of regretion to use"
   echo ""
@@ -420,9 +420,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2024-07-19T19:03:52Z"
+LABEL org.opencontainers.image.created="2024-07-24T09:44:34Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="1b0489d41a7b1ebf53400daa326d679617ebada3"
+LABEL org.opencontainers.image.revision="aeb407309603f1746b588b8e98fc6ce281e9bda9"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -615,14 +615,20 @@ while [[ $# -gt 0 ]]; do
             shift 1
             ;;
         --reg_type)
-            [ -n "$VIASH_PAR_REG_TYPE" ] && ViashError Bad arguments for option \'--reg_type\': \'$VIASH_PAR_REG_TYPE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_REG_TYPE="$2"
+            if [ -z "$VIASH_PAR_REG_TYPE" ]; then
+              VIASH_PAR_REG_TYPE="$2"
+            else
+              VIASH_PAR_REG_TYPE="$VIASH_PAR_REG_TYPE;""$2"
+            fi
             [ $# -lt 2 ] && ViashError Not enough arguments passed to --reg_type. Use "--help" to get more information on the parameters. && exit 1
             shift 2
             ;;
         --reg_type=*)
-            [ -n "$VIASH_PAR_REG_TYPE" ] && ViashError Bad arguments for option \'--reg_type=*\': \'$VIASH_PAR_REG_TYPE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_REG_TYPE=$(ViashRemoveFlags "$1")
+            if [ -z "$VIASH_PAR_REG_TYPE" ]; then
+              VIASH_PAR_REG_TYPE=$(ViashRemoveFlags "$1")
+            else
+              VIASH_PAR_REG_TYPE="$VIASH_PAR_REG_TYPE;"$(ViashRemoveFlags "$1")
+            fi
             shift 1
             ;;
         --subsample)
@@ -943,7 +949,7 @@ par = {
   'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'score': $( if [ ! -z ${VIASH_PAR_SCORE+x} ]; then echo "r'${VIASH_PAR_SCORE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\'/\'\"\'\"r\'}'.split(';')"; else echo None; fi ),
   'subsample': $( if [ ! -z ${VIASH_PAR_SUBSAMPLE+x} ]; then echo "int(r'${VIASH_PAR_SUBSAMPLE//\'/\'\"\'\"r\'}')"; else echo None; fi )
 }
 meta = {

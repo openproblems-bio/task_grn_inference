@@ -443,9 +443,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "ruamel.yaml"
 
 LABEL org.opencontainers.image.description="Companion container for running component common create_component"
-LABEL org.opencontainers.image.created="2024-07-19T19:03:51Z"
+LABEL org.opencontainers.image.created="2024-07-24T09:44:34Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="1b0489d41a7b1ebf53400daa326d679617ebada3"
+LABEL org.opencontainers.image.revision="aeb407309603f1746b588b8e98fc6ce281e9bda9"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

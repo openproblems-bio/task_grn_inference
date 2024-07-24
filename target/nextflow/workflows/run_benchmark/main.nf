@@ -2856,104 +2856,6 @@ meta = [
             "multiple" : false,
             "multiple_sep" : ":",
             "dest" : "par"
-          },
-          {
-            "type" : "file",
-            "name" : "--perturbation_data",
-            "info" : {
-              "label" : "perturbation",
-              "summary" : "Perturbation dataset for benchmarking.",
-              "file_type" : "h5ad",
-              "slots" : {
-                "obs" : [
-                  {
-                    "name" : "cell_type",
-                    "type" : "string",
-                    "description" : "The annotated cell type of each cell based on RNA expression.",
-                    "required" : true
-                  },
-                  {
-                    "name" : "sm_name",
-                    "type" : "string",
-                    "description" : "The primary name for the (parent) compound (in a standardized representation)\nas chosen by LINCS. This is provided to map the data in this experiment to \nthe LINCS Connectivity Map data.\n",
-                    "required" : true
-                  },
-                  {
-                    "name" : "donor_id",
-                    "type" : "string",
-                    "description" : "Donor id",
-                    "required" : true
-                  },
-                  {
-                    "name" : "plate_name",
-                    "type" : "string",
-                    "description" : "Plate name 6 levels",
-                    "required" : true
-                  },
-                  {
-                    "name" : "row",
-                    "type" : "string",
-                    "description" : "Row name on the plate",
-                    "required" : true
-                  },
-                  {
-                    "name" : "well",
-                    "type" : "string",
-                    "description" : "Well name on the plate",
-                    "required" : true
-                  },
-                  {
-                    "name" : "cell_count",
-                    "type" : "string",
-                    "description" : "Number of single cells pseudobulked",
-                    "required" : true
-                  }
-                ],
-                "layers" : [
-                  {
-                    "name" : "n_counts",
-                    "type" : "double",
-                    "description" : "Pseudobulked values using mean approach",
-                    "required" : true
-                  },
-                  {
-                    "name" : "pearson",
-                    "type" : "double",
-                    "description" : "Normalized values using pearson residuals",
-                    "required" : true
-                  },
-                  {
-                    "name" : "lognorm",
-                    "type" : "double",
-                    "description" : "Normalized values using shifted logarithm ",
-                    "required" : true
-                  }
-                ]
-              }
-            },
-            "example" : [
-              "resources/grn-benchmark/perturbation_data.h5ad"
-            ],
-            "must_exist" : true,
-            "create_parent" : true,
-            "required" : true,
-            "direction" : "input",
-            "multiple" : false,
-            "multiple_sep" : ":",
-            "dest" : "par"
-          },
-          {
-            "type" : "string",
-            "name" : "--layer",
-            "description" : "Which layer to use.",
-            "default" : [
-              "lognorm"
-            ],
-            "required" : true,
-            "direction" : "input",
-            "multiple" : false,
-            "multiple_sep" : ":",
-            "dest" : "par"
           }
         ]
       },
@@ -2980,20 +2882,6 @@ meta = [
             "name" : "--method_configs",
             "default" : [
               "method_configs.yaml"
-            ],
-            "must_exist" : true,
-            "create_parent" : true,
-            "required" : true,
-            "direction" : "output",
-            "multiple" : false,
-            "multiple_sep" : ":",
-            "dest" : "par"
-          },
-          {
-            "type" : "file",
-            "name" : "--metric_configs",
-            "default" : [
-              "metric_configs.yaml"
             ],
             "must_exist" : true,
             "create_parent" : true,
@@ -3040,16 +2928,6 @@ meta = [
             "type" : "string",
             "name" : "--method_ids",
             "description" : "A list of method ids to run. If not specified, all methods will be run.",
-            "required" : false,
-            "direction" : "input",
-            "multiple" : true,
-            "multiple_sep" : ":",
-            "dest" : "par"
-          },
-          {
-            "type" : "string",
-            "name" : "--metric_ids",
-            "description" : "A list of metric ids to run. If not specified, all metric will be run.",
             "required" : false,
             "direction" : "input",
             "multiple" : true,
@@ -3115,7 +2993,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_benchmark",
     "viash_version" : "0.8.6",
-    "git_commit" : "1b0489d41a7b1ebf53400daa326d679617ebada3",
+    "git_commit" : "aeb407309603f1746b588b8e98fc6ce281e9bda9",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3128,7 +3006,7 @@ meta = [
 // user-provided Nextflow code
 // construct list of methods
 methods = [
-  scglue
+  figr
 ]
 
 // construct list of metrics
