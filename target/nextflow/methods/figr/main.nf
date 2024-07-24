@@ -2781,6 +2781,7 @@ meta = [
   "config": processConfig(readJsonBlob('''{
   "functionality" : {
     "name" : "figr",
+    "namespace" : "methods",
     "version" : "build-main",
     "arguments" : [
       {
@@ -2945,11 +2946,31 @@ meta = [
         "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/methods/figr/"
       }
     ],
+    "test_resources" : [
+      {
+        "type" : "python_script",
+        "path" : "src/common/component_tests/run_and_check_output.py",
+        "is_executable" : true,
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
+      },
+      {
+        "type" : "file",
+        "path" : "resources_test/grn-benchmark",
+        "dest" : "resources_test/grn-benchmark",
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
+      }
+    ],
     "info" : {
       "label" : "figr",
       "summary" : "GRN inference using figr",
       "description" : "GRN inference using figr.\n",
-      "documentation_url" : "https://buenrostrolab.github.io/FigR/articles/FigR_shareseq.html"
+      "documentation_url" : "https://buenrostrolab.github.io/FigR/articles/FigR_shareseq.html",
+      "type" : "methods",
+      "type_info" : {
+        "label" : "Method",
+        "summary" : "A GRN inference method",
+        "description" : "A method for inferring GRN from expression data.\n"
+      }
     },
     "status" : "enabled",
     "set_wd_to_resources_dir" : false
@@ -3012,9 +3033,9 @@ meta = [
   "info" : {
     "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/figr/config.vsh.yaml",
     "platform" : "nextflow",
-    "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/figr",
+    "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/methods/figr",
     "viash_version" : "0.8.6",
-    "git_commit" : "6bf5ab2e866b2ec9b93467cc0420bf9816d8cab5",
+    "git_commit" : "5c3f7701be9b25f1fdb37bea7ebabb0f1f094fb8",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3557,7 +3578,7 @@ meta["defaults"] = [
   directives: readJsonBlob('''{
   "container" : {
     "registry" : "ghcr.io",
-    "image" : "openproblems-bio/task_grn_inference/figr",
+    "image" : "openproblems-bio/task_grn_inference/methods/figr",
     "tag" : "build-main"
   },
   "label" : [

@@ -7,23 +7,23 @@ functionality:
       summary: A GRN inference method
       description: |
         A method for inferring GRN from expression data.
-  arguments:
-    - name: --multiomics_rna
-      __merge__: file_multiomics_rna_h5ad.yaml
-      required: True
-      direction: input
+#   arguments:
+#     - name: --multiomics_rna
+#       __merge__: file_multiomics_rna_h5ad.yaml
+#       required: True
+#       direction: input
       
-    - name: --multiomics_atac
-      __merge__: file_multiomics_atac_h5ad.yaml
-      required: false
-      direction: input
-    - name: --prediction
-      __merge__: file_prediction.yaml
-      required: true
-      direction: output
+#     - name: --multiomics_atac
+#       __merge__: file_multiomics_atac_h5ad.yaml
+#       required: false
+#       direction: input
+#     - name: --prediction
+#       __merge__: file_prediction.yaml
+#       required: true
+#       direction: output
 
   test_resources:
     - type: python_script
       path: /src/common/component_tests/run_and_check_output.py
-    - path: /resources/grn-benchmark
-      dest: resources/grn-benchmark
+    - path: /resources_test/grn-benchmark
+      dest: resources_test/grn-benchmark

@@ -1,4 +1,4 @@
-# __merge__: ../../api/comp_method.yaml
+__merge__: ../../api/comp_method.yaml
 
 functionality:
   name: figr
@@ -71,9 +71,6 @@ functionality:
 platforms:
   - type: docker
     image: janursa/figr:19-08-2024
-    # setup:
-    #   - type: r
-    #     packages: [dplyr, FNN, chromVAR, doParallel, BuenColors, FigR, BSgenome.Hsapiens.UCSC.hg38]
 
   - type: native
   - type: nextflow
