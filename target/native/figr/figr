@@ -183,7 +183,7 @@ function ViashHelp {
   echo ""
   echo "    --prediction"
   echo "        type: file, required parameter, output, file must exist"
-  echo "        example: resources/grn-benchmark/collectri.csv"
+  echo "        example: resources/grn-benchmark/grn_models/collectri.csv"
   echo ""
   echo "    --cell_topic"
   echo "        type: file, required parameter, file must exist"

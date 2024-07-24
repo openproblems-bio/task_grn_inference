@@ -183,7 +183,7 @@ function ViashHelp {
   echo ""
   echo "    --prediction"
   echo "        type: file, required parameter, output, file must exist"
-  echo "        example: resources/grn-benchmark/collectri.csv"
+  echo "        example: resources/grn-benchmark/grn_models/collectri.csv"
   echo ""
   echo "    --cell_topic"
   echo "        type: file, required parameter, file must exist"
@@ -424,9 +424,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component figr"
-LABEL org.opencontainers.image.created="2024-07-24T09:48:50Z"
+LABEL org.opencontainers.image.created="2024-07-24T09:59:50Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="70e5d6d963009db3ec71019caf524d2621cc4085"
+LABEL org.opencontainers.image.revision="8352ecf305f085f0cfeb78ae8882e09d7be0aba1"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

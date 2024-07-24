@@ -2898,7 +2898,7 @@ meta = [
           ]
         },
         "example" : [
-          "resources/grn-benchmark/collectri.csv"
+          "resources/grn-benchmark/grn_models/collectri.csv"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -3077,7 +3077,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "70e5d6d963009db3ec71019caf524d2621cc4085",
+    "git_commit" : "8352ecf305f085f0cfeb78ae8882e09d7be0aba1",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
