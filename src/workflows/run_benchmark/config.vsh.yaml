@@ -51,14 +51,9 @@ functionality:
       entrypoint: run_wf
     - type: file
       path: "../../api/task_info.yaml"
-  dependencies:
-  - name: common/extract_metadata
-    repository: openproblemsv2
   # dependencies:
-  #   # - name: common/extract_metadata
-  #   #   repository: openproblemsv2
-  #   # - name: control_methods/positive_control
-  #   # - name: control_methods/negative_control
+  #   - name: common/extract_metadata
+  #     repository: openproblemsv2
   #   - name: methods/scglue
   #   - name: metrics/regression_1
   # repositories:
