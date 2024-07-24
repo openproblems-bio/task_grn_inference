@@ -1,13 +1,13 @@
 functionality:
-  name: "regression_1"
-  namespace: "metrics"
+  name: "scglue"
+  namespace: "methods"
   version: "build-main"
   arguments:
   - type: "file"
-    name: "--perturbation_data"
+    name: "--multiomics_rna"
     info:
-      label: "perturbation"
-      summary: "Perturbation dataset for benchmarking."
+      label: "multiomics rna"
+      summary: "RNA expression for multiomics data."
       file_type: "h5ad"
       slots:
         obs:
@@ -15,50 +15,40 @@ functionality:
           type: "string"
           description: "The annotated cell type of each cell based on RNA expression."
           required: true
-        - name: "sm_name"
+        - name: "donor_id"
           type: "string"
-          description: "The primary name for the (parent) compound (in a standardized\
-            \ representation)\nas chosen by LINCS. This is provided to map the data\
-            \ in this experiment to \nthe LINCS Connectivity Map data.\n"
+          description: "Donor id"
+          required: true
+    example:
+    - "resources/grn-benchmark/multiomics_rna.h5ad"
+    must_exist: true
+    create_parent: true
+    required: true
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--multiomics_atac"
+    info:
+      label: "multiomics atac"
+      summary: "Peak data for multiomics data."
+      file_type: "h5ad"
+      slots:
+        obs:
+        - name: "cell_type"
+          type: "string"
+          description: "The annotated cell type of each cell based on RNA expression."
           required: true
         - name: "donor_id"
           type: "string"
           description: "Donor id"
           required: true
-        - name: "plate_name"
-          type: "string"
-          description: "Plate name 6 levels"
-          required: true
-        - name: "row"
-          type: "string"
-          description: "Row name on the plate"
-          required: true
-        - name: "well"
-          type: "string"
-          description: "Well name on the plate"
-          required: true
-        - name: "cell_count"
-          type: "string"
-          description: "Number of single cells pseudobulked"
-          required: true
-        layers:
-        - name: "n_counts"
-          type: "double"
-          description: "Pseudobulked values using mean approach"
-          required: true
-        - name: "pearson"
-          type: "double"
-          description: "Normalized values using pearson residuals"
-          required: false
-        - name: "lognorm"
-          type: "double"
-          description: "Normalized values using shifted logarithm "
-          required: false
     example:
-    - "resources/grn-benchmark/perturbation_data.h5ad"
+    - "resources/grn-benchmark/multiomics_atac.h5ad"
     must_exist: true
     create_parent: true
-    required: true
+    required: false
     direction: "input"
     multiple: false
     multiple_sep: ":"
@@ -87,55 +77,69 @@ functionality:
     must_exist: true
     create_parent: true
     required: true
+    direction: "output"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--annotation_file"
+    info:
+      label: "annotation"
+      summary: "annotation file"
+      file_type: "gtf.gz"
+      columns:
+      - name: "gene_name"
+        type: "string"
+        required: false
+      - name: "annotation"
+        type: "string"
+        required: false
+    example:
+    - "resources/grn-benchmark/supp/gencode.v45.annotation.gtf.gz"
+    must_exist: true
+    create_parent: true
+    required: false
     direction: "input"
     multiple: false
     multiple_sep: ":"
     dest: "par"
   - type: "file"
-    name: "--score"
+    name: "--motif_file"
     info:
-      label: "Score"
-      summary: "File indicating the score of a metric."
-      file_type: "csv"
+      label: "tfmotif"
+      summary: "Tf motif info"
+      file_type: "bed.gz"
       columns:
-      - type: "string"
-        name: "accuracy"
-        description: "some explanation"
-        multiple: true
+      - name: "tf_name"
+        type: "string"
         required: false
-      - type: "double"
-        name: "completeness"
-        description: "some explanation"
-        multiple: true
+      - name: "region"
+        type: "string"
         required: false
     example:
-    - "resources/grn-benchmark/score.csv"
+    - "resources/grn-benchmark/supp/JASPAR2022-hg38.bed.gz"
     must_exist: true
     create_parent: true
-    required: true
-    direction: "output"
+    required: false
+    direction: "input"
     multiple: false
     multiple_sep: ":"
     dest: "par"
   - type: "string"
-    name: "--reg_type"
-    description: "name of regretion to use"
-    info:
-      test_default: "ridge"
+    name: "--temp_dir"
+    info: null
     default:
-    - "ridge"
+    - "output"
     required: false
     direction: "input"
     multiple: false
     multiple_sep: ":"
     dest: "par"
   - type: "integer"
-    name: "--subsample"
-    description: "number of samples randomly drawn from perturbation data"
-    info:
-      test_default: 200
+    name: "--num_workers"
+    info: null
     default:
-    - -1
+    - 4
     required: false
     direction: "input"
     multiple: false
@@ -155,20 +159,21 @@ functionality:
     path: "resources/grn-benchmark"
     dest: "resources/grn-benchmark"
   info:
-    label: "Regression 1"
-    summary: "Calculates R2 score for regression 1"
-    description: "Calculates R2 score using regression approach 1.\n"
-    type: "metrics"
+    label: "scglue"
+    summary: "GRN inference using scglue"
+    description: "GRN inference using scglue. \n"
+    documentation_url: "https://scglue.readthedocs.io/"
+    type: "methods"
     type_info:
-      label: "Label"
-      summary: "A metric to evaluate the performance of the inferred GRN"
-      description: "A metric to evaluate the performance of the inferred GRN\n"
+      label: "Method"
+      summary: "A GRN inference method"
+      description: "A method for inferring GRN from expression data.\n"
   status: "enabled"
   set_wd_to_resources_dir: false
 platforms:
 - type: "docker"
   id: "docker"
-  image: "ghcr.io/openproblems-bio/base_python:1.0.4"
+  image: "janursa/scglue:19-08-2024"
   target_organization: "openproblems-bio/task_grn_inference"
   target_registry: "ghcr.io"
   namespace_separator: "/"
@@ -176,21 +181,17 @@ platforms:
   chown: true
   setup_strategy: "ifneedbepullelsecachedbuild"
   target_image_source: "https://github.com/openproblems-bio/task_grn_inference"
-  setup:
-  - type: "python"
-    user: false
-    packages:
-    - "lightgbm"
-    upgrade: true
   entrypoint: []
   cmd: null
+- type: "native"
+  id: "native"
 - type: "nextflow"
   id: "nextflow"
   directives:
     label:
     - "midtime"
-    - "highmem"
-    - "highcpu"
+    - "midmem"
+    - "midcpu"
     tag: "$id"
   auto:
     simplifyInput: true
@@ -214,10 +215,10 @@ platforms:
   debug: false
   container: "docker"
 info:
-  config: "/home/runner/work/task_grn_inference/task_grn_inference/src/metrics/regression_1/config.vsh.yaml"
+  config: "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/scglue/config.vsh.yaml"
   platform: "docker"
-  output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/metrics/regression_1"
-  executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/metrics/regression_1/regression_1"
+  output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/methods/scglue"
+  executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/methods/scglue/scglue"
   viash_version: "0.8.6"
-  git_commit: "802934bbaad83fb5aef40293b513fd6acc451405"
+  git_commit: "260b24096cf27e9031deabb4cb87d1014879acf3"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
