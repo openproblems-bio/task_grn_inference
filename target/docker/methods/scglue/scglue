@@ -430,9 +430,9 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 LABEL org.opencontainers.image.description="Companion container for running component methods scglue"
-LABEL org.opencontainers.image.created="2024-07-25T10:21:59Z"
+LABEL org.opencontainers.image.created="2024-07-25T10:49:07Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="48c500b707ba5766bbc131c8e95f9982c7e10589"
+LABEL org.opencontainers.image.revision="9c39fcac88ad1332ba14ce82755d66550092b17c"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

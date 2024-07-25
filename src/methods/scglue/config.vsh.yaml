@@ -68,6 +68,7 @@ functionality:
       path: script.py
     - path: main.py
 
+
 platforms:
   - type: docker
     # image: janursa/scglue:19-08-2024
