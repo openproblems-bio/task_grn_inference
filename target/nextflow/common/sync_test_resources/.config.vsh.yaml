@@ -117,5 +117,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/common/sync_test_resources"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/common/sync_test_resources/sync_test_resources"
   viash_version: "0.8.6"
-  git_commit: "a11432f29c35aaa5b87b3b1273472ab03efc38a2"
+  git_commit: "b685a8bef772fb61f5197bea45d4b744ac41e47c"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
