@@ -70,13 +70,13 @@ functionality:
 
 platforms:
   - type: docker
-    image: janursa/scglue:19-08-2024
-    # image: nvcr.io/nvidia/pytorch:24.06-py3
-    # setup:
-    #   - type: python
-    #     packages: [ scglue==0.3.2, pyscenic==0.12.1, numpy==1.23.4, scanpy, networkx, pyarrow, cytoolz, scikit-misc, cuda-python]
-    #   - type: apt
-    #     packages: [bedtools]
+    # image: janursa/scglue:19-08-2024
+    image: nvcr.io/nvidia/pytorch:24.06-py3
+    setup:
+      - type: python
+        packages: [ scglue==0.3.2, pyscenic==0.12.1, numpy==1.23.4, scanpy, networkx, pyarrow, cytoolz, scikit-misc, cuda-python]
+      - type: apt
+        packages: [bedtools]
 
   - type: native
   - type: nextflow
