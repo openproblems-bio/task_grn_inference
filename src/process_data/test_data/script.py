@@ -38,7 +38,23 @@ adata_atac_s = adata_atac[mask]
 chr_mask = adata_atac_s.var.index.str.split(':').str[0] == 'chr1'
 adata_atac_s = adata_atac_s[adata_rna_s.obs_names, chr_mask]
 
-adata_atac_s = adata_atac_s[:, adata_atac_s.var.sample(n=n_peaks, random_state=42).index]
+# adata_atac_s = adata_atac_s[:, adata_atac_s.var.sample(n=n_peaks, random_state=42).index]
+total_counts = adata_atac_s.X.sum(axis=0).A1  # .A1 converts the sparse matrix to a dense array
+
+# Create a DataFrame with peak indices and their total counts
+peaks_df = pd.DataFrame({
+    'peak': adata_atac_s.var.index,
+    'total_counts': total_counts
+})
+
+# Sort peaks by total counts in descending order and select the top n_peaks
+top_peaks = peaks_df.nlargest(n_peaks, 'total_counts')['peak']
+
+# Subset the ATAC data to keep only the top peaks
+adata_atac_s = adata_atac_s[:, top_peaks]
+
+# Ensure the ATAC variable information is updated
+adata_atac_s.var = adata_atac_s.var.loc[top_peaks]
 
 print(adata_rna_s)
 print(adata_atac_s)
