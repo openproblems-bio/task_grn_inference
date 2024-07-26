@@ -20,7 +20,7 @@ par = {
 }
 
 n_cells = 1000
-n_peaks = 1000
+n_peaks = 5000
 
 adata_rna = ad.read_h5ad(par['multiomics_rna'])
 adata_atac = ad.read_h5ad(par['multiomics_atac'])
