@@ -6,17 +6,22 @@ library(FigR)
 
 # Example usage
 par <- list(
-    temp_dir = 'resources_test/matrixdata',
+    rna_matrix = 'output/scRNA/X_matrix.mtx',
+    atac_matrix ='output/scATAC/X_matrix.mtx',
+    rna_gene_annot = 'output/scRNA/annotation_gene.csv',
+    rna_cell_annot = 'output/scRNA/annotation_cell.csv',
+    atac_peak_annot = 'output/scATAC/annotation_gene.csv',
+    atac_cell_annot = 'output/scATAC/annotation_cell.csv', 
     rna_rds = 'resources_test/grn-benchmark/multiomics_r/rna.rds',
     atac_rds = 'resources_test/grn-benchmark/multiomics_r/atac.rds'
 )
 
 
 ## Load atac-seq and create summarizedexperiment
-X <- readMM(paste0(par$temp_dir, "/scATAC/X_matrix.mtx"))
+X <- readMM(par$atac_matrix)
 X <- t(X)
-annotation_peak <- read.csv(paste0(par$temp_dir, "/scATAC/annotation_peak.csv"), row.names = 1)
-annotation_cells <- read.csv(paste0(par$temp_dir, "/scATAC/annotation_cells.csv"), row.names = 1)
+annotation_peak <- read.csv(par$atac_peak_annot, row.names = 1)
+annotation_cells <- read.csv(par$atac_cell_annot, row.names = 1)
 
 # Filter out entries where seqname is 'chr10'
 filter_indices <- grepl("^chr", annotation_peak$seqname)
@@ -32,17 +37,17 @@ atac <- SummarizedExperiment(assays = list(counts = X_filtered),
                              colData = DataFrame(annotation_cells))
 colnames(atac) <- annotation_cells$obs_id    
 
-dim(atac) #peaks*cells
+print(dim(atac)) #peaks*cells
 
 saveRDS(atac, par$atac_rds)
 
 
 
 ### Load RNA-seq and create sparsematrix
-XX <- readMM(paste0(par$temp_dir, "/scRNA/X_matrix.mtx"))
+XX <- readMM(par$rna_matrix)
 XX <- t(XX)
-annotation_gene <- read.csv(paste0(par$temp_dir, "/scRNA/annotation_gene.csv"), row.names = 1)
-annotation_cells <- read.csv(paste0(par$temp_dir, "/scRNA/annotation_cells.csv"), row.names = 1)
+annotation_gene <- read.csv(par$rna_gene_annot, row.names = 1)
+annotation_cells <- read.csv(par$rna_cell_annot, row.names = 1)
 
 rna <- as(XX, "CsparseMatrix")
 rownames(rna) <- annotation_gene$location
@@ -51,7 +56,7 @@ colnames(rna) <- annotation_cells$obs_id
 # Remove genes with zero expression across all cells
 rna <- rna[Matrix::rowSums(rna)!=0,]
 
-dim(rna) # genes*cells
+print(dim(rna)) # genes*cells
 
 saveRDS(rna, par$rna_rds)
 

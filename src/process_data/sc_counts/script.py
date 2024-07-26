@@ -10,8 +10,7 @@ import scanpy as sc
 
 par = {
     'sc_counts': 'resources/raw-data/sc_counts.h5ad',
-    'perturbation_data': 'resources/raw-data/perturbation_data.h5ad',
-
+    'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
 }
 
 def preprocess_sc(par):
