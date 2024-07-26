@@ -61,7 +61,7 @@ functionality:
     - name: --num_workers
       type: integer
       direction: input
-      default: 4
+      default: 1
       
   resources:
     - type: python_script
