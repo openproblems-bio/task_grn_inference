@@ -9,6 +9,7 @@ functionality:
       type: file 
       required: True
       direction: input
+      default: /resources/datasets_raw/multiome_counts.h5ad
     - name: --multiomics_rna
       type: file 
       required: true

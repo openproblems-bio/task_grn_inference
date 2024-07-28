@@ -25,34 +25,12 @@ functionality:
     - name: --annotation_file
       type: file
       example: resources/grn-benchmark/supp/gencode.v45.annotation.gtf.gz
-      info:
-        label: annotation
-        summary: "annotation file"
-        file_type: gtf.gz
-        columns: 
-          - name: gene_name
-            type: string
-            required: false
-          - name: annotation
-            type: string
-            required: false
-      required: false
+      required: true
       direction: input
     - name: --motif_file
       type: file
       example: resources/grn-benchmark/supp/JASPAR2022-hg38.bed.gz
-      info:
-        label: tfmotif
-        summary: "Tf motif info"
-        file_type: bed.gz
-        columns: 
-          - name: tf_name
-            type: string
-            required: false
-          - name: region
-            type: string
-            required: false
-      required: false
+      required: true
       direction: input
     - name: --temp_dir
       type: string

@@ -9,7 +9,7 @@ from scipy import sparse
 import scanpy as sc
 
 par = {
-    'sc_counts': 'resources/raw-data/sc_counts.h5ad',
+    'sc_counts': 'resources/raw-data/perturbation_counts.h5ad',
     'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
 }
 

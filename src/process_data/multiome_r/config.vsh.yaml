@@ -1,0 +1,56 @@
+functionality:
+  name: reformat_resources_r
+  info:
+    label: reformat_resources_r
+    summary: "Converts data to format needed for R methods."
+
+  arguments:
+    - name: --rna_matrix
+      type: file
+      required: true
+      direction: input
+    - name: --atac_matrix
+      type: file
+      required: true
+      direction: input
+    - name: --rna_gene_annot
+      type: file
+      required: true
+      direction: input
+    - name: --rna_cell_annot
+      type: file
+      required: true
+      direction: input
+    - name: --atac_peak_annot
+      type: file
+      required: true
+      direction: input
+    - name: --atac_cell_annot
+      type: file
+      required: true
+      direction: input
+    - name: --rna_rds
+      type: file
+      required: true
+      direction: output
+    - name: --atac_rds
+      type: file
+      required: true
+      direction: output
+
+  resources:
+    - type: r_script
+      path: script.R
+
+
+platforms:
+  - type: docker
+    image: janursa/figr:19-08-2024
+    # setup:
+    #   - type: r
+    #     packages: [dplyr, FNN, chromVAR, doParallel]
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]
