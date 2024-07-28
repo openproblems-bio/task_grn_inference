@@ -4,9 +4,9 @@
 import anndata as ad 
 import pandas as pd
 import numpy as np
-import sctk
 from scipy import sparse
 import scanpy as sc
+import requests
 
 par = {
     'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
@@ -19,8 +19,8 @@ par = {
     'perturbation_data_test': 'resources_test/grn-benchmark/perturbation_data.h5ad',
 }
 
-n_cells = 1000
-n_peaks = 5000
+n_cells = 2000
+n_peaks = 10000
 
 adata_rna = ad.read_h5ad(par['multiomics_rna'])
 adata_atac = ad.read_h5ad(par['multiomics_atac'])
@@ -29,6 +29,8 @@ adata_atac = ad.read_h5ad(par['multiomics_atac'])
 mask = adata_rna.obs.donor_id=='donor_0'
 adata_rna_s = adata_rna[mask]
 # only one chr and n_cells 
+if 'interval' not in adata_rna.var:
+    raise ValueError('location is not given in rna')
 chr_mask = adata_rna_s.var.interval.str.split(':').str[0] == 'chr1'
 adata_rna_s = adata_rna_s[:n_cells, chr_mask]
 

@@ -3,7 +3,9 @@
 # aws s3 cp s3://openproblems-bio/public/neurips-2023-competition/2023-09-14_kaggle_upload/2023-08-31_sc_multiome_expression_atac.h5ad ./datasets_raw --no-sign-request
 # aws s3 cp s3://openproblems-bio/public/neurips-2023-competition/sc_counts.h5ad  ./datasets_raw/ --no-sign-request
 # mv ./datasets_raw/2023-08-31_sc_multiome_expression_atac.h5ad ./datasets_raw/multiome.h5ad
-# aws s3 sync ./datasets_raw/ s3://openproblems-data/resources/datasets_raw/grn 
+
+# aws s3 sync ./datasets_raw/ s3://openproblems-data/resources/grn/datasets_raw 
+
 
 # aws s3 sync s3://openproblems-data/resources/datasets_raw/grn ./datasets_raw/
 
