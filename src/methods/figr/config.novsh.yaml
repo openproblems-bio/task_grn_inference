@@ -11,30 +11,12 @@ functionality:
   arguments:
     - name: --multiomics_rna
       type: file
-      example: resources/grn-benchmark/multiomics_r/rna.rds
-      info:
-        label: multiomics_rna
-        summary: "Multiomics rna in rds format"
-        file_type: rds
-        columns: 
-          - name: dummpy
-            type: string
-            required: false
-        test_default: resources_test/grn-benchmark/multiomics_r/rna.rds
       required: true
+      direction: input
     - name: --multiomics_atac
       type: file
-      example: resources/grn-benchmark/multiomics_r/atac.rds
-      info:
-        label: multiomics_atac
-        summary: "Multiomics atac in rds format"
-        file_type: rds
-        columns: 
-          - name: dummpy
-            type: string
-            required: false
-        test_default: resources_test/grn-benchmark/multiomics_r/atac.rds
       required: true
+      direction: input
     - name: --prediction
       __merge__: ../../api/file_prediction.yaml
       required: true

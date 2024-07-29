@@ -16,7 +16,7 @@ functionality:
       direction: input
     - name: --multiomics_atac
       type: file
-      required: false
+      required: True
       direction: input
     - name: --prediction
       type: file

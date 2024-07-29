@@ -1,0 +1,45 @@
+
+functionality:
+  name: hvgs
+  info:
+    label: hvgs
+    summary: "Determining HVGs based on perturbation data"
+
+  arguments:
+    - name: --perturbation_data
+      __merge__: ../../../api/file_perturbation_h5ad.yaml
+      direction: input
+      required: true 
+    - name: --multiomics_rna
+      __merge__: ../../../api/file_multiomics_rna_h5ad.yaml
+      direction: input
+      required: true 
+    - name: --n_hvgs
+      type: integer 
+      direction: input 
+      required: false
+      default: 3000
+    - name: --hvgs
+      type: file
+      direction: output
+      required: true 
+      default: resources/grn-benchmark/supp/hvgs.csv
+    
+  resources:
+    - type: r_script
+      path: script.R
+
+
+platforms:
+  - type: docker
+    image: janursa/figr:19-08-2024
+    setup:
+      - type: r
+        packages: [scry]
+
+    
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

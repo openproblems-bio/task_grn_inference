@@ -5,6 +5,8 @@ import anndata as ad
 par = {
   "multiomics_rna": "resources/grn-benchmark/multiomics_rna.h5ad",
   "multiomics_atac": "resources/grn-benchmark/multiomics_atac.h5ad",
+  "annotation_file": "resources/grn-benchmark/annotation_file",
+  "motif_file": "resources/grn-benchmark/motif_file",
   "prediction": "output/prediction.csv",
 }
 ## VIASH END

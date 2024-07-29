@@ -1,11 +1,12 @@
 import anndata as ad
-#!aws s3 cp s3://openproblems-bio/public/neurips-2023-competition/2023-09-14_kaggle_upload/2023-08-31_sc_multiome_expression_atac.h5ad ./resources/raw-data/ --no-sign-request
-# mv resources/raw-data/2023-08-31_sc_multiome_expression_atac.h5ad resources/raw-data/multiome.h5ad
+
 par = {
-    'multiome_counts': '/resources/datasets_raw/multiome_counts.h5ad',
+    'multiome_counts': 'resources/datasets_raw/multiome_counts.h5ad',
     'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
     'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad'
 }
+
+
 # Load 
 multiomics = ad.read_h5ad(par['multiome_counts'])
 multiomics.X = multiomics.layers['counts']

@@ -3,13 +3,11 @@ functionality:
   info:
     label: multiome
     summary: "Download multiome, splits to rna and atac and saves seperately."
-
   arguments:
     - name: --multiome_counts
       type: file 
       required: True
       direction: input
-      default: /resources/datasets_raw/multiome_counts.h5ad
     - name: --multiomics_rna
       type: file 
       required: true
@@ -18,12 +16,9 @@ functionality:
       type: file 
       required: true
       direction: output
-
   resources:
     - type: python_script
       path: script.py
-
-
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4
