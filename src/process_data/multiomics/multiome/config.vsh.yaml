@@ -1,3 +1,5 @@
+__merge__: ../../../api/comp_method.yaml
+
 functionality:
   name: multiome
   info:
@@ -6,16 +8,19 @@ functionality:
   arguments:
     - name: --multiome_counts
       type: file 
-      required: True
+      required: false
       direction: input
+      default: resources/datasets_raw/multiome_counts.h5ad
     - name: --multiomics_rna
       type: file 
-      required: true
+      required: false
       direction: output
+      default: resources/grn-benchmark/multiomics_rna.h5ad
     - name: --multiomics_atac
       type: file 
-      required: true
+      required: false
       direction: output
+      default: resources/grn-benchmark/multiomics_atac.h5ad
   resources:
     - type: python_script
       path: script.py

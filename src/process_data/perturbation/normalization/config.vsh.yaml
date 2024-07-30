@@ -1,15 +1,15 @@
 functionality:
-  name: batch_correction_scgen
+  name: normalization
   info:
-    label: batch_correction_scgen
-    summary: "Correct batch effects using scgen"
-    
+    label: normalization
+    summary: "Normalize pseudobulked data"
+
 
   arguments:
+
     - name: --perturbation_data
       type: file 
       required: true
-
       
 
   resources:
@@ -20,6 +20,9 @@ functionality:
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4
+    setup:
+      - type: python
+        packages: [ sctk==0.2.2]
 
   - type: native
   - type: nextflow

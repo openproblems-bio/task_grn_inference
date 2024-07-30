@@ -24,7 +24,6 @@ multiomics_genes <- rownames(multiomics_rna)
 
 # Subset adata to keep only the genes present in multiomics_rna
 adata <- adata[rownames(adata) %in% multiomics_genes, ]
-print(adata)
 
 adata_sce = devianceFeatureSelection(adata, assay="X", batch=colData(adata)$plate_name)
 

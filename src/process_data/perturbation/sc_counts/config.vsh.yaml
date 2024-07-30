@@ -13,12 +13,15 @@ functionality:
   arguments:
     - name: --perturbation_counts
       type: file 
-      required: True
+      required: false
       direction: input
+      default: resources/datasets_raw/perturbation_counts.h5ad 
+      
     - name: --perturbation_data
       type: file 
-      required: true
+      required: false
       direction: output
+      default: resources/grn-benchmark/perturbation_data.h5ad 
       
 
   resources:

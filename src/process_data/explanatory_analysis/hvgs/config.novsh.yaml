@@ -32,10 +32,11 @@ functionality:
 
 platforms:
   - type: docker
-    image: janursa/figr:19-08-2024
+    image: ghcr.io/openproblems-bio/base_images/r:1.1.0
     setup:
       - type: r
-        packages: [scry]
+        bioc: [scry]
+        packages: [zellkonverter]
 
     
 

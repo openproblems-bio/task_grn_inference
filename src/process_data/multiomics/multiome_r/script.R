@@ -35,7 +35,9 @@ atac <- SummarizedExperiment(assays = list(counts = X_filtered),
                              rowRanges = GRanges(annotation_peak_filtered$seqname,
                              IRanges(annotation_peak_filtered$ranges)), 
                              colData = DataFrame(annotation_cells))
+
 colnames(atac) <- annotation_cells$obs_id    
+rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac)), sep=':')   
 
 print(dim(atac)) #peaks*cells
 
@@ -59,7 +61,3 @@ rna <- rna[Matrix::rowSums(rna)!=0,]
 print(dim(rna)) # genes*cells
 
 saveRDS(rna, par$rna_rds)
-
-
-
-

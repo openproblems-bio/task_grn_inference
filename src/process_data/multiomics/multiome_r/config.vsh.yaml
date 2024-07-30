@@ -7,36 +7,52 @@ functionality:
   arguments:
     - name: --rna_matrix
       type: file
-      required: true
+      required: false
       direction: input
+      default: output/scRNA/X_matrix.mtx
+  
     - name: --atac_matrix
       type: file
-      required: true
+      required: false
       direction: input
+      default: output/scATAC/X_matrix.mtx 
+
     - name: --rna_gene_annot
       type: file
-      required: true
+      required: false
       direction: input
+      default: output/scRNA/annotation_gene.csv
+
     - name: --rna_cell_annot
       type: file
-      required: true
+      required: false
       direction: input
+      default: output/scRNA/annotation_cell.csv 
+   
     - name: --atac_peak_annot
       type: file
-      required: true
+      required: false
       direction: input
+      default: output/scATAC/annotation_gene.csv
+      
     - name: --atac_cell_annot
       type: file
-      required: true
+      required: false
       direction: input
+      default: output/scATAC/annotation_cell.csv
+
     - name: --rna_rds
       type: file
-      required: true
+      required: false
       direction: output
+      default: resources/grn-benchmark/multiomics_r/rna.rds
     - name: --atac_rds
       type: file
-      required: true
+      required: false
       direction: output
+      default: resources/grn-benchmark/multiomics_r/atac.rds
+
+
 
   resources:
     - type: r_script

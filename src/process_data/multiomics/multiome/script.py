@@ -1,9 +1,9 @@
 import anndata as ad
 
 par = {
-    'multiome_counts': 'resources/datasets_raw/multiome_counts.h5ad',
-    'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
-    'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad'
+    # 'multiome_counts': 'resources/datasets_raw/multiome_counts.h5ad',
+    # 'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
+    # 'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad'
 }
 
 
