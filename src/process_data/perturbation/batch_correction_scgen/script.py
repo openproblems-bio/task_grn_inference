@@ -5,11 +5,12 @@ import scanpy as sc
 import scgen
 
 par = {
-    'perturbation_data': 'resources/raw-data/perturbation_data.h5ad',
+    'perturbation_data_n': 'resources/raw-data/perturbation_data.h5ad',
+    "perturbation_data_bc": 'resources/raw-data/perturbation_data.h5ad'
 }
 
 
-bulk_adata = ad.read_h5ad(par['perturbation_data'])
+bulk_adata = ad.read_h5ad(par['perturbation_data_n'])
 print(bulk_adata)
 
 for norm_name in ['lognorm', 'pearson']:
@@ -30,4 +31,4 @@ for norm_name in ['lognorm', 'pearson']:
     corrected_adata = model.batch_removal()
 
     bulk_adata.layers[f'scgen_{norm_name}'] = corrected_adata.X
-bulk_adata.write_h5ad(par['perturbation_data'])
+bulk_adata.write_h5ad(par['perturbation_data_bc'])

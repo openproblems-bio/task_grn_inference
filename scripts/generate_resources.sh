@@ -14,8 +14,19 @@ viash run src/process_data/test_data_counts/config.novsh.yaml
 echo ">> process multiome"
 viash run src/process_data/multiomics/multiome/config.vsh.yaml 
 
-echo ">> process perturbation data"
-viash run src/process_data/perturbation/sc_counts/config.vsh.yaml 
+echo ">> Preprocess perturbation data"
+echo "> QC, pseudobulk, and filter"
+# viash run src/process_data/perturbation/sc_counts/config.vsh.yaml 
+python src/process_data/perturbation/sc_counts/script.py
+echo "> Normalize counts"
+# viash run src/process_data/perturbation/normalization/config.vsh.yaml 
+python src/process_data/perturbation/normalization/script.py
+echo "> Batch correction using scgen"
+# viash run src/process_data/perturbation/batch_correction_scgen/config.vsh.yaml 
+python src/process_data/perturbation/batch_correction_scgen/script.py
+echo "> Batch correction using seurat"
+viash run src/process_data/perturbation/batch_correction_seurat/config.vsh.yaml 
+
 
 
 # echo ">> Perturbation data: batch correction" TODO"
@@ -24,6 +35,7 @@ viash run src/process_data/perturbation/sc_counts/config.vsh.yaml
 
 # echo ">> process supp: TODO"
 
+echo ">> Format multiomics data for R "
 echo ">> Extract matrix and annotations from multiome "
 viash run  src/process_data/multiomics/multiome_matrix/config.vsh.yaml 
 
@@ -32,7 +44,7 @@ echo ">> Construct rds files from multiomics count matrix and annotations"
 viash run  src/process_data/multiomics/multiome_r/config.vsh.yaml 
 
 
-echo ">> create test resources "
+echo ">> Create test resources"
 echo ">> Extract matrix and annotations from multiome: test data "
 viash run  src/process_data/multiomics/multiome_matrix/config.vsh.yaml --  --multiomics_rna resources_test/grn-benchmark/multiomics_rna.h5ad \
     --multiomics_atac resources_test/grn-benchmark/multiomics_atac.h5ad \

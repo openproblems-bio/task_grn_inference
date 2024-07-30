@@ -10,7 +10,7 @@ import scanpy as sc
 
 par = {
     'sc_counts': 'resources/datasets_raw/perturbation_counts.h5ad',
-    'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
+    'perturbation_data_f': 'resources/grn-benchmark/perturbation_data.h5ad',
 }
 
 def preprocess_sc(par):
@@ -186,25 +186,10 @@ def filter_func(bulk_adata):
     for key in ['cell_type','plate_name']:
         bulk_adata_filtered.obs[key] = bulk_adata_filtered.obs[key].astype(str)
     return bulk_adata_filtered
-def normalize_func(bulk_adata):
-    # normalize data based on mean pseudobulk
-    bulk_adata.X = bulk_adata.layers['counts'].copy()
 
-    bulk_adata_c = bulk_adata.copy()
-    sc.experimental.pp.normalize_pearson_residuals(bulk_adata_c)
-    bulk_adata.layers['pearson'] = bulk_adata_c.X
-
-    bulk_adata_c = bulk_adata.copy()
-    sc.pp.normalize_total(bulk_adata_c)
-    sc.pp.log1p(bulk_adata_c)
-    sc.pp.scale(bulk_adata_c)
-    bulk_adata.layers['lognorm'] = bulk_adata_c.X
-    
-    return bulk_adata
     
 sc_counts_f = preprocess_sc(par)
 bulk_adata = pseudobulk_sum_func(sc_counts_f)
 bulk_adata = pseudobulk_mean_func(bulk_adata)
 bulk_adata_filtered = filter_func(bulk_adata)
-bulk_adata_n = normalize_func(bulk_adata_filtered)
-bulk_adata_n.write(par['perturbation_data'])
+bulk_adata_filtered.write(par['perturbation_data_f'])
