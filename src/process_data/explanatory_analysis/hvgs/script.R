@@ -13,6 +13,8 @@ par <- list(
   hvgs = "resources/grn-benchmark/supp/hvgs.txt",
   n_hvgs = 3000 
 )
+## VIASH END
+
 print(par)
 
 
@@ -40,6 +42,6 @@ mask[indices] <- TRUE
 hvgs_sce <- rownames(adata_sce)[mask]
 
 # Save the highly variable genes to a text file
-# print(hvgs_sce)
+print(dim(hvgs_sce))
 
 write(hvgs_sce, file = par$hvgs)

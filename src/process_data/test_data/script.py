@@ -8,6 +8,8 @@ from scipy import sparse
 import scanpy as sc
 import requests
 
+## VIASH START
+
 par = {
     'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
     'multiomics_rna_test': 'resources_test/grn-benchmark/multiomics_rna.h5ad',
@@ -18,6 +20,7 @@ par = {
     'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
     'perturbation_data_test': 'resources_test/grn-benchmark/perturbation_data.h5ad',
 }
+## VIASH END
 
 n_cells = 2000
 n_peaks = 10000

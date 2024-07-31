@@ -14,6 +14,8 @@ par <- list(
   multiomics_atac = "resources/grn-benchmark/multiomics_atac.h5ad",
   annot_peak_database = "resources/grn-benchmark/supp/annot_peak_database.csv"
 )
+## VIASH END
+
 print(par)
 
 adata_atac <- read_h5ad(par$multiomics_atac)

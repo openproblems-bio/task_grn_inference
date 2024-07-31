@@ -4,7 +4,8 @@ library(chromVAR)
 library(doParallel)
 library(FigR)
 
-# Example usage
+## VIASH START
+
 par <- list(
     rna_matrix = 'output/scRNA/X_matrix.mtx',
     atac_matrix ='output/scATAC/X_matrix.mtx',
@@ -15,6 +16,7 @@ par <- list(
     rna_rds = 'resources_test/grn-benchmark/multiomics_r/rna.rds',
     atac_rds = 'resources_test/grn-benchmark/multiomics_r/atac.rds'
 )
+## VIASH END
 
 
 ## Load atac-seq and create summarizedexperiment

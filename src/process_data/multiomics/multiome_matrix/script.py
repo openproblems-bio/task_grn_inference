@@ -8,6 +8,7 @@ from scipy.io import mmwrite
 
 import argparse
 
+## VIASH START
 
 par = {
   "multiomics_rna": "resources_test/grn-benchmark/multiomics_rna.h5ad",
@@ -20,6 +21,8 @@ par = {
   "atac_cell_annot": 'output/scATAC/annotation_cell.csv'
 
 }
+## VIASH END
+
 print(par)
 def format_data(par):
     os.makedirs("output/scATAC/", exist_ok=True)

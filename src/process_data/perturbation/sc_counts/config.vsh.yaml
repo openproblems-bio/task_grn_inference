@@ -3,10 +3,10 @@ functionality:
   info:
     label: perturbation_counts
     summary: "Porcesses sc counts of perturbation data to generate pseudobulked"
-    # description: |
-    #   It conducts QC on sc level to remove low quality cell and genes. 
-    #   Then, sc counts are pseudobulked and filtered for outliers compounds, samples with low quality cells, and genes with low coverage. 
-    #   Finally, it normalized the counts data. 
+    description: |
+      It conducts QC on sc level to remove low quality cell and genes. 
+      Then, sc counts are pseudobulked and filtered for outliers compounds, samples with low quality cells, and genes with low coverage. 
+      Finally, it normalized the counts data. 
     
   arguments:
     - name: --perturbation_counts

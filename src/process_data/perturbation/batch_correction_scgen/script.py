@@ -4,11 +4,12 @@ import numpy as np
 import scanpy as sc
 import scgen
 
+## VIASH START
 par = {
-    'perturbation_data_n': 'resources/raw-data/perturbation_data.h5ad',
-    "perturbation_data_bc": 'resources/raw-data/perturbation_data.h5ad'
+    'perturbation_data_n': 'resources_test/grn-benchmark/perturbation_data.h5ad',
+    "perturbation_data_bc": 'resources_test/grn-benchmark/perturbation_data.h5ad'
 }
-
+## VIASH END
 
 bulk_adata = ad.read_h5ad(par['perturbation_data_n'])
 print(bulk_adata)

@@ -12,13 +12,14 @@ par = {
   "hvgs":  "resources/grn-benchmark/supp/hvgs.txt"
 
 }
+## VIASH END
+
 # meta = {
 #   "resources_dir":'resources'
 # }
 sys.path.append(meta["resources_dir"])
 from helper import Explanatory_analysis
 
-## VIASH END
 print('Reading input files', flush=True)
 
 perturbation_data = pd.read_csv(par["perturbation_data"])

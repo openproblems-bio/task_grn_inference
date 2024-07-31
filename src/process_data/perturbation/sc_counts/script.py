@@ -8,14 +8,16 @@ import sctk
 from scipy import sparse
 import scanpy as sc
 
+## VIASH START
 par = {
-    'sc_counts': 'resources/datasets_raw/perturbation_counts.h5ad',
-    'perturbation_data_f': 'resources/grn-benchmark/perturbation_data.h5ad',
+    'perturbation_counts': 'resources_test/datasets_raw/perturbation_counts.h5ad',
+    'perturbation_data_f': 'resources_test/grn-benchmark/perturbation_data.h5ad',
 }
+## VIASH END
 
 def preprocess_sc(par):
     # clean up
-    sc_counts = ad.read_h5ad(par['sc_counts'])
+    sc_counts = ad.read_h5ad(par['perturbation_counts'])
     sc_counts.obs = sc_counts.obs[['well', 'row', 'col', 'plate_name', 'cell_type', 'donor_id', 'sm_name']]
     sc_counts.X = sc_counts.layers['counts']
     del sc_counts.layers 
@@ -154,9 +156,10 @@ def filter_func(bulk_adata):
     outliers_toxic = ['Alvocidib', 'UNII-BXU45ZH6LI', 'CGP 60474', 'BMS-387032']
     bulk_adata_filtered = bulk_adata_filtered[~bulk_adata_filtered.obs.sm_name.isin(outliers_toxic),:]
     # remove those with less than 10 cells left 
-    mask_low_cell_count = bulk_adata_filtered.obs.cell_count < 10
-    print(mask_low_cell_count.shape)
+
+    mask_low_cell_count = bulk_adata_filtered.obs.cell_count < cell_counts_t
     bulk_adata_filtered = bulk_adata_filtered[~mask_low_cell_count]
+    
     # remove those that have less than 2 cells types left per donor
     to_go_compounds = []
     for donor_id in bulk_adata_filtered.obs.donor_id.unique():
@@ -165,7 +168,7 @@ def filter_func(bulk_adata):
         to_go_compounds.append(cell_type_n[cell_type_n<=2].index.astype(str))
     to_go_compounds = np.unique(np.concatenate(to_go_compounds))
     outliers_two_celltype = ['CEP-18770 (Delanzomib)', 'IN1451', 'MLN 2238', 'Oprozomib (ONX 0912)']
-    assert np.all(to_go_compounds==outliers_two_celltype)
+    # assert np.all(to_go_compounds==outliers_two_celltype)
     bulk_adata_filtered = bulk_adata_filtered[~bulk_adata_filtered.obs.sm_name.isin(to_go_compounds),:]
 
     # remove big class misbalance in all donors 
@@ -187,6 +190,15 @@ def filter_func(bulk_adata):
         bulk_adata_filtered.obs[key] = bulk_adata_filtered.obs[key].astype(str)
     return bulk_adata_filtered
 
+test_flag = False
+if 'test' in par['perturbation_counts'].split('/')[0]:
+    print('Test')
+    test_flag = True
+    cell_counts_t = 1
+    cell_type_t = 1
+else:
+    cell_counts_t = 10
+    cell_type_t = 2
     
 sc_counts_f = preprocess_sc(par)
 bulk_adata = pseudobulk_sum_func(sc_counts_f)

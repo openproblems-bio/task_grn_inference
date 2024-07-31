@@ -5,6 +5,8 @@ import numpy as np
 import scanpy as sc
 import os
 
+## VIASH START
+
 par = {
     'multiomics_counts': 'resources/datasets_raw/multiome_counts.h5ad',
     'multiomics_counts_test': 'resources_test/datasets_raw/multiome_counts.h5ad',
@@ -13,6 +15,7 @@ par = {
     'perturbation_counts_test': 'resources_test/datasets_raw/perturbation_counts.h5ad',
 
 }
+## VIASH END
 
 os.makedirs('resources_test/datasets_raw/', exist_ok=True)
 multiomics_counts = ad.read_h5ad(par['multiomics_counts'])

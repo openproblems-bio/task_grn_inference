@@ -8,10 +8,12 @@ import sctk
 from scipy import sparse
 import scanpy as sc
 
+## VIASH START
 par = {
     'perturbation_data_f': 'resources/grn-benchmark/perturbation_data.h5ad',
     'perturbation_data_n': 'resources/grn-benchmark/perturbation_data.h5ad'
 }
+## VIASH END
 
 def normalize_func(bulk_adata):
     # normalize data based on mean pseudobulk
