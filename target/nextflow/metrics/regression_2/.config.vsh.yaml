@@ -1,0 +1,223 @@
+functionality:
+  name: "regression_2"
+  namespace: "metrics"
+  version: "build-main"
+  arguments:
+  - type: "file"
+    name: "--perturbation_data"
+    info:
+      label: "perturbation"
+      summary: "Perturbation dataset for benchmarking."
+      file_type: "h5ad"
+      slots:
+        obs:
+        - name: "cell_type"
+          type: "string"
+          description: "The annotated cell type of each cell based on RNA expression."
+          required: true
+        - name: "sm_name"
+          type: "string"
+          description: "The primary name for the (parent) compound (in a standardized\
+            \ representation)\nas chosen by LINCS. This is provided to map the data\
+            \ in this experiment to \nthe LINCS Connectivity Map data.\n"
+          required: true
+        - name: "donor_id"
+          type: "string"
+          description: "Donor id"
+          required: true
+        - name: "plate_name"
+          type: "string"
+          description: "Plate name 6 levels"
+          required: true
+        - name: "row"
+          type: "string"
+          description: "Row name on the plate"
+          required: true
+        - name: "well"
+          type: "string"
+          description: "Well name on the plate"
+          required: true
+        - name: "cell_count"
+          type: "string"
+          description: "Number of single cells pseudobulked"
+          required: true
+        layers:
+        - name: "n_counts"
+          type: "double"
+          description: "Pseudobulked values using mean approach"
+          required: true
+        - name: "pearson"
+          type: "double"
+          description: "Normalized values using pearson residuals"
+          required: false
+        - name: "lognorm"
+          type: "double"
+          description: "Normalized values using shifted logarithm "
+          required: false
+    example:
+    - "resources/grn-benchmark/perturbation_data.h5ad"
+    must_exist: true
+    create_parent: true
+    required: true
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--prediction"
+    info:
+      label: "GRN"
+      summary: "GRN prediction"
+      file_type: "csv"
+      columns:
+      - name: "source"
+        description: "Source of regulation"
+        type: "string"
+        required: true
+      - name: "target"
+        description: "Target of regulation"
+        type: "string"
+        required: true
+      - name: "weight"
+        description: "Weight of regulation"
+        type: "float"
+        required: true
+    example:
+    - "resources/grn-benchmark/grn_models/collectri.csv"
+    must_exist: true
+    create_parent: true
+    required: true
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--score"
+    info:
+      label: "Score"
+      summary: "File indicating the score of a metric."
+      file_type: "csv"
+      columns:
+      - type: "string"
+        name: "accuracy"
+        description: "some explanation"
+        multiple: true
+        required: false
+      - type: "double"
+        name: "completeness"
+        description: "some explanation"
+        multiple: true
+        required: false
+    example:
+    - "resources/grn-benchmark/score.csv"
+    must_exist: true
+    create_parent: true
+    required: true
+    direction: "output"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--reg_type"
+    description: "name of regretion to use"
+    info:
+      test_default: "ridge"
+    default:
+    - "ridge"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "integer"
+    name: "--subsample"
+    description: "number of samples randomly drawn from perturbation data"
+    info:
+      test_default: 200
+    default:
+    - -1
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  resources:
+  - type: "python_script"
+    path: "script.py"
+    is_executable: true
+  - type: "file"
+    path: "main.py"
+  test_resources:
+  - type: "python_script"
+    path: "src/common/component_tests/run_and_check_output.py"
+    is_executable: true
+  - type: "file"
+    path: "resources/grn-benchmark"
+    dest: "resources/grn-benchmark"
+  info:
+    label: "Regression 2"
+    summary: "Calculates R2 score for regression 2"
+    description: "Calculates R2 score using regression approach 2.\n"
+    type: "metrics"
+    type_info:
+      label: "Label"
+      summary: "A metric to evaluate the performance of the inferred GRN"
+      description: "A metric to evaluate the performance of the inferred GRN\n"
+  status: "enabled"
+  set_wd_to_resources_dir: false
+platforms:
+- type: "docker"
+  id: "docker"
+  image: "ghcr.io/openproblems-bio/base_python:1.0.4"
+  target_organization: "openproblems-bio/task_grn_inference"
+  target_registry: "ghcr.io"
+  namespace_separator: "/"
+  resolve_volume: "Automatic"
+  chown: true
+  setup_strategy: "ifneedbepullelsecachedbuild"
+  target_image_source: "https://github.com/openproblems-bio/task_grn_inference"
+  setup:
+  - type: "python"
+    user: false
+    packages:
+    - "lightgbm"
+    upgrade: true
+  entrypoint: []
+  cmd: null
+- type: "nextflow"
+  id: "nextflow"
+  directives:
+    label:
+    - "midtime"
+    - "highmem"
+    - "highcpu"
+    tag: "$id"
+  auto:
+    simplifyInput: true
+    simplifyOutput: false
+    transcript: false
+    publish: false
+  config:
+    labels:
+      lowmem: "memory = 20.Gb"
+      midmem: "memory = 50.Gb"
+      highmem: "memory = 100.Gb"
+      lowcpu: "cpus = 5"
+      midcpu: "cpus = 15"
+      highcpu: "cpus = 30"
+      lowtime: "time = 1.h"
+      midtime: "time = 4.h"
+      hightime: "time = 8.h"
+      veryhightime: "time = 24.h"
+    script:
+    - "process.errorStrategy = 'ignore'"
+  debug: false
+  container: "docker"
+info:
+  config: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/metrics/regression_2/config.vsh.yaml"
+  platform: "nextflow"
+  output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2"
+  executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2/regression_2"
+  viash_version: "0.8.6"
+  git_commit: "6c92f6b3e79eb243279a46a8ef9e96b0af5dc28f"
+  git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"

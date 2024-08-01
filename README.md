@@ -41,7 +41,7 @@ Similarly, run the command for other methods.
 ## Evaluate a GRN
 
 ``` bash
-scripts/benchmark_grn.sh --grn resources/grn-benchmark/models/collectri.csv 
+scripts/run_evaluation.sh --grn resources/grn-benchmark/grn_models/collectri.csv 
 ```
 
 Similarly, run the command for other GRN models.
@@ -100,10 +100,11 @@ approaches to assess both accuracy and comprehensiveness.
 
 ## Authors & contributors
 
-| name              | roles  |
-|:------------------|:-------|
-| Jalil Nourisa     | author |
-| Robrecht Cannoodt | author |
+| name               | roles  |
+|:-------------------|:-------|
+| Jalil Nourisa      | author |
+| Robrecht Cannoodt  | author |
+| Antoine Passemiers | author |
 
 ## API
 
