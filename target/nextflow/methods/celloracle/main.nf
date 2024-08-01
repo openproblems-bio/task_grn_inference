@@ -2811,9 +2811,12 @@ meta = [
         "example" : [
           "resources/grn-benchmark/multiomics_rna.h5ad"
         ],
+        "default" : [
+          "resources_test/grn-benchmark/multiomics_rna.h5ad"
+        ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2845,6 +2848,9 @@ meta = [
         },
         "example" : [
           "resources/grn-benchmark/multiomics_atac.h5ad"
+        ],
+        "default" : [
+          "resources_test/grn-benchmark/multiomics_atac.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2885,9 +2891,12 @@ meta = [
         "example" : [
           "resources/grn-benchmark/grn_models/collectri.csv"
         ],
+        "default" : [
+          "resources_test/grn-benchmark/perturbation_data.h5ad"
+        ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "output",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2964,29 +2973,14 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "ghcr.io/openproblems-bio/base_python:1.0.4",
+      "image" : "kenjikamimoto126/celloracle_ubuntu:0.18.0",
       "target_organization" : "openproblems-bio/task_grn_inference",
       "target_registry" : "ghcr.io",
       "namespace_separator" : "/",
       "resolve_volume" : "Automatic",
       "chown" : true,
       "setup_strategy" : "ifneedbepullelsecachedbuild",
-      "target_image_source" : "https://github.com/openproblems-bio/task_grn_inference",
-      "setup" : [
-        {
-          "type" : "python",
-          "user" : false,
-          "packages" : [
-            "celloracle==0.14.0",
-            "genomepy==0.16.1"
-          ],
-          "upgrade" : true
-        },
-        {
-          "type" : "apt",
-          "interactive" : false
-        }
-      ]
+      "target_image_source" : "https://github.com/openproblems-bio/task_grn_inference"
     },
     {
       "type" : "native",
@@ -3035,7 +3029,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/methods/celloracle",
     "viash_version" : "0.8.6",
-    "git_commit" : "9928733231ae9d5a2f21592d820d3aeb70d9f943",
+    "git_commit" : "0b0f464fc596e545861bd77bb22fcdccd759ab83",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

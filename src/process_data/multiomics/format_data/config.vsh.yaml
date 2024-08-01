@@ -1,9 +1,9 @@
-__merge__: ../../../api/comp_method.yaml
 
 functionality:
-  name: multiome
+  name: format_data
+  namespace: "multiomics"
   info:
-    label: multiome
+    label: format_data
     summary: "Download multiome, splits to rna and atac and saves seperately."
   arguments:
     - name: --multiome_counts

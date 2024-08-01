@@ -406,9 +406,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "sctk==0.2.2"
 
 LABEL org.opencontainers.image.description="Companion container for running component normalization"
-LABEL org.opencontainers.image.created="2024-08-01T10:00:42Z"
+LABEL org.opencontainers.image.created="2024-08-01T12:26:55Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="9928733231ae9d5a2f21592d820d3aeb70d9f943"
+LABEL org.opencontainers.image.revision="0b0f464fc596e545861bd77bb22fcdccd759ab83"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

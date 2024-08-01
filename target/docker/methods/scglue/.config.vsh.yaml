@@ -218,5 +218,5 @@ info:
   output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/docker/methods/scglue"
   executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/docker/methods/scglue/scglue"
   viash_version: "0.8.6"
-  git_commit: "9928733231ae9d5a2f21592d820d3aeb70d9f943"
+  git_commit: "0b0f464fc596e545861bd77bb22fcdccd759ab83"
   git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"
