@@ -5,6 +5,7 @@
 resources/
 resources_test/
 output/
+out/
 target/
 local/
 datasets_raw/
