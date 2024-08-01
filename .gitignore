@@ -6,6 +6,7 @@ resources/
 resources_test/
 output/
 local/
+datasets_raw/
 
 # related to python
 .ipynb_checkpoints

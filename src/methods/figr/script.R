@@ -58,7 +58,8 @@ print('2: peak_gene_func finished')
 ## Step 2: create DORCs and smooth them 
 dorc_genes_func <- function(par){
   cisCorr = read.csv(paste0(par$temp_dir, "cisCorr.csv"))
-  cisCorr.filt <- cisCorr %>% filter(pvalZ <= 0.05)
+  # cisCorr.filt <- cisCorr %>% filter(pvalZ <= 0.05)
+  cisCorr.filt <- cisCorr %>% filter(pvalZ <= 0.2)
 
   atac = readRDS(par$multiomics_atac)
   rna  = readRDS(par$multiomics_rna)

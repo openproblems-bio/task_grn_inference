@@ -1,0 +1,47 @@
+functionality:
+  name: create_test_data
+  info:
+    label: create_test_data
+    summary: "Subset resources to create resources_test"
+
+
+  arguments:
+    - name: --multiomics_rna
+      type: file 
+      required: true
+      direction: input
+    - name: --multiomics_rna_test
+      type: file 
+      required: true
+      direction: output
+    - name: --multiomics_atac
+      type: file 
+      required: true
+      direction: input
+    - name: --multiomics_atac_test
+      type: file 
+      required: true
+      direction: input
+    - name: --perturbation_data
+      type: file 
+      required: true
+      direction: input
+    - name: --perturbation_data_test
+      type: file 
+      required: true
+      direction: output
+      
+
+  resources:
+    - type: python_script
+      path: script.py
+
+
+platforms:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

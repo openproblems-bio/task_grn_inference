@@ -1,0 +1,67 @@
+functionality:
+  name: normalization
+  info:
+    label: normalization
+    summary: "Normalize pseudobulked data"
+
+
+  arguments:
+
+    - name: --perturbation_data_f
+      type: file
+      info:
+        label: perturbation
+        summary: "Perturbation dataset for benchmarking."
+        file_type: h5ad
+        slots:
+          layers:
+            - name: n_counts
+              type: double
+              description: "Pseudobulked values using mean approach"
+              required: true
+
+      required: false
+      direction: input
+      default: resources/grn-benchmark/perturbation_data.h5ad 
+
+    - name: --perturbation_data_n
+      type: file
+      info:
+        label: perturbation
+        summary: "Perturbation dataset for benchmarking."
+        file_type: h5ad
+        slots:
+          layers:
+            - name: n_counts
+              type: double
+              description: "Pseudobulked values using mean approach"
+              required: true
+            - name: pearson
+              type: double
+              description: "Normalized values using pearson residuals"
+              required: true
+            - name: lognorm
+              type: double
+              description: "Normalized values using shifted logarithm "
+              required: true
+      required: false
+      direction: input
+      default: resources/grn-benchmark/perturbation_data.h5ad 
+      
+
+  resources:
+    - type: python_script
+      path: script.py
+
+
+platforms:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    setup:
+      - type: python
+        packages: [ sctk==0.2.2]
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

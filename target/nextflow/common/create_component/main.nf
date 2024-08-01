@@ -2882,12 +2882,12 @@ meta = [
         "type" : "python_script",
         "path" : "script.py",
         "is_executable" : true,
-        "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/common/create_component/"
+        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/common/create_component/"
       },
       {
         "type" : "file",
         "path" : "read_and_merge_yaml.py",
-        "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/common/create_component/"
+        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/common/create_component/"
       }
     ],
     "description" : "Create a component Viash component.\n\nUsage:\n```\nbin/create_component --task denoising --type method --language r --name foo\nbin/create_component --task denoising --type metric --language python --name bar\n```\n",
@@ -2955,12 +2955,12 @@ meta = [
     }
   ],
   "info" : {
-    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/common/create_component/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/common/create_component/config.vsh.yaml",
     "platform" : "nextflow",
-    "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/common/create_component",
+    "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/common/create_component",
     "viash_version" : "0.8.6",
-    "git_commit" : "b163932318aef117b54930791489d68951dc878e",
-    "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
+    "git_commit" : "9928733231ae9d5a2f21592d820d3aeb70d9f943",
+    "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
 ]

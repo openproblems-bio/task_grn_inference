@@ -1,0 +1,86 @@
+functionality:
+  name: batch_correction_seurat
+  info:
+    label: batch_correction_seurat
+    summary: "Correct batch effects using seurat"
+  
+  arguments:
+    - name: --perturbation_data_n
+      type: file
+      info:
+        label: perturbation
+        summary: "Perturbation dataset for benchmarking."
+        file_type: h5ad
+        slots:
+          layers:
+            - name: n_counts
+              type: double
+              description: "Pseudobulked values using mean approach"
+              required: true
+            - name: pearson
+              type: double
+              description: "Normalized values using pearson residuals"
+              required: true
+            - name: lognorm
+              type: double
+              description: "Normalized values using shifted logarithm "
+              required: true
+      required: false
+      direction: input
+      default: resources_test/grn-benchmark/perturbation_data.h5ad 
+    - name: --perturbation_data_bc
+      type: file
+      info:
+        label: perturbation
+        summary: "Perturbation dataset for benchmarking."
+        file_type: h5ad
+        slots:
+          layers:
+            - name: n_counts
+              type: double
+              description: "Pseudobulked values using mean approach"
+              required: true
+            - name: pearson
+              type: double
+              description: "Normalized values using pearson residuals"
+              required: true
+            - name: lognorm
+              type: double
+              description: "Normalized values using shifted logarithm "
+              required: true
+            - name: scgen_lognorm
+              type: double
+              description: "Batch correction using scgen on lognorm data"
+              required: true
+            - name: scgen_pearson
+              type: double
+              description: "Batch correction using scgen on pearson data"
+              required: true
+            - name: seurat_lognorm
+              type: double
+              description: "Batch correction using seurat on lognorm data"
+              required: true
+            - name: seurat_pearson
+              type: double
+              description: "Batch correction using seurat on pearson data"
+              required: true
+      required: false
+      direction: input
+      default: resources_test/grn-benchmark/perturbation_data.h5ad 
+
+
+  resources:
+    - type: r_script
+      path: script.R
+platforms:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_images/r:1.1.0
+    setup:
+      - type: r
+        bioc: []
+        packages: [Seurat, zellkonverter]
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

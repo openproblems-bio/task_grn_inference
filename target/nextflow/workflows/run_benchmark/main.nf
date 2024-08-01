@@ -2942,13 +2942,13 @@ meta = [
         "type" : "nextflow_script",
         "path" : "main.nf",
         "is_executable" : true,
-        "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/workflows/run_benchmark/",
+        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/run_benchmark/",
         "entrypoint" : "run_wf"
       },
       {
         "type" : "file",
         "path" : "../../api/task_info.yaml",
-        "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/workflows/run_benchmark/"
+        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/run_benchmark/"
       }
     ],
     "status" : "enabled",
@@ -2989,12 +2989,12 @@ meta = [
     }
   ],
   "info" : {
-    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/workflows/run_benchmark/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/run_benchmark/config.vsh.yaml",
     "platform" : "nextflow",
-    "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_benchmark",
+    "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_benchmark",
     "viash_version" : "0.8.6",
-    "git_commit" : "b163932318aef117b54930791489d68951dc878e",
-    "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
+    "git_commit" : "9928733231ae9d5a2f21592d820d3aeb70d9f943",
+    "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
 ]

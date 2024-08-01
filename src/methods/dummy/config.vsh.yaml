@@ -1,0 +1,39 @@
+__merge__: ../../api/comp_method.yaml
+
+functionality:
+  name: dummy
+  info:
+    label: dummy
+    summary: "FILL IN: A one sentence summary of this method."
+    description: |
+      A dummy method that contains the format of a real GRN inference method.
+    documentation_url: https://url.to/the/documentation
+    repository_url: https://github.com/organisation/repository
+  arguments:
+    - name: --multiomics_rna
+      type: file
+      required: True
+      direction: input
+    - name: --multiomics_atac
+      type: file
+      required: True
+      direction: input
+    - name: --prediction
+      type: file
+      required: true
+      direction: output
+  resources:
+    - type: python_script
+      path: script.py
+
+platforms:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    setup:
+      - type: python
+        packages: [  ]
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

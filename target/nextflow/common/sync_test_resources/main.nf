@@ -2855,7 +2855,7 @@ meta = [
         "type" : "bash_script",
         "path" : "script.sh",
         "is_executable" : true,
-        "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/common/sync_test_resources/"
+        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/common/sync_test_resources/"
       }
     ],
     "description" : "Synchronise the test resources from s3 to resources_test",
@@ -2914,12 +2914,12 @@ meta = [
     }
   ],
   "info" : {
-    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/common/sync_test_resources/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/common/sync_test_resources/config.vsh.yaml",
     "platform" : "nextflow",
-    "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/common/sync_test_resources",
+    "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/common/sync_test_resources",
     "viash_version" : "0.8.6",
-    "git_commit" : "b163932318aef117b54930791489d68951dc878e",
-    "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
+    "git_commit" : "9928733231ae9d5a2f21592d820d3aeb70d9f943",
+    "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
 ]

@@ -143,10 +143,10 @@ platforms:
   debug: false
   container: "docker"
 info:
-  config: "/home/runner/work/task_grn_inference/task_grn_inference/src/common/create_component/config.vsh.yaml"
+  config: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/common/create_component/config.vsh.yaml"
   platform: "docker"
-  output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/common/create_component"
-  executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/common/create_component/create_component"
+  output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/docker/common/create_component"
+  executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/docker/common/create_component/create_component"
   viash_version: "0.8.6"
-  git_commit: "b163932318aef117b54930791489d68951dc878e"
-  git_remote: "https://github.com/openproblems-bio/task_grn_inference"
+  git_commit: "9928733231ae9d5a2f21592d820d3aeb70d9f943"
+  git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"
