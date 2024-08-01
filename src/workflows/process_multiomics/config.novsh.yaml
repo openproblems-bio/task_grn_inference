@@ -9,18 +9,18 @@ functionality:
   arguments:
     - name: --multiome_counts
       type: file 
-      required: false
+      required: true
       direction: input
       default: resources/datasets_raw/multiome_counts.h5ad
       description: multiomics data at baseline
     - name: --multiomics_rna
       type: file 
-      required: false
+      required: true
       direction: output
       default: resources/grn-benchmark/multiomics_rna.h5ad
     - name: --multiomics_atac
       type: file 
-      required: false
+      required: true
       direction: output
       default: resources/grn-benchmark/multiomics_atac.h5ad
     
@@ -29,9 +29,9 @@ functionality:
       path: main.nf
       entrypoint: run_wf
   dependencies:
-    - name: src/process_dataset/multiomics/format_data 
-    - name: src/process_dataset/multiomics/multiome_matrix
-    - name: src/process_dataset/multiomics/multiome_r 
+    - name: process_dataset/multiomics/format_data 
+    - name: process_dataset/multiomics/multiome_matrix
+    - name: process_dataset/multiomics/multiome_r 
 platforms:
   - type: nextflow
     directives:

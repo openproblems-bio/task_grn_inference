@@ -15,7 +15,7 @@ functionality:
       type: file
       required: false
       direction: input
-      direction: resources/grn-benchmark/multiomics_atac.h5ad
+      default: resources/grn-benchmark/multiomics_atac.h5ad
 
     - name: --rna_matrix
       type: file
@@ -52,14 +52,9 @@ functionality:
       required: false
       direction: output
       default: output/scATAC/annotation_cell.csv
-
-
-
   resources:
     - type: python_script
       path: script.py
-
-
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4

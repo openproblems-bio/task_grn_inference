@@ -65,10 +65,10 @@ functionality:
       path: script.py
 platforms:
   - type: docker
-    image: python:3.8.19-slim-bullseye
+    image: janursa/scglue:19-08-2024
     setup:
       - type: python
-        packages: [scgen]
+        packages: [requests, scgen]
 
   - type: native
   - type: nextflow

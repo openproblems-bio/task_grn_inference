@@ -16,14 +16,11 @@ viash run src/process_data/multiomics/multiome/config.vsh.yaml
 
 echo ">> Preprocess perturbation data"
 echo "> QC, pseudobulk, and filter"
-# viash run src/process_data/perturbation/sc_counts/config.vsh.yaml 
-python src/process_data/perturbation/sc_counts/script.py
+viash run src/process_data/perturbation/sc_counts/config.vsh.yaml 
 echo "> Normalize counts"
-# viash run src/process_data/perturbation/normalization/config.vsh.yaml 
-python src/process_data/perturbation/normalization/script.py
+viash run src/process_data/perturbation/normalization/config.vsh.yaml 
 echo "> Batch correction using scgen"
-# viash run src/process_data/perturbation/batch_correction_scgen/config.vsh.yaml 
-python src/process_data/perturbation/batch_correction_scgen/script.py
+viash run src/process_data/perturbation/batch_correction_scgen/config.vsh.yaml 
 echo "> Batch correction using seurat"
 viash run src/process_data/perturbation/batch_correction_seurat/config.vsh.yaml 
 
