@@ -1,7 +1,8 @@
 functionality:
-  name: reformat_resources_r
+  name: format_resources_r
+  namespace: "multiomics"
   info:
-    label: reformat_resources_r
+    label: format_resources_r
     summary: "Converts data to format needed for R methods."
 
   arguments:

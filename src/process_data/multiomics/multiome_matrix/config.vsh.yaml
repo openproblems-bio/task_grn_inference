@@ -1,5 +1,6 @@
 functionality:
   name: multiome_matrix
+  namespace: "multiomics"
   info:
     label: multiome_matrix
     summary: "Converts data to format needed for R methods."

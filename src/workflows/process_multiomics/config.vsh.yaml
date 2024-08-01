@@ -29,9 +29,9 @@ functionality:
       path: main.nf
       entrypoint: run_wf
   dependencies:
-    - name: process_dataset/multiomics/format_data 
-    - name: process_dataset/multiomics/multiome_matrix
-    - name: process_dataset/multiomics/multiome_r 
+    - name: multiomics/format_data 
+    - name: multiomics/multiome_matrix
+    - name: multiomics/format_resources_r 
 platforms:
   - type: nextflow
     directives:
