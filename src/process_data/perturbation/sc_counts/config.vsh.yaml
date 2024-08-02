@@ -1,7 +1,8 @@
 functionality:
-  name: perturbation_counts
+  name: sc_counts
+  namespace: "perturbation"
   info:
-    label: perturbation_counts
+    label: sc_counts
     summary: "Porcesses sc counts of perturbation data to generate pseudobulked"
     description: |
       It conducts QC on sc level to remove low quality cell and genes. 

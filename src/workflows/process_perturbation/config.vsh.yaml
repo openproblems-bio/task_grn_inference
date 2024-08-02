@@ -1,0 +1,37 @@
+
+functionality:
+  name: process_perturbation
+  namespace: "workflows"
+  info:
+    label: process_perturbation
+    summary: "Processes perturbation data from sc counts to batch corrected perturbation_data"
+
+  arguments:
+    - name: --perturbation_counts
+      type: file 
+      required: true
+      direction: input
+      default: resources/datasets_raw/perturbation_counts.h5ad
+      description: single cell perturbation data 
+
+    - name: --perturbation_data_bc
+      type: file
+      required: true
+      direction: output
+      default: resources/grn-benchmark/multiomics_rna.h5ad
+    
+    
+  resources:
+    - type: nextflow_script
+      path: main.nf
+      entrypoint: run_wf
+  dependencies:
+    - name: perturbation/sc_counts 
+    - name: perturbation/normalization
+    - name: perturbation/batch_correction_scgen
+    - name: perturbation/batch_correction_seurat 
+
+platforms:
+  - type: nextflow
+    directives:
+      label: [ midtime, midmem, lowcpu ]

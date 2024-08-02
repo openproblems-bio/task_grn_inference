@@ -31,6 +31,8 @@ workflow run_wf {
                 atac_rds: "atac_rds"]
     )
 
+    | setState(["multiomics_rna", "multiomics_atac", "rna_rds", "atac_rds"])
+
   emit:
   output_ch
 }
