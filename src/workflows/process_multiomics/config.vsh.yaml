@@ -13,6 +13,7 @@ functionality:
       direction: input
       default: resources/datasets_raw/multiome_counts.h5ad
       description: multiomics data at baseline
+
     - name: --multiomics_rna
       type: file 
       required: true
@@ -23,6 +24,17 @@ functionality:
       required: true
       direction: output
       default: resources/grn-benchmark/multiomics_atac.h5ad
+    
+    - name: --rna_rds
+      type: file
+      required: true
+      direction: output
+      default: resources/grn-benchmark/multiomics_r/rna.rds
+    - name: --atac_rds
+      type: file
+      required: true
+      direction: output
+      default: resources/grn-benchmark/multiomics_r/atac.rds
     
   resources:
     - type: nextflow_script
