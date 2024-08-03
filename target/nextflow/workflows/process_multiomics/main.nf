@@ -2826,6 +2826,34 @@ meta = [
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
+      },
+      {
+        "type" : "file",
+        "name" : "--rna_rds",
+        "default" : [
+          "resources/grn-benchmark/multiomics_r/rna.rds"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : true,
+        "direction" : "output",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "file",
+        "name" : "--atac_rds",
+        "default" : [
+          "resources/grn-benchmark/multiomics_r/atac.rds"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : true,
+        "direction" : "output",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
       }
     ],
     "resources" : [
@@ -2859,7 +2887,7 @@ meta = [
           "functionalityNamespace" : "multiomics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "72aa8b12b7f297ebcb17bed8e006d8cb087a2a9e",
+          "git_commit" : "25cabcc2d69d453cd1a4173033cf7ae869ef8d7a",
           "executable" : "/nextflow/multiomics/format_data/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/multiomics/format_data"
@@ -2880,7 +2908,7 @@ meta = [
           "functionalityNamespace" : "multiomics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "72aa8b12b7f297ebcb17bed8e006d8cb087a2a9e",
+          "git_commit" : "25cabcc2d69d453cd1a4173033cf7ae869ef8d7a",
           "executable" : "/nextflow/multiomics/multiome_matrix/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/multiomics/multiome_matrix"
@@ -2901,7 +2929,7 @@ meta = [
           "functionalityNamespace" : "multiomics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "72aa8b12b7f297ebcb17bed8e006d8cb087a2a9e",
+          "git_commit" : "25cabcc2d69d453cd1a4173033cf7ae869ef8d7a",
           "executable" : "/nextflow/multiomics/format_resources_r/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/multiomics/format_resources_r"
@@ -2953,7 +2981,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/process_multiomics",
     "viash_version" : "0.8.6",
-    "git_commit" : "72aa8b12b7f297ebcb17bed8e006d8cb087a2a9e",
+    "git_commit" : "25cabcc2d69d453cd1a4173033cf7ae869ef8d7a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -2979,10 +3007,28 @@ workflow run_wf {
       toState: [multiomics_rna: "multiomics_rna", multiomics_atac: "multiomics_atac"]
     )
 
-    | setState([
-      "multiomics_rna",
-      "multiomics_atac"
-    ])
+    | multiome_matrix.run(
+      fromState: [multiomics_rna: "multiomics_rna", multiomics_atac: "multiomics_atac"],
+      toState: [rna_matrix: "rna_matrix",
+                atac_matrix: "atac_matrix",
+                rna_gene_annot: "rna_gene_annot",
+                rna_cell_annot: "rna_cell_annot",
+                atac_peak_annot: "atac_peak_annot",
+                atac_cell_annot: "atac_cell_annot"]
+    )
+    
+    | format_resources_r.run(
+      fromState: [rna_matrix: "rna_matrix",
+                atac_matrix: "atac_matrix",
+                rna_gene_annot: "rna_gene_annot",
+                rna_cell_annot: "rna_cell_annot",
+                atac_peak_annot: "atac_peak_annot",
+                atac_cell_annot: "atac_cell_annot"],
+      toState: [rna_rds: "rna_rds",
+                atac_rds: "atac_rds"]
+    )
+
+    | setState(["multiomics_rna", "multiomics_atac", "rna_rds", "atac_rds"])
 
   emit:
   output_ch

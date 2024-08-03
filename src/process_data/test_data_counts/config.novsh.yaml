@@ -1,11 +1,9 @@
-__merge__: ../../api/comp_method.yaml
 
 functionality:
   name: create_test_data
   info:
     label: create_test_data
     summary: "Subset resources to create resources_test"
-
 
   arguments:
     - name: --multiomics_counts

@@ -28,6 +28,11 @@ functionality:
       multiple: false
       info:
         test_default: ridge
+    - name: --layer
+      type: string
+      direction: input
+      required: false
+      default: pearson
     - name: --subsample
       type: integer
       direction: input
@@ -35,6 +40,8 @@ functionality:
       description: number of samples randomly drawn from perturbation data
       info:
         test_default: 200
+
+
       
   test_resources:
     - type: python_script

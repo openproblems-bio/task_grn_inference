@@ -1,5 +1,6 @@
 functionality:
   name: batch_correction_scgen
+  namespace: "perturbation"
   info:
     label: batch_correction_scgen
     summary: "Correct batch effects using scgen"
@@ -65,7 +66,7 @@ functionality:
       path: script.py
 platforms:
   - type: docker
-    image: janursa/scglue:19-08-2024
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
     setup:
       - type: python
         packages: [requests, scgen]

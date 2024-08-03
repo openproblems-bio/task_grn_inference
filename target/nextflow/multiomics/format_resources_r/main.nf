@@ -2972,7 +2972,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/multiomics/format_resources_r",
     "viash_version" : "0.8.6",
-    "git_commit" : "72aa8b12b7f297ebcb17bed8e006d8cb087a2a9e",
+    "git_commit" : "25cabcc2d69d453cd1a4173033cf7ae869ef8d7a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

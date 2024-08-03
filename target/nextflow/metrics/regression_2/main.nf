@@ -2914,23 +2914,37 @@ meta = [
         "info" : {
           "label" : "Score",
           "summary" : "File indicating the score of a metric.",
-          "file_type" : "csv",
-          "columns" : [
-            {
-              "type" : "string",
-              "name" : "accuracy",
-              "description" : "some explanation",
-              "multiple" : true,
-              "required" : false
-            },
-            {
-              "type" : "double",
-              "name" : "completeness",
-              "description" : "some explanation",
-              "multiple" : true,
-              "required" : false
-            }
-          ]
+          "file_type" : "h5ad",
+          "slots" : {
+            "uns" : [
+              {
+                "type" : "string",
+                "name" : "dataset_id",
+                "description" : "A unique identifier for the dataset",
+                "required" : true
+              },
+              {
+                "type" : "string",
+                "name" : "method_id",
+                "description" : "A unique identifier for the method",
+                "required" : true
+              },
+              {
+                "type" : "string",
+                "name" : "metric_ids",
+                "description" : "One or more unique metric identifiers",
+                "multiple" : true,
+                "required" : true
+              },
+              {
+                "type" : "double",
+                "name" : "metric_values",
+                "description" : "The metric values obtained for the given prediction. Must be of same length as 'metric_ids'.",
+                "multiple" : true,
+                "required" : true
+              }
+            ]
+          }
         },
         "example" : [
           "resources/grn-benchmark/score.csv"
@@ -2952,6 +2966,18 @@ meta = [
         },
         "default" : [
           "ridge"
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "string",
+        "name" : "--layer",
+        "default" : [
+          "pearson"
         ],
         "required" : false,
         "direction" : "input",
@@ -3083,7 +3109,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "72aa8b12b7f297ebcb17bed8e006d8cb087a2a9e",
+    "git_commit" : "25cabcc2d69d453cd1a4173033cf7ae869ef8d7a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3110,6 +3136,7 @@ par = {
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'score': $( if [ ! -z ${VIASH_PAR_SCORE+x} ]; then echo "r'${VIASH_PAR_SCORE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'subsample': $( if [ ! -z ${VIASH_PAR_SUBSAMPLE+x} ]; then echo "int(r'${VIASH_PAR_SUBSAMPLE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi )
 }
 meta = {

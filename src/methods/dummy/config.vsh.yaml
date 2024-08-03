@@ -1,6 +1,7 @@
 
 functionality:
   name: dummy
+  namespace: "grn_methods"
   info:
     label: dummy
     summary: "FILL IN: A one sentence summary of this method."

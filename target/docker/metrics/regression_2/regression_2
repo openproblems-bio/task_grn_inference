@@ -190,6 +190,10 @@ function ViashHelp {
   echo "        default: ridge"
   echo "        name of regretion to use"
   echo ""
+  echo "    --layer"
+  echo "        type: string"
+  echo "        default: pearson"
+  echo ""
   echo "    --subsample"
   echo "        type: integer"
   echo "        default: -1"
@@ -420,9 +424,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_2"
-LABEL org.opencontainers.image.created="2024-08-03T10:19:19Z"
+LABEL org.opencontainers.image.created="2024-08-03T10:28:04Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="72aa8b12b7f297ebcb17bed8e006d8cb087a2a9e"
+LABEL org.opencontainers.image.revision="25cabcc2d69d453cd1a4173033cf7ae869ef8d7a"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -625,6 +629,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_REG_TYPE=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --layer)
+            [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_LAYER="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --layer. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --layer=*)
+            [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer=*\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_LAYER=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --subsample)
             [ -n "$VIASH_PAR_SUBSAMPLE" ] && ViashError Bad arguments for option \'--subsample\': \'$VIASH_PAR_SUBSAMPLE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_SUBSAMPLE="$2"
@@ -791,6 +806,9 @@ fi
 if [ -z ${VIASH_PAR_REG_TYPE+x} ]; then
   VIASH_PAR_REG_TYPE="ridge"
 fi
+if [ -z ${VIASH_PAR_LAYER+x} ]; then
+  VIASH_PAR_LAYER="pearson"
+fi
 if [ -z ${VIASH_PAR_SUBSAMPLE+x} ]; then
   VIASH_PAR_SUBSAMPLE="-1"
 fi
@@ -944,6 +962,7 @@ par = {
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'score': $( if [ ! -z ${VIASH_PAR_SCORE+x} ]; then echo "r'${VIASH_PAR_SCORE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'subsample': $( if [ ! -z ${VIASH_PAR_SUBSAMPLE+x} ]; then echo "int(r'${VIASH_PAR_SUBSAMPLE//\'/\'\"\'\"r\'}')"; else echo None; fi )
 }
 meta = {

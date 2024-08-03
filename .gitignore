@@ -8,6 +8,8 @@ output/
 out/
 local/
 datasets_raw/
+state*
+trace*
 
 # related to python
 .ipynb_checkpoints
