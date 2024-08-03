@@ -67,11 +67,18 @@ functionality:
       path: main.nf
       entrypoint: run_wf
   dependencies:
-    - name: perturbation/sc_counts 
-    - name: perturbation/normalization
-    - name: perturbation/batch_correction_scgen
-    - name: perturbation/batch_correction_seurat 
-
+    # - name: common/extract_metadata
+    #   repository: openproblemsv2
+    - name: grn_methods/dummy 
+    - name: grn_methods/celloracle 
+    - name: metrics/regression_1
+    # - name: grn_methods/figr
+    # - name: grn_methods/scglue
+  # repositories:
+  #   - name: openproblemsv2
+  #     type: github
+  #     repo: openproblems-bio/openproblems-v2
+  #     tag: main_build
 platforms:
   - type: nextflow
     directives:

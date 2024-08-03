@@ -1,5 +1,6 @@
 functionality:
   name: create_test_data
+  namespace: "testdata"
   info:
     label: create_test_data
     summary: "Subset resources to create resources_test"
@@ -10,33 +11,36 @@ functionality:
       type: file 
       required: true
       direction: input
+      default: resources/grn-benchmark/multiomics_rna.h5ad
     - name: --multiomics_rna_test
       type: file 
       required: true
       direction: output
+      default: resources_test/grn-benchmark/multiomics_rna.h5ad
+
     - name: --multiomics_atac
       type: file 
       required: true
       direction: input
+      default: resources/grn-benchmark/multiomics_atac.h5ad
     - name: --multiomics_atac_test
       type: file 
       required: true
       direction: input
+      default: resources_test/grn-benchmark/multiomics_atac.h5ad
     - name: --perturbation_data
       type: file 
       required: true
       direction: input
+      default: resources/grn-benchmark/perturbation_data.h5ad
     - name: --perturbation_data_test
       type: file 
       required: true
       direction: output
-      
-
+      default: resources_test/grn-benchmark/perturbation_data.h5ad
   resources:
     - type: python_script
       path: script.py
-
-
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4
