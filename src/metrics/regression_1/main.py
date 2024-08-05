@@ -243,10 +243,10 @@ def main(par):
 
             output = run_method_1(net_subset, pert_df, exclude_missing_genes=exclude_missing_genes, reg_type=reg_type)
             result_key = f'ex({exclude_missing_genes})_tf({tf_n})'
-            layer_results[result_key] = output['mean_score_r2']
+            layer_results[result_key] = [output['mean_score_r2']]
 
     # Convert results to DataFrame
-    df_results = pd.DataFrame(results, index=layers)
+    df_results = pd.DataFrame(layer_results)
     if 'ex(True)_tf(140)' not in df_results.columns:
         df_results['ex(True)_tf(140)'] = df_results['ex(True)_tf(-1)']
     if 'ex(False)_tf(140)' not in df_results.columns:

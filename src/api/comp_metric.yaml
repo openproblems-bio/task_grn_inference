@@ -10,16 +10,19 @@ functionality:
   arguments:
     - name: --perturbation_data
       __merge__: file_perturbation_h5ad.yaml
-      required: true
+      required: false
       direction: input
+      default: resources/grn-benchmark/perturbation_data.h5ad
     - name: --prediction
       __merge__: file_prediction.yaml
-      required: true
+      required: false
       direction: input
+      default: resources/grn-benchmark/grn_models/collectri.csv
     - name: --score
       __merge__: file_score.yaml
-      required: true
+      required: false
       direction: output
+      default: output/score.h5ad
     - name: --reg_type
       type: string
       direction: input

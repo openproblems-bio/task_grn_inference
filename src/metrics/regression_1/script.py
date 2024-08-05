@@ -27,13 +27,14 @@ output.columns = ['S1', 'S2', 'S3', 'S4']
 print("Write output to file", flush=True)
 print(output)
 # output.to_csv(par['score'])
-# print("Completed", flush=True)
+print("Completed", flush=True)
+print(output)
 
 output = ad.AnnData(
     X=np.empty((0, 0)),
     uns={
         "layer": par["layer"],
-        "metric_ids": output.columns,
+        "metric_ids": output.columns.to_numpy(),
         "metric_values": output.values
     }
 )

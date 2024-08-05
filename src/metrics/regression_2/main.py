@@ -171,49 +171,47 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     grn = load_grn(par['prediction'], gene_names)
     
     results = []
-    layers = ['scgen_pearson', 'scgen_lognorm']
-    for layer in layers:
-        print(f'Compute metrics for layer: {layer}', flush=True)
+    layer = 'pearson'
+    print(f'Compute metrics for layer: {layer}', flush=True)
 
-        # Load and standardize perturbation data
-        X = perturbation_data.layers[layer]
-        X = RobustScaler().fit_transform(X)
+    # Load and standardize perturbation data
+    X = perturbation_data.layers[layer]
+    X = RobustScaler().fit_transform(X)
 
-        # Determine maximum number of input features
-        max_n_regulators = min(100, int(0.5 * n_genes))
+    # Determine maximum number of input features
+    max_n_regulators = min(100, int(0.5 * n_genes))
 
-        # Learn background distribution for each value of `n_features`:
-        # r2 scores using random genes as features.
-        background = learn_background_distribution(par['reg_type'], X, groups, max_n_regulators, random_state=random_state)
+    # Learn background distribution for each value of `n_features`:
+    # r2 scores using random genes as features.
+    background = learn_background_distribution(par['reg_type'], X, groups, max_n_regulators, random_state=random_state)
 
-        # Cross-validate each gene using the inferred GRN to define select input features
-        res = cross_validate(
-            par['reg_type'],
-            gene_names,
-            X,
-            groups,
-            grn,
-            np.clip(np.sum(grn != 0, axis=0), 0, max_n_regulators)
-        )
+    # Cross-validate each gene using the inferred GRN to define select input features
+    res = cross_validate(
+        par['reg_type'],
+        gene_names,
+        X,
+        groups,
+        grn,
+        np.clip(np.sum(grn != 0, axis=0), 0, max_n_regulators)
+    )
 
-        # Compute z-scores from r2 scores to take into account the fact
-        # that random network can still perform well when the number of features is large
-        scores = []
-        for j in range(n_genes):
-            if np.isnan(res['scores'][j]['avg-r2']):
-                continue
-            n_features = int(np.sum(grn[:, j] != 0))
-            if n_features in background:
-                mu, sigma = background[n_features]
-            else:
-                mu, sigma = background['max']
-            z_score = (res['scores'][j]['avg-r2'] - mu) / sigma
-            z_score = max(0, z_score)
-            scores.append(z_score)
+    # Compute z-scores from r2 scores to take into account the fact
+    # that random network can still perform well when the number of features is large
+    scores = []
+    for j in range(n_genes):
+        if np.isnan(res['scores'][j]['avg-r2']):
+            continue
+        n_features = int(np.sum(grn[:, j] != 0))
+        if n_features in background:
+            mu, sigma = background[n_features]
+        else:
+            mu, sigma = background['max']
+        z_score = (res['scores'][j]['avg-r2'] - mu) / sigma
+        z_score = max(0, z_score)
+        scores.append(z_score)
 
-        total_score = np.mean(scores)
-        print(f'Score on {layer}: {total_score}')
-        results.append({'score': total_score})
+    total_score = np.mean(scores)
+    print(f'Score on {layer}: {total_score}')
 
     # Convert results to DataFrame
     df_results = pd.DataFrame(results, index=layers)
