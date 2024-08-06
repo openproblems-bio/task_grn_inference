@@ -28,9 +28,9 @@ for (norm_name in c('lognorm', 'pearson')){
   # Make sure the rows and columns are in the same order as the original object
   integrated_expr <- integrated_expr[rownames(seurat), colnames(seurat)]
   # Transpose the matrix to AnnData format
-  integrated_expr <- t(as.matrix(integrated_expr))
+  integrated_expr <- as.matrix(integrated_expr)
   assay_name <- paste0("seurat_", norm_name)
-  assays(adata_seurat, withDimnames=FALSE)[[assay_name]] <-integrated_expr
+  assays(adata_seurat, withDimnames=FALSE)[[assay_name]] <- integrated_expr
   print(paste0(norm_name, " batch corrected"))
 }
 
