@@ -130,9 +130,9 @@ def run_method_1(
 
 
     mean_score_r2 = r2_score(y_true, y_pred, multioutput='variance_weighted')
-    gene_scores_r2 = r2_score(y_true.T, y_pred.T, multioutput='raw_values')
+    # gene_scores_r2 = r2_score(y_true.T, y_pred.T, multioutput='raw_values')
 
-    output = dict(mean_score_r2=mean_score_r2, gene_scores_r2=list(gene_scores_r2))
+    output = dict(mean_score_r2=mean_score_r2)
 
     return output
 

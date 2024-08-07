@@ -1,6 +1,5 @@
 param_list:
-  - id: test_process_perturatbion
-    perturbation_counts: "s3://openproblems-data/resources/grn//datasets_raw/perturbation_counts.h5ad",
-
-output_state: "state.yaml"
-publish_dir: "s3://openproblems-data/resources/grn/results/run_2024-08-06_18-40-37"
+  - id: test_process_perturbation
+    perturbation_counts: "s3://openproblems-data/resources/grn/datasets_raw/perturbation_counts.h5ad"
+    output_state: "state.yaml"
+    publish_dir: "s3://openproblems-data/resources/grn/results/run_2024-08-06_18-40-37"
