@@ -175,11 +175,11 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --perturbation_data_n"
   echo "        type: file, file must exist"
-  echo "        default: resources_test/grn-benchmark/perturbation_data.h5ad"
+  echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
   echo ""
   echo "    --perturbation_data_bc"
   echo "        type: file, file must exist"
-  echo "        default: resources_test/grn-benchmark/perturbation_data.h5ad"
+  echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -397,18 +397,16 @@ function ViashDockerCheckCommands {
 #   ViashDockerFile
 function ViashDockerfile {
   cat << 'VIASHDOCKER'
-FROM ghcr.io/openproblems-bio/base_images/r:1.1.0
+FROM janursa/batch_correction_seurat:19-08-2024
 
 ENTRYPOINT []
 
  
-RUN Rscript -e 'if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")' && \
-  Rscript -e 'remotes::install_cran(c("Seurat", "zellkonverter"), repos = "https://cran.rstudio.com")'
-
+RUN :
 LABEL org.opencontainers.image.description="Companion container for running component perturbation batch_correction_seurat"
-LABEL org.opencontainers.image.created="2024-08-03T10:28:04Z"
+LABEL org.opencontainers.image.created="2024-08-07T09:26:43Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="25cabcc2d69d453cd1a4173033cf7ae869ef8d7a"
+LABEL org.opencontainers.image.revision="4d4bd81efeee05042198b53aebc9837add8db4b8"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -730,10 +728,10 @@ fi
 
 # filling in defaults
 if [ -z ${VIASH_PAR_PERTURBATION_DATA_N+x} ]; then
-  VIASH_PAR_PERTURBATION_DATA_N="resources_test/grn-benchmark/perturbation_data.h5ad"
+  VIASH_PAR_PERTURBATION_DATA_N="resources/grn-benchmark/perturbation_data.h5ad"
 fi
 if [ -z ${VIASH_PAR_PERTURBATION_DATA_BC+x} ]; then
-  VIASH_PAR_PERTURBATION_DATA_BC="resources_test/grn-benchmark/perturbation_data.h5ad"
+  VIASH_PAR_PERTURBATION_DATA_BC="resources/grn-benchmark/perturbation_data.h5ad"
 fi
 
 # check whether required files exist
@@ -861,6 +859,8 @@ cat > "\$tempscript" << 'VIASHMAIN'
 library(zellkonverter)
 options(digits=5, max.print=100)  # Adjust numbers as needed
 library(Seurat)
+library(SingleCellExperiment)
+
 # library(reticulate)
 
 
@@ -901,10 +901,8 @@ rm(.viash_orig_warn)
 print(par)
 batch_key = 'plate_name'
 adata_seurat = readH5AD(par\$perturbation_data_n) # raw counts
-
+print(adata_seurat)
 for (norm_name in c('lognorm', 'pearson')){
-  
-  
   seurat <- as.Seurat(adata_seurat, counts = "X", data = norm_name)
   batch_list <- SplitObject(seurat, split.by = batch_key)
   anchors <- FindIntegrationAnchors(batch_list, anchor.features = rownames(seurat))
@@ -915,9 +913,9 @@ for (norm_name in c('lognorm', 'pearson')){
   integrated_expr <- integrated_expr[rownames(seurat), colnames(seurat)]
   # Transpose the matrix to AnnData format
   integrated_expr <- as.matrix(integrated_expr)
-
-
-  assay(adata_seurat, paste0("seurat_", norm_name)) <- integrated_expr
+  assay_name <- paste0("seurat_", norm_name)
+  assays(adata_seurat, withDimnames=FALSE)[[assay_name]] <- integrated_expr
+  print(paste0(norm_name, " batch corrected"))
 }
 
 print("Writing adata to h5ad")

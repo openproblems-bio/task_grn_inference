@@ -2887,6 +2887,20 @@ meta = [
         "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/perturbation/batch_correction_scgen/"
       }
     ],
+    "test_resources" : [
+      {
+        "type" : "python_script",
+        "path" : "src/common/component_tests/run_and_check_output.py",
+        "is_executable" : true,
+        "parent" : "file:///home/runner/work/task_grn_benchmark/task_grn_benchmark/"
+      },
+      {
+        "type" : "file",
+        "path" : "resources/grn-benchmark",
+        "dest" : "resources/grn-benchmark",
+        "parent" : "file:///home/runner/work/task_grn_benchmark/task_grn_benchmark/"
+      }
+    ],
     "info" : {
       "label" : "batch_correction_scgen",
       "summary" : "Correct batch effects using scgen"
@@ -2898,25 +2912,14 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "ghcr.io/openproblems-bio/base_python:1.0.4",
+      "image" : "janursa/scgen:19-08-2024",
       "target_organization" : "openproblems-bio/task_grn_inference",
       "target_registry" : "ghcr.io",
       "namespace_separator" : "/",
       "resolve_volume" : "Automatic",
       "chown" : true,
       "setup_strategy" : "ifneedbepullelsecachedbuild",
-      "target_image_source" : "https://github.com/openproblems-bio/task_grn_inference",
-      "setup" : [
-        {
-          "type" : "python",
-          "user" : false,
-          "packages" : [
-            "requests",
-            "scgen"
-          ],
-          "upgrade" : true
-        }
-      ]
+      "target_image_source" : "https://github.com/openproblems-bio/task_grn_inference"
     },
     {
       "type" : "native",
@@ -2965,7 +2968,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/batch_correction_scgen",
     "viash_version" : "0.8.6",
-    "git_commit" : "25cabcc2d69d453cd1a4173033cf7ae869ef8d7a",
+    "git_commit" : "4d4bd81efeee05042198b53aebc9837add8db4b8",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3034,6 +3037,7 @@ for norm_name in ['lognorm', 'pearson']:
     corrected_adata = model.batch_removal()
 
     bulk_adata.layers[f'scgen_{norm_name}'] = corrected_adata.X
+    print(f"{norm_name} finished batch correction")
 bulk_adata.write_h5ad(par['perturbation_data_bc'])
 VIASHMAIN
 python -B "$tempscript"

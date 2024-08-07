@@ -55,7 +55,8 @@ def run_method_1(
             train_df: pd.DataFrame,
             reg_type: str = 'GB',
             exclude_missing_genes: bool = False,
-            verbose: int = 0) -> None: 
+            verbose: int = 0,
+            max_workers: int = 4) -> None: 
     """
     net: a df with index as genes and columns as tfs
     train_df: a df with index as genes and columns as samples
@@ -64,15 +65,11 @@ def run_method_1(
     gene_names_grn = net.index.to_numpy()
     # determine regressor 
     if reg_type=='ridge':
-        # regr = Pipeline([
-        #     ('scaler', StandardScaler()),
-        #     ('svc', Ridge(alpha=100, random_state=32))
-        # ])
         regr =  Ridge(**dict(random_state=32))
     elif reg_type=='GB':
-        regr = lightgbm_wrapper(dict(random_state=32, n_estimators=100, min_samples_leaf=2, min_child_samples=1, feature_fraction=0.05, verbosity=-1))
+        regr = lightgbm_wrapper(dict(random_state=32, n_estimators=100, min_samples_leaf=2, min_child_samples=1, feature_fraction=0.05, verbosity=-1, max_workers=max_workers))
     elif reg_type=='RF':
-        regr = lightgbm_wrapper(dict(boosting_type='rf',random_state=32, n_estimators=100,  feature_fraction=0.05, verbosity=-1))
+        regr = lightgbm_wrapper(dict(boosting_type='rf',random_state=32, n_estimators=100,  feature_fraction=0.05, verbosity=-1, max_workers=max_workers))
     else:
         print(f'{reg_type} is not defined')
         raise ValueError("define first")        
@@ -130,9 +127,9 @@ def run_method_1(
 
 
     mean_score_r2 = r2_score(y_true, y_pred, multioutput='variance_weighted')
-    gene_scores_r2 = r2_score(y_true.T, y_pred.T, multioutput='raw_values')
+    # gene_scores_r2 = r2_score(y_true.T, y_pred.T, multioutput='raw_values')
 
-    output = dict(mean_score_r2=mean_score_r2, gene_scores_r2=list(gene_scores_r2))
+    output = dict(mean_score_r2=mean_score_r2)
 
     return output
 
@@ -186,34 +183,7 @@ def main(par):
 
     subsample = par['subsample']
     reg_type = par['reg_type']
-    
-    # process pert data
-    # for layer in ['scgen_pearson', 'scgen_lognorm']:
-    #     pert_df = pd.DataFrame(perturbation_data.layers[layer], columns=gene_names)
-    #     if subsample != -1:
-    #         pert_df = pert_df.sample(n=subsample)
-    #     pert_df = pert_df.T # make it gene*sample
-
-    #     # process net
-    #     net = process_net(net, gene_names, manipulate)
-
-    #     print('Compute metrics', flush=True)
-    #     out_dict = {}
-    #     for exclude_missing_genes in [True, False]: # two settings on target gene
-    #         for tf_n in [-1, 140]: # two settings on tfs
-    #             # Subset TFs 
-    #             if tf_n==-1:
-    #                 degrees = net.abs().sum(axis=0)
-    #                 net = net.loc[:, degrees>=degrees.quantile((1-theta))]
-    #             else:
-    #                 if tf_n>net.shape[1]:
-    #                     print(f'Skip running because tf_n ({tf_n}) is bigger than net.shape[1] ({net.shape[1]})')
-    #                     return 
-    #                 degrees = net.abs().sum(axis=0)
-    #                 net = net[degrees.nlargest(tf_n).index]
-    #             output = run_method_1(net, pert_df, exclude_missing_genes=exclude_missing_genes, reg_type=reg_type)
-    #             out_dict[f'ex({exclude_missing_genes})_tf({tf_n})'] = output['mean_score_r2']
-
+    max_workers = par['max_workers']
     layer = par["layer"]
     pert_df = pd.DataFrame(perturbation_data.layers[layer], columns=gene_names)
 
@@ -241,12 +211,12 @@ def main(par):
                 degrees = net_subset.abs().sum(axis=0)
                 net_subset = net_subset[degrees.nlargest(tf_n).index]
 
-            output = run_method_1(net_subset, pert_df, exclude_missing_genes=exclude_missing_genes, reg_type=reg_type)
+            output = run_method_1(net_subset, pert_df, exclude_missing_genes=exclude_missing_genes, reg_type=reg_type, max_workers=max_workers)
             result_key = f'ex({exclude_missing_genes})_tf({tf_n})'
-            layer_results[result_key] = output['mean_score_r2']
+            layer_results[result_key] = [output['mean_score_r2']]
 
     # Convert results to DataFrame
-    df_results = pd.DataFrame(results, index=layers)
+    df_results = pd.DataFrame(layer_results)
     if 'ex(True)_tf(140)' not in df_results.columns:
         df_results['ex(True)_tf(140)'] = df_results['ex(True)_tf(-1)']
     if 'ex(False)_tf(140)' not in df_results.columns:

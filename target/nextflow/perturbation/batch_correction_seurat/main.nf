@@ -2815,7 +2815,7 @@ meta = [
           }
         },
         "default" : [
-          "resources_test/grn-benchmark/perturbation_data.h5ad"
+          "resources/grn-benchmark/perturbation_data.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2880,7 +2880,7 @@ meta = [
           }
         },
         "default" : [
-          "resources_test/grn-benchmark/perturbation_data.h5ad"
+          "resources/grn-benchmark/perturbation_data.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2899,6 +2899,20 @@ meta = [
         "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/perturbation/batch_correction_seurat/"
       }
     ],
+    "test_resources" : [
+      {
+        "type" : "python_script",
+        "path" : "src/common/component_tests/run_and_check_output.py",
+        "is_executable" : true,
+        "parent" : "file:///home/runner/work/task_grn_benchmark/task_grn_benchmark/"
+      },
+      {
+        "type" : "file",
+        "path" : "resources/grn-benchmark",
+        "dest" : "resources/grn-benchmark",
+        "parent" : "file:///home/runner/work/task_grn_benchmark/task_grn_benchmark/"
+      }
+    ],
     "info" : {
       "label" : "batch_correction_seurat",
       "summary" : "Correct batch effects using seurat"
@@ -2910,24 +2924,14 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "ghcr.io/openproblems-bio/base_images/r:1.1.0",
+      "image" : "janursa/batch_correction_seurat:19-08-2024",
       "target_organization" : "openproblems-bio/task_grn_inference",
       "target_registry" : "ghcr.io",
       "namespace_separator" : "/",
       "resolve_volume" : "Automatic",
       "chown" : true,
       "setup_strategy" : "ifneedbepullelsecachedbuild",
-      "target_image_source" : "https://github.com/openproblems-bio/task_grn_inference",
-      "setup" : [
-        {
-          "type" : "r",
-          "packages" : [
-            "Seurat",
-            "zellkonverter"
-          ],
-          "bioc_force_install" : false
-        }
-      ]
+      "target_image_source" : "https://github.com/openproblems-bio/task_grn_inference"
     },
     {
       "type" : "native",
@@ -2976,7 +2980,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/batch_correction_seurat",
     "viash_version" : "0.8.6",
-    "git_commit" : "25cabcc2d69d453cd1a4173033cf7ae869ef8d7a",
+    "git_commit" : "4d4bd81efeee05042198b53aebc9837add8db4b8",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -2995,6 +2999,8 @@ cat > "$tempscript" << VIASHMAIN
 library(zellkonverter)
 options(digits=5, max.print=100)  # Adjust numbers as needed
 library(Seurat)
+library(SingleCellExperiment)
+
 # library(reticulate)
 
 
@@ -3035,10 +3041,8 @@ rm(.viash_orig_warn)
 print(par)
 batch_key = 'plate_name'
 adata_seurat = readH5AD(par\\$perturbation_data_n) # raw counts
-
+print(adata_seurat)
 for (norm_name in c('lognorm', 'pearson')){
-  
-  
   seurat <- as.Seurat(adata_seurat, counts = "X", data = norm_name)
   batch_list <- SplitObject(seurat, split.by = batch_key)
   anchors <- FindIntegrationAnchors(batch_list, anchor.features = rownames(seurat))
@@ -3049,9 +3053,9 @@ for (norm_name in c('lognorm', 'pearson')){
   integrated_expr <- integrated_expr[rownames(seurat), colnames(seurat)]
   # Transpose the matrix to AnnData format
   integrated_expr <- as.matrix(integrated_expr)
-
-
-  assay(adata_seurat, paste0("seurat_", norm_name)) <- integrated_expr
+  assay_name <- paste0("seurat_", norm_name)
+  assays(adata_seurat, withDimnames=FALSE)[[assay_name]] <- integrated_expr
+  print(paste0(norm_name, " batch corrected"))
 }
 
 print("Writing adata to h5ad")

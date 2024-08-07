@@ -33,4 +33,5 @@ for norm_name in ['lognorm', 'pearson']:
     corrected_adata = model.batch_removal()
 
     bulk_adata.layers[f'scgen_{norm_name}'] = corrected_adata.X
+    print(f"{norm_name} finished batch correction")
 bulk_adata.write_h5ad(par['perturbation_data_bc'])

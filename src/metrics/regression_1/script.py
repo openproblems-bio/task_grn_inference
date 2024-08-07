@@ -20,21 +20,19 @@ sys.path.append(meta["resources_dir"])
 from main import main 
 
 output = main(par) 
-output = output.mean(axis=0).to_frame().T # average across datasets
 print(output)
 output.columns = ['S1', 'S2', 'S3', 'S4']
 
 print("Write output to file", flush=True)
 print(output)
-# output.to_csv(par['score'])
-# print("Completed", flush=True)
+output.to_csv(par['score'])
 
-output = ad.AnnData(
-    X=np.empty((0, 0)),
-    uns={
-        "layer": par["layer"],
-        "metric_ids": output.columns,
-        "metric_values": output.values
-    }
-)
-output.write_h5ad(par["score"], compression="gzip")
+# output = ad.AnnData(
+#     X=np.empty((0, 0)),
+#     uns={
+#         "layer": par["layer"],
+#         "metric_ids": output.columns.to_numpy(),
+#         "metric_values": output.values
+#     }
+# )
+# output.write_h5ad(par["score"], compression="gzip")

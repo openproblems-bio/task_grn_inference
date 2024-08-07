@@ -2861,9 +2861,12 @@ meta = [
         "example" : [
           "resources/grn-benchmark/perturbation_data.h5ad"
         ],
+        "default" : [
+          "resources/grn-benchmark/perturbation_data.h5ad"
+        ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2900,9 +2903,12 @@ meta = [
         "example" : [
           "resources/grn-benchmark/grn_models/collectri.csv"
         ],
+        "default" : [
+          "resources/grn-benchmark/grn_models/collectri.csv"
+        ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2949,9 +2955,12 @@ meta = [
         "example" : [
           "resources/grn-benchmark/score.csv"
         ],
+        "default" : [
+          "output/score.h5ad"
+        ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "output",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2994,6 +3003,18 @@ meta = [
         },
         "default" : [
           -1
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "integer",
+        "name" : "--max_workers",
+        "default" : [
+          4
         ],
         "required" : false,
         "direction" : "input",
@@ -3109,7 +3130,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "25cabcc2d69d453cd1a4173033cf7ae869ef8d7a",
+    "git_commit" : "4d4bd81efeee05042198b53aebc9837add8db4b8",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3137,7 +3158,8 @@ par = {
   'score': $( if [ ! -z ${VIASH_PAR_SCORE+x} ]; then echo "r'${VIASH_PAR_SCORE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'subsample': $( if [ ! -z ${VIASH_PAR_SUBSAMPLE+x} ]; then echo "int(r'${VIASH_PAR_SUBSAMPLE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi )
+  'subsample': $( if [ ! -z ${VIASH_PAR_SUBSAMPLE+x} ]; then echo "int(r'${VIASH_PAR_SUBSAMPLE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
+  'max_workers': $( if [ ! -z ${VIASH_PAR_MAX_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_MAX_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),

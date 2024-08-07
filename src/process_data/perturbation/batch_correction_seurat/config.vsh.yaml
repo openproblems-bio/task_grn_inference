@@ -1,3 +1,5 @@
+__merge__: ../../../api/comp_test.yaml
+
 functionality:
   name: batch_correction_seurat
   namespace: "perturbation"
@@ -28,7 +30,7 @@ functionality:
               required: true
       required: false
       direction: input
-      default: resources_test/grn-benchmark/perturbation_data.h5ad 
+      default: resources/grn-benchmark/perturbation_data.h5ad 
     - name: --perturbation_data_bc
       type: file
       info:
@@ -67,7 +69,7 @@ functionality:
               required: true
       required: false
       direction: input
-      default: resources_test/grn-benchmark/perturbation_data.h5ad 
+      default: resources/grn-benchmark/perturbation_data.h5ad 
 
 
   resources:
@@ -75,11 +77,11 @@ functionality:
       path: script.R
 platforms:
   - type: docker
-    image: ghcr.io/openproblems-bio/base_images/r:1.1.0
-    setup:
-      - type: r
-        bioc: []
-        packages: [Seurat, zellkonverter]
+    image: janursa/batch_correction_seurat:19-08-2024
+    # setup:
+    #   - type: r
+    #     bioc: []
+    #     packages: [zellkonverter]
 
   - type: native
   - type: nextflow
