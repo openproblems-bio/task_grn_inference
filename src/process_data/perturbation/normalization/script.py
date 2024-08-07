@@ -10,7 +10,7 @@ import scanpy as sc
 
 ## VIASH START
 par = {
-    'perturbation_data_f': 'resources/grn-benchmark/perturbation_data.h5ad',
+    'pseudobulked_data_f': 'resources/grn-benchmark/perturbation_data.h5ad',
     'perturbation_data_n': 'resources/grn-benchmark/perturbation_data.h5ad'
 }
 ## VIASH END
@@ -31,7 +31,7 @@ def normalize_func(bulk_adata):
     
     return bulk_adata
 print("reading the file")
-bulk_adata_filtered = ad.read_h5ad(par['perturbation_data_f'])
+bulk_adata_filtered = ad.read_h5ad(par['pseudobulked_data_f'])
 bulk_adata_n = normalize_func(bulk_adata_filtered)
 print("Normalizing completed")
 print("Writing the file")

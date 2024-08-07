@@ -11,7 +11,8 @@ import scanpy as sc
 ## VIASH START
 par = {
     'perturbation_counts': 'resources_test/datasets_raw/perturbation_counts.h5ad',
-    'perturbation_data_f': 'resources_test/grn-benchmark/perturbation_data.h5ad',
+    'pseudobulked_data': 'resources_local/pseudobulked_data.h5ad',
+    'pseudobulked_data_f': 'resources_local/pseudobulked_data_f.h5ad',
 }
 ## VIASH END
 
@@ -203,5 +204,6 @@ else:
 sc_counts_f = preprocess_sc(par)
 bulk_adata = pseudobulk_sum_func(sc_counts_f)
 bulk_adata = pseudobulk_mean_func(bulk_adata)
+bulk_adata.write(par['pseudobulked_data'])
 bulk_adata_filtered = filter_func(bulk_adata)
-bulk_adata_filtered.write(par['perturbation_data_f'])
+bulk_adata_filtered.write(par['pseudobulked_data_f'])

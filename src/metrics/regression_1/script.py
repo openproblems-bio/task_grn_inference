@@ -6,11 +6,12 @@ import numpy as np
 ## VIASH START
 par = {
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
-  "prediction": "resources/grn-benchmark/negative_control.csv",
+  "prediction": "resources/grn-benchmark/grn_models/collectri.csv",
   'score': 'output/score.h5ad',
   'reg_type': 'ridge',
   'layer': 'lognorm',
   'subsample': 200,
+  'max_workers': 4,
 }
 
 ## VIASH END
@@ -21,7 +22,7 @@ from main import main
 
 output = main(par) 
 print(output)
-output.columns = ['S1', 'S2', 'S3', 'S4']
+# output.columns = ['S1', 'S2', 'S3', 'S4']
 
 print("Write output to file", flush=True)
 print(output)

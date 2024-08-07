@@ -31,6 +31,7 @@ functionality:
       required: false
       direction: input
       default: resources/grn-benchmark/perturbation_data.h5ad 
+      example: resources_test/grn-benchmark/perturbation_data.h5ad 
     - name: --perturbation_data_bc
       type: file
       info:
@@ -62,6 +63,7 @@ functionality:
       required: false
       direction: input
       default: resources/grn-benchmark/perturbation_data.h5ad 
+      example: resources_test/grn-benchmark/perturbation_data.h5ad 
 
   resources:
     - type: python_script
@@ -69,10 +71,6 @@ functionality:
 platforms:
   - type: docker
     image: janursa/scgen:19-08-2024
-    # setup:
-    #   - type: python
-    #     packages: [requests]
-    #     git: [https://github.com/theislab/scgen.git]
 
   - type: native
   - type: nextflow

@@ -18,7 +18,17 @@ functionality:
       direction: input
       default: resources/datasets_raw/perturbation_counts.h5ad 
       
-    - name: --perturbation_data_f
+    - name: --pseudobulked_data
+      type: file
+      info:
+        label: pseudobulked_data
+        summary: "Pseudobulked perturbation dataset for benchmarking."
+        file_type: h5ad
+      required: false
+      direction: output
+      default: resources_local/pseudobulked_data.h5ad
+
+    - name: --pseudobulked_data_f
       type: file
       info:
         label: perturbation
@@ -32,7 +42,7 @@ functionality:
               required: true
       required: false
       direction: output
-      default: resources/grn-benchmark/perturbation_data.h5ad 
+      default: resources_local/pseudobulked_data_f.h5ad 
       
 
   resources:
