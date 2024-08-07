@@ -2,8 +2,7 @@
 .DS_Store
 
 # related to files
-resources/
-resources_test/
+resources*
 output/
 out/
 local/

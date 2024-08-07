@@ -2924,7 +2924,7 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "janursa/batch_correction_seurat:19-08-2024",
+      "image" : "janursa/batch_correction_seurat:latest",
       "target_organization" : "openproblems-bio/task_grn_inference",
       "target_registry" : "ghcr.io",
       "namespace_separator" : "/",
@@ -2980,7 +2980,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/batch_correction_seurat",
     "viash_version" : "0.8.6",
-    "git_commit" : "c6c3e72ba932fc4f6648d2380152a2ee65a2966b",
+    "git_commit" : "c663e062a807471a223df0839759294e418680e5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

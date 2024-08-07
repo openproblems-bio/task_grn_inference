@@ -177,9 +177,13 @@ function ViashHelp {
   echo "        type: file, file must exist"
   echo "        default: resources/datasets_raw/perturbation_counts.h5ad"
   echo ""
-  echo "    --perturbation_data_f"
+  echo "    --pseudobulked_data"
   echo "        type: file, output, file must exist"
-  echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
+  echo "        default: resources_local/pseudobulked_data.h5ad"
+  echo ""
+  echo "    --pseudobulked_data_f"
+  echo "        type: file, output, file must exist"
+  echo "        default: resources_local/pseudobulked_data_f.h5ad"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -406,9 +410,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "sctk==0.2.2"
 
 LABEL org.opencontainers.image.description="Companion container for running component perturbation sc_counts"
-LABEL org.opencontainers.image.created="2024-08-07T14:07:13Z"
+LABEL org.opencontainers.image.created="2024-08-07T17:12:56Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="c6c3e72ba932fc4f6648d2380152a2ee65a2966b"
+LABEL org.opencontainers.image.revision="c663e062a807471a223df0839759294e418680e5"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -578,15 +582,26 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_PERTURBATION_COUNTS=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --perturbation_data_f)
-            [ -n "$VIASH_PAR_PERTURBATION_DATA_F" ] && ViashError Bad arguments for option \'--perturbation_data_f\': \'$VIASH_PAR_PERTURBATION_DATA_F\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_PERTURBATION_DATA_F="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --perturbation_data_f. Use "--help" to get more information on the parameters. && exit 1
+        --pseudobulked_data)
+            [ -n "$VIASH_PAR_PSEUDOBULKED_DATA" ] && ViashError Bad arguments for option \'--pseudobulked_data\': \'$VIASH_PAR_PSEUDOBULKED_DATA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_PSEUDOBULKED_DATA="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --pseudobulked_data. Use "--help" to get more information on the parameters. && exit 1
             shift 2
             ;;
-        --perturbation_data_f=*)
-            [ -n "$VIASH_PAR_PERTURBATION_DATA_F" ] && ViashError Bad arguments for option \'--perturbation_data_f=*\': \'$VIASH_PAR_PERTURBATION_DATA_F\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_PERTURBATION_DATA_F=$(ViashRemoveFlags "$1")
+        --pseudobulked_data=*)
+            [ -n "$VIASH_PAR_PSEUDOBULKED_DATA" ] && ViashError Bad arguments for option \'--pseudobulked_data=*\': \'$VIASH_PAR_PSEUDOBULKED_DATA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_PSEUDOBULKED_DATA=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --pseudobulked_data_f)
+            [ -n "$VIASH_PAR_PSEUDOBULKED_DATA_F" ] && ViashError Bad arguments for option \'--pseudobulked_data_f\': \'$VIASH_PAR_PSEUDOBULKED_DATA_F\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_PSEUDOBULKED_DATA_F="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --pseudobulked_data_f. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --pseudobulked_data_f=*)
+            [ -n "$VIASH_PAR_PSEUDOBULKED_DATA_F" ] && ViashError Bad arguments for option \'--pseudobulked_data_f=*\': \'$VIASH_PAR_PSEUDOBULKED_DATA_F\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_PSEUDOBULKED_DATA_F=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---setup)
@@ -732,8 +747,11 @@ fi
 if [ -z ${VIASH_PAR_PERTURBATION_COUNTS+x} ]; then
   VIASH_PAR_PERTURBATION_COUNTS="resources/datasets_raw/perturbation_counts.h5ad"
 fi
-if [ -z ${VIASH_PAR_PERTURBATION_DATA_F+x} ]; then
-  VIASH_PAR_PERTURBATION_DATA_F="resources/grn-benchmark/perturbation_data.h5ad"
+if [ -z ${VIASH_PAR_PSEUDOBULKED_DATA+x} ]; then
+  VIASH_PAR_PSEUDOBULKED_DATA="resources_local/pseudobulked_data.h5ad"
+fi
+if [ -z ${VIASH_PAR_PSEUDOBULKED_DATA_F+x} ]; then
+  VIASH_PAR_PSEUDOBULKED_DATA_F="resources_local/pseudobulked_data_f.h5ad"
 fi
 
 # check whether required files exist
@@ -787,8 +805,11 @@ if [[ -n "$VIASH_META_MEMORY_PB" ]]; then
 fi
 
 # create parent directories of output files, if so desired
-if [ ! -z "$VIASH_PAR_PERTURBATION_DATA_F" ] && [ ! -d "$(dirname "$VIASH_PAR_PERTURBATION_DATA_F")" ]; then
-  mkdir -p "$(dirname "$VIASH_PAR_PERTURBATION_DATA_F")"
+if [ ! -z "$VIASH_PAR_PSEUDOBULKED_DATA" ] && [ ! -d "$(dirname "$VIASH_PAR_PSEUDOBULKED_DATA")" ]; then
+  mkdir -p "$(dirname "$VIASH_PAR_PSEUDOBULKED_DATA")"
+fi
+if [ ! -z "$VIASH_PAR_PSEUDOBULKED_DATA_F" ] && [ ! -d "$(dirname "$VIASH_PAR_PSEUDOBULKED_DATA_F")" ]; then
+  mkdir -p "$(dirname "$VIASH_PAR_PSEUDOBULKED_DATA_F")"
 fi
 
 # detect volumes from file arguments
@@ -797,10 +818,15 @@ if [ ! -z "$VIASH_PAR_PERTURBATION_COUNTS" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PERTURBATION_COUNTS")" )
   VIASH_PAR_PERTURBATION_COUNTS=$(ViashAutodetectMount "$VIASH_PAR_PERTURBATION_COUNTS")
 fi
-if [ ! -z "$VIASH_PAR_PERTURBATION_DATA_F" ]; then
-  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PERTURBATION_DATA_F")" )
-  VIASH_PAR_PERTURBATION_DATA_F=$(ViashAutodetectMount "$VIASH_PAR_PERTURBATION_DATA_F")
-  VIASH_CHOWN_VARS+=( "$VIASH_PAR_PERTURBATION_DATA_F" )
+if [ ! -z "$VIASH_PAR_PSEUDOBULKED_DATA" ]; then
+  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PSEUDOBULKED_DATA")" )
+  VIASH_PAR_PSEUDOBULKED_DATA=$(ViashAutodetectMount "$VIASH_PAR_PSEUDOBULKED_DATA")
+  VIASH_CHOWN_VARS+=( "$VIASH_PAR_PSEUDOBULKED_DATA" )
+fi
+if [ ! -z "$VIASH_PAR_PSEUDOBULKED_DATA_F" ]; then
+  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PSEUDOBULKED_DATA_F")" )
+  VIASH_PAR_PSEUDOBULKED_DATA_F=$(ViashAutodetectMount "$VIASH_PAR_PSEUDOBULKED_DATA_F")
+  VIASH_CHOWN_VARS+=( "$VIASH_PAR_PSEUDOBULKED_DATA_F" )
 fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_META_RESOURCES_DIR")" )
@@ -873,7 +899,8 @@ import scanpy as sc
 # The following code has been auto-generated by Viash.
 par = {
   'perturbation_counts': $( if [ ! -z ${VIASH_PAR_PERTURBATION_COUNTS+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_COUNTS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'perturbation_data_f': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA_F+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA_F//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'pseudobulked_data': $( if [ ! -z ${VIASH_PAR_PSEUDOBULKED_DATA+x} ]; then echo "r'${VIASH_PAR_PSEUDOBULKED_DATA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'pseudobulked_data_f': $( if [ ! -z ${VIASH_PAR_PSEUDOBULKED_DATA_F+x} ]; then echo "r'${VIASH_PAR_PSEUDOBULKED_DATA_F//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1083,8 +1110,9 @@ else:
 sc_counts_f = preprocess_sc(par)
 bulk_adata = pseudobulk_sum_func(sc_counts_f)
 bulk_adata = pseudobulk_mean_func(bulk_adata)
+bulk_adata.write(par['pseudobulked_data'])
 bulk_adata_filtered = filter_func(bulk_adata)
-bulk_adata_filtered.write(par['perturbation_data_f'])
+bulk_adata_filtered.write(par['pseudobulked_data_f'])
 VIASHMAIN
 python -B "\$tempscript" &
 wait "\$!"
@@ -1096,8 +1124,11 @@ VIASHEOF
 if [ ! -z "$VIASH_PAR_PERTURBATION_COUNTS" ]; then
   VIASH_PAR_PERTURBATION_COUNTS=$(ViashStripAutomount "$VIASH_PAR_PERTURBATION_COUNTS")
 fi
-if [ ! -z "$VIASH_PAR_PERTURBATION_DATA_F" ]; then
-  VIASH_PAR_PERTURBATION_DATA_F=$(ViashStripAutomount "$VIASH_PAR_PERTURBATION_DATA_F")
+if [ ! -z "$VIASH_PAR_PSEUDOBULKED_DATA" ]; then
+  VIASH_PAR_PSEUDOBULKED_DATA=$(ViashStripAutomount "$VIASH_PAR_PSEUDOBULKED_DATA")
+fi
+if [ ! -z "$VIASH_PAR_PSEUDOBULKED_DATA_F" ]; then
+  VIASH_PAR_PSEUDOBULKED_DATA_F=$(ViashStripAutomount "$VIASH_PAR_PSEUDOBULKED_DATA_F")
 fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_META_RESOURCES_DIR=$(ViashStripAutomount "$VIASH_META_RESOURCES_DIR")
@@ -1114,8 +1145,12 @@ fi
 
 
 # check whether required files exist
-if [ ! -z "$VIASH_PAR_PERTURBATION_DATA_F" ] && [ ! -e "$VIASH_PAR_PERTURBATION_DATA_F" ]; then
-  ViashError "Output file '$VIASH_PAR_PERTURBATION_DATA_F' does not exist."
+if [ ! -z "$VIASH_PAR_PSEUDOBULKED_DATA" ] && [ ! -e "$VIASH_PAR_PSEUDOBULKED_DATA" ]; then
+  ViashError "Output file '$VIASH_PAR_PSEUDOBULKED_DATA' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_PSEUDOBULKED_DATA_F" ] && [ ! -e "$VIASH_PAR_PSEUDOBULKED_DATA_F" ]; then
+  ViashError "Output file '$VIASH_PAR_PSEUDOBULKED_DATA_F' does not exist."
   exit 1
 fi
 

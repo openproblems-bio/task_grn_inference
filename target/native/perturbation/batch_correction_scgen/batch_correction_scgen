@@ -176,10 +176,12 @@ function ViashHelp {
   echo "    --perturbation_data_n"
   echo "        type: file, file must exist"
   echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
+  echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
   echo ""
   echo "    --perturbation_data_bc"
   echo "        type: file, file must exist"
   echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
+  echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
 }
 
 # initialise array

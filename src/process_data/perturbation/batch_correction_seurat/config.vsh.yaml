@@ -77,7 +77,7 @@ functionality:
       path: script.R
 platforms:
   - type: docker
-    image: janursa/batch_correction_seurat:19-08-2024
+    image: janursa/batch_correction_seurat:latest
     # setup:
     #   - type: r
     #     bioc: []

@@ -175,7 +175,7 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --perturbation_data_f"
   echo "        type: file, file must exist"
-  echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
+  echo "        default: resources_local/pseudobulked_data_f"
   echo ""
   echo "    --perturbation_data_n"
   echo "        type: file, file must exist"
@@ -331,7 +331,7 @@ fi
 
 # filling in defaults
 if [ -z ${VIASH_PAR_PERTURBATION_DATA_F+x} ]; then
-  VIASH_PAR_PERTURBATION_DATA_F="resources/grn-benchmark/perturbation_data.h5ad"
+  VIASH_PAR_PERTURBATION_DATA_F="resources_local/pseudobulked_data_f"
 fi
 if [ -z ${VIASH_PAR_PERTURBATION_DATA_N+x} ]; then
   VIASH_PAR_PERTURBATION_DATA_N="resources/grn-benchmark/perturbation_data.h5ad"
@@ -461,7 +461,7 @@ def normalize_func(bulk_adata):
     
     return bulk_adata
 print("reading the file")
-bulk_adata_filtered = ad.read_h5ad(par['perturbation_data_f'])
+bulk_adata_filtered = ad.read_h5ad(par['pseudobulked_data_f'])
 bulk_adata_n = normalize_func(bulk_adata_filtered)
 print("Normalizing completed")
 print("Writing the file")

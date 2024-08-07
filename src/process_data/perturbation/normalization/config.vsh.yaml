@@ -25,7 +25,7 @@ functionality:
 
       required: false
       direction: input
-      default: resources/grn-benchmark/perturbation_data.h5ad 
+      default: resources_local/pseudobulked_data_f
 
     - name: --perturbation_data_n
       type: file

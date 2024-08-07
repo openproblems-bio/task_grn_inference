@@ -2803,7 +2803,7 @@ meta = [
           }
         },
         "default" : [
-          "resources/grn-benchmark/perturbation_data.h5ad"
+          "resources_local/pseudobulked_data_f"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2954,7 +2954,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/normalization",
     "viash_version" : "0.8.6",
-    "git_commit" : "c6c3e72ba932fc4f6648d2380152a2ee65a2966b",
+    "git_commit" : "c663e062a807471a223df0839759294e418680e5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3021,7 +3021,7 @@ def normalize_func(bulk_adata):
     
     return bulk_adata
 print("reading the file")
-bulk_adata_filtered = ad.read_h5ad(par['perturbation_data_f'])
+bulk_adata_filtered = ad.read_h5ad(par['pseudobulked_data_f'])
 bulk_adata_n = normalize_func(bulk_adata_filtered)
 print("Normalizing completed")
 print("Writing the file")

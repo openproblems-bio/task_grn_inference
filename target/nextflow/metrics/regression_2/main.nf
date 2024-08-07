@@ -2920,37 +2920,15 @@ meta = [
         "info" : {
           "label" : "Score",
           "summary" : "File indicating the score of a metric.",
-          "file_type" : "h5ad",
-          "slots" : {
-            "uns" : [
-              {
-                "type" : "string",
-                "name" : "dataset_id",
-                "description" : "A unique identifier for the dataset",
-                "required" : true
-              },
-              {
-                "type" : "string",
-                "name" : "method_id",
-                "description" : "A unique identifier for the method",
-                "required" : true
-              },
-              {
-                "type" : "string",
-                "name" : "metric_ids",
-                "description" : "One or more unique metric identifiers",
-                "multiple" : true,
-                "required" : true
-              },
-              {
-                "type" : "double",
-                "name" : "metric_values",
-                "description" : "The metric values obtained for the given prediction. Must be of same length as 'metric_ids'.",
-                "multiple" : true,
-                "required" : true
-              }
-            ]
-          }
+          "file_type" : "csv",
+          "columns" : [
+            {
+              "name" : "S1",
+              "description" : "S1 metric",
+              "type" : "string",
+              "required" : false
+            }
+          ]
         },
         "example" : [
           "resources/grn-benchmark/score.csv"
@@ -3130,7 +3108,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "c6c3e72ba932fc4f6648d2380152a2ee65a2966b",
+    "git_commit" : "c663e062a807471a223df0839759294e418680e5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
