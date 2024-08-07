@@ -1,0 +1,1 @@
+viash build src/methods/pycistopic/config.vsh.yaml --platform docker -o bin/pycistopic && bin/pycistopic/pycistopic --multiomics_atac resources/resources_test/grn-benchmark/multiomics_atac.h5ad --prediction bin/pycistopic/prediction.csv --cell_topic resources/resources_test/grn-benchmark/supp/cell_topic.csv --out_dir output/pycistopic
