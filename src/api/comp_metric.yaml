@@ -43,6 +43,10 @@ functionality:
       description: number of samples randomly drawn from perturbation data
       info:
         test_default: 200
+    - name: --max_workers
+      type: integer
+      direction: input
+      default: 4
 
 
       

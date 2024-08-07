@@ -7,6 +7,7 @@ import os
 ## VIASH START
 par = {
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
+  'max_workers': 4,
   'reg_type': 'ridge',
   'subsample': 1,
 }
