@@ -19,15 +19,16 @@ functionality:
       default: scgen_pearson
       description: Which layer of pertubation data to use to find tf-gene relationships.
       required: false
-    - name: --prior_data
-      __merge__: file_prior.yaml
-      direction: input
-      description: Prior information used for grn inference.
-      required: true
     - name: --prediction
       __merge__: file_prediction.yaml
       required: true
       direction: output
+    - name: --tf_all
+      type: file
+      required: false
+      direction: input
+      default: resources/prior/tf_all.csv
+      
   test_resources:
     - type: python_script
       path: /src/common/component_tests/run_and_check_output.py

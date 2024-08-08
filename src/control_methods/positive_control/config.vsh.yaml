@@ -6,6 +6,14 @@ functionality:
     summary: Source-target links based on perturbation data
     description: |
       By directly training on perturbation data, positive control is expected to learn more accurate tf-gene connections.
+  # arguments:
+  #   - name: --tf_list
+  #     type: file
+  #     file_type: csv
+  #     description: List of known tfs obtained from https://resources.aertslab.org/cistarget. 
+  #     direction: input
+  #     required: True 
+
   resources:
     - type: python_script
       path: script.py

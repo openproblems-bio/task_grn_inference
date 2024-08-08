@@ -7,9 +7,8 @@ grn_names=(
     "figr"
     "granie"
     "scglue"
-    "positive_control"
-    "negative_control"
 )
+
 reg_type="ridge" 
 subsample="2"
 max_workers="4"
@@ -21,12 +20,24 @@ layers=("pearson" "lognorm" "scgen_pearson" "scgen_lognorm" "seurat_pearson" "se
 
 for layer in "${layers[@]}"; do
     # Loop through each GRN model and run the benchmark script
-    layer_folder="${folder}/${layer}"
-    mkdir $layer_folder
-    for grn_name in "${grn_names[@]}"; do
-        grn_model="${models_folder}/${grn_name}.csv"
-        score="${layer_folder}/${grn_name}.csv"
-        bash scripts/run_evaluation.sh --grn_model "$grn_model" \
+    # layer_folder="${folder}/${layer}"
+    # mkdir $layer_folder
+    # for grn_name in "${grn_names[@]}"; do
+    #     grn_model="${models_folder}/${grn_name}.csv"
+    #     score="${layer_folder}/${grn_name}.csv"
+    #     bash scripts/run_evaluation.sh --grn_model "$grn_model" \
+    #         --grn_name "$grn_name" --subsample "$subsample" --reg_type "$reg_type" \
+    #         --score "$score" --max_workers "$max_workers" --layer "$layer"
+    # done
+
+    for control_model in "${controls[@]}"; do
+        prediction="predictions/{$layer}_{$control_model}.csv"
+        viash run src/control_methods/$control_model/config.vsh.yaml -- --perturbation_data resources/grn-benchmark/perturbation_data.h5ad \
+            --layer $layer \
+            --prediction $prediction
+
+        score="${layer_folder}/${control_model}.csv"
+        bash scripts/run_evaluation.sh --grn_model "$prediction" \
             --grn_name "$grn_name" --subsample "$subsample" --reg_type "$reg_type" \
             --score "$score" --max_workers "$max_workers" --layer "$layer"
     done

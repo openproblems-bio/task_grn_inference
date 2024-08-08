@@ -6,8 +6,6 @@ import numpy as np
 ## VIASH START
 par = {
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
-  "layer": "scgen_pearson",
-  "prior_data":  "resources/grn-benchmark/prior_data.h5ad",
   "prediction": "output/negative_control.csv",
 }
 ## VIASH END
