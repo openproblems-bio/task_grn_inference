@@ -15,15 +15,13 @@ par = {
 }
 
 ## VIASH END
-print('Reading input data')
-
 sys.path.append(meta["resources_dir"])
 from main import main 
 
 output = main(par) 
 print(output)
 # output.columns = ['S1', 'S2', 'S3', 'S4']
-
+output.index=[par["layer"]]
 print("Write output to file", flush=True)
 print(output)
 output.to_csv(par['score'])

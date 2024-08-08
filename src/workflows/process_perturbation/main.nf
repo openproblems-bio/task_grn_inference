@@ -12,11 +12,11 @@ workflow run_wf {
 
     | normalization.run(
       fromState: [pseudobulked_data_f: "pseudobulked_data_f"],
-      toState: [perturbation_data_n: "perturbation_data_n"]
+      toState: [perturbation_data: "perturbation_data"]
     )
     
     | batch_correction_scgen.run(
-      fromState: [perturbation_data_n: "perturbation_data_n"],
+      fromState: [perturbation_data: "perturbation_data"],
       toState: [perturbation_data_bc: "perturbation_data_bc"]
     )
 

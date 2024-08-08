@@ -17,6 +17,7 @@ functionality:
       required: false
       direction: input
       default: resources/datasets_raw/perturbation_counts.h5ad 
+      example: resources_test/datasets_raw/perturbation_counts.h5ad 
       
     - name: --pseudobulked_data
       type: file
@@ -27,6 +28,7 @@ functionality:
       required: false
       direction: output
       default: resources_local/pseudobulked_data.h5ad
+      example: resources_test/grn-benchmark/perturbation_data.h5ad
 
     - name: --pseudobulked_data_f
       type: file
@@ -43,6 +45,7 @@ functionality:
       required: false
       direction: output
       default: resources_local/pseudobulked_data_f.h5ad 
+      example: resources_test/grn-benchmark/perturbation_data.h5ad
       
 
   resources:

@@ -6,13 +6,13 @@ import scgen
 
 ## VIASH START
 par = {
-    'perturbation_data_n': 'resources/grn-benchmark/perturbation_data.h5ad',
+    'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
     "perturbation_data_bc": 'resources/grn-benchmark/perturbation_data.h5ad'
 }
 ## VIASH END
 batch_key = 'plate_name'
 label_key = 'cell_type'
-bulk_adata = ad.read_h5ad(par['perturbation_data_n'])
+bulk_adata = ad.read_h5ad(par['perturbation_data'])
 print(bulk_adata)
 
 for norm_name in ['lognorm', 'pearson']:
