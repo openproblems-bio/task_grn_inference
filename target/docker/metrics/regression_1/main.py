@@ -8,6 +8,8 @@ import random
 from concurrent.futures import ThreadPoolExecutor
 import pandas as pd
 import anndata as ad
+from tqdm import tqdm
+
 import os
 
 
@@ -50,7 +52,7 @@ def cv_5(genes_n):
     return groups
 
 
-def run_method_1(
+def regression_1(
             net: pd.DataFrame, 
             train_df: pd.DataFrame,
             reg_type: str = 'GB',
@@ -85,7 +87,6 @@ def run_method_1(
     Y_df = train_df.loc[included_genes,:]
 
     mask_shared_genes = X_df.index.isin(net.index)
-    # print(X_df.shape, Y_df.shape)
     
     # fill the actuall regulatory links
     X_df.loc[mask_shared_genes, :] = net.values
@@ -99,38 +100,28 @@ def run_method_1(
     y_pred[:] = means
     y_pred = y_pred.values
 
-    
     # initialize y_true
     Y = Y_df.values
     y_true = Y.copy()
 
     unique_groups = np.unique(groups)
-    
-    for group in unique_groups:
+
+    for group in tqdm(unique_groups, desc="Processing groups"):
         mask_va = groups == group
         mask_tr = ~mask_va
-
         # Use logical AND to combine masks correctly
         X_tr = X[mask_tr & mask_shared_genes, :]
         Y_tr = Y[mask_tr & mask_shared_genes, :]
 
         regr.fit(X_tr, Y_tr)
-
         y_pred[mask_va & mask_shared_genes, :] = regr.predict(X[mask_va & mask_shared_genes, :])
 
-
-    # assert ~(y_true==0).any()
-
-    # if verbose >= 1:
     score_r2  = r2_score(y_true, y_pred, multioutput='variance_weighted') #uniform_average', 'variance_weighted
-    # print(f'score_r2: ', score_r2)
-
 
     mean_score_r2 = r2_score(y_true, y_pred, multioutput='variance_weighted')
     # gene_scores_r2 = r2_score(y_true.T, y_pred.T, multioutput='raw_values')
 
     output = dict(mean_score_r2=mean_score_r2)
-
     return output
 
 def set_global_seed(seed):
@@ -198,6 +189,8 @@ def main(par):
     layer_results = {}  # Store results for this layer
     for exclude_missing_genes in [True, False]:  # two settings on target gene
         for tf_n in [-1, 140]:  # two settings on tfs
+            run_key = f'ex({exclude_missing_genes})_tf({tf_n})'
+            print(run_key)
             net_subset = net_processed.copy()
 
             # Subset TFs 
@@ -211,9 +204,9 @@ def main(par):
                 degrees = net_subset.abs().sum(axis=0)
                 net_subset = net_subset[degrees.nlargest(tf_n).index]
 
-            output = run_method_1(net_subset, pert_df, exclude_missing_genes=exclude_missing_genes, reg_type=reg_type, max_workers=max_workers)
-            result_key = f'ex({exclude_missing_genes})_tf({tf_n})'
-            layer_results[result_key] = [output['mean_score_r2']]
+            output = regression_1(net_subset, pert_df, exclude_missing_genes=exclude_missing_genes, reg_type=reg_type, max_workers=max_workers)
+            
+            layer_results[run_key] = [output['mean_score_r2']]
 
     # Convert results to DataFrame
     df_results = pd.DataFrame(layer_results)
@@ -221,5 +214,7 @@ def main(par):
         df_results['ex(True)_tf(140)'] = df_results['ex(True)_tf(-1)']
     if 'ex(False)_tf(140)' not in df_results.columns:
         df_results['ex(False)_tf(140)'] = df_results['ex(False)_tf(-1)']
+    
+    df_results['Mean'] = df_results.mean(axis=1)
     
     return df_results

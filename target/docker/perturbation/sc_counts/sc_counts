@@ -176,14 +176,17 @@ function ViashHelp {
   echo "    --perturbation_counts"
   echo "        type: file, file must exist"
   echo "        default: resources/datasets_raw/perturbation_counts.h5ad"
+  echo "        example: resources_test/datasets_raw/perturbation_counts.h5ad"
   echo ""
   echo "    --pseudobulked_data"
   echo "        type: file, output, file must exist"
   echo "        default: resources_local/pseudobulked_data.h5ad"
+  echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
   echo ""
   echo "    --pseudobulked_data_f"
   echo "        type: file, output, file must exist"
   echo "        default: resources_local/pseudobulked_data_f.h5ad"
+  echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -410,9 +413,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "sctk==0.2.2"
 
 LABEL org.opencontainers.image.description="Companion container for running component perturbation sc_counts"
-LABEL org.opencontainers.image.created="2024-08-07T17:12:56Z"
+LABEL org.opencontainers.image.created="2024-08-08T12:09:00Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="c663e062a807471a223df0839759294e418680e5"
+LABEL org.opencontainers.image.revision="f7b438a541c6ef7e1b3c4b39efc3b46135186b86"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

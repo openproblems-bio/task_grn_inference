@@ -2859,7 +2859,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "c663e062a807471a223df0839759294e418680e5",
+          "git_commit" : "f7b438a541c6ef7e1b3c4b39efc3b46135186b86",
           "executable" : "/nextflow/perturbation/sc_counts/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/sc_counts"
@@ -2880,7 +2880,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "c663e062a807471a223df0839759294e418680e5",
+          "git_commit" : "f7b438a541c6ef7e1b3c4b39efc3b46135186b86",
           "executable" : "/nextflow/perturbation/normalization/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/normalization"
@@ -2901,7 +2901,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "c663e062a807471a223df0839759294e418680e5",
+          "git_commit" : "f7b438a541c6ef7e1b3c4b39efc3b46135186b86",
           "executable" : "/nextflow/perturbation/batch_correction_scgen/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/batch_correction_scgen"
@@ -2922,7 +2922,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "c663e062a807471a223df0839759294e418680e5",
+          "git_commit" : "f7b438a541c6ef7e1b3c4b39efc3b46135186b86",
           "executable" : "/nextflow/perturbation/batch_correction_seurat/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/batch_correction_seurat"
@@ -2974,7 +2974,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/process_perturbation",
     "viash_version" : "0.8.6",
-    "git_commit" : "c663e062a807471a223df0839759294e418680e5",
+    "git_commit" : "f7b438a541c6ef7e1b3c4b39efc3b46135186b86",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3003,11 +3003,11 @@ workflow run_wf {
 
     | normalization.run(
       fromState: [pseudobulked_data_f: "pseudobulked_data_f"],
-      toState: [perturbation_data_n: "perturbation_data_n"]
+      toState: [perturbation_data: "perturbation_data"]
     )
     
     | batch_correction_scgen.run(
-      fromState: [perturbation_data_n: "perturbation_data_n"],
+      fromState: [perturbation_data: "perturbation_data"],
       toState: [perturbation_data_bc: "perturbation_data_bc"]
     )
 

@@ -3108,7 +3108,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "c663e062a807471a223df0839759294e418680e5",
+    "git_commit" : "f7b438a541c6ef7e1b3c4b39efc3b46135186b86",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3158,15 +3158,13 @@ dep = {
 }
 
 ## VIASH END
-print('Reading input data')
-
 sys.path.append(meta["resources_dir"])
 from main import main 
 
 output = main(par) 
 print(output)
 # output.columns = ['S1', 'S2', 'S3', 'S4']
-
+output.index=[par["layer"]]
 print("Write output to file", flush=True)
 print(output)
 output.to_csv(par['score'])

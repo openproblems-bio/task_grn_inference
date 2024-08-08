@@ -10,7 +10,7 @@ functionality:
 
   arguments:
 
-    - name: --perturbation_data_f
+    - name: --pseudobulked_data_f
       type: file
       info:
         label: perturbation
@@ -26,8 +26,9 @@ functionality:
       required: false
       direction: input
       default: resources_local/pseudobulked_data_f
+      example: resources_test/grn-benchmark/perturbation_data.h5ad 
 
-    - name: --perturbation_data_n
+    - name: --perturbation_data
       type: file
       info:
         label: perturbation
@@ -50,6 +51,7 @@ functionality:
       required: false
       direction: input
       default: resources/grn-benchmark/perturbation_data.h5ad 
+      example: resources_test/grn-benchmark/perturbation_data.h5ad 
       
 
   resources:
