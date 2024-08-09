@@ -21,6 +21,9 @@ workflow run_wf {
    * RUN METRICS *
    ***************************/
   score_ch = input_ch
+    | map{ id, state ->
+        [id, state + ["_meta": [join_id: id]]]
+      }
     // run all metrics
     | runEach(
       components: metrics,
@@ -30,7 +33,9 @@ workflow run_wf {
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
         layer: "layer", 
-        prediction: "prediction"
+        prediction: "prediction",
+        subsample: "subsample",
+        reg_type: "reg_type"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->
@@ -55,6 +60,7 @@ workflow run_wf {
     )
 
     | joinStates { ids, states ->
+      assert states[0]._meta, "no _meta found in state[0]"
       // store the metric configs in a file
       def metric_configs = metrics.collect{it.config}
       def metric_configs_yaml_blob = toYamlBlob(metric_configs)
@@ -70,16 +76,15 @@ workflow run_wf {
       score_uns_file.write(score_uns_yaml_blob)
 
       def new_state = [
-        output_metric_configs: metric_configs_file,
-        output_task_info: task_info_file,
-        output_scores: score_uns_file
+        metric_configs: metric_configs_file,
+        scores: score_uns_file,
+        _meta: states[0]._meta
       ]
 
       ["output", new_state]
     }
 
     // merge all of the output data 
-    | mix(dataset_meta_ch)
     | joinStates{ ids, states ->
       def mergedStates = states.inject([:]) { acc, m -> acc + m }
       [ids[0], mergedStates]
@@ -87,23 +92,4 @@ workflow run_wf {
 
   emit:
   output_ch
-}
-  
-
-    // def layer = "pearson"
-    // predictions.each { prediction ->
-    //   output_ch = input_ch
-    //   | regression_1.run(
-    //     fromState: [layer: layer, prediction: prediction],
-    //     toState: [score: "score_reg1"]
-    //   )
-
-    //   | regression_2.run(
-    //     fromState: [layer: layer, prediction: prediction],
-    //     toState: [score: "score_reg2"]
-    //   )
-    // }
-
-  emit:
-    output_ch
 }

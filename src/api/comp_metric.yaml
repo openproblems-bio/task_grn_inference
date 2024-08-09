@@ -22,6 +22,7 @@ functionality:
       __merge__: file_score.yaml
       required: false
       direction: output
+      default: out/score.h5ad
     - name: --reg_type
       type: string
       direction: input
