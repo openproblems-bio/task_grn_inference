@@ -1,11 +1,13 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ID=0
+
+
+RUN_ID="subsample_200_ridge"
 resources_dir="s3://openproblems-data/resources/grn/"
 publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
 reg_type=ridge
-subsample=2
+subsample=200
 
 grn_names=(
     "celloracle"
