@@ -1,0 +1,6 @@
+param_list:
+  - id: pearson_scenicplus
+    layer: "lognorm"
+    prediction: resources/grn_models/scenicplus.csv 
+publish_dir: "./"
+output_state: "state.yaml"

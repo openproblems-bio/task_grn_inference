@@ -21,17 +21,16 @@ from main import main
 output = main(par) 
 print(output)
 # output.columns = ['S1', 'S2', 'S3', 'S4']
-output.index=[par["layer"]]
-print("Write output to file", flush=True)
-print(output)
-output.to_csv(par['score'])
+# output.index=[par["layer"]]
+# print("Write output to file", flush=True)
+# print(output)
+# output.to_csv(par['score'])
 
-# output = ad.AnnData(
-#     X=np.empty((0, 0)),
-#     uns={
-#         "layer": par["layer"],
-#         "metric_ids": output.columns.to_numpy(),
-#         "metric_values": output.values
-#     }
-# )
-# output.write_h5ad(par["score"], compression="gzip")
+output = ad.AnnData(
+    X=np.empty((0, 0)),
+    uns={
+        "metric_ids": output.columns.to_numpy(),
+        "metric_values": output.values
+    }
+)
+output.write_h5ad(par["score"], compression="gzip")

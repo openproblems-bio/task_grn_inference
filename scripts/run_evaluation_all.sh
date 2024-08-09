@@ -19,16 +19,16 @@ folder="out"
 layers=("pearson" "lognorm" "scgen_pearson" "scgen_lognorm" "seurat_pearson" "seurat_lognorm")
 
 for layer in "${layers[@]}"; do
-    # Loop through each GRN model and run the benchmark script
-    # layer_folder="${folder}/${layer}"
-    # mkdir $layer_folder
-    # for grn_name in "${grn_names[@]}"; do
-    #     grn_model="${models_folder}/${grn_name}.csv"
-    #     score="${layer_folder}/${grn_name}.csv"
-    #     bash scripts/run_evaluation.sh --grn_model "$grn_model" \
-    #         --grn_name "$grn_name" --subsample "$subsample" --reg_type "$reg_type" \
-    #         --score "$score" --max_workers "$max_workers" --layer "$layer"
-    # done
+    Loop through each GRN model and run the benchmark script
+    layer_folder="${folder}/${layer}"
+    mkdir $layer_folder
+    for grn_name in "${grn_names[@]}"; do
+        grn_model="${models_folder}/${grn_name}.csv"
+        score="${layer_folder}/${grn_name}.csv"
+        bash scripts/run_evaluation.sh --grn_model "$grn_model" \
+            --grn_name "$grn_name" --subsample "$subsample" --reg_type "$reg_type" \
+            --score "$score" --max_workers "$max_workers" --layer "$layer"
+    done
 
     for control_model in "${controls[@]}"; do
         prediction="predictions/{$layer}_{$control_model}.csv"

@@ -17,12 +17,11 @@ functionality:
       __merge__: file_prediction.yaml
       required: false
       direction: input
-      default: resources/grn-benchmark/grn_models/collectri.csv
+      default: resources/grn_models/collectri.csv
     - name: --score
       __merge__: file_score.yaml
       required: false
       direction: output
-      default: output/score.h5ad
     - name: --reg_type
       type: string
       direction: input

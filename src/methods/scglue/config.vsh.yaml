@@ -10,37 +10,18 @@ functionality:
       GRN inference using scglue. 
     documentation_url: https://scglue.readthedocs.io/
   arguments:
-    - name: --multiomics_rna
-      __merge__: ../../api/file_multiomics_rna_h5ad.yaml
-      required: True
-      direction: input
-    - name: --multiomics_atac
-      __merge__: ../../api/file_multiomics_atac_h5ad.yaml
-      required: false
-      direction: input
-    - name: --prediction
-      __merge__: ../../api/file_prediction.yaml
-      required: true
-      direction: output
-
     - name: --annotation_file
       type: file
-      example: resources/grn-benchmark/supp/gencode.v45.annotation.gtf.gz
-      required: true
+      example: resources/supplements/gencode.v45.annotation.gtf.gz
+      default: resources/supplements/gencode.v45.annotation.gtf.gz
+      required: false
       direction: input
     - name: --motif_file
       type: file
-      example: resources/grn-benchmark/supp/JASPAR2022-hg38.bed.gz
-      required: true
+      example: resources/supplements/JASPAR2022-hg38.bed.gz
+      default: resources/supplements/JASPAR2022-hg38.bed.gz
+      required: false
       direction: input
-    - name: --temp_dir
-      type: string
-      direction: input
-      default: output/figr/
-    - name: --num_workers
-      type: integer
-      direction: input
-      default: 1
       
   resources:
     - type: python_script
