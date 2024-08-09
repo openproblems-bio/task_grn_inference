@@ -1,4 +1,4 @@
-# __merge__: ../../api/comp_method.yaml
+__merge__: ../../api/comp_method.yaml
 
 functionality:
   name: pycistopic
@@ -9,39 +9,24 @@ functionality:
       Cis-regulatory topic modeling using pycisTopic.
     documentation_url: https://pycistopic.readthedocs.io/en/latest/
   arguments:
-    - name: --multiomics_atac
-      type: file
-      must_exist: true
-      example: resources/grn-benchmark/multiomics_atac.h5ad
-      info:
-        label: multiomics_atac
-        summary: "ATAC data"
-        file_type: h5ad
-        columns: 
-          - name: dummpy
-            type: string
-            required: false
-      required: true
-    - name: --out_dir
-      type: file
-      direction: output
-      create_parent: true
-      default: 'output/pycistopic'
-    - name: --cell_topic
-      type: file
-      example: resources/grn-benchmark/supp/cell_topic.csv
-      info:
-        label: Cell topic probability database
-        summary: "annotation file"
-        file_type: csv
-        columns: 
-          - name: topic
-            type: string
-            required: false
-      required: true
     - name: --qc
-      type: boolean_true
+      type: boolean
       description: Whether to perform quality control
+      default: False
+    # - name: --cell_topic
+    #   type: file
+    #   example: resources/prior/cell_topic.csv
+    #   default: resources/prior/cell_topic.csv
+    #   info:
+    #     label: Cell topic probability database
+    #     summary: "annotation file"
+    #     file_type: csv
+    #     columns: 
+    #       - name: topic
+    #         type: string
+    #         required: false
+    #   required: true
+    
   resources:
     - type: python_script
       path: script.py
