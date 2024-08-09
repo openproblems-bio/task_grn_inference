@@ -26,11 +26,18 @@ print(output)
 # print(output)
 # output.to_csv(par['score'])
 
+print(output.values.shape, output.columns.to_numpy().shape)
 output = ad.AnnData(
     X=np.empty((0, 0)),
     uns={
+        "dataset_id": par["layer"],
+        "method_id": f"reg1-{par['method_id']}",
         "metric_ids": output.columns.to_numpy(),
-        "metric_values": output.values
+        "metric_values": output.values[0]
     }
 )
+
+
+# print(output.uns)
+
 output.write_h5ad(par["score"], compression="gzip")

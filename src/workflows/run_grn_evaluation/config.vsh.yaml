@@ -27,8 +27,12 @@ functionality:
           type: string
           direction: input
           default: ridge
+        - name: --method_id 
+          type: string 
+          direction: input 
+          required: True
+          example: collectri
         
-
     - name: Outputs
       arguments:
         - name: "--scores"
