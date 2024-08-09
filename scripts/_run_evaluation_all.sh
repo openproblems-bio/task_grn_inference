@@ -8,6 +8,8 @@ grn_names=(
     "granie"
     "scglue"
 )
+layers=("pearson" "lognorm" "scgen_pearson" "scgen_lognorm" "seurat_pearson" "seurat_lognorm")
+
 
 reg_type="ridge" 
 subsample="2"
