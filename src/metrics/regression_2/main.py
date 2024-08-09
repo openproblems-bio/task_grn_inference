@@ -14,6 +14,7 @@ from sklearn.metrics import r2_score, mean_squared_error
 
 SEED = 0xCAFE
 N_POINTS_TO_ESTIMATE_BACKGROUND = 20
+LAYERS = ['scgen_pearson', 'scgen_lognorm']
 
 
 def load_grn(filepath: str, gene_names: np.ndarray) -> np.ndarray:
@@ -48,7 +49,7 @@ def cross_validate_gene(
         random_state: int = 0xCAFE
 ) -> Dict[str, float]:
     
-    results = {'r2': np.nan, 'mse': np.nan, 'avg-r2': np.nan}
+    results = {'r2': 0.0, 'mse': np.inf, 'avg-r2': 0.0}
     
     if n_features == 0:
         return results
@@ -170,9 +171,8 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     # Load inferred GRN
     grn = load_grn(par['prediction'], gene_names)
     
-    results = []
-    layers = ['scgen_pearson', 'scgen_lognorm']
-    for layer in layers:
+    results = {}
+    for layer in LAYERS:
         print(f'Compute metrics for layer: {layer}', flush=True)
 
         # Load and standardize perturbation data
@@ -184,6 +184,7 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
 
         # Learn background distribution for each value of `n_features`:
         # r2 scores using random genes as features.
+        print("pqr", par['reg_type'])
         background = learn_background_distribution(par['reg_type'], X, groups, max_n_regulators, random_state=random_state)
 
         # Cross-validate each gene using the inferred GRN to define select input features
@@ -213,9 +214,9 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
 
         total_score = np.mean(scores)
         print(f'Score on {layer}: {total_score}')
-        results.append({'score': total_score})
+        results[layer] = [total_score]
 
     # Convert results to DataFrame
-    df_results = pd.DataFrame(results, index=layers)
+    df_results = pd.DataFrame(results)
     
     return df_results

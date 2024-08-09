@@ -257,7 +257,7 @@ if not os.path.exists(os.path.join(out_dir, 'cistopic_obj.pkl')):
         # Create cistopic objects
         print('Create cisTopic objects')
         cistopic_obj_list = []
-        for donor_id in fragments_dict.keys():
+        for donor_id in unique_donor_ids:
             sample_metrics = pl.read_parquet(
                 os.path.join(out_dir, 'qc', donor_id, f'{donor_id}.fragments_stats_per_cb.parquet')
             ).to_pandas().set_index('CB').loc[sample_id_to_barcodes_passing_filters[sample_id]]
@@ -277,7 +277,7 @@ if not os.path.exists(os.path.join(out_dir, 'cistopic_obj.pkl')):
         # Skip QC and create cisTopic objects
         print('Create cisTopic objects without QC')
         cistopic_obj_list = []
-        for donor_id in fragments_dict.keys():
+        for donor_id in unique_donor_ids:
             cistopic_obj = create_cistopic_object_from_fragments(
                 path_to_fragments=fragments_dict[donor_id],
                 path_to_regions=os.path.join(out_dir, 'consensus_peak_calling/consensus_regions.bed'),
@@ -310,6 +310,12 @@ else:
     # Load cistopic objects
     with open(os.path.join(out_dir, 'cistopic_obj.pkl'), 'rb') as f:
         cistopic_obj_list = pickle.load(f)
+
+# Save one cistopic object per sample
+os.makedirs(os.path.join(out_dir, 'cistopic_objects'), exist_ok=True)
+for i, donor_id in enumerate(unique_donor_ids):
+    with open(os.path.join(out_dir, 'cistopic_objects', f'{donor_id}.pkl'), 'wb') as f:
+        pickle.dump(cistopic_obj_list[i], f)
 
 # Download Mallet
 MALLET_PATH = os.path.join(out_dir, 'Mallet-202108', 'bin', 'mallet')
@@ -434,7 +440,7 @@ for i in range(len(cistopic_obj_list)):
     )
 
     # Save topics
-    folder = os.path.join(out_dir, 'region_sets', 'Topics_otsu', donor_id)
+    folder = os.path.join(out_dir, 'region_sets', donor_id, 'Topics_otsu')
     os.makedirs(folder, exist_ok=True)
     for topic in binarized_cell_topic:
         region_names_to_coordinates(
@@ -446,9 +452,27 @@ for i in range(len(cistopic_obj_list)):
             sep='\t',
             header=False, index=False
         )
+    folder = os.path.join(out_dir, 'region_sets', donor_id, 'Topics_top_3k')
+    os.makedirs(folder, exist_ok=True)
+    for topic in region_bin_topics_top_3k:
+        region_names_to_coordinates(
+            region_bin_topics_top_3k[topic].index
+        ).sort_values(
+            ['Chromosome', 'Start', 'End']
+        ).to_csv(
+            os.path.join(folder, f'{topic}.bed'),
+            sep='\t',
+            header=False, index=False
+        )
+    folder = os.path.join(out_dir, 'candidate_enhancers', donor_id)
+    os.makedirs(folder, exist_ok=True)
+    with open(os.path.join(folder, 'region_bin_topics_otsu.pkl'), 'wb') as f:
+        pickle.dump(region_bin_topics_otsu, f)
+    with open(os.path.join(folder, 'region_bin_topics_top3k.pkl'), 'wb') as f:
+        pickle.dump(region_bin_topics_top_3k, f)
 
     # Save DARs
-    folder = os.path.join(out_dir, 'region_sets', 'DARs_cell_type', donor_id)
+    folder = os.path.join(out_dir, 'region_sets', donor_id, 'DARs_cell_type')
     os.makedirs(folder, exist_ok=True)
     for cell_type in markers_dict:
         region_names_to_coordinates(
@@ -461,6 +485,9 @@ for i in range(len(cistopic_obj_list)):
             header=False,
             index=False
         )
+    folder = os.path.join(out_dir, 'candidate_enhancers', donor_id)
+    with open(os.path.join(folder, 'markers_dict.pkl'), 'wb') as f:
+        pickle.dump(markers_dict, f)
 
     # Get gene activity
     pr_annotation = pd.read_table(
