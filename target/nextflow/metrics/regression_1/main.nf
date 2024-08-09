@@ -2904,7 +2904,7 @@ meta = [
           "resources/grn-benchmark/grn_models/collectri.csv"
         ],
         "default" : [
-          "resources/grn-benchmark/grn_models/collectri.csv"
+          "resources/grn_models/collectri.csv"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2920,21 +2920,31 @@ meta = [
         "info" : {
           "label" : "Score",
           "summary" : "File indicating the score of a metric.",
-          "file_type" : "csv",
-          "columns" : [
-            {
-              "name" : "S1",
-              "description" : "S1 metric",
-              "type" : "string",
-              "required" : false
-            }
-          ]
+          "file_type" : "h5ad",
+          "slots" : {
+            "uns" : [
+              {
+                "type" : "string",
+                "name" : "metric_ids",
+                "description" : "One or more unique metric identifiers",
+                "multiple" : true,
+                "required" : true
+              },
+              {
+                "type" : "double",
+                "name" : "metric_values",
+                "description" : "The metric values obtained for the given prediction. Must be of same length as 'metric_ids'.",
+                "multiple" : true,
+                "required" : true
+              }
+            ]
+          }
         },
         "example" : [
           "resources/grn-benchmark/score.csv"
         ],
         "default" : [
-          "output/score.h5ad"
+          "out/score.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2995,6 +3005,18 @@ meta = [
           4
         ],
         "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "string",
+        "name" : "--method_id",
+        "example" : [
+          "collectri"
+        ],
+        "required" : true,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -3108,7 +3130,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "f7b438a541c6ef7e1b3c4b39efc3b46135186b86",
+    "git_commit" : "59865251f12f474017a9324598224a1bfca78c7c",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3137,7 +3159,8 @@ par = {
   'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'subsample': $( if [ ! -z ${VIASH_PAR_SUBSAMPLE+x} ]; then echo "int(r'${VIASH_PAR_SUBSAMPLE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'max_workers': $( if [ ! -z ${VIASH_PAR_MAX_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_MAX_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi )
+  'max_workers': $( if [ ! -z ${VIASH_PAR_MAX_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_MAX_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
+  'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3164,20 +3187,26 @@ from main import main
 output = main(par) 
 print(output)
 # output.columns = ['S1', 'S2', 'S3', 'S4']
-output.index=[par["layer"]]
-print("Write output to file", flush=True)
-print(output)
-output.to_csv(par['score'])
+# output.index=[par["layer"]]
+# print("Write output to file", flush=True)
+# print(output)
+# output.to_csv(par['score'])
 
-# output = ad.AnnData(
-#     X=np.empty((0, 0)),
-#     uns={
-#         "layer": par["layer"],
-#         "metric_ids": output.columns.to_numpy(),
-#         "metric_values": output.values
-#     }
-# )
-# output.write_h5ad(par["score"], compression="gzip")
+print(output.values.shape, output.columns.to_numpy().shape)
+output = ad.AnnData(
+    X=np.empty((0, 0)),
+    uns={
+        "dataset_id": par["layer"],
+        "method_id": f"reg1-{par['method_id']}",
+        "metric_ids": output.columns.to_numpy(),
+        "metric_values": output.values[0]
+    }
+)
+
+
+# print(output.uns)
+
+output.write_h5ad(par["score"], compression="gzip")
 VIASHMAIN
 python -B "$tempscript"
 '''

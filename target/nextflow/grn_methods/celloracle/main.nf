@@ -2892,7 +2892,7 @@ meta = [
           "resources/grn-benchmark/grn_models/collectri.csv"
         ],
         "default" : [
-          "resources_test/grn-benchmark/perturbation_data.h5ad"
+          "output/grn.csv"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2906,7 +2906,7 @@ meta = [
         "type" : "string",
         "name" : "--temp_dir",
         "default" : [
-          "output/celloracle/"
+          "output/temdir"
         ],
         "required" : false,
         "direction" : "input",
@@ -2918,7 +2918,7 @@ meta = [
         "type" : "integer",
         "name" : "--num_workers",
         "default" : [
-          1
+          4
         ],
         "required" : false,
         "direction" : "input",
@@ -3029,7 +3029,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/celloracle",
     "viash_version" : "0.8.6",
-    "git_commit" : "f7b438a541c6ef7e1b3c4b39efc3b46135186b86",
+    "git_commit" : "59865251f12f474017a9324598224a1bfca78c7c",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

@@ -185,16 +185,16 @@ function ViashHelp {
   echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"
-  echo "        default: resources_test/grn-benchmark/perturbation_data.h5ad"
+  echo "        default: output/grn.csv"
   echo "        example: resources/grn-benchmark/grn_models/collectri.csv"
   echo ""
   echo "    --temp_dir"
   echo "        type: string"
-  echo "        default: output/celloracle/"
+  echo "        default: output/temdir"
   echo ""
   echo "    --num_workers"
   echo "        type: integer"
-  echo "        default: 1"
+  echo "        default: 4"
 }
 
 # initialise array
@@ -385,13 +385,13 @@ if [ -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then
   VIASH_PAR_MULTIOMICS_ATAC="resources_test/grn-benchmark/multiomics_atac.h5ad"
 fi
 if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
-  VIASH_PAR_PREDICTION="resources_test/grn-benchmark/perturbation_data.h5ad"
+  VIASH_PAR_PREDICTION="output/grn.csv"
 fi
 if [ -z ${VIASH_PAR_TEMP_DIR+x} ]; then
-  VIASH_PAR_TEMP_DIR="output/celloracle/"
+  VIASH_PAR_TEMP_DIR="output/temdir"
 fi
 if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
-  VIASH_PAR_NUM_WORKERS="1"
+  VIASH_PAR_NUM_WORKERS="4"
 fi
 
 # check whether required files exist

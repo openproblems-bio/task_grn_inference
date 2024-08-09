@@ -7,7 +7,7 @@ functionality:
       summary: A metric to evaluate the performance of the inferred GRN
       description: |
         A metric to evaluate the performance of the inferred GRN
-  arguments:
+  arguments: 
     - name: --perturbation_data
       __merge__: file_perturbation_h5ad.yaml
       required: false
@@ -17,12 +17,12 @@ functionality:
       __merge__: file_prediction.yaml
       required: false
       direction: input
-      default: resources/grn-benchmark/grn_models/collectri.csv
+      default: resources/grn_models/collectri.csv
     - name: --score
       __merge__: file_score.yaml
       required: false
       direction: output
-      default: output/score.h5ad
+      default: out/score.h5ad
     - name: --reg_type
       type: string
       direction: input
@@ -47,6 +47,11 @@ functionality:
       type: integer
       direction: input
       default: 4
+    - name: --method_id 
+      type: string 
+      direction: input 
+      required: True
+      example: collectri
 
 
       

@@ -69,11 +69,9 @@ functionality:
   dependencies:
     # - name: common/extract_metadata
     #   repository: openproblemsv2
-    - name: grn_methods/dummy 
     - name: grn_methods/celloracle 
-    - name: metrics/regression_1
     # - name: grn_methods/figr
-    # - name: grn_methods/scglue
+    - name: grn_methods/scglue
   # repositories:
   #   - name: openproblemsv2
   #     type: github

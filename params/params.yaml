@@ -3,4 +3,7 @@ param_list:
     perturbation_counts: "s3://openproblems-data/resources/grn/datasets_raw/perturbation_counts.h5ad"
 
 output_state: "state.yaml"
-publish_dir: "s3://openproblems-data/resources/grn/results/process_perturbation/run_4"
+publish_dir: "s3://openproblems-data/resources/grn/results/process_perturbation/run_5"
+
+
+

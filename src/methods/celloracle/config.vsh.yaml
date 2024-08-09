@@ -9,31 +9,8 @@ functionality:
     description: |
       GRN inference using celloracle. 
     documentation_url: https://morris-lab.github.io/CellOracle.documentation/
-  arguments:
-    - name: --multiomics_rna
-      __merge__: ../../api/file_multiomics_rna_h5ad.yaml
-      required: false
-      direction: input
-      default: resources_test/grn-benchmark/multiomics_rna.h5ad
-    - name: --multiomics_atac
-      __merge__: ../../api/file_multiomics_atac_h5ad.yaml
-      required: false
-      direction: input
-      default: resources_test/grn-benchmark/multiomics_atac.h5ad
-    - name: --prediction
-      __merge__: ../../api/file_prediction.yaml
-      required: false
-      direction: output
-      default: resources_test/grn-benchmark/perturbation_data.h5ad
-
-    - name: --temp_dir
-      type: string
-      direction: input
-      default: output/celloracle/
-    - name: --num_workers
-      type: integer
-      direction: input
-      default: 1
+  # arguments:
+    
       
   resources:
     - type: python_script

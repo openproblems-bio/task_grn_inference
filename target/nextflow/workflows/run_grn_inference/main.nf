@@ -2937,27 +2937,6 @@ meta = [
     "status" : "enabled",
     "dependencies" : [
       {
-        "name" : "grn_methods/dummy",
-        "repository" : {
-          "type" : "local",
-          "localPath" : ""
-        },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/dummy/config.vsh.yaml",
-        "configInfo" : {
-          "functionalityName" : "dummy",
-          "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
-          "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/dummy/config.vsh.yaml",
-          "functionalityNamespace" : "grn_methods",
-          "output" : "",
-          "platform" : "",
-          "git_commit" : "f7b438a541c6ef7e1b3c4b39efc3b46135186b86",
-          "executable" : "/nextflow/grn_methods/dummy/main.nf"
-        },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/dummy"
-      },
-      {
         "name" : "grn_methods/celloracle",
         "repository" : {
           "type" : "local",
@@ -2973,31 +2952,31 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "f7b438a541c6ef7e1b3c4b39efc3b46135186b86",
+          "git_commit" : "59865251f12f474017a9324598224a1bfca78c7c",
           "executable" : "/nextflow/grn_methods/celloracle/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/celloracle"
       },
       {
-        "name" : "metrics/regression_1",
+        "name" : "grn_methods/scglue",
         "repository" : {
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/metrics/regression_1/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/scglue/config.vsh.yaml",
         "configInfo" : {
-          "functionalityName" : "regression_1",
+          "functionalityName" : "scglue",
           "git_tag" : "",
           "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/metrics/regression_1/config.vsh.yaml",
-          "functionalityNamespace" : "metrics",
+          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/scglue/config.vsh.yaml",
+          "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "f7b438a541c6ef7e1b3c4b39efc3b46135186b86",
-          "executable" : "/nextflow/metrics/regression_1/main.nf"
+          "git_commit" : "59865251f12f474017a9324598224a1bfca78c7c",
+          "executable" : "/nextflow/grn_methods/scglue/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1"
+        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scglue"
       }
     ],
     "set_wd_to_resources_dir" : false
@@ -3046,7 +3025,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_grn_inference",
     "viash_version" : "0.8.6",
-    "git_commit" : "f7b438a541c6ef7e1b3c4b39efc3b46135186b86",
+    "git_commit" : "59865251f12f474017a9324598224a1bfca78c7c",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3054,9 +3033,8 @@ meta = [
 
 // resolve dependencies dependencies (if any)
 meta["root_dir"] = getRootDir()
-include { dummy } from "${meta.resources_dir}/../../../nextflow/grn_methods/dummy/main.nf"
 include { celloracle } from "${meta.resources_dir}/../../../nextflow/grn_methods/celloracle/main.nf"
-include { regression_1 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_1/main.nf"
+include { scglue } from "${meta.resources_dir}/../../../nextflow/grn_methods/scglue/main.nf"
 
 // inner workflow
 // user-provided Nextflow code

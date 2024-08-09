@@ -1,0 +1,17 @@
+param_list:
+  - id: lognorm_scenicplus
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    layer: "lognorm"
+    prediction: resources/grn_models/scenicplus.csv 
+    reg_type: ridge
+    method_id: scenicplus
+    subsample: 2
+  - id: pearson_scenicplus
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    layer: "lognorm"
+    prediction: resources/grn_models/scenicplus.csv 
+    reg_type: ridge
+    method_id: scenicplus
+    subsample: 2
+publish_dir: "./out/"
+output_state: "state.yaml"

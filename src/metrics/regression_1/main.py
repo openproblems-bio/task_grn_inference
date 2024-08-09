@@ -69,9 +69,15 @@ def regression_1(
     if reg_type=='ridge':
         regr =  Ridge(**dict(random_state=32))
     elif reg_type=='GB':
-        regr = lightgbm_wrapper(dict(random_state=32, n_estimators=100, min_samples_leaf=2, min_child_samples=1, feature_fraction=0.05, verbosity=-1, max_workers=max_workers))
+        params = dict(random_state=32, 
+                    n_estimators=100, min_samples_leaf=2, min_child_samples=1, 
+                    feature_fraction=0.05, verbosity=-1
+        )
+        regr = lightgbm_wrapper(params, max_workers=max_workers)
     elif reg_type=='RF':
-        regr = lightgbm_wrapper(dict(boosting_type='rf',random_state=32, n_estimators=100,  feature_fraction=0.05, verbosity=-1, max_workers=max_workers))
+        params = dict(boosting_type='rf',random_state=32, n_estimators=100,  
+        feature_fraction=0.05, verbosity=-1)
+        regr = lightgbm_wrapper(params, max_workers)
     else:
         print(f'{reg_type} is not defined')
         raise ValueError("define first")        

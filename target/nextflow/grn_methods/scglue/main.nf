@@ -2811,9 +2811,12 @@ meta = [
         "example" : [
           "resources/grn-benchmark/multiomics_rna.h5ad"
         ],
+        "default" : [
+          "resources_test/grn-benchmark/multiomics_rna.h5ad"
+        ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2845,6 +2848,9 @@ meta = [
         },
         "example" : [
           "resources/grn-benchmark/multiomics_atac.h5ad"
+        ],
+        "default" : [
+          "resources_test/grn-benchmark/multiomics_atac.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2885,38 +2891,13 @@ meta = [
         "example" : [
           "resources/grn-benchmark/grn_models/collectri.csv"
         ],
+        "default" : [
+          "output/grn.csv"
+        ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "output",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "file",
-        "name" : "--annotation_file",
-        "example" : [
-          "resources/grn-benchmark/supp/gencode.v45.annotation.gtf.gz"
-        ],
-        "must_exist" : true,
-        "create_parent" : true,
-        "required" : true,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "file",
-        "name" : "--motif_file",
-        "example" : [
-          "resources/grn-benchmark/supp/JASPAR2022-hg38.bed.gz"
-        ],
-        "must_exist" : true,
-        "create_parent" : true,
-        "required" : true,
-        "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
@@ -2925,7 +2906,7 @@ meta = [
         "type" : "string",
         "name" : "--temp_dir",
         "default" : [
-          "output/figr/"
+          "output/temdir"
         ],
         "required" : false,
         "direction" : "input",
@@ -2937,8 +2918,42 @@ meta = [
         "type" : "integer",
         "name" : "--num_workers",
         "default" : [
-          1
+          4
         ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "file",
+        "name" : "--annotation_file",
+        "example" : [
+          "resources/supplements/gencode.v45.annotation.gtf.gz"
+        ],
+        "default" : [
+          "resources/supplements/gencode.v45.annotation.gtf.gz"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "file",
+        "name" : "--motif_file",
+        "example" : [
+          "resources/supplements/JASPAR2022-hg38.bed.gz"
+        ],
+        "default" : [
+          "resources/supplements/JASPAR2022-hg38.bed.gz"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
         "required" : false,
         "direction" : "input",
         "multiple" : false,
@@ -3073,7 +3088,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scglue",
     "viash_version" : "0.8.6",
-    "git_commit" : "f7b438a541c6ef7e1b3c4b39efc3b46135186b86",
+    "git_commit" : "59865251f12f474017a9324598224a1bfca78c7c",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3099,10 +3114,10 @@ par = {
   'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'multiomics_atac': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_ATAC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'annotation_file': $( if [ ! -z ${VIASH_PAR_ANNOTATION_FILE+x} ]; then echo "r'${VIASH_PAR_ANNOTATION_FILE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'motif_file': $( if [ ! -z ${VIASH_PAR_MOTIF_FILE+x} ]; then echo "r'${VIASH_PAR_MOTIF_FILE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi )
+  'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
+  'annotation_file': $( if [ ! -z ${VIASH_PAR_ANNOTATION_FILE+x} ]; then echo "r'${VIASH_PAR_ANNOTATION_FILE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'motif_file': $( if [ ! -z ${VIASH_PAR_MOTIF_FILE+x} ]; then echo "r'${VIASH_PAR_MOTIF_FILE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
