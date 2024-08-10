@@ -2790,9 +2790,32 @@ meta = [
           {
             "type" : "file",
             "name" : "--multiomics_rna",
-            "description" : "single cell multiomics rna data",
-            "default" : [
+            "info" : {
+              "label" : "multiomics rna",
+              "summary" : "RNA expression for multiomics data.",
+              "file_type" : "h5ad",
+              "slots" : {
+                "obs" : [
+                  {
+                    "name" : "cell_type",
+                    "type" : "string",
+                    "description" : "The annotated cell type of each cell based on RNA expression.",
+                    "required" : true
+                  },
+                  {
+                    "name" : "donor_id",
+                    "type" : "string",
+                    "description" : "Donor id",
+                    "required" : true
+                  }
+                ]
+              }
+            },
+            "example" : [
               "resources/grn-benchmark/multiomics_rna.h5ad"
+            ],
+            "default" : [
+              "resources_test/grn-benchmark/multiomics_rna.h5ad"
             ],
             "must_exist" : true,
             "create_parent" : true,
@@ -2805,12 +2828,59 @@ meta = [
           {
             "type" : "file",
             "name" : "--multiomics_atac",
-            "description" : "single cell multiomics atac data",
-            "default" : [
+            "info" : {
+              "label" : "multiomics atac",
+              "summary" : "Peak data for multiomics data.",
+              "file_type" : "h5ad",
+              "slots" : {
+                "obs" : [
+                  {
+                    "name" : "cell_type",
+                    "type" : "string",
+                    "description" : "The annotated cell type of each cell based on RNA expression.",
+                    "required" : true
+                  },
+                  {
+                    "name" : "donor_id",
+                    "type" : "string",
+                    "description" : "Donor id",
+                    "required" : true
+                  }
+                ]
+              }
+            },
+            "example" : [
               "resources/grn-benchmark/multiomics_atac.h5ad"
+            ],
+            "default" : [
+              "resources_test/grn-benchmark/multiomics_atac.h5ad"
             ],
             "must_exist" : true,
             "create_parent" : true,
+            "required" : true,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "string",
+            "name" : "--temp_dir",
+            "default" : [
+              "output/temdir"
+            ],
+            "required" : true,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "integer",
+            "name" : "--num_workers",
+            "default" : [
+              4
+            ],
             "required" : true,
             "direction" : "input",
             "multiple" : false,
@@ -2824,97 +2894,40 @@ meta = [
         "arguments" : [
           {
             "type" : "file",
-            "name" : "--scores",
-            "description" : "A yaml file containing the scores of each of the methods",
-            "default" : [
-              "score_uns.yaml"
+            "name" : "--prediction_celloracle",
+            "info" : {
+              "label" : "GRN",
+              "summary" : "GRN prediction",
+              "file_type" : "csv",
+              "columns" : [
+                {
+                  "name" : "source",
+                  "description" : "Source of regulation",
+                  "type" : "string",
+                  "required" : true
+                },
+                {
+                  "name" : "target",
+                  "description" : "Target of regulation",
+                  "type" : "string",
+                  "required" : true
+                },
+                {
+                  "name" : "weight",
+                  "description" : "Weight of regulation",
+                  "type" : "float",
+                  "required" : true
+                }
+              ]
+            },
+            "example" : [
+              "resources/grn-benchmark/grn_models/collectri.csv"
             ],
             "must_exist" : true,
             "create_parent" : true,
             "required" : true,
             "direction" : "output",
             "multiple" : false,
-            "multiple_sep" : ":",
-            "dest" : "par"
-          },
-          {
-            "type" : "file",
-            "name" : "--method_configs",
-            "default" : [
-              "method_configs.yaml"
-            ],
-            "must_exist" : true,
-            "create_parent" : true,
-            "required" : true,
-            "direction" : "output",
-            "multiple" : false,
-            "multiple_sep" : ":",
-            "dest" : "par"
-          },
-          {
-            "type" : "file",
-            "name" : "--metric_configs",
-            "default" : [
-              "metric_configs.yaml"
-            ],
-            "must_exist" : true,
-            "create_parent" : true,
-            "required" : true,
-            "direction" : "output",
-            "multiple" : false,
-            "multiple_sep" : ":",
-            "dest" : "par"
-          },
-          {
-            "type" : "file",
-            "name" : "--dataset_uns",
-            "default" : [
-              "dataset_uns.yaml"
-            ],
-            "must_exist" : true,
-            "create_parent" : true,
-            "required" : true,
-            "direction" : "output",
-            "multiple" : false,
-            "multiple_sep" : ":",
-            "dest" : "par"
-          },
-          {
-            "type" : "file",
-            "name" : "--task_info",
-            "default" : [
-              "task_info.yaml"
-            ],
-            "must_exist" : true,
-            "create_parent" : true,
-            "required" : true,
-            "direction" : "output",
-            "multiple" : false,
-            "multiple_sep" : ":",
-            "dest" : "par"
-          }
-        ]
-      },
-      {
-        "name" : "Arguments",
-        "arguments" : [
-          {
-            "type" : "string",
-            "name" : "--method_ids",
-            "description" : "A list of method ids to run. If not specified, all methods will be run.",
-            "required" : false,
-            "direction" : "input",
-            "multiple" : true,
-            "multiple_sep" : ":",
-            "dest" : "par"
-          },
-          {
-            "type" : "string",
-            "name" : "--metric_ids",
-            "description" : "A list of metric ids to run. If not specified, all metric will be run.",
-            "required" : false,
-            "direction" : "input",
-            "multiple" : true,
             "multiple_sep" : ":",
             "dest" : "par"
           }
@@ -2952,31 +2965,10 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "ccf72dd57328a03c8be421f6b05f1f32825fd395",
+          "git_commit" : "1a657f7e8ed180683b16206c0fed1d9e67de4675",
           "executable" : "/nextflow/grn_methods/celloracle/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/celloracle"
-      },
-      {
-        "name" : "grn_methods/scglue",
-        "repository" : {
-          "type" : "local",
-          "localPath" : ""
-        },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/scglue/config.vsh.yaml",
-        "configInfo" : {
-          "functionalityName" : "scglue",
-          "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
-          "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/scglue/config.vsh.yaml",
-          "functionalityNamespace" : "grn_methods",
-          "output" : "",
-          "platform" : "",
-          "git_commit" : "ccf72dd57328a03c8be421f6b05f1f32825fd395",
-          "executable" : "/nextflow/grn_methods/scglue/main.nf"
-        },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scglue"
       }
     ],
     "set_wd_to_resources_dir" : false
@@ -3025,7 +3017,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_grn_inference",
     "viash_version" : "0.8.6",
-    "git_commit" : "ccf72dd57328a03c8be421f6b05f1f32825fd395",
+    "git_commit" : "1a657f7e8ed180683b16206c0fed1d9e67de4675",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3034,250 +3026,28 @@ meta = [
 // resolve dependencies dependencies (if any)
 meta["root_dir"] = getRootDir()
 include { celloracle } from "${meta.resources_dir}/../../../nextflow/grn_methods/celloracle/main.nf"
-include { scglue } from "${meta.resources_dir}/../../../nextflow/grn_methods/scglue/main.nf"
 
 // inner workflow
 // user-provided Nextflow code
-// construct list of methods
-methods = [
-  dummy,
-  celloracle
-]
-
-// construct list of metrics
-// metrics = [
-//   regression_1
-// ]
-
-// helper workflow for starting a workflow based on lists of yaml files
-workflow auto {
-  findStates(params, meta.config)
-    | meta.workflow.run(
-      auto: [publish: "state"]
-    )
-}
-
-// benchmarking workflow
 workflow run_wf {
   take:
   input_ch
 
   main:
+  output_ch = input_ch
 
-  /***************************
-   * RUN METHODS AND METRICS *
-   ***************************/
-  score_ch = input_ch
-
-    | run_benchmark_fun(
-      methods: methods,
-      // metrics: metrics,
-      methodFromState: { id, state, comp ->
-        def new_args = [
-          multiomics_rna: state.multiomics_rna,
-          multiomics_atac: state.multiomics_atac,
-          prediction: 'predictions/$id.$key.output.h5ad'
-        ]
-        // if (comp.config.functionality.info.type == "control_method") {
-        //   new_args.de_test_h5ad = state.de_test_h5ad
-        // }
-        new_args
-      },
-      methodToState: ["prediction": "prediction"],
-      // metricFromState: [
-      //   perturbation_data: "perturbation_data",
-      //   prediction: "prediction",
-      // ],
-      // metricToState: ["score": "score"],
-      methodAuto: [publish: "state"]
+    | celloracle.run(
+      fromState: [multiomics_rna: "multiomics_rna",
+              multiomics_atac: "multiomics_atac",
+              temp_dir: "temp_dir",
+              num_workers: "num_workers"
+              ],
+      toState: [prediction:"prediction_celloracle"]
     )
-    | joinStates { ids, states ->
-      def score_uns = states.collect{it.score_uns}
-      def score_uns_yaml_blob = toYamlBlob(score_uns)
-      def score_uns_file = tempFile("score_uns.yaml")
-      score_uns_file.write(score_uns_yaml_blob)
-      
-      ["score", [scores: score_uns_file]]
-    }
-
-  /******************************
-   * GENERATE OUTPUT YAML FILES *
-   ******************************/
-  // create dataset, method and metric metadata files
-  // metadata_ch = input_ch
-  //   | create_metadata_files(
-  //     datasetFromState: [input: "perturbation_data"],
-  //     methods: methods,
-  //     metrics: metrics,
-  //     meta: meta
-  //   )
-
-  // merge all of the output data 
-  // output_ch = score_ch
-  //   | mix(metadata_ch)
-  //   | joinStates{ ids, states ->
-  //     def mergedStates = states.inject([:]) { acc, m -> acc + m }
-  //     [ids[0], mergedStates]
-  //   }
+    | setState(["prediction_celloracle"])
 
   emit:
   output_ch
-}
-
-
-
-
-
-def run_benchmark_fun(args) {
-  // required args
-  def methods_ = args.methods
-  def metrics_ = args.metrics
-  def methodFromState = args.methodFromState
-  def methodToState = args.methodToState
-  def metricFromState = args.metricFromState
-  def metricToState = args.metricToState
-
-  assert methods_, "methods must be defined"
-  assert metrics_, "metrics must be defined"
-  assert methodFromState, "methodFromState must be defined"
-  assert methodToState, "methodToState must be defined"
-  assert metricFromState, "metricFromState must be defined"
-  assert metricToState, "metricToState must be defined"
-
-  // optional args
-  def keyPrefix = args.keyPrefix ?: ""
-  def methodAuto = args.methodAuto ?: [:]
-  def metricAuto = args.metricAuto ?: [:]
-
-  // add the key prefix to the method and metric names
-  if (keyPrefix && keyPrefix != "") {
-    methods_ = methods.collect{ method ->
-      method.run(key: keyPrefix + method.config.functionality.name)
-    }
-    metrics_ = metrics.collect{ metric ->
-      metric.run(key: keyPrefix + metric.config.functionality.name)
-    }
-  }
-
-  workflow bench {
-    take: input_ch
-
-    main:
-    output_ch = input_ch
-      // run all methods
-      | runEach(
-        components: methods_,
-        filter: { id, state, comp ->
-          !state.method_ids || state.method_ids.contains(comp.config.functionality.name)
-        },
-        id: { id, state, comp ->
-          id + "." + comp.config.functionality.name
-        },
-        fromState: methodFromState,
-        toState: methodToState,
-        auto: methodAuto
-      )
-
-      // run all metrics
-      | runEach(
-        components: metrics_,
-        filter: { id, state, comp ->
-          !state.metric_ids || state.metric_ids.contains(comp.config.functionality.name)
-        },
-        id: { id, state, comp ->
-          id + "." + comp.config.functionality.name
-        },
-        fromState: metricFromState,
-        toState: metricToState,
-        auto: metricAuto
-      )
-
-      // extract the scores
-      // | extract_metadata.run(
-      //   key: "${keyPrefix}score_uns",
-      //   fromState: [input: "score"],
-      //   toState: { id, output, state ->
-      //     state + [
-      //       score_uns: readYaml(output.output).uns
-      //     ]
-      //   }
-      // )
-
-    emit: output_ch
-  }
-  return bench
-}
-
-
-def create_metadata_files(args) {
-  // required args
-  def meta_ = args.meta
-  def methods_ = args.methods
-  def metrics_ = args.metrics
-  def datasetFromState = args.datasetFromState
-
-  assert meta_, "meta must be defined"
-  assert methods_, "methods must be defined"
-  assert metrics_, "metrics must be defined"
-  assert datasetFromState, "datasetFromState must be defined"
-
-  workflow metadata {
-    take: input_ch
-
-    main:
-    output_ch = input_ch
-
-      | map{ id, state ->
-        [id, state + ["_meta": [join_id: id]]]
-      }
-
-      | extract_metadata.run(
-        key: "dataset_uns",
-        fromState: args.datasetFromState,
-        toState: { id, output, state ->
-          state + [
-            dataset_info: readYaml(output.output).uns
-          ]
-        }
-      )
-    
-      | joinStates { ids, states ->
-        assert states.size() > 0, "no states found"
-        assert states[0]._meta, "no _meta found in state[0]"
-        assert states.every{it.dataset_info}, "not all states have dataset_info"
-
-        // combine the dataset info into one file
-        def dataset_uns = states.collect{it.dataset_info}
-        def dataset_uns_yaml_blob = toYamlBlob(dataset_uns)
-        def dataset_uns_file = tempFile("dataset_uns.yaml")
-        dataset_uns_file.write(dataset_uns_yaml_blob)
-
-        // store the method configs in a file
-        def method_configs = methods_.collect{it.config}
-        def method_configs_yaml_blob = toYamlBlob(method_configs)
-        def method_configs_file = tempFile("method_configs.yaml")
-        method_configs_file.write(method_configs_yaml_blob)
-
-        // store the metric configs in a file
-        def metric_configs = metrics_.collect{it.config}
-        def metric_configs_yaml_blob = toYamlBlob(metric_configs)
-        def metric_configs_file = tempFile("metric_configs.yaml")
-        metric_configs_file.write(metric_configs_yaml_blob)
-
-        def task_info_file = meta_.resources_dir.resolve("task_info.yaml")
-
-        def new_state = [
-          dataset_uns: dataset_uns_file,
-          method_configs: method_configs_file,
-          metric_configs: metric_configs_file,
-          task_info: task_info_file,
-          _meta: states[0]._meta
-        ]
-        ["output", new_state]
-      }
-    emit: output_ch
-  }
-  return metadata
 }
 
 // inner workflow hook

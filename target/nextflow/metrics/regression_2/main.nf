@@ -2925,6 +2925,18 @@ meta = [
             "uns" : [
               {
                 "type" : "string",
+                "name" : "dataset_id",
+                "description" : "A unique identifier for the dataset",
+                "required" : true
+              },
+              {
+                "type" : "string",
+                "name" : "method_id",
+                "description" : "A unique identifier for the method",
+                "required" : true
+              },
+              {
+                "type" : "string",
                 "name" : "metric_ids",
                 "description" : "One or more unique metric identifiers",
                 "multiple" : true,
@@ -3130,7 +3142,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "ccf72dd57328a03c8be421f6b05f1f32825fd395",
+    "git_commit" : "1a657f7e8ed180683b16206c0fed1d9e67de4675",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

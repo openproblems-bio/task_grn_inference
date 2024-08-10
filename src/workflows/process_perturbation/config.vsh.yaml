@@ -17,10 +17,9 @@ functionality:
       description: single cell perturbation data 
 
     - name: --perturbation_data_bc
-      type: file
+      __merge__: ../../api/file_perturbation_h5ad.yaml
       required: true
       direction: output
-      default: resources/grn-benchmark/multiomics_rna.h5ad
     
     
   resources:

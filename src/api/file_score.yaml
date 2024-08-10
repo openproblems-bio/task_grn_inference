@@ -6,14 +6,14 @@ info:
   file_type: h5ad
   slots:
     uns:
-      # - type: string
-      #   name: dataset_id
-      #   description: "A unique identifier for the dataset"
-      #   required: true
-      # - type: string
-      #   name: method_id
-      #   description: "A unique identifier for the method"
-      #   required: true
+      - type: string
+        name: dataset_id
+        description: "A unique identifier for the dataset"
+        required: true
+      - type: string
+        name: method_id
+        description: "A unique identifier for the method"
+        required: true
       - type: string
         name: metric_ids
         description: "One or more unique metric identifiers"

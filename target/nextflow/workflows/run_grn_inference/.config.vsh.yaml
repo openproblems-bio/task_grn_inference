@@ -7,10 +7,24 @@ functionality:
     arguments:
     - type: "file"
       name: "--multiomics_rna"
-      description: "single cell multiomics rna data"
-      info: null
-      default:
+      info:
+        label: "multiomics rna"
+        summary: "RNA expression for multiomics data."
+        file_type: "h5ad"
+        slots:
+          obs:
+          - name: "cell_type"
+            type: "string"
+            description: "The annotated cell type of each cell based on RNA expression."
+            required: true
+          - name: "donor_id"
+            type: "string"
+            description: "Donor id"
+            required: true
+      example:
       - "resources/grn-benchmark/multiomics_rna.h5ad"
+      default:
+      - "resources_test/grn-benchmark/multiomics_rna.h5ad"
       must_exist: true
       create_parent: true
       required: true
@@ -20,12 +34,46 @@ functionality:
       dest: "par"
     - type: "file"
       name: "--multiomics_atac"
-      description: "single cell multiomics atac data"
-      info: null
-      default:
+      info:
+        label: "multiomics atac"
+        summary: "Peak data for multiomics data."
+        file_type: "h5ad"
+        slots:
+          obs:
+          - name: "cell_type"
+            type: "string"
+            description: "The annotated cell type of each cell based on RNA expression."
+            required: true
+          - name: "donor_id"
+            type: "string"
+            description: "Donor id"
+            required: true
+      example:
       - "resources/grn-benchmark/multiomics_atac.h5ad"
+      default:
+      - "resources_test/grn-benchmark/multiomics_atac.h5ad"
       must_exist: true
       create_parent: true
+      required: true
+      direction: "input"
+      multiple: false
+      multiple_sep: ":"
+      dest: "par"
+    - type: "string"
+      name: "--temp_dir"
+      info: null
+      default:
+      - "output/temdir"
+      required: true
+      direction: "input"
+      multiple: false
+      multiple_sep: ":"
+      dest: "par"
+    - type: "integer"
+      name: "--num_workers"
+      info: null
+      default:
+      - 4
       required: true
       direction: "input"
       multiple: false
@@ -34,86 +82,31 @@ functionality:
   - name: "Outputs"
     arguments:
     - type: "file"
-      name: "--scores"
-      description: "A yaml file containing the scores of each of the methods"
-      info: null
-      default:
-      - "score_uns.yaml"
+      name: "--prediction_celloracle"
+      info:
+        label: "GRN"
+        summary: "GRN prediction"
+        file_type: "csv"
+        columns:
+        - name: "source"
+          description: "Source of regulation"
+          type: "string"
+          required: true
+        - name: "target"
+          description: "Target of regulation"
+          type: "string"
+          required: true
+        - name: "weight"
+          description: "Weight of regulation"
+          type: "float"
+          required: true
+      example:
+      - "resources/grn-benchmark/grn_models/collectri.csv"
       must_exist: true
       create_parent: true
       required: true
       direction: "output"
       multiple: false
-      multiple_sep: ":"
-      dest: "par"
-    - type: "file"
-      name: "--method_configs"
-      info: null
-      default:
-      - "method_configs.yaml"
-      must_exist: true
-      create_parent: true
-      required: true
-      direction: "output"
-      multiple: false
-      multiple_sep: ":"
-      dest: "par"
-    - type: "file"
-      name: "--metric_configs"
-      info: null
-      default:
-      - "metric_configs.yaml"
-      must_exist: true
-      create_parent: true
-      required: true
-      direction: "output"
-      multiple: false
-      multiple_sep: ":"
-      dest: "par"
-    - type: "file"
-      name: "--dataset_uns"
-      info: null
-      default:
-      - "dataset_uns.yaml"
-      must_exist: true
-      create_parent: true
-      required: true
-      direction: "output"
-      multiple: false
-      multiple_sep: ":"
-      dest: "par"
-    - type: "file"
-      name: "--task_info"
-      info: null
-      default:
-      - "task_info.yaml"
-      must_exist: true
-      create_parent: true
-      required: true
-      direction: "output"
-      multiple: false
-      multiple_sep: ":"
-      dest: "par"
-  - name: "Arguments"
-    arguments:
-    - type: "string"
-      name: "--method_ids"
-      description: "A list of method ids to run. If not specified, all methods will\
-        \ be run."
-      info: null
-      required: false
-      direction: "input"
-      multiple: true
-      multiple_sep: ":"
-      dest: "par"
-    - type: "string"
-      name: "--metric_ids"
-      description: "A list of metric ids to run. If not specified, all metric will\
-        \ be run."
-      info: null
-      required: false
-      direction: "input"
-      multiple: true
       multiple_sep: ":"
       dest: "par"
   resources:
@@ -140,26 +133,9 @@ functionality:
       functionalityNamespace: "grn_methods"
       output: ""
       platform: ""
-      git_commit: "ccf72dd57328a03c8be421f6b05f1f32825fd395"
+      git_commit: "1a657f7e8ed180683b16206c0fed1d9e67de4675"
       executable: "/nextflow/grn_methods/celloracle/main.nf"
     writtenPath: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/celloracle"
-  - name: "grn_methods/scglue"
-    repository:
-      type: "local"
-      localPath: ""
-    foundConfigPath: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/scglue/config.vsh.yaml"
-    configInfo:
-      functionalityName: "scglue"
-      git_tag: ""
-      git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"
-      viash_version: "0.8.6"
-      config: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/scglue/config.vsh.yaml"
-      functionalityNamespace: "grn_methods"
-      output: ""
-      platform: ""
-      git_commit: "ccf72dd57328a03c8be421f6b05f1f32825fd395"
-      executable: "/nextflow/grn_methods/scglue/main.nf"
-    writtenPath: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scglue"
   set_wd_to_resources_dir: false
 platforms:
 - type: "nextflow"
@@ -197,5 +173,5 @@ info:
   output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_grn_inference"
   executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_grn_inference/main.nf"
   viash_version: "0.8.6"
-  git_commit: "ccf72dd57328a03c8be421f6b05f1f32825fd395"
+  git_commit: "1a657f7e8ed180683b16206c0fed1d9e67de4675"
   git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"

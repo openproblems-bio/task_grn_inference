@@ -8,9 +8,7 @@ functionality:
     summary: "GRN inference using celloracle"
     description: |
       GRN inference using celloracle. 
-    documentation_url: https://morris-lab.github.io/CellOracle.documentation/
-  # arguments:
-    
+    documentation_url: https://morris-lab.github.io/CellOracle.documentation/    
       
   resources:
     - type: python_script
@@ -20,13 +18,7 @@ functionality:
 
 platforms:
   - type: docker
-    # image: ghcr.io/openproblems-bio/base_python:1.0.4
     image: kenjikamimoto126/celloracle_ubuntu:0.18.0
-    # setup:
-    #   - type: python
-    #     packages: [celloracle==0.14.0, genomepy==0.16.1]
-    #   - type: apt
-    #     packages: []
 
   - type: native
   - type: nextflow

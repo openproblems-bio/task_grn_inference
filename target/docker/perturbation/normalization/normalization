@@ -174,12 +174,12 @@ function ViashHelp {
   echo ""
   echo "Arguments:"
   echo "    --pseudobulked_data_f"
-  echo "        type: file, file must exist"
+  echo "        type: file, required parameter, file must exist"
   echo "        default: resources_local/pseudobulked_data_f"
   echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
   echo ""
   echo "    --perturbation_data"
-  echo "        type: file, file must exist"
+  echo "        type: file, required parameter, output, file must exist"
   echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
   echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
 }
@@ -408,9 +408,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "sctk==0.2.2"
 
 LABEL org.opencontainers.image.description="Companion container for running component perturbation normalization"
-LABEL org.opencontainers.image.created="2024-08-09T15:59:49Z"
+LABEL org.opencontainers.image.created="2024-08-10T13:22:51Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="ccf72dd57328a03c8be421f6b05f1f32825fd395"
+LABEL org.opencontainers.image.revision="1a657f7e8ed180683b16206c0fed1d9e67de4675"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -709,6 +709,14 @@ fi
 
 
 # check whether required parameters exist
+if [ -z ${VIASH_PAR_PSEUDOBULKED_DATA_F+x} ]; then
+  ViashError '--pseudobulked_data_f' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
+if [ -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then
+  ViashError '--perturbation_data' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then
   ViashError 'functionality_name' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
@@ -730,21 +738,9 @@ if [ -z ${VIASH_META_TEMP_DIR+x} ]; then
   exit 1
 fi
 
-# filling in defaults
-if [ -z ${VIASH_PAR_PSEUDOBULKED_DATA_F+x} ]; then
-  VIASH_PAR_PSEUDOBULKED_DATA_F="resources_local/pseudobulked_data_f"
-fi
-if [ -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then
-  VIASH_PAR_PERTURBATION_DATA="resources/grn-benchmark/perturbation_data.h5ad"
-fi
-
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_PSEUDOBULKED_DATA_F" ] && [ ! -e "$VIASH_PAR_PSEUDOBULKED_DATA_F" ]; then
   ViashError "Input file '$VIASH_PAR_PSEUDOBULKED_DATA_F' does not exist."
-  exit 1
-fi
-if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ] && [ ! -e "$VIASH_PAR_PERTURBATION_DATA" ]; then
-  ViashError "Input file '$VIASH_PAR_PERTURBATION_DATA' does not exist."
   exit 1
 fi
 
@@ -792,6 +788,11 @@ if [[ -n "$VIASH_META_MEMORY_PB" ]]; then
   fi
 fi
 
+# create parent directories of output files, if so desired
+if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ] && [ ! -d "$(dirname "$VIASH_PAR_PERTURBATION_DATA")" ]; then
+  mkdir -p "$(dirname "$VIASH_PAR_PERTURBATION_DATA")"
+fi
+
 # detect volumes from file arguments
 VIASH_CHOWN_VARS=()
 if [ ! -z "$VIASH_PAR_PSEUDOBULKED_DATA_F" ]; then
@@ -801,6 +802,7 @@ fi
 if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PERTURBATION_DATA")" )
   VIASH_PAR_PERTURBATION_DATA=$(ViashAutodetectMount "$VIASH_PAR_PERTURBATION_DATA")
+  VIASH_CHOWN_VARS+=( "$VIASH_PAR_PERTURBATION_DATA" )
 fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_META_RESOURCES_DIR")" )
@@ -941,6 +943,13 @@ if [ ! -z "$VIASH_META_CONFIG" ]; then
 fi
 if [ ! -z "$VIASH_META_TEMP_DIR" ]; then
   VIASH_META_TEMP_DIR=$(ViashStripAutomount "$VIASH_META_TEMP_DIR")
+fi
+
+
+# check whether required files exist
+if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ] && [ ! -e "$VIASH_PAR_PERTURBATION_DATA" ]; then
+  ViashError "Output file '$VIASH_PAR_PERTURBATION_DATA' does not exist."
+  exit 1
 fi
 
 

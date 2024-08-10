@@ -2802,8 +2802,79 @@ meta = [
       {
         "type" : "file",
         "name" : "--perturbation_data_bc",
-        "default" : [
-          "resources/grn-benchmark/multiomics_rna.h5ad"
+        "info" : {
+          "label" : "perturbation",
+          "summary" : "Perturbation dataset for benchmarking.",
+          "file_type" : "h5ad",
+          "slots" : {
+            "obs" : [
+              {
+                "name" : "cell_type",
+                "type" : "string",
+                "description" : "The annotated cell type of each cell based on RNA expression.",
+                "required" : true
+              },
+              {
+                "name" : "sm_name",
+                "type" : "string",
+                "description" : "The primary name for the (parent) compound (in a standardized representation)\nas chosen by LINCS. This is provided to map the data in this experiment to \nthe LINCS Connectivity Map data.\n",
+                "required" : true
+              },
+              {
+                "name" : "donor_id",
+                "type" : "string",
+                "description" : "Donor id",
+                "required" : true
+              },
+              {
+                "name" : "plate_name",
+                "type" : "string",
+                "description" : "Plate name 6 levels",
+                "required" : true
+              },
+              {
+                "name" : "row",
+                "type" : "string",
+                "description" : "Row name on the plate",
+                "required" : true
+              },
+              {
+                "name" : "well",
+                "type" : "string",
+                "description" : "Well name on the plate",
+                "required" : true
+              },
+              {
+                "name" : "cell_count",
+                "type" : "string",
+                "description" : "Number of single cells pseudobulked",
+                "required" : true
+              }
+            ],
+            "layers" : [
+              {
+                "name" : "n_counts",
+                "type" : "double",
+                "description" : "Pseudobulked values using mean approach",
+                "required" : true
+              },
+              {
+                "name" : "pearson",
+                "type" : "double",
+                "description" : "Normalized values using pearson residuals",
+                "required" : false
+              },
+              {
+                "name" : "lognorm",
+                "type" : "double",
+                "description" : "Normalized values using shifted logarithm ",
+                "required" : false
+              }
+            ]
+          }
+        },
+        "example" : [
+          "resources/grn-benchmark/perturbation_data.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2859,7 +2930,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "ccf72dd57328a03c8be421f6b05f1f32825fd395",
+          "git_commit" : "1a657f7e8ed180683b16206c0fed1d9e67de4675",
           "executable" : "/nextflow/perturbation/sc_counts/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/sc_counts"
@@ -2880,7 +2951,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "ccf72dd57328a03c8be421f6b05f1f32825fd395",
+          "git_commit" : "1a657f7e8ed180683b16206c0fed1d9e67de4675",
           "executable" : "/nextflow/perturbation/normalization/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/normalization"
@@ -2901,7 +2972,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "ccf72dd57328a03c8be421f6b05f1f32825fd395",
+          "git_commit" : "1a657f7e8ed180683b16206c0fed1d9e67de4675",
           "executable" : "/nextflow/perturbation/batch_correction_scgen/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/batch_correction_scgen"
@@ -2922,7 +2993,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "ccf72dd57328a03c8be421f6b05f1f32825fd395",
+          "git_commit" : "1a657f7e8ed180683b16206c0fed1d9e67de4675",
           "executable" : "/nextflow/perturbation/batch_correction_seurat/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/batch_correction_seurat"
@@ -2974,7 +3045,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/process_perturbation",
     "viash_version" : "0.8.6",
-    "git_commit" : "ccf72dd57328a03c8be421f6b05f1f32825fd395",
+    "git_commit" : "1a657f7e8ed180683b16206c0fed1d9e67de4675",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3003,18 +3074,20 @@ workflow run_wf {
 
     | normalization.run(
       fromState: [pseudobulked_data_f: "pseudobulked_data_f"],
-      toState: [perturbation_data: "perturbation_data"]
+      toState: [perturbation_data_n: "perturbation_data_n"]
     )
     
     | batch_correction_scgen.run(
-      fromState: [perturbation_data: "perturbation_data"],
+      fromState: [perturbation_data_n: "perturbation_data_n"],
       toState: [perturbation_data_bc: "perturbation_data_bc"]
     )
 
     | batch_correction_seurat.run(
-      fromState: [perturbation_data_bc: "perturbation_data_bc"],
+      fromState: [perturbation_data_n: "perturbation_data_bc"],
       toState: [perturbation_data_bc: "perturbation_data_bc"]
     )
+    
+    | setState(["perturbation_data_bc"])
 
   emit:
   output_ch
