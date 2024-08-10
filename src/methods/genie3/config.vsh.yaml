@@ -1,0 +1,54 @@
+functionality:
+  name: genie3
+  info:
+    label: genie3
+    summary: "GRN inference using GENIE3"
+    description: |
+      GRN inference using GENIE3.
+    documentation_url: https://www.bioconductor.org/packages/release/bioc/html/GENIE3.html
+  arguments:
+    - name: --multiomics_rna
+      type: file
+      example: resources/grn-benchmark/multiomics_rna.h5ad
+      info:
+        label: multiomics_rna
+        summary: "Multiomics RNA data"
+        file_type: rds
+        columns: 
+          - name: dummpy
+            type: string
+            required: false
+      required: true
+      must_exist: true
+    - name: --prediction
+      __merge__: ../../api/file_prediction.yaml
+      required: true
+      direction: output
+    - name: --max_n_links
+      type: integer
+      default: 50000
+    - name: --temp_dir
+      type: string
+      direction: input
+      default: 'output/genie3'
+    - name: --num_workers
+      type: integer
+      direction: input
+      default: 4
+  resources:
+    - type: python_script
+      path: script.py
+
+platforms:
+  - type: docker
+    image: continuumio/anaconda3:2024.02-1
+    setup:
+      - type: docker
+        run: |
+          conda install -y -c bioconda arboreto pandas
+      - type: python
+        packages: [ anndata ]
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

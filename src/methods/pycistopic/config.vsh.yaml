@@ -27,18 +27,6 @@ functionality:
       direction: output
       create_parent: true
       default: 'output/pycistopic'
-    - name: --cell_topic
-      type: file
-      example: resources/grn-benchmark/supp/cell_topic.csv
-      info:
-        label: Cell topic probability database
-        summary: "annotation file"
-        file_type: csv
-        columns: 
-          - name: topic
-            type: string
-            required: false
-      required: true
     - name: --qc
       type: boolean_true
       description: Whether to perform quality control
