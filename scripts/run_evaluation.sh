@@ -42,6 +42,10 @@ bin/regression_1/regression_1 --perturbation_data resources/grn-benchmark/pertur
 
 # Run regression analysis 2
 echo "Regression 2"
+if [ ! -f resources/grn-benchmark/consensus-num-regulators.json ]; then
+    viash build src/metrics/regression_2/consensus/config.vsh.yaml --platform docker -o bin/regression_2/consensus
+    bin/regression_2/consensus/consensus_for_regression_2 --perturbation_data resources/grn-benchmark/perturbation_data.h5ad --output resources/grn-benchmark/consensus-num-regulators.json --grn_folder resources/grn-benchmark/grn_models/ --grns ananse.csv,celloracle.csv,figr.csv,granie.csv,scenicplus.csv,scglue.csv
+fi
 mkdir -p bin/regression_2
 viash build src/metrics/regression_2/config.vsh.yaml -p docker -o bin/regression_2
-bin/regression_2/regression_2 --perturbation_data resources/grn-benchmark/perturbation_data.h5ad --reg_type $reg_type --prediction $grn --score $score
+bin/regression_2/regression_2 --perturbation_data resources/grn-benchmark/perturbation_data.h5ad --consensus resources/grn-benchmark/consensus-num-regulators.json --layer scgen_pearson --reg_type $reg_type --prediction $grn --score $score

@@ -1,5 +1,6 @@
 from typing import Dict, List, Tuple, Any, Union
 import random
+import json
 
 import tqdm
 import numpy as np
@@ -14,7 +15,6 @@ from sklearn.metrics import r2_score, mean_squared_error
 
 SEED = 0xCAFE
 N_POINTS_TO_ESTIMATE_BACKGROUND = 20
-LAYERS = ['scgen_pearson', 'scgen_lognorm']
 
 
 def load_grn(filepath: str, gene_names: np.ndarray) -> np.ndarray:
@@ -99,11 +99,10 @@ def learn_background_distribution(
         estimator_t: str,
         X: np.ndarray,
         groups: np.ndarray,
-        max_n_regulators: int,
-        random_state: int = 0xCAFE
+        max_n_regulators: int
 ) -> Dict[int, Tuple[float, float]]:
 
-    rng = np.random.default_rng(seed=random_state)
+    rng = np.random.default_rng(seed=SEED)
 
     n_genes = X.shape[1]
     random_grn = rng.random(size=(n_genes, n_genes))
@@ -121,7 +120,7 @@ def learn_background_distribution(
                 random_grn,
                 j,
                 n_features=n_features,
-                random_state=random_state
+                random_state=SEED
             )
             scores.append(res['avg-r2'])
         background[n_features] = (np.mean(scores), max(0.001, np.std(scores)))
@@ -152,6 +151,52 @@ def cross_validate(
     }
 
 
+def dynamic_approach(grn: np.ndarray, X: np.ndarray, groups: np.ndarray, gene_names: List[str], reg_type: str) -> float:
+
+    # Determine maximum number of input features
+    n_genes = X.shape[1]
+    max_n_regulators = min(100, int(0.5 * n_genes))
+
+    # Learn background distribution for each value of `n_features`:
+    # r2 scores using random genes as features.
+    background = learn_background_distribution(reg_type, X, groups, max_n_regulators)
+
+    # Cross-validate each gene using the inferred GRN to define select input features
+    res = cross_validate(
+        reg_type,
+        gene_names,
+        X,
+        groups,
+        grn,
+        np.clip(np.sum(grn != 0, axis=0), 0, max_n_regulators)
+    )
+
+    # Compute z-scores from r2 scores to take into account the fact
+    # that random network can still perform well when the number of features is large
+    scores = []
+    for j in range(n_genes):
+        if np.isnan(res['scores'][j]['avg-r2']):
+            continue
+        n_features = int(np.sum(grn[:, j] != 0))
+        if n_features in background:
+            mu, sigma = background[n_features]
+        else:
+            mu, sigma = background['max']
+        z_score = (res['scores'][j]['avg-r2'] - mu) / sigma
+        z_score = max(0, z_score)
+        scores.append(z_score)
+
+    return np.mean(scores)
+
+
+def static_approach(grn: np.ndarray, n_features: np.ndarray, X: np.ndarray, groups: np.ndarray, gene_names: List[str], reg_type: str) -> float:
+
+    # Cross-validate each gene using the inferred GRN to define select input features
+    res = cross_validate(reg_type, gene_names, X, groups, grn, n_features)
+
+    return np.mean([res['scores'][j]['avg-r2'] for j in range(len(res['scores']))])
+
+
 def main(par: Dict[str, Any]) -> pd.DataFrame:
 
     # Set global seed for reproducibility purposes
@@ -169,52 +214,42 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     groups = LabelEncoder().fit_transform(perturbation_data.obs.plate_name)
     
     # Load inferred GRN
+    print(f'Loading GRN', flush=True)
     grn = load_grn(par['prediction'], gene_names)
     
-    results = {}
-    for layer in LAYERS:
-        print(f'Compute metrics for layer: {layer}', flush=True)
+    # Load and standardize perturbation data
+    layer = par['layer']
+    X = perturbation_data.layers[layer]
+    X = RobustScaler().fit_transform(X)
 
-        # Load and standardize perturbation data
-        X = perturbation_data.layers[layer]
-        X = RobustScaler().fit_transform(X)
+    # Load consensus numbers of putative regulators
+    with open(par['consensus'], 'r') as f:
+        data = json.load(f)
+    n_features_theta_min = np.asarray([data[gene_name]['0'] for gene_name in gene_names], dtype=int)
+    n_features_theta_median = np.asarray([data[gene_name]['0.5'] for gene_name in gene_names], dtype=int)
+    n_features_theta_max = np.asarray([data[gene_name]['1'] for gene_name in gene_names], dtype=int)
 
-        # Determine maximum number of input features
-        max_n_regulators = min(100, int(0.5 * n_genes))
+    # Evaluate GRN
+    print(f'Compute metrics for layer: {layer}', flush=True)
+    print(f'Dynamic approach:', flush=True)
+    score_dynamic = dynamic_approach(grn, X, groups, gene_names, par['reg_type'])
+    print(f'Static approach (theta=0):', flush=True)
+    score_static_min = static_approach(grn, n_features_theta_min, X, groups, gene_names, par['reg_type'])
+    print(f'Static approach (theta=0.5):', flush=True)
+    score_static_median = static_approach(grn, n_features_theta_median, X, groups, gene_names, par['reg_type'])
+    print(f'Static approach (theta=1):', flush=True)
+    score_static_max = static_approach(grn, n_features_theta_max, X, groups, gene_names, par['reg_type'])
+    score_overall = score_dynamic + score_static_min + score_static_median + score_static_max
+    # TODO: find a mathematically sound way to combine Z-scores and r2 scores
 
-        # Learn background distribution for each value of `n_features`:
-        # r2 scores using random genes as features.
-        print("pqr", par['reg_type'])
-        background = learn_background_distribution(par['reg_type'], X, groups, max_n_regulators, random_state=random_state)
-
-        # Cross-validate each gene using the inferred GRN to define select input features
-        res = cross_validate(
-            par['reg_type'],
-            gene_names,
-            X,
-            groups,
-            grn,
-            np.clip(np.sum(grn != 0, axis=0), 0, max_n_regulators)
-        )
-
-        # Compute z-scores from r2 scores to take into account the fact
-        # that random network can still perform well when the number of features is large
-        scores = []
-        for j in range(n_genes):
-            if np.isnan(res['scores'][j]['avg-r2']):
-                continue
-            n_features = int(np.sum(grn[:, j] != 0))
-            if n_features in background:
-                mu, sigma = background[n_features]
-            else:
-                mu, sigma = background['max']
-            z_score = (res['scores'][j]['avg-r2'] - mu) / sigma
-            z_score = max(0, z_score)
-            scores.append(z_score)
-
-        total_score = np.mean(scores)
-        print(f'Score on {layer}: {total_score}')
-        results[layer] = [total_score]
+    print(f'Score on {layer}: {score_overall}')
+    results = {
+        'static-theta-0.0': [score_static_min],
+        'static-theta-0.5': [score_static_median],
+        'static-theta-1.0': [score_static_max],
+        'dynamic': [score_dynamic],
+        'Overall': [score_overall],
+    }
 
     # Convert results to DataFrame
     df_results = pd.DataFrame(results)
