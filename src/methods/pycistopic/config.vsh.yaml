@@ -22,14 +22,34 @@ functionality:
             type: string
             required: false
       required: true
+    - name: --qc
+      type: boolean_true
+      description: Whether to perform quality control
     - name: --out_dir
       type: file
       direction: output
       create_parent: true
       default: 'output/pycistopic'
-    - name: --qc
-      type: boolean_true
-      description: Whether to perform quality control
+    - name: --region_bin_topics_otsu
+      type: file
+      direction: output
+      default: 'output/pycistopic/candidate_enhancers/region_bin_topics_otsu.pkl'
+    - name: --region_bin_topics_top3k
+      type: file
+      direction: output
+      default: 'output/pycistopic/candidate_enhancers/region_bin_topics_top3k.pkl'
+    - name: --markers_dict
+      type: file
+      direction: output
+      default: 'output/pycistopic/candidate_enhancers/markers_dict.pkl'
+    - name: --cistopic_object
+      type: file
+      direction: output
+      default: 'output/pycistopic/cistopic_object_with_model.pkl'
+    - name: --region_sets
+      type: file
+      direction: output
+      default: 'output/pycistopic/region_sets/'
   resources:
     - type: python_script
       path: script.py
