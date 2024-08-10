@@ -1,10 +1,10 @@
 #!/bin/bash
 
-RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
+RUN_ID="process_perturbation"
 resources_dir="s3://openproblems-data/resources/grn/"
 publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
 
-cat > ./params/params.yaml << HERE
+cat > ./params/${RUN_ID}.yaml << HERE
 param_list:
   - id: test_process_perturatbion
     perturbation_counts: "$resources_dir/datasets_raw/perturbation_counts.h5ad",

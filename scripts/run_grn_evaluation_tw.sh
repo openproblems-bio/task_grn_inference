@@ -5,9 +5,12 @@
 
 RUN_ID="subsample_200_ridge"
 resources_dir="s3://openproblems-data/resources/grn/"
+# resources_dir="resources/"
+
 publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
 reg_type=ridge
 subsample=200
+max_workers=20
 
 grn_names=(
     "celloracle"
@@ -28,44 +31,49 @@ for grn_name in "${grn_names[@]}"; do
   for layer in "${layers[@]}"; do
     cat >> ./params/params_${RUN_ID}.yaml << HERE
   - id: ${layer}_${grn_name}
-    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
     layer: ${layer}
-    prediction: resources/grn_models/${grn_name}.csv 
+    prediction: ${resources_dir}/grn_models/${grn_name}.csv 
     reg_type: $reg_type
     method_id: $grn_name
     subsample: $subsample
+    max_workers: $max_workers
 
 HERE
   done
 done
 
-# append the positive controls
-grn_name="positive_control"
-for layer in "${layers[@]}"; do
-  cat >> ./params/params_${RUN_ID}.yaml << HERE
-  - id: ${layer}_${grn_name}
-    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
-    layer: ${layer}
-    prediction: resources/control_models/${layer}_${grn_name}.csv 
-    reg_type: $reg_type
-    method_id: $grn_name
-    subsample: $subsample
-
-HERE
-done
 
 # append negative control
-grn_name="negative_control"
-cat >> ./params/params_${RUN_ID}.yaml << HERE
-  - id: ${layer}_${grn_name}
-    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
-    layer: ${layer}
-    prediction: resources/control_models/${grn_name}.csv 
-    reg_type: $reg_type
-    method_id: $grn_name
-    subsample: $subsample
+# grn_name="negative_control"
+# cat >> ./params/params_${RUN_ID}.yaml << HERE
+#   - id: ${layer}_${grn_name}
+#     perturbation_data: ${perturbation_data}
+#     layer: ${layer}
+#     prediction: resources/control_models/${grn_name}.csv 
+#     reg_type: $reg_type
+#     method_id: $grn_name
+#     subsample: $subsample
+#     max_workers: $max_workers
 
-HERE
+# HERE
+
+# # append the positive controls
+# grn_name="positive_control"
+# for layer in "${layers[@]}"; do
+#   cat >> ./params/params_${RUN_ID}.yaml << HERE
+#   - id: ${layer}_${grn_name}
+#     perturbation_data: ${perturbation_data}
+#     layer: ${layer}
+#     prediction: resources/control_models/${layer}_${grn_name}.csv 
+#     reg_type: $reg_type
+#     method_id: $grn_name
+#     subsample: $subsample
+#     max_workers: $max_workers
+
+# HERE
+# done
+
 # Append the remaining output_state and publish_dir to the YAML file
 cat >> ./params/params_${RUN_ID}.yaml << HERE
 output_state: "state.yaml"
@@ -73,17 +81,12 @@ publish_dir: "$publish_dir"
 HERE
 
 
+# nextflow run . \
+#   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
+#   -profile docker \
+#   -with-trace \
+#   -c src/common/nextflow_helpers/labels_ci.config \
+#    -params-file ./params/params_${RUN_ID}.yaml
 
 
-# ./tw-windows-x86_64.exe launch openproblems-bio/task_grn_benchmark \
-#   --revision build/main \
-#   --pull-latest \
-#   --main-script target/nextflow/workflows/process_perturbation/main.nf \
-#   --workspace 53907369739130 \
-#   --compute-env 6TeIFgV5OY4pJCk8I0bfOh \
-#   --params-file ./params/params_${RUN_ID}.yaml \
-#   --config src/common/nextflow_helpers/labels_tw.config
-
-
-
-#   ./tw-windows-x86_64.exe launch openproblems-bio/task_grn_benchmark --revision build/main --pull-latest --main-script target/nextflow/workflows/process_perturbation/main.nf --workspace 53907369739130 --compute-env 6TeIFgV5OY4pJCk8I0bfOh --params-file /tmp/params.yaml --config src/common/nextflow_helpers/labels_tw.config
+# ./tw-windows-x86_64.exe launch https://github.com/openproblems-bio/task_grn_benchmark.git --revision build/main --pull-latest --main-script target/nextflow/workflows/run_grn_evaluation/main.nf --workspace 53907369739130 --compute-env 6TeIFgV5OY4pJCk8I0bfOh --params-file ./params/params.yaml --config src/common/nextflow_helpers/labels_tw.config

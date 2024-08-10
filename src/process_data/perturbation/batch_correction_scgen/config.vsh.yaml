@@ -28,7 +28,7 @@ functionality:
               type: double
               description: "Normalized values using shifted logarithm "
               required: true
-      required: false
+      required: true
       direction: input
       default: resources/grn-benchmark/perturbation_data.h5ad 
       example: resources_test/grn-benchmark/perturbation_data.h5ad 
@@ -60,8 +60,8 @@ functionality:
               type: double
               description: "Batch correction using scgen on pearson data"
               required: true
-      required: false
-      direction: input
+      required: true
+      direction: ouput
       default: resources/grn-benchmark/perturbation_data.h5ad 
       example: resources_test/grn-benchmark/perturbation_data.h5ad 
 

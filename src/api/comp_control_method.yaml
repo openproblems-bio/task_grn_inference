@@ -23,11 +23,7 @@ functionality:
       __merge__: file_prediction.yaml
       required: true
       direction: output
-    - name: --tf_all
-      type: file
-      required: false
-      direction: input
-      default: resources/prior/tf_all.csv
+
       
   test_resources:
     - type: python_script

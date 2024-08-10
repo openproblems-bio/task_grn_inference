@@ -36,7 +36,8 @@ workflow run_wf {
         prediction: "prediction",
         subsample: "subsample",
         reg_type: "reg_type",
-        method_id: "method_id"
+        method_id: "method_id",
+        max_workers: "max_workers"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->

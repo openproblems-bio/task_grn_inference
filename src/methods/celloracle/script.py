@@ -9,7 +9,7 @@ par = {
   "multiomics_atac": "resources/grn-benchmark/multiomics_atac.h5ad",
   "temp_dir": 'output/celloracle/',
   "num_workers": 4,
-  "prediction": "output/prediction.csv",
+  "prediction": "output/prediction.h5ad",
 }
 ## VIASH END
 # meta = {
