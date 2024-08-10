@@ -7,7 +7,7 @@ functionality:
     summary: "GRN inference using scenicplus"
     description: |
       GRN inference using scenicplus
-    documentation_url: https://scenicplus.readthedocs.io/en/stable/pbmc_multiome_tutorial.html
+    documentation_url: https://scenicplus.readthedocs.io/en/latest/human_cerebellum.html
   arguments:
     - name: --multiomics_rna
       __merge__: ../../api/file_multiomics_rna_h5ad.yaml

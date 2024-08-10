@@ -88,69 +88,67 @@ if not os.path.exists(os.path.join(work_dir, 'rna.h5ad')):
     sc.pp.log1p(adata_rna)
     adata_rna.write_h5ad(os.path.join(work_dir, 'rna.h5ad'))
 
-for donor_id in ['donor_0']:  # TODO
+# Load candidate enhancer regions
+with open(os.path.join(par['cistopic_out'], f'candidate_enhancers/region_bin_topics_otsu.pkl'), 'rb') as f:
+    region_bin_topics_otsu = pickle.load(f)
+with open(os.path.join(par['cistopic_out'], f'candidate_enhancers/region_bin_topics_top3k.pkl'), 'rb') as f:
+    region_bin_topics_top3k = pickle.load(f)
+with open(os.path.join(par['cistopic_out'], f'candidate_enhancers/markers_dict.pkl'), 'rb') as f:
+    markers_dict = pickle.load(f)
 
-    # Load candidate enhancer regions
-    with open(os.path.join(par['cistopic_out'], f'candidate_enhancers/{donor_id}/region_bin_topics_otsu.pkl'), 'rb') as f:
-        region_bin_topics_otsu = pickle.load(f)
-    with open(os.path.join(par['cistopic_out'], f'candidate_enhancers/{donor_id}/region_bin_topics_top3k.pkl'), 'rb') as f:
-        region_bin_topics_top3k = pickle.load(f)
-    with open(os.path.join(par['cistopic_out'], f'candidate_enhancers/{donor_id}/markers_dict.pkl'), 'rb') as f:
-        markers_dict = pickle.load(f)
+# Convert to dictionary of pyrange objects
+region_sets = {}
+region_sets['topics_otsu'] = {}
+region_sets['topics_top_3'] = {}
+region_sets['DARs'] = {}
+for topic in region_bin_topics_otsu.keys():
+    regions = region_bin_topics_otsu[topic].index[region_bin_topics_otsu[topic].index.str.startswith('chr')] #only keep regions on known chromosomes
+    region_sets['topics_otsu'][topic] = pr.PyRanges(region_names_to_coordinates(regions))
+for topic in region_bin_topics_top3k.keys():
+    regions = region_bin_topics_top3k[topic].index[region_bin_topics_top3k[topic].index.str.startswith('chr')] #only keep regions on known chromosomes
+    region_sets['topics_top_3'][topic] = pr.PyRanges(region_names_to_coordinates(regions))
+for DAR in markers_dict.keys():
+    regions = markers_dict[DAR].index[markers_dict[DAR].index.str.startswith('chr')]
+    region_sets['DARs'][DAR] = pr.PyRanges(region_names_to_coordinates(regions))
 
-    # Convert to dictionary of pyrange objects
-    region_sets = {}
-    region_sets['topics_otsu'] = {}
-    region_sets['topics_top_3'] = {}
-    region_sets['DARs'] = {}
-    for topic in region_bin_topics_otsu.keys():
-        regions = region_bin_topics_otsu[topic].index[region_bin_topics_otsu[topic].index.str.startswith('chr')] #only keep regions on known chromosomes
-        region_sets['topics_otsu'][topic] = pr.PyRanges(region_names_to_coordinates(regions))
-    for topic in region_bin_topics_top3k.keys():
-        regions = region_bin_topics_top3k[topic].index[region_bin_topics_top3k[topic].index.str.startswith('chr')] #only keep regions on known chromosomes
-        region_sets['topics_top_3'][topic] = pr.PyRanges(region_names_to_coordinates(regions))
-    for DAR in markers_dict.keys():
-        regions = markers_dict[DAR].index[markers_dict[DAR].index.str.startswith('chr')]
-        region_sets['DARs'][DAR] = pr.PyRanges(region_names_to_coordinates(regions))
+# Define rankings, score and motif annotation databases
+rankings_db = os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.rankings.feather')
+scores_db =  os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.scores.feather')
+motif_annotation = os.path.join(DB_PATH, 'motifs-v10-nr.hgnc-m0.00001-o0.0.tbl')
 
-    # Define rankings, score and motif annotation databases
-    rankings_db = os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.rankings.feather')
-    scores_db =  os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.scores.feather')
-    motif_annotation = os.path.join(DB_PATH, 'motifs-v10-nr.hgnc-m0.00001-o0.0.tbl')
+# Init scenicplus pipeline
+os.makedirs(os.path.join(work_dir, 'scplus_pipeline'), exist_ok=True)
+os.makedirs(os.path.join(work_dir, 'scplus_pipeline', 'temp'), exist_ok=True)
+subprocess.run(['scenicplus', 'init_snakemake', '--out_dir', os.path.join(work_dir, 'scplus_pipeline')])
 
-    # Init scenicplus pipeline
-    os.makedirs(os.path.join(work_dir, 'scplus_pipeline'), exist_ok=True)
-    os.makedirs(os.path.join(work_dir, 'scplus_pipeline', 'temp'), exist_ok=True)
-    subprocess.run(['scenicplus', 'init_snakemake', '--out_dir', os.path.join(work_dir, 'scplus_pipeline')])
+# Load pipeline settings
+with open(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'r') as f:
+    settings = yaml.safe_load(f)
 
-    # Load pipeline settings
-    with open(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'r') as f:
-        settings = yaml.safe_load(f)
+# Update settings: indicate locations of input files
+settings['input_data']['cisTopic_obj_fname'] = os.path.join(par['cistopic_out'], f'cistopic_object_with_model.pkl')
+settings['input_data']['GEX_anndata_fname'] = os.path.join(work_dir, 'rna.h5ad')
+settings['input_data']['region_set_folder'] = os.path.join(par['cistopic_out'], 'region_sets')
+settings['input_data']['ctx_db_fname'] = rankings_db
+settings['input_data']['dem_db_fname'] = scores_db
+settings['input_data']['path_to_motif_annotations'] = motif_annotation
+settings['params_general']['temp_dir'] = os.path.join(work_dir, 'scplus_pipeline', 'temp')
+settings['params_general']['n_cpu'] = 1
 
-    # Update settings: indicate locations of input files
-    settings['input_data']['cisTopic_obj_fname'] = os.path.join(par['cistopic_out'], 'cistopic_objects', f'{donor_id}.pkl')
-    settings['input_data']['GEX_anndata_fname'] = os.path.join(work_dir, 'rna.h5ad')
-    settings['input_data']['region_set_folder'] = os.path.join(par['cistopic_out'], 'region_sets', donor_id)
-    settings['input_data']['ctx_db_fname'] = rankings_db
-    settings['input_data']['dem_db_fname'] = scores_db
-    settings['input_data']['path_to_motif_annotations'] = motif_annotation
-    settings['params_general']['temp_dir'] = os.path.join(work_dir, 'scplus_pipeline', 'temp')
-    settings['params_general']['n_cpu'] = 1
+# Save pipeline settings
+with open(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'w') as f:
+    yaml.dump(settings, f)
 
-    # Save pipeline settings
-    with open(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'w') as f:
-        yaml.dump(settings, f)
+# TODO: from this line onward, the code is untested (could not run it locally due to excessive memory requirements)
 
-    # Run pipeline
-    with contextlib.chdir(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake')):
-        subprocess.run([
-            'snakemake',
-            '--cores', '1',
-            #'--unlock'
-        ])
-    
-    # TODO: parse output in folder and re-format GRN
+# Run pipeline
+with contextlib.chdir(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake')):
+    subprocess.run([
+        'snakemake',
+        '--cores', '1',
+        #'--unlock'
+    ])
 
-
-print('Write output to file', flush=True)
-prediction.to_csv(par['prediction'])
+# Make sure the file is properly formatted, and re-format it if needed
+filepath = os.path.join(work_dir, 'tf_to_gene_adj.tsv')
+shutil.copyfile(filepath, par['prediction'])

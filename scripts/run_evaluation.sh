@@ -4,7 +4,7 @@
 grn=""
 sample="200"  # Default value for sample
 reg_type="ridge"
-score="out/score.csv"
+score="output/score.csv"
 
 # Parse arguments
 while [[ "$#" -gt 0 ]]; do

@@ -18,7 +18,7 @@ from sklearn.manifold import TSNE
 import pycisTopic.loom
 from pycisTopic.pseudobulk_peak_calling import export_pseudobulk, peak_calling
 from pycisTopic.iterative_peak_calling import get_consensus_peaks
-from pycisTopic.cistopic_class import create_cistopic_object_from_fragments
+from pycisTopic.cistopic_class import create_cistopic_object_from_fragments, merge
 from pycisTopic.qc import get_barcodes_passing_qc_for_sample
 from pycisTopic.lda_models import evaluate_models, run_cgs_models, run_cgs_models_mallet
 from pycisTopic.topic_binarization import binarize_topics
@@ -302,20 +302,20 @@ if not os.path.exists(os.path.join(out_dir, 'cistopic_obj.pkl')):
         scrub.plot_histogram();
         scrublet = pd.DataFrame([scrub.doublet_scores_obs_, scrub.predicted_doublets_], columns=cistopic_obj.cell_names, index=['Doublet_scores_fragments', 'Predicted_doublets_fragments']).T
         cistopic_obj_list[i].add_cell_data(scrublet, split_pattern='-')
+
+    # Combine samples into a single cistopic object
+    if len(cistopic_obj_list) == 1:
+        cistopic_obj = cistopic_obj_list[0]
+    else:
+        cistopic_obj = merge(cistopic_obj_list, is_acc=1, copy=False, split_pattern='-')
     
     # Save cistopic objects
     with open(os.path.join(out_dir, 'cistopic_obj.pkl'), 'wb') as f:
-        pickle.dump(cistopic_obj_list, f)
+        pickle.dump(cistopic_obj, f)
 else:
     # Load cistopic objects
     with open(os.path.join(out_dir, 'cistopic_obj.pkl'), 'rb') as f:
-        cistopic_obj_list = pickle.load(f)
-
-# Save one cistopic object per sample
-os.makedirs(os.path.join(out_dir, 'cistopic_objects'), exist_ok=True)
-for i, donor_id in enumerate(unique_donor_ids):
-    with open(os.path.join(out_dir, 'cistopic_objects', f'{donor_id}.pkl'), 'wb') as f:
-        pickle.dump(cistopic_obj_list[i], f)
+        cistopic_obj = pickle.load(f)
 
 # Download Mallet
 MALLET_PATH = os.path.join(out_dir, 'Mallet-202108', 'bin', 'mallet')
@@ -329,234 +329,227 @@ if not os.path.exists(MALLET_PATH):
 
 # LDA-based topic modeling
 print('Run LDA models')
-filepath = os.path.join(out_dir, 'cistopic_objects_with_models.pkl')
+filepath = os.path.join(out_dir, 'cistopic_object_with_model.pkl')
 if not os.path.exists(filepath):
-    for i in range(len(cistopic_obj_list)):
-        if not os.path.exists(filepath):
 
-            # Topic modeling
-            n_topics = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-            if os.path.exists(MALLET_PATH):
-                models = run_cgs_models_mallet(
-                    cistopic_obj_list[i],
-                    n_topics=n_topics,
-                    n_cpu=12,
-                    n_iter=500,
-                    random_state=555,
-                    alpha=50,
-                    alpha_by_topic=True,
-                    eta=0.1,
-                    eta_by_topic=False,
-                    mallet_path=MALLET_PATH
-                )
-            else:
-                print('Could not find Mallet. Running the sequential version of LDA instead.')
-                models = run_cgs_models(
-                    cistopic_obj_list[i],
-                    n_topics=n_topics,
-                    n_cpu=12,
-                    n_iter=500,
-                    random_state=555,
-                    alpha=50,
-                    alpha_by_topic=True,
-                    eta=0.1,
-                    eta_by_topic=False
-                )
+    # Topic modeling
+    n_topics = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+    if os.path.exists(MALLET_PATH):
+        models = run_cgs_models_mallet(
+            cistopic_obj,
+            n_topics=n_topics,
+            n_cpu=12,
+            n_iter=500,
+            random_state=555,
+            alpha=50,
+            alpha_by_topic=True,
+            eta=0.1,
+            eta_by_topic=False,
+            mallet_path=MALLET_PATH
+        )
+    else:
+        print('Could not find Mallet. Running the sequential version of LDA instead.')
+        models = run_cgs_models(
+            cistopic_obj,
+            n_topics=n_topics,
+            n_cpu=12,
+            n_iter=500,
+            random_state=555,
+            alpha=50,
+            alpha_by_topic=True,
+            eta=0.1,
+            eta_by_topic=False
+        )
 
-            # Model selection
-            model = evaluate_models(models, select_model=40, return_model=True)
-            cistopic_obj_list[i].add_LDA_model(model)
+    # Model selection
+    model = evaluate_models(models, select_model=40, return_model=True)
+    cistopic_obj.add_LDA_model(model)
 
     with open(filepath, 'wb') as f:
-        pickle.dump(cistopic_obj_list, f)
+        pickle.dump(cistopic_obj, f)
 else:
     with open(filepath, 'rb') as f:
-        cistopic_obj_list = pickle.load(f)
+        cistopic_obj = pickle.load(f)
 
 chromsizes = pd.read_table(os.path.join(out_dir, "qc", "hg38.chrom_sizes_and_alias.tsv"))
 chromsizes.rename({"# ucsc": "Chromosome", "length": "End"}, axis = 1, inplace = True)
 chromsizes['Start'] = 0
 chromsizes = pr.PyRanges(chromsizes[['Chromosome', 'Start', 'End']])
 
-for i in range(len(cistopic_obj_list)):
+# Find clusters
+find_clusters(
+    cistopic_obj,
+    target='cell',
+    k=10,
+    res=[0.6, 1.2, 3],
+    scale=True,
+    split_pattern='-'
+)
 
-    donor_id = unique_donor_ids[i]
+# 2D projections
+run_umap(cistopic_obj, target='cell', scale=True)
+run_tsne(cistopic_obj, target='cell', scale=True)
 
-    # Find clusters
-    find_clusters(
-        cistopic_obj_list[i],
-        target='cell',
-        k=10,
-        res=[0.6, 1.2, 3],
-        scale=True,
-        split_pattern='-'
+# Topic binarization
+region_bin_topics_top_3k = binarize_topics(cistopic_obj, method='ntop', ntop=3_000)
+region_bin_topics_otsu = binarize_topics(cistopic_obj, method='otsu')
+binarized_cell_topic = binarize_topics(cistopic_obj, target='cell', method='li')
+
+# Topic annotation
+topic_annot = topic_annotation(
+    cistopic_obj,
+    annot_var='cell_type',
+    binarized_cell_topic=binarized_cell_topic,
+    general_topic_thr=0.2
+)
+
+# Identify differentially accessible regions
+imputed_acc_obj = impute_accessibility(
+    cistopic_obj,
+    selected_cells=None,
+    selected_regions=None,
+    scale_factor=10**6
+)
+normalized_imputed_acc_obj = normalize_scores(imputed_acc_obj, scale_factor=10**4)
+variable_regions = find_highly_variable_features(
+    normalized_imputed_acc_obj,
+    min_disp=0.05,
+    min_mean=0.0125,
+    max_mean=3,
+    max_disp=np.inf,
+    n_bins=20,
+    n_top_features=None,
+    plot=False
+)
+markers_dict = find_diff_features(
+    cistopic_obj,
+    imputed_acc_obj,
+    variable='cell_type',
+    var_features=variable_regions,
+    contrasts=None,
+    adjpval_thr=0.05,
+    log2fc_thr=np.log2(1.5),
+    n_cpu=5,
+    split_pattern='-'
+)
+
+# Save topics
+folder = os.path.join(out_dir, 'region_sets', 'Topics_otsu')
+os.makedirs(folder, exist_ok=True)
+for topic in binarized_cell_topic:
+    region_names_to_coordinates(
+        region_bin_topics_otsu[topic].index
+    ).sort_values(
+        ['Chromosome', 'Start', 'End']
+    ).to_csv(
+        os.path.join(folder, f'{topic}.bed'),
+        sep='\t',
+        header=False, index=False
     )
-
-    # 2D projections
-    run_umap(cistopic_obj_list[i], target='cell', scale=True)
-    run_tsne(cistopic_obj_list[i], target='cell', scale=True)
-
-    # Topic binarization
-    region_bin_topics_top_3k = binarize_topics(cistopic_obj_list[i], method='ntop', ntop=3_000)
-    region_bin_topics_otsu = binarize_topics(cistopic_obj_list[i], method='otsu')
-    binarized_cell_topic = binarize_topics(cistopic_obj_list[i], target='cell', method='li')
-
-    # Topic annotation
-    topic_annot = topic_annotation(
-        cistopic_obj_list[i],
-        annot_var='cell_type',
-        binarized_cell_topic=binarized_cell_topic,
-        general_topic_thr=0.2
+folder = os.path.join(out_dir, 'region_sets', 'Topics_top_3k')
+os.makedirs(folder, exist_ok=True)
+for topic in region_bin_topics_top_3k:
+    region_names_to_coordinates(
+        region_bin_topics_top_3k[topic].index
+    ).sort_values(
+        ['Chromosome', 'Start', 'End']
+    ).to_csv(
+        os.path.join(folder, f'{topic}.bed'),
+        sep='\t',
+        header=False, index=False
     )
+folder = os.path.join(out_dir, 'candidate_enhancers')
+os.makedirs(folder, exist_ok=True)
+with open(os.path.join(folder, 'region_bin_topics_otsu.pkl'), 'wb') as f:
+    pickle.dump(region_bin_topics_otsu, f)
+with open(os.path.join(folder, 'region_bin_topics_top3k.pkl'), 'wb') as f:
+    pickle.dump(region_bin_topics_top_3k, f)
 
-    # Identify differentially accessible regions
-    imputed_acc_obj = impute_accessibility(
-        cistopic_obj_list[i],
-        selected_cells=None,
-        selected_regions=None,
-        scale_factor=10**6
+# Save DARs
+folder = os.path.join(out_dir, 'region_sets', 'DARs_cell_type')
+os.makedirs(folder, exist_ok=True)
+for cell_type in markers_dict:
+    region_names_to_coordinates(
+        markers_dict[cell_type].index
+    ).sort_values(
+        ['Chromosome', 'Start', 'End']
+    ).to_csv(
+        os.path.join(folder, f'{cell_type}.bed'),
+        sep='\t',
+        header=False,
+        index=False
     )
-    normalized_imputed_acc_obj = normalize_scores(imputed_acc_obj, scale_factor=10**4)
-    variable_regions = find_highly_variable_features(
-        normalized_imputed_acc_obj,
-        min_disp=0.05,
-        min_mean=0.0125,
-        max_mean=3,
-        max_disp=np.inf,
-        n_bins=20,
-        n_top_features=None,
-        plot=False
-    )
-    markers_dict = find_diff_features(
-        cistopic_obj_list[i],
-        imputed_acc_obj,
-        variable='cell_type',
-        var_features=variable_regions,
-        contrasts=None,
-        adjpval_thr=0.05,
-        log2fc_thr=np.log2(1.5),
-        n_cpu=5,
-        split_pattern='-'
-    )
+folder = os.path.join(out_dir, 'candidate_enhancers')
+with open(os.path.join(folder, 'markers_dict.pkl'), 'wb') as f:
+    pickle.dump(markers_dict, f)
 
-    # Save topics
-    folder = os.path.join(out_dir, 'region_sets', donor_id, 'Topics_otsu')
-    os.makedirs(folder, exist_ok=True)
-    for topic in binarized_cell_topic:
-        region_names_to_coordinates(
-            region_bin_topics_otsu[topic].index
-        ).sort_values(
-            ['Chromosome', 'Start', 'End']
-        ).to_csv(
-            os.path.join(folder, f'{topic}.bed'),
-            sep='\t',
-            header=False, index=False
-        )
-    folder = os.path.join(out_dir, 'region_sets', donor_id, 'Topics_top_3k')
-    os.makedirs(folder, exist_ok=True)
-    for topic in region_bin_topics_top_3k:
-        region_names_to_coordinates(
-            region_bin_topics_top_3k[topic].index
-        ).sort_values(
-            ['Chromosome', 'Start', 'End']
-        ).to_csv(
-            os.path.join(folder, f'{topic}.bed'),
-            sep='\t',
-            header=False, index=False
-        )
-    folder = os.path.join(out_dir, 'candidate_enhancers', donor_id)
-    os.makedirs(folder, exist_ok=True)
-    with open(os.path.join(folder, 'region_bin_topics_otsu.pkl'), 'wb') as f:
-        pickle.dump(region_bin_topics_otsu, f)
-    with open(os.path.join(folder, 'region_bin_topics_top3k.pkl'), 'wb') as f:
-        pickle.dump(region_bin_topics_top_3k, f)
+# Get gene activity
+pr_annotation = pd.read_table(
+    os.path.join(out_dir, 'qc', 'tss.bed')
+).rename(
+    {'Name': 'Gene', '# Chromosome': 'Chromosome'}, axis=1)
+pr_annotation['Transcription_Start_Site'] = pr_annotation['Start']
+pr_annotation = pr.PyRanges(pr_annotation)
+gene_act, weights = get_gene_activity(
+    imputed_acc_obj,
+    pr_annotation,
+    chromsizes,
+    use_gene_boundaries=True,
+    upstream=[1000, 100000],
+    downstream=[1000, 100000],
+    distance_weight=True,
+    decay_rate=1,
+    extend_gene_body_upstream=10000,
+    extend_gene_body_downstream=500,
+    gene_size_weight=False,
+    gene_size_scale_factor='median',
+    remove_promoters=False,
+    average_scores=True,
+    scale_factor=1,
+    extend_tss=[10, 10],
+    gini_weight = True,
+    return_weights= True
+)
 
-    # Save DARs
-    folder = os.path.join(out_dir, 'region_sets', donor_id, 'DARs_cell_type')
-    os.makedirs(folder, exist_ok=True)
-    for cell_type in markers_dict:
-        region_names_to_coordinates(
-            markers_dict[cell_type].index
-        ).sort_values(
-            ['Chromosome', 'Start', 'End']
-        ).to_csv(
-            os.path.join(folder, f'{cell_type}.bed'),
-            sep='\t',
-            header=False,
-            index=False
-        )
-    folder = os.path.join(out_dir, 'candidate_enhancers', donor_id)
-    with open(os.path.join(folder, 'markers_dict.pkl'), 'wb') as f:
-        pickle.dump(markers_dict, f)
+# Infer differentially accessible genes
+DAG_markers_dict= find_diff_features(
+    cistopic_obj,
+    gene_act,
+    variable='cell_type',
+    var_features=None,
+    contrasts=None,
+    adjpval_thr=0.05,
+    log2fc_thr=np.log2(1.5),
+    n_cpu=5,
+    split_pattern='-'
+)
 
-    # Get gene activity
-    pr_annotation = pd.read_table(
-        os.path.join(out_dir, 'qc', 'tss.bed')
-    ).rename(
-        {'Name': 'Gene', '# Chromosome': 'Chromosome'}, axis=1)
-    pr_annotation['Transcription_Start_Site'] = pr_annotation['Start']
-    pr_annotation = pr.PyRanges(pr_annotation)
-    gene_act, weights = get_gene_activity(
-        imputed_acc_obj,
-        pr_annotation,
-        chromsizes,
-        use_gene_boundaries=True,
-        upstream=[1000, 100000],
-        downstream=[1000, 100000],
-        distance_weight=True,
-        decay_rate=1,
-        extend_gene_body_upstream=10000,
-        extend_gene_body_downstream=500,
-        gene_size_weight=False,
-        gene_size_scale_factor='median',
-        remove_promoters=False,
-        average_scores=True,
-        scale_factor=1,
-        extend_tss=[10, 10],
-        gini_weight = True,
-        return_weights= True,
-        project=donor_id
-    )
-
-    # Infer differentially accessible genes
-    DAG_markers_dict= find_diff_features(
-        cistopic_obj_list[i],
-        gene_act,
-        variable='cell_type',
-        var_features=None,
-        contrasts=None,
-        adjpval_thr=0.05,
-        log2fc_thr=np.log2(1.5),
-        n_cpu=5,
-        split_pattern='-'
-    )
-
-    # Exporting to loom
-    os.makedirs(os.path.join(out_dir, 'loom'), exist_ok=True)
-    cluster_markers = {'cell_type': markers_dict}
-    filepath = os.path.join(out_dir, 'loom', f'region-accessibility-{donor_id}.loom')
-    print(f'Saving region accessibility to {filepath}')
-    export_region_accessibility_to_loom(
-        accessibility_matrix=imputed_acc_obj,
-        cistopic_obj=cistopic_obj_list[i],
-        binarized_topic_region=region_bin_topics_otsu,
-        binarized_cell_topic=binarized_cell_topic,
-        out_fname=filepath,
-        cluster_annotation=['cell_type'],
-        cluster_markers=cluster_markers,
-        nomenclature='hg38',
-        split_pattern='-'
-    )
-    filepath = os.path.join(out_dir, 'loom', f'gene-activity-{donor_id}.loom')
-    print(f'Saving gene activity to {filepath}')
-    export_gene_activity_to_loom(
-        gene_activity_matrix=gene_act,
-        cistopic_obj=cistopic_obj_list[i],
-        out_fname=filepath,
-        cluster_annotation=['cell_type'],
-        cluster_markers=cluster_markers,
-        nomenclature='hg38',
-        split_pattern='-'
-    )
+# Exporting to loom
+os.makedirs(os.path.join(out_dir, 'loom'), exist_ok=True)
+cluster_markers = {'cell_type': markers_dict}
+filepath = os.path.join(out_dir, 'loom', f'region-accessibility.loom')
+print(f'Saving region accessibility to {filepath}')
+export_region_accessibility_to_loom(
+    accessibility_matrix=imputed_acc_obj,
+    cistopic_obj=cistopic_obj,
+    binarized_topic_region=region_bin_topics_otsu,
+    binarized_cell_topic=binarized_cell_topic,
+    out_fname=filepath,
+    cluster_annotation=['cell_type'],
+    cluster_markers=cluster_markers,
+    nomenclature='hg38',
+    split_pattern='-'
+)
+filepath = os.path.join(out_dir, 'loom', f'gene-activity.loom')
+print(f'Saving gene activity to {filepath}')
+export_gene_activity_to_loom(
+    gene_activity_matrix=gene_act,
+    cistopic_obj=cistopic_obj,
+    out_fname=filepath,
+    cluster_annotation=['cell_type'],
+    cluster_markers=cluster_markers,
+    nomenclature='hg38',
+    split_pattern='-'
+)
 
 print('Finished.')
