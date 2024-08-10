@@ -32,11 +32,10 @@ functionality:
 
     - name: Outputs
       arguments:
-        - name: --prediction
+        - name: --prediction_celloracle
           __merge__: ../../api/file_prediction.yaml
           required: true
           direction: output
-          default: output/grn.csv
         
   resources:
     - type: nextflow_script
@@ -47,7 +46,7 @@ functionality:
     #   repository: openproblemsv2
     - name: grn_methods/celloracle 
     # - name: grn_methods/figr
-    - name: grn_methods/scglue
+    # - name: grn_methods/scglue
   # repositories:
   #   - name: openproblemsv2
   #     type: github

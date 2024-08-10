@@ -17,7 +17,7 @@ functionality:
       description: single cell perturbation data 
 
     - name: --perturbation_data_bc
-      __merge__: ../../../api/file_perturbation_h5ad.yaml
+      __merge__: ../../api/file_perturbation_h5ad.yaml
       required: true
       direction: output
     

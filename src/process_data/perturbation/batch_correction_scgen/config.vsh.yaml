@@ -61,7 +61,7 @@ functionality:
               description: "Batch correction using scgen on pearson data"
               required: true
       required: true
-      direction: ouput
+      direction: output
       default: resources/grn-benchmark/perturbation_data.h5ad 
       example: resources_test/grn-benchmark/perturbation_data.h5ad 
 

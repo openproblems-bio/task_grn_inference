@@ -4,24 +4,20 @@
 
 
 RUN_ID="celloracle_test"
-resources_dir="s3://openproblems-data/resources/grn/"
+# resources_dir="s3://openproblems-data/resources_test/grn/"
+resources_dir="./resources_test"
 publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
-reg_type=ridge
-subsample=200
-max_workers=20
+num_workers=20
 
 
 # Start writing to the YAML file
-cat > ./params/params_${RUN_ID}.yaml << HERE
+cat > ./params/${RUN_ID}.yaml << HERE
 param_list:
   - id: ${RUN_ID}
-    multiomics_rna: resources/grn-benchmark/perturbation_data.h5ad
-    layer: ${layer}
-    prediction: resources/grn_models/${grn_name}.csv 
-    reg_type: $reg_type
-    method_id: $grn_name
-    subsample: $subsample
-    max_workers: $max_workers
+    multiomics_rna: ${resources_dir}/grn-benchmark/multiomics_rna.h5ad
+    multiomics_atac: ${resources_dir}/grn-benchmark/multiomics_atac.h5ad
+    num_workers: $num_workers
+    temp_dir: ./tmp/celloracle
 output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
@@ -32,7 +28,7 @@ nextflow run . \
   -profile docker \
   -with-trace \
   -c src/common/nextflow_helpers/labels_ci.config \
-  -params-file params/params_${RUN_ID}.yaml
+  -params-file params/${RUN_ID}.yaml
 
 
 
