@@ -26,14 +26,22 @@ print(output)
 # print(output)
 # output.to_csv(par['score'])
 
-print(output.values.shape, output.columns.to_numpy().shape)
+
+metric_ids = output.columns.to_numpy().reshape(1, -1)
+metric_values = output.values
+# if metric_ids.ndim == 1:
+#     metric_ids = metric_ids.reshape(1, -1)
+# if metric_values.ndim == 1:
+#     metric_values = metric_values.reshape(1, -1)
+
+print(metric_ids.shape, metric_values.shape)
 output = ad.AnnData(
     X=np.empty((0, 0)),
     uns={
         "dataset_id": par["layer"],
         "method_id": f"reg1-{par['method_id']}",
-        "metric_ids": output.columns.to_numpy(),
-        "metric_values": output.values[0]
+        "metric_ids": metric_ids,
+        "metric_values": metric_values
     }
 )
 
