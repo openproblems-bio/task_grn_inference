@@ -2,6 +2,7 @@
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 submit=false
+read_results=false
 
 RUN_ID="subsample_200_ridge"
 resources_dir="s3://openproblems-data/resources/grn"
@@ -100,11 +101,10 @@ if [ "$submit" = true ]; then
       --params-file ./params/subsample_200_ridge.yaml `
       --config src/common/nextflow_helpers/labels_tw.config
 
-
-
+fi
 
     
-else
+if [ "$read_results" = true ]; then 
     aws s3 sync s3://openproblems-data/resources/grn/results/${RUN_ID} ./resources/results/${RUN_ID} 
 fi
 
