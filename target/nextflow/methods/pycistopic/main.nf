@@ -3045,7 +3045,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/methods/pycistopic",
     "viash_version" : "0.8.6",
-    "git_commit" : "1a657f7e8ed180683b16206c0fed1d9e67de4675",
+    "git_commit" : "ba24f2e7fcaa3c947a1b5430fd9aa7a7fd858d42",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3235,7 +3235,7 @@ if not valid:
         bed_path=os.path.join(out_dir, 'consensus_peak_calling/pseudobulk_bed_files'),
         bigwig_path=os.path.join(out_dir, 'consensus_peak_calling/pseudobulk_bw_files'),
         path_to_fragments=fragments_dict,
-        n_cpu=10,
+        n_cpu=num_workers,
         temp_dir=os.path.join(out_dir, 'consensus_peak_calling/tmp'),
         split_pattern='-',
     )
@@ -3256,7 +3256,7 @@ narrow_peak_dict = peak_calling(
     bed_paths=bed_paths,
     outdir=os.path.join(os.path.join(out_dir, 'consensus_peak_calling/MACS')),
     genome_size='hs',
-    n_cpu=10,
+    n_cpu=num_workers,
     input_format='BEDPE',
     shift=73,
     ext_size=146,
@@ -3351,7 +3351,7 @@ if not os.path.exists(os.path.join(out_dir, 'cistopic_obj.pkl')):
                 path_to_blacklist=os.path.join(out_dir, 'hg38-blacklist.v2.bed'),
                 metrics=sample_metrics,
                 valid_bc=sample_id_to_barcodes_passing_filters[sample_id],
-                n_cpu=10,
+                n_cpu=num_workers,
                 project=donor_id,
                 split_pattern='-'
             )
@@ -3366,7 +3366,7 @@ if not os.path.exists(os.path.join(out_dir, 'cistopic_obj.pkl')):
                 path_to_fragments=fragments_dict[donor_id],
                 path_to_regions=os.path.join(out_dir, 'consensus_peak_calling/consensus_regions.bed'),
                 path_to_blacklist=os.path.join(out_dir, 'hg38-blacklist.v2.bed'),
-                n_cpu=10,
+                n_cpu=num_workers,
                 project=donor_id,
                 split_pattern='-'
             )
@@ -3424,7 +3424,7 @@ if not os.path.exists(filepath):
                 models = run_cgs_models_mallet(
                     cistopic_obj_list[i],
                     n_topics=n_topics,
-                    n_cpu=12,
+                    n_cpu=num_workers,
                     n_iter=500,
                     random_state=555,
                     alpha=50,
@@ -3438,7 +3438,7 @@ if not os.path.exists(filepath):
                 models = run_cgs_models(
                     cistopic_obj_list[i],
                     n_topics=n_topics,
-                    n_cpu=12,
+                    n_cpu=num_workers,
                     n_iter=500,
                     random_state=555,
                     alpha=50,
@@ -3519,7 +3519,7 @@ for i in range(len(cistopic_obj_list)):
         contrasts=None,
         adjpval_thr=0.05,
         log2fc_thr=np.log2(1.5),
-        n_cpu=5,
+        n_cpu=num_workers,
         split_pattern='-'
     )
 
@@ -3611,7 +3611,7 @@ for i in range(len(cistopic_obj_list)):
         contrasts=None,
         adjpval_thr=0.05,
         log2fc_thr=np.log2(1.5),
-        n_cpu=5,
+        n_cpu=num_workers,
         split_pattern='-'
     )
 

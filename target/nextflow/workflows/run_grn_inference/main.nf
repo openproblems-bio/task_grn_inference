@@ -2894,7 +2894,7 @@ meta = [
         "arguments" : [
           {
             "type" : "file",
-            "name" : "--prediction_celloracle",
+            "name" : "--prediction",
             "info" : {
               "label" : "GRN",
               "summary" : "GRN prediction",
@@ -2965,7 +2965,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "1a657f7e8ed180683b16206c0fed1d9e67de4675",
+          "git_commit" : "ba24f2e7fcaa3c947a1b5430fd9aa7a7fd858d42",
           "executable" : "/nextflow/grn_methods/celloracle/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/celloracle"
@@ -3017,7 +3017,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_grn_inference",
     "viash_version" : "0.8.6",
-    "git_commit" : "1a657f7e8ed180683b16206c0fed1d9e67de4675",
+    "git_commit" : "ba24f2e7fcaa3c947a1b5430fd9aa7a7fd858d42",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3042,9 +3042,9 @@ workflow run_wf {
               temp_dir: "temp_dir",
               num_workers: "num_workers"
               ],
-      toState: [prediction:"prediction_celloracle"]
+      toState: [prediction:"prediction"]
     )
-    | setState(["prediction_celloracle"])
+    | setState(["prediction"])
 
   emit:
   output_ch

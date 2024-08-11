@@ -5,4 +5,4 @@ param_list:
     num_workers: 20
     temp_dir: ./tmp/celloracle
 output_state: "state.yaml"
-publish_dir: "s3://openproblems-data/resources/grn/results/celloracle_test"
+publish_dir: "./output/celloracle_test"

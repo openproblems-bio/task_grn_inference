@@ -2959,7 +2959,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/common/create_component",
     "viash_version" : "0.8.6",
-    "git_commit" : "1a657f7e8ed180683b16206c0fed1d9e67de4675",
+    "git_commit" : "ba24f2e7fcaa3c947a1b5430fd9aa7a7fd858d42",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
