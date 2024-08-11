@@ -3093,7 +3093,8 @@ meta = [
           "type" : "python",
           "user" : false,
           "packages" : [
-            "lightgbm==4.3.0"
+            "lightgbm==4.3.0",
+            "numpy==1.26.4"
           ],
           "upgrade" : true
         }
@@ -3142,7 +3143,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "fd91ad810cdd6084e4abb9f5952306c090267b09",
+    "git_commit" : "dfd49975348994ae0a9bbe46bccf84df6df53701",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
