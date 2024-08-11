@@ -1,0 +1,2 @@
+viash build src/methods/scsgl/config.vsh.yaml -p docker -o bin/scsgl && bin/scsgl/scsgl --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/scsgl/prediction.csv
+#viash run src/methods/scsgl/config.vsh.yaml -p docker -- ---setup build && bin/scsgl/scsgl --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/scsgl/prediction.csv

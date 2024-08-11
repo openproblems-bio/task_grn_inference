@@ -1,11 +1,11 @@
 functionality:
-  name: genie3
+  name: tigress
   info:
-    label: genie3
-    summary: "GRN inference using GENIE3"
+    label: tigress
+    summary: "GRN inference using TIGRESS"
     description: |
-      GRN inference using GENIE3.
-    documentation_url: https://www.bioconductor.org/packages/release/bioc/html/GENIE3.html
+      GRN inference using TIGRESS.
+    documentation_url: https://rdrr.io/github/jpvert/tigress/man/tigress.html
   arguments:
     - name: --multiomics_rna
       type: file
@@ -30,24 +30,24 @@ functionality:
     - name: --temp_dir
       type: file
       direction: output
-      default: 'output/genie3'
+      default: 'output/tigress'
     - name: --num_workers
       type: integer
       direction: input
       default: 4
   resources:
-    - type: python_script
-      path: script.py
+    - type: r_script
+      path: script.R
 
 platforms:
   - type: docker
-    image: continuumio/anaconda3:2024.02-1
+    image: janursa/figr:19-08-2024
     setup:
+      - type: r
+        packages: [ devtools, foreach, plyr, doRNG, glmnet, randomForest, anndata, dplyr ]
       - type: docker
         run: |
-          conda install -y -c bioconda arboreto pandas
-      - type: python
-        packages: [ anndata ]
+          Rscript -e 'library(devtools); install_github("jpvert/tigress")'
   - type: native
   - type: nextflow
     directives:

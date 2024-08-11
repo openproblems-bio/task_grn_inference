@@ -1,11 +1,11 @@
 functionality:
-  name: genie3
+  name: ppcor
   info:
-    label: genie3
-    summary: "GRN inference using GENIE3"
+    label: ppcor
+    summary: "GRN inference using PPCOR"
     description: |
-      GRN inference using GENIE3.
-    documentation_url: https://www.bioconductor.org/packages/release/bioc/html/GENIE3.html
+      GRN inference using PPCOR.
+    documentation_url: https://rdrr.io/cran/ppcor/man/
   arguments:
     - name: --multiomics_rna
       type: file
@@ -30,24 +30,21 @@ functionality:
     - name: --temp_dir
       type: file
       direction: output
-      default: 'output/genie3'
+      default: 'output/ppcor'
     - name: --num_workers
       type: integer
       direction: input
       default: 4
   resources:
-    - type: python_script
-      path: script.py
+    - type: r_script
+      path: script.R
 
 platforms:
   - type: docker
-    image: continuumio/anaconda3:2024.02-1
+    image: janursa/figr:19-08-2024
     setup:
-      - type: docker
-        run: |
-          conda install -y -c bioconda arboreto pandas
-      - type: python
-        packages: [ anndata ]
+      - type: r
+        packages: [ ppcor, anndata, dplyr ]
   - type: native
   - type: nextflow
     directives:

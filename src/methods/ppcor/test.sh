@@ -1,0 +1,2 @@
+viash build src/methods/ppcor/config.vsh.yaml -p docker -o bin/ppcor && bin/ppcor/ppcor --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/ppcor/prediction.csv
+#viash run src/methods/ppcor/config.vsh.yaml -p docker -- ---setup build && bin/ppcor/ppcor --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/ppcor/prediction.csv

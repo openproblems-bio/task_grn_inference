@@ -28,8 +28,8 @@ functionality:
       type: integer
       default: 50000
     - name: --temp_dir
-      type: string
-      direction: input
+      type: file
+      direction: output
       default: 'output/grnboost2'
     - name: --num_workers
       type: integer
