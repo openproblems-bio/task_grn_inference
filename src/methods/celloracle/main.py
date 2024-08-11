@@ -122,9 +122,9 @@ def infer_grn(par):
     k = min([int(0.025*n_cell), 50])
     print(f"Auto-selected k is :{k}")
     oracle.knn_imputation(n_pca_dims=n_comps, k=k, balanced=True, b_sight=k*8,
-                        b_maxl=k*4, n_jobs=4)
+                        b_maxl=k*4, n_jobs=par["num_workers"])
     links = oracle.get_links(cluster_name_for_GRN_unit="cell_type", alpha=10,
-                        verbose_level=10)
+                        verbose_level=10, n_jobs=par["num_workers"])
     links.to_hdf5(file_path=f"{par['temp_dir']}/links.celloracle.links")
 def refine_grns(par):
     print("Refining GRNs")

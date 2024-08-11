@@ -1,4 +1,4 @@
-
+  
 workflow auto {
   findStatesTemp(params, meta.config)
     | meta.workflow.run(
@@ -24,6 +24,19 @@ workflow run_wf {
     | map{ id, state ->
         [id, state + ["_meta": [join_id: id]]]
       }
+    // Run positive_control if method_id is 'positive_control'
+    | if { state.method_id == 'positive_control' }
+    .map { id, state ->
+        positive_control.run(
+          fromState: [perturbation_data: state["perturbation_data"],
+          layer: "layer", 
+          tf_all: "tf_all"],
+          toState: [prediction: state['prediction']]
+        )
+        return [id, state]
+      }
+    else { it } // Pass through if method_id is not 'positive_control'
+
     // run all metrics
     | runEach(
       components: metrics,

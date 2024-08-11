@@ -35,6 +35,11 @@ functionality:
           type: integer
           direction: input
           required: True
+        - name: --tf_all
+          type: file
+          required: true
+          direction: input
+          default: resources/prior/tf_all.csv
         
     - name: Outputs
       arguments:
@@ -73,6 +78,7 @@ functionality:
       repository: openproblemsv2
     - name: metrics/regression_2 
     - name: metrics/regression_1
+    - name: control_methods/positive_control
   repositories:
     - name: openproblemsv2
       type: github
