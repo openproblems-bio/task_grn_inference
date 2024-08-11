@@ -432,12 +432,12 @@ ENTRYPOINT []
 
  
 RUN pip install --upgrade pip && \
-  pip install --upgrade --no-cache-dir "lightgbm"
+  pip install --upgrade --no-cache-dir "lightgbm==4.3.0"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2024-08-11T09:20:21Z"
+LABEL org.opencontainers.image.created="2024-08-11T12:35:15Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="008daf59914e9cf09095831d78d2e3f7a0cbc8a8"
+LABEL org.opencontainers.image.revision="fd91ad810cdd6084e4abb9f5952306c090267b09"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

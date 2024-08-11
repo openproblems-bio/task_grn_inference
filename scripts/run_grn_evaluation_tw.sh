@@ -89,12 +89,12 @@ nextflow run . \
   -c src/common/nextflow_helpers/labels_ci.config \
    -params-file ${param_file}
 
-# ./tw-windows-x86_64.exe launch `
-#     https://github.com/openproblems-bio/task_grn_benchmark.git `
-#     --revision build/main `
-#     --pull-latest `
-#     --main-script target/nextflow/workflows/run_grn_evaluation/main.nf `
-#     --workspace 53907369739130 `
-#     --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
-#     --params-file ./params/subsample_200_ridge.yaml `
-#     --config src/common/nextflow_helpers/labels_tw.config
+./tw-windows-x86_64.exe launch `
+    https://github.com/openproblems-bio/task_grn_benchmark.git `
+    --revision build/main `
+    --pull-latest `
+    --main-script target/nextflow/workflows/run_grn_evaluation/main.nf `
+    --workspace 53907369739130 `
+    --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
+    --params-file ./params/subsample_200_ridge.yaml `
+    --config src/common/nextflow_helpers/labels_tw.config

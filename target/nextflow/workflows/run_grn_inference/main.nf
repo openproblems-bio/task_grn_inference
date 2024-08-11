@@ -2965,7 +2965,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "008daf59914e9cf09095831d78d2e3f7a0cbc8a8",
+          "git_commit" : "fd91ad810cdd6084e4abb9f5952306c090267b09",
           "executable" : "/nextflow/grn_methods/celloracle/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/celloracle"
@@ -3017,7 +3017,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_grn_inference",
     "viash_version" : "0.8.6",
-    "git_commit" : "008daf59914e9cf09095831d78d2e3f7a0cbc8a8",
+    "git_commit" : "fd91ad810cdd6084e4abb9f5952306c090267b09",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
