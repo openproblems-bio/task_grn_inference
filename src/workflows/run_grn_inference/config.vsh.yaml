@@ -32,7 +32,7 @@ functionality:
 
     - name: Outputs
       arguments:
-        - name: --prediction_celloracle
+        - name: --prediction
           __merge__: ../../api/file_prediction.yaml
           required: true
           direction: output

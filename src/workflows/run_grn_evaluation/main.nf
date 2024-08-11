@@ -32,6 +32,7 @@ workflow run_wf {
       },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
+        perturbation_data: "perturbation_data",
         layer: "layer", 
         prediction: "prediction",
         subsample: "subsample",

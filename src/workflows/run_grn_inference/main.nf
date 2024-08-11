@@ -11,9 +11,9 @@ workflow run_wf {
               temp_dir: "temp_dir",
               num_workers: "num_workers"
               ],
-      toState: [prediction:"prediction_celloracle"]
+      toState: [prediction:"prediction"]
     )
-    | setState(["prediction_celloracle"])
+    | setState(["prediction"])
 
   emit:
   output_ch
