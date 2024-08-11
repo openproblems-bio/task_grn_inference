@@ -3143,7 +3143,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "dfd49975348994ae0a9bbe46bccf84df6df53701",
+    "git_commit" : "4f918540fa48b1fc2b3c7af9c54b005b606a6d89",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3206,8 +3206,8 @@ print(output)
 # output.to_csv(par['score'])
 
 
-metric_ids = output.columns.to_numpy().reshape(1, -1)
-metric_values = output.values
+metric_ids = output.columns.to_numpy()
+metric_values = output.values[0]
 # if metric_ids.ndim == 1:
 #     metric_ids = metric_ids.reshape(1, -1)
 # if metric_values.ndim == 1:

@@ -27,8 +27,8 @@ print(output)
 # output.to_csv(par['score'])
 
 
-metric_ids = output.columns.to_numpy().reshape(1, -1)
-metric_values = output.values
+metric_ids = output.columns.to_numpy()
+metric_values = output.values[0]
 # if metric_ids.ndim == 1:
 #     metric_ids = metric_ids.reshape(1, -1)
 # if metric_values.ndim == 1:

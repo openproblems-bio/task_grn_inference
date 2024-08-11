@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-
+submit=false
 
 RUN_ID="subsample_200_ridge"
 resources_dir="s3://openproblems-data/resources/grn"
@@ -12,6 +12,7 @@ subsample=200
 max_workers=20
 
 param_file="./params/${RUN_ID}.yaml"
+
 
 grn_names=(
     "celloracle"
@@ -81,20 +82,30 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
+if [ "$submit" = true ]; then
+  nextflow run . \
+    -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
+    -profile docker \
+    -with-trace \
+    -c src/common/nextflow_helpers/labels_ci.config \
+    -params-file ${param_file}
 
-nextflow run . \
-  -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
-  -profile docker \
-  -with-trace \
-  -c src/common/nextflow_helpers/labels_ci.config \
-   -params-file ${param_file}
+  ./tw-windows-x86_64.exe launch `
+      https://github.com/openproblems-bio/task_grn_benchmark.git `
+      --revision build/main `
+      --pull-latest `
+      --main-script target/nextflow/workflows/run_grn_evaluation/main.nf `
+      --workspace 53907369739130 `
+      --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
+      --params-file ./params/subsample_200_ridge.yaml `
+      --config src/common/nextflow_helpers/labels_tw.config
 
-./tw-windows-x86_64.exe launch `
-    https://github.com/openproblems-bio/task_grn_benchmark.git `
-    --revision build/main `
-    --pull-latest `
-    --main-script target/nextflow/workflows/run_grn_evaluation/main.nf `
-    --workspace 53907369739130 `
-    --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
-    --params-file ./params/subsample_200_ridge.yaml `
-    --config src/common/nextflow_helpers/labels_tw.config
+
+
+
+    
+else
+    aws s3 sync s3://openproblems-data/resources/grn/results/${RUN_ID} ./resources/results/${RUN_ID} 
+fi
+
+

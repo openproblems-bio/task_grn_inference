@@ -435,9 +435,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2024-08-11T18:32:53Z"
+LABEL org.opencontainers.image.created="2024-08-11T19:02:31Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="dfd49975348994ae0a9bbe46bccf84df6df53701"
+LABEL org.opencontainers.image.revision="4f918540fa48b1fc2b3c7af9c54b005b606a6d89"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1041,8 +1041,8 @@ print(output)
 # output.to_csv(par['score'])
 
 
-metric_ids = output.columns.to_numpy().reshape(1, -1)
-metric_values = output.values
+metric_ids = output.columns.to_numpy()
+metric_values = output.values[0]
 # if metric_ids.ndim == 1:
 #     metric_ids = metric_ids.reshape(1, -1)
 # if metric_values.ndim == 1:
