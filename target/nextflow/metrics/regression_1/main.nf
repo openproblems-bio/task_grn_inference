@@ -3142,7 +3142,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "ba24f2e7fcaa3c947a1b5430fd9aa7a7fd858d42",
+    "git_commit" : "008daf59914e9cf09095831d78d2e3f7a0cbc8a8",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3204,14 +3204,22 @@ print(output)
 # print(output)
 # output.to_csv(par['score'])
 
-print(output.values.shape, output.columns.to_numpy().shape)
+
+metric_ids = output.columns.to_numpy().reshape(1, -1)
+metric_values = output.values
+# if metric_ids.ndim == 1:
+#     metric_ids = metric_ids.reshape(1, -1)
+# if metric_values.ndim == 1:
+#     metric_values = metric_values.reshape(1, -1)
+
+print(metric_ids.shape, metric_values.shape)
 output = ad.AnnData(
     X=np.empty((0, 0)),
     uns={
         "dataset_id": par["layer"],
         "method_id": f"reg1-{par['method_id']}",
-        "metric_ids": output.columns.to_numpy(),
-        "metric_values": output.values[0]
+        "metric_ids": metric_ids,
+        "metric_values": metric_values
     }
 )
 

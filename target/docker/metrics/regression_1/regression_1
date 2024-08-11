@@ -435,9 +435,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2024-08-11T08:40:56Z"
+LABEL org.opencontainers.image.created="2024-08-11T09:20:21Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="ba24f2e7fcaa3c947a1b5430fd9aa7a7fd858d42"
+LABEL org.opencontainers.image.revision="008daf59914e9cf09095831d78d2e3f7a0cbc8a8"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1040,14 +1040,22 @@ print(output)
 # print(output)
 # output.to_csv(par['score'])
 
-print(output.values.shape, output.columns.to_numpy().shape)
+
+metric_ids = output.columns.to_numpy().reshape(1, -1)
+metric_values = output.values
+# if metric_ids.ndim == 1:
+#     metric_ids = metric_ids.reshape(1, -1)
+# if metric_values.ndim == 1:
+#     metric_values = metric_values.reshape(1, -1)
+
+print(metric_ids.shape, metric_values.shape)
 output = ad.AnnData(
     X=np.empty((0, 0)),
     uns={
         "dataset_id": par["layer"],
         "method_id": f"reg1-{par['method_id']}",
-        "metric_ids": output.columns.to_numpy(),
-        "metric_values": output.values[0]
+        "metric_ids": metric_ids,
+        "metric_values": metric_values
     }
 )
 

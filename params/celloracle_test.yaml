@@ -1,8 +1,0 @@
-param_list:
-  - id: celloracle_test
-    multiomics_rna: ./resources_test/grn-benchmark/multiomics_rna.h5ad
-    multiomics_atac: ./resources_test/grn-benchmark/multiomics_atac.h5ad
-    num_workers: 20
-    temp_dir: ./tmp/celloracle
-output_state: "state.yaml"
-publish_dir: "./output/celloracle_test"

@@ -3088,7 +3088,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scglue",
     "viash_version" : "0.8.6",
-    "git_commit" : "ba24f2e7fcaa3c947a1b5430fd9aa7a7fd858d42",
+    "git_commit" : "008daf59914e9cf09095831d78d2e3f7a0cbc8a8",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
