@@ -2,7 +2,7 @@
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 submit=false
-read_results=true
+read_results=false
 
 RUN_ID="celloracle"
 resources_dir="s3://openproblems-data/resources/grn/"
