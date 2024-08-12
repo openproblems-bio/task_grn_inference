@@ -28,7 +28,7 @@ HERE
 
 if [ "$submit" = true ]; then
   nextflow run . \
-    -main-script  target/nextflow/workflows/run_grn_inference/main.nf \
+    -main-script  target/nextflow/workflows/grn_inference_celloracle/main.nf \
     -profile docker \
     -with-trace \
     -c src/common/nextflow_helpers/labels_ci.config \
