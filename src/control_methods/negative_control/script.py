@@ -6,9 +6,7 @@ import numpy as np
 ## VIASH START
 par = {
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
-  "layer": "lognorm",
-  "prior_data":  "resources/grn-benchmark/prior_data.h5ad",
-  "output": "resources/grn-benchmark/negative_control.csv",
+  "prediction": "output/negative_control.csv",
 }
 ## VIASH END
 print('Reading input data')
@@ -30,5 +28,5 @@ pivoted_net = pivoted_net.rename(columns={'index': 'target'})
 pivoted_net = pivoted_net[pivoted_net['weight'] != 0]
 
 print('Saving')
-pivoted_net.to_csv(par["output"])
+pivoted_net.to_csv(par["prediction"])
 

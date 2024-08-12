@@ -1,0 +1,44 @@
+
+functionality:
+  name: create_test_data
+  info:
+    label: create_test_data
+    summary: "Subset resources to create resources_test"
+
+  arguments:
+    - name: --multiomics_counts
+      type: file 
+      required: no
+      direction: input
+      default: resources/datasets_raw/multiome_counts.h5ad
+    - name: --multiomics_counts_test
+      type: file 
+      required: no
+      direction: output
+      default: resources_test/datasets_raw/multiome_count.h5ad
+
+    - name: --perturbation_counts
+      type: file 
+      required: no
+      direction: input
+      default: resources/datasets_raw/perturbation_counts.h5ad
+    - name: --perturbation_counts_test
+      type: file 
+      required: no
+      direction: output
+      default: resources_test/datasets_raw/perturbation_counts.h5ad
+      
+
+  resources:
+    - type: python_script
+      path: script.py
+
+
+platforms:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

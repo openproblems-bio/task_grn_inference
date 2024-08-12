@@ -1,0 +1,22 @@
+param_list:
+  - id: pearson_celloracle
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    prediction: resources/grn_models/celloracle.csv 
+    reg_type: ridge
+    method_id: celloracle
+    subsample: 200
+    max_workers: 20
+
+  - id: lognorm_positive_control
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: positive_control
+    tf_all: resources/prior/tf_all.csv
+    subsample: 200
+    max_workers: 20
+
+
+output_state: "state.yaml"
+publish_dir: "s3://openproblems-data/resources/grn/results/subsample_200_ridge"

@@ -1,6 +1,7 @@
 __merge__: ../../api/comp_metric.yaml
 functionality:
   name: regression_2
+  namespace: "metrics"
   info:
     label: Regression 2
     summary: Calculates R2 score for regression 2

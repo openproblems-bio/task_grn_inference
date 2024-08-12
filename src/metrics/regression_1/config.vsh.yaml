@@ -1,6 +1,7 @@
 __merge__: ../../api/comp_metric.yaml
 functionality:
   name: regression_1
+  namespace: "metrics"
   info:
     label: Regression 1
     summary: Calculates R2 score for regression 1
@@ -15,7 +16,7 @@ platforms:
     image: ghcr.io/openproblems-bio/base_python:1.0.4
     setup:
       - type: python
-        packages: [ lightgbm ]
+        packages: [ lightgbm==4.3.0, numpy==1.26.4 ]
   - type: nextflow
     directives:
       label: [ midtime, highmem, highcpu ]

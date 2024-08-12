@@ -8,6 +8,8 @@ import random
 from concurrent.futures import ThreadPoolExecutor
 import pandas as pd
 import anndata as ad
+from tqdm import tqdm
+
 import os
 
 
@@ -50,12 +52,13 @@ def cv_5(genes_n):
     return groups
 
 
-def run_method_1(
+def regression_1(
             net: pd.DataFrame, 
             train_df: pd.DataFrame,
-            reg_type: str = 'GRB',
+            reg_type: str = 'GB',
             exclude_missing_genes: bool = False,
-            verbose: int = 0) -> None: 
+            verbose: int = 0,
+            max_workers: int = 4) -> None: 
     """
     net: a df with index as genes and columns as tfs
     train_df: a df with index as genes and columns as samples
@@ -64,17 +67,19 @@ def run_method_1(
     gene_names_grn = net.index.to_numpy()
     # determine regressor 
     if reg_type=='ridge':
-        # regr = Pipeline([
-        #     ('scaler', StandardScaler()),
-        #     ('svc', Ridge(alpha=100, random_state=32))
-        # ])
         regr =  Ridge(**dict(random_state=32))
     elif reg_type=='GB':
-        regr = lightgbm_wrapper(dict(random_state=32, n_estimators=100, min_samples_leaf=2, min_child_samples=1, feature_fraction=0.05, verbosity=-1))
+        params = dict(random_state=32, 
+                    n_estimators=100, min_samples_leaf=2, min_child_samples=1, 
+                    feature_fraction=0.05, verbosity=-1
+        )
+        regr = lightgbm_wrapper(params, max_workers=max_workers)
     elif reg_type=='RF':
-        regr = lightgbm_wrapper(dict(boosting_type='rf',random_state=32, n_estimators=100,  feature_fraction=0.05, verbosity=-1))
-    
+        params = dict(boosting_type='rf',random_state=32, n_estimators=100,  
+        feature_fraction=0.05, verbosity=-1)
+        regr = lightgbm_wrapper(params, max_workers)
     else:
+        print(f'{reg_type} is not defined')
         raise ValueError("define first")        
     
     n_tfs = net.shape[1]
@@ -88,7 +93,6 @@ def run_method_1(
     Y_df = train_df.loc[included_genes,:]
 
     mask_shared_genes = X_df.index.isin(net.index)
-    # print(X_df.shape, Y_df.shape)
     
     # fill the actuall regulatory links
     X_df.loc[mask_shared_genes, :] = net.values
@@ -102,38 +106,28 @@ def run_method_1(
     y_pred[:] = means
     y_pred = y_pred.values
 
-    
     # initialize y_true
     Y = Y_df.values
     y_true = Y.copy()
 
     unique_groups = np.unique(groups)
-    
-    for group in unique_groups:
+
+    for group in tqdm(unique_groups, desc="Processing groups"):
         mask_va = groups == group
         mask_tr = ~mask_va
-
         # Use logical AND to combine masks correctly
         X_tr = X[mask_tr & mask_shared_genes, :]
         Y_tr = Y[mask_tr & mask_shared_genes, :]
 
         regr.fit(X_tr, Y_tr)
-
         y_pred[mask_va & mask_shared_genes, :] = regr.predict(X[mask_va & mask_shared_genes, :])
 
-
-    # assert ~(y_true==0).any()
-
-    # if verbose >= 1:
     score_r2  = r2_score(y_true, y_pred, multioutput='variance_weighted') #uniform_average', 'variance_weighted
-    # print(f'score_r2: ', score_r2)
-
 
     mean_score_r2 = r2_score(y_true, y_pred, multioutput='variance_weighted')
-    gene_scores_r2 = r2_score(y_true.T, y_pred.T, multioutput='raw_values')
+    # gene_scores_r2 = r2_score(y_true.T, y_pred.T, multioutput='raw_values')
 
-    output = dict(mean_score_r2=mean_score_r2, gene_scores_r2=list(gene_scores_r2))
-
+    output = dict(mean_score_r2=mean_score_r2)
     return output
 
 def set_global_seed(seed):
@@ -186,73 +180,47 @@ def main(par):
 
     subsample = par['subsample']
     reg_type = par['reg_type']
-    
-    # process pert data
-    # for layer in ['scgen_pearson', 'scgen_lognorm']:
-    #     pert_df = pd.DataFrame(perturbation_data.layers[layer], columns=gene_names)
-    #     if subsample != -1:
-    #         pert_df = pert_df.sample(n=subsample)
-    #     pert_df = pert_df.T # make it gene*sample
+    max_workers = par['max_workers']
+    layer = par["layer"]
+    pert_df = pd.DataFrame(perturbation_data.layers[layer], columns=gene_names)
 
-    #     # process net
-    #     net = process_net(net, gene_names, manipulate)
+    if subsample != -1:
+        pert_df = pert_df.sample(n=subsample)
+    pert_df = pert_df.T  # make it gene*sample
 
-    #     print('Compute metrics', flush=True)
-    #     out_dict = {}
-    #     for exclude_missing_genes in [True, False]: # two settings on target gene
-    #         for tf_n in [-1, 140]: # two settings on tfs
-    #             # Subset TFs 
-    #             if tf_n==-1:
-    #                 degrees = net.abs().sum(axis=0)
-    #                 net = net.loc[:, degrees>=degrees.quantile((1-theta))]
-    #             else:
-    #                 if tf_n>net.shape[1]:
-    #                     print(f'Skip running because tf_n ({tf_n}) is bigger than net.shape[1] ({net.shape[1]})')
-    #                     return 
-    #                 degrees = net.abs().sum(axis=0)
-    #                 net = net[degrees.nlargest(tf_n).index]
-    #             output = run_method_1(net, pert_df, exclude_missing_genes=exclude_missing_genes, reg_type=reg_type)
-    #             out_dict[f'ex({exclude_missing_genes})_tf({tf_n})'] = output['mean_score_r2']
-    results = []
-    layers = ['scgen_pearson', 'scgen_lognorm']
-    for layer in layers:
-        pert_df = pd.DataFrame(perturbation_data.layers[layer], columns=gene_names)
+    # process net
+    net_processed = process_net(net.copy(), gene_names, manipulate)
 
-        if subsample != -1:
-            pert_df = pert_df.sample(n=subsample)
-        pert_df = pert_df.T  # make it gene*sample
+    print(f'Compute metrics for layer: {layer}', flush=True)
+    layer_results = {}  # Store results for this layer
+    for exclude_missing_genes in [True, False]:  # two settings on target gene
+        for tf_n in [-1, 140]:  # two settings on tfs
+            run_key = f'ex({exclude_missing_genes})_tf({tf_n})'
+            print(run_key)
+            net_subset = net_processed.copy()
 
-        # process net
-        net_processed = process_net(net.copy(), gene_names, manipulate)
+            # Subset TFs 
+            if tf_n == -1:
+                degrees = net_subset.abs().sum(axis=0)
+                net_subset = net_subset.loc[:, degrees >= degrees.quantile((1 - theta))]
+            else:
+                if tf_n > net_subset.shape[1]:
+                    print(f'Skip running because tf_n ({tf_n}) is bigger than net.shape[1] ({net_subset.shape[1]})')
+                    continue
+                degrees = net_subset.abs().sum(axis=0)
+                net_subset = net_subset[degrees.nlargest(tf_n).index]
 
-        print(f'Compute metrics for layer: {layer}', flush=True)
-        layer_results = {}  # Store results for this layer
-        for exclude_missing_genes in [True, False]:  # two settings on target gene
-            for tf_n in [-1, 140]:  # two settings on tfs
-                net_subset = net_processed.copy()
-
-                # Subset TFs 
-                if tf_n == -1:
-                    degrees = net_subset.abs().sum(axis=0)
-                    net_subset = net_subset.loc[:, degrees >= degrees.quantile((1 - theta))]
-                else:
-                    if tf_n > net_subset.shape[1]:
-                        print(f'Skip running because tf_n ({tf_n}) is bigger than net.shape[1] ({net_subset.shape[1]})')
-                        continue
-                    degrees = net_subset.abs().sum(axis=0)
-                    net_subset = net_subset[degrees.nlargest(tf_n).index]
-
-                output = run_method_1(net_subset, pert_df, exclude_missing_genes=exclude_missing_genes, reg_type=reg_type)
-                result_key = f'ex({exclude_missing_genes})_tf({tf_n})'
-                layer_results[result_key] = output['mean_score_r2']
-
-        results.append(layer_results)
+            output = regression_1(net_subset, pert_df, exclude_missing_genes=exclude_missing_genes, reg_type=reg_type, max_workers=max_workers)
+            
+            layer_results[run_key] = [output['mean_score_r2']]
 
     # Convert results to DataFrame
-    df_results = pd.DataFrame(results, index=layers)
+    df_results = pd.DataFrame(layer_results)
     if 'ex(True)_tf(140)' not in df_results.columns:
         df_results['ex(True)_tf(140)'] = df_results['ex(True)_tf(-1)']
     if 'ex(False)_tf(140)' not in df_results.columns:
         df_results['ex(False)_tf(140)'] = df_results['ex(False)_tf(-1)']
+    
+    df_results['Mean'] = df_results.mean(axis=1)
     
     return df_results

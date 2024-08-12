@@ -20,10 +20,13 @@ def preprocess(rna, atac, par):
     sc.tl.pca(rna, n_comps=100, svd_solver="auto")
     sc.pp.neighbors(rna, metric="cosine")
     sc.tl.umap(rna)
+    print('step 1 completed')
+    
     
     scglue.data.lsi(atac, n_components=100, n_iter=15)
     sc.pp.neighbors(atac, use_rep="X_lsi", metric="cosine")
     sc.tl.umap(atac)
+    print('step 2 completed')
 
 
     
@@ -68,6 +71,7 @@ def preprocess(rna, atac, par):
     nx.write_graphml(guidance, f"{par['temp_dir']}/guidance.graphml.gz")
 
 def training(par):
+    os.makedirs(f"{par['temp_dir']}/glue", exist_ok=True)
     rna = ad.read_h5ad(f"{par['temp_dir']}/rna.h5ad")
     atac = ad.read_h5ad(f"{par['temp_dir']}/atac.h5ad")
     guidance = nx.read_graphml(f"{par['temp_dir']}/guidance.graphml.gz")
@@ -79,6 +83,7 @@ def training(par):
         atac, "NB", use_highly_variable=False,
         use_rep="X_lsi"
     )
+    
 
     glue = scglue.models.fit_SCGLUE(
         {"rna": rna, "atac": atac}, guidance,
@@ -244,16 +249,13 @@ def main(par):
     
     os.makedirs(par['temp_dir'], exist_ok=True)
     print('Reading input files', flush=True)
-    # rna = ad.read_h5ad(par['multiomics_rna'])
-    # atac = ad.read_h5ad(par['multiomics_atac'])
+    rna = ad.read_h5ad(par['multiomics_rna'])
+    atac = ad.read_h5ad(par['multiomics_atac'])
 
-    # rna = rna[rna.obs.donor_id=='donor_0',:1000]
-    # atac = atac[atac.obs.donor_id=='donor_0', :10000]
-
-    # print('Preprocess data', flush=True)
-    # preprocess(rna, atac, par)
-    # print('Train a model', flush=True)
-    # training(par)
+    print('Preprocess data', flush=True)
+    preprocess(rna, atac, par)
+    print('Train a model', flush=True)
+    training(par)
     cis_inference(par)
     print('Curate predictions', flush=True)
     df = pd.read_csv(

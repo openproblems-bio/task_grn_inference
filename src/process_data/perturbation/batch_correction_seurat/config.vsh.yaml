@@ -1,0 +1,59 @@
+__merge__: ../../../api/comp_test.yaml
+
+functionality:
+  name: batch_correction_seurat
+  namespace: "perturbation"
+  info:
+    label: batch_correction_seurat
+    summary: "Correct batch effects using seurat"
+  
+  arguments:
+    - name: --perturbation_data_n
+      type: file
+      info:
+        label: perturbation
+        summary: "Perturbation dataset for benchmarking."
+        file_type: h5ad
+        slots:
+          layers:
+            - name: n_counts
+              type: double
+              description: "Pseudobulked values using mean approach"
+              required: true
+            - name: pearson
+              type: double
+              description: "Normalized values using pearson residuals"
+              required: true
+            - name: lognorm
+              type: double
+              description: "Normalized values using shifted logarithm "
+              required: true
+      required: true
+      direction: input
+      default: resources/grn-benchmark/perturbation_data.h5ad 
+    - name: --perturbation_data_bc
+      type: file
+      info:
+        label: perturbation
+        summary: "Perturbation dataset for benchmarking."
+        __merge__: ../../../api/file_perturbation_h5ad.yaml
+      required: false
+      direction: output
+      default: resources/grn-benchmark/perturbation_data.h5ad 
+
+
+  resources:
+    - type: r_script
+      path: script.R
+platforms:
+  - type: docker
+    image: janursa/batch_correction_seurat:latest
+    # setup:
+    #   - type: r
+    #     bioc: []
+    #     packages: [zellkonverter]
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

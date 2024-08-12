@@ -46,9 +46,9 @@ info:
       - name: pearson
         type: double
         description: "Normalized values using pearson residuals"
-        required: true
+        required: false
       - name: lognorm
         type: double
         description: "Normalized values using shifted logarithm "
-        required: true
+        required: false
       

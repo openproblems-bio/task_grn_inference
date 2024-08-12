@@ -1,0 +1,34 @@
+
+functionality:
+  name: format_data
+  namespace: "multiomics"
+  info:
+    label: format_data
+    summary: "Download multiome, splits to rna and atac and saves seperately."
+  arguments:
+    - name: --multiome_counts
+      type: file 
+      required: false
+      direction: input
+      default: resources/datasets_raw/multiome_counts.h5ad
+    - name: --multiomics_rna
+      type: file 
+      required: false
+      direction: output
+      default: resources/grn-benchmark/multiomics_rna.h5ad
+    - name: --multiomics_atac
+      type: file 
+      required: false
+      direction: output
+      default: resources/grn-benchmark/multiomics_atac.h5ad
+  resources:
+    - type: python_script
+      path: script.py
+platforms:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

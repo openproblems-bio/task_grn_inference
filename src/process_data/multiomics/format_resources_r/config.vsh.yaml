@@ -1,0 +1,73 @@
+functionality:
+  name: format_resources_r
+  namespace: "multiomics"
+  info:
+    label: format_resources_r
+    summary: "Converts data to format needed for R methods."
+
+  arguments:
+    - name: --rna_matrix
+      type: file
+      required: false
+      direction: input
+      default: output/scRNA/X_matrix.mtx
+  
+    - name: --atac_matrix
+      type: file
+      required: false
+      direction: input
+      default: output/scATAC/X_matrix.mtx 
+
+    - name: --rna_gene_annot
+      type: file
+      required: false
+      direction: input
+      default: output/scRNA/annotation_gene.csv
+
+    - name: --rna_cell_annot
+      type: file
+      required: false
+      direction: input
+      default: output/scRNA/annotation_cell.csv 
+   
+    - name: --atac_peak_annot
+      type: file
+      required: false
+      direction: input
+      default: output/scATAC/annotation_gene.csv
+      
+    - name: --atac_cell_annot
+      type: file
+      required: false
+      direction: input
+      default: output/scATAC/annotation_cell.csv
+
+    - name: --rna_rds
+      type: file
+      required: false
+      direction: output
+      default: resources/grn-benchmark/multiomics_r/rna.rds
+    - name: --atac_rds
+      type: file
+      required: false
+      direction: output
+      default: resources/grn-benchmark/multiomics_r/atac.rds
+
+
+
+  resources:
+    - type: r_script
+      path: script.R
+
+
+platforms:
+  - type: docker
+    image: janursa/figr:19-08-2024
+    # setup:
+    #   - type: r
+    #     packages: [dplyr, FNN, chromVAR, doParallel]
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

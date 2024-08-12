@@ -6,6 +6,13 @@ functionality:
     summary: Source-target links based on perturbation data
     description: |
       By directly training on perturbation data, positive control is expected to learn more accurate tf-gene connections.
+  arguments:
+    - name: --tf_all
+      type: file
+      required: false
+      direction: input
+      default: resources/prior/tf_all.csv
+
   resources:
     - type: python_script
       path: script.py

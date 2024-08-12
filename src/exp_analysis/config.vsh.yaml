@@ -1,0 +1,46 @@
+
+functionality:
+  name: explanatory_analysis
+  info:
+    label: explanatory_analysis
+    summary: "Explanatory analysis of inferred GRN to provide insights about network topology and annotations"
+
+  arguments:
+    - name: --perturbation_data
+      type: file
+      required: true
+      direction: input
+    - name: --tf_gene_net
+      type: file
+      required: true
+      direction: input
+    - name: --peak_gene_net
+      type: file
+      required: false
+      direction: input
+    - name: --annot_peak_database
+      type: file 
+      required: true 
+      direction: input
+      default: resources/grn-benchmark/supp/annot_peak_database.csv
+    - name: --annot_gene_database
+      type: file 
+      required: true 
+      direction: input
+      default: resources/grn-benchmark/supp/annot_gene_database.csv
+    
+  resources:
+    - type: python_script
+      path: script.py
+    - path: helper.py
+platforms:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    setup:
+      - type: python
+        packages: [  ]
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

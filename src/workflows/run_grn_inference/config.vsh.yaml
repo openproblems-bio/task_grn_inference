@@ -1,0 +1,58 @@
+
+functionality:
+  name: run_grn_inference
+  namespace: "workflows"
+  info:
+    label: run_grn_inference
+    summary: "Infers GRNs from multiomics data using GRN inference methods."
+
+  argument_groups:
+    - name: Inputs
+      arguments:
+        - name: --multiomics_rna
+          __merge__: ../../api/file_multiomics_rna_h5ad.yaml
+          required: true
+          direction: input
+          default: resources_test/grn-benchmark/multiomics_rna.h5ad
+        - name: --multiomics_atac
+          __merge__: ../../api/file_multiomics_atac_h5ad.yaml
+          required: true
+          direction: input
+          default: resources_test/grn-benchmark/multiomics_atac.h5ad
+        - name: --temp_dir
+          type: string
+          required: true
+          direction: input
+          default: output/temdir
+        - name: --num_workers
+          required: true
+          type: integer
+          direction: input
+          default: 4
+
+    - name: Outputs
+      arguments:
+        - name: --prediction
+          __merge__: ../../api/file_prediction.yaml
+          required: true
+          direction: output
+        
+  resources:
+    - type: nextflow_script
+      path: main.nf
+      entrypoint: run_wf
+  dependencies:
+    # - name: common/extract_metadata
+    #   repository: openproblemsv2
+    - name: grn_methods/celloracle 
+    # - name: grn_methods/figr
+    # - name: grn_methods/scglue
+  # repositories:
+  #   - name: openproblemsv2
+  #     type: github
+  #     repo: openproblems-bio/openproblems-v2
+  #     tag: main_build
+platforms:
+  - type: nextflow
+    directives:
+      label: [ midtime, midmem, lowcpu ]

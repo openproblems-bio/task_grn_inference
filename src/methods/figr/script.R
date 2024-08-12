@@ -11,16 +11,18 @@ par <- list(
   multiomics_rna = "resources_test/grn-benchmark/multiomics_r/rna.rds",
   multiomics_atac = "resources_test/grn-benchmark/multiomics_r/atac.rds",
   temp_dir =  "output/figr/",
-  cell_topic = "resources/grn-benchmark/supp/cell_topic.csv",
-  num_workers = 40,
+  cell_topic = "resources_test/grn-benchmark/supp/cell_topic.csv",
+  num_workers = 2,
   n_topics = 48,
   peak_gene = "output/figr/peak_gene.csv",
   prediction= "output/figr/prediction.csv"
 )
+print(par)
 # meta <- list(
 #   functionality_name = "my_method_r"
 # )
 ## VIASH END
+dir.create(par$temp_dir, recursive = TRUE, showWarnings = TRUE)
 
 cellknn_func <- function(par) {
   ## load cell topic probabilities and create cell-cluster matrix
@@ -29,16 +31,18 @@ cellknn_func <- function(par) {
   # Derive cell kNN using this
   cellkNN <- get.knn(cell_topic, k=par$n_topics)$nn.index
   rownames(cellkNN) <- rownames(cell_topic)
-  print(dim(cellkNN))
   saveRDS(cellkNN, paste0(par$temp_dir, "cellkNN.rds"))
 }
-print(par)
 cellknn_func(par)
-
+print('1: cellknn_func finished')
 ## Step1: Peak-gene association testing
 peak_gene_func <- function(par){
   atac = readRDS(par$multiomics_atac)
   rna  = readRDS(par$multiomics_rna)
+  common_cells <- intersect(colnames(atac), colnames(rna))
+  rna = rna[,common_cells]
+  atac = atac[,common_cells]
+
   cisCorr <- FigR::runGenePeakcorr(ATAC.se = atac,
                             RNAmat = rna,
                             genome = "hg38", # One of hg19, mm10 or hg38 
@@ -48,10 +52,14 @@ peak_gene_func <- function(par){
   write.csv(cisCorr, paste0(par$temp_dir, "cisCorr.csv"), row.names = TRUE)
 }
 
+peak_gene_func(par)
+
+print('2: peak_gene_func finished')
 ## Step 2: create DORCs and smooth them 
 dorc_genes_func <- function(par){
   cisCorr = read.csv(paste0(par$temp_dir, "cisCorr.csv"))
-  cisCorr.filt <- cisCorr %>% filter(pvalZ <= 0.05)
+  # cisCorr.filt <- cisCorr %>% filter(pvalZ <= 0.05)
+  cisCorr.filt <- cisCorr %>% filter(pvalZ <= 0.2)
 
   atac = readRDS(par$multiomics_atac)
   rna  = readRDS(par$multiomics_rna)
@@ -61,22 +69,28 @@ dorc_genes_func <- function(par){
                           dorcTab = cisCorr.filt,
                           geneList = allGenes,
                           nCores = par$num_workers)
-
   cellkNN = readRDS(paste0(par$temp_dir, "cellkNN.rds"))
   # Smooth dorc scores using cell KNNs (k=n_topics)
   n_topics = par$n_topics
-  dorcMat.s <- smoothScoresNN(NNmat = cellkNN[,1:n_topics], mat = dorcMat, nCores = 4)
-
+  common_cells <- intersect(rownames(cellkNN), colnames(rna))
+  cellkNN = cellkNN[common_cells,]
+  dorcMat = dorcMat[,common_cells]
+  cat('cellKNN dim:', dim(cellkNN), '\n')
+  cat('dorcMat dim:', dim(dorcMat), '\n')
+  cat('rna dim:', dim(rna), '\n')
+  dorcMat.s <- smoothScoresNN(NNmat = cellkNN[,1:n_topics], mat = dorcMat, nCores = par$num_workers) 
+  cat('dorcMat.s completed')
   # Smooth RNA using cell KNNs
   # This takes longer since it's all genes
-  RNAmat.s <- smoothScoresNN(NNmat = cellkNN[,1:n_topics], mat = rna,nCores = 4)
-
+  RNAmat.s <- smoothScoresNN(NNmat = cellkNN[,1:n_topics], mat = rna, nCores = par$num_workers)
+  cat('RNAmat.s completed')
   # get peak gene connection
   write.csv(cisCorr.filt, paste0(par$temp_dir, "cisCorr.filt.csv"))
   saveRDS(RNAmat.s, paste0(par$temp_dir, "RNAmat.s.RDS"))
   saveRDS(dorcMat.s, paste0(par$temp_dir, "dorcMat.s.RDS"))
 }
-
+dorc_genes_func(par)
+print('3: dorc_genes_func finished')
 ## TF-gene associations
 tf_gene_association_func <- function(par){
   cisCorr.filt = read.csv(paste0(par$temp_dir, "cisCorr.filt.csv"))
@@ -93,6 +107,8 @@ tf_gene_association_func <- function(par){
 
   write.csv(figR.d, paste0(par$temp_dir, "figR.d.csv"))
 }
+tf_gene_association_func(par)
+print('3: tf_gene_association_func finished')
 
 extract_peak_gene_func <- function(par) {
   # Read the CSV file
@@ -117,6 +133,9 @@ extract_peak_gene_func <- function(par) {
   # Write the result to a CSV file
   write.csv(peak_gene_figr, file = par$peak_gene, row.names = FALSE)
 }
+extract_peak_gene_func(par)
+print('4: extract_peak_gene_func finished')
+
 
 filter_figr_grn <- function(par) {
   # Read the CSV file
@@ -145,8 +164,4 @@ filter_figr_grn <- function(par) {
 }
 
 
-# peak_gene_func(par)
-# dorc_genes_func(par)
-# tf_gene_association_func(par)
-# extract_peak_gene_func(par)
-# filter_figr_grn(par)
+filter_figr_grn(par)

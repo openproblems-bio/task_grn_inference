@@ -10,19 +10,27 @@ functionality:
   arguments:
     - name: --multiomics_rna
       __merge__: file_multiomics_rna_h5ad.yaml
-      required: True
+      required: false
       direction: input
-      info:
-        test_default: ../../resources_test/grn-benchmark/multiomics_rna.h5ad
+      default: resources_test/grn-benchmark/multiomics_rna.h5ad
     - name: --multiomics_atac
       __merge__: file_multiomics_atac_h5ad.yaml
       required: false
       direction: input
+      default: resources_test/grn-benchmark/multiomics_atac.h5ad
     - name: --prediction
       __merge__: file_prediction.yaml
-      required: true
+      required: false
       direction: output
-
+      default: output/grn.csv
+    - name: --temp_dir
+      type: string
+      direction: input
+      default: output/temdir
+    - name: --num_workers
+      type: integer
+      direction: input
+      default: 4
   test_resources:
     - type: python_script
       path: /src/common/component_tests/run_and_check_output.py

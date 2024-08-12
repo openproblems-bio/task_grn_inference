@@ -2,12 +2,16 @@
 .DS_Store
 
 # related to files
-resources/
-resources_test/
+params*
+resources*
 output/
 out/
 target/
 local/
+datasets_raw/
+state*
+trace*
+tw-*
 
 # related to python
 .ipynb_checkpoints
