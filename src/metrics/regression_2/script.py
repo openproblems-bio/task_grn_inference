@@ -8,10 +8,11 @@ import numpy as np
 par = {
     'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
     'layer': 'scgen_pearson',
-    'prediction': 'resources/grn-benchmark/negative_control.csv',
+    'prediction': 'resources/grn_models/collectri.csv',
     'consensus': 'resources/grn-benchmark/consensus-num-regulators.json',
     'score': 'output/score_regression2.csv',
-    'reg_type': 'ridge'
+    'reg_type': 'ridge',
+    
 }
 ## VIASH END
 
@@ -27,6 +28,19 @@ print('Reading input data')
 output = main(par)
 
 print('Write output to file', flush=True)
-print(output)
-output.to_csv(par['score'])
+metric_ids = output.columns.to_numpy()
+metric_values = output.values[0]
+
+print(metric_ids.shape, metric_values.shape)
+output = ad.AnnData(
+    X=np.empty((0, 0)),
+    uns={
+        "dataset_id": par["layer"],
+        "method_id": f"reg2-{par['method_id']}",
+        "metric_ids": metric_ids,
+        "metric_values": metric_values
+    }
+)
+
+output.write_h5ad(par["score"], compression="gzip")
 print('Completed', flush=True)

@@ -29,10 +29,6 @@ print(output)
 
 metric_ids = output.columns.to_numpy()
 metric_values = output.values[0]
-# if metric_ids.ndim == 1:
-#     metric_ids = metric_ids.reshape(1, -1)
-# if metric_values.ndim == 1:
-#     metric_values = metric_values.reshape(1, -1)
 
 print(metric_ids.shape, metric_values.shape)
 output = ad.AnnData(
@@ -44,8 +40,5 @@ output = ad.AnnData(
         "metric_values": metric_values
     }
 )
-
-
-# print(output.uns)
 
 output.write_h5ad(par["score"], compression="gzip")

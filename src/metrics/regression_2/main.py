@@ -70,7 +70,7 @@ def cross_validate_gene(
         if estimator_t == 'ridge':
             model = Ridge(random_state=random_state)
         elif estimator_t == 'GB':
-            model = lightgbm.LGBMRegressor(verbosity=-1, n_estimators=100, n_jobs=4, random_state=random_state)
+            model = lightgbm.LGBMRegressor(verbosity=-1, n_estimators=100, n_jobs=par["max_workers"], random_state=random_state)
         else:
             raise NotImplementedError(f'Unknown model "{estimator_t}"')
 
@@ -209,6 +209,9 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     
     # Load perturbation data
     perturbation_data = ad.read_h5ad(par['perturbation_data'])
+    subsample = par['subsample']
+    if subsample != -1:
+        perturbation_data = perturbation_data[np.random.choice(perturbation_data.n_obs, subsample, replace=False), :]
     gene_names = perturbation_data.var.index.to_numpy()
     n_genes = len(gene_names)
     groups = LabelEncoder().fit_transform(perturbation_data.obs.plate_name)
@@ -216,10 +219,14 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     # Load inferred GRN
     print(f'Loading GRN', flush=True)
     grn = load_grn(par['prediction'], gene_names)
+
+    
     
     # Load and standardize perturbation data
     layer = par['layer']
     X = perturbation_data.layers[layer]
+    print(X.shape)
+
     X = RobustScaler().fit_transform(X)
 
     # Load consensus numbers of putative regulators
@@ -232,26 +239,27 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     # Evaluate GRN
     print(f'Compute metrics for layer: {layer}', flush=True)
     print(f'Dynamic approach:', flush=True)
-    score_dynamic = dynamic_approach(grn, X, groups, gene_names, par['reg_type'])
+    # score_dynamic = dynamic_approach(grn, X, groups, gene_names, par['reg_type'])
     print(f'Static approach (theta=0):', flush=True)
     score_static_min = static_approach(grn, n_features_theta_min, X, groups, gene_names, par['reg_type'])
     print(f'Static approach (theta=0.5):', flush=True)
     score_static_median = static_approach(grn, n_features_theta_median, X, groups, gene_names, par['reg_type'])
     print(f'Static approach (theta=1):', flush=True)
     score_static_max = static_approach(grn, n_features_theta_max, X, groups, gene_names, par['reg_type'])
-    score_overall = score_dynamic + score_static_min + score_static_median + score_static_max
+    # score_overall = score_dynamic + score_static_min + score_static_median + score_static_max
     # TODO: find a mathematically sound way to combine Z-scores and r2 scores
 
-    print(f'Score on {layer}: {score_overall}')
+    # print(f'Score on {layer}: {score_overall}')
     results = {
         'static-theta-0.0': [score_static_min],
         'static-theta-0.5': [score_static_median],
         'static-theta-1.0': [score_static_max],
-        'dynamic': [score_dynamic],
-        'Overall': [score_overall],
+        # 'dynamic': [score_dynamic],
+        # 'Overall': [score_overall],
     }
 
     # Convert results to DataFrame
     df_results = pd.DataFrame(results)
+    df_results['Mean'] = df_results.mean(axis=1)
     
     return df_results
