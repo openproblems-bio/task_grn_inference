@@ -51,7 +51,7 @@ done
 grn_name="negative_control"
 cat >> $param_file << HERE
   - id: ${layer}_${grn_name}
-    perturbation_data: ${perturbation_data}
+    perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
     layer: ${layer}
     reg_type: $reg_type
     method_id: $grn_name

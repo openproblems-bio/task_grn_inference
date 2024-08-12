@@ -1,6 +1,6 @@
 functionality:
-  name: "celloracle"
-  namespace: "grn_methods"
+  name: "grn_inference_scglue"
+  namespace: "workflows"
   version: "build-main"
   arguments:
   - type: "file"
@@ -108,35 +108,30 @@ functionality:
     multiple_sep: ":"
     dest: "par"
   - type: "file"
-    name: "--base_grn"
+    name: "--annotation_file"
     info: null
-    default:
-    - "output/celloracle/base_grn.csv"
     must_exist: true
     create_parent: true
-    required: false
-    direction: "output"
+    required: true
+    direction: "input"
     multiple: false
     multiple_sep: ":"
     dest: "par"
   - type: "file"
-    name: "--links"
+    name: "--motif_file"
     info: null
-    default:
-    - "output/celloracle/links.celloracle.links"
     must_exist: true
     create_parent: true
-    required: false
-    direction: "output"
+    required: true
+    direction: "input"
     multiple: false
     multiple_sep: ":"
     dest: "par"
   resources:
-  - type: "python_script"
-    path: "script.py"
+  - type: "nextflow_script"
+    path: "main.nf"
     is_executable: true
-  - type: "file"
-    path: "main.py"
+    entrypoint: "run_wf"
   test_resources:
   - type: "python_script"
     path: "src/common/component_tests/run_and_check_output.py"
@@ -145,39 +140,41 @@ functionality:
     path: "resources/grn-benchmark"
     dest: "resources/grn-benchmark"
   info:
-    label: "celloracle"
-    summary: "GRN inference using celloracle"
-    description: "GRN inference using celloracle. \n"
-    documentation_url: "https://morris-lab.github.io/CellOracle.documentation/"
+    label: "grn_inference_scglue"
+    summary: "Infers GRNs from multiomics data using scglue."
     type: "methods"
     type_info:
       label: "Method"
       summary: "A GRN inference method"
       description: "A method for inferring GRN from expression data.\n"
   status: "enabled"
+  dependencies:
+  - name: "grn_methods/scglue"
+    repository:
+      type: "local"
+      localPath: ""
+    foundConfigPath: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/scglue/config.vsh.yaml"
+    configInfo:
+      functionalityName: "scglue"
+      git_tag: ""
+      git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"
+      viash_version: "0.8.6"
+      config: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/scglue/config.vsh.yaml"
+      functionalityNamespace: "grn_methods"
+      output: ""
+      platform: ""
+      git_commit: "f79437062831ca5577c374b0acc67ed17be60e39"
+      executable: "/nextflow/grn_methods/scglue/main.nf"
+    writtenPath: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scglue"
   set_wd_to_resources_dir: false
 platforms:
-- type: "docker"
-  id: "docker"
-  image: "kenjikamimoto126/celloracle_ubuntu:0.18.0"
-  target_organization: "openproblems-bio/task_grn_inference"
-  target_registry: "ghcr.io"
-  namespace_separator: "/"
-  resolve_volume: "Automatic"
-  chown: true
-  setup_strategy: "ifneedbepullelsecachedbuild"
-  target_image_source: "https://github.com/openproblems-bio/task_grn_inference"
-  entrypoint: []
-  cmd: null
-- type: "native"
-  id: "native"
 - type: "nextflow"
   id: "nextflow"
   directives:
     label:
     - "midtime"
     - "midmem"
-    - "midcpu"
+    - "lowcpu"
     tag: "$id"
   auto:
     simplifyInput: true
@@ -201,10 +198,10 @@ platforms:
   debug: false
   container: "docker"
 info:
-  config: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/celloracle/config.vsh.yaml"
-  platform: "native"
-  output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/native/grn_methods/celloracle"
-  executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/native/grn_methods/celloracle/celloracle"
+  config: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/scglue_ns/config.vsh.yaml"
+  platform: "nextflow"
+  output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/grn_inference_scglue"
+  executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/grn_inference_scglue/main.nf"
   viash_version: "0.8.6"
   git_commit: "f79437062831ca5577c374b0acc67ed17be60e39"
   git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"
