@@ -48,18 +48,17 @@ done
 
 
 # append negative control
-# grn_name="negative_control"
-# cat >> $param_file << HERE
-#   - id: ${layer}_${grn_name}
-#     perturbation_data: ${perturbation_data}
-#     layer: ${layer}
-#     prediction: resources/control_models/${grn_name}.csv 
-#     reg_type: $reg_type
-#     method_id: $grn_name
-#     subsample: $subsample
-#     max_workers: $max_workers
+grn_name="negative_control"
+cat >> $param_file << HERE
+  - id: ${layer}_${grn_name}
+    perturbation_data: ${perturbation_data}
+    layer: ${layer}
+    reg_type: $reg_type
+    method_id: $grn_name
+    subsample: $subsample
+    max_workers: $max_workers
 
-# HERE
+HERE
 
 # append the positive controls
 grn_name="positive_control"

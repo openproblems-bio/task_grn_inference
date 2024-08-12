@@ -427,9 +427,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods celloracle"
-LABEL org.opencontainers.image.created="2024-08-12T17:41:20Z"
+LABEL org.opencontainers.image.created="2024-08-12T18:53:55Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="725a476d6a65d28b34ab6f6c33beec46af49a8cf"
+LABEL org.opencontainers.image.revision="946543ddef68017ad16e8f204b21540d3a06f6fa"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
