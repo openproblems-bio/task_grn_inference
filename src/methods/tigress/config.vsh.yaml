@@ -1,0 +1,54 @@
+functionality:
+  name: tigress
+  info:
+    label: tigress
+    summary: "GRN inference using TIGRESS"
+    description: |
+      GRN inference using TIGRESS.
+    documentation_url: https://rdrr.io/github/jpvert/tigress/man/tigress.html
+  arguments:
+    - name: --multiomics_rna
+      type: file
+      example: resources/grn-benchmark/multiomics_rna.h5ad
+      info:
+        label: multiomics_rna
+        summary: "Multiomics RNA data"
+        file_type: rds
+        columns: 
+          - name: dummpy
+            type: string
+            required: false
+      required: true
+      must_exist: true
+    - name: --prediction
+      __merge__: ../../api/file_prediction.yaml
+      required: true
+      direction: output
+    - name: --max_n_links
+      type: integer
+      default: 50000
+    - name: --temp_dir
+      type: file
+      direction: output
+      default: 'output/tigress'
+    - name: --num_workers
+      type: integer
+      direction: input
+      default: 4
+  resources:
+    - type: r_script
+      path: script.R
+
+platforms:
+  - type: docker
+    image: janursa/figr:19-08-2024
+    setup:
+      - type: r
+        packages: [ devtools, foreach, plyr, doRNG, glmnet, randomForest, anndata, dplyr ]
+      - type: docker
+        run: |
+          Rscript -e 'library(devtools); install_github("jpvert/tigress")'
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

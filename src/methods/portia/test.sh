@@ -1,0 +1,2 @@
+viash build src/methods/portia/config.vsh.yaml -p docker -o bin/portia && bin/portia/portia --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/portia/prediction.csv
+#viash run src/methods/portia/config.vsh.yaml -p docker -- ---setup build && bin/portia/portia --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/portia/prediction.csv

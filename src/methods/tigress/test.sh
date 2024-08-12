@@ -1,0 +1,2 @@
+viash build src/methods/tigress/config.vsh.yaml -p docker -o bin/tigress && bin/tigress/tigress --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/tigress/prediction.csv
+#viash run src/methods/tigress/config.vsh.yaml -p docker -- ---setup build && bin/tigress/tigress --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/tigress/prediction.csv

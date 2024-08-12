@@ -25,17 +25,23 @@ workflow run_wf {
         [id, state + ["_meta": [join_id: id]]]
       }
     // Run positive_control if method_id is 'positive_control'
-    | if { state.method_id == 'positive_control' }
-    .map { id, state ->
-        positive_control.run(
-          fromState: [perturbation_data: state["perturbation_data"],
-          layer: "layer", 
-          tf_all: "tf_all"],
-          toState: [prediction: state['prediction']]
+    | map { id, state ->
+      if (state.method_id == 'positive_control') {
+        // Run the positive_control component
+        def output = positive_control.run(
+          fromState: [
+            perturbation_data: "perturbation_data",
+            layer: "layer",
+            tf_all: "tf_all"
+          ],
+          toState: [
+            prediction: "prediction"
+          ]
         )
-        return [id, state]
+        state = state + output
       }
-    else { it } // Pass through if method_id is not 'positive_control'
+    }
+    // Pass through if method_id is not 'positive_control'
 
     // run all metrics
     | runEach(

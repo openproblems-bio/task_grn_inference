@@ -1,0 +1,2 @@
+viash build src/methods/genie3/config.vsh.yaml -p docker -o bin/genie3 && bin/genie3/genie3 --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/genie3/prediction.csv
+#viash run src/methods/genie3/config.vsh.yaml -p docker -- ---setup build && bin/genie3/genie3 --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/genie3/prediction.csv

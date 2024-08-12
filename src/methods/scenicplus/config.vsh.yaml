@@ -1,0 +1,43 @@
+# __merge__: ../../api/comp_method.yaml
+
+functionality:
+  name: scenicplus
+  info:
+    label: scenicplus
+    summary: "GRN inference using scenicplus"
+    description: |
+      GRN inference using scenicplus
+    documentation_url: https://scenicplus.readthedocs.io/en/latest/human_cerebellum.html
+  arguments:
+    - name: --multiomics_rna
+      __merge__: ../../api/file_multiomics_rna_h5ad.yaml
+      required: True
+      direction: input
+    - name: --multiomics_atac
+      __merge__: ../../api/file_multiomics_atac_h5ad.yaml
+      required: true
+      direction: input
+    - name: --cistopic_out
+      type: file
+      required: true
+      direction: input
+    - name: --out_dir
+      type: file
+      direction: output
+      create_parent: true
+      default: 'output/scenicplus'
+    - name: --prediction
+      __merge__: ../../api/file_prediction.yaml
+      required: true
+      direction: output
+  resources:
+    - type: python_script
+      path: script.py
+
+platforms:
+  - type: docker
+    image: apassemi/scenicplus:latest
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,himem,hicpu]
