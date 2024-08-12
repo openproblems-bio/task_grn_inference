@@ -15,7 +15,6 @@ workflow run_wf {
   // construct list of metrics
   metrics = [
     regression_1
-    regression_2
   ]
     
   /***************************
@@ -25,19 +24,22 @@ workflow run_wf {
     | map{ id, state ->
         [id, state + ["_meta": [join_id: id]]]
       }
-    // Run positive_control if method_id is 'positive_control'
-    // | positive_control.run(
-    //         fromState: [
-    //           perturbation_data: "perturbation_data",
-    //           layer: "layer",
-    //           tf_all: "tf_all"
-    //         ],
-    //         toState: [
-    //           prediction: "prediction"
-    //         ]
-    //       )
-    //     }
-    
+
+    | positive_control.run(
+      runIf: { id, state ->
+        state.method_id == 'positive_control'
+      },
+      fromState: [
+        perturbation_data: "perturbation_data",
+        layer: "layer",
+        tf_all: "tf_all"
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
 
     // run all metrics
     | runEach(
