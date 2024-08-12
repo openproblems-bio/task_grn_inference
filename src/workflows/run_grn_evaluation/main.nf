@@ -14,7 +14,8 @@ workflow run_wf {
 
   // construct list of metrics
   metrics = [
-    regression_1
+    regression_1,
+    regression_2
   ]
     
   /***************************
@@ -33,6 +34,19 @@ workflow run_wf {
         perturbation_data: "perturbation_data",
         layer: "layer",
         tf_all: "tf_all"
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
+    | negative_control.run(
+      runIf: { id, state ->
+        state.method_id == 'negative_control'
+      },
+      fromState: [
+        perturbation_data: "perturbation_data"
       ],
       toState: {id, output, state ->
         state + [

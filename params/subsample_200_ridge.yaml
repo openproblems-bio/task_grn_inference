@@ -269,8 +269,17 @@ param_list:
     subsample: 200
     max_workers: 20
 
+  - id: seurat_lognorm_negative_control
+    perturbation_data: 
+    layer: seurat_lognorm
+    reg_type: ridge
+    method_id: negative_control
+    subsample: 200
+    max_workers: 20
+
   - id: pearson_positive_control
     perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
     layer: pearson
     reg_type: ridge
     method_id: positive_control
@@ -279,6 +288,7 @@ param_list:
 
   - id: lognorm_positive_control
     perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
     layer: lognorm
     reg_type: ridge
     method_id: positive_control
@@ -287,6 +297,7 @@ param_list:
 
   - id: scgen_pearson_positive_control
     perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
     layer: scgen_pearson
     reg_type: ridge
     method_id: positive_control
@@ -295,6 +306,7 @@ param_list:
 
   - id: scgen_lognorm_positive_control
     perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
     layer: scgen_lognorm
     reg_type: ridge
     method_id: positive_control
@@ -303,6 +315,7 @@ param_list:
 
   - id: seurat_pearson_positive_control
     perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
     layer: seurat_pearson
     reg_type: ridge
     method_id: positive_control
@@ -311,6 +324,7 @@ param_list:
 
   - id: seurat_lognorm_positive_control
     perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
     layer: seurat_lognorm
     reg_type: ridge
     method_id: positive_control

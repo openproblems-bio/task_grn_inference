@@ -14,6 +14,8 @@ workflow run_wf {
       toState: [prediction:"prediction", base_grn: "base_grn", links: "links"]
     )
 
+    | setState(["prediction", "base_grn", "links"])
+
   emit:
   output_ch
 }
