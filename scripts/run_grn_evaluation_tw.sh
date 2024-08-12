@@ -66,7 +66,8 @@ grn_name="positive_control"
 for layer in "${layers[@]}"; do
   cat >> $param_file << HERE
   - id: ${layer}_${grn_name}
-    perturbation_data: ${perturbation_data}
+    perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
+    tf_all: ${resources_dir}/prior/tf_all.csv
     layer: ${layer}
     reg_type: $reg_type
     method_id: $grn_name

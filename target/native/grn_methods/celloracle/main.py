@@ -50,7 +50,7 @@ def base_grn(par) -> None:
 
     df = tfi.to_dataframe()
     print("Base GRN is built")
-    df.to_csv(f"{par['temp_dir']}/grn_celloracle_base.csv")
+    df.to_csv(par['base_grn'])
 
 def preprocess_rna(par) -> None:
     print("Processing rna data")
@@ -102,7 +102,7 @@ def preprocess_rna(par) -> None:
 def infer_grn(par):
     print("Inferring GRN using base GRN and rna expression")
     adata = ad.read_h5ad(f"{par['temp_dir']}/adata.h5ad")
-    base_GRN = pd.read_csv(f"{par['temp_dir']}/grn_celloracle_base.csv")
+    base_GRN = pd.read_csv(par['base_grn'])
     # Instantiate Oracle object
     oracle = co.Oracle()
     # Instantiate Oracle object.
@@ -125,14 +125,15 @@ def infer_grn(par):
                         b_maxl=k*4, n_jobs=par["num_workers"])
     links = oracle.get_links(cluster_name_for_GRN_unit="cell_type", alpha=10,
                         verbose_level=10, n_jobs=par["num_workers"])
-    links.to_hdf5(file_path=f"{par['temp_dir']}/links.celloracle.links")
+    links.to_hdf5(file_path=par['links'])
 def refine_grns(par):
     print("Refining GRNs")
-    links_o = co.load_hdf5(f"{par['temp_dir']}/links.celloracle.links")
+    links_o = co.load_hdf5(par['links'])
     links_dict =  links_o.links_dict.copy()
     grn_stack = []
     tt = 0.05
     for cell_type, grn in links_dict.items():
+        print(f"{cell_type}, GRN before filter: {grn.shape}")
         mask = grn.p<tt # remove insig links
         grn = grn[mask]
         grn = grn[~(grn.coef_abs==0)] # remove those with 0 coeff

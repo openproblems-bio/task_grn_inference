@@ -2940,9 +2940,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems-v2",
           "tag" : "main_build",
-          "localPath" : "/tmp/viash_hub_repo180848704428930938"
+          "localPath" : "/tmp/viash_hub_repo9256313905328048788"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo180848704428930938/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo9256313905328048788/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_remote" : "https://github.com/openproblems-bio/openproblems-v2",
@@ -2972,7 +2972,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "ee9f1ce0866aafbc0659fc8f437cacb0beacccff",
+          "git_commit" : "725a476d6a65d28b34ab6f6c33beec46af49a8cf",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2"
@@ -2993,7 +2993,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "ee9f1ce0866aafbc0659fc8f437cacb0beacccff",
+          "git_commit" : "725a476d6a65d28b34ab6f6c33beec46af49a8cf",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1"
@@ -3014,7 +3014,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "ee9f1ce0866aafbc0659fc8f437cacb0beacccff",
+          "git_commit" : "725a476d6a65d28b34ab6f6c33beec46af49a8cf",
           "executable" : "/nextflow/control_methods/positive_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/positive_control"
@@ -3075,7 +3075,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.8.6",
-    "git_commit" : "ee9f1ce0866aafbc0659fc8f437cacb0beacccff",
+    "git_commit" : "725a476d6a65d28b34ab6f6c33beec46af49a8cf",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
