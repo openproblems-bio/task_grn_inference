@@ -245,8 +245,6 @@ def cis_inference(par):
         print("pyscenic ctx failed with return code", result.returncode)
 
 def main(par):
-    
-    
     os.makedirs(par['temp_dir'], exist_ok=True)
     print('Reading input files', flush=True)
     rna = ad.read_h5ad(par['multiomics_rna'])
@@ -258,7 +256,7 @@ def main(par):
     training(par)
     cis_inference(par)
     print('Curate predictions', flush=True)
-    df = pd.read_csv(
+    pruned_grn = pd.read_csv(
         f"{par['temp_dir']}/pruned_grn.csv", header=None, skiprows=3,
         usecols=[0, 8], names=["TF", "targets"]
     )
@@ -266,7 +264,7 @@ def main(par):
     tfs_list = []
     target_list = []
     weight_list = []
-    for i, (tf, targets) in df.iterrows():
+    for i, (tf, targets) in pruned_grn.iterrows():
         for target, weight in literal_eval(targets):
             tfs_list.append(tf)
             target_list.append(target)
@@ -274,11 +272,6 @@ def main(par):
     scglue_grn = pd.DataFrame(np.stack([tfs_list, target_list, weight_list], axis=1), columns=['source','target','weight'])
     scglue_grn.weight = scglue_grn.weight.astype(float)
     scglue_grn = scglue_grn.drop_duplicates().reset_index(drop=True)
-
-    
-    # scglue_grn = pd.DataFrame(
-    # data = {'source':['tf1'], 'target':['g1'], 'weight':[1]}
-    # )
 
     return scglue_grn
     

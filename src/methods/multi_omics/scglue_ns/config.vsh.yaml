@@ -1,0 +1,29 @@
+
+__merge__: ../../../api/comp_method.yaml
+
+functionality:
+  name: grn_inference_scglue
+  namespace: "workflows"
+  info:
+    label: grn_inference_scglue
+    summary: "Infers GRNs from multiomics data using scglue."
+  arguments:
+    - name: --annotation_file
+      type: file
+      required: true
+      direction: input
+    - name: --motif_file
+      type: file
+      required: true
+      direction: input
+  resources:
+    - type: nextflow_script
+      path: main.nf
+      entrypoint: run_wf
+  dependencies:
+    - name: grn_methods/scglue 
+
+platforms:
+  - type: nextflow
+    directives:
+      label: [ midtime, midmem, lowcpu ]
