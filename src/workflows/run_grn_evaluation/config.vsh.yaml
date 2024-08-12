@@ -18,6 +18,7 @@ functionality:
         - name: --prediction
           type: file
           direction: input
+          required: false
         - name: --subsample
           type: integer
           direction: input
@@ -37,7 +38,7 @@ functionality:
           required: True
         - name: --tf_all
           type: file
-          required: true
+          required: false
           direction: input
           default: resources/prior/tf_all.csv
         

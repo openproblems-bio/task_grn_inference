@@ -1,7 +1,6 @@
 __merge__: ../../api/comp_metric.yaml
 functionality:
   name: regression_2
-  namespace: "metrics"
   info:
     label: Regression 2
     summary: Calculates R2 score for regression 2
@@ -11,6 +10,12 @@ functionality:
     - type: python_script
       path: script.py
     - path: main.py
+  arguments:
+    - name: --consensus
+      type: file
+      direction: input
+      must_exist: true
+      default: 'resources/grn-benchmark/consensus-num-regulators.json'
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4

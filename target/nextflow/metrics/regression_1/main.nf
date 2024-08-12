@@ -3143,7 +3143,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "ef349bcf65194e032cbbaefdb823e7a7a64017c9",
+    "git_commit" : "ee9f1ce0866aafbc0659fc8f437cacb0beacccff",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3208,10 +3208,6 @@ print(output)
 
 metric_ids = output.columns.to_numpy()
 metric_values = output.values[0]
-# if metric_ids.ndim == 1:
-#     metric_ids = metric_ids.reshape(1, -1)
-# if metric_values.ndim == 1:
-#     metric_values = metric_values.reshape(1, -1)
 
 print(metric_ids.shape, metric_values.shape)
 output = ad.AnnData(
@@ -3223,9 +3219,6 @@ output = ad.AnnData(
         "metric_values": metric_values
     }
 )
-
-
-# print(output.uns)
 
 output.write_h5ad(par["score"], compression="gzip")
 VIASHMAIN

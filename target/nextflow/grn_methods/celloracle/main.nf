@@ -2932,12 +2932,12 @@ meta = [
         "type" : "python_script",
         "path" : "script.py",
         "is_executable" : true,
-        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/celloracle/"
+        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/celloracle/"
       },
       {
         "type" : "file",
         "path" : "main.py",
-        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/celloracle/"
+        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/celloracle/"
       }
     ],
     "test_resources" : [
@@ -3025,11 +3025,11 @@ meta = [
     }
   ],
   "info" : {
-    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/celloracle/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/celloracle/config.vsh.yaml",
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/celloracle",
     "viash_version" : "0.8.6",
-    "git_commit" : "ef349bcf65194e032cbbaefdb823e7a7a64017c9",
+    "git_commit" : "ee9f1ce0866aafbc0659fc8f437cacb0beacccff",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

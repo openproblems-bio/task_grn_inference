@@ -1,0 +1,56 @@
+functionality:
+  name: scsgl
+  info:
+    label: scsgl
+    summary: "GRN inference using SCSGL"
+    description: |
+      GRN inference using SCSGL.
+    documentation_url: https://doi.org/10.1101/2021.07.08.451697
+  arguments:
+    - name: --multiomics_rna
+      type: file
+      example: resources/grn-benchmark/multiomics_rna.h5ad
+      info:
+        label: multiomics_rna
+        summary: "Multiomics RNA data"
+        file_type: rds
+        columns: 
+          - name: dummpy
+            type: string
+            required: false
+      required: true
+      must_exist: true
+    - name: --prediction
+      __merge__: ../../api/file_prediction.yaml
+      required: true
+      direction: output
+    - name: --max_n_links
+      type: integer
+      default: 50000
+    - name: --temp_dir
+      type: file
+      direction: output
+      default: 'output/scsgl'
+    - name: --num_workers
+      type: integer
+      direction: input
+      default: 4
+  resources:
+    - type: python_script
+      path: script.py
+
+platforms:
+  - type: docker
+    image: python:3.8
+    setup:
+      - type: docker
+        run: |
+          apt-get update && \
+          apt-get install -y r-base time  && \
+          Rscript -e "install.packages('pcaPP')"
+      - type: python
+        packages: [ anndata, numba==0.53.1, scipy==1.6.3, pandas==1.2.4, rpy2==3.4.4, numpy==1.20.2, scikit-learn==0.24.1 ]
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

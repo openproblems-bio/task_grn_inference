@@ -61,21 +61,20 @@ done
 
 # HERE
 
-# # append the positive controls
-# grn_name="positive_control"
-# for layer in "${layers[@]}"; do
-#   cat >> $param_file << HERE
-#   - id: ${layer}_${grn_name}
-#     perturbation_data: ${perturbation_data}
-#     layer: ${layer}
-#     prediction: resources/control_models/${layer}_${grn_name}.csv 
-#     reg_type: $reg_type
-#     method_id: $grn_name
-#     subsample: $subsample
-#     max_workers: $max_workers
+# append the positive controls
+grn_name="positive_control"
+for layer in "${layers[@]}"; do
+  cat >> $param_file << HERE
+  - id: ${layer}_${grn_name}
+    perturbation_data: ${perturbation_data}
+    layer: ${layer}
+    reg_type: $reg_type
+    method_id: $grn_name
+    subsample: $subsample
+    max_workers: $max_workers
 
-# HERE
-# done
+HERE
+done
 
 # Append the remaining output_state and publish_dir to the YAML file
 cat >> $param_file << HERE

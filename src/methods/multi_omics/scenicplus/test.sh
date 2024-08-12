@@ -1,0 +1,1 @@
+viash build src/methods/scenicplus/config.vsh.yaml --platform docker -o bin/scenicplus && bin/scenicplus/scenicplus --multiomics_atac resources/resources_test/grn-benchmark/multiomics_atac.h5ad --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --prediction bin/scenicplus/prediction.csv --cistopic_out output/pycistopic --out_dir output/scenicplus

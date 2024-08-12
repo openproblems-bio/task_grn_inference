@@ -136,10 +136,6 @@ def set_global_seed(seed):
     lightgbm.LGBMRegressor().set_params(random_state=seed)
 
 
-def format_folder(work_dir, exclude_missing_genes, reg_type, theta, tf_n, norm_method, subsample=None):
-    return f'{work_dir}/benchmark/scores/subsample_{subsample}/exclude_missing_genes_{exclude_missing_genes}/{reg_type}/theta_{theta}_tf_n_{tf_n}/{norm_method}'
-
-
 def pivot_grn(net):
     ''' make net to have gene*tf format'''
     df_tmp = net.pivot(index='target', columns='source', values='weight')

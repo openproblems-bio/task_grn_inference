@@ -174,7 +174,8 @@ function ViashHelp {
   echo ""
   echo "Arguments:"
   echo "    --perturbation_data"
-  echo "        type: file, required parameter, file must exist"
+  echo "        type: file, file must exist"
+  echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
   echo ""
   echo "    --tf_gene_net"
   echo "        type: file, required parameter, file must exist"
@@ -183,12 +184,20 @@ function ViashHelp {
   echo "        type: file, file must exist"
   echo ""
   echo "    --annot_peak_database"
-  echo "        type: file, required parameter, file must exist"
-  echo "        default: resources/grn-benchmark/supp/annot_peak_database.csv"
+  echo "        type: file, file must exist"
+  echo "        default: resources/supplements/annot_peak_database.csv"
   echo ""
-  echo "    --annot_gene_database"
-  echo "        type: file, required parameter, file must exist"
-  echo "        default: resources/grn-benchmark/supp/annot_gene_database.csv"
+  echo "    --tf_gene_indegee_fig"
+  echo "        type: file, output, file must exist"
+  echo "        default: output/tf_gene_indegree.png"
+  echo ""
+  echo "    --tf_gene_outdegee_fig"
+  echo "        type: file, output, file must exist"
+  echo "        default: output/tf_gene_outdegree.png"
+  echo ""
+  echo "    --stats"
+  echo "        type: file, output, file must exist"
+  echo "        default: output/stats.json"
 }
 
 # initialise array
@@ -261,15 +270,37 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_ANNOT_PEAK_DATABASE=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --annot_gene_database)
-            [ -n "$VIASH_PAR_ANNOT_GENE_DATABASE" ] && ViashError Bad arguments for option \'--annot_gene_database\': \'$VIASH_PAR_ANNOT_GENE_DATABASE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_ANNOT_GENE_DATABASE="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --annot_gene_database. Use "--help" to get more information on the parameters. && exit 1
+        --tf_gene_indegee_fig)
+            [ -n "$VIASH_PAR_TF_GENE_INDEGEE_FIG" ] && ViashError Bad arguments for option \'--tf_gene_indegee_fig\': \'$VIASH_PAR_TF_GENE_INDEGEE_FIG\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TF_GENE_INDEGEE_FIG="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --tf_gene_indegee_fig. Use "--help" to get more information on the parameters. && exit 1
             shift 2
             ;;
-        --annot_gene_database=*)
-            [ -n "$VIASH_PAR_ANNOT_GENE_DATABASE" ] && ViashError Bad arguments for option \'--annot_gene_database=*\': \'$VIASH_PAR_ANNOT_GENE_DATABASE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_ANNOT_GENE_DATABASE=$(ViashRemoveFlags "$1")
+        --tf_gene_indegee_fig=*)
+            [ -n "$VIASH_PAR_TF_GENE_INDEGEE_FIG" ] && ViashError Bad arguments for option \'--tf_gene_indegee_fig=*\': \'$VIASH_PAR_TF_GENE_INDEGEE_FIG\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TF_GENE_INDEGEE_FIG=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --tf_gene_outdegee_fig)
+            [ -n "$VIASH_PAR_TF_GENE_OUTDEGEE_FIG" ] && ViashError Bad arguments for option \'--tf_gene_outdegee_fig\': \'$VIASH_PAR_TF_GENE_OUTDEGEE_FIG\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TF_GENE_OUTDEGEE_FIG="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --tf_gene_outdegee_fig. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --tf_gene_outdegee_fig=*)
+            [ -n "$VIASH_PAR_TF_GENE_OUTDEGEE_FIG" ] && ViashError Bad arguments for option \'--tf_gene_outdegee_fig=*\': \'$VIASH_PAR_TF_GENE_OUTDEGEE_FIG\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TF_GENE_OUTDEGEE_FIG=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --stats)
+            [ -n "$VIASH_PAR_STATS" ] && ViashError Bad arguments for option \'--stats\': \'$VIASH_PAR_STATS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_STATS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --stats. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --stats=*)
+            [ -n "$VIASH_PAR_STATS" ] && ViashError Bad arguments for option \'--stats=*\': \'$VIASH_PAR_STATS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_STATS=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---cpus)
@@ -350,20 +381,8 @@ fi
 
 
 # check whether required parameters exist
-if [ -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then
-  ViashError '--perturbation_data' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
 if [ -z ${VIASH_PAR_TF_GENE_NET+x} ]; then
   ViashError '--tf_gene_net' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_ANNOT_PEAK_DATABASE+x} ]; then
-  ViashError '--annot_peak_database' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_ANNOT_GENE_DATABASE+x} ]; then
-  ViashError '--annot_gene_database' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then
@@ -387,6 +406,23 @@ if [ -z ${VIASH_META_TEMP_DIR+x} ]; then
   exit 1
 fi
 
+# filling in defaults
+if [ -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then
+  VIASH_PAR_PERTURBATION_DATA="resources/grn-benchmark/perturbation_data.h5ad"
+fi
+if [ -z ${VIASH_PAR_ANNOT_PEAK_DATABASE+x} ]; then
+  VIASH_PAR_ANNOT_PEAK_DATABASE="resources/supplements/annot_peak_database.csv"
+fi
+if [ -z ${VIASH_PAR_TF_GENE_INDEGEE_FIG+x} ]; then
+  VIASH_PAR_TF_GENE_INDEGEE_FIG="output/tf_gene_indegree.png"
+fi
+if [ -z ${VIASH_PAR_TF_GENE_OUTDEGEE_FIG+x} ]; then
+  VIASH_PAR_TF_GENE_OUTDEGEE_FIG="output/tf_gene_outdegree.png"
+fi
+if [ -z ${VIASH_PAR_STATS+x} ]; then
+  VIASH_PAR_STATS="output/stats.json"
+fi
+
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ] && [ ! -e "$VIASH_PAR_PERTURBATION_DATA" ]; then
   ViashError "Input file '$VIASH_PAR_PERTURBATION_DATA' does not exist."
@@ -402,10 +438,6 @@ if [ ! -z "$VIASH_PAR_PEAK_GENE_NET" ] && [ ! -e "$VIASH_PAR_PEAK_GENE_NET" ]; t
 fi
 if [ ! -z "$VIASH_PAR_ANNOT_PEAK_DATABASE" ] && [ ! -e "$VIASH_PAR_ANNOT_PEAK_DATABASE" ]; then
   ViashError "Input file '$VIASH_PAR_ANNOT_PEAK_DATABASE' does not exist."
-  exit 1
-fi
-if [ ! -z "$VIASH_PAR_ANNOT_GENE_DATABASE" ] && [ ! -e "$VIASH_PAR_ANNOT_GENE_DATABASE" ]; then
-  ViashError "Input file '$VIASH_PAR_ANNOT_GENE_DATABASE' does not exist."
   exit 1
 fi
 
@@ -453,6 +485,17 @@ if [[ -n "$VIASH_META_MEMORY_PB" ]]; then
   fi
 fi
 
+# create parent directories of output files, if so desired
+if [ ! -z "$VIASH_PAR_TF_GENE_INDEGEE_FIG" ] && [ ! -d "$(dirname "$VIASH_PAR_TF_GENE_INDEGEE_FIG")" ]; then
+  mkdir -p "$(dirname "$VIASH_PAR_TF_GENE_INDEGEE_FIG")"
+fi
+if [ ! -z "$VIASH_PAR_TF_GENE_OUTDEGEE_FIG" ] && [ ! -d "$(dirname "$VIASH_PAR_TF_GENE_OUTDEGEE_FIG")" ]; then
+  mkdir -p "$(dirname "$VIASH_PAR_TF_GENE_OUTDEGEE_FIG")"
+fi
+if [ ! -z "$VIASH_PAR_STATS" ] && [ ! -d "$(dirname "$VIASH_PAR_STATS")" ]; then
+  mkdir -p "$(dirname "$VIASH_PAR_STATS")"
+fi
+
 
 # set dependency paths
 
@@ -474,6 +517,7 @@ cat > "\$tempscript" << 'VIASHMAIN'
 import pandas as pd
 import anndata as ad
 import sys
+import json
 
 ## VIASH START
 # The following code has been auto-generated by Viash.
@@ -482,7 +526,9 @@ par = {
   'tf_gene_net': $( if [ ! -z ${VIASH_PAR_TF_GENE_NET+x} ]; then echo "r'${VIASH_PAR_TF_GENE_NET//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'peak_gene_net': $( if [ ! -z ${VIASH_PAR_PEAK_GENE_NET+x} ]; then echo "r'${VIASH_PAR_PEAK_GENE_NET//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'annot_peak_database': $( if [ ! -z ${VIASH_PAR_ANNOT_PEAK_DATABASE+x} ]; then echo "r'${VIASH_PAR_ANNOT_PEAK_DATABASE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'annot_gene_database': $( if [ ! -z ${VIASH_PAR_ANNOT_GENE_DATABASE+x} ]; then echo "r'${VIASH_PAR_ANNOT_GENE_DATABASE//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'tf_gene_indegee_fig': $( if [ ! -z ${VIASH_PAR_TF_GENE_INDEGEE_FIG+x} ]; then echo "r'${VIASH_PAR_TF_GENE_INDEGEE_FIG//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'tf_gene_outdegee_fig': $( if [ ! -z ${VIASH_PAR_TF_GENE_OUTDEGEE_FIG+x} ]; then echo "r'${VIASH_PAR_TF_GENE_OUTDEGEE_FIG//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'stats': $( if [ ! -z ${VIASH_PAR_STATS+x} ]; then echo "r'${VIASH_PAR_STATS//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -512,33 +558,52 @@ from helper import Explanatory_analysis
 
 print('Reading input files', flush=True)
 
-perturbation_data = pd.read_csv(par["perturbation_data"])
+perturbation_data = ad.read_h5ad(par["perturbation_data"])
 tf_gene_net = pd.read_csv(par["tf_gene_net"])
-peak_gene_net = pd.read_csv(par["peak_gene_net"])
+# peak_gene_net = pd.read_csv(par["peak_gene_net"])
 annot_peak_database = pd.read_csv(par["annot_peak_database"])
-hvgs = pd.read_csv(par["hvgs"])
+# hvgs = pd.read_csv(par["hvgs"])
 
-print("Create exp anal object")
-peak_gene_net['source'] = peak_gene_net['peak']
-info_obj = Explanatory_analysis(net=tf_gene_net, peak_gene_net=peak_gene_net)
-print("Annotation of peaks")
-peak_annot = info_obj.annotate_peaks(annot_peak_database)
+# peak_gene_net['source'] = peak_gene_net['peak']
+info_obj = Explanatory_analysis(net=tf_gene_net)
+print("Calculate basic stats")
+stats = info_obj.calculate_basic_stats()
+with open(par['stats'], 'w') as ff:
+  json.dump(stats, ff)
+# print("Annotation of peaks")
+# peak_annot = info_obj.annotate_peaks(annot_peak_database)
 # print("Annotation of genes")
-gene_annot = info_obj.annotate_genes(annot_gene_database)
+# gene_annot = info_obj.annotate_genes(annot_gene_database)
 print("Topological analysis")
 info_obj.calculate_centrality_stats()
-peak_gene = info_obj.peak_gene.in_deg
+
 tf_gene_in = info_obj.tf_gene.in_deg
 tf_gene_out = info_obj.tf_gene.out_deg
 
-print("HVGs analysis")
-pert_genes = perturbation_data.var_names
-hvgs_info = info_obj.calculate_hvgs_stats(hvgs, pert_genes)
+fig, ax = info_obj.plot_cdf(tf_gene_in, title='In degree TF-gene')
+fig.savefig(par['tf_gene_indegee_fig'], dpi=300, bbox_inches='tight', format='png')
+fig, ax = info_obj.plot_cdf(tf_gene_out, title='Out degree TF-gene')
+fig.savefig(par['tf_gene_outdegee_fig'], dpi=300, bbox_inches='tight', format='png')
 VIASHMAIN
 python -B "\$tempscript" &
 wait "\$!"
 
 VIASHEOF
+
+
+# check whether required files exist
+if [ ! -z "$VIASH_PAR_TF_GENE_INDEGEE_FIG" ] && [ ! -e "$VIASH_PAR_TF_GENE_INDEGEE_FIG" ]; then
+  ViashError "Output file '$VIASH_PAR_TF_GENE_INDEGEE_FIG' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_TF_GENE_OUTDEGEE_FIG" ] && [ ! -e "$VIASH_PAR_TF_GENE_OUTDEGEE_FIG" ]; then
+  ViashError "Output file '$VIASH_PAR_TF_GENE_OUTDEGEE_FIG' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_STATS" ] && [ ! -e "$VIASH_PAR_STATS" ]; then
+  ViashError "Output file '$VIASH_PAR_STATS' does not exist."
+  exit 1
+fi
 
 
 exit 0

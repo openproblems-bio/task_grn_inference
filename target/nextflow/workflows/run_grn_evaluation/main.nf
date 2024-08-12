@@ -2871,7 +2871,7 @@ meta = [
             ],
             "must_exist" : true,
             "create_parent" : true,
-            "required" : true,
+            "required" : false,
             "direction" : "input",
             "multiple" : false,
             "multiple_sep" : ":",
@@ -2940,9 +2940,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems-v2",
           "tag" : "main_build",
-          "localPath" : "/tmp/viash_hub_repo11758593725278150304"
+          "localPath" : "/tmp/viash_hub_repo180848704428930938"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo11758593725278150304/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo180848704428930938/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_remote" : "https://github.com/openproblems-bio/openproblems-v2",
@@ -2972,7 +2972,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "ef349bcf65194e032cbbaefdb823e7a7a64017c9",
+          "git_commit" : "ee9f1ce0866aafbc0659fc8f437cacb0beacccff",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2"
@@ -2993,7 +2993,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "ef349bcf65194e032cbbaefdb823e7a7a64017c9",
+          "git_commit" : "ee9f1ce0866aafbc0659fc8f437cacb0beacccff",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1"
@@ -3014,7 +3014,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "ef349bcf65194e032cbbaefdb823e7a7a64017c9",
+          "git_commit" : "ee9f1ce0866aafbc0659fc8f437cacb0beacccff",
           "executable" : "/nextflow/control_methods/positive_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/positive_control"
@@ -3075,7 +3075,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.8.6",
-    "git_commit" : "ef349bcf65194e032cbbaefdb823e7a7a64017c9",
+    "git_commit" : "ee9f1ce0866aafbc0659fc8f437cacb0beacccff",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3116,18 +3116,22 @@ workflow run_wf {
     | map{ id, state ->
         [id, state + ["_meta": [join_id: id]]]
       }
-    // Run positive_control if method_id is 'positive_control'
-    | if { state.method_id == 'positive_control' }
-    .map { id, state ->
-        positive_control.run(
-          fromState: [perturbation_data: state["perturbation_data"],
-          layer: "layer", 
-          tf_all: "tf_all"],
-          toState: [prediction: state['prediction']]
-        )
-        return [id, state]
+
+    | positive_control.run(
+      runIf: { id, state ->
+        state.method_id == 'positive_control'
+      },
+      fromState: [
+        perturbation_data: "perturbation_data",
+        layer: "layer",
+        tf_all: "tf_all"
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
       }
-    else { it } // Pass through if method_id is not 'positive_control'
+    )
 
     // run all metrics
     | runEach(
