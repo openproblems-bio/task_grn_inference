@@ -8,7 +8,7 @@ functionality:
     summary: "Correct batch effects using scgen"
   
   arguments:
-    - name: --perturbation_data
+    - name: --perturbation_data_n
       type: file
       info:
         label: perturbation

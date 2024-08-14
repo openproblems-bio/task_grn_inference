@@ -207,7 +207,7 @@ function ViashHelp {
   echo "        default: 4"
   echo ""
   echo "    --method_id"
-  echo "        type: string, required parameter"
+  echo "        type: string"
   echo "        example: collectri"
 }
 
@@ -435,9 +435,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2024-08-14T05:08:33Z"
+LABEL org.opencontainers.image.created="2024-08-14T08:00:26Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="649e90876b7876cbae31f728a2f06a78141954f9"
+LABEL org.opencontainers.image.revision="2e89383c80dd13a7797df462e4adb356ed4fb974"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -802,10 +802,6 @@ fi
 
 
 # check whether required parameters exist
-if [ -z ${VIASH_PAR_METHOD_ID+x} ]; then
-  ViashError '--method_id' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then
   ViashError 'functionality_name' is a required argument. Use "--help" to get more information on the parameters.
   exit 1

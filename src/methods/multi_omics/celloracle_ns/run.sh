@@ -5,7 +5,7 @@ submit=false
 read_results=true
 
 RUN_ID="celloracle"
-resources_dir="s3://openproblems-data/resources/grn/"
+resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
 
 # resources_dir="./resources_test"
