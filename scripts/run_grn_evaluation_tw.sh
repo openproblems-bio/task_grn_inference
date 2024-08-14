@@ -1,8 +1,6 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-submit=false
-read_results=false
 
 RUN_ID="subsample_200_ridge"
 resources_dir="s3://openproblems-data/resources/grn"
@@ -16,12 +14,14 @@ param_file="./params/${RUN_ID}.yaml"
 
 
 grn_names=(
+    "collectri"
     "celloracle"
     "scenicplus"
     "figr"
     "granie"
     "scglue"
 )
+
 layers=("pearson" "lognorm" "scgen_pearson" "scgen_lognorm" "seurat_pearson" "seurat_lognorm")
 
 # Start writing to the YAML file
@@ -52,7 +52,9 @@ done
 
 # Append negative control
 grn_name="negative_control"
-append_entry "$grn_name"
+for layer in "${layers[@]}"; do
+  append_entry "$grn_name" "" "true"
+done
 
 # Append positive controls
 grn_name="positive_control"

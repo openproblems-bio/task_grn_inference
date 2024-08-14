@@ -2,7 +2,7 @@
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 RUN_ID="scglue"
-resources_dir="s3://openproblems-data/resources/grn/"
+resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
 
 num_workers=20

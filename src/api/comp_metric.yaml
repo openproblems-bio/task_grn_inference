@@ -50,7 +50,7 @@ functionality:
     - name: --method_id 
       type: string 
       direction: input 
-      required: True
+      required: false
       example: collectri
 
 
