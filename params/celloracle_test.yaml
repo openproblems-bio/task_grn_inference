@@ -1,8 +1,0 @@
-param_list:
-  - id: celloracle_test
-    multiomics_rna: s3://openproblems-data/resources_test/grn//grn-benchmark/multiomics_rna.h5ad
-    multiomics_atac: s3://openproblems-data/resources_test/grn//grn-benchmark/multiomics_atac.h5ad
-    num_workers: 20
-    temp_dir: ./tmp/grn
-output_state: "state.yaml"
-publish_dir: "s3://openproblems-data/resources/grn/results/celloracle_test"

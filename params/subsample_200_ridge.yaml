@@ -6,7 +6,7 @@ param_list:
     method_id: celloracle
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/celloracle.csv
   - id: lognorm_celloracle
@@ -16,7 +16,7 @@ param_list:
     method_id: celloracle
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/celloracle.csv
   - id: scgen_pearson_celloracle
@@ -26,7 +26,7 @@ param_list:
     method_id: celloracle
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/celloracle.csv
   - id: scgen_lognorm_celloracle
@@ -36,7 +36,7 @@ param_list:
     method_id: celloracle
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/celloracle.csv
   - id: seurat_pearson_celloracle
@@ -46,7 +46,7 @@ param_list:
     method_id: celloracle
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/celloracle.csv
   - id: seurat_lognorm_celloracle
@@ -56,7 +56,7 @@ param_list:
     method_id: celloracle
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/celloracle.csv
   - id: pearson_scenicplus
@@ -66,7 +66,7 @@ param_list:
     method_id: scenicplus
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/scenicplus.csv
   - id: lognorm_scenicplus
@@ -76,7 +76,7 @@ param_list:
     method_id: scenicplus
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/scenicplus.csv
   - id: scgen_pearson_scenicplus
@@ -86,7 +86,7 @@ param_list:
     method_id: scenicplus
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/scenicplus.csv
   - id: scgen_lognorm_scenicplus
@@ -96,7 +96,7 @@ param_list:
     method_id: scenicplus
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/scenicplus.csv
   - id: seurat_pearson_scenicplus
@@ -106,7 +106,7 @@ param_list:
     method_id: scenicplus
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/scenicplus.csv
   - id: seurat_lognorm_scenicplus
@@ -116,7 +116,7 @@ param_list:
     method_id: scenicplus
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/scenicplus.csv
   - id: pearson_figr
@@ -126,7 +126,7 @@ param_list:
     method_id: figr
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/figr.csv
   - id: lognorm_figr
@@ -136,7 +136,7 @@ param_list:
     method_id: figr
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/figr.csv
   - id: scgen_pearson_figr
@@ -146,7 +146,7 @@ param_list:
     method_id: figr
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/figr.csv
   - id: scgen_lognorm_figr
@@ -156,7 +156,7 @@ param_list:
     method_id: figr
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/figr.csv
   - id: seurat_pearson_figr
@@ -166,7 +166,7 @@ param_list:
     method_id: figr
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/figr.csv
   - id: seurat_lognorm_figr
@@ -176,7 +176,7 @@ param_list:
     method_id: figr
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/figr.csv
   - id: pearson_granie
@@ -186,7 +186,7 @@ param_list:
     method_id: granie
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/granie.csv
   - id: lognorm_granie
@@ -196,7 +196,7 @@ param_list:
     method_id: granie
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/granie.csv
   - id: scgen_pearson_granie
@@ -206,7 +206,7 @@ param_list:
     method_id: granie
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/granie.csv
   - id: scgen_lognorm_granie
@@ -216,7 +216,7 @@ param_list:
     method_id: granie
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/granie.csv
   - id: seurat_pearson_granie
@@ -226,7 +226,7 @@ param_list:
     method_id: granie
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/granie.csv
   - id: seurat_lognorm_granie
@@ -236,7 +236,7 @@ param_list:
     method_id: granie
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/granie.csv
   - id: pearson_scglue
@@ -246,7 +246,7 @@ param_list:
     method_id: scglue
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/scglue.csv
   - id: lognorm_scglue
@@ -256,7 +256,7 @@ param_list:
     method_id: scglue
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/scglue.csv
   - id: scgen_pearson_scglue
@@ -266,7 +266,7 @@ param_list:
     method_id: scglue
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/scglue.csv
   - id: scgen_lognorm_scglue
@@ -276,7 +276,7 @@ param_list:
     method_id: scglue
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/scglue.csv
   - id: seurat_pearson_scglue
@@ -286,7 +286,7 @@ param_list:
     method_id: scglue
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/scglue.csv
   - id: seurat_lognorm_scglue
@@ -296,7 +296,7 @@ param_list:
     method_id: scglue
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     prediction: s3://openproblems-data/resources/grn/grn_models/scglue.csv
   - id: seurat_lognorm_negative_control
@@ -306,7 +306,7 @@ param_list:
     method_id: negative_control
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     
     
   - id: pearson_positive_control
@@ -316,7 +316,7 @@ param_list:
     method_id: positive_control
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
     
   - id: lognorm_positive_control
@@ -326,7 +326,7 @@ param_list:
     method_id: positive_control
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
     
   - id: scgen_pearson_positive_control
@@ -336,7 +336,7 @@ param_list:
     method_id: positive_control
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
     
   - id: scgen_lognorm_positive_control
@@ -346,7 +346,7 @@ param_list:
     method_id: positive_control
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
     
   - id: seurat_pearson_positive_control
@@ -356,7 +356,7 @@ param_list:
     method_id: positive_control
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
     
   - id: seurat_lognorm_positive_control
@@ -366,7 +366,7 @@ param_list:
     method_id: positive_control
     subsample: 200
     max_workers: 20
-    consensus: s3://openproblems-data/resources/grn/prior/consensus.csv
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
     tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
     
 output_state: "state.yaml"
