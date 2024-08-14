@@ -65,7 +65,10 @@ def preprocess_rna(par) -> None:
                                                 log=False)
 
     # Subset the genes
-    adata = adata[:, filter_result.gene_subset]
+    if False: #only hvgs
+        adata = adata[:, filter_result.gene_subset]
+    else:
+        pass
 
     # Renormalize after filtering
     sc.pp.normalize_per_cell(adata)

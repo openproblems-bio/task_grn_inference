@@ -212,7 +212,7 @@ function ViashHelp {
   echo ""
   echo "    --consensus"
   echo "        type: file, file must exist"
-  echo "        default: resources/grn-benchmark/consensus-num-regulators.json"
+  echo "        default: resources/prior/consensus-num-regulators.json"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -439,9 +439,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_2"
-LABEL org.opencontainers.image.created="2024-08-12T19:36:25Z"
+LABEL org.opencontainers.image.created="2024-08-14T04:18:11Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="f79437062831ca5577c374b0acc67ed17be60e39"
+LABEL org.opencontainers.image.revision="1f232ff67ed3a18325b7daefdc2a43076af70909"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -865,7 +865,7 @@ if [ -z ${VIASH_PAR_MAX_WORKERS+x} ]; then
   VIASH_PAR_MAX_WORKERS="4"
 fi
 if [ -z ${VIASH_PAR_CONSENSUS+x} ]; then
-  VIASH_PAR_CONSENSUS="resources/grn-benchmark/consensus-num-regulators.json"
+  VIASH_PAR_CONSENSUS="resources/prior/consensus-num-regulators.json"
 fi
 
 # check whether required files exist
