@@ -28,6 +28,7 @@ print('Reading input data')
 output = main(par)
 
 print('Write output to file', flush=True)
+print(output)
 metric_ids = output.columns.to_numpy()
 metric_values = output.values[0]
 

@@ -9,7 +9,7 @@ import subprocess
 import pandas as pd
 import numpy as np
 from ast import literal_eval
-
+import requests
 
 def preprocess(rna, atac, par):
     rna.layers["counts"] = rna.X.copy()
@@ -243,6 +243,23 @@ def cis_inference(par):
         print("pyscenic ctx executed successfully")
     else:
         print("pyscenic ctx failed with return code", result.returncode)
+
+# def download_prior(par):
+#     # get gene annotation
+#     response = requests.get("https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.annotation.gtf.gz")
+#     par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
+#     if response.status_code == 200:
+#         # Write the content to a file
+#         with open(par['annotation_file'], 'wb') as file:
+#             file.write(response.content)
+#         print(f"File downloaded and saved as gencode.v45.annotation.gtf.gz")
+#     else:
+#         print(f"Failed to download the gencode.v45.annotation.gtf.gz. Status code: {response.status_code}")
+
+
+    
+#     annotation_file
+
 
 def main(par):
     os.makedirs(par['temp_dir'], exist_ok=True)

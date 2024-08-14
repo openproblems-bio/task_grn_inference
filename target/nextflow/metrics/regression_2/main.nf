@@ -3107,7 +3107,8 @@ meta = [
           "type" : "python",
           "user" : false,
           "packages" : [
-            "lightgbm"
+            "lightgbm==4.3.0",
+            "numpy==1.26.4"
           ],
           "upgrade" : true
         }
@@ -3156,7 +3157,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "1f232ff67ed3a18325b7daefdc2a43076af70909",
+    "git_commit" : "649e90876b7876cbae31f728a2f06a78141954f9",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3222,6 +3223,7 @@ print('Reading input data')
 output = main(par)
 
 print('Write output to file', flush=True)
+print(output)
 metric_ids = output.columns.to_numpy()
 metric_values = output.values[0]
 

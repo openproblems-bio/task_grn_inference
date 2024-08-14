@@ -38,7 +38,7 @@ append_entry() {
     method_id: $1
     subsample: $subsample
     max_workers: $max_workers
-    consensus: ${resources_dir}/prior/consensus.json
+    consensus: ${resources_dir}/prior/consensus-num-regulators.json
     ${2:+tf_all: ${resources_dir}/prior/tf_all.csv}
     ${3:+prediction: ${resources_dir}/grn_models/$1.csv}
 HERE
@@ -66,29 +66,21 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
-if [ "$submit" = true ]; then
-  nextflow run . \
-    -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
-    -profile docker \
-    -with-trace \
-    -c src/common/nextflow_helpers/labels_ci.config \
-    -params-file ${param_file}
+# nextflow run . \
+#   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
+#   -profile docker \
+#   -with-trace \
+#   -c src/common/nextflow_helpers/labels_ci.config \
+#   -params-file ${param_file}
 
-  ./tw-windows-x86_64.exe launch `
-      https://github.com/openproblems-bio/task_grn_benchmark.git `
-      --revision build/main `
-      --pull-latest `
-      --main-script target/nextflow/workflows/run_grn_evaluation/main.nf `
-      --workspace 53907369739130 `
-      --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
-      --params-file ./params/subsample_200_ridge.yaml `
-      --config src/common/nextflow_helpers/labels_tw.config
-
-fi
-
-    
-if [ "$read_results" = true ]; then 
-    aws s3 sync s3://openproblems-data/resources/grn/results/${RUN_ID} ./resources/results/${RUN_ID} 
-fi
+./tw-windows-x86_64.exe launch `
+    https://github.com/openproblems-bio/task_grn_benchmark.git `
+    --revision build/main `
+    --pull-latest `
+    --main-script target/nextflow/workflows/run_grn_evaluation/main.nf `
+    --workspace 53907369739130 `
+    --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
+    --params-file ./params/subsample_200_ridge.yaml `
+    --config src/common/nextflow_helpers/labels_tw.config
 
 
