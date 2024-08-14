@@ -15,7 +15,7 @@ functionality:
       type: file
       direction: input
       must_exist: true
-      default: 'resources/grn-benchmark/consensus-num-regulators.json'
+      default: 'resources/prior/consensus-num-regulators.json'
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4

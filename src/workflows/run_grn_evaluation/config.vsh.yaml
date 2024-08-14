@@ -41,6 +41,11 @@ functionality:
           required: false
           direction: input
           default: resources/prior/tf_all.csv
+        - name: --consensus
+          type: file
+          required: false
+          direction: input
+          default: resources/prior/consensus.json
         
     - name: Outputs
       arguments:

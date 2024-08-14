@@ -29,51 +29,35 @@ cat > $param_file << HERE
 param_list:
 HERE
 
-# Nested loops to iterate over grn_names and layers
-for grn_name in "${grn_names[@]}"; do
-  for layer in "${layers[@]}"; do
-    cat >> $param_file << HERE
-  - id: ${layer}_${grn_name}
+append_entry() {
+  cat >> $param_file << HERE
+  - id: ${layer}_${1}
     perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
     layer: ${layer}
-    prediction: ${resources_dir}/grn_models/${grn_name}.csv 
     reg_type: $reg_type
-    method_id: $grn_name
+    method_id: $1
     subsample: $subsample
     max_workers: $max_workers
-
+    consensus: ${resources_dir}/prior/consensus.json
+    ${2:+tf_all: ${resources_dir}/prior/tf_all.csv}
+    ${3:+prediction: ${resources_dir}/grn_models/$1.csv}
 HERE
+}
+# Loop through grn_names and layers
+for grn_name in "${grn_names[@]}"; do
+  for layer in "${layers[@]}"; do
+    append_entry "$grn_name" "" "true"
   done
 done
 
-
-# append negative control
+# Append negative control
 grn_name="negative_control"
-cat >> $param_file << HERE
-  - id: ${layer}_${grn_name}
-    perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
-    layer: ${layer}
-    reg_type: $reg_type
-    method_id: $grn_name
-    subsample: $subsample
-    max_workers: $max_workers
+append_entry "$grn_name"
 
-HERE
-
-# append the positive controls
+# Append positive controls
 grn_name="positive_control"
 for layer in "${layers[@]}"; do
-  cat >> $param_file << HERE
-  - id: ${layer}_${grn_name}
-    perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
-    tf_all: ${resources_dir}/prior/tf_all.csv
-    layer: ${layer}
-    reg_type: $reg_type
-    method_id: $grn_name
-    subsample: $subsample
-    max_workers: $max_workers
-
-HERE
+  append_entry "$grn_name" "true"
 done
 
 # Append the remaining output_state and publish_dir to the YAML file
