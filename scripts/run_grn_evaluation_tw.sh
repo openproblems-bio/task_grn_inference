@@ -2,11 +2,10 @@
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 
-RUN_ID="subsample_200_ridge"
+RUN_ID="subsample_200_gb"
 resources_dir="s3://openproblems-data/resources/grn"
-# resources_dir="resources/"
 publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
-reg_type=ridge
+reg_type=GB
 subsample=200
 max_workers=20
 
@@ -82,7 +81,7 @@ HERE
     --main-script target/nextflow/workflows/run_grn_evaluation/main.nf `
     --workspace 53907369739130 `
     --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
-    --params-file ./params/subsample_200_ridge.yaml `
+    --params-file ./params/subsample_200_gb.yaml `
     --config src/common/nextflow_helpers/labels_tw.config
 
 

@@ -46,7 +46,8 @@ def cross_validate_gene(
         grn: np.ndarray,
         j: int,
         n_features: int = 10,
-        random_state: int = 0xCAFE
+        random_state: int = 0xCAFE,
+        n_jobs: int = 10
 ) -> Dict[str, float]:
     
     results = {'r2': 0.0, 'mse': np.inf, 'avg-r2': 0.0}
@@ -70,7 +71,7 @@ def cross_validate_gene(
         if estimator_t == 'ridge':
             model = Ridge(random_state=random_state)
         elif estimator_t == 'GB':
-            model = lightgbm.LGBMRegressor(verbosity=-1, n_estimators=100, n_jobs=par["max_workers"], random_state=random_state)
+            model = lightgbm.LGBMRegressor(verbosity=-1, n_estimators=100, n_jobs=n_jobs, random_state=random_state)
         else:
             raise NotImplementedError(f'Unknown model "{estimator_t}"')
 
@@ -95,37 +96,39 @@ def cross_validate_gene(
     return results
 
 
-def learn_background_distribution(
-        estimator_t: str,
-        X: np.ndarray,
-        groups: np.ndarray,
-        max_n_regulators: int
-) -> Dict[int, Tuple[float, float]]:
+# def learn_background_distribution(
+#         estimator_t: str,
+#         X: np.ndarray,
+#         groups: np.ndarray,
+#         max_n_regulators: int,
 
-    rng = np.random.default_rng(seed=SEED)
+# ) -> Dict[int, Tuple[float, float]]:
 
-    n_genes = X.shape[1]
-    random_grn = rng.random(size=(n_genes, n_genes))
+#     rng = np.random.default_rng(seed=SEED)
 
-    background = {}
-    for n_features in tqdm.tqdm(range(1, max_n_regulators + 1), desc='Estimating background dist'):
-        scores = []
-        for _ in range(N_POINTS_TO_ESTIMATE_BACKGROUND):
-            j = rng.integers(low=0, high=n_genes)
-            random_grn[:, j] = rng.random(size=n_genes)
-            res = cross_validate_gene(
-                estimator_t,
-                X,
-                groups,
-                random_grn,
-                j,
-                n_features=n_features,
-                random_state=SEED
-            )
-            scores.append(res['avg-r2'])
-        background[n_features] = (np.mean(scores), max(0.001, np.std(scores)))
-    background['max'] = background[max_n_regulators]
-    return background
+#     n_genes = X.shape[1]
+#     random_grn = rng.random(size=(n_genes, n_genes))
+
+#     background = {}
+#     for n_features in tqdm.tqdm(range(1, max_n_regulators + 1), desc='Estimating background dist'):
+#         scores = []
+#         for _ in range(N_POINTS_TO_ESTIMATE_BACKGROUND):
+#             j = rng.integers(low=0, high=n_genes)
+#             random_grn[:, j] = rng.random(size=n_genes)
+#             res = cross_validate_gene(
+#                 estimator_t,
+#                 X,
+#                 groups,
+#                 random_grn,
+#                 j,
+#                 n_features=n_features,
+#                 random_state=SEED,
+#                 n_jobs=n_jobs
+#             )
+#             scores.append(res['avg-r2'])
+#         background[n_features] = (np.mean(scores), max(0.001, np.std(scores)))
+#     background['max'] = background[max_n_regulators]
+#     return background
 
 
 def cross_validate(
@@ -134,7 +137,8 @@ def cross_validate(
         X: np.ndarray,
         groups: np.ndarray,
         grn: np.ndarray,
-        n_features: np.ndarray
+        n_features: np.ndarray,
+        n_jobs: int
 ) -> List[Dict[str, float]]:
     n_genes = len(grn)
     
@@ -142,7 +146,7 @@ def cross_validate(
     
     results = []
     for j in tqdm.tqdm(range(n_genes), desc=f'{estimator_t} CV'):
-        res = cross_validate_gene(estimator_t, X, groups, grn, j, n_features=int(n_features[j]))
+        res = cross_validate_gene(estimator_t, X, groups, grn, j, n_features=int(n_features[j]),n_jobs=n_jobs)
         results.append(res)
     
     return {
@@ -151,48 +155,48 @@ def cross_validate(
     }
 
 
-def dynamic_approach(grn: np.ndarray, X: np.ndarray, groups: np.ndarray, gene_names: List[str], reg_type: str) -> float:
+# def dynamic_approach(grn: np.ndarray, X: np.ndarray, groups: np.ndarray, gene_names: List[str], reg_type: str) -> float:
 
-    # Determine maximum number of input features
-    n_genes = X.shape[1]
-    max_n_regulators = min(100, int(0.5 * n_genes))
+#     # Determine maximum number of input features
+#     n_genes = X.shape[1]
+#     max_n_regulators = min(100, int(0.5 * n_genes))
 
-    # Learn background distribution for each value of `n_features`:
-    # r2 scores using random genes as features.
-    background = learn_background_distribution(reg_type, X, groups, max_n_regulators)
+#     # Learn background distribution for each value of `n_features`:
+#     # r2 scores using random genes as features.
+#     background = learn_background_distribution(reg_type, X, groups, max_n_regulators)
+
+#     # Cross-validate each gene using the inferred GRN to define select input features
+#     res = cross_validate(
+#         reg_type,
+#         gene_names,
+#         X,
+#         groups,
+#         grn,
+#         np.clip(np.sum(grn != 0, axis=0), 0, max_n_regulators)
+#     )
+
+#     # Compute z-scores from r2 scores to take into account the fact
+#     # that random network can still perform well when the number of features is large
+#     scores = []
+#     for j in range(n_genes):
+#         if np.isnan(res['scores'][j]['avg-r2']):
+#             continue
+#         n_features = int(np.sum(grn[:, j] != 0))
+#         if n_features in background:
+#             mu, sigma = background[n_features]
+#         else:
+#             mu, sigma = background['max']
+#         z_score = (res['scores'][j]['avg-r2'] - mu) / sigma
+#         z_score = max(0, z_score)
+#         scores.append(z_score)
+
+#     return np.mean(scores)
+
+
+def static_approach(grn: np.ndarray, n_features: np.ndarray, X: np.ndarray, groups: np.ndarray, gene_names: List[str], reg_type: str, n_jobs:int) -> float:
 
     # Cross-validate each gene using the inferred GRN to define select input features
-    res = cross_validate(
-        reg_type,
-        gene_names,
-        X,
-        groups,
-        grn,
-        np.clip(np.sum(grn != 0, axis=0), 0, max_n_regulators)
-    )
-
-    # Compute z-scores from r2 scores to take into account the fact
-    # that random network can still perform well when the number of features is large
-    scores = []
-    for j in range(n_genes):
-        if np.isnan(res['scores'][j]['avg-r2']):
-            continue
-        n_features = int(np.sum(grn[:, j] != 0))
-        if n_features in background:
-            mu, sigma = background[n_features]
-        else:
-            mu, sigma = background['max']
-        z_score = (res['scores'][j]['avg-r2'] - mu) / sigma
-        z_score = max(0, z_score)
-        scores.append(z_score)
-
-    return np.mean(scores)
-
-
-def static_approach(grn: np.ndarray, n_features: np.ndarray, X: np.ndarray, groups: np.ndarray, gene_names: List[str], reg_type: str) -> float:
-
-    # Cross-validate each gene using the inferred GRN to define select input features
-    res = cross_validate(reg_type, gene_names, X, groups, grn, n_features)
+    res = cross_validate(reg_type, gene_names, X, groups, grn, n_features, n_jobs=n_jobs)
 
     return np.mean([res['scores'][j]['avg-r2'] for j in range(len(res['scores']))])
 
@@ -219,8 +223,6 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     # Load inferred GRN
     print(f'Loading GRN', flush=True)
     grn = load_grn(par['prediction'], gene_names)
-
-    
     
     # Load and standardize perturbation data
     layer = par['layer']
@@ -241,11 +243,11 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     print(f'Dynamic approach:', flush=True)
     # score_dynamic = dynamic_approach(grn, X, groups, gene_names, par['reg_type'])
     print(f'Static approach (theta=0):', flush=True)
-    score_static_min = static_approach(grn, n_features_theta_min, X, groups, gene_names, par['reg_type'])
+    score_static_min = static_approach(grn, n_features_theta_min, X, groups, gene_names, par['reg_type'], n_jobs=par['max_workers'])
     print(f'Static approach (theta=0.5):', flush=True)
-    score_static_median = static_approach(grn, n_features_theta_median, X, groups, gene_names, par['reg_type'])
+    score_static_median = static_approach(grn, n_features_theta_median, X, groups, gene_names, par['reg_type'], n_jobs=par['max_workers'])
     print(f'Static approach (theta=1):', flush=True)
-    score_static_max = static_approach(grn, n_features_theta_max, X, groups, gene_names, par['reg_type'])
+    score_static_max = static_approach(grn, n_features_theta_max, X, groups, gene_names, par['reg_type'], n_jobs=par['max_workers'])
     # score_overall = score_dynamic + score_static_min + score_static_median + score_static_max
     # TODO: find a mathematically sound way to combine Z-scores and r2 scores
 
