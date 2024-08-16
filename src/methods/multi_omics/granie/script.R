@@ -14,25 +14,25 @@ library(BSgenome.Mmusculus.UCSC.mm39)
 library(dplyr)
 
 ## VIASH START
-par <- list(
-  file_rna = "resources_test/grn-benchmark/multiomics_r/rna.rds",
-  files_atac = "resources_test/grn-benchmark/multiomics_r/atac.rds",
-  temp_dir =  "output/granie/",
-  preprocessing_clusteringMethod = 1, # Seurat::FindClusters: (1 = original Louvain algorithm, 2 = Louvain algorithm with multilevel refinement, 3 = SLM algorithm, 4 = Leiden algorithm)
-  preprocessing_clusterResolution = 14, # Typically between 5 and 20
-  preprocessing_SCT_nDimensions = 50, # Default 50
-  genomeAssembly = "hg38",
-  GRaNIE_corMethod = "spearman",
-  GRaNIE_includeSexChr = TRUE,
-  GRaNIE_promoterRange = 250000,
-  GRaNIE_TF_peak.fdr.threshold = 0.2,
-  GRaNIE_peak_gene.fdr.threshold = 0.2,
-  GRaNIE_nCores = 4,
-  peak_gene = "output/granie/peak_gene.csv", # not yet implemented, should I?
-  prediction= "output/granie/prediction.csv",
-  useWeightingLinks = FALSE,
-  forceRerun = FALSE
-)
+# par <- list(
+#   file_rna = "resources_test/grn-benchmark/multiomics_r/rna.rds",
+#   file_atac = "resources_test/grn-benchmark/multiomics_r/atac.rds",
+#   temp_dir =  "output/granie/",
+#   preprocessing_clusteringMethod = 1, # Seurat::FindClusters: (1 = original Louvain algorithm, 2 = Louvain algorithm with multilevel refinement, 3 = SLM algorithm, 4 = Leiden algorithm)
+#   preprocessing_clusterResolution = 14, # Typically between 5 and 20
+#   preprocessing_SCT_nDimensions = 50, # Default 50
+#   genomeAssembly = "hg38",
+#   GRaNIE_corMethod = "spearman",
+#   GRaNIE_includeSexChr = TRUE,
+#   GRaNIE_promoterRange = 250000,
+#   GRaNIE_TF_peak.fdr.threshold = 0.2,
+#   GRaNIE_peak_gene.fdr.threshold = 0.2,
+#   GRaNIE_nCores = 4,
+#   peak_gene = "output/granie/peak_gene.csv", # not yet implemented, should I?
+#   prediction= "output/granie/prediction.csv",
+#   useWeightingLinks = FALSE,
+#   forceRerun = FALSE
+# )
 
 print(par)
 # meta <- list(
