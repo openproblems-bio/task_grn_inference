@@ -2929,11 +2929,8 @@ meta = [
       {
         "type" : "file",
         "name" : "--annotation_file",
-        "example" : [
-          "resources/supplements/gencode.v45.annotation.gtf.gz"
-        ],
         "default" : [
-          "resources/supplements/gencode.v45.annotation.gtf.gz"
+          "resources/supplementary/gencode.v45.annotation.gtf.gz"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2946,11 +2943,8 @@ meta = [
       {
         "type" : "file",
         "name" : "--motif_file",
-        "example" : [
-          "resources/supplements/JASPAR2022-hg38.bed.gz"
-        ],
         "default" : [
-          "resources/supplements/JASPAR2022-hg38.bed.gz"
+          "resources/supplementary/JASPAR2022-hg38.bed.gz"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -3088,7 +3082,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scglue",
     "viash_version" : "0.8.6",
-    "git_commit" : "238e004bad4bace6b89b4a50d6daea1bc69218b2",
+    "git_commit" : "00c7c9312fd3cf7fcc92e8985716b702e5b61df5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

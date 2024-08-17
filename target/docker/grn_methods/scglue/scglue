@@ -198,13 +198,11 @@ function ViashHelp {
   echo ""
   echo "    --annotation_file"
   echo "        type: file, file must exist"
-  echo "        default: resources/supplements/gencode.v45.annotation.gtf.gz"
-  echo "        example: resources/supplements/gencode.v45.annotation.gtf.gz"
+  echo "        default: resources/supplementary/gencode.v45.annotation.gtf.gz"
   echo ""
   echo "    --motif_file"
   echo "        type: file, file must exist"
-  echo "        default: resources/supplements/JASPAR2022-hg38.bed.gz"
-  echo "        example: resources/supplements/JASPAR2022-hg38.bed.gz"
+  echo "        default: resources/supplementary/JASPAR2022-hg38.bed.gz"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -435,9 +433,9 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scglue"
-LABEL org.opencontainers.image.created="2024-08-16T16:08:28Z"
+LABEL org.opencontainers.image.created="2024-08-17T08:43:34Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="238e004bad4bace6b89b4a50d6daea1bc69218b2"
+LABEL org.opencontainers.image.revision="00c7c9312fd3cf7fcc92e8985716b702e5b61df5"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -829,10 +827,10 @@ if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
   VIASH_PAR_NUM_WORKERS="4"
 fi
 if [ -z ${VIASH_PAR_ANNOTATION_FILE+x} ]; then
-  VIASH_PAR_ANNOTATION_FILE="resources/supplements/gencode.v45.annotation.gtf.gz"
+  VIASH_PAR_ANNOTATION_FILE="resources/supplementary/gencode.v45.annotation.gtf.gz"
 fi
 if [ -z ${VIASH_PAR_MOTIF_FILE+x} ]; then
-  VIASH_PAR_MOTIF_FILE="resources/supplements/JASPAR2022-hg38.bed.gz"
+  VIASH_PAR_MOTIF_FILE="resources/supplementary/JASPAR2022-hg38.bed.gz"
 fi
 
 # check whether required files exist

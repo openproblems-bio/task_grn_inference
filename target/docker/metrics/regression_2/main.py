@@ -216,6 +216,15 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     subsample = par['subsample']
     if subsample != -1:
         perturbation_data = perturbation_data[np.random.choice(perturbation_data.n_obs, subsample, replace=False), :]
+    
+    if True: # one combination of cell_type, sm_name
+        sampled_obs = perturbation_data.obs.groupby(['sm_name', 'cell_type'], observed=False).apply(lambda x: x.sample(1)).reset_index(drop=True)
+        obs = perturbation_data.obs
+        mask = []
+        for _, row in obs.iterrows():
+            mask.append((sampled_obs==row).all(axis=1).any())  
+        perturbation_data = perturbation_data[mask,:]
+
     gene_names = perturbation_data.var.index.to_numpy()
     n_genes = len(gene_names)
     groups = LabelEncoder().fit_transform(perturbation_data.obs.plate_name)
