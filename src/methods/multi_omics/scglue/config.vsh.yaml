@@ -13,14 +13,12 @@ functionality:
   arguments:
     - name: --annotation_file
       type: file
-      example: resources/supplements/gencode.v45.annotation.gtf.gz
-      default: resources/supplements/gencode.v45.annotation.gtf.gz
+      default: resources/supplementary/gencode.v45.annotation.gtf.gz
       required: false
       direction: input
     - name: --motif_file
       type: file
-      example: resources/supplements/JASPAR2022-hg38.bed.gz
-      default: resources/supplements/JASPAR2022-hg38.bed.gz
+      default: resources/supplementary/JASPAR2022-hg38.bed.gz
       required: false
       direction: input
       

@@ -16,6 +16,7 @@ functionality:
       direction: input
       must_exist: true
       default: 'resources/prior/consensus-num-regulators.json'
+      example: 'resources_test/prior/consensus-num-regulators.json'
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4
