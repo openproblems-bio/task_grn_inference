@@ -8,11 +8,12 @@ from sklearn.preprocessing import StandardScaler
 
 par = {
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
-  'max_workers': 40,
+  'max_workers': 10,
   'reg_type': 'ridge',
-  'subsample': -2,
+  'subsample': 2,
   "tf_all":  "./resources/prior/tf_all.csv",
-  "temp_dir": "output"
+  "temp_dir": "output",
+  'consensus': 'resources/prior/consensus-num-regulators.json',
 }
 
 def create_positive_control(X: np.ndarray, groups: np.ndarray):
@@ -48,7 +49,7 @@ controls = ['negative_control', 'positive_control']
 
 os.makedirs(par['temp_dir'], exist_ok=True)
 for grn_model in controls + grn_models :
-  par["score"] = f"{par['temp_dir']}/reg1-{grn_model}.csv"
+  par["score"] = f"{par['temp_dir']}/reg2-{grn_model}.csv"
   for ii, layer in enumerate(layers):
     par["layer"] = layer
     if grn_model=='positive_control':

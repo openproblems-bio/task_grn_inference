@@ -3143,7 +3143,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "00c7c9312fd3cf7fcc92e8985716b702e5b61df5",
+    "git_commit" : "06a699a4192f0f5c720e952ce3465e7b495245b4",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3199,12 +3199,6 @@ from main import main
 
 output = main(par) 
 print(output)
-# output.columns = ['S1', 'S2', 'S3', 'S4']
-# output.index=[par["layer"]]
-# print("Write output to file", flush=True)
-# print(output)
-# output.to_csv(par['score'])
-
 
 metric_ids = output.columns.to_numpy()
 metric_values = output.values[0]

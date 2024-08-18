@@ -180,8 +180,18 @@ def main(par):
     layer = par["layer"]
     pert_df = pd.DataFrame(perturbation_data.layers[layer], columns=gene_names)
 
-    if subsample != -1:
-        pert_df = pert_df.sample(n=subsample)
+    if subsample == -1:
+        pass
+    elif subsample == -2: # one combination of cell_type, sm_name
+        sampled_obs = perturbation_data.obs.groupby(['sm_name', 'cell_type'], observed=False).apply(lambda x: x.sample(1)).reset_index(drop=True)
+        obs = perturbation_data.obs
+        mask = []
+        for _, row in obs.iterrows():
+            mask.append((sampled_obs==row).all(axis=1).any())  
+        perturbation_data = perturbation_data[mask,:]
+    else:
+        perturbation_data = perturbation_data[np.random.choice(perturbation_data.n_obs, subsample, replace=False), :]
+
     pert_df = pert_df.T  # make it gene*sample
 
     # process net
