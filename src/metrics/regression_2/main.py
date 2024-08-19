@@ -50,7 +50,7 @@ def cross_validate_gene(
         n_jobs: int = 10
 ) -> Dict[str, float]:
     
-    results = {'r2': 0.0, 'mse': np.inf, 'avg-r2': 0.0}
+    results = {'r2': 0.0, 'avg-r2': 0.0}
     
     if n_features == 0:
         return results
@@ -89,9 +89,9 @@ def cross_validate_gene(
     y_pred = np.concatenate(y_pred, axis=0)
     y_target = np.concatenate(y_target, axis=0)
     
-    results['r2'] = float(r2_score(y_target, y_pred))
-    results['mse'] = float(mean_squared_error(y_target, y_pred))
+    # results['r2'] = float(r2_score(y_target, y_pred))
     results['avg-r2'] = float(np.mean(r2s))
+
     
     return results
 
@@ -197,8 +197,10 @@ def static_approach(grn: np.ndarray, n_features: np.ndarray, X: np.ndarray, grou
 
     # Cross-validate each gene using the inferred GRN to define select input features
     res = cross_validate(reg_type, gene_names, X, groups, grn, n_features, n_jobs=n_jobs)
+    mean_r2_scores = np.asarray([res['scores'][j]['avg-r2'] for j in range(len(res['scores']))])
+    mean_r2_scores = mean_r2_scores[mean_r2_scores>-1]
 
-    return np.mean([res['scores'][j]['avg-r2'] for j in range(len(res['scores']))])
+    return np.mean(mean_r2_scores)
 
 
 def main(par: Dict[str, Any]) -> pd.DataFrame:
@@ -214,8 +216,18 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     # Load perturbation data
     perturbation_data = ad.read_h5ad(par['perturbation_data'])
     subsample = par['subsample']
-    if subsample != -1:
+    if subsample == -1:
+        pass
+    elif subsample == -2: # one combination of cell_type, sm_name
+        sampled_obs = perturbation_data.obs.groupby(['sm_name', 'cell_type'], observed=False).apply(lambda x: x.sample(1)).reset_index(drop=True)
+        obs = perturbation_data.obs
+        mask = []
+        for _, row in obs.iterrows():
+            mask.append((sampled_obs==row).all(axis=1).any())  
+        perturbation_data = perturbation_data[mask,:]
+    else:
         perturbation_data = perturbation_data[np.random.choice(perturbation_data.n_obs, subsample, replace=False), :]
+
     gene_names = perturbation_data.var.index.to_numpy()
     n_genes = len(gene_names)
     groups = LabelEncoder().fit_transform(perturbation_data.obs.plate_name)

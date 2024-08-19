@@ -2,10 +2,10 @@ __merge__: ../../../api/comp_method.yaml
 
 
 functionality:
-  name: GRaNIE
+  name: granie
   namespace: "grn_methods"
   info:
-    label: GRaNIE
+    label: granie
     summary: "GRN inference using GRaNIE"
     description: |
       GRN inference using GRaNIE
@@ -13,22 +13,18 @@ functionality:
   arguments:
   - name: --file_rna
     type: file
-    required: true
+    required: false
     direction: input
     description: "Path to the RNA data file (e.g., rna.rds)."
+    default: resources_test/grn-benchmark/multiomics_rna.rds
 
   - name: --file_atac
     type: file
-    required: true
-    direction: input
-    description: "Path to the ATAC data file (e.g., atac.rds)."
-
-  - name: --temp_dir
-    type: directory
     required: false
     direction: input
-    default: "output/granie/"
-    description: "Temporary directory for output files."
+    description: "Path to the ATAC data file (e.g., atac.rds)."
+    default: resources_test/grn-benchmark/multiomics_atac.rds
+
 
   - name: --preprocessing_clusteringMethod
     type: integer
@@ -38,76 +34,67 @@ functionality:
     description: "Seurat::FindClusters: Clustering method to use (1 = original Louvain algorithm, 2 = Louvain algorithm with multilevel refinement, 3 = SLM algorithm, 4 = Leiden algorithm)."
 
   - name: --preprocessing_clusterResolution
-    type: float
-    required: true
+    type: double
+    required: false
     direction: input
-    description: "Resolution for clustering, typically between 5 and 20."
+    description: Resolution for clustering, typically between 5 and 20.
+    default: 14
 
   - name: --preprocessing_SCT_nDimensions
     type: integer
     required: false
     direction: input
     default: 50
-    description: "Number of dimensions for SCT, default is 50."
+    description: Number of dimensions for SCT, default is 50.
 
   - name: --genomeAssembly
     type: string
-    required: true
+    required: false
     direction: input
-    description: "Genome assembly version (e.g., hg38). Currently, hg38 and mm10 is supported."
+    description: Genome assembly version (e.g., hg38). Currently, hg38 and mm10 is supported.
+    default: hg38
 
   - name: --GRaNIE_corMethod
     type: string
     required: false
-    default: "spearman"
+    default: spearman
     direction: input
-    description: "Correlation method used in GRaNIE (e.g., 'spearman')."
+    description: Correlation method used in GRaNIE (e.g., 'spearman').
 
   - name: --GRaNIE_includeSexChr
     type: boolean
     required: false
     default: true
     direction: input
-    description: "Include sex chromosomes in analysis."
+    description: Include sex chromosomes in analysis.
 
   - name: --GRaNIE_promoterRange
     type: integer
     required: false
     default: 250000
     direction: input
-    description: "Range in base pairs for maximum distance of peak-gene connections (default is 250000)."
+    description: Range in base pairs for maximum distance of peak-gene connections (default is 250000).
 
-  - name: --GRaNIE_TF_peak.fdr.threshold
-    type: float
+  - name: --GRaNIE_TF_peak_fdr_threshold
+    type: double
     required: false
     default: 0.2
     direction: input
-    description: "FDR threshold for TF-peak connections (default is 0.2)."
+    description: FDR threshold for TF-peak connections (default is 0.2).
 
-  - name: --GRaNIE_peak_gene.fdr.threshold
-    type: float
+  - name: --GRaNIE_peak_gene_fdr_threshold
+    type: double
     required: false
     default: 0.2
     direction: input
-    description: "FDR threshold for peak-gene connections (default is 0.2)."
-
-  - name: --GRaNIE_nCores
-    type: integer
-    required: true
-    direction: input
-    description: "Number of cores to use for computation (default is 4)."
+    description: FDR threshold for peak-gene connections (default is 0.2).
 
   - name: --peak_gene
     type: file
     required: false
     direction: output
-    description: "Path to the peak-gene output file (e.g., peak_gene.csv). Not yet implemented."
-
-  - name: --prediction
-    type: file
-    required: true
-    direction: output
-    description: "Path to the prediction output file (e.g., prediction.csv)."
+    description: Path to the peak-gene output file (e.g., peak_gene.csv). Not yet implemented.
+    default: output/granie/peak_gene.csv
 
   - name: --useWeightingLinks
     type: boolean

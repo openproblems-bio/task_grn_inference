@@ -17,7 +17,7 @@ functionality:
     - name: --links
       type: file
       direction: output
-      default: output/celloracle/links.celloracle.links    
+      default: output/celloracle/links.celloracle.links 
   resources:
     - type: python_script
       path: script.py
