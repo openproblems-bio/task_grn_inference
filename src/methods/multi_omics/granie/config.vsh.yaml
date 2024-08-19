@@ -16,14 +16,14 @@ functionality:
     required: false
     direction: input
     description: "Path to the RNA data file (e.g., rna.rds)."
-    default: resources_test/grn-benchmark/multiomics_rna.rds
+    default: resources_test/grn-benchmark/multiomics_r/rna.rds
 
   - name: --file_atac
     type: file
     required: false
     direction: input
     description: "Path to the ATAC data file (e.g., atac.rds)."
-    default: resources_test/grn-benchmark/multiomics_atac.rds
+    default: resources_test/grn-benchmark/multiomics_r/atac.rds
 
 
   - name: --preprocessing_clusteringMethod
@@ -117,7 +117,7 @@ functionality:
 
 platforms:
   - type: docker
-    image: chrarnold84/granieverse:latest
+    image: chrarnold84/granieverse:v1.1
 
   - type: native
   - type: nextflow
