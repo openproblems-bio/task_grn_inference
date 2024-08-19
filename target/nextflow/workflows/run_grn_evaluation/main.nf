@@ -3142,7 +3142,7 @@ workflow run_wf {
 
   // construct list of metrics
   metrics = [
-    regression_2
+    regression_1
   ]
     
   /***************************
