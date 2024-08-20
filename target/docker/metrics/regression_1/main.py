@@ -191,6 +191,8 @@ def main(par):
         perturbation_data = perturbation_data[mask,:]
     else:
         perturbation_data = perturbation_data[np.random.choice(perturbation_data.n_obs, subsample, replace=False), :]
+    
+    print(perturbation_data.shape)
 
     pert_df = pert_df.T  # make it gene*sample
 
