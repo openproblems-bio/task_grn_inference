@@ -1,5 +1,5 @@
 __merge__: ../../../api/comp_method.yaml
-
+  
 
 functionality:
   name: granie
@@ -25,6 +25,55 @@ functionality:
     description: "Path to the ATAC data file (e.g., atac.rds)."
     default: resources_test/grn-benchmark/multiomics_r/atac.rds
 
+  - name: --normRNA
+    type: string
+    required: false
+    direction: input
+    description: Normalization method for RNA data.
+    default: "SCT"
+
+  - name: --normATAC
+    type: string
+    required: false
+    direction: input
+    description: Normalization method for ATAC data.
+    default: "LSI"
+
+  - name: --LSI_featureCutoff
+    type: string
+    required: false
+    direction: input
+    description: Feature cutoff for LSI normalization.
+    default: "q0"
+
+  - name: --nDimensions_ATAC
+    type: integer
+    required: false
+    direction: input
+    description: Number of dimensions for ATAC modality
+    default: 50
+
+  - name: --integrationMethod
+    type: string
+    required: false
+    direction: input
+    description: Method used for data integration.
+    default: "WNN"
+
+  - name: --WNN_knn
+    type: integer
+    required: false
+    direction: input
+    description: Number of nearest neighbors for WNN integration.
+    default: 20
+
+  - name: --minCellsPerCluster
+    type: integer
+    required: false
+    direction: input
+    description: Minimum number of cells required per cluster.
+    default: 25
+
 
   - name: --preprocessing_clusteringMethod
     type: integer
@@ -40,12 +89,12 @@ functionality:
     description: Resolution for clustering, typically between 5 and 20.
     default: 14
 
-  - name: --preprocessing_SCT_nDimensions
+  - name: --preprocessing_RNA_nDimensions
     type: integer
     required: false
     direction: input
     default: 50
-    description: Number of dimensions for SCT, default is 50.
+    description: Number of dimensions for RNA reduction, default is 50.
 
   - name: --genomeAssembly
     type: string
@@ -117,7 +166,7 @@ functionality:
 
 platforms:
   - type: docker
-    image: chrarnold84/granieverse:v1.1
+    image: chrarnold84/granieverse:v1.3
 
   - type: native
   - type: nextflow
