@@ -2931,7 +2931,7 @@ meta = [
         "name" : "--file_rna",
         "description" : "Path to the RNA data file (e.g., rna.rds).",
         "default" : [
-          "resources_test/grn-benchmark/multiomics_rna.rds"
+          "resources_test/grn-benchmark/multiomics_r/rna.rds"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2946,10 +2946,101 @@ meta = [
         "name" : "--file_atac",
         "description" : "Path to the ATAC data file (e.g., atac.rds).",
         "default" : [
-          "resources_test/grn-benchmark/multiomics_atac.rds"
+          "resources_test/grn-benchmark/multiomics_r/atac.rds"
         ],
         "must_exist" : true,
         "create_parent" : true,
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "string",
+        "name" : "--normRNA",
+        "description" : "Normalization method for RNA data.",
+        "default" : [
+          "SCT"
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "string",
+        "name" : "--normATAC",
+        "description" : "Normalization method for ATAC data.",
+        "default" : [
+          "LSI"
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "string",
+        "name" : "--LSI_featureCutoff",
+        "description" : "Feature cutoff for LSI normalization.",
+        "default" : [
+          "q0"
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "integer",
+        "name" : "--nDimensions_ATAC",
+        "description" : "Number of dimensions for ATAC modality",
+        "default" : [
+          50
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "string",
+        "name" : "--integrationMethod",
+        "description" : "Method used for data integration.",
+        "default" : [
+          "WNN"
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "integer",
+        "name" : "--WNN_knn",
+        "description" : "Number of nearest neighbors for WNN integration.",
+        "default" : [
+          20
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "integer",
+        "name" : "--minCellsPerCluster",
+        "description" : "Minimum number of cells required per cluster.",
+        "default" : [
+          25
+        ],
         "required" : false,
         "direction" : "input",
         "multiple" : false,
@@ -2984,8 +3075,8 @@ meta = [
       },
       {
         "type" : "integer",
-        "name" : "--preprocessing_SCT_nDimensions",
-        "description" : "Number of dimensions for SCT, default is 50.",
+        "name" : "--preprocessing_RNA_nDimensions",
+        "description" : "Number of dimensions for RNA reduction, default is 50.",
         "default" : [
           50
         ],
@@ -3074,21 +3165,6 @@ meta = [
         "dest" : "par"
       },
       {
-        "type" : "file",
-        "name" : "--peak_gene",
-        "description" : "Path to the peak-gene output file (e.g., peak_gene.csv). Not yet implemented.",
-        "default" : [
-          "output/granie/peak_gene.csv"
-        ],
-        "must_exist" : true,
-        "create_parent" : true,
-        "required" : false,
-        "direction" : "output",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
         "type" : "boolean",
         "name" : "--useWeightingLinks",
         "description" : "Flag to indicate whether to use weighting links in analysis.",
@@ -3105,6 +3181,19 @@ meta = [
         "type" : "boolean",
         "name" : "--forceRerun",
         "description" : "Flag to force rerun of the analysis regardless of existing results.",
+        "default" : [
+          false
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "boolean",
+        "name" : "--subset",
+        "description" : "Flag for testing purposes to subset the data for faster running times",
         "default" : [
           false
         ],
@@ -3156,7 +3245,7 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "chrarnold84/granieverse:latest",
+      "image" : "chrarnold84/granieverse:v1.3",
       "target_organization" : "openproblems-bio/task_grn_inference",
       "target_registry" : "ghcr.io",
       "namespace_separator" : "/",
@@ -3212,7 +3301,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/granie",
     "viash_version" : "0.8.6",
-    "git_commit" : "cbd73988090376c134b8c5aaad6700aa720f2379",
+    "git_commit" : "329c6b83682eb91a6ef0f782db992e566a64ef58",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3228,20 +3317,6 @@ def innerWorkflowFactory(args) {
 tempscript=".viash_script.sh"
 cat > "$tempscript" << VIASHMAIN
 
-set.seed(42)
-
-library(Seurat)
-library(Signac)
-library(Matrix)
-library(GRaNIEverse)
-library(GRaNIE)
-library(qs)
-library(BSgenome.Hsapiens.UCSC.hg38)
-library(EnsDb.Hsapiens.v86)
-library(EnsDb.Mmusculus.v79)
-library(BSgenome.Mmusculus.UCSC.mm39)
-library(dplyr)
-
 ## VIASH START
 # The following code has been auto-generated by Viash.
 # treat warnings as errors
@@ -3255,18 +3330,25 @@ par <- list(
   "num_workers" = $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_NUM_WORKERS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "file_rna" = $( if [ ! -z ${VIASH_PAR_FILE_RNA+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_FILE_RNA" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "file_atac" = $( if [ ! -z ${VIASH_PAR_FILE_ATAC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_FILE_ATAC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
+  "normRNA" = $( if [ ! -z ${VIASH_PAR_NORMRNA+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_NORMRNA" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
+  "normATAC" = $( if [ ! -z ${VIASH_PAR_NORMATAC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_NORMATAC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
+  "LSI_featureCutoff" = $( if [ ! -z ${VIASH_PAR_LSI_FEATURECUTOFF+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_LSI_FEATURECUTOFF" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
+  "nDimensions_ATAC" = $( if [ ! -z ${VIASH_PAR_NDIMENSIONS_ATAC+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_NDIMENSIONS_ATAC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
+  "integrationMethod" = $( if [ ! -z ${VIASH_PAR_INTEGRATIONMETHOD+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_INTEGRATIONMETHOD" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
+  "WNN_knn" = $( if [ ! -z ${VIASH_PAR_WNN_KNN+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_WNN_KNN" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
+  "minCellsPerCluster" = $( if [ ! -z ${VIASH_PAR_MINCELLSPERCLUSTER+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_MINCELLSPERCLUSTER" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "preprocessing_clusteringMethod" = $( if [ ! -z ${VIASH_PAR_PREPROCESSING_CLUSTERINGMETHOD+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_PREPROCESSING_CLUSTERINGMETHOD" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "preprocessing_clusterResolution" = $( if [ ! -z ${VIASH_PAR_PREPROCESSING_CLUSTERRESOLUTION+x} ]; then echo -n "as.numeric('"; echo -n "$VIASH_PAR_PREPROCESSING_CLUSTERRESOLUTION" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
-  "preprocessing_SCT_nDimensions" = $( if [ ! -z ${VIASH_PAR_PREPROCESSING_SCT_NDIMENSIONS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_PREPROCESSING_SCT_NDIMENSIONS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
+  "preprocessing_RNA_nDimensions" = $( if [ ! -z ${VIASH_PAR_PREPROCESSING_RNA_NDIMENSIONS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_PREPROCESSING_RNA_NDIMENSIONS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "genomeAssembly" = $( if [ ! -z ${VIASH_PAR_GENOMEASSEMBLY+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_GENOMEASSEMBLY" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "GRaNIE_corMethod" = $( if [ ! -z ${VIASH_PAR_GRANIE_CORMETHOD+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_GRANIE_CORMETHOD" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "GRaNIE_includeSexChr" = $( if [ ! -z ${VIASH_PAR_GRANIE_INCLUDESEXCHR+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_GRANIE_INCLUDESEXCHR" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi ),
   "GRaNIE_promoterRange" = $( if [ ! -z ${VIASH_PAR_GRANIE_PROMOTERRANGE+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_GRANIE_PROMOTERRANGE" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "GRaNIE_TF_peak_fdr_threshold" = $( if [ ! -z ${VIASH_PAR_GRANIE_TF_PEAK_FDR_THRESHOLD+x} ]; then echo -n "as.numeric('"; echo -n "$VIASH_PAR_GRANIE_TF_PEAK_FDR_THRESHOLD" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "GRaNIE_peak_gene_fdr_threshold" = $( if [ ! -z ${VIASH_PAR_GRANIE_PEAK_GENE_FDR_THRESHOLD+x} ]; then echo -n "as.numeric('"; echo -n "$VIASH_PAR_GRANIE_PEAK_GENE_FDR_THRESHOLD" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
-  "peak_gene" = $( if [ ! -z ${VIASH_PAR_PEAK_GENE+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PEAK_GENE" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "useWeightingLinks" = $( if [ ! -z ${VIASH_PAR_USEWEIGHTINGLINKS+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_USEWEIGHTINGLINKS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi ),
-  "forceRerun" = $( if [ ! -z ${VIASH_PAR_FORCERERUN+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_FORCERERUN" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi )
+  "forceRerun" = $( if [ ! -z ${VIASH_PAR_FORCERERUN+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_FORCERERUN" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi ),
+  "subset" = $( if [ ! -z ${VIASH_PAR_SUBSET+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_SUBSET" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi )
 )
 meta <- list(
   "functionality_name" = $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo -n "'"; echo -n "$VIASH_META_FUNCTIONALITY_NAME" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
@@ -3292,15 +3374,33 @@ options(.viash_orig_warn)
 rm(.viash_orig_warn)
 
 ## VIASH END
-print(par)
-# meta <- list(
-#   functionality_name = "my_method_r"
-# )
+
+set.seed(42)
+suppressPackageStartupMessages(library(Seurat))
+
+suppressPackageStartupMessages(library(Signac))
+suppressPackageStartupMessages(library(Matrix))
+library(GRaNIEverse)
+library(GRaNIE)
+suppressPackageStartupMessages(library(qs))
+suppressPackageStartupMessages(library(BSgenome.Hsapiens.UCSC.hg38))
+suppressPackageStartupMessages(library(EnsDb.Hsapiens.v86))
+suppressPackageStartupMessages(library(EnsDb.Mmusculus.v79))
+suppressPackageStartupMessages(library(BSgenome.Mmusculus.UCSC.mm39))
+suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library(SummarizedExperiment))
+
+
+cat("Content of par list:")
+str(par)
+
+#qs::qsave(par, "/home/carnold/par.qs")
+
 
 
 #### STANDARD ASSIGNMENTS ###
 file_seurat = "seurat_granie.qs"
-outputDir = par\\$temp_dir
+outputDir = dirname(par\\$prediction)
 
 if (!dir.exists(outputDir)) {
   dir.create(outputDir, recursive = TRUE)
@@ -3325,7 +3425,7 @@ if (!file.exists(destfile)) {
 # Define the directory to extract the files to
 exdir <- "PWMScan_HOCOMOCOv12_H12INVIVO"
 
-GRaNIE_TFBSFolder = paste0(exdir, "/PWMScan_HOCOMOCOv12/H12INVIVO")
+GRaNIE_TFBSFolder = paste0(exdir, "/H12INVIVO")
 
 if (!file.exists(GRaNIE_TFBSFolder)) {
   untar(destfile, exdir = exdir)
@@ -3349,7 +3449,7 @@ if (!file.exists(file_RNA)) {
 # Preprocess data #
 ###################
 
-if (par.l\\$forceRerun | !file.exists(file_seurat)) {
+if (par\\$forceRerun | !file.exists(file_seurat)) {
   
  # Sparse matrix
  rna.m = readRDS(par\\$file_rna)
@@ -3404,12 +3504,6 @@ if (par.l\\$forceRerun | !file.exists(file_seurat)) {
 }
 
 output_seuratProcessed = paste0(outputDir, "/seuratObject.qs")
-if (!file.exists(output_seuratProcessed)) {
-  prepareData = TRUE
-} else {
-  prepareData = FALSE
-}
-
 
 ###################
 # Preprocess data #
@@ -3420,24 +3514,38 @@ GRaNIE_file_peaks = paste0(outputDir, "/atac.pseudobulkFromClusters_res", par\\$
 GRaNIE_file_rna = paste0(outputDir, "/rna.pseudobulkFromClusters_res", par\\$preprocessing_clusterResolution, "_mean.tsv.gz")
 GRaNIE_file_metadata = paste0(outputDir, "/metadata_res", par\\$preprocessing_clusterResolution, "_mean.tsv.gz")
 
-if (file.exists(GRaNIE_file_peaks) & file.exists(GRaNIE_file_metadata) & file.exists(GRaNIE_file_rna) & !par.l\\$forceRerun) {
+if (file.exists(GRaNIE_file_peaks) & file.exists(GRaNIE_file_metadata) & file.exists(GRaNIE_file_rna) & !par\\$forceRerun) {
   
-  cat("Preprocessing skipped because all files alreadx exist anf forceRerun = FALSE.")
+  cat("Preprocessing skipped because all files already exist anf forceRerun = FALSE.")
   
 } else {
-  
+
+    # Subset for testing purposes
+    if (par\\$subset == TRUE) {
+        cat("SUBSET cells\\\\n")
+        random_cells <- sample(Cells(seurat_object), size = 5000, replace = FALSE)
+        seurat_object = subset(seurat_object, cells = random_cells)
+        cat("SUBSET peaks\\\\n")
+        peak_names <- rownames(seurat_object[["peaks"]])
+        selected_peaks <- sample(peak_names, size = 50000, replace = FALSE)
+        seurat_object[["peaks"]] = subset(seurat_object[["peaks"]], features = selected_peaks)
+    }
+
   seurat_object = prepareSeuratData_GRaNIE(seurat_object, 
-                                           outputDir = par\\$outputDir,
-                                           file_RNA_features = file_RNA, 
-                                           assayName_RNA_raw = "RNA", assayName_ATAC = "peaks", 
-                                           prepareData = prepareData, 
-                                           SCT_nDimensions = par\\$preprocessing_SCT_nDimensions, 
-                                           dimensionsToIgnore_LSI_ATAC = 1,
+                                           outputDir = outputDir,
+                                           saveSeuratObject = TRUE,
+                                           genome = par\\$genomeAssembly,
+                                           assayName_RNA = "RNA", normRNA = "SCT", nDimensions_RNA = par\\$preprocessing_RNA_nDimensions, recalculateVariableFeatures = NULL,
+                                           assayName_ATAC_raw = "peaks", 
+                                           normATAC = "LSI", LSI_featureCutoff = "q0", nDimensions_ATAC = 50, dimensionsToIgnore_LSI_ATAC = 1,
+                                           integrationMethod = "WNN", WNN_knn = 20,
                                            pseudobulk_source = "cluster",
                                            countAggregation = "mean",
                                            clusteringAlgorithm = par\\$preprocessing_clusteringMethod, 
-                                           clusterResolutions = par\\$preprocessing_clusterResolution, 
-                                           saveSeuratObject = TRUE)
+                                           clusterResolutions = par\\$preprocessing_clusterResolution,
+                                           minCellsPerCluster = 25,
+                                           forceRerun = FALSE
+      )
   
 }
 
@@ -3448,7 +3556,7 @@ if (file.exists(GRaNIE_file_peaks) & file.exists(GRaNIE_file_metadata) & file.ex
 ##############
 
 GRN = runGRaNIE(
-  dir_output = par\\$temp_dir,
+  dir_output = outputDir,
   datasetName = "undescribed",
   GRaNIE_file_peaks,
   GRaNIE_file_rna,

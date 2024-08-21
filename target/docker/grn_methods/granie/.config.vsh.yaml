@@ -112,7 +112,7 @@ functionality:
     description: "Path to the RNA data file (e.g., rna.rds)."
     info: null
     default:
-    - "resources_test/grn-benchmark/multiomics_rna.rds"
+    - "resources_test/grn-benchmark/multiomics_r/rna.rds"
     must_exist: true
     create_parent: true
     required: false
@@ -125,9 +125,86 @@ functionality:
     description: "Path to the ATAC data file (e.g., atac.rds)."
     info: null
     default:
-    - "resources_test/grn-benchmark/multiomics_atac.rds"
+    - "resources_test/grn-benchmark/multiomics_r/atac.rds"
     must_exist: true
     create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--normRNA"
+    description: "Normalization method for RNA data."
+    info: null
+    default:
+    - "SCT"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--normATAC"
+    description: "Normalization method for ATAC data."
+    info: null
+    default:
+    - "LSI"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--LSI_featureCutoff"
+    description: "Feature cutoff for LSI normalization."
+    info: null
+    default:
+    - "q0"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "integer"
+    name: "--nDimensions_ATAC"
+    description: "Number of dimensions for ATAC modality"
+    info: null
+    default:
+    - 50
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--integrationMethod"
+    description: "Method used for data integration."
+    info: null
+    default:
+    - "WNN"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "integer"
+    name: "--WNN_knn"
+    description: "Number of nearest neighbors for WNN integration."
+    info: null
+    default:
+    - 20
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "integer"
+    name: "--minCellsPerCluster"
+    description: "Minimum number of cells required per cluster."
+    info: null
+    default:
+    - 25
     required: false
     direction: "input"
     multiple: false
@@ -158,8 +235,8 @@ functionality:
     multiple_sep: ":"
     dest: "par"
   - type: "integer"
-    name: "--preprocessing_SCT_nDimensions"
-    description: "Number of dimensions for SCT, default is 50."
+    name: "--preprocessing_RNA_nDimensions"
+    description: "Number of dimensions for RNA reduction, default is 50."
     info: null
     default:
     - 50
@@ -236,20 +313,6 @@ functionality:
     multiple: false
     multiple_sep: ":"
     dest: "par"
-  - type: "file"
-    name: "--peak_gene"
-    description: "Path to the peak-gene output file (e.g., peak_gene.csv). Not yet\
-      \ implemented."
-    info: null
-    default:
-    - "output/granie/peak_gene.csv"
-    must_exist: true
-    create_parent: true
-    required: false
-    direction: "output"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
   - type: "boolean"
     name: "--useWeightingLinks"
     description: "Flag to indicate whether to use weighting links in analysis."
@@ -264,6 +327,18 @@ functionality:
   - type: "boolean"
     name: "--forceRerun"
     description: "Flag to force rerun of the analysis regardless of existing results."
+    info: null
+    default:
+    - false
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "boolean"
+    name: "--subset"
+    description: "Flag for testing purposes to subset the data for faster running\
+      \ times"
     info: null
     default:
     - false
@@ -298,7 +373,7 @@ functionality:
 platforms:
 - type: "docker"
   id: "docker"
-  image: "chrarnold84/granieverse:latest"
+  image: "chrarnold84/granieverse:v1.3"
   target_organization: "openproblems-bio/task_grn_inference"
   target_registry: "ghcr.io"
   namespace_separator: "/"
@@ -345,5 +420,5 @@ info:
   output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/docker/grn_methods/granie"
   executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/docker/grn_methods/granie/granie"
   viash_version: "0.8.6"
-  git_commit: "cbd73988090376c134b8c5aaad6700aa720f2379"
+  git_commit: "329c6b83682eb91a6ef0f782db992e566a64ef58"
   git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"
