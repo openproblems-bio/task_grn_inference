@@ -52,41 +52,42 @@ for grn_model in controls + grn_models :
   for ii, layer in enumerate(layers):
     par["layer"] = layer
     if grn_model=='positive_control':
-      # print('Inferring GRN')
-      # net = create_positive_control(perturbation_data.layers[par["layer"]], groups)
+      print('Inferring positive control')
+      net = create_positive_control(perturbation_data.layers[par["layer"]], groups)
 
-      # net = pd.DataFrame(net, index=gene_names, columns=gene_names)
-      # net = net.loc[:, net.columns.isin(tf_all)]
+      net = pd.DataFrame(net, index=gene_names, columns=gene_names)
+      net = net.loc[:, net.columns.isin(tf_all)]
 
-      # pivoted_net = net.reset_index().melt(id_vars='index', var_name='source', value_name='weight')
+      pivoted_net = net.reset_index().melt(id_vars='index', var_name='source', value_name='weight')
 
-      # pivoted_net = pivoted_net.rename(columns={'index': 'target'})
-      # pivoted_net = pivoted_net[pivoted_net['weight'] != 0]
+      pivoted_net = pivoted_net.rename(columns={'index': 'target'})
+      pivoted_net = pivoted_net[pivoted_net['weight'] != 0]
       par['prediction'] = f"{par['temp_dir']}/{layer}_positive_control.csv"
-      # pivoted_net.to_csv(par['prediction'])
+      print(par['prediction'])
+      pivoted_net.to_csv(par['prediction'])
     elif grn_model=='negative_control':
-      # print('Inferring GRN')
-      # net = create_negative_control(gene_names)
+      print('Inferring negative control')
+      net = create_negative_control(gene_names)
 
-      # pivoted_net = net.reset_index().melt(id_vars='index', var_name='source', value_name='weight')
+      pivoted_net = net.reset_index().melt(id_vars='index', var_name='source', value_name='weight')
 
-      # pivoted_net = pivoted_net.rename(columns={'index': 'target'})
-      # pivoted_net = pivoted_net[pivoted_net['weight'] != 0]
+      pivoted_net = pivoted_net.rename(columns={'index': 'target'})
+      pivoted_net = pivoted_net[pivoted_net['weight'] != 0]
       par['prediction'] = f"{par['temp_dir']}/negative_control.csv"
-      # pivoted_net.to_csv(par['prediction'])
+      pivoted_net.to_csv(par['prediction'])
     else:
       par['prediction'] = f"resources/grn_models/{grn_model}.csv"
-    output = main(par) 
-    output.index = [layer]
+    # output = main(par) 
+    # output.index = [layer]
 
-    if ii == 0:
-      score = output
-    else:
-      score = pd.concat([score, output], axis=0)
+    # if ii == 0:
+    #   score = output
+    # else:
+    #   score = pd.concat([score, output], axis=0)
 
-    print("Write output to file", flush=True)
-    print(grn_model, layer, score)
+    # print("Write output to file", flush=True)
+    # print(grn_model, layer, score)
 
-  print("Write output to file", flush=True)
-  score.to_csv(par['score'])
+  # print("Write output to file", flush=True)
+  # score.to_csv(par['score'])
 

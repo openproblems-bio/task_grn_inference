@@ -2,13 +2,13 @@
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 
-RUN_ID="scgen_pearson_gb_sub549"
+RUN_ID="pearson_gb"
 resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
 # grn_models_folder="${resources_dir}/supplementary/grn_models_noised"
 grn_models_folder="${resources_dir}/grn_models"
 reg_type=GB
-subsample=-1
+subsample=-2
 max_workers=20
 
 param_file="./params/${RUN_ID}.yaml"
@@ -24,7 +24,7 @@ grn_names=(
 )
 
 # layers=("pearson" "lognorm" "scgen_pearson" "scgen_lognorm" "seurat_pearson" "seurat_lognorm")
-layers=( "scgen_pearson" )
+layers=( "pearson" )
 
 # Start writing to the YAML file
 cat > $param_file << HERE
@@ -52,17 +52,17 @@ for grn_name in "${grn_names[@]}"; do
   done
 done
 
-# # Append negative control
-# grn_name="negative_control"
-# for layer in "${layers[@]}"; do
-#   append_entry "$grn_name" "" "true"
-# done
+# Append negative control
+grn_name="negative_control"
+for layer in "${layers[@]}"; do
+  append_entry "$grn_name" "" "true"
+done
 
-# # Append positive controls
-# grn_name="positive_control"
-# for layer in "${layers[@]}"; do
-#   append_entry "$grn_name" "true"
-# done
+# Append positive controls
+grn_name="positive_control"
+for layer in "${layers[@]}"; do
+  append_entry "$grn_name" "true"
+done
 
 # Append the remaining output_state and publish_dir to the YAML file
 cat >> $param_file << HERE
@@ -84,7 +84,7 @@ HERE
     --main-script target/nextflow/workflows/run_grn_evaluation/main.nf `
     --workspace 53907369739130 `
     --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
-    --params-file ./params/scgen_pearson_gb_sub549.yaml `
+    --params-file ./params/scgen_pearson_gb_pcs.yaml `
     --config src/common/nextflow_helpers/labels_tw.config
 
 
