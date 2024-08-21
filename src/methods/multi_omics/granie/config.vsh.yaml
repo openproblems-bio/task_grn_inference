@@ -123,7 +123,7 @@ functionality:
     default: 250000
     direction: input
     description: Range in base pairs for maximum distance of peak-gene connections (default is 250000).
-
+--GRaNIE_includeSexChr
   - name: --GRaNIE_TF_peak_fdr_threshold
     type: double
     required: false
@@ -138,12 +138,13 @@ functionality:
     direction: input
     description: FDR threshold for peak-gene connections (default is 0.2).
 
-  - name: --peak_gene
-    type: file
-    required: false
-    direction: output
-    description: Path to the peak-gene output file (e.g., peak_gene.csv). Not yet implemented.
-    default: output/granie/peak_gene.csv
+  #  File existance is checked, so commenting out for now
+  # - name: --peak_gene
+  #   type: file
+  #   required: false
+  #   direction: output
+  #   description: Path to the peak-gene output file (e.g., peak_gene.csv). Not yet implemented.
+  #   default: output/granie/peak_gene.csv
 
   - name: --useWeightingLinks
     type: boolean

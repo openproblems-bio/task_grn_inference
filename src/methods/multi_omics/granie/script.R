@@ -10,9 +10,9 @@
 #   GRaNIE_corMethod = "spearman",
 #   GRaNIE_includeSexChr = TRUE,
 #   GRaNIE_promoterRange = 250000,
-#   GRaNIE_TF_peak.fdr.threshold = 0.2,
-#   GRaNIE_peak_gene.fdr.threshold = 0.2,
-#   GRaNIE_nCores = 4,
+#   GRaNIE_TF_peak_fdr_threshold = 0.2,
+#   GGRaNIE_peak_gene_fdr_threshold = 0.2,
+#   num_workers = 4,
 #   peak_gene = "output/granie/peak_gene.csv", # not yet implemented, should I?
 #   prediction= "output/granie/prediction.csv",
 #   useWeightingLinks = FALSE,
@@ -225,11 +225,11 @@ GRN = runGRaNIE(
   corMethod = par$GRaNIE_corMethod,
   promoterRange = par$GRaNIE_promoterRange,
   useGCCorrection = FALSE,
-  TF_peak.fdr.threshold = par$GRaNIE_TF_peak.fdr.threshold,
-  peak_gene.fdr.threshold = par$GRaNIE_peak_gene.fdr.threshold,
+  TF_peak.fdr.threshold = par$GRaNIE_TF_peak_fdr_threshold,
+  peak_gene.fdr.threshold = par$GRaNIE_peak_gene_fdr_threshold,
   runTFClassification = FALSE,
   runNetworkAnalyses = FALSE,
-  nCores = par$GRaNIE_nCores,
+  nCores = par$num_workers,
   forceRerun = TRUE
 )
 
