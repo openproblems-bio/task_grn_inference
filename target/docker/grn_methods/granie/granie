@@ -175,13 +175,11 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --multiomics_rna"
   echo "        type: file, file must exist"
-  echo "        default: resources_test/grn-benchmark/multiomics_rna.h5ad"
-  echo "        example: resources/grn-benchmark/multiomics_rna.h5ad"
+  echo "        default: resources_test/grn-benchmark/multiomics_rna.rds"
   echo ""
   echo "    --multiomics_atac"
   echo "        type: file, file must exist"
-  echo "        default: resources_test/grn-benchmark/multiomics_atac.h5ad"
-  echo "        example: resources/grn-benchmark/multiomics_atac.h5ad"
+  echo "        default: resources_test/grn-benchmark/multiomics_atac.rds"
   echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"
@@ -195,16 +193,6 @@ function ViashHelp {
   echo "    --num_workers"
   echo "        type: integer"
   echo "        default: 4"
-  echo ""
-  echo "    --file_rna"
-  echo "        type: file, file must exist"
-  echo "        default: resources_test/grn-benchmark/multiomics_r/rna.rds"
-  echo "        Path to the RNA data file (e.g., rna.rds)."
-  echo ""
-  echo "    --file_atac"
-  echo "        type: file, file must exist"
-  echo "        default: resources_test/grn-benchmark/multiomics_r/atac.rds"
-  echo "        Path to the ATAC data file (e.g., atac.rds)."
   echo ""
   echo "    --normRNA"
   echo "        type: string"
@@ -528,9 +516,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods granie"
-LABEL org.opencontainers.image.created="2024-08-21T18:01:30Z"
+LABEL org.opencontainers.image.created="2024-08-21T18:35:30Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="329c6b83682eb91a6ef0f782db992e566a64ef58"
+LABEL org.opencontainers.image.revision="7f91a8f88722023bd1507442b19168beff1c2bb2"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -742,28 +730,6 @@ while [[ $# -gt 0 ]]; do
         --num_workers=*)
             [ -n "$VIASH_PAR_NUM_WORKERS" ] && ViashError Bad arguments for option \'--num_workers=*\': \'$VIASH_PAR_NUM_WORKERS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_NUM_WORKERS=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --file_rna)
-            [ -n "$VIASH_PAR_FILE_RNA" ] && ViashError Bad arguments for option \'--file_rna\': \'$VIASH_PAR_FILE_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_FILE_RNA="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --file_rna. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --file_rna=*)
-            [ -n "$VIASH_PAR_FILE_RNA" ] && ViashError Bad arguments for option \'--file_rna=*\': \'$VIASH_PAR_FILE_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_FILE_RNA=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --file_atac)
-            [ -n "$VIASH_PAR_FILE_ATAC" ] && ViashError Bad arguments for option \'--file_atac\': \'$VIASH_PAR_FILE_ATAC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_FILE_ATAC="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --file_atac. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --file_atac=*)
-            [ -n "$VIASH_PAR_FILE_ATAC" ] && ViashError Bad arguments for option \'--file_atac=*\': \'$VIASH_PAR_FILE_ATAC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_FILE_ATAC=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --normRNA)
@@ -1116,10 +1082,10 @@ fi
 
 # filling in defaults
 if [ -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then
-  VIASH_PAR_MULTIOMICS_RNA="resources_test/grn-benchmark/multiomics_rna.h5ad"
+  VIASH_PAR_MULTIOMICS_RNA="resources_test/grn-benchmark/multiomics_rna.rds"
 fi
 if [ -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then
-  VIASH_PAR_MULTIOMICS_ATAC="resources_test/grn-benchmark/multiomics_atac.h5ad"
+  VIASH_PAR_MULTIOMICS_ATAC="resources_test/grn-benchmark/multiomics_atac.rds"
 fi
 if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
   VIASH_PAR_PREDICTION="output/grn.csv"
@@ -1129,12 +1095,6 @@ if [ -z ${VIASH_PAR_TEMP_DIR+x} ]; then
 fi
 if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
   VIASH_PAR_NUM_WORKERS="4"
-fi
-if [ -z ${VIASH_PAR_FILE_RNA+x} ]; then
-  VIASH_PAR_FILE_RNA="resources_test/grn-benchmark/multiomics_r/rna.rds"
-fi
-if [ -z ${VIASH_PAR_FILE_ATAC+x} ]; then
-  VIASH_PAR_FILE_ATAC="resources_test/grn-benchmark/multiomics_r/atac.rds"
 fi
 if [ -z ${VIASH_PAR_NORMRNA+x} ]; then
   VIASH_PAR_NORMRNA="SCT"
@@ -1201,14 +1161,6 @@ if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ];
 fi
 if [ ! -z "$VIASH_PAR_MULTIOMICS_ATAC" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_ATAC" ]; then
   ViashError "Input file '$VIASH_PAR_MULTIOMICS_ATAC' does not exist."
-  exit 1
-fi
-if [ ! -z "$VIASH_PAR_FILE_RNA" ] && [ ! -e "$VIASH_PAR_FILE_RNA" ]; then
-  ViashError "Input file '$VIASH_PAR_FILE_RNA' does not exist."
-  exit 1
-fi
-if [ ! -z "$VIASH_PAR_FILE_ATAC" ] && [ ! -e "$VIASH_PAR_FILE_ATAC" ]; then
-  ViashError "Input file '$VIASH_PAR_FILE_ATAC' does not exist."
   exit 1
 fi
 
@@ -1360,14 +1312,6 @@ if [ ! -z "$VIASH_PAR_PREDICTION" ]; then
   VIASH_PAR_PREDICTION=$(ViashAutodetectMount "$VIASH_PAR_PREDICTION")
   VIASH_CHOWN_VARS+=( "$VIASH_PAR_PREDICTION" )
 fi
-if [ ! -z "$VIASH_PAR_FILE_RNA" ]; then
-  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_FILE_RNA")" )
-  VIASH_PAR_FILE_RNA=$(ViashAutodetectMount "$VIASH_PAR_FILE_RNA")
-fi
-if [ ! -z "$VIASH_PAR_FILE_ATAC" ]; then
-  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_FILE_ATAC")" )
-  VIASH_PAR_FILE_ATAC=$(ViashAutodetectMount "$VIASH_PAR_FILE_ATAC")
-fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_META_RESOURCES_DIR")" )
   VIASH_META_RESOURCES_DIR=$(ViashAutodetectMount "$VIASH_META_RESOURCES_DIR")
@@ -1437,8 +1381,6 @@ par <- list(
   "prediction" = $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PREDICTION" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "temp_dir" = $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TEMP_DIR" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "num_workers" = $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_NUM_WORKERS" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi ),
-  "file_rna" = $( if [ ! -z ${VIASH_PAR_FILE_RNA+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_FILE_RNA" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "file_atac" = $( if [ ! -z ${VIASH_PAR_FILE_ATAC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_FILE_ATAC" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "normRNA" = $( if [ ! -z ${VIASH_PAR_NORMRNA+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_NORMRNA" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "normATAC" = $( if [ ! -z ${VIASH_PAR_NORMATAC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_NORMATAC" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "LSI_featureCutoff" = $( if [ ! -z ${VIASH_PAR_LSI_FEATURECUTOFF+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_LSI_FEATURECUTOFF" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
@@ -1561,12 +1503,12 @@ if (!file.exists(file_RNA)) {
 if (par\$forceRerun | !file.exists(file_seurat)) {
   
  # Sparse matrix
- rna.m = readRDS(par\$file_rna)
+ rna.m = readRDS(par\$perturbation_rna)
  
  seurat_object <- CreateSeuratObject(count = rna.m, project = "PBMC", min.cells = 1, min.features = 1, assay = "RNA")
  
  # RangedSummarizedExperiment
- atac = readRDS(par\$file_atac)
+ atac = readRDS(par\$perturbation_atac)
  
  # Extract counts and metadata from the RangedSummarizedExperiment
   atac_counts <- assays(atac)\$counts
@@ -1729,12 +1671,6 @@ if [ ! -z "$VIASH_PAR_MULTIOMICS_ATAC" ]; then
 fi
 if [ ! -z "$VIASH_PAR_PREDICTION" ]; then
   VIASH_PAR_PREDICTION=$(ViashStripAutomount "$VIASH_PAR_PREDICTION")
-fi
-if [ ! -z "$VIASH_PAR_FILE_RNA" ]; then
-  VIASH_PAR_FILE_RNA=$(ViashStripAutomount "$VIASH_PAR_FILE_RNA")
-fi
-if [ ! -z "$VIASH_PAR_FILE_ATAC" ]; then
-  VIASH_PAR_FILE_ATAC=$(ViashStripAutomount "$VIASH_PAR_FILE_ATAC")
 fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_META_RESOURCES_DIR=$(ViashStripAutomount "$VIASH_META_RESOURCES_DIR")

@@ -2956,7 +2956,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/sc_counts",
     "viash_version" : "0.8.6",
-    "git_commit" : "329c6b83682eb91a6ef0f782db992e566a64ef58",
+    "git_commit" : "7f91a8f88722023bd1507442b19168beff1c2bb2",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

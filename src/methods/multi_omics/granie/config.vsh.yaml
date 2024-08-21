@@ -1,4 +1,4 @@
-__merge__: ../../../api/comp_method.yaml
+__merge__: ../../../api/comp_method_r.yaml
 
 
 functionality:
@@ -11,20 +11,6 @@ functionality:
       GRN inference using GRaNIE
     documentation_url: https://grp-zaugg.embl-community.io/GRaNIE/
   arguments:
-  - name: --file_rna
-    type: file
-    required: false
-    direction: input
-    description: "Path to the RNA data file (e.g., rna.rds)."
-    default: resources_test/grn-benchmark/multiomics_r/rna.rds
-
-  - name: --file_atac
-    type: file
-    required: false
-    direction: input
-    description: "Path to the ATAC data file (e.g., atac.rds)."
-    default: resources_test/grn-benchmark/multiomics_r/atac.rds
-
   - name: --normRNA
     type: string
     required: false

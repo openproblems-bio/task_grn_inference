@@ -1,0 +1,187 @@
+functionality:
+  name: "grn_inference_granie"
+  namespace: "workflows"
+  version: "build-main"
+  arguments:
+  - type: "file"
+    name: "--multiomics_rna"
+    info:
+      label: "multiomics rna"
+      summary: "RNA expression for multiomics data."
+      file_type: "h5ad"
+      slots:
+        obs:
+        - name: "cell_type"
+          type: "string"
+          description: "The annotated cell type of each cell based on RNA expression."
+          required: true
+        - name: "donor_id"
+          type: "string"
+          description: "Donor id"
+          required: true
+    example:
+    - "resources/grn-benchmark/multiomics_rna.h5ad"
+    default:
+    - "resources_test/grn-benchmark/multiomics_rna.h5ad"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--multiomics_atac"
+    info:
+      label: "multiomics atac"
+      summary: "Peak data for multiomics data."
+      file_type: "h5ad"
+      slots:
+        obs:
+        - name: "cell_type"
+          type: "string"
+          description: "The annotated cell type of each cell based on RNA expression."
+          required: true
+        - name: "donor_id"
+          type: "string"
+          description: "Donor id"
+          required: true
+    example:
+    - "resources/grn-benchmark/multiomics_atac.h5ad"
+    default:
+    - "resources_test/grn-benchmark/multiomics_atac.h5ad"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--prediction"
+    info:
+      label: "GRN"
+      summary: "GRN prediction"
+      file_type: "csv"
+      columns:
+      - name: "source"
+        description: "Source of regulation"
+        type: "string"
+        required: true
+      - name: "target"
+        description: "Target of regulation"
+        type: "string"
+        required: true
+      - name: "weight"
+        description: "Weight of regulation"
+        type: "float"
+        required: true
+    example:
+    - "resources/grn-benchmark/grn_models/collectri.csv"
+    default:
+    - "output/grn.csv"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "output"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--temp_dir"
+    info: null
+    default:
+    - "output/temdir"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "integer"
+    name: "--num_workers"
+    info: null
+    default:
+    - 4
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  resources:
+  - type: "nextflow_script"
+    path: "main.nf"
+    is_executable: true
+    entrypoint: "run_wf"
+  test_resources:
+  - type: "python_script"
+    path: "src/common/component_tests/run_and_check_output.py"
+    is_executable: true
+  - type: "file"
+    path: "resources/grn-benchmark"
+    dest: "resources/grn-benchmark"
+  info:
+    label: "grn_inference_granie"
+    summary: "Infers GRNs from multiomics data using granie."
+    type: "methods"
+    type_info:
+      label: "Method"
+      summary: "A GRN inference method"
+      description: "A method for inferring GRN from expression data.\n"
+  status: "enabled"
+  dependencies:
+  - name: "grn_methods/granie"
+    repository:
+      type: "local"
+      localPath: ""
+    foundConfigPath: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/granie/config.vsh.yaml"
+    configInfo:
+      functionalityName: "granie"
+      git_tag: ""
+      git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"
+      viash_version: "0.8.6"
+      config: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/granie/config.vsh.yaml"
+      functionalityNamespace: "grn_methods"
+      output: ""
+      platform: ""
+      git_commit: "7f91a8f88722023bd1507442b19168beff1c2bb2"
+      executable: "/nextflow/grn_methods/granie/main.nf"
+    writtenPath: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/granie"
+  set_wd_to_resources_dir: false
+platforms:
+- type: "nextflow"
+  id: "nextflow"
+  directives:
+    label:
+    - "hightime"
+    - "midmem"
+    - "highcpu"
+    tag: "$id"
+  auto:
+    simplifyInput: true
+    simplifyOutput: false
+    transcript: false
+    publish: false
+  config:
+    labels:
+      lowmem: "memory = 20.Gb"
+      midmem: "memory = 50.Gb"
+      highmem: "memory = 100.Gb"
+      lowcpu: "cpus = 5"
+      midcpu: "cpus = 15"
+      highcpu: "cpus = 30"
+      lowtime: "time = 1.h"
+      midtime: "time = 4.h"
+      hightime: "time = 8.h"
+      veryhightime: "time = 24.h"
+    script:
+    - "process.errorStrategy = 'ignore'"
+  debug: false
+  container: "docker"
+info:
+  config: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/granie_ns/config.vsh.yaml"
+  platform: "nextflow"
+  output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/grn_inference_granie"
+  executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/grn_inference_granie/main.nf"
+  viash_version: "0.8.6"
+  git_commit: "7f91a8f88722023bd1507442b19168beff1c2bb2"
+  git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"

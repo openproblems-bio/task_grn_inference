@@ -2787,32 +2787,8 @@ meta = [
       {
         "type" : "file",
         "name" : "--multiomics_rna",
-        "info" : {
-          "label" : "multiomics rna",
-          "summary" : "RNA expression for multiomics data.",
-          "file_type" : "h5ad",
-          "slots" : {
-            "obs" : [
-              {
-                "name" : "cell_type",
-                "type" : "string",
-                "description" : "The annotated cell type of each cell based on RNA expression.",
-                "required" : true
-              },
-              {
-                "name" : "donor_id",
-                "type" : "string",
-                "description" : "Donor id",
-                "required" : true
-              }
-            ]
-          }
-        },
-        "example" : [
-          "resources/grn-benchmark/multiomics_rna.h5ad"
-        ],
         "default" : [
-          "resources_test/grn-benchmark/multiomics_rna.h5ad"
+          "resources_test/grn-benchmark/multiomics_rna.rds"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2825,32 +2801,8 @@ meta = [
       {
         "type" : "file",
         "name" : "--multiomics_atac",
-        "info" : {
-          "label" : "multiomics atac",
-          "summary" : "Peak data for multiomics data.",
-          "file_type" : "h5ad",
-          "slots" : {
-            "obs" : [
-              {
-                "name" : "cell_type",
-                "type" : "string",
-                "description" : "The annotated cell type of each cell based on RNA expression.",
-                "required" : true
-              },
-              {
-                "name" : "donor_id",
-                "type" : "string",
-                "description" : "Donor id",
-                "required" : true
-              }
-            ]
-          }
-        },
-        "example" : [
-          "resources/grn-benchmark/multiomics_atac.h5ad"
-        ],
         "default" : [
-          "resources_test/grn-benchmark/multiomics_atac.h5ad"
+          "resources_test/grn-benchmark/multiomics_atac.rds"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2920,36 +2872,6 @@ meta = [
         "default" : [
           4
         ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "file",
-        "name" : "--file_rna",
-        "description" : "Path to the RNA data file (e.g., rna.rds).",
-        "default" : [
-          "resources_test/grn-benchmark/multiomics_r/rna.rds"
-        ],
-        "must_exist" : true,
-        "create_parent" : true,
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "file",
-        "name" : "--file_atac",
-        "description" : "Path to the ATAC data file (e.g., atac.rds).",
-        "default" : [
-          "resources_test/grn-benchmark/multiomics_r/atac.rds"
-        ],
-        "must_exist" : true,
-        "create_parent" : true,
         "required" : false,
         "direction" : "input",
         "multiple" : false,
@@ -3231,9 +3153,9 @@ meta = [
       "summary" : "GRN inference using GRaNIE",
       "description" : "GRN inference using GRaNIE\n",
       "documentation_url" : "https://grp-zaugg.embl-community.io/GRaNIE/",
-      "type" : "methods",
+      "type" : "methods_r",
       "type_info" : {
-        "label" : "Method",
+        "label" : "Method r",
         "summary" : "A GRN inference method",
         "description" : "A method for inferring GRN from expression data.\n"
       }
@@ -3301,7 +3223,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/granie",
     "viash_version" : "0.8.6",
-    "git_commit" : "329c6b83682eb91a6ef0f782db992e566a64ef58",
+    "git_commit" : "7f91a8f88722023bd1507442b19168beff1c2bb2",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3328,8 +3250,6 @@ par <- list(
   "prediction" = $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PREDICTION" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "temp_dir" = $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TEMP_DIR" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "num_workers" = $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_NUM_WORKERS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
-  "file_rna" = $( if [ ! -z ${VIASH_PAR_FILE_RNA+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_FILE_RNA" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "file_atac" = $( if [ ! -z ${VIASH_PAR_FILE_ATAC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_FILE_ATAC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "normRNA" = $( if [ ! -z ${VIASH_PAR_NORMRNA+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_NORMRNA" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "normATAC" = $( if [ ! -z ${VIASH_PAR_NORMATAC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_NORMATAC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "LSI_featureCutoff" = $( if [ ! -z ${VIASH_PAR_LSI_FEATURECUTOFF+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_LSI_FEATURECUTOFF" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
@@ -3452,12 +3372,12 @@ if (!file.exists(file_RNA)) {
 if (par\\$forceRerun | !file.exists(file_seurat)) {
   
  # Sparse matrix
- rna.m = readRDS(par\\$file_rna)
+ rna.m = readRDS(par\\$perturbation_rna)
  
  seurat_object <- CreateSeuratObject(count = rna.m, project = "PBMC", min.cells = 1, min.features = 1, assay = "RNA")
  
  # RangedSummarizedExperiment
- atac = readRDS(par\\$file_atac)
+ atac = readRDS(par\\$perturbation_atac)
  
  # Extract counts and metadata from the RangedSummarizedExperiment
   atac_counts <- assays(atac)\\$counts

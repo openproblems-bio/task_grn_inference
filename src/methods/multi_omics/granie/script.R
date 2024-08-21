@@ -101,12 +101,12 @@ if (!file.exists(file_RNA)) {
 if (par$forceRerun | !file.exists(file_seurat)) {
   
  # Sparse matrix
- rna.m = readRDS(par$file_rna)
+ rna.m = readRDS(par$perturbation_rna)
  
  seurat_object <- CreateSeuratObject(count = rna.m, project = "PBMC", min.cells = 1, min.features = 1, assay = "RNA")
  
  # RangedSummarizedExperiment
- atac = readRDS(par$file_atac)
+ atac = readRDS(par$perturbation_atac)
  
  # Extract counts and metadata from the RangedSummarizedExperiment
   atac_counts <- assays(atac)$counts
