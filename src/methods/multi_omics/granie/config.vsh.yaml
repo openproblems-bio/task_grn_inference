@@ -123,7 +123,7 @@ functionality:
     default: 250000
     direction: input
     description: Range in base pairs for maximum distance of peak-gene connections (default is 250000).
---GRaNIE_includeSexChr
+
   - name: --GRaNIE_TF_peak_fdr_threshold
     type: double
     required: false
@@ -138,7 +138,7 @@ functionality:
     direction: input
     description: FDR threshold for peak-gene connections (default is 0.2).
 
-  #  File existance is checked, so commenting out for now
+  # Existance of output files is checked, not yet implemented
   # - name: --peak_gene
   #   type: file
   #   required: false
@@ -163,7 +163,7 @@ functionality:
   - name: --subset
     type: boolean
     required: false
-    default: True
+    default: true
     direction: input
     description: "Flag for testing purposes to subset the data for faster running times"
 
