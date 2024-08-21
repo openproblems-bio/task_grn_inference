@@ -1,0 +1,21 @@
+
+__merge__: ../../../api/comp_method.yaml
+
+functionality:
+  name: grn_inference_granie
+  namespace: "workflows"
+  info:
+    label: grn_inference_granie
+    summary: "Infers GRNs from multiomics data using granie."
+
+  resources:
+    - type: nextflow_script
+      path: main.nf
+      entrypoint: run_wf
+  dependencies:
+    - name: grn_methods/granie 
+
+platforms:
+  - type: nextflow
+    directives:
+      label: [ hightime, midmem, highcpu ]
