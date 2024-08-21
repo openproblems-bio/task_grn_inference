@@ -1,5 +1,5 @@
 __merge__: ../../../api/comp_method.yaml
-  
+
 
 functionality:
   name: granie
@@ -158,6 +158,13 @@ functionality:
     default: false
     direction: input
     description: "Flag to force rerun of the analysis regardless of existing results."
+
+  - name: --subset
+    type: boolean
+    required: false
+    default: True
+    direction: input
+    description: "Flag for testing purposes to subset the data for faster running times"
 
   resources:
     - type: r_script

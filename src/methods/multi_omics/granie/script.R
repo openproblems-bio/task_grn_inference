@@ -74,7 +74,7 @@ if (!file.exists(destfile)) {
 # Define the directory to extract the files to
 exdir <- "PWMScan_HOCOMOCOv12_H12INVIVO"
 
-GRaNIE_TFBSFolder = paste0(exdir, "/PWMScan_HOCOMOCOv12/H12INVIVO")
+GRaNIE_TFBSFolder = paste0(exdir, "/H12INVIVO")
 
 if (!file.exists(GRaNIE_TFBSFolder)) {
   untar(destfile, exdir = exdir)
@@ -169,7 +169,16 @@ if (file.exists(GRaNIE_file_peaks) & file.exists(GRaNIE_file_metadata) & file.ex
   
 } else {
 
-  #str(formals(prepareSeuratData_GRaNIE))
+    # Subset for testing purposes
+    if (par$subset == TRUE) {
+        cat("SUBSET cells\n")
+        random_cells <- sample(Cells(seurat_object), size = 5000, replace = FALSE)
+        seurat_object = subset(seurat_object, cells = random_cells)
+        cat("SUBSET peaks\n")
+        peak_names <- rownames(seurat_object[["peaks"]])
+        selected_peaks <- sample(peak_names, size = 50000, replace = FALSE)
+        seurat_object[["peaks"]] = subset(seurat_object[["peaks"]], features = selected_peaks)
+    }
 
   seurat_object = prepareSeuratData_GRaNIE(seurat_object, 
                                            outputDir = outputDir,
