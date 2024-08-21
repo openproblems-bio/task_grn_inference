@@ -3223,7 +3223,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/granie",
     "viash_version" : "0.8.6",
-    "git_commit" : "7f91a8f88722023bd1507442b19168beff1c2bb2",
+    "git_commit" : "5e30c299509011d09360084a564aa54f355a9b81",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3372,12 +3372,12 @@ if (!file.exists(file_RNA)) {
 if (par\\$forceRerun | !file.exists(file_seurat)) {
   
  # Sparse matrix
- rna.m = readRDS(par\\$perturbation_rna)
+ rna.m = readRDS(par\\$multiomics_rna)
  
  seurat_object <- CreateSeuratObject(count = rna.m, project = "PBMC", min.cells = 1, min.features = 1, assay = "RNA")
  
  # RangedSummarizedExperiment
- atac = readRDS(par\\$perturbation_atac)
+ atac = readRDS(par\\$multiomics_atac)
  
  # Extract counts and metadata from the RangedSummarizedExperiment
   atac_counts <- assays(atac)\\$counts
