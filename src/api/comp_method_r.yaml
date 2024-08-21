@@ -8,12 +8,12 @@ functionality:
       description: |
         A method for inferring GRN from expression data.
   arguments:
-    - name: --multiomics_rna
+    - name: --multiomics_rna_r
       type: file
       required: false
       direction: input
       default: resources_test/grn-benchmark/multiomics_rna.rds
-    - name: --multiomics_atac
+    - name: --multiomics_atac_r
       type: file
       required: false
       direction: input

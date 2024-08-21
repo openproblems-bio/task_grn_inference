@@ -1,29 +1,3 @@
-
-## VIASH START
-# par <- list(
-#   file_rna = "resources_test/grn-benchmark/multiomics_r/rna.rds",
-#   file_atac = "resources_test/grn-benchmark/multiomics_r/atac.rds",
-#   preprocessing_clusteringMethod = 1, # Seurat::FindClusters: (1 = original Louvain algorithm, 2 = Louvain algorithm with multilevel refinement, 3 = SLM algorithm, 4 = Leiden algorithm)
-#   preprocessing_clusterResolution = 14, # Typically between 5 and 20
-#   preprocessing_RNA_nDimensions = 50, # Default 50
-#   genomeAssembly = "hg38",
-#   GRaNIE_corMethod = "spearman",
-#   GRaNIE_includeSexChr = TRUE,
-#   GRaNIE_promoterRange = 250000,
-#   GRaNIE_TF_peak_fdr_threshold = 0.2,
-#   GGRaNIE_peak_gene_fdr_threshold = 0.2,
-#   num_workers = 4,
-#   peak_gene = "output/granie/peak_gene.csv", # not yet implemented, should I?
-#   prediction= "output/granie/prediction.csv",
-#   useWeightingLinks = FALSE,
-#   forceRerun = FALSE
-# )
-
-# meta <- list(
-#   functionality_name = "my_method_r"
-# )
-## VIASH END
-
 set.seed(42)
 suppressPackageStartupMessages(library(Seurat))
 
@@ -40,12 +14,30 @@ suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(SummarizedExperiment))
 
 
+## VIASH START
+par <- list(
+  multiomics_rna_r = "resources_test/grn-benchmark/multiomics_rna.rds",
+  multiomics_atac_r = "resources_test/grn-benchmark/multiomics_atac.rds",
+  preprocessing_clusteringMethod = 1, # Seurat::FindClusters: (1 = original Louvain algorithm, 2 = Louvain algorithm with multilevel refinement, 3 = SLM algorithm, 4 = Leiden algorithm)
+  preprocessing_clusterResolution = 14, # Typically between 5 and 20
+  preprocessing_RNA_nDimensions = 50, # Default 50
+  genomeAssembly = "hg38",
+  GRaNIE_corMethod = "spearman",
+  GRaNIE_includeSexChr = TRUE,
+  GRaNIE_promoterRange = 250000,
+  GRaNIE_TF_peak_fdr_threshold = 0.2,
+  GGRaNIE_peak_gene_fdr_threshold = 0.2,
+  num_workers = 4,
+  peak_gene = "output/granie/peak_gene.csv", # not yet implemented, should I?
+  prediction= "output/granie/prediction.csv",
+  useWeightingLinks = FALSE,
+  forceRerun = FALSE
+)
+## VIASH END
+
+
 cat("Content of par list:")
 str(par)
-
-#qs::qsave(par, "/home/carnold/par.qs")
-
-
 
 #### STANDARD ASSIGNMENTS ###
 file_seurat = "seurat_granie.qs"
@@ -101,12 +93,12 @@ if (!file.exists(file_RNA)) {
 if (par$forceRerun | !file.exists(file_seurat)) {
   
  # Sparse matrix
- rna.m = readRDS(par$multiomics_rna)
+ rna.m = readRDS(par$multiomics_rna_r)
  
  seurat_object <- CreateSeuratObject(count = rna.m, project = "PBMC", min.cells = 1, min.features = 1, assay = "RNA")
  
  # RangedSummarizedExperiment
- atac = readRDS(par$multiomics_atac)
+ atac = readRDS(par$multiomics_atac_r)
  
  # Extract counts and metadata from the RangedSummarizedExperiment
   atac_counts <- assays(atac)$counts
