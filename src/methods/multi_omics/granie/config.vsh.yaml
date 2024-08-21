@@ -163,7 +163,7 @@ functionality:
   - name: --subset
     type: boolean
     required: false
-    default: true
+    default: false
     direction: input
     description: "Flag for testing purposes to subset the data for faster running times"
 
