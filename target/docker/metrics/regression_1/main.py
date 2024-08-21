@@ -65,6 +65,9 @@ def regression_1(
     """
     gene_names = train_df.index.to_numpy()
     gene_names_grn = net.index.to_numpy()
+    print(net)
+    print(gene_names)
+    aa
     # determine regressor 
     if reg_type=='ridge':
         regr =  Ridge(**dict(random_state=32))
@@ -162,6 +165,7 @@ def process_net(net, gene_names, manipulate):
         net = net.map(lambda x: 1 if x>0 else (-1 if x<0 else 0))
     return net
 
+
 def main(par):
     random_state = 42
     set_global_seed(random_state)
@@ -172,7 +176,7 @@ def main(par):
     
     perturbation_data = ad.read_h5ad(par['perturbation_data'])
     gene_names = perturbation_data.var.index.to_numpy()
-    net = pd.read_csv(par['prediction'])
+    net = pd.read_csv(par['prediction'], index_col=0)
 
     subsample = par['subsample']
     reg_type = par['reg_type']
