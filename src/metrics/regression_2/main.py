@@ -231,10 +231,11 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     gene_names = perturbation_data.var.index.to_numpy()
     n_genes = len(gene_names)
     groups = LabelEncoder().fit_transform(perturbation_data.obs.plate_name)
+
     
     # Load inferred GRN
     print(f'Loading GRN', flush=True)
-    grn = load_grn(par['prediction'], gene_names)
+    grn = pd.read_csv(par['prediction'])
     
     # Load and standardize perturbation data
     layer = par['layer']
