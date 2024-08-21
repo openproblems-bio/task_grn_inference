@@ -16,14 +16,63 @@ functionality:
     required: false
     direction: input
     description: "Path to the RNA data file (e.g., rna.rds)."
-    default: resources_test/grn-benchmark/multiomics_rna.rds
+    default: resources_test/grn-benchmark/multiomics_r/rna.rds
 
   - name: --file_atac
     type: file
     required: false
     direction: input
     description: "Path to the ATAC data file (e.g., atac.rds)."
-    default: resources_test/grn-benchmark/multiomics_atac.rds
+    default: resources_test/grn-benchmark/multiomics_r/atac.rds
+
+  - name: --normRNA
+    type: string
+    required: false
+    direction: input
+    description: Normalization method for RNA data.
+    default: "SCT"
+
+  - name: --normATAC
+    type: string
+    required: false
+    direction: input
+    description: Normalization method for ATAC data.
+    default: "LSI"
+
+  - name: --LSI_featureCutoff
+    type: string
+    required: false
+    direction: input
+    description: Feature cutoff for LSI normalization.
+    default: "q0"
+
+  - name: --nDimensions_ATAC
+    type: integer
+    required: false
+    direction: input
+    description: Number of dimensions for ATAC modality
+    default: 50
+
+  - name: --integrationMethod
+    type: string
+    required: false
+    direction: input
+    description: Method used for data integration.
+    default: "WNN"
+
+  - name: --WNN_knn
+    type: integer
+    required: false
+    direction: input
+    description: Number of nearest neighbors for WNN integration.
+    default: 20
+
+  - name: --minCellsPerCluster
+    type: integer
+    required: false
+    direction: input
+    description: Minimum number of cells required per cluster.
+    default: 25
 
 
   - name: --preprocessing_clusteringMethod
@@ -40,12 +89,12 @@ functionality:
     description: Resolution for clustering, typically between 5 and 20.
     default: 14
 
-  - name: --preprocessing_SCT_nDimensions
+  - name: --preprocessing_RNA_nDimensions
     type: integer
     required: false
     direction: input
     default: 50
-    description: Number of dimensions for SCT, default is 50.
+    description: Number of dimensions for RNA reduction, default is 50.
 
   - name: --genomeAssembly
     type: string
@@ -89,12 +138,13 @@ functionality:
     direction: input
     description: FDR threshold for peak-gene connections (default is 0.2).
 
-  - name: --peak_gene
-    type: file
-    required: false
-    direction: output
-    description: Path to the peak-gene output file (e.g., peak_gene.csv). Not yet implemented.
-    default: output/granie/peak_gene.csv
+  # Existance of output files is checked, not yet implemented
+  # - name: --peak_gene
+  #   type: file
+  #   required: false
+  #   direction: output
+  #   description: Path to the peak-gene output file (e.g., peak_gene.csv). Not yet implemented.
+  #   default: output/granie/peak_gene.csv
 
   - name: --useWeightingLinks
     type: boolean
@@ -110,6 +160,13 @@ functionality:
     direction: input
     description: "Flag to force rerun of the analysis regardless of existing results."
 
+  - name: --subset
+    type: boolean
+    required: false
+    default: false
+    direction: input
+    description: "Flag for testing purposes to subset the data for faster running times"
+
   resources:
     - type: r_script
       path: script.R
@@ -117,7 +174,7 @@ functionality:
 
 platforms:
   - type: docker
-    image: chrarnold84/granieverse:latest
+    image: chrarnold84/granieverse:v1.3
 
   - type: native
   - type: nextflow
