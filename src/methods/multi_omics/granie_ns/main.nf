@@ -8,7 +8,7 @@ workflow run_wf {
     | granie.run(
       fromState: [
               multiomics_rna_r: "multiomics_rna_r",
-              multiomics_ata_r: "multiomics_ata_r",
+              multiomics_atac_r: "multiomics_atac_r",
               num_workers: "num_workers"
               ],
       toState: [prediction:"prediction"]
