@@ -1,0 +1,97 @@
+functionality:
+  name: "run_robustness_analysis"
+  namespace: "workflows"
+  version: "build-main"
+  resources:
+  - type: "nextflow_script"
+    path: "main.nf"
+    is_executable: true
+    entrypoint: "run_wf"
+  - type: "file"
+    path: "../../api/task_info.yaml"
+  info:
+    label: "run_robustness_analysis"
+    summary: "Evaluates GRNs and provides scores using regression analysis."
+  status: "enabled"
+  dependencies:
+  - name: "common/extract_metadata"
+    repository:
+      type: "github"
+      name: ""
+      repo: "openproblems-bio/openproblems-v2"
+      tag: "main_build"
+      localPath: "/tmp/viash_hub_repo13364176287444176936"
+    foundConfigPath: "/tmp/viash_hub_repo13364176287444176936/target/nextflow/common/extract_metadata/.config.vsh.yaml"
+    configInfo:
+      functionalityName: "extract_metadata"
+      git_remote: "https://github.com/openproblems-bio/openproblems-v2"
+      viash_version: "0.8.0"
+      config: "/home/runner/work/openproblems-v2/openproblems-v2/src/common/extract_metadata/config.vsh.yaml"
+      functionalityNamespace: "common"
+      output: "/home/runner/work/openproblems-v2/openproblems-v2/target/nextflow/common/extract_metadata"
+      platform: "nextflow"
+      git_commit: "d0bc03fb05d43fb26f51c6fe6aa2e2a2f7ff5ade"
+      executable: "/home/runner/work/openproblems-v2/openproblems-v2/target/nextflow/common/extract_metadata/extract_metadata"
+    writtenPath: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/dependencies/github/openproblems-bio/openproblems-v2/main_build/nextflow/common/extract_metadata"
+  - name: "metrics/regression_1"
+    repository:
+      type: "local"
+      localPath: ""
+    foundConfigPath: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/metrics/regression_1/config.vsh.yaml"
+    configInfo:
+      functionalityName: "regression_1"
+      git_tag: ""
+      git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"
+      viash_version: "0.8.6"
+      config: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/metrics/regression_1/config.vsh.yaml"
+      functionalityNamespace: "metrics"
+      output: ""
+      platform: ""
+      git_commit: "debe9ff6f21106e1817a123b979ff9bd722428f7"
+      executable: "/nextflow/metrics/regression_1/main.nf"
+    writtenPath: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1"
+  repositories:
+  - type: "github"
+    name: "openproblemsv2"
+    repo: "openproblems-bio/openproblems-v2"
+    tag: "main_build"
+    localPath: ""
+  set_wd_to_resources_dir: false
+platforms:
+- type: "nextflow"
+  id: "nextflow"
+  directives:
+    label:
+    - "midtime"
+    - "midmem"
+    - "lowcpu"
+    tag: "$id"
+  auto:
+    simplifyInput: true
+    simplifyOutput: false
+    transcript: false
+    publish: false
+  config:
+    labels:
+      lowmem: "memory = 20.Gb"
+      midmem: "memory = 50.Gb"
+      highmem: "memory = 100.Gb"
+      lowcpu: "cpus = 5"
+      midcpu: "cpus = 15"
+      highcpu: "cpus = 30"
+      lowtime: "time = 1.h"
+      midtime: "time = 4.h"
+      hightime: "time = 8.h"
+      veryhightime: "time = 24.h"
+    script:
+    - "process.errorStrategy = 'ignore'"
+  debug: false
+  container: "docker"
+info:
+  config: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/robustness_analysis/config.vsh.yaml"
+  platform: "nextflow"
+  output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_robustness_analysis"
+  executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_robustness_analysis/main.nf"
+  viash_version: "0.8.6"
+  git_commit: "debe9ff6f21106e1817a123b979ff9bd722428f7"
+  git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"

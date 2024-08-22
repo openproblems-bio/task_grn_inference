@@ -2930,7 +2930,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "f98576c9477439325e40b4b31dbb36b7a06d6632",
+          "git_commit" : "debe9ff6f21106e1817a123b979ff9bd722428f7",
           "executable" : "/nextflow/grn_methods/granie/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/granie"
@@ -2982,7 +2982,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/grn_inference_granie",
     "viash_version" : "0.8.6",
-    "git_commit" : "f98576c9477439325e40b4b31dbb36b7a06d6632",
+    "git_commit" : "debe9ff6f21106e1817a123b979ff9bd722428f7",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3004,7 +3004,7 @@ workflow run_wf {
     | granie.run(
       fromState: [
               multiomics_rna_r: "multiomics_rna_r",
-              multiomics_ata_r: "multiomics_ata_r",
+              multiomics_atac_r: "multiomics_atac_r",
               num_workers: "num_workers"
               ],
       toState: [prediction:"prediction"]

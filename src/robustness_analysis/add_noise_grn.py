@@ -5,7 +5,7 @@ import numpy as np
 layer = 'scgen_pearson'
 grn_folder = 'resources/grn_models'
 grn_folder_noised = 'resources/supplementary/grn_models_noised'
-noise_ratio = 0.2
+noise_ratio = 0.5
 # permute_ratio = 0.2
 
 # Ensure the output folder exists
