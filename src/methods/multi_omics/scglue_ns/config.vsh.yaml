@@ -26,4 +26,4 @@ functionality:
 platforms:
   - type: nextflow
     directives:
-      label: [ hightime, midmem, highcpu ]
+      label: [ veryhightime, midmem, highcpu ]

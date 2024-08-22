@@ -12,8 +12,10 @@ par = {
   'reg_type': 'ridge',
   'subsample': -2,
   "tf_all":  "./resources/prior/tf_all.csv",
-  "temp_dir": "output"
+  "temp_dir": "output/ridge/noised"
 }
+grn_models_folder = 'resources/grn_models'
+grn_models_folder = 'resources/supplementary/grn_models_noised'
 
 def create_positive_control(X: np.ndarray, groups: np.ndarray):
     grns = []
@@ -42,9 +44,11 @@ meta = {
 }
 sys.path.append(meta["resources_dir"])
 from main import main 
-layers = ['pearson', 'lognorm', 'scgen_pearson', 'scgen_lognorm', 'seurat_lognorm', 'seurat_pearson']
+# layers = ['pearson', 'lognorm', 'scgen_pearson', 'scgen_lognorm', 'seurat_lognorm', 'seurat_pearson']
+layers = ['pearson']
 grn_models = ['scenicplus', 'celloracle', 'figr', 'granie', 'scglue', 'collectri']
-controls = ['negative_control', 'positive_control']
+# controls = ['negative_control', 'positive_control']
+controls = []
 
 os.makedirs(par['temp_dir'], exist_ok=True)
 for grn_model in controls + grn_models :
@@ -76,18 +80,18 @@ for grn_model in controls + grn_models :
       par['prediction'] = f"{par['temp_dir']}/negative_control.csv"
       pivoted_net.to_csv(par['prediction'])
     else:
-      par['prediction'] = f"resources/grn_models/{grn_model}.csv"
-    # output = main(par) 
-    # output.index = [layer]
+      par['prediction'] = f"{grn_models_folder}/{grn_model}.csv"
+    output = main(par) 
+    output.index = [layer]
 
-    # if ii == 0:
-    #   score = output
-    # else:
-    #   score = pd.concat([score, output], axis=0)
+    if ii == 0:
+      score = output
+    else:
+      score = pd.concat([score, output], axis=0)
 
-    # print("Write output to file", flush=True)
-    # print(grn_model, layer, score)
+    print("Write output to file", flush=True)
+    print(grn_model, layer, score)
 
-  # print("Write output to file", flush=True)
-  # score.to_csv(par['score'])
+  print("Write output to file", flush=True)
+  score.to_csv(par['score'])
 

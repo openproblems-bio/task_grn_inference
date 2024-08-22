@@ -1,5 +1,5 @@
 
-__merge__: ../../../api/comp_method.yaml
+__merge__: ../../../api/comp_method_r.yaml
 
 functionality:
   name: grn_inference_granie

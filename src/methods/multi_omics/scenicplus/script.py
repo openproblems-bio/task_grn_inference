@@ -22,12 +22,12 @@ par = {
   'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
   'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad',
   'cistopic_out': 'output/pycistopic',
-  'out_dir': 'output/scenicplus',
+  'temp_dir': 'output/scenicplus',
   'prediction': 'output/prediction.csv',
 }
 ## VIASH END
 
-work_dir = par['out_dir']
+work_dir = par['temp_dir']
 os.makedirs(os.path.join(work_dir, 'scRNA'), exist_ok=True)
 
 # Download databases
@@ -119,7 +119,7 @@ motif_annotation = os.path.join(DB_PATH, 'motifs-v10-nr.hgnc-m0.00001-o0.0.tbl')
 # Init scenicplus pipeline
 os.makedirs(os.path.join(work_dir, 'scplus_pipeline'), exist_ok=True)
 os.makedirs(os.path.join(work_dir, 'scplus_pipeline', 'temp'), exist_ok=True)
-subprocess.run(['scenicplus', 'init_snakemake', '--out_dir', os.path.join(work_dir, 'scplus_pipeline')])
+subprocess.run(['scenicplus', 'init_snakemake', '--temp_dir', os.path.join(work_dir, 'scplus_pipeline')])
 
 # Load pipeline settings
 with open(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'r') as f:
