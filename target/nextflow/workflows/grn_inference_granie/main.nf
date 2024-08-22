@@ -2786,33 +2786,9 @@ meta = [
     "arguments" : [
       {
         "type" : "file",
-        "name" : "--multiomics_rna",
-        "info" : {
-          "label" : "multiomics rna",
-          "summary" : "RNA expression for multiomics data.",
-          "file_type" : "h5ad",
-          "slots" : {
-            "obs" : [
-              {
-                "name" : "cell_type",
-                "type" : "string",
-                "description" : "The annotated cell type of each cell based on RNA expression.",
-                "required" : true
-              },
-              {
-                "name" : "donor_id",
-                "type" : "string",
-                "description" : "Donor id",
-                "required" : true
-              }
-            ]
-          }
-        },
-        "example" : [
-          "resources/grn-benchmark/multiomics_rna.h5ad"
-        ],
+        "name" : "--multiomics_rna_r",
         "default" : [
-          "resources_test/grn-benchmark/multiomics_rna.h5ad"
+          "resources_test/grn-benchmark/multiomics_rna.rds"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2824,33 +2800,9 @@ meta = [
       },
       {
         "type" : "file",
-        "name" : "--multiomics_atac",
-        "info" : {
-          "label" : "multiomics atac",
-          "summary" : "Peak data for multiomics data.",
-          "file_type" : "h5ad",
-          "slots" : {
-            "obs" : [
-              {
-                "name" : "cell_type",
-                "type" : "string",
-                "description" : "The annotated cell type of each cell based on RNA expression.",
-                "required" : true
-              },
-              {
-                "name" : "donor_id",
-                "type" : "string",
-                "description" : "Donor id",
-                "required" : true
-              }
-            ]
-          }
-        },
-        "example" : [
-          "resources/grn-benchmark/multiomics_atac.h5ad"
-        ],
+        "name" : "--multiomics_atac_r",
         "default" : [
-          "resources_test/grn-benchmark/multiomics_atac.h5ad"
+          "resources_test/grn-benchmark/multiomics_atac.rds"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2953,9 +2905,9 @@ meta = [
     "info" : {
       "label" : "grn_inference_granie",
       "summary" : "Infers GRNs from multiomics data using granie.",
-      "type" : "methods",
+      "type" : "methods_r",
       "type_info" : {
-        "label" : "Method",
+        "label" : "Method r",
         "summary" : "A GRN inference method",
         "description" : "A method for inferring GRN from expression data.\n"
       }
@@ -2978,7 +2930,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "7a90f7738f50ce4596429a608c4caa576f03fd5f",
+          "git_commit" : "f98576c9477439325e40b4b31dbb36b7a06d6632",
           "executable" : "/nextflow/grn_methods/granie/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/granie"
@@ -3030,7 +2982,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/grn_inference_granie",
     "viash_version" : "0.8.6",
-    "git_commit" : "7a90f7738f50ce4596429a608c4caa576f03fd5f",
+    "git_commit" : "f98576c9477439325e40b4b31dbb36b7a06d6632",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3051,8 +3003,8 @@ workflow run_wf {
 
     | granie.run(
       fromState: [
-              multiomics_rna: "multiomics_rna",
-              multiomics_atac: "multiomics_atac",
+              multiomics_rna_r: "multiomics_rna_r",
+              multiomics_ata_r: "multiomics_ata_r",
               num_workers: "num_workers"
               ],
       toState: [prediction:"prediction"]

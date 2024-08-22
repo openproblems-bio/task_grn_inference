@@ -4,25 +4,10 @@ functionality:
   version: "build-main"
   arguments:
   - type: "file"
-    name: "--multiomics_rna"
-    info:
-      label: "multiomics rna"
-      summary: "RNA expression for multiomics data."
-      file_type: "h5ad"
-      slots:
-        obs:
-        - name: "cell_type"
-          type: "string"
-          description: "The annotated cell type of each cell based on RNA expression."
-          required: true
-        - name: "donor_id"
-          type: "string"
-          description: "Donor id"
-          required: true
-    example:
-    - "resources/grn-benchmark/multiomics_rna.h5ad"
+    name: "--multiomics_rna_r"
+    info: null
     default:
-    - "resources_test/grn-benchmark/multiomics_rna.h5ad"
+    - "resources_test/grn-benchmark/multiomics_rna.rds"
     must_exist: true
     create_parent: true
     required: false
@@ -31,25 +16,10 @@ functionality:
     multiple_sep: ":"
     dest: "par"
   - type: "file"
-    name: "--multiomics_atac"
-    info:
-      label: "multiomics atac"
-      summary: "Peak data for multiomics data."
-      file_type: "h5ad"
-      slots:
-        obs:
-        - name: "cell_type"
-          type: "string"
-          description: "The annotated cell type of each cell based on RNA expression."
-          required: true
-        - name: "donor_id"
-          type: "string"
-          description: "Donor id"
-          required: true
-    example:
-    - "resources/grn-benchmark/multiomics_atac.h5ad"
+    name: "--multiomics_atac_r"
+    info: null
     default:
-    - "resources_test/grn-benchmark/multiomics_atac.h5ad"
+    - "resources_test/grn-benchmark/multiomics_atac.rds"
     must_exist: true
     create_parent: true
     required: false
@@ -122,9 +92,9 @@ functionality:
   info:
     label: "grn_inference_granie"
     summary: "Infers GRNs from multiomics data using granie."
-    type: "methods"
+    type: "methods_r"
     type_info:
-      label: "Method"
+      label: "Method r"
       summary: "A GRN inference method"
       description: "A method for inferring GRN from expression data.\n"
   status: "enabled"
@@ -143,7 +113,7 @@ functionality:
       functionalityNamespace: "grn_methods"
       output: ""
       platform: ""
-      git_commit: "7a90f7738f50ce4596429a608c4caa576f03fd5f"
+      git_commit: "f98576c9477439325e40b4b31dbb36b7a06d6632"
       executable: "/nextflow/grn_methods/granie/main.nf"
     writtenPath: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/granie"
   set_wd_to_resources_dir: false
@@ -183,5 +153,5 @@ info:
   output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/grn_inference_granie"
   executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/grn_inference_granie/main.nf"
   viash_version: "0.8.6"
-  git_commit: "7a90f7738f50ce4596429a608c4caa576f03fd5f"
+  git_commit: "f98576c9477439325e40b4b31dbb36b7a06d6632"
   git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"

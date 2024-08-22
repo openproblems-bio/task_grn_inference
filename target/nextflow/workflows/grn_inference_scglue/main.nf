@@ -3000,7 +3000,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "7a90f7738f50ce4596429a608c4caa576f03fd5f",
+          "git_commit" : "f98576c9477439325e40b4b31dbb36b7a06d6632",
           "executable" : "/nextflow/grn_methods/scglue/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scglue"
@@ -3014,7 +3014,7 @@ meta = [
       "id" : "nextflow",
       "directives" : {
         "label" : [
-          "hightime",
+          "veryhightime",
           "midmem",
           "highcpu"
         ],
@@ -3052,7 +3052,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/grn_inference_scglue",
     "viash_version" : "0.8.6",
-    "git_commit" : "7a90f7738f50ce4596429a608c4caa576f03fd5f",
+    "git_commit" : "f98576c9477439325e40b4b31dbb36b7a06d6632",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3104,7 +3104,7 @@ meta["defaults"] = [
   // default directives
   directives: readJsonBlob('''{
   "label" : [
-    "hightime",
+    "veryhightime",
     "midmem",
     "highcpu"
   ],
