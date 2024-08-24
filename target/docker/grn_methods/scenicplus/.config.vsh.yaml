@@ -1,6 +1,6 @@
 functionality:
   name: "scenicplus"
-  namespace: "methods"
+  namespace: "grn_methods"
   version: "build-main"
   arguments:
   - type: "file"
@@ -186,9 +186,9 @@ platforms:
   container: "docker"
 info:
   config: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/scenicplus/config.vsh.yaml"
-  platform: "nextflow"
-  output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/methods/scenicplus"
-  executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/methods/scenicplus/scenicplus"
+  platform: "docker"
+  output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/docker/grn_methods/scenicplus"
+  executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/docker/grn_methods/scenicplus/scenicplus"
   viash_version: "0.8.6"
-  git_commit: "7ecf20ca942cb87f4d66ff76c9aed9bbfcf4e467"
+  git_commit: "a183f16843a73d309e45e7045505827473072750"
   git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"

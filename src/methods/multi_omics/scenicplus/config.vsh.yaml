@@ -3,6 +3,7 @@ __merge__: ../../../api/comp_method.yaml
 
 functionality:
   name: scenicplus
+  namespace: grn_methods
   info:
     label: scenicplus
     summary: "GRN inference using scenicplus"

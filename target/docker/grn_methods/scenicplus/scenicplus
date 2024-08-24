@@ -421,10 +421,10 @@ ENTRYPOINT []
 
  
 RUN :
-LABEL org.opencontainers.image.description="Companion container for running component methods scenicplus"
-LABEL org.opencontainers.image.created="2024-08-24T08:14:41Z"
+LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenicplus"
+LABEL org.opencontainers.image.created="2024-08-24T08:49:57Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="7ecf20ca942cb87f4d66ff76c9aed9bbfcf4e467"
+LABEL org.opencontainers.image.revision="a183f16843a73d309e45e7045505827473072750"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -713,14 +713,14 @@ eval set -- $VIASH_POSITIONAL_ARGS
 ViashDockerInstallationCheck
 
 if [ $VIASH_MODE == "docker_setup" ]; then
-  ViashDockerSetup 'ghcr.io/openproblems-bio/task_grn_inference/methods/scenicplus:build-main' "$VIASH_DOCKER_SETUP_STRATEGY"
+  ViashDockerSetup 'ghcr.io/openproblems-bio/task_grn_inference/grn_methods/scenicplus:build-main' "$VIASH_DOCKER_SETUP_STRATEGY"
   exit 0
 fi
-ViashDockerSetup 'ghcr.io/openproblems-bio/task_grn_inference/methods/scenicplus:build-main' ifneedbepullelsecachedbuild
+ViashDockerSetup 'ghcr.io/openproblems-bio/task_grn_inference/grn_methods/scenicplus:build-main' ifneedbepullelsecachedbuild
 
 if [ $VIASH_MODE == "docker_debug" ]; then
-  ViashNotice "+ docker run --entrypoint=bash -i --rm -v "$(pwd)":/pwd --workdir /pwd -t 'ghcr.io/openproblems-bio/task_grn_inference/methods/scenicplus:build-main'"
-  docker run --entrypoint=bash -i --rm -v "$(pwd)":/pwd --workdir /pwd -t 'ghcr.io/openproblems-bio/task_grn_inference/methods/scenicplus:build-main'
+  ViashNotice "+ docker run --entrypoint=bash -i --rm -v "$(pwd)":/pwd --workdir /pwd -t 'ghcr.io/openproblems-bio/task_grn_inference/grn_methods/scenicplus:build-main'"
+  docker run --entrypoint=bash -i --rm -v "$(pwd)":/pwd --workdir /pwd -t 'ghcr.io/openproblems-bio/task_grn_inference/grn_methods/scenicplus:build-main'
   exit 0
 fi
 
@@ -917,7 +917,7 @@ VIASH_UNIQUE_MOUNTS=($(for val in "${VIASH_EXTRA_MOUNTS[@]}"; do echo "$val"; do
 function ViashPerformChown {
   if (( ${#VIASH_CHOWN_VARS[@]} )); then
     set +e
-    eval docker run --entrypoint=bash -i --rm ${VIASH_UNIQUE_MOUNTS[@]} ghcr.io/openproblems-bio/task_grn_inference/methods/scenicplus:build-main -c "'chown $(id -u):$(id -g) --silent --recursive ${VIASH_CHOWN_VARS[@]}'"
+    eval docker run --entrypoint=bash -i --rm ${VIASH_UNIQUE_MOUNTS[@]} ghcr.io/openproblems-bio/task_grn_inference/grn_methods/scenicplus:build-main -c "'chown $(id -u):$(id -g) --silent --recursive ${VIASH_CHOWN_VARS[@]}'"
     set -e
   fi
 }
@@ -936,8 +936,8 @@ fi
 # set dependency paths
 
 
-ViashDebug "Running command: $(echo docker run --entrypoint=bash -i --rm ${VIASH_UNIQUE_MOUNTS[@]} $VIASH_EXTRA_DOCKER_ARGS ghcr.io/openproblems-bio/task_grn_inference/methods/scenicplus:build-main)"
-cat << VIASHEOF | eval docker run --entrypoint=bash -i --rm ${VIASH_UNIQUE_MOUNTS[@]} $VIASH_EXTRA_DOCKER_ARGS ghcr.io/openproblems-bio/task_grn_inference/methods/scenicplus:build-main
+ViashDebug "Running command: $(echo docker run --entrypoint=bash -i --rm ${VIASH_UNIQUE_MOUNTS[@]} $VIASH_EXTRA_DOCKER_ARGS ghcr.io/openproblems-bio/task_grn_inference/grn_methods/scenicplus:build-main)"
+cat << VIASHEOF | eval docker run --entrypoint=bash -i --rm ${VIASH_UNIQUE_MOUNTS[@]} $VIASH_EXTRA_DOCKER_ARGS ghcr.io/openproblems-bio/task_grn_inference/grn_methods/scenicplus:build-main
 set -e
 tempscript=\$(mktemp "$VIASH_META_TEMP_DIR/viash-run-scenicplus-XXXXXX").py
 function clean_up {
