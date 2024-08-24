@@ -39,7 +39,7 @@ functionality:
     - name: --subsample
       type: integer
       direction: input
-      default: -1
+      default: -2
       description: number of samples randomly drawn from perturbation data
       info:
         test_default: 200
