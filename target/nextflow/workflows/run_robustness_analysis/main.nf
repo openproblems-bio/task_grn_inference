@@ -2783,18 +2783,161 @@ meta = [
     "name" : "run_robustness_analysis",
     "namespace" : "workflows",
     "version" : "build-main",
+    "argument_groups" : [
+      {
+        "name" : "Inputs",
+        "arguments" : [
+          {
+            "type" : "string",
+            "name" : "--layer",
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "file",
+            "name" : "--prediction",
+            "must_exist" : true,
+            "create_parent" : true,
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "integer",
+            "name" : "--subsample",
+            "default" : [
+              200
+            ],
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "string",
+            "name" : "--reg_type",
+            "default" : [
+              "ridge"
+            ],
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "string",
+            "name" : "--method_id",
+            "example" : [
+              "collectri"
+            ],
+            "required" : true,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "integer",
+            "name" : "--max_workers",
+            "required" : true,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "file",
+            "name" : "--consensus",
+            "default" : [
+              "resources/prior/consensus.json"
+            ],
+            "must_exist" : true,
+            "create_parent" : true,
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "integer",
+            "name" : "--degree",
+            "default" : [
+              20
+            ],
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "string",
+            "name" : "--type",
+            "default" : [
+              "weight"
+            ],
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          }
+        ]
+      },
+      {
+        "name" : "Outputs",
+        "arguments" : [
+          {
+            "type" : "file",
+            "name" : "--scores",
+            "default" : [
+              "scores.yaml"
+            ],
+            "must_exist" : true,
+            "create_parent" : true,
+            "required" : true,
+            "direction" : "output",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "file",
+            "name" : "--metric_configs",
+            "default" : [
+              "metric_configs.yaml"
+            ],
+            "must_exist" : true,
+            "create_parent" : true,
+            "required" : true,
+            "direction" : "output",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          }
+        ]
+      }
+    ],
     "resources" : [
       {
         "type" : "nextflow_script",
         "path" : "main.nf",
         "is_executable" : true,
-        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/robustness_analysis/",
+        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/run_robustness_analysis/",
         "entrypoint" : "run_wf"
       },
       {
         "type" : "file",
         "path" : "../../api/task_info.yaml",
-        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/robustness_analysis/"
+        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/run_robustness_analysis/"
       }
     ],
     "info" : {
@@ -2810,9 +2953,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems-v2",
           "tag" : "main_build",
-          "localPath" : "/tmp/viash_hub_repo13364176287444176936"
+          "localPath" : "/tmp/viash_hub_repo466339830898704932"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo13364176287444176936/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo466339830898704932/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_remote" : "https://github.com/openproblems-bio/openproblems-v2",
@@ -2842,10 +2985,52 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "debe9ff6f21106e1817a123b979ff9bd722428f7",
+          "git_commit" : "5c2cfe86432ee25c2646f342b76b4918bfba067b",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1"
+      },
+      {
+        "name" : "metrics/regression_2",
+        "repository" : {
+          "type" : "local",
+          "localPath" : ""
+        },
+        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/metrics/regression_2/config.vsh.yaml",
+        "configInfo" : {
+          "functionalityName" : "regression_2",
+          "git_tag" : "",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "viash_version" : "0.8.6",
+          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/metrics/regression_2/config.vsh.yaml",
+          "functionalityNamespace" : "metrics",
+          "output" : "",
+          "platform" : "",
+          "git_commit" : "5c2cfe86432ee25c2646f342b76b4918bfba067b",
+          "executable" : "/nextflow/metrics/regression_2/main.nf"
+        },
+        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2"
+      },
+      {
+        "name" : "robustness_analysis/noise_grn",
+        "repository" : {
+          "type" : "local",
+          "localPath" : ""
+        },
+        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/robustness_analysis/config.vsh.yaml",
+        "configInfo" : {
+          "functionalityName" : "noise_grn",
+          "git_tag" : "",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "viash_version" : "0.8.6",
+          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/robustness_analysis/config.vsh.yaml",
+          "functionalityNamespace" : "robustness_analysis",
+          "output" : "",
+          "platform" : "",
+          "git_commit" : "5c2cfe86432ee25c2646f342b76b4918bfba067b",
+          "executable" : "/nextflow/robustness_analysis/noise_grn/main.nf"
+        },
+        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/robustness_analysis/noise_grn"
       }
     ],
     "repositories" : [
@@ -2899,11 +3084,11 @@ meta = [
     }
   ],
   "info" : {
-    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/robustness_analysis/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/run_robustness_analysis/config.vsh.yaml",
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_robustness_analysis",
     "viash_version" : "0.8.6",
-    "git_commit" : "debe9ff6f21106e1817a123b979ff9bd722428f7",
+    "git_commit" : "5c2cfe86432ee25c2646f342b76b4918bfba067b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -2913,6 +3098,8 @@ meta = [
 meta["root_dir"] = getRootDir()
 include { extract_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems-v2/main_build/nextflow/common/extract_metadata/main.nf"
 include { regression_1 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_1/main.nf"
+include { regression_2 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_2/main.nf"
+include { noise_grn } from "${meta.resources_dir}/../../../nextflow/robustness_analysis/noise_grn/main.nf"
 
 // inner workflow
 // user-provided Nextflow code
@@ -2942,34 +3129,14 @@ workflow run_wf {
     | map{ id, state ->
         [id, state + ["_meta": [join_id: id]]]
       }
-
-    | positive_control.run(
-      runIf: { id, state ->
-        state.method_id == 'positive_control'
-      },
+    
+    | noise_grn.run(
       fromState: [
-        perturbation_data: "perturbation_data",
-        layer: "layer",
-        tf_all: "tf_all"
+        prediction: "prediction"
       ],
-      toState: {id, output, state ->
-        state + [
-          prediction: output.prediction
+      toState: [
+          prediction_n: "prediction_n"
         ]
-      }
-    )
-    | negative_control.run(
-      runIf: { id, state ->
-        state.method_id == 'negative_control'
-      },
-      fromState: [
-        perturbation_data: "perturbation_data"
-      ],
-      toState: {id, output, state ->
-        state + [
-          prediction: output.prediction
-        ]
-      }
     )
 
     // run all metrics
@@ -2980,14 +3147,15 @@ workflow run_wf {
       },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
-        perturbation_data: "perturbation_data",
+        prediction_n: "prediction",
         layer: "layer", 
-        prediction: "prediction",
         subsample: "subsample",
         reg_type: "reg_type",
         method_id: "method_id",
         max_workers: "max_workers",
-        consensus: "consensus"
+        consensus: "consensus",
+        degree: "degree",
+        type: "type"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->

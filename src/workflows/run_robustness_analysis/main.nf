@@ -24,34 +24,14 @@ workflow run_wf {
     | map{ id, state ->
         [id, state + ["_meta": [join_id: id]]]
       }
-
-    | positive_control.run(
-      runIf: { id, state ->
-        state.method_id == 'positive_control'
-      },
+    
+    | noise_grn.run(
       fromState: [
-        perturbation_data: "perturbation_data",
-        layer: "layer",
-        tf_all: "tf_all"
+        prediction: "prediction"
       ],
-      toState: {id, output, state ->
-        state + [
-          prediction: output.prediction
+      toState: [
+          prediction_n: "prediction_n"
         ]
-      }
-    )
-    | negative_control.run(
-      runIf: { id, state ->
-        state.method_id == 'negative_control'
-      },
-      fromState: [
-        perturbation_data: "perturbation_data"
-      ],
-      toState: {id, output, state ->
-        state + [
-          prediction: output.prediction
-        ]
-      }
     )
 
     // run all metrics
@@ -62,14 +42,15 @@ workflow run_wf {
       },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
-        perturbation_data: "perturbation_data",
+        prediction_n: "prediction",
         layer: "layer", 
-        prediction: "prediction",
         subsample: "subsample",
         reg_type: "reg_type",
         method_id: "method_id",
         max_workers: "max_workers",
-        consensus: "consensus"
+        consensus: "consensus",
+        degree: "degree",
+        type: "type"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->

@@ -3002,7 +3002,7 @@ meta = [
           "test_default" : 200
         },
         "default" : [
-          -1
+          -2
         ],
         "required" : false,
         "direction" : "input",
@@ -3160,7 +3160,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "debe9ff6f21106e1817a123b979ff9bd722428f7",
+    "git_commit" : "5c2cfe86432ee25c2646f342b76b4918bfba067b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
