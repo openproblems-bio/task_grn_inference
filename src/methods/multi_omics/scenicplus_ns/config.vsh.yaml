@@ -7,6 +7,10 @@ functionality:
   info:
     label: grn_inference_scenicplus
     summary: "Infers GRNs from multiomics data using scenicplus."
+  arguments:
+    - name: --cistopic_object
+      type: file
+      direction: output
 
   resources:
     - type: nextflow_script

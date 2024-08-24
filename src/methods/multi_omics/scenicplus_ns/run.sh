@@ -31,14 +31,14 @@ HERE
 #   -params-file params/${RUN_ID}.yaml
 
 
-# ./tw-windows-x86_64.exe launch `
-#       https://github.com/openproblems-bio/task_grn_benchmark.git `
-#       --revision build/main `
-#       --pull-latest `
-#       --main-script target/nextflow/workflows/run_grn_inference/main.nf `
-#       --workspace 53907369739130 `
-#       --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
-#       --params-file ./params/celloracle_test.yaml `
-#       --config src/common/nextflow_helpers/labels_tw.config
+./tw-windows-x86_64.exe launch `
+      https://github.com/openproblems-bio/task_grn_benchmark.git `
+      --revision build/main `
+      --pull-latest `
+      --main-script target/nextflow/workflows/grn_inference_scenicplus/main.nf `
+      --workspace 53907369739130 `
+      --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
+      --params-file ./params/scenicplus.yaml `
+      --config src/common/nextflow_helpers/labels_tw.config
 
 

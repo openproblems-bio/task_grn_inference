@@ -433,9 +433,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component common sync_test_resources"
-LABEL org.opencontainers.image.created="2024-08-24T08:49:57Z"
+LABEL org.opencontainers.image.created="2024-08-24T11:23:52Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="a183f16843a73d309e45e7045505827473072750"
+LABEL org.opencontainers.image.revision="dbe05111aa79f6bc2da8a8f0f10f06d8192b7bc4"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

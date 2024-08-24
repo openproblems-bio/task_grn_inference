@@ -108,12 +108,12 @@ functionality:
     multiple_sep: ":"
     dest: "par"
   - type: "file"
-    name: "--cistopic_out"
+    name: "--cistopic_object"
     info: null
     must_exist: true
     create_parent: true
     required: false
-    direction: "input"
+    direction: "output"
     multiple: false
     multiple_sep: ":"
     dest: "par"
@@ -190,5 +190,5 @@ info:
   output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/native/grn_methods/scenicplus"
   executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/native/grn_methods/scenicplus/scenicplus"
   viash_version: "0.8.6"
-  git_commit: "a183f16843a73d309e45e7045505827473072750"
+  git_commit: "dbe05111aa79f6bc2da8a8f0f10f06d8192b7bc4"
   git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"

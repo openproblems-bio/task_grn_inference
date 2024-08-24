@@ -3,11 +3,11 @@
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 
 RUN_ID="robust_analy"
-# resources_dir="resources"
-# publish_dir="output/${RUN_ID}"
+resources_dir="resources"
+publish_dir="output/${RUN_ID}"
 
-resources_dir="s3://openproblems-data/resources/grn"
-publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
+# resources_dir="s3://openproblems-data/resources/grn"
+# publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
 
 grn_models_folder="${resources_dir}/grn_models"
 

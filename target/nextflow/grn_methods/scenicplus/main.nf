@@ -2928,11 +2928,11 @@ meta = [
       },
       {
         "type" : "file",
-        "name" : "--cistopic_out",
+        "name" : "--cistopic_object",
         "must_exist" : true,
         "create_parent" : true,
         "required" : false,
-        "direction" : "input",
+        "direction" : "output",
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
@@ -3035,7 +3035,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "a183f16843a73d309e45e7045505827473072750",
+    "git_commit" : "dbe05111aa79f6bc2da8a8f0f10f06d8192b7bc4",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3077,7 +3077,7 @@ par = {
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'cistopic_out': $( if [ ! -z ${VIASH_PAR_CISTOPIC_OUT+x} ]; then echo "r'${VIASH_PAR_CISTOPIC_OUT//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'cistopic_object': $( if [ ! -z ${VIASH_PAR_CISTOPIC_OBJECT+x} ]; then echo "r'${VIASH_PAR_CISTOPIC_OBJECT//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3100,6 +3100,8 @@ dep = {
 ## VIASH END
 
 work_dir = par['temp_dir']
+par['cistopic_out'] = f'{work_dir}/cistopic_out'
+par['cistopic_object'] = os.path.join(par['cistopic_out'], f'cistopic_object_with_model.pkl')
 os.makedirs(os.path.join(work_dir, 'scRNA'), exist_ok=True)
 
 # Download databases
@@ -3168,6 +3170,7 @@ with open(os.path.join(par['cistopic_out'], f'candidate_enhancers/region_bin_top
 with open(os.path.join(par['cistopic_out'], f'candidate_enhancers/markers_dict.pkl'), 'rb') as f:
     markers_dict = pickle.load(f)
 
+
 # Convert to dictionary of pyrange objects
 region_sets = {}
 region_sets['topics_otsu'] = {}
@@ -3198,7 +3201,7 @@ with open(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake', 'config', 'conf
     settings = yaml.safe_load(f)
 
 # Update settings: indicate locations of input files
-settings['input_data']['cisTopic_obj_fname'] = os.path.join(par['cistopic_out'], f'cistopic_object_with_model.pkl')
+settings['input_data']['cisTopic_obj_fname'] = par['cistopic_object']
 settings['input_data']['GEX_anndata_fname'] = os.path.join(work_dir, 'rna.h5ad')
 settings['input_data']['region_set_folder'] = os.path.join(par['cistopic_out'], 'region_sets')
 settings['input_data']['ctx_db_fname'] = rankings_db
@@ -3224,6 +3227,13 @@ with contextlib.chdir(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake')):
 # Make sure the file is properly formatted, and re-format it if needed
 filepath = os.path.join(work_dir, 'tf_to_gene_adj.tsv')
 shutil.copyfile(filepath, par['prediction'])
+
+
+# cistopic_obj = pickle.load(os.path.join(par['cistopic_out'], f'cistopic_object_with_model.pkl'))
+# # get cell topic association 
+# cell_topic = cistopic_obj.selected_model.cell_topic.T
+# cell_names = cistopic_obj.cell_data.obs_id.values
+# cell_topic.index = cell_names
 VIASHMAIN
 python -B "$tempscript"
 '''
