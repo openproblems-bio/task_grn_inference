@@ -15,7 +15,7 @@ functionality:
       default: resources/grn-benchmark/perturbation_data.h5ad
     - name: --prediction
       __merge__: file_prediction.yaml
-      required: false
+      required: true
       direction: input
       default: resources/grn_models/collectri.csv
     - name: --score

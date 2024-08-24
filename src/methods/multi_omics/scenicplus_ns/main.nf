@@ -11,10 +11,10 @@ workflow run_wf {
               temp_dir: "temp_dir",
               num_workers: "num_workers"
               ],
-      toState: [prediction:"prediction"]
+      toState: [prediction:"prediction", cistopic_object:"cistopic_object"]
     )
 
-    | setState(["prediction"])
+    | setState(["prediction", "cistopic_object"])
 
   emit:
   output_ch

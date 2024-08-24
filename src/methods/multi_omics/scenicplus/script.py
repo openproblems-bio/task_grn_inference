@@ -21,13 +21,14 @@ from scenicplus.wrappers.run_pycistarget import run_pycistarget
 par = {
   'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
   'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad',
-  'cistopic_out': 'output/pycistopic',
   'temp_dir': 'output/scenicplus',
   'prediction': 'output/prediction.csv',
 }
 ## VIASH END
 
 work_dir = par['temp_dir']
+par['cistopic_out'] = f'{work_dir}/cistopic_out'
+par['cistopic_object'] = os.path.join(par['cistopic_out'], f'cistopic_object_with_model.pkl')
 os.makedirs(os.path.join(work_dir, 'scRNA'), exist_ok=True)
 
 # Download databases
@@ -96,6 +97,7 @@ with open(os.path.join(par['cistopic_out'], f'candidate_enhancers/region_bin_top
 with open(os.path.join(par['cistopic_out'], f'candidate_enhancers/markers_dict.pkl'), 'rb') as f:
     markers_dict = pickle.load(f)
 
+
 # Convert to dictionary of pyrange objects
 region_sets = {}
 region_sets['topics_otsu'] = {}
@@ -126,7 +128,7 @@ with open(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake', 'config', 'conf
     settings = yaml.safe_load(f)
 
 # Update settings: indicate locations of input files
-settings['input_data']['cisTopic_obj_fname'] = os.path.join(par['cistopic_out'], f'cistopic_object_with_model.pkl')
+settings['input_data']['cisTopic_obj_fname'] = par['cistopic_object']
 settings['input_data']['GEX_anndata_fname'] = os.path.join(work_dir, 'rna.h5ad')
 settings['input_data']['region_set_folder'] = os.path.join(par['cistopic_out'], 'region_sets')
 settings['input_data']['ctx_db_fname'] = rankings_db
@@ -152,3 +154,10 @@ with contextlib.chdir(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake')):
 # Make sure the file is properly formatted, and re-format it if needed
 filepath = os.path.join(work_dir, 'tf_to_gene_adj.tsv')
 shutil.copyfile(filepath, par['prediction'])
+
+
+# cistopic_obj = pickle.load(os.path.join(par['cistopic_out'], f'cistopic_object_with_model.pkl'))
+# # get cell topic association 
+# cell_topic = cistopic_obj.selected_model.cell_topic.T
+# cell_names = cistopic_obj.cell_data.obs_id.values
+# cell_topic.index = cell_names
