@@ -3,10 +3,15 @@
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 
 RUN_ID="robust_analy"
-resources_dir="resources"
-publish_dir="output/${RUN_ID}"
+# resources_dir="resources"
+# publish_dir="output/${RUN_ID}"
+
+resources_dir="s3://openproblems-data/resources/grn"
+publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
 
 grn_models_folder="${resources_dir}/grn_models"
+
+
 reg_type=ridge
 subsample=-2
 max_workers=10
@@ -35,6 +40,7 @@ HERE
 append_entry() {
   cat >> $param_file << HERE
   - id: ${1}_${2}_${3}
+    perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
     layer: ${layer}
     reg_type: $reg_type
     method_id: $1
