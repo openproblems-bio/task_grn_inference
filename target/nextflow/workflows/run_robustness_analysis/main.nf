@@ -2953,9 +2953,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems-v2",
           "tag" : "main_build",
-          "localPath" : "/tmp/viash_hub_repo466339830898704932"
+          "localPath" : "/tmp/viash_hub_repo953292262183672703"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo466339830898704932/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo953292262183672703/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_remote" : "https://github.com/openproblems-bio/openproblems-v2",
@@ -2985,7 +2985,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "5c2cfe86432ee25c2646f342b76b4918bfba067b",
+          "git_commit" : "7ecf20ca942cb87f4d66ff76c9aed9bbfcf4e467",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1"
@@ -3006,7 +3006,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "5c2cfe86432ee25c2646f342b76b4918bfba067b",
+          "git_commit" : "7ecf20ca942cb87f4d66ff76c9aed9bbfcf4e467",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2"
@@ -3027,7 +3027,7 @@ meta = [
           "functionalityNamespace" : "robustness_analysis",
           "output" : "",
           "platform" : "",
-          "git_commit" : "5c2cfe86432ee25c2646f342b76b4918bfba067b",
+          "git_commit" : "7ecf20ca942cb87f4d66ff76c9aed9bbfcf4e467",
           "executable" : "/nextflow/robustness_analysis/noise_grn/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/robustness_analysis/noise_grn"
@@ -3088,7 +3088,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_robustness_analysis",
     "viash_version" : "0.8.6",
-    "git_commit" : "5c2cfe86432ee25c2646f342b76b4918bfba067b",
+    "git_commit" : "7ecf20ca942cb87f4d66ff76c9aed9bbfcf4e467",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

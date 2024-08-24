@@ -2930,7 +2930,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "5c2cfe86432ee25c2646f342b76b4918bfba067b",
+          "git_commit" : "7ecf20ca942cb87f4d66ff76c9aed9bbfcf4e467",
           "executable" : "/nextflow/grn_methods/granie/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/granie"
@@ -2982,7 +2982,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/grn_inference_granie",
     "viash_version" : "0.8.6",
-    "git_commit" : "5c2cfe86432ee25c2646f342b76b4918bfba067b",
+    "git_commit" : "7ecf20ca942cb87f4d66ff76c9aed9bbfcf4e467",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
