@@ -2,9 +2,7 @@
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 
-degrees=(0 10 20 50 100)
-noise_type="$1"
-echo $noise_type
+subsamples=(-2 -3 -4)
 
 RUN_ID="robust_analy_$1"
 resources_dir="resources"
@@ -17,7 +15,6 @@ grn_models_folder="${resources_dir}/grn_models"
 
 
 reg_type=ridge
-subsample=-2
 max_workers=10
 layer=pearson
 
@@ -46,20 +43,21 @@ append_entry() {
     layer: ${layer}
     reg_type: $reg_type
     method_id: ${2}-${1}
-    subsample: $subsample
+    subsample: $2
     max_workers: $max_workers
     consensus: ${resources_dir}/prior/consensus-num-regulators.json
     prediction: ${grn_models_folder}/$1.csv
-    degree: ${2}
-    noise_type: ${noise_type}
+    degree: 0
+
 HERE
 }
 # Loop through grn_names and layers
-for degree in "${degrees[@]}"; do
+for subsample in "${subsamples[@]}"; do
     for grn_name in "${grn_names[@]}"; do
-        append_entry "$grn_name" "$degree" 
+        append_entry "$grn_name" "$subsample" 
     done
 done
+
 
 
 # Append the remaining output_state and publish_dir to the YAML file
@@ -74,4 +72,15 @@ nextflow run . \
   -with-trace \
   -c src/common/nextflow_helpers/labels_ci.config \
   -params-file ${param_file}
+
+# ./tw-windows-x86_64.exe launch `
+#     https://github.com/openproblems-bio/task_grn_benchmark.git `
+#     --revision build/main `
+#     --pull-latest `
+#     --main-script target/nextflow/workflows/run_grn_evaluation/main.nf `
+#     --workspace 53907369739130 `
+#     --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
+#     --params-file ./params/scgen_pearson_gb_pcs.yaml `
+#     --config src/common/nextflow_helpers/labels_tw.config
+
 

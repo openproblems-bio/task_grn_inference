@@ -27,7 +27,7 @@ workflow run_wf {
     
     | noise_grn.run(
       fromState: [
-        prediction: "prediction"
+        prediction: "prediction", degree: "degree", noise_type: "noise_type"
       ],
       toState: [
           prediction_n: "prediction_n"
@@ -49,9 +49,7 @@ workflow run_wf {
         reg_type: "reg_type",
         method_id: "method_id",
         max_workers: "max_workers",
-        consensus: "consensus",
-        degree: "degree",
-        type: "type"
+        consensus: "consensus"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->
