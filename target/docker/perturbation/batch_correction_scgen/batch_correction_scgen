@@ -406,9 +406,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component perturbation batch_correction_scgen"
-LABEL org.opencontainers.image.created="2024-08-24T11:23:52Z"
+LABEL org.opencontainers.image.created="2024-08-25T20:12:31Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="dbe05111aa79f6bc2da8a8f0f10f06d8192b7bc4"
+LABEL org.opencontainers.image.revision="3651b4705a5171b2e7eddebdeb32559dd07a68de"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

@@ -44,7 +44,7 @@ functionality:
           required: false
           direction: input
           default: 20
-        - name: --type
+        - name: --noise_type
           type: string
           required: false
           direction: input

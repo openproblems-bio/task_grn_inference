@@ -27,8 +27,6 @@ def preprocess(rna, atac, par):
     sc.pp.neighbors(atac, use_rep="X_lsi", metric="cosine")
     sc.tl.umap(atac)
     print('step 2 completed')
-
-
     
     scglue.data.get_gene_annotation(
         rna, gtf=par['annotation_file'],

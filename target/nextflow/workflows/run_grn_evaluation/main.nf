@@ -2954,9 +2954,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems-v2",
           "tag" : "main_build",
-          "localPath" : "/tmp/viash_hub_repo3745177506868598660"
+          "localPath" : "/tmp/viash_hub_repo11579834523462103944"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo3745177506868598660/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo11579834523462103944/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_remote" : "https://github.com/openproblems-bio/openproblems-v2",
@@ -2986,7 +2986,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "dbe05111aa79f6bc2da8a8f0f10f06d8192b7bc4",
+          "git_commit" : "3651b4705a5171b2e7eddebdeb32559dd07a68de",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2"
@@ -3007,7 +3007,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "dbe05111aa79f6bc2da8a8f0f10f06d8192b7bc4",
+          "git_commit" : "3651b4705a5171b2e7eddebdeb32559dd07a68de",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1"
@@ -3028,7 +3028,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "dbe05111aa79f6bc2da8a8f0f10f06d8192b7bc4",
+          "git_commit" : "3651b4705a5171b2e7eddebdeb32559dd07a68de",
           "executable" : "/nextflow/control_methods/positive_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/positive_control"
@@ -3049,7 +3049,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "dbe05111aa79f6bc2da8a8f0f10f06d8192b7bc4",
+          "git_commit" : "3651b4705a5171b2e7eddebdeb32559dd07a68de",
           "executable" : "/nextflow/control_methods/negative_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/negative_control"
@@ -3110,7 +3110,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.8.6",
-    "git_commit" : "dbe05111aa79f6bc2da8a8f0f10f06d8192b7bc4",
+    "git_commit" : "3651b4705a5171b2e7eddebdeb32559dd07a68de",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3142,8 +3142,7 @@ workflow run_wf {
 
   // construct list of metrics
   metrics = [
-    regression_1,
-    regression_2
+    regression_1
   ]
     
   /***************************

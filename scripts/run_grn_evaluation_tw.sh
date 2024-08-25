@@ -1,15 +1,13 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-
-RUN_ID="pearson_gb"
+RUN_ID="pearson_gb_subsample"
 resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
-# grn_models_folder="${resources_dir}/supplementary/grn_models_noised"
 grn_models_folder="${resources_dir}/grn_models"
 reg_type=GB
 subsample=-2
-max_workers=20
+max_workers=10
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -77,14 +75,14 @@ HERE
 #   -c src/common/nextflow_helpers/labels_ci.config \
 #   -params-file ${param_file}
 
-./tw-windows-x86_64.exe launch `
-    https://github.com/openproblems-bio/task_grn_benchmark.git `
-    --revision build/main `
-    --pull-latest `
-    --main-script target/nextflow/workflows/run_grn_evaluation/main.nf `
-    --workspace 53907369739130 `
-    --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
-    --params-file ./params/scgen_pearson_gb_pcs.yaml `
-    --config src/common/nextflow_helpers/labels_tw.config
+# ./tw-windows-x86_64.exe launch `
+#     https://github.com/openproblems-bio/task_grn_benchmark.git `
+#     --revision build/main `
+#     --pull-latest `
+#     --main-script target/nextflow/workflows/run_grn_evaluation/main.nf `
+#     --workspace 53907369739130 `
+#     --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
+#     --params-file ./params/scgen_pearson_gb_pcs.yaml `
+#     --config src/common/nextflow_helpers/labels_tw.config
 
 

@@ -181,8 +181,6 @@ def main(par):
     reg_type = par['reg_type']
     max_workers = par['max_workers']
     layer = par["layer"]
-    pert_df = pd.DataFrame(perturbation_data.layers[layer], columns=gene_names)
-
     if subsample == -1:
         pass
     elif subsample == -2: # one combination of cell_type, sm_name
@@ -192,11 +190,18 @@ def main(par):
         for _, row in obs.iterrows():
             mask.append((sampled_obs==row).all(axis=1).any())  
         perturbation_data = perturbation_data[mask,:]
+    elif subsample == -3: #negative control
+        mask = perturbation_data.obs.sm_name == 'Dimethyl Sulfoxide'
+        perturbation_data = perturbation_data[mask,:]
+    elif subsample == -4: #positive control
+        mask = perturbation_data.obs.sm_name.isin(['Dabrafenib', 'Belinostat'])
+        perturbation_data = perturbation_data[mask,:]
     else:
         perturbation_data = perturbation_data[np.random.choice(perturbation_data.n_obs, subsample, replace=False), :]
     
     print(perturbation_data.shape)
 
+    pert_df = pd.DataFrame(perturbation_data.layers[layer], columns=gene_names)
     pert_df = pert_df.T  # make it gene*sample
 
     # process net
