@@ -11,12 +11,20 @@ functionality:
       path: script.py
     - path: main.py
   arguments:
+    - name: --tfs
+      type: file
+      direction: input
+      must_exist: true
+      default: 'resources/prior/tf_all.csv'
     - name: --consensus
       type: file
       direction: input
       must_exist: true
       default: 'resources/prior/consensus-num-regulators.json'
       example: 'resources_test/prior/consensus-num-regulators.json'
+    - name: --static_only
+      type: boolean
+      default: true
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4
