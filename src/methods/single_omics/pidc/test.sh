@@ -1,2 +1,1 @@
-viash build src/methods/pidc/config.vsh.yaml -p docker -o bin/pidc && bin/pidc/pidc --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/pidc/prediction.csv
-#viash run src/methods/pidc/config.vsh.yaml -p docker -- ---setup build && bin/pidc/pidc --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/pidc/prediction.csv
+viash build src/methods/single_omics/pidc/config.novsh.yaml -p docker -o bin/pidc && bin/pidc/pidc --multiomics_rna resources/grn-benchmark/multiomics_rna.h5ad --prediction output/pidc/prediction.csv

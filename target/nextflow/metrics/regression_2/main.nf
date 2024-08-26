@@ -3036,6 +3036,20 @@ meta = [
       },
       {
         "type" : "file",
+        "name" : "--tfs",
+        "default" : [
+          "resources/prior/tf_all.csv"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "file",
         "name" : "--consensus",
         "example" : [
           "resources_test/prior/consensus-num-regulators.json"
@@ -3045,6 +3059,18 @@ meta = [
         ],
         "must_exist" : true,
         "create_parent" : true,
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "boolean",
+        "name" : "--static_only",
+        "default" : [
+          true
+        ],
         "required" : false,
         "direction" : "input",
         "multiple" : false,
@@ -3160,7 +3186,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "3651b4705a5171b2e7eddebdeb32559dd07a68de",
+    "git_commit" : "6dd9aee2155324671e967151f1b5f4ba364da480",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3192,7 +3218,9 @@ par = {
   'subsample': $( if [ ! -z ${VIASH_PAR_SUBSAMPLE+x} ]; then echo "int(r'${VIASH_PAR_SUBSAMPLE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'max_workers': $( if [ ! -z ${VIASH_PAR_MAX_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_MAX_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'consensus': $( if [ ! -z ${VIASH_PAR_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'tfs': $( if [ ! -z ${VIASH_PAR_TFS+x} ]; then echo "r'${VIASH_PAR_TFS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'consensus': $( if [ ! -z ${VIASH_PAR_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'static_only': $( if [ ! -z ${VIASH_PAR_STATIC_ONLY+x} ]; then echo "r'${VIASH_PAR_STATIC_ONLY//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3230,18 +3258,16 @@ print(output)
 metric_ids = output.columns.to_numpy()
 metric_values = output.values[0]
 
-print(metric_ids.shape, metric_values.shape)
 output = ad.AnnData(
     X=np.empty((0, 0)),
     uns={
-        "dataset_id": par["layer"],
+        "dataset_id": str(par["layer"]),
         "method_id": f"reg2-{par['method_id']}",
         "metric_ids": metric_ids,
         "metric_values": metric_values
     }
 )
-
-output.write_h5ad(par["score"], compression="gzip")
+output.write_h5ad(par['score'], compression='gzip')
 print('Completed', flush=True)
 VIASHMAIN
 python -B "$tempscript"

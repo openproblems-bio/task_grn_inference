@@ -210,10 +210,18 @@ function ViashHelp {
   echo "        type: string"
   echo "        example: collectri"
   echo ""
+  echo "    --tfs"
+  echo "        type: file, file must exist"
+  echo "        default: resources/prior/tf_all.csv"
+  echo ""
   echo "    --consensus"
   echo "        type: file, file must exist"
   echo "        default: resources/prior/consensus-num-regulators.json"
   echo "        example: resources_test/prior/consensus-num-regulators.json"
+  echo ""
+  echo "    --static_only"
+  echo "        type: boolean"
+  echo "        default: true"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -440,9 +448,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_2"
-LABEL org.opencontainers.image.created="2024-08-25T20:12:33Z"
+LABEL org.opencontainers.image.created="2024-08-26T08:37:50Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="3651b4705a5171b2e7eddebdeb32559dd07a68de"
+LABEL org.opencontainers.image.revision="6dd9aee2155324671e967151f1b5f4ba364da480"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -689,6 +697,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_METHOD_ID=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --tfs)
+            [ -n "$VIASH_PAR_TFS" ] && ViashError Bad arguments for option \'--tfs\': \'$VIASH_PAR_TFS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TFS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --tfs. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --tfs=*)
+            [ -n "$VIASH_PAR_TFS" ] && ViashError Bad arguments for option \'--tfs=*\': \'$VIASH_PAR_TFS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TFS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --consensus)
             [ -n "$VIASH_PAR_CONSENSUS" ] && ViashError Bad arguments for option \'--consensus\': \'$VIASH_PAR_CONSENSUS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_CONSENSUS="$2"
@@ -698,6 +717,17 @@ while [[ $# -gt 0 ]]; do
         --consensus=*)
             [ -n "$VIASH_PAR_CONSENSUS" ] && ViashError Bad arguments for option \'--consensus=*\': \'$VIASH_PAR_CONSENSUS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_CONSENSUS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --static_only)
+            [ -n "$VIASH_PAR_STATIC_ONLY" ] && ViashError Bad arguments for option \'--static_only\': \'$VIASH_PAR_STATIC_ONLY\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_STATIC_ONLY="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --static_only. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --static_only=*)
+            [ -n "$VIASH_PAR_STATIC_ONLY" ] && ViashError Bad arguments for option \'--static_only=*\': \'$VIASH_PAR_STATIC_ONLY\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_STATIC_ONLY=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---setup)
@@ -862,8 +892,14 @@ fi
 if [ -z ${VIASH_PAR_MAX_WORKERS+x} ]; then
   VIASH_PAR_MAX_WORKERS="4"
 fi
+if [ -z ${VIASH_PAR_TFS+x} ]; then
+  VIASH_PAR_TFS="resources/prior/tf_all.csv"
+fi
 if [ -z ${VIASH_PAR_CONSENSUS+x} ]; then
   VIASH_PAR_CONSENSUS="resources/prior/consensus-num-regulators.json"
+fi
+if [ -z ${VIASH_PAR_STATIC_ONLY+x} ]; then
+  VIASH_PAR_STATIC_ONLY="true"
 fi
 
 # check whether required files exist
@@ -873,6 +909,10 @@ if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ] && [ ! -e "$VIASH_PAR_PERTURBATION_DA
 fi
 if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -e "$VIASH_PAR_PREDICTION" ]; then
   ViashError "Input file '$VIASH_PAR_PREDICTION' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_TFS" ] && [ ! -e "$VIASH_PAR_TFS" ]; then
+  ViashError "Input file '$VIASH_PAR_TFS' does not exist."
   exit 1
 fi
 if [ ! -z "$VIASH_PAR_CONSENSUS" ] && [ ! -e "$VIASH_PAR_CONSENSUS" ]; then
@@ -890,6 +930,12 @@ fi
 if [[ -n "$VIASH_PAR_MAX_WORKERS" ]]; then
   if ! [[ "$VIASH_PAR_MAX_WORKERS" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--max_workers' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_STATIC_ONLY" ]]; then
+  if ! [[ "$VIASH_PAR_STATIC_ONLY" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--static_only' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -955,6 +1001,10 @@ if [ ! -z "$VIASH_PAR_SCORE" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_SCORE")" )
   VIASH_PAR_SCORE=$(ViashAutodetectMount "$VIASH_PAR_SCORE")
   VIASH_CHOWN_VARS+=( "$VIASH_PAR_SCORE" )
+fi
+if [ ! -z "$VIASH_PAR_TFS" ]; then
+  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_TFS")" )
+  VIASH_PAR_TFS=$(ViashAutodetectMount "$VIASH_PAR_TFS")
 fi
 if [ ! -z "$VIASH_PAR_CONSENSUS" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_CONSENSUS")" )
@@ -1034,7 +1084,9 @@ par = {
   'subsample': $( if [ ! -z ${VIASH_PAR_SUBSAMPLE+x} ]; then echo "int(r'${VIASH_PAR_SUBSAMPLE//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'max_workers': $( if [ ! -z ${VIASH_PAR_MAX_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_MAX_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'consensus': $( if [ ! -z ${VIASH_PAR_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_CONSENSUS//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'tfs': $( if [ ! -z ${VIASH_PAR_TFS+x} ]; then echo "r'${VIASH_PAR_TFS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'consensus': $( if [ ! -z ${VIASH_PAR_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_CONSENSUS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'static_only': $( if [ ! -z ${VIASH_PAR_STATIC_ONLY+x} ]; then echo "r'${VIASH_PAR_STATIC_ONLY//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1072,18 +1124,16 @@ print(output)
 metric_ids = output.columns.to_numpy()
 metric_values = output.values[0]
 
-print(metric_ids.shape, metric_values.shape)
 output = ad.AnnData(
     X=np.empty((0, 0)),
     uns={
-        "dataset_id": par["layer"],
+        "dataset_id": str(par["layer"]),
         "method_id": f"reg2-{par['method_id']}",
         "metric_ids": metric_ids,
         "metric_values": metric_values
     }
 )
-
-output.write_h5ad(par["score"], compression="gzip")
+output.write_h5ad(par['score'], compression='gzip')
 print('Completed', flush=True)
 VIASHMAIN
 python -B "\$tempscript" &
@@ -1101,6 +1151,9 @@ if [ ! -z "$VIASH_PAR_PREDICTION" ]; then
 fi
 if [ ! -z "$VIASH_PAR_SCORE" ]; then
   VIASH_PAR_SCORE=$(ViashStripAutomount "$VIASH_PAR_SCORE")
+fi
+if [ ! -z "$VIASH_PAR_TFS" ]; then
+  VIASH_PAR_TFS=$(ViashStripAutomount "$VIASH_PAR_TFS")
 fi
 if [ ! -z "$VIASH_PAR_CONSENSUS" ]; then
   VIASH_PAR_CONSENSUS=$(ViashStripAutomount "$VIASH_PAR_CONSENSUS")

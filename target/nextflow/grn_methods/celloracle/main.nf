@@ -3057,7 +3057,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/celloracle",
     "viash_version" : "0.8.6",
-    "git_commit" : "3651b4705a5171b2e7eddebdeb32559dd07a68de",
+    "git_commit" : "6dd9aee2155324671e967151f1b5f4ba364da480",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

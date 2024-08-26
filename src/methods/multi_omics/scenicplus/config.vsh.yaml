@@ -8,12 +8,18 @@ functionality:
     label: scenicplus
     summary: "GRN inference using scenicplus"
     description: |
-      GRN inference using scenicplus
+      GRN inference using scenicplus.
     documentation_url: https://scenicplus.readthedocs.io/en/latest/human_cerebellum.html
   arguments:
     - name: --cistopic_object
       type: file
+      required: true
       direction: output
+      description: "Path to the pycistopic serialized (.pkl) object."
+    - name: --qc
+      type: boolean
+      default: false
+      description: "Whether to perform quality control."
   resources:
     - type: python_script
       path: script.py
