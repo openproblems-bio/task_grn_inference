@@ -2965,7 +2965,8 @@ meta = [
           "lowtime" : "time = 1.h",
           "midtime" : "time = 4.h",
           "hightime" : "time = 8.h",
-          "veryhightime" : "time = 24.h"
+          "veryhightime" : "time = 24.h",
+          "veryveryhightime" : "time = 48.h"
         },
         "script" : [
           "process.errorStrategy = 'ignore'"
@@ -2980,7 +2981,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/batch_correction_evaluation",
     "viash_version" : "0.8.6",
-    "git_commit" : "69f2ee5de19b06d1b82d8b87f2e0c7aaff846c8a",
+    "git_commit" : "729745dc8520810a18c3fc49642df713f32479b3",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

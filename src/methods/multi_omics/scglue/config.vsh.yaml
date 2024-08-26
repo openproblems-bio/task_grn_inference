@@ -41,4 +41,4 @@ platforms:
   - type: native
   - type: nextflow
     directives:
-      label: [veryhightime,midmem,midcpu]
+      label: [veryveryhightime,midmem,midcpu]

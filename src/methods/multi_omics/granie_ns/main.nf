@@ -9,7 +9,8 @@ workflow run_wf {
       fromState: [
               multiomics_rna_r: "multiomics_rna_r",
               multiomics_atac_r: "multiomics_atac_r",
-              num_workers: "num_workers"
+              num_workers: "num_workers",
+              subset: "subset"
               ],
       toState: [prediction:"prediction"]
     )
