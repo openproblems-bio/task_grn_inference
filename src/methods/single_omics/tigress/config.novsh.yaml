@@ -20,8 +20,17 @@ functionality:
             required: false
       required: true
       must_exist: true
+    - name: --tfs
+      type: file
+      example: resources/prior/tf_all.csv
+      info:
+        label: tfs
+        summary: "List of putative TFs"
+        file_type: csv
+      required: true
+      must_exist: true
     - name: --prediction
-      __merge__: ../../api/file_prediction.yaml
+      __merge__: ../../../api/file_prediction.yaml
       required: true
       direction: output
     - name: --max_n_links

@@ -21,7 +21,7 @@ functionality:
       required: true
       must_exist: true
     - name: --prediction
-      __merge__: ../../api/file_prediction.yaml
+      __merge__: ../../../api/file_prediction.yaml
       required: true
       direction: output
     - name: --max_n_links
