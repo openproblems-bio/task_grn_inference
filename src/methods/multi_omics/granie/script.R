@@ -47,8 +47,6 @@ if (!dir.exists(outputDir)) {
   dir.create(outputDir, recursive = TRUE)
 }
 
-setwd(outputDir)
-
 
 #########################
 # Downloading resources #
