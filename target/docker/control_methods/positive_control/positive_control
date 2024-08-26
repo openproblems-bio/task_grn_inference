@@ -414,9 +414,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component control_methods positive_control"
-LABEL org.opencontainers.image.created="2024-08-26T08:37:51Z"
+LABEL org.opencontainers.image.created="2024-08-26T09:13:26Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="6dd9aee2155324671e967151f1b5f4ba364da480"
+LABEL org.opencontainers.image.revision="69f2ee5de19b06d1b82d8b87f2e0c7aaff846c8a"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

@@ -2916,7 +2916,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/robustness_analysis/noise_grn",
     "viash_version" : "0.8.6",
-    "git_commit" : "6dd9aee2155324671e967151f1b5f4ba364da480",
+    "git_commit" : "69f2ee5de19b06d1b82d8b87f2e0c7aaff846c8a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3018,11 +3018,16 @@ elif type == 'net': # shuffle source-target matrix
 
   # Melt the DataFrame to turn it back into long-form (source-target-weight)
   prediction = flat_df.melt(id_vars='target', var_name='source', value_name='weight')
-
-
   prediction = prediction[prediction['weight'] !=0 ].reset_index(drop=True)
-
-
+elif type == 'sign': # change the regulatory sign
+  num_rows = len(prediction)
+  num_to_modify = int(num_rows * degree)
+  # 2. Randomly select indices to modify
+  random_indices = np.random.choice(prediction.index, size=num_to_modify, replace=False)
+  # 3. Change the sign of the selected rows
+  prediction.loc[random_indices, 'weight'] *= -1
+elif type == 'binary': # change the regulatory sign
+  prediction['weight'] = np.where(prediction['weight'] > 0, 1, -1)
 else:
   raise ValueError(f'Wrong type ({type}) for adding noise')
 

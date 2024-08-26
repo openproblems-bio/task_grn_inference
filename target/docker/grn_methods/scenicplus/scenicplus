@@ -428,9 +428,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenicplus"
-LABEL org.opencontainers.image.created="2024-08-26T08:37:50Z"
+LABEL org.opencontainers.image.created="2024-08-26T09:13:25Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="6dd9aee2155324671e967151f1b5f4ba364da480"
+LABEL org.opencontainers.image.revision="69f2ee5de19b06d1b82d8b87f2e0c7aaff846c8a"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1570,18 +1570,6 @@ export_gene_activity_to_loom(
 
 work_dir = os.path.join(out_dir, 'scenicplus')
 os.makedirs(work_dir, exist_ok=True)
-=======
-  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
-  'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad',
-  'temp_dir': 'output/scenicplus',
-  'prediction': 'output/prediction.csv',
-}
-## VIASH END
-
-work_dir = par['temp_dir']
-par['cistopic_out'] = f'{work_dir}/cistopic_out'
-par['cistopic_object'] = os.path.join(par['cistopic_out'], f'cistopic_object_with_model.pkl')
->>>>>>> dbe05111aa79f6bc2da8a8f0f10f06d8192b7bc4
 os.makedirs(os.path.join(work_dir, 'scRNA'), exist_ok=True)
 
 # Download databases

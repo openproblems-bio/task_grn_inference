@@ -41,7 +41,6 @@ from pycisTopic.clust_vis import find_clusters, run_umap, run_tsne, plot_metadat
 
 ## VIASH START
 par = {
-<<<<<<< HEAD
   'multiomics_rna': '/base/resources/resources_test/grn-benchmark/multiomics_rna.h5ad',
   'multiomics_atac': '/base/resources/resources_test/grn-benchmark/multiomics_atac.h5ad',
   'temp_dir': '/base/output/scenicplus',
@@ -570,18 +569,6 @@ export_gene_activity_to_loom(
 
 work_dir = os.path.join(out_dir, 'scenicplus')
 os.makedirs(work_dir, exist_ok=True)
-=======
-  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
-  'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad',
-  'temp_dir': 'output/scenicplus',
-  'prediction': 'output/prediction.csv',
-}
-## VIASH END
-
-work_dir = par['temp_dir']
-par['cistopic_out'] = f'{work_dir}/cistopic_out'
-par['cistopic_object'] = os.path.join(par['cistopic_out'], f'cistopic_object_with_model.pkl')
->>>>>>> dbe05111aa79f6bc2da8a8f0f10f06d8192b7bc4
 os.makedirs(os.path.join(work_dir, 'scRNA'), exist_ok=True)
 
 # Download databases

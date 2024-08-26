@@ -3049,7 +3049,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "6dd9aee2155324671e967151f1b5f4ba364da480",
+    "git_commit" : "69f2ee5de19b06d1b82d8b87f2e0c7aaff846c8a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3654,18 +3654,6 @@ export_gene_activity_to_loom(
 
 work_dir = os.path.join(out_dir, 'scenicplus')
 os.makedirs(work_dir, exist_ok=True)
-=======
-  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
-  'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad',
-  'temp_dir': 'output/scenicplus',
-  'prediction': 'output/prediction.csv',
-}
-## VIASH END
-
-work_dir = par['temp_dir']
-par['cistopic_out'] = f'{work_dir}/cistopic_out'
-par['cistopic_object'] = os.path.join(par['cistopic_out'], f'cistopic_object_with_model.pkl')
->>>>>>> dbe05111aa79f6bc2da8a8f0f10f06d8192b7bc4
 os.makedirs(os.path.join(work_dir, 'scRNA'), exist_ok=True)
 
 # Download databases
