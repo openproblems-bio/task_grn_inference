@@ -209,8 +209,8 @@ def main(par):
 
     print(f'Compute metrics for layer: {layer}', flush=True)
     layer_results = {}  # Store results for this layer
-    for exclude_missing_genes in [True, False]:  # two settings on target gene
-        for tf_n in [-1, 140]:  # two settings on tfs
+    for exclude_missing_genes in [False]:  # two settings on target gene
+        for tf_n in [-1]:  # two settings on tfs
             run_key = f'ex({exclude_missing_genes})_tf({tf_n})'
             print(run_key)
             net_subset = net_processed.copy()
@@ -232,10 +232,10 @@ def main(par):
 
     # Convert results to DataFrame
     df_results = pd.DataFrame(layer_results)
-    if 'ex(True)_tf(140)' not in df_results.columns:
-        df_results['ex(True)_tf(140)'] = df_results['ex(True)_tf(-1)']
-    if 'ex(False)_tf(140)' not in df_results.columns:
-        df_results['ex(False)_tf(140)'] = df_results['ex(False)_tf(-1)']
+    # if 'ex(True)_tf(140)' not in df_results.columns:
+    #     df_results['ex(True)_tf(140)'] = df_results['ex(True)_tf(-1)']
+    # if 'ex(False)_tf(140)' not in df_results.columns:
+    #     df_results['ex(False)_tf(140)'] = df_results['ex(False)_tf(-1)']
     
     df_results['Mean'] = df_results.mean(axis=1)
     
