@@ -3068,7 +3068,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "f1920c711c2e760a8246e69620aee3d8a84c2b10",
+    "git_commit" : "5114f04f817524fa6bb1811c95a3ad73c73b2cd6",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3704,6 +3704,7 @@ def download_checksum(url: str, filepath: str) -> str:
     with open(filepath, 'r') as f:
         s = f.read()
     return s.split()[0]
+print("Downloading prior databases", flush=True)
 url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.rankings.feather.sha1sum.txt'
 digest = download_checksum(url, os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.rankings.feather.sha1sum.txt'))
 url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.rankings.feather'
@@ -3716,6 +3717,7 @@ url = 'https://resources.aertslab.org/cistarget/motif_collections/v10nr_clust_pu
 download(url, os.path.join(DB_PATH, 'motifs-v10-nr.hgnc-m0.00001-o0.0.tbl'))
 
 if not os.path.exists(os.path.join(work_dir, 'rna.h5ad')):
+    print("Preprocess RNA-seq", flush=True)
     # Load scRNA-seq data
     adata_rna = anndata.read_h5ad(par['multiomics_rna'])
     # Only keep cells with at least 200 expressed genes, and genes with at least 3 cells expressing them
@@ -3769,11 +3771,11 @@ motif_annotation = os.path.join(DB_PATH, 'motifs-v10-nr.hgnc-m0.00001-o0.0.tbl')
 os.makedirs(os.path.join(work_dir, 'scplus_pipeline'), exist_ok=True)
 os.makedirs(os.path.join(work_dir, 'scplus_pipeline', 'temp'), exist_ok=True)
 subprocess.run(['scenicplus', 'init_snakemake', '--out_dir', os.path.join(work_dir, 'scplus_pipeline')])
-
+print("snake make initialized", flush=True)
 # Load pipeline settings
 with open(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'r') as f:
     settings = yaml.safe_load(f)
-
+print('output_data:', settings['output_data'], flush=True)
 # Update settings
 settings['input_data']['cisTopic_obj_fname'] = par['cistopic_object']
 settings['input_data']['GEX_anndata_fname'] = os.path.join(work_dir, 'rna.h5ad')
@@ -3805,12 +3807,13 @@ settings['params_data_preparation']['nr_cells_per_metacells'] = 5
 settings['params_data_preparation']['species'] = 'hsapiens'
 settings['output_data']['scplus_mdata'] = par['scplus_mdata']
 
+print('output_data:', settings['output_data'], flush=True)
 # Save pipeline settings
 with open(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'w') as f:
     yaml.dump(settings, f)
 
 # TODO: from this line onward, the code is untested (could not run it locally due to excessive memory requirements)
-
+print('run snakemake ', flush=True)
 # Run pipeline
 with contextlib.chdir(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake')):
     subprocess.run([
