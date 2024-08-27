@@ -8,10 +8,10 @@ library(BSgenome.Hsapiens.UCSC.hg38)
 
 ## VIASH START
 par <- list(
-  multiomics_rna = "resources_test/grn-benchmark/multiomics_r/rna.rds",
-  multiomics_atac = "resources_test/grn-benchmark/multiomics_r/atac.rds",
+  multiomics_rna_r = "resources_test/grn-benchmark/multiomics_rna.rds",
+  multiomics_atac_r = "resources_test/grn-benchmark/multiomics_atac.rds",
   temp_dir =  "output/figr/",
-  cell_topic = "resources_test/grn-benchmark/supp/cell_topic.csv",
+  cell_topic = "resources_test/prior/cell_topic.csv",
   num_workers = 2,
   n_topics = 48,
   peak_gene = "output/figr/peak_gene.csv",
@@ -23,6 +23,13 @@ print(par)
 # )
 ## VIASH END
 dir.create(par$temp_dir, recursive = TRUE, showWarnings = TRUE)
+
+atac = readRDS(par$multiomics_atac_r)
+rna  = readRDS(par$multiomics_rna_r)
+
+colnames(atac) <- gsub("-", "", colnames(atac))
+colnames(rna) <- gsub("-", "", colnames(rna))
+
 
 cellknn_func <- function(par) {
   ## load cell topic probabilities and create cell-cluster matrix
@@ -37,8 +44,7 @@ cellknn_func(par)
 print('1: cellknn_func finished')
 ## Step1: Peak-gene association testing
 peak_gene_func <- function(par){
-  atac = readRDS(par$multiomics_atac)
-  rna  = readRDS(par$multiomics_rna)
+  
   common_cells <- intersect(colnames(atac), colnames(rna))
   rna = rna[,common_cells]
   atac = atac[,common_cells]
@@ -58,11 +64,7 @@ print('2: peak_gene_func finished')
 ## Step 2: create DORCs and smooth them 
 dorc_genes_func <- function(par){
   cisCorr = read.csv(paste0(par$temp_dir, "cisCorr.csv"))
-  # cisCorr.filt <- cisCorr %>% filter(pvalZ <= 0.05)
-  cisCorr.filt <- cisCorr %>% filter(pvalZ <= 0.2)
-
-  atac = readRDS(par$multiomics_atac)
-  rna  = readRDS(par$multiomics_rna)
+  cisCorr.filt <- cisCorr %>% filter(pvalZ <= 0.05)
 
   allGenes = unique(cisCorr.filt$Gene) 
   dorcMat <- getDORCScores(ATAC.se = atac, # Has to be same SE as used in previous step
@@ -70,9 +72,11 @@ dorc_genes_func <- function(par){
                           geneList = allGenes,
                           nCores = par$num_workers)
   cellkNN = readRDS(paste0(par$temp_dir, "cellkNN.rds"))
+
   # Smooth dorc scores using cell KNNs (k=n_topics)
   n_topics = par$n_topics
   common_cells <- intersect(rownames(cellkNN), colnames(rna))
+
   cellkNN = cellkNN[common_cells,]
   dorcMat = dorcMat[,common_cells]
   cat('cellKNN dim:', dim(cellkNN), '\n')
@@ -97,7 +101,6 @@ tf_gene_association_func <- function(par){
   RNAmat.s = readRDS(paste0(par$temp_dir, "RNAmat.s.RDS"))
   dorcMat.s = readRDS(paste0(par$temp_dir, "dorcMat.s.RDS"))
 
-  atac = readRDS(par$multiomics_atac)
   figR.d <- runFigRGRN(ATAC.se = atac, # Must be the same input as used in runGenePeakcorr()
                       dorcTab = cisCorr.filt, # Filtered peak-gene associations
                       genome = "hg38",

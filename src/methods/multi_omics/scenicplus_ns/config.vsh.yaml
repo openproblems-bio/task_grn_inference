@@ -8,9 +8,22 @@ functionality:
     label: grn_inference_scenicplus
     summary: "Infers GRNs from multiomics data using scenicplus."
   arguments:
-    - name: --cistopic_object
+    - name: --scplus_mdata
       type: file
+      required: false
       direction: output
+      description: "Main output object."
+      default: "scplus_mdata.h5mu"
+    - name: --qc
+      type: boolean
+      default: false
+      description: "Whether to perform quality control."
+    - name: --cell_topic
+      type: file 
+      default: output/cell_topic.csv
+      required: true
+      direction: output
+      description: "Cell-topics prob scores"
 
   resources:
     - type: nextflow_script

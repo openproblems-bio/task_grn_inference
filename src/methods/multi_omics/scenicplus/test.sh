@@ -1,2 +1,6 @@
-viash build src/methods/multi_omics/scenicplus/config.vsh.yaml --platform docker -o bin/scenicplus && bin/scenicplus/scenicplus --multiomics_atac resources/resources_test/grn-benchmark/multiomics_atac.h5ad --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --temp_dir output/scenicplus --prediction output/scenicplus/prediction.csv --cistopic_object output/scenicplus/pycistopic.pkl
-#docker run -v /mnt/c/Users/antoi/git/task_grn_inference/:/base apassemi/scenicplus python /base/src/methods/multi_omics/scenicplus/script.py
+viash run src/methods/multi_omics/scenicplus/config.vsh.yaml -- --multiomics_atac resources_test/grn-benchmark/multiomics_atac.h5ad \
+    --multiomics_rna resources_test/grn-benchmark/multiomics_rna.h5ad \
+    --temp_dir output/scenicplus \
+    --prediction output/scenicplus/prediction.csv \
+    --cell_topic output/scenicplus/cell_topic.csv \
+    --scplus_mdata output/scenicplus/scplus_mdata.h5mu
