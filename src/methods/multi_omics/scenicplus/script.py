@@ -44,7 +44,7 @@ par = {
   'multiomics_rna': '/base/resources/resources_test/grn-benchmark/multiomics_rna.h5ad',
   'multiomics_atac': '/base/resources/resources_test/grn-benchmark/multiomics_atac.h5ad',
   'temp_dir': '/base/output/scenicplus',
-  'pycistopic_object': '/base/output/scenicplus/pycistopic.pkl',
+  'cistopic_object': '/base/output/scenicplus/pycistopic.pkl',
   'prediction': '/base/output/prediction.csv',
   'qc': False,
   'num_workers': 4
@@ -345,7 +345,7 @@ if not os.path.exists(MALLET_PATH):
 
 # LDA-based topic modeling
 print('Run LDA models')
-if not os.path.exists(par['pycistopic_object']):
+if not os.path.exists(par['cistopic_object']):
 
     # Topic modeling
     n_topics = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]

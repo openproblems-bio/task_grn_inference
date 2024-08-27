@@ -890,7 +890,7 @@ if not os.path.exists(MALLET_PATH):
 
 # LDA-based topic modeling
 print('Run LDA models')
-if not os.path.exists(par['pycistopic_object']):
+if not os.path.exists(par['cistopic_object']):
 
     # Topic modeling
     n_topics = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
