@@ -6,15 +6,19 @@ workflow run_wf {
   output_ch = input_ch
 
     | scenicplus.run(
-      fromState: [multiomics_rna: "multiomics_rna",
+      fromState: [
+              multiomics_rna: "multiomics_rna",
               multiomics_atac: "multiomics_atac",
               temp_dir: "temp_dir",
-              num_workers: "num_workers"
+              num_workers: "num_workers",
+              scplus_mdata: "scplus_mdata", 
+              cell_topic: "cell_topic"
+              
               ],
-      toState: [prediction:"prediction", cistopic_object:"cistopic_object"]
+      toState: [prediction:"prediction", cell_topic:"cell_topic", scplus_mdata:"scplus_mdata"]
     )
 
-    | setState(["prediction", "cistopic_object"])
+    | setState(["prediction", "cell_topic", "scplus_mdata"])
 
   emit:
   output_ch

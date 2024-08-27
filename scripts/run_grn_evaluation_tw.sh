@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ID="pearson_gb_subsample"
+RUN_ID="pearson_gb_subsample_RF"
 resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
 grn_models_folder="${resources_dir}/grn_models"
-reg_type=GB
+reg_type=RF
 subsample=-2
 max_workers=10
 

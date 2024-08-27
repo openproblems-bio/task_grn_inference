@@ -41,13 +41,14 @@ from pycisTopic.clust_vis import find_clusters, run_umap, run_tsne, plot_metadat
 
 ## VIASH START
 par = {
-  'multiomics_rna': '/base/resources/resources_test/grn-benchmark/multiomics_rna.h5ad',
-  'multiomics_atac': '/base/resources/resources_test/grn-benchmark/multiomics_atac.h5ad',
-  'temp_dir': '/base/output/scenicplus',
-  'cistopic_object': '/base/output/scenicplus/pycistopic.pkl',
-  'prediction': '/base/output/prediction.csv',
+  'multiomics_rna': 'resources/resources_test/grn-benchmark/multiomics_rna.h5ad',
+  'multiomics_atac': 'resources/resources_test/grn-benchmark/multiomics_atac.h5ad',
+  'temp_dir': 'output/scenicplus',
+  'cistopic_object': 'output/scenicplus/pycistopic.pkl',
+  'prediction': 'output/prediction.csv',
   'qc': False,
-  'num_workers': 4
+  'num_workers': 4,
+  'scplus_mdata': 'output/scenicplus/scplus_mdata.h5mu'
 }
 ## VIASH END
 
@@ -65,6 +66,8 @@ except NameError:
 out_dir = par['temp_dir']
 atac_dir = os.path.join(out_dir, 'atac')
 os.makedirs(atac_dir, exist_ok=True)
+
+par['cistopic_object'] = f"{par['temp_dir']}/cistopic_object.pkl"
 
 # Get list of samples (e.g., donors)
 print('Collect list of samples')
@@ -231,9 +234,7 @@ if not os.path.exists(os.path.join(out_dir, 'qc', 'tss.bed')):
 
 # Create cistopic objects
 if not os.path.exists(os.path.join(out_dir, 'cistopic_obj.pkl')):
-
     if par['qc']:  # Whether to perform quality control
-
         # Compute QC metrics
         print('Perform QC')
         for donor_id in unique_donor_ids:
@@ -346,7 +347,6 @@ if not os.path.exists(MALLET_PATH):
 # LDA-based topic modeling
 print('Run LDA models')
 if not os.path.exists(par['cistopic_object']):
-
     # Topic modeling
     n_topics = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
     if os.path.exists(MALLET_PATH):
@@ -380,11 +380,17 @@ if not os.path.exists(par['cistopic_object']):
     model = evaluate_models(models, select_model=40, return_model=True)
     cistopic_obj.add_LDA_model(model)
 
-    with open(filepath, 'wb') as f:
+    with open(par['cistopic_object'], 'wb') as f:
         pickle.dump(cistopic_obj, f)
+    
+
 else:
-    with open(filepath, 'rb') as f:
+    with open(par['cistopic_object'], 'rb') as f:
         cistopic_obj = pickle.load(f)
+    
+cell_topic = cistopic_obj.selected_model.cell_topic.T
+cell_topic.index = cell_topic.index.str.split('-').str[0]
+cell_topic.to_csv(par['cell_topic'])
 
 chromsizes = pd.read_table(os.path.join(out_dir, "qc", "hg38.chrom_sizes_and_alias.tsv"))
 chromsizes.rename({"# ucsc": "Chromosome", "length": "End"}, axis = 1, inplace = True)
@@ -447,7 +453,6 @@ markers_dict = find_diff_features(
     n_cpu=5,
     split_pattern='-'
 )
-
 # Save topics
 folder = os.path.join(out_dir, 'region_sets', 'Topics_otsu')
 os.makedirs(folder, exist_ok=True)
@@ -607,10 +612,8 @@ url = 'https://resources.aertslab.org/cistarget/motif_collections/v10nr_clust_pu
 download(url, os.path.join(DB_PATH, 'motifs-v10-nr.hgnc-m0.00001-o0.0.tbl'))
 
 if not os.path.exists(os.path.join(work_dir, 'rna.h5ad')):
-
     # Load scRNA-seq data
     adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-
     # Only keep cells with at least 200 expressed genes, and genes with at least 3 cells expressing them
     sc.pp.filter_cells(adata_rna, min_genes=200)
     sc.pp.filter_genes(adata_rna, min_cells=3)
@@ -696,6 +699,7 @@ settings['params_data_preparation']['is_multiome'] = True
 settings['params_data_preparation']['is_multiome'] = 'key_to_group_by'
 settings['params_data_preparation']['nr_cells_per_metacells'] = 5
 settings['params_data_preparation']['species'] = 'hsapiens'
+settings['output_data']['scplus_mdata'] = par['scplus_mdata']
 
 # Save pipeline settings
 with open(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'w') as f:
@@ -707,17 +711,17 @@ with open(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake', 'config', 'conf
 with contextlib.chdir(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake')):
     subprocess.run([
         'snakemake',
-        '--cores', str(par['num_workers']),
-        #'--unlock'
+        '--cores', str(par['num_workers'])
     ])
+import mudata
+scplus_mdata = mudata.read(par['scplus_mdata'])
+prediction = scplus_mdata.uns["direct_e_regulon_metadata"]
 
-# Make sure the file is properly formatted, and re-format it if needed
-filepath = os.path.join(work_dir, 'tf_to_gene_adj.tsv')
-shutil.copyfile(filepath, par['prediction'])
+prediction.to_csv(par['prediction'])
+
+# # Make sure the file is properly formatted, and re-format it if needed
+# filepath = os.path.join(work_dir, 'tf_to_gene_adj.tsv')
+# shutil.copyfile(filepath, par['prediction'])
 
 
-# cistopic_obj = pickle.load(os.path.join(par['cistopic_out'], f'cistopic_object_with_model.pkl'))
-# # get cell topic association 
-# cell_topic = cistopic_obj.selected_model.cell_topic.T
-# cell_names = cistopic_obj.cell_data.obs_id.values
-# cell_topic.index = cell_names
+
