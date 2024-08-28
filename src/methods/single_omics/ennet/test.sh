@@ -1,2 +1,1 @@
-viash build src/methods/single_omics/ennet/config.novsh.yaml -p docker -o bin/ennet && bin/ennet/ennet --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --tfs resources/prior/tf_all.csv --prediction output/ennet/prediction.csv
-#viash run src/methods/single_omics/ennet/config.novsh.yaml -p docker -- ---setup build && bin/ennet/ennet --multiomics_rna resources/resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/ennet/prediction.csv
+viash run src/methods/single_omics/ennet/config.novsh.yaml -- --multiomics_rna resources_test/grn-benchmark/multiomics_rna.h5ad --tfs resources/prior/tf_all.csv --prediction output/ennet/prediction.csv

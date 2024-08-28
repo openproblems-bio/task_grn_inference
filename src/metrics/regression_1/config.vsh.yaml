@@ -7,6 +7,12 @@ functionality:
     summary: Calculates R2 score for regression 1
     description: |
       Calculates R2 score using regression approach 1.
+  arguments:
+    - name: --layer
+      type: string
+      direction: input
+      required: false
+      default: pearson
   resources:
     - type: python_script
       path: script.py

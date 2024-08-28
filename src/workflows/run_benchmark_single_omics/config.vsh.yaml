@@ -1,0 +1,80 @@
+
+functionality:
+  name: run_benchmark_single_omics
+  namespace: "workflows"
+  info:
+    label: run_benchmark_single_omics
+    summary: "Infer GRNs and evaluate each prediction for single omics grns"
+
+  argument_groups:
+    - name: Inputs
+      arguments:
+        - name: --multiomics_rna
+          type: file
+          direction: input
+        - name: --perturbation_data
+          type: file
+          direction: input
+        - name: --prediction
+          type: file
+          direction: input
+          required: false
+        - name: --subsample
+          type: integer
+          direction: input
+          default: 2
+        - name: --reg_type
+          type: string
+          direction: input
+          default: ridge
+        - name: --max_workers
+          type: integer
+          direction: input
+          required: True
+        - name: --tf_all
+          type: file
+          required: false
+          direction: input
+          default: resources/prior/tf_all.csv
+        - name: --consensus
+          type: file
+          required: false
+          direction: input
+          default: resources/prior/consensus.json
+        
+    - name: Outputs
+      arguments:
+        - name: "--scores"
+          type: file
+          required: true
+          direction: output
+          default: "scores.yaml"
+        - name: "--metric_configs"
+          type: file
+          required: true
+          direction: output
+          default: metric_configs.yaml
+    
+  resources:
+    - type: nextflow_script
+      path: main.nf
+      entrypoint: run_wf
+    - type: file
+      path: ../../api/task_info.yaml
+  dependencies:
+    - name: common/extract_metadata
+      repository: openproblemsv2
+    - name: metrics/regression_2 
+    - name: metrics/regression_1
+    - name: control_methods/positive_control
+    - name: control_methods/negative_control
+    - name: grn_methods/portia
+  repositories:
+    - name: openproblemsv2
+      type: github
+      repo: openproblems-bio/openproblems-v2
+      tag: main_build
+platforms:
+  - type: nextflow
+    directives:
+      label: [ midtime, midmem, lowcpu ]

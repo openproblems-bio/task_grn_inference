@@ -62,6 +62,8 @@ try:
 except NameError:
     pass
 
+par['temp_dir'] = os.path.join(os.path.dirname(par['prediction']), 'scenicplus')
+
 out_dir = par['temp_dir']
 atac_dir = os.path.join(out_dir, 'atac')
 os.makedirs(atac_dir, exist_ok=True)
