@@ -17,7 +17,7 @@ param_list:
     multiomics_rna: ${resources_dir}/grn-benchmark/multiomics_rna.h5ad
     multiomics_atac: ${resources_dir}/grn-benchmark/multiomics_atac.h5ad
     num_workers: $num_workers
-    temp_dir: ./tmp/grn
+    temp_dir: tmp/grn
 output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE

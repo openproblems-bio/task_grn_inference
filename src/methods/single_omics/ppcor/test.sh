@@ -1,1 +1,1 @@
-viash build src/methods/single_omics/ppcor/config.novsh.yaml -p docker -o bin/ppcor && bin/ppcor/ppcor --multiomics_rna resources/grn-benchmark/multiomics_rna.h5ad --prediction output/ppcor/prediction.csv
+viash run src/methods/single_omics/ppcor/config.novsh.yaml -- --multiomics_rna resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/ppcor/prediction.csv

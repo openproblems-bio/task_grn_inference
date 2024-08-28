@@ -27,6 +27,14 @@ functionality:
       required: true
       direction: output
       description: "Cell-topics prob scores"
+    - name: --rankings_db
+      type: file
+      direction: input
+    - name: --scores_db
+      type: file
+      direction: input
+      
+
       
   resources:
     - type: python_script

@@ -31,11 +31,6 @@ functionality:
       multiple: false
       info:
         test_default: ridge
-    - name: --layer
-      type: string
-      direction: input
-      required: false
-      default: pearson
     - name: --subsample
       type: integer
       direction: input
@@ -52,6 +47,10 @@ functionality:
       direction: input 
       required: false
       example: collectri
+    - name: --tfs
+      type: file
+      direction: input
+      default: 'resources/prior/tf_all.csv'
 
 
       

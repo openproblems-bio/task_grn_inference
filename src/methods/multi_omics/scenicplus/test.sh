@@ -3,4 +3,6 @@ viash run src/methods/multi_omics/scenicplus/config.vsh.yaml -- --multiomics_ata
     --temp_dir output/scenicplus \
     --prediction output/scenicplus/prediction.csv \
     --cell_topic output/scenicplus/cell_topic.csv \
-    --scplus_mdata output/scenicplus/scplus_mdata.h5mu
+    --scplus_mdata output/scenicplus/scplus_mdata.h5mu \
+    --scores_db resources_test/supplementary/scenicplus_data/hg38_screen_v10_clust.regions_vs_motifs.scores.feather \
+    --rankings_db resources_test/supplementary/scenicplus_data/hg38_screen_v10_clust.regions_vs_motifs.rankings.feather

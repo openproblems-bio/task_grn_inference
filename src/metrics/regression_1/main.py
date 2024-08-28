@@ -169,13 +169,15 @@ def main(par):
     theta = 1 # no subsetting based on theta
     manipulate = None 
     ## read and process input data
+
     print('Reading input files', flush=True)
     
     perturbation_data = ad.read_h5ad(par['perturbation_data'])
-    # perturbation_data = perturbation_data[:, :2000]
-    # print(perturbation_data)
+    tf_all = np.loadtxt(par['tfs'], dtype=str)
     gene_names = perturbation_data.var.index.to_numpy()
     net = pd.read_csv(par['prediction'])
+    # subset to keep only those links with source as tf
+    net = net[net.source.isin(tf_all)]
 
     subsample = par['subsample']
     reg_type = par['reg_type']

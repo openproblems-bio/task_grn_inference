@@ -2983,18 +2983,6 @@ meta = [
         "dest" : "par"
       },
       {
-        "type" : "string",
-        "name" : "--layer",
-        "default" : [
-          "pearson"
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
         "type" : "integer",
         "name" : "--subsample",
         "description" : "number of samples randomly drawn from perturbation data",
@@ -3070,6 +3058,18 @@ meta = [
         "name" : "--static_only",
         "default" : [
           true
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "string",
+        "name" : "--layer",
+        "default" : [
+          "scgen_pearson"
         ],
         "required" : false,
         "direction" : "input",
@@ -3187,7 +3187,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "5114f04f817524fa6bb1811c95a3ad73c73b2cd6",
+    "git_commit" : "32829356ec586e0c0dfa304f902fca34ea4a1a32",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3215,13 +3215,13 @@ par = {
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'score': $( if [ ! -z ${VIASH_PAR_SCORE+x} ]; then echo "r'${VIASH_PAR_SCORE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'subsample': $( if [ ! -z ${VIASH_PAR_SUBSAMPLE+x} ]; then echo "int(r'${VIASH_PAR_SUBSAMPLE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'max_workers': $( if [ ! -z ${VIASH_PAR_MAX_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_MAX_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'tfs': $( if [ ! -z ${VIASH_PAR_TFS+x} ]; then echo "r'${VIASH_PAR_TFS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'consensus': $( if [ ! -z ${VIASH_PAR_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'static_only': $( if [ ! -z ${VIASH_PAR_STATIC_ONLY+x} ]; then echo "r'${VIASH_PAR_STATIC_ONLY//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
+  'static_only': $( if [ ! -z ${VIASH_PAR_STATIC_ONLY+x} ]; then echo "r'${VIASH_PAR_STATIC_ONLY//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),

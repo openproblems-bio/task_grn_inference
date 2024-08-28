@@ -193,10 +193,6 @@ function ViashHelp {
   echo "        default: ridge"
   echo "        name of regretion to use"
   echo ""
-  echo "    --layer"
-  echo "        type: string"
-  echo "        default: pearson"
-  echo ""
   echo "    --subsample"
   echo "        type: integer"
   echo "        default: -2"
@@ -222,6 +218,10 @@ function ViashHelp {
   echo "    --static_only"
   echo "        type: boolean"
   echo "        default: true"
+  echo ""
+  echo "    --layer"
+  echo "        type: string"
+  echo "        default: scgen_pearson"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -448,9 +448,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_2"
-LABEL org.opencontainers.image.created="2024-08-27T17:54:34Z"
+LABEL org.opencontainers.image.created="2024-08-28T18:19:43Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="5114f04f817524fa6bb1811c95a3ad73c73b2cd6"
+LABEL org.opencontainers.image.revision="32829356ec586e0c0dfa304f902fca34ea4a1a32"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -653,17 +653,6 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_REG_TYPE=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --layer)
-            [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_LAYER="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --layer. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --layer=*)
-            [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer=*\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_LAYER=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
         --subsample)
             [ -n "$VIASH_PAR_SUBSAMPLE" ] && ViashError Bad arguments for option \'--subsample\': \'$VIASH_PAR_SUBSAMPLE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_SUBSAMPLE="$2"
@@ -728,6 +717,17 @@ while [[ $# -gt 0 ]]; do
         --static_only=*)
             [ -n "$VIASH_PAR_STATIC_ONLY" ] && ViashError Bad arguments for option \'--static_only=*\': \'$VIASH_PAR_STATIC_ONLY\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_STATIC_ONLY=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --layer)
+            [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_LAYER="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --layer. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --layer=*)
+            [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer=*\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_LAYER=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---setup)
@@ -883,9 +883,6 @@ fi
 if [ -z ${VIASH_PAR_REG_TYPE+x} ]; then
   VIASH_PAR_REG_TYPE="ridge"
 fi
-if [ -z ${VIASH_PAR_LAYER+x} ]; then
-  VIASH_PAR_LAYER="pearson"
-fi
 if [ -z ${VIASH_PAR_SUBSAMPLE+x} ]; then
   VIASH_PAR_SUBSAMPLE="-2"
 fi
@@ -900,6 +897,9 @@ if [ -z ${VIASH_PAR_CONSENSUS+x} ]; then
 fi
 if [ -z ${VIASH_PAR_STATIC_ONLY+x} ]; then
   VIASH_PAR_STATIC_ONLY="true"
+fi
+if [ -z ${VIASH_PAR_LAYER+x} ]; then
+  VIASH_PAR_LAYER="scgen_pearson"
 fi
 
 # check whether required files exist
@@ -1080,13 +1080,13 @@ par = {
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'score': $( if [ ! -z ${VIASH_PAR_SCORE+x} ]; then echo "r'${VIASH_PAR_SCORE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'subsample': $( if [ ! -z ${VIASH_PAR_SUBSAMPLE+x} ]; then echo "int(r'${VIASH_PAR_SUBSAMPLE//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'max_workers': $( if [ ! -z ${VIASH_PAR_MAX_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_MAX_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'tfs': $( if [ ! -z ${VIASH_PAR_TFS+x} ]; then echo "r'${VIASH_PAR_TFS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'consensus': $( if [ ! -z ${VIASH_PAR_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_CONSENSUS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'static_only': $( if [ ! -z ${VIASH_PAR_STATIC_ONLY+x} ]; then echo "r'${VIASH_PAR_STATIC_ONLY//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
+  'static_only': $( if [ ! -z ${VIASH_PAR_STATIC_ONLY+x} ]; then echo "r'${VIASH_PAR_STATIC_ONLY//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
+  'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
