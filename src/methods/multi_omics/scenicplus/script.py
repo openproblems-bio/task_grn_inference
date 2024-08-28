@@ -41,17 +41,16 @@ from pycisTopic.clust_vis import find_clusters, run_umap, run_tsne, plot_metadat
 
 ## VIASH START
 par = {
-  'multiomics_rna': 'resources/resources_test/grn-benchmark/multiomics_rna.h5ad',
-  'multiomics_atac': 'resources/resources_test/grn-benchmark/multiomics_atac.h5ad',
+  'multiomics_rna': 'resources_test/grn-benchmark/multiomics_rna.h5ad',
+  'multiomics_atac': 'resources_test/grn-benchmark/multiomics_atac.h5ad',
   'temp_dir': 'output/scenicplus',
-  'cistopic_object': 'output/scenicplus/pycistopic.pkl',
   'prediction': 'output/prediction.csv',
   'qc': False,
   'num_workers': 4,
-  'scplus_mdata': 'output/scenicplus/scplus_mdata.h5mu'
+  'scplus_mdata': 'output/scenicplus/scplus_mdata.h5mu',
+  'cell_topic': 'output/cell_topic.csv'
 }
 ## VIASH END
-
 
 # Bug in pycistopic: Import is missing in pycisTopic.loom,
 # so TSNE must be dynamically added to the library's namespace.
@@ -346,47 +345,43 @@ if not os.path.exists(MALLET_PATH):
 
 # LDA-based topic modeling
 print('Run LDA models')
-if not os.path.exists(par['cistopic_object']):
-    # Topic modeling
-    n_topics = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-    if os.path.exists(MALLET_PATH):
-        models = run_cgs_models_mallet(
-            cistopic_obj,
-            n_topics=n_topics,
-            n_cpu=par['num_workers'],
-            n_iter=500,
-            random_state=555,
-            alpha=50,
-            alpha_by_topic=True,
-            eta=0.1,
-            eta_by_topic=False,
-            mallet_path=MALLET_PATH
-        )
-    else:
-        print('Could not find Mallet. Running the sequential version of LDA instead.')
-        models = run_cgs_models(
-            cistopic_obj,
-            n_topics=n_topics,
-            n_cpu=12,
-            n_iter=500,
-            random_state=555,
-            alpha=50,
-            alpha_by_topic=True,
-            eta=0.1,
-            eta_by_topic=False
-        )
 
-    # Model selection
-    model = evaluate_models(models, select_model=40, return_model=True)
-    cistopic_obj.add_LDA_model(model)
-
-    with open(par['cistopic_object'], 'wb') as f:
-        pickle.dump(cistopic_obj, f)
-    
-
+# Topic modeling
+n_topics = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+if os.path.exists(MALLET_PATH):
+    models = run_cgs_models_mallet(
+        cistopic_obj,
+        n_topics=n_topics,
+        n_cpu=par['num_workers'],
+        n_iter=500,
+        random_state=555,
+        alpha=50,
+        alpha_by_topic=True,
+        eta=0.1,
+        eta_by_topic=False,
+        mallet_path=MALLET_PATH
+    )
 else:
-    with open(par['cistopic_object'], 'rb') as f:
-        cistopic_obj = pickle.load(f)
+    print('Could not find Mallet. Running the sequential version of LDA instead.')
+    models = run_cgs_models(
+        cistopic_obj,
+        n_topics=n_topics,
+        n_cpu=12,
+        n_iter=500,
+        random_state=555,
+        alpha=50,
+        alpha_by_topic=True,
+        eta=0.1,
+        eta_by_topic=False
+    )
+
+# Model selection
+model = evaluate_models(models, select_model=40, return_model=True)
+cistopic_obj.add_LDA_model(model)
+
+with open(par['cistopic_object'], 'wb') as f:
+    pickle.dump(cistopic_obj, f)
+
     
 cell_topic = cistopic_obj.selected_model.cell_topic.T
 cell_topic.index = cell_topic.index.str.split('-').str[0]
@@ -572,12 +567,10 @@ export_gene_activity_to_loom(
     split_pattern='-'
 )
 
-work_dir = os.path.join(out_dir, 'scenicplus')
-os.makedirs(work_dir, exist_ok=True)
-os.makedirs(os.path.join(work_dir, 'scRNA'), exist_ok=True)
+os.makedirs(os.path.join(out_dir, 'scRNA'), exist_ok=True)
 
 # Download databases
-DB_PATH = os.path.join(work_dir, 'db')
+DB_PATH = os.path.join(out_dir, 'db')
 os.makedirs(DB_PATH, exist_ok=True)
 def download(url: str, filepath: str) -> None:
     if os.path.exists(filepath):
@@ -600,39 +593,53 @@ def download_checksum(url: str, filepath: str) -> str:
     with open(filepath, 'r') as f:
         s = f.read()
     return s.split()[0]
-print("Downloading prior databases", flush=True)
-url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.rankings.feather.sha1sum.txt'
-digest = download_checksum(url, os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.rankings.feather.sha1sum.txt'))
-url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.rankings.feather'
-download_and_checksum(url, os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.rankings.feather'), digest)
-url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.scores.feather.sha1sum.txt'
-digest = download_checksum(url, os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.scores.feather.sha1sum.txt'))
-url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.scores.feather'
-download_and_checksum(url, os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.scores.feather'), digest)
+# Define rankings, score and motif annotation databases
+if par['rankings_db']:
+    print("Read tf motif db locally")
+    rankings_db = par['rankings_db']
+    scores_db =  par['scores_db']
+else:
+    print("Downloading tf motif db")
+    url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.rankings.feather.sha1sum.txt'
+    digest = download_checksum(url, os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.rankings.feather.sha1sum.txt'))
+
+    url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.rankings.feather'
+    download_and_checksum(url, os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.rankings.feather'), digest)
+
+    url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.scores.feather.sha1sum.txt'
+    digest = download_checksum(url, os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.scores.feather.sha1sum.txt'))
+
+    url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.scores.feather'
+    download_and_checksum(url, os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.scores.feather'), digest)
+
+    rankings_db = os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.rankings.feather')
+    scores_db =  os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.scores.feather')
+
 url = 'https://resources.aertslab.org/cistarget/motif_collections/v10nr_clust_public/snapshots/motifs-v10-nr.hgnc-m0.00001-o0.0.tbl'
 download(url, os.path.join(DB_PATH, 'motifs-v10-nr.hgnc-m0.00001-o0.0.tbl'))
+motif_annotation = os.path.join(DB_PATH, 'motifs-v10-nr.hgnc-m0.00001-o0.0.tbl')
 
-if not os.path.exists(os.path.join(work_dir, 'rna.h5ad')):
-    print("Preprocess RNA-seq", flush=True)
-    # Load scRNA-seq data
-    adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-    # Only keep cells with at least 200 expressed genes, and genes with at least 3 cells expressing them
-    sc.pp.filter_cells(adata_rna, min_genes=200)
-    sc.pp.filter_genes(adata_rna, min_cells=3)
 
-    # Filter out doublets using scrublet
-    sc.external.pp.scrublet(adata_rna)
-    adata_rna = adata_rna[adata_rna.obs['predicted_doublet'] == False]
+print("Preprocess RNA-seq", flush=True)
+# Load scRNA-seq data
+adata_rna = anndata.read_h5ad(par['multiomics_rna'])
+# Only keep cells with at least 200 expressed genes, and genes with at least 3 cells expressing them
+sc.pp.filter_cells(adata_rna, min_genes=200)
+sc.pp.filter_genes(adata_rna, min_cells=3)
 
-    # Filter based on mitochondrial and total counts
-    adata_rna.var['mt'] = adata_rna.var_names.str.startswith('MT-')
-    sc.pp.calculate_qc_metrics(adata_rna, qc_vars=['mt'], percent_top=None, log1p=False, inplace=True)
+# Filter out doublets using scrublet
+sc.external.pp.scrublet(adata_rna)
+adata_rna = adata_rna[adata_rna.obs['predicted_doublet'] == False]
 
-    # Normalize data but keep track of original data
-    adata_rna.raw = adata_rna
-    sc.pp.normalize_total(adata_rna, target_sum=1e4)
-    sc.pp.log1p(adata_rna)
-    adata_rna.write_h5ad(os.path.join(work_dir, 'rna.h5ad'))
+# Filter based on mitochondrial and total counts
+adata_rna.var['mt'] = adata_rna.var_names.str.startswith('MT-')
+sc.pp.calculate_qc_metrics(adata_rna, qc_vars=['mt'], percent_top=None, log1p=False, inplace=True)
+
+# Normalize data but keep track of original data
+adata_rna.raw = adata_rna
+sc.pp.normalize_total(adata_rna, target_sum=1e4)
+sc.pp.log1p(adata_rna)
+adata_rna.write_h5ad(os.path.join(out_dir, 'rna.h5ad'))
 
 # Load candidate enhancer regions
 with open(os.path.join(out_dir, f'candidate_enhancers/region_bin_topics_otsu.pkl'), 'rb') as f:
@@ -658,28 +665,23 @@ for DAR in markers_dict.keys():
     regions = markers_dict[DAR].index[markers_dict[DAR].index.str.startswith('chr')]
     region_sets['DARs'][DAR] = pr.PyRanges(region_names_to_coordinates(regions))
 
-# Define rankings, score and motif annotation databases
-rankings_db = os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.rankings.feather')
-scores_db =  os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.scores.feather')
-motif_annotation = os.path.join(DB_PATH, 'motifs-v10-nr.hgnc-m0.00001-o0.0.tbl')
-
 # Init scenicplus pipeline
-os.makedirs(os.path.join(work_dir, 'scplus_pipeline'), exist_ok=True)
-os.makedirs(os.path.join(work_dir, 'scplus_pipeline', 'temp'), exist_ok=True)
-subprocess.run(['scenicplus', 'init_snakemake', '--out_dir', os.path.join(work_dir, 'scplus_pipeline')])
+os.makedirs(os.path.join(out_dir, 'scplus_pipeline'), exist_ok=True)
+os.makedirs(os.path.join(out_dir, 'scplus_pipeline', 'temp'), exist_ok=True)
+subprocess.run(['scenicplus', 'init_snakemake', '--out_dir', os.path.join(out_dir, 'scplus_pipeline')])
 print("snake make initialized", flush=True)
 # Load pipeline settings
-with open(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'r') as f:
+with open(os.path.join(out_dir, 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'r') as f:
     settings = yaml.safe_load(f)
 print('output_data:', settings['output_data'], flush=True)
 # Update settings
 settings['input_data']['cisTopic_obj_fname'] = par['cistopic_object']
-settings['input_data']['GEX_anndata_fname'] = os.path.join(work_dir, 'rna.h5ad')
+settings['input_data']['GEX_anndata_fname'] = os.path.join(out_dir, 'rna.h5ad')
 settings['input_data']['region_set_folder'] = os.path.join(out_dir, 'region_sets')
 settings['input_data']['ctx_db_fname'] = rankings_db
 settings['input_data']['dem_db_fname'] = scores_db
 settings['input_data']['path_to_motif_annotations'] = motif_annotation
-settings['params_general']['temp_dir'] = os.path.join(work_dir, 'scplus_pipeline', 'temp')
+settings['params_general']['temp_dir'] = os.path.join(out_dir, 'scplus_pipeline', 'temp')
 settings['params_general']['n_cpu'] = par['num_workers']
 settings['params_inference']['quantile_thresholds_region_to_gene'] = '0.85 0.90 0.95'
 settings['params_inference']['top_n_regionTogenes_per_gene'] = '5 10 15'
@@ -705,13 +707,13 @@ settings['output_data']['scplus_mdata'] = par['scplus_mdata']
 
 print('output_data:', settings['output_data'], flush=True)
 # Save pipeline settings
-with open(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'w') as f:
+with open(os.path.join(out_dir, 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'w') as f:
     yaml.dump(settings, f)
 
 # TODO: from this line onward, the code is untested (could not run it locally due to excessive memory requirements)
 print('run snakemake ', flush=True)
 # Run pipeline
-with contextlib.chdir(os.path.join(work_dir, 'scplus_pipeline', 'Snakemake')):
+with contextlib.chdir(os.path.join(out_dir, 'scplus_pipeline', 'Snakemake')):
     subprocess.run([
         'snakemake',
         '--cores', str(par['num_workers'])
@@ -723,7 +725,7 @@ prediction = scplus_mdata.uns["direct_e_regulon_metadata"]
 prediction.to_csv(par['prediction'])
 
 # # Make sure the file is properly formatted, and re-format it if needed
-# filepath = os.path.join(work_dir, 'tf_to_gene_adj.tsv')
+# filepath = os.path.join(out_dir, 'tf_to_gene_adj.tsv')
 # shutil.copyfile(filepath, par['prediction'])
 
 
