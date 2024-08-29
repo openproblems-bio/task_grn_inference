@@ -12,6 +12,9 @@ functionality:
         - name: --multiomics_rna
           type: file
           direction: input
+        - name: --multiomics_atac
+          type: file
+          direction: input
         - name: --perturbation_data
           type: file
           direction: input

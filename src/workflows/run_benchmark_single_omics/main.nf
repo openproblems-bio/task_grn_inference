@@ -77,6 +77,7 @@ workflow run_wf {
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
         multiomics_rna: "multiomics_rna",
+        multiomics_atac: "multiomics_atac",
         tf_all: "tf_all",
       ],
       // use 'toState' to publish that component's outputs to the overall state
