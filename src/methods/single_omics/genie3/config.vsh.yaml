@@ -1,16 +1,15 @@
 __merge__: ../../../api/comp_method.yaml
 
 functionality:
-  name: portia
+  name: genie3
   namespace: "grn_methods"
   info:
-    label: portia
-    summary: "GRN inference using PORTIA"
+    label: genie3
+    
+    summary: "GRN inference using GENIE3"
     description: |
-      GRN inference using PORTIA.
-    documentation_url: https://github.com/AntoinePassemiers/PORTIA
-
-
+      GRN inference using GENIE3.
+    documentation_url: https://www.bioconductor.org/packages/release/bioc/html/GENIE3.html
   resources:
     - type: python_script
       path: script.py
@@ -19,8 +18,11 @@ platforms:
   - type: docker
     image: continuumio/anaconda3:2024.02-1
     setup:
+      - type: docker
+        run: |
+          conda install -y -c bioconda arboreto pandas
       - type: python
-        packages: [ anndata, numpy, scipy, scikit-learn, portia-grn ]
+        packages: [ anndata ]
   - type: native
   - type: nextflow
     directives:
