@@ -173,7 +173,7 @@ def main(par):
     print('Reading input files', flush=True)
     
     perturbation_data = ad.read_h5ad(par['perturbation_data'])
-    tf_all = np.loadtxt(par['tfs'], dtype=str)
+    tf_all = np.loadtxt(par['tf_all'], dtype=str)
     gene_names = perturbation_data.var.index.to_numpy()
     net = pd.read_csv(par['prediction'])
     # subset to keep only those links with source as tf
