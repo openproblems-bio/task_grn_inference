@@ -18,6 +18,7 @@ functionality:
       required: false
       direction: input
       default: resources_test/grn-benchmark/multiomics_atac.h5ad
+      must_exist: false
     - name: --prediction
       __merge__: file_prediction.yaml
       required: false
