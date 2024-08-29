@@ -179,7 +179,7 @@ function ViashHelp {
   echo "        example: resources/grn-benchmark/multiomics_rna.h5ad"
   echo ""
   echo "    --multiomics_atac"
-  echo "        type: file, file must exist"
+  echo "        type: file"
   echo "        default: resources_test/grn-benchmark/multiomics_atac.h5ad"
   echo "        example: resources/grn-benchmark/multiomics_atac.h5ad"
   echo ""
@@ -430,10 +430,6 @@ fi
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
   ViashError "Input file '$VIASH_PAR_MULTIOMICS_RNA' does not exist."
-  exit 1
-fi
-if [ ! -z "$VIASH_PAR_MULTIOMICS_ATAC" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_ATAC" ]; then
-  ViashError "Input file '$VIASH_PAR_MULTIOMICS_ATAC' does not exist."
   exit 1
 fi
 if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then

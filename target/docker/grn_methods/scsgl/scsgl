@@ -179,7 +179,7 @@ function ViashHelp {
   echo "        example: resources/grn-benchmark/multiomics_rna.h5ad"
   echo ""
   echo "    --multiomics_atac"
-  echo "        type: file, file must exist"
+  echo "        type: file"
   echo "        default: resources_test/grn-benchmark/multiomics_atac.h5ad"
   echo "        example: resources/grn-benchmark/multiomics_atac.h5ad"
   echo ""
@@ -433,9 +433,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata" "numba==0.53.1" "scipy==1.6.3" "pandas==1.2.4" "rpy2==3.4.4" "numpy==1.20.2" "scikit-learn==0.24.1"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scsgl"
-LABEL org.opencontainers.image.created="2024-08-29T11:50:49Z"
+LABEL org.opencontainers.image.created="2024-08-29T13:59:09Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="376e5b46b925529a1194ff4c31357d290c719773"
+LABEL org.opencontainers.image.revision="f0cc72480768d69f19d35a53e7d9ac31ec128467"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -833,10 +833,6 @@ fi
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
   ViashError "Input file '$VIASH_PAR_MULTIOMICS_RNA' does not exist."
-  exit 1
-fi
-if [ ! -z "$VIASH_PAR_MULTIOMICS_ATAC" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_ATAC" ]; then
-  ViashError "Input file '$VIASH_PAR_MULTIOMICS_ATAC' does not exist."
   exit 1
 fi
 if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
