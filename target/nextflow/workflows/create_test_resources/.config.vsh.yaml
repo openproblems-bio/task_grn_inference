@@ -123,7 +123,7 @@ functionality:
       functionalityNamespace: "multiomics"
       output: ""
       platform: ""
-      git_commit: "32829356ec586e0c0dfa304f902fca34ea4a1a32"
+      git_commit: "376e5b46b925529a1194ff4c31357d290c719773"
       executable: "/nextflow/multiomics/multiome_matrix/main.nf"
     writtenPath: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/multiomics/multiome_matrix"
   - name: "multiomics/format_resources_r"
@@ -140,7 +140,7 @@ functionality:
       functionalityNamespace: "multiomics"
       output: ""
       platform: ""
-      git_commit: "32829356ec586e0c0dfa304f902fca34ea4a1a32"
+      git_commit: "376e5b46b925529a1194ff4c31357d290c719773"
       executable: "/nextflow/multiomics/format_resources_r/main.nf"
     writtenPath: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/multiomics/format_resources_r"
   - name: "testdata/create_test_data"
@@ -157,7 +157,7 @@ functionality:
       functionalityNamespace: "testdata"
       output: ""
       platform: ""
-      git_commit: "32829356ec586e0c0dfa304f902fca34ea4a1a32"
+      git_commit: "376e5b46b925529a1194ff4c31357d290c719773"
       executable: "/nextflow/testdata/create_test_data/main.nf"
     writtenPath: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/testdata/create_test_data"
   set_wd_to_resources_dir: false
@@ -188,6 +188,8 @@ platforms:
       hightime: "time = 8.h"
       veryhightime: "time = 24.h"
       veryveryhightime: "time = 48.h"
+      threedaystime: "time = 72.h"
+      oneweektime: "time = 168.h"
     script:
     - "process.errorStrategy = 'ignore'"
   debug: false
@@ -198,5 +200,5 @@ info:
   output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/create_test_resources"
   executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/create_test_resources/main.nf"
   viash_version: "0.8.6"
-  git_commit: "32829356ec586e0c0dfa304f902fca34ea4a1a32"
+  git_commit: "376e5b46b925529a1194ff4c31357d290c719773"
   git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"

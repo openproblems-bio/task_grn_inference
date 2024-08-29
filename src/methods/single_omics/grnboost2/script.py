@@ -10,7 +10,7 @@ from distributed import Client
 ## VIASH START
 par = {
   'multiomics_rna': 'resources/resources_test/grn-benchmark/multiomics_rna.h5ad',
-  'tfs': 'resources/prior/tf_all.csv',
+  "tf_all": 'resources/prior/tf_all.csv',
   'prediction': 'output/grnboost2/prediction.csv',
   'max_n_links': 50000
 }
@@ -32,7 +32,7 @@ mask = (np.mean(X == 0, axis=1) >= 0.9)
 adata_rna = X[~mask, :]
 
 # Load list of putative TFs
-df = pd.read_csv(par['tfs'], header=None, names=['gene_name'])
+df = pd.read_csv(par["tf_all"], header=None, names=['gene_name'])
 tfs = set(list(df['gene_name']))
 tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
 

@@ -2930,7 +2930,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "32829356ec586e0c0dfa304f902fca34ea4a1a32",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
           "executable" : "/nextflow/perturbation/sc_counts/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/sc_counts"
@@ -2951,7 +2951,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "32829356ec586e0c0dfa304f902fca34ea4a1a32",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
           "executable" : "/nextflow/perturbation/normalization/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/normalization"
@@ -2972,7 +2972,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "32829356ec586e0c0dfa304f902fca34ea4a1a32",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
           "executable" : "/nextflow/perturbation/batch_correction_scgen/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/batch_correction_scgen"
@@ -2993,7 +2993,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "32829356ec586e0c0dfa304f902fca34ea4a1a32",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
           "executable" : "/nextflow/perturbation/batch_correction_seurat/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/batch_correction_seurat"
@@ -3031,7 +3031,9 @@ meta = [
           "midtime" : "time = 4.h",
           "hightime" : "time = 8.h",
           "veryhightime" : "time = 24.h",
-          "veryveryhightime" : "time = 48.h"
+          "veryveryhightime" : "time = 48.h",
+          "threedaystime" : "time = 72.h",
+          "oneweektime" : "time = 168.h"
         },
         "script" : [
           "process.errorStrategy = 'ignore'"
@@ -3046,7 +3048,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/process_perturbation",
     "viash_version" : "0.8.6",
-    "git_commit" : "32829356ec586e0c0dfa304f902fca34ea4a1a32",
+    "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

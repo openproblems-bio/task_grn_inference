@@ -196,6 +196,14 @@ function ViashHelp {
   echo "        type: integer"
   echo "        default: 4"
   echo ""
+  echo "    --tf_all"
+  echo "        type: file, file must exist"
+  echo "        example: resources/prior/tf_all.csv"
+  echo ""
+  echo "    --max_n_links"
+  echo "        type: integer"
+  echo "        default: 50000"
+  echo ""
   echo "    --base_grn"
   echo "        type: file, output, file must exist"
   echo "        default: output/celloracle/base_grn.csv"
@@ -284,6 +292,28 @@ while [[ $# -gt 0 ]]; do
         --num_workers=*)
             [ -n "$VIASH_PAR_NUM_WORKERS" ] && ViashError Bad arguments for option \'--num_workers=*\': \'$VIASH_PAR_NUM_WORKERS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_NUM_WORKERS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --tf_all)
+            [ -n "$VIASH_PAR_TF_ALL" ] && ViashError Bad arguments for option \'--tf_all\': \'$VIASH_PAR_TF_ALL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TF_ALL="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --tf_all. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --tf_all=*)
+            [ -n "$VIASH_PAR_TF_ALL" ] && ViashError Bad arguments for option \'--tf_all=*\': \'$VIASH_PAR_TF_ALL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TF_ALL=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --max_n_links)
+            [ -n "$VIASH_PAR_MAX_N_LINKS" ] && ViashError Bad arguments for option \'--max_n_links\': \'$VIASH_PAR_MAX_N_LINKS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MAX_N_LINKS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --max_n_links. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --max_n_links=*)
+            [ -n "$VIASH_PAR_MAX_N_LINKS" ] && ViashError Bad arguments for option \'--max_n_links=*\': \'$VIASH_PAR_MAX_N_LINKS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MAX_N_LINKS=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --base_grn)
@@ -423,6 +453,9 @@ fi
 if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
   VIASH_PAR_NUM_WORKERS="4"
 fi
+if [ -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then
+  VIASH_PAR_MAX_N_LINKS="50000"
+fi
 if [ -z ${VIASH_PAR_BASE_GRN+x} ]; then
   VIASH_PAR_BASE_GRN="output/celloracle/base_grn.csv"
 fi
@@ -439,11 +472,21 @@ if [ ! -z "$VIASH_PAR_MULTIOMICS_ATAC" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_ATAC" 
   ViashError "Input file '$VIASH_PAR_MULTIOMICS_ATAC' does not exist."
   exit 1
 fi
+if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
+  ViashError "Input file '$VIASH_PAR_TF_ALL' does not exist."
+  exit 1
+fi
 
 # check whether parameters values are of the right type
 if [[ -n "$VIASH_PAR_NUM_WORKERS" ]]; then
   if ! [[ "$VIASH_PAR_NUM_WORKERS" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--num_workers' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_MAX_N_LINKS" ]]; then
+  if ! [[ "$VIASH_PAR_MAX_N_LINKS" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--max_n_links' has to be an integer. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -532,6 +575,8 @@ par = {
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'base_grn': $( if [ ! -z ${VIASH_PAR_BASE_GRN+x} ]; then echo "r'${VIASH_PAR_BASE_GRN//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'links': $( if [ ! -z ${VIASH_PAR_LINKS+x} ]; then echo "r'${VIASH_PAR_LINKS//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }

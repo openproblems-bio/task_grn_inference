@@ -2899,20 +2899,6 @@ meta = [
             "multiple" : false,
             "multiple_sep" : ":",
             "dest" : "par"
-          },
-          {
-            "type" : "file",
-            "name" : "--metric_configs",
-            "default" : [
-              "metric_configs.yaml"
-            ],
-            "must_exist" : true,
-            "create_parent" : true,
-            "required" : true,
-            "direction" : "output",
-            "multiple" : false,
-            "multiple_sep" : ":",
-            "dest" : "par"
           }
         ]
       }
@@ -2944,9 +2930,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems-v2",
           "tag" : "main_build",
-          "localPath" : "/tmp/viash_hub_repo12425616857991758800"
+          "localPath" : "/tmp/viash_hub_repo13248719328125240291"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo12425616857991758800/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo13248719328125240291/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_remote" : "https://github.com/openproblems-bio/openproblems-v2",
@@ -2976,7 +2962,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "32829356ec586e0c0dfa304f902fca34ea4a1a32",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2"
@@ -2997,7 +2983,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "32829356ec586e0c0dfa304f902fca34ea4a1a32",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1"
@@ -3018,7 +3004,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "32829356ec586e0c0dfa304f902fca34ea4a1a32",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
           "executable" : "/nextflow/control_methods/positive_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/positive_control"
@@ -3039,7 +3025,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "32829356ec586e0c0dfa304f902fca34ea4a1a32",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
           "executable" : "/nextflow/control_methods/negative_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/negative_control"
@@ -3060,10 +3046,157 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "32829356ec586e0c0dfa304f902fca34ea4a1a32",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
           "executable" : "/nextflow/grn_methods/portia/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/portia"
+      },
+      {
+        "name" : "grn_methods/ennet",
+        "repository" : {
+          "type" : "local",
+          "localPath" : ""
+        },
+        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/ennet/config.vsh.yaml",
+        "configInfo" : {
+          "functionalityName" : "ennet",
+          "git_tag" : "",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "viash_version" : "0.8.6",
+          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/ennet/config.vsh.yaml",
+          "functionalityNamespace" : "grn_methods",
+          "output" : "",
+          "platform" : "",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
+          "executable" : "/nextflow/grn_methods/ennet/main.nf"
+        },
+        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/ennet"
+      },
+      {
+        "name" : "grn_methods/genie3",
+        "repository" : {
+          "type" : "local",
+          "localPath" : ""
+        },
+        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/genie3/config.vsh.yaml",
+        "configInfo" : {
+          "functionalityName" : "genie3",
+          "git_tag" : "",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "viash_version" : "0.8.6",
+          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/genie3/config.vsh.yaml",
+          "functionalityNamespace" : "grn_methods",
+          "output" : "",
+          "platform" : "",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
+          "executable" : "/nextflow/grn_methods/genie3/main.nf"
+        },
+        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/genie3"
+      },
+      {
+        "name" : "grn_methods/grnboost2",
+        "repository" : {
+          "type" : "local",
+          "localPath" : ""
+        },
+        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/grnboost2/config.vsh.yaml",
+        "configInfo" : {
+          "functionalityName" : "grnboost2",
+          "git_tag" : "",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "viash_version" : "0.8.6",
+          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/grnboost2/config.vsh.yaml",
+          "functionalityNamespace" : "grn_methods",
+          "output" : "",
+          "platform" : "",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
+          "executable" : "/nextflow/grn_methods/grnboost2/main.nf"
+        },
+        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/grnboost2"
+      },
+      {
+        "name" : "grn_methods/pidc",
+        "repository" : {
+          "type" : "local",
+          "localPath" : ""
+        },
+        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/pidc/config.vsh.yaml",
+        "configInfo" : {
+          "functionalityName" : "pidc",
+          "git_tag" : "",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "viash_version" : "0.8.6",
+          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/pidc/config.vsh.yaml",
+          "functionalityNamespace" : "grn_methods",
+          "output" : "",
+          "platform" : "",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
+          "executable" : "/nextflow/grn_methods/pidc/main.nf"
+        },
+        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/pidc"
+      },
+      {
+        "name" : "grn_methods/ppcor",
+        "repository" : {
+          "type" : "local",
+          "localPath" : ""
+        },
+        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/ppcor/config.vsh.yaml",
+        "configInfo" : {
+          "functionalityName" : "ppcor",
+          "git_tag" : "",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "viash_version" : "0.8.6",
+          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/ppcor/config.vsh.yaml",
+          "functionalityNamespace" : "grn_methods",
+          "output" : "",
+          "platform" : "",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
+          "executable" : "/nextflow/grn_methods/ppcor/main.nf"
+        },
+        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/ppcor"
+      },
+      {
+        "name" : "grn_methods/scsgl",
+        "repository" : {
+          "type" : "local",
+          "localPath" : ""
+        },
+        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/scsgl/config.vsh.yaml",
+        "configInfo" : {
+          "functionalityName" : "scsgl",
+          "git_tag" : "",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "viash_version" : "0.8.6",
+          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/scsgl/config.vsh.yaml",
+          "functionalityNamespace" : "grn_methods",
+          "output" : "",
+          "platform" : "",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
+          "executable" : "/nextflow/grn_methods/scsgl/main.nf"
+        },
+        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scsgl"
+      },
+      {
+        "name" : "grn_methods/tigress",
+        "repository" : {
+          "type" : "local",
+          "localPath" : ""
+        },
+        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/tigress/config.vsh.yaml",
+        "configInfo" : {
+          "functionalityName" : "tigress",
+          "git_tag" : "",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "viash_version" : "0.8.6",
+          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/tigress/config.vsh.yaml",
+          "functionalityNamespace" : "grn_methods",
+          "output" : "",
+          "platform" : "",
+          "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
+          "executable" : "/nextflow/grn_methods/tigress/main.nf"
+        },
+        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/tigress"
       }
     ],
     "repositories" : [
@@ -3083,9 +3216,9 @@ meta = [
       "id" : "nextflow",
       "directives" : {
         "label" : [
-          "midtime",
+          "hightime",
           "midmem",
-          "lowcpu"
+          "highcpu"
         ],
         "tag" : "$id"
       },
@@ -3107,7 +3240,9 @@ meta = [
           "midtime" : "time = 4.h",
           "hightime" : "time = 8.h",
           "veryhightime" : "time = 24.h",
-          "veryveryhightime" : "time = 48.h"
+          "veryveryhightime" : "time = 48.h",
+          "threedaystime" : "time = 72.h",
+          "oneweektime" : "time = 168.h"
         },
         "script" : [
           "process.errorStrategy = 'ignore'"
@@ -3122,7 +3257,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_benchmark_single_omics",
     "viash_version" : "0.8.6",
-    "git_commit" : "32829356ec586e0c0dfa304f902fca34ea4a1a32",
+    "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3136,20 +3271,16 @@ include { regression_1 } from "${meta.resources_dir}/../../../nextflow/metrics/r
 include { positive_control } from "${meta.resources_dir}/../../../nextflow/control_methods/positive_control/main.nf"
 include { negative_control } from "${meta.resources_dir}/../../../nextflow/control_methods/negative_control/main.nf"
 include { portia } from "${meta.resources_dir}/../../../nextflow/grn_methods/portia/main.nf"
+include { ennet } from "${meta.resources_dir}/../../../nextflow/grn_methods/ennet/main.nf"
+include { genie3 } from "${meta.resources_dir}/../../../nextflow/grn_methods/genie3/main.nf"
+include { grnboost2 } from "${meta.resources_dir}/../../../nextflow/grn_methods/grnboost2/main.nf"
+include { pidc } from "${meta.resources_dir}/../../../nextflow/grn_methods/pidc/main.nf"
+include { ppcor } from "${meta.resources_dir}/../../../nextflow/grn_methods/ppcor/main.nf"
+include { scsgl } from "${meta.resources_dir}/../../../nextflow/grn_methods/scsgl/main.nf"
+include { tigress } from "${meta.resources_dir}/../../../nextflow/grn_methods/tigress/main.nf"
 
 // inner workflow
 // user-provided Nextflow code
-// construct list of methods
-methods = [
-  portia
-]
-
-// construct list of metrics
-metrics = [
-  regression_1
-]
-
-// helper workflow for starting a workflow based on lists of yaml files
 workflow auto {
   findStates(params, meta.config)
     | meta.workflow.run(
@@ -3157,70 +3288,189 @@ workflow auto {
     )
 }
 
-// benchmarking workflow
 workflow run_wf {
   take:
   input_ch
 
   main:
 
+  // construct list of methods
+  // methods = [
+  //   portia,
+  //   ennet,
+  //   genie3,
+  //   grnboost2,
+  //   pidc,
+  //   ppcor,
+  //   scsgl,
+  //   tigress
+  // ]
+
+  methods = [
+    portia,
+    pidc,
+    ppcor,
+    tigress
+  ]
+
+  // construct list of metrics
+  metrics = [
+    regression_1
+  ]
+
+  /****************************
+   * EXTRACT DATASET METADATA *
+   ****************************/
+  dataset_ch = input_ch
+    // store join id
+    | map{ id, state -> 
+      [id, state + ["_meta": [join_id: id]]]
+    }
+
+    // // extract the dataset metadata
+    // | extract_metadata.run(
+    //   fromState: [input: "input_test"],
+    //   toState: { id, output, state ->
+    //     state + [
+    //       dataset_uns: readYaml(output.output).uns
+    //     ]
+    //   }
+    // )
+    
   /***************************
    * RUN METHODS AND METRICS *
    ***************************/
-  score_ch = input_ch
+  score_ch = dataset_ch
 
-    | run_benchmark_fun(
-      methods: methods,
-      metrics: metrics,
-      methodFromState: { id, state, comp ->
-        def new_args = [
-          multiomics_rna: state.multiomics_rna,
-          tf_all: state.tf_all,
-          prediction: 'predictions/$id.$key.output.h5ad',
-          output_model: null
-        ]
-        if (comp.config.functionality.info.type == "control_method") {
-          new_args.de_test_h5ad = state.de_test_h5ad
-        }
-        new_args
+    // run all methods
+    | runEach(
+      components: methods,
+
+      // use the 'filter' argument to only run a defined method or all methods
+      // filter: { id, state, comp ->
+      //   def method_check = !state.method_ids || state.method_ids.contains(comp.config.functionality.name)
+
+      //   method_check
+      // },
+
+      // define a new 'id' by appending the method name to the dataset id
+      id: { id, state, comp ->
+        id + "." + comp.config.functionality.name
       },
-      methodToState: ["prediction": "prediction"],
-      metricFromState: [
+      // use 'fromState' to fetch the arguments the component requires from the overall state
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        tf_all: "tf_all",
+      ],
+      // use 'toState' to publish that component's outputs to the overall state
+      toState: { id, output, state, comp ->
+        state + [
+          method_id: comp.config.functionality.name,
+          prediction: output.prediction
+        ]
+      }
+    )
+
+    // run all metrics
+    | runEach(
+      components: metrics,
+      id: { id, state, comp ->
+        id + "." + comp.config.functionality.name
+      },
+      // use 'fromState' to fetch the arguments the component requires from the overall state
+      fromState: [
         perturbation_data: "perturbation_data",
         prediction: "prediction",
+        method_id: "method_id", 
         subsample: "subsample",
         reg_type: "reg_type",
         max_workers: "max_workers",
         consensus: "consensus",
         tf_all: "tf_all"
       ],
-      metricToState: ["metric_output": "output"],
-      methodAuto: [publish: "state"]
+      // use 'toState' to publish that component's outputs to the overall state
+      toState: { id, output, state, comp ->
+        state + [
+          metric_id: comp.config.functionality.name,
+          metric_output: output.score
+        ]
+      }
     )
-    | joinStates { ids, states ->
-      def score_uns = states.collect{it.score_uns}
-      def score_uns_yaml_blob = toYamlBlob(score_uns)
-      def score_uns_file = tempFile("score_uns.yaml")
-      score_uns_file.write(score_uns_yaml_blob)
-      
-      ["output", [scores: score_uns_file]]
-    }
 
   /******************************
    * GENERATE OUTPUT YAML FILES *
    ******************************/
-  // create dataset, method and metric metadata files
-  metadata_ch = input_ch
-    | create_metadata_files(
-      datasetFromState: [input: "multiomics_rna"],
-      methods: methods,
-      metrics: metrics,
-      meta: meta
+  // TODO: can we store everything below in a separate helper function?
+  // NOTE: the 'denoising' task doesn't use normalized data,
+  // so code related to normalization_ids is commented out
+
+  // extract the dataset metadata
+  // dataset_meta_ch = dataset_ch
+  //   // // only keep one of the normalization methods
+  //   // | filter{ id, state ->
+  //   //   state.dataset_uns.normalization_id == "log_cp10k"
+  //   // }
+  //   | joinStates { ids, states ->
+  //     // store the dataset metadata in a file
+  //     def dataset_uns = states.collect{state ->
+  //       def uns = state.dataset_uns.clone()
+  //       // uns.remove("normalization_id")
+  //       uns
+  //     }
+  //     def dataset_uns_yaml_blob = toYamlBlob(dataset_uns)
+  //     def dataset_uns_file = tempFile("dataset_uns.yaml")
+  //     dataset_uns_file.write(dataset_uns_yaml_blob)
+
+  //     ["output", [output_dataset_info: dataset_uns_file]]
+  //   }
+
+  output_ch = score_ch
+
+    // extract the scores
+    | extract_metadata.run(
+      key: "extract_scores",
+      fromState: [input: "metric_output"],
+      toState: { id, output, state ->
+        state + [
+          score_uns: readYaml(output.output).uns
+        ]
+      }
     )
 
-  // merge all of the output data 
-  output_ch = score_ch
-    | mix(metadata_ch)
+    | joinStates { ids, states ->
+      // store the method configs in a file
+      def method_configs = methods.collect{it.config}
+      def method_configs_yaml_blob = toYamlBlob(method_configs)
+      def method_configs_file = tempFile("method_configs.yaml")
+      method_configs_file.write(method_configs_yaml_blob)
+
+      // store the metric configs in a file
+      def metric_configs = metrics.collect{it.config}
+      def metric_configs_yaml_blob = toYamlBlob(metric_configs)
+      def metric_configs_file = tempFile("metric_configs.yaml")
+      metric_configs_file.write(metric_configs_yaml_blob)
+
+      def task_info_file = meta.resources_dir.resolve("task_info.yaml")
+
+      // store the scores in a file
+      def score_uns = states.collect{it.score_uns}
+      def score_uns_yaml_blob = toYamlBlob(score_uns)
+      def score_uns_file = tempFile("score_uns.yaml")
+      score_uns_file.write(score_uns_yaml_blob)
+
+      def new_state = [
+        // output_method_configs: method_configs_file,
+        // output_metric_configs: metric_configs_file,
+        // output_task_info: task_info_file,
+        scores: score_uns_file,
+        _meta: states[0]._meta
+      ]
+
+      ["output", new_state]
+    }
+
+    // merge all of the output data 
+    // | mix(dataset_meta_ch)
     | joinStates{ ids, states ->
       def mergedStates = states.inject([:]) { acc, m -> acc + m }
       [ids[0], mergedStates]
@@ -3228,162 +3478,6 @@ workflow run_wf {
 
   emit:
   output_ch
-}
-
-
-
-
-
-def run_benchmark_fun(args) {
-  // required args
-  def methods_ = args.methods
-  def metrics_ = args.metrics
-  def methodFromState = args.methodFromState
-  def methodToState = args.methodToState
-  def metricFromState = args.metricFromState
-  def metricToState = args.metricToState
-
-  assert methods_, "methods must be defined"
-  assert metrics_, "metrics must be defined"
-  assert methodFromState, "methodFromState must be defined"
-  assert methodToState, "methodToState must be defined"
-  assert metricFromState, "metricFromState must be defined"
-  assert metricToState, "metricToState must be defined"
-
-  // optional args
-  def keyPrefix = args.keyPrefix ?: ""
-  def methodAuto = args.methodAuto ?: [:]
-  def metricAuto = args.metricAuto ?: [:]
-
-  // add the key prefix to the method and metric names
-  if (keyPrefix && keyPrefix != "") {
-    methods_ = methods.collect{ method ->
-      method.run(key: keyPrefix + method.config.functionality.name)
-    }
-    metrics_ = metrics.collect{ metric ->
-      metric.run(key: keyPrefix + metric.config.functionality.name)
-    }
-  }
-
-  workflow bench {
-    take: input_ch
-
-    main:
-    output_ch = input_ch
-      // run all methods
-      | runEach(
-        components: methods_,
-        filter: { id, state, comp ->
-          !state.method_ids || state.method_ids.contains(comp.config.functionality.name)
-        },
-        id: { id, state, comp ->
-          id + "." + comp.config.functionality.name
-        },
-        fromState: methodFromState,
-        toState: methodToState,
-        auto: methodAuto
-      )
-
-      // run all metrics
-      | runEach(
-        components: metrics_,
-        filter: { id, state, comp ->
-          !state.metric_ids || state.metric_ids.contains(comp.config.functionality.name)
-        },
-        id: { id, state, comp ->
-          id + "." + comp.config.functionality.name
-        },
-        fromState: metricFromState,
-        toState: metricToState,
-        auto: metricAuto
-      )
-
-      // extract the scores
-      | extract_metadata.run(
-        key: "${keyPrefix}score_uns",
-        fromState: [input: "metric_output"],
-        toState: { id, output, state ->
-          state + [
-            score_uns: readYaml(output.output).uns
-          ]
-        }
-      )
-
-    emit: output_ch
-  }
-  return bench
-}
-
-
-def create_metadata_files(args) {
-  // required args
-  def meta_ = args.meta
-  def methods_ = args.methods
-  def metrics_ = args.metrics
-  def datasetFromState = args.datasetFromState
-
-  assert meta_, "meta must be defined"
-  assert methods_, "methods must be defined"
-  assert metrics_, "metrics must be defined"
-  assert datasetFromState, "datasetFromState must be defined"
-
-  workflow metadata {
-    take: input_ch
-
-    main:
-    output_ch = input_ch
-
-      | map{ id, state ->
-        [id, state + ["_meta": [join_id: id]]]
-      }
-
-      | extract_metadata.run(
-        key: "dataset_uns",
-        fromState: args.datasetFromState,
-        toState: { id, output, state ->
-          state + [
-            dataset_info: readYaml(output.output).uns
-          ]
-        }
-      )
-    
-      | joinStates { ids, states ->
-        assert states.size() > 0, "no states found"
-        assert states[0]._meta, "no _meta found in state[0]"
-        assert states.every{it.dataset_info}, "not all states have dataset_info"
-
-        // combine the dataset info into one file
-        def dataset_uns = states.collect{it.dataset_info}
-        def dataset_uns_yaml_blob = toYamlBlob(dataset_uns)
-        def dataset_uns_file = tempFile("dataset_uns.yaml")
-        dataset_uns_file.write(dataset_uns_yaml_blob)
-
-        // store the method configs in a file
-        def method_configs = methods_.collect{it.config}
-        def method_configs_yaml_blob = toYamlBlob(method_configs)
-        def method_configs_file = tempFile("method_configs.yaml")
-        method_configs_file.write(method_configs_yaml_blob)
-
-        // store the metric configs in a file
-        def metric_configs = metrics_.collect{it.config}
-        def metric_configs_yaml_blob = toYamlBlob(metric_configs)
-        def metric_configs_file = tempFile("metric_configs.yaml")
-        metric_configs_file.write(metric_configs_yaml_blob)
-
-        def task_info_file = meta_.resources_dir.resolve("task_info.yaml")
-
-        def new_state = [
-          dataset_uns: dataset_uns_file,
-          method_configs: method_configs_file,
-          metric_configs: metric_configs_file,
-          task_info: task_info_file,
-          _meta: states[0]._meta
-        ]
-        ["output", new_state]
-      }
-    emit: output_ch
-  }
-  return metadata
 }
 
 // inner workflow hook
@@ -3402,9 +3496,9 @@ meta["defaults"] = [
   // default directives
   directives: readJsonBlob('''{
   "label" : [
-    "midtime",
+    "hightime",
     "midmem",
-    "lowcpu"
+    "highcpu"
   ],
   "tag" : "$id"
 }'''),

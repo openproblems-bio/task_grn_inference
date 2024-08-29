@@ -2928,6 +2928,32 @@ meta = [
       },
       {
         "type" : "file",
+        "name" : "--tf_all",
+        "example" : [
+          "resources/prior/tf_all.csv"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "integer",
+        "name" : "--max_n_links",
+        "default" : [
+          50000
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "file",
         "name" : "--scplus_mdata",
         "description" : "Main output object.",
         "default" : [
@@ -3075,7 +3101,9 @@ meta = [
           "midtime" : "time = 4.h",
           "hightime" : "time = 8.h",
           "veryhightime" : "time = 24.h",
-          "veryveryhightime" : "time = 48.h"
+          "veryveryhightime" : "time = 48.h",
+          "threedaystime" : "time = 72.h",
+          "oneweektime" : "time = 168.h"
         },
         "script" : [
           "process.errorStrategy = 'ignore'"
@@ -3090,7 +3118,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "32829356ec586e0c0dfa304f902fca34ea4a1a32",
+    "git_commit" : "376e5b46b925529a1194ff4c31357d290c719773",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3154,6 +3182,8 @@ par = {
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
+  'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'scplus_mdata': $( if [ ! -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then echo "r'${VIASH_PAR_SCPLUS_MDATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'qc': $( if [ ! -z ${VIASH_PAR_QC+x} ]; then echo "r'${VIASH_PAR_QC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),

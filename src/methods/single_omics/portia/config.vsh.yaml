@@ -9,14 +9,7 @@ functionality:
     description: |
       GRN inference using PORTIA.
     documentation_url: https://github.com/AntoinePassemiers/PORTIA
-  arguments:
-    - name: --tf_all
-      type: file
-      example: resources/prior/tf_all.csv
-      required: true
-    - name: --max_n_links
-      type: integer
-      default: 50000
+
 
   resources:
     - type: python_script

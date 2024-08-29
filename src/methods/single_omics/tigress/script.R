@@ -5,7 +5,7 @@ library(dplyr)
 ## VIASH START
 par <- list(
     "multiomics_rna" = 'resources/resources_test/grn-benchmark/multiomics_rna.h5ad',
-    "tfs" = 'resources/prior/tf_all.csv',
+    "tf_all" = 'resources/prior/tf_all.csv',
     "prediction" = 'output/tigress/prediction.csv',
     "temp_dir": 'output/tigress',
     "max_n_links": 50000
@@ -30,7 +30,7 @@ mask <- (zero_proportion <= 0.9)
 X <- X[mask,]
 
 # Load list of putative TFs
-dat <- read.csv(par$tfs, header = FALSE)
+dat <- read.csv(par$tf_all, header = FALSE)
 Tf <- intersect(gene_names, dat$V1)
 
 # Run GRN inference method

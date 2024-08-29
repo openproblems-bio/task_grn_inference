@@ -197,7 +197,7 @@ function ViashHelp {
   echo "        default: 4"
   echo ""
   echo "    --tf_all"
-  echo "        type: file, required parameter, file must exist"
+  echo "        type: file, file must exist"
   echo "        example: resources/prior/tf_all.csv"
   echo ""
   echo "    --max_n_links"
@@ -386,10 +386,6 @@ fi
 
 
 # check whether required parameters exist
-if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
-  ViashError '--tf_all' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then
   ViashError 'functionality_name' is a required argument. Use "--help" to get more information on the parameters.
   exit 1

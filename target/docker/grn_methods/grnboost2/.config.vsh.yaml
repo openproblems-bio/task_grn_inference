@@ -1,0 +1,218 @@
+functionality:
+  name: "grnboost2"
+  namespace: "grn_methods"
+  version: "build-main"
+  arguments:
+  - type: "file"
+    name: "--multiomics_rna"
+    info:
+      label: "multiomics rna"
+      summary: "RNA expression for multiomics data."
+      file_type: "h5ad"
+      slots:
+        obs:
+        - name: "cell_type"
+          type: "string"
+          description: "The annotated cell type of each cell based on RNA expression."
+          required: true
+        - name: "donor_id"
+          type: "string"
+          description: "Donor id"
+          required: true
+    example:
+    - "resources/grn-benchmark/multiomics_rna.h5ad"
+    default:
+    - "resources_test/grn-benchmark/multiomics_rna.h5ad"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--multiomics_atac"
+    info:
+      label: "multiomics atac"
+      summary: "Peak data for multiomics data."
+      file_type: "h5ad"
+      slots:
+        obs:
+        - name: "cell_type"
+          type: "string"
+          description: "The annotated cell type of each cell based on RNA expression."
+          required: true
+        - name: "donor_id"
+          type: "string"
+          description: "Donor id"
+          required: true
+    example:
+    - "resources/grn-benchmark/multiomics_atac.h5ad"
+    default:
+    - "resources_test/grn-benchmark/multiomics_atac.h5ad"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--prediction"
+    info:
+      label: "GRN"
+      summary: "GRN prediction"
+      file_type: "csv"
+      columns:
+      - name: "source"
+        description: "Source of regulation"
+        type: "string"
+        required: true
+      - name: "target"
+        description: "Target of regulation"
+        type: "string"
+        required: true
+      - name: "weight"
+        description: "Weight of regulation"
+        type: "float"
+        required: true
+    example:
+    - "resources/grn-benchmark/grn_models/collectri.csv"
+    default:
+    - "output/grn.csv"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "output"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--temp_dir"
+    info: null
+    default:
+    - "output/temdir"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "integer"
+    name: "--num_workers"
+    info: null
+    default:
+    - 4
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--tf_all"
+    info: null
+    example:
+    - "resources/prior/tf_all.csv"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "integer"
+    name: "--max_n_links"
+    info: null
+    default:
+    - 50000
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  resources:
+  - type: "python_script"
+    path: "script.py"
+    is_executable: true
+  test_resources:
+  - type: "python_script"
+    path: "src/common/component_tests/run_and_check_output.py"
+    is_executable: true
+  - type: "file"
+    path: "resources/grn-benchmark"
+    dest: "resources/grn-benchmark"
+  info:
+    label: "grnboost2"
+    summary: "GRN inference using GRNBoost2"
+    description: "GRN inference using GRNBoost2.\n"
+    documentation_url: "https://arboreto.readthedocs.io/en/latest/algorithms.html#grnboost2"
+    type: "methods"
+    type_info:
+      label: "Method"
+      summary: "A GRN inference method"
+      description: "A method for inferring GRN from expression data.\n"
+  status: "enabled"
+  set_wd_to_resources_dir: false
+platforms:
+- type: "docker"
+  id: "docker"
+  image: "continuumio/anaconda3:2024.02-1"
+  target_organization: "openproblems-bio/task_grn_inference"
+  target_registry: "ghcr.io"
+  namespace_separator: "/"
+  resolve_volume: "Automatic"
+  chown: true
+  setup_strategy: "ifneedbepullelsecachedbuild"
+  target_image_source: "https://github.com/openproblems-bio/task_grn_inference"
+  setup:
+  - type: "docker"
+    run:
+    - "conda install -y -c bioconda arboreto pandas\n"
+  - type: "python"
+    user: false
+    packages:
+    - "anndata"
+    upgrade: true
+  entrypoint: []
+  cmd: null
+- type: "native"
+  id: "native"
+- type: "nextflow"
+  id: "nextflow"
+  directives:
+    label:
+    - "midtime"
+    - "midmem"
+    - "midcpu"
+    tag: "$id"
+  auto:
+    simplifyInput: true
+    simplifyOutput: false
+    transcript: false
+    publish: false
+  config:
+    labels:
+      lowmem: "memory = 20.Gb"
+      midmem: "memory = 50.Gb"
+      highmem: "memory = 100.Gb"
+      lowcpu: "cpus = 5"
+      midcpu: "cpus = 15"
+      highcpu: "cpus = 30"
+      lowtime: "time = 1.h"
+      midtime: "time = 4.h"
+      hightime: "time = 8.h"
+      veryhightime: "time = 24.h"
+      veryveryhightime: "time = 48.h"
+      threedaystime: "time = 72.h"
+      oneweektime: "time = 168.h"
+    script:
+    - "process.errorStrategy = 'ignore'"
+  debug: false
+  container: "docker"
+info:
+  config: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/grnboost2/config.vsh.yaml"
+  platform: "docker"
+  output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/docker/grn_methods/grnboost2"
+  executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/docker/grn_methods/grnboost2/grnboost2"
+  viash_version: "0.8.6"
+  git_commit: "376e5b46b925529a1194ff4c31357d290c719773"
+  git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"
