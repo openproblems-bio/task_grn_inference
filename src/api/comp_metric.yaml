@@ -47,7 +47,7 @@ functionality:
       direction: input 
       required: false
       example: collectri
-    - name: --tfs
+    - name: --tf_all
       type: file
       direction: input
       default: 'resources/prior/tf_all.csv'
