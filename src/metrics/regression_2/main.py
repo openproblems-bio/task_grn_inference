@@ -277,8 +277,9 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     n_features_theta_max = np.asarray([data[gene_name]['1'] for gene_name in gene_names], dtype=int)
 
     # Load list of putative TFs
-    df = pd.read_csv(par['tf_all'], header=None, names=['gene_name'])
-    tf_names = set(list(df['gene_name'].to_numpy()))
+    tf_names = np.loadtxt(par['tf_all'], dtype=str)
+    if par['apply_tf']==False:
+        tf_names = gene_names
 
     # Evaluate GRN
     print(f'Compute metrics for layer: {layer}', flush=True)

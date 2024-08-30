@@ -51,6 +51,10 @@ functionality:
       type: file
       direction: input
       default: 'resources/prior/tf_all.csv'
+    - name: --apply_tf
+      type: boolean 
+      required: false
+      default: true
 
 
       
