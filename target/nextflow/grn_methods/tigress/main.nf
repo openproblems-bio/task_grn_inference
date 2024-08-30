@@ -3036,7 +3036,7 @@ meta = [
         "label" : [
           "midtime",
           "midmem",
-          "midcpu"
+          "highcpu"
         ],
         "tag" : "$id"
       },
@@ -3075,7 +3075,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/tigress",
     "viash_version" : "0.8.6",
-    "git_commit" : "144813fcf91cf642040be123316759e56e53696b",
+    "git_commit" : "dd969e0eed413b90e2b935e6de09cf738542879d",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3531,7 +3531,7 @@ meta["defaults"] = [
   "label" : [
     "midtime",
     "midmem",
-    "midcpu"
+    "highcpu"
   ],
   "tag" : "$id"
 }'''),

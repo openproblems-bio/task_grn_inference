@@ -13,6 +13,11 @@ functionality:
       direction: input
       required: false
       default: pearson
+    - name: --min_tf
+      type: integer
+      direction: input
+      description: calculate the scores for the given min tfs in addition to the default 
+      required: false
   resources:
     - type: python_script
       path: script.py

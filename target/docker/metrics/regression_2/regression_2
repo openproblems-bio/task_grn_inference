@@ -210,6 +210,10 @@ function ViashHelp {
   echo "        type: file, file must exist"
   echo "        default: resources/prior/tf_all.csv"
   echo ""
+  echo "    --apply_tf"
+  echo "        type: boolean"
+  echo "        default: true"
+  echo ""
   echo "    --consensus"
   echo "        type: file, file must exist"
   echo "        default: resources/prior/consensus-num-regulators.json"
@@ -448,9 +452,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_2"
-LABEL org.opencontainers.image.created="2024-08-29T16:43:51Z"
+LABEL org.opencontainers.image.created="2024-08-30T08:08:27Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="144813fcf91cf642040be123316759e56e53696b"
+LABEL org.opencontainers.image.revision="dd969e0eed413b90e2b935e6de09cf738542879d"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -697,6 +701,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_TF_ALL=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --apply_tf)
+            [ -n "$VIASH_PAR_APPLY_TF" ] && ViashError Bad arguments for option \'--apply_tf\': \'$VIASH_PAR_APPLY_TF\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_APPLY_TF="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --apply_tf. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --apply_tf=*)
+            [ -n "$VIASH_PAR_APPLY_TF" ] && ViashError Bad arguments for option \'--apply_tf=*\': \'$VIASH_PAR_APPLY_TF\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_APPLY_TF=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --consensus)
             [ -n "$VIASH_PAR_CONSENSUS" ] && ViashError Bad arguments for option \'--consensus\': \'$VIASH_PAR_CONSENSUS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_CONSENSUS="$2"
@@ -892,6 +907,9 @@ fi
 if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
   VIASH_PAR_TF_ALL="resources/prior/tf_all.csv"
 fi
+if [ -z ${VIASH_PAR_APPLY_TF+x} ]; then
+  VIASH_PAR_APPLY_TF="true"
+fi
 if [ -z ${VIASH_PAR_CONSENSUS+x} ]; then
   VIASH_PAR_CONSENSUS="resources/prior/consensus-num-regulators.json"
 fi
@@ -930,6 +948,12 @@ fi
 if [[ -n "$VIASH_PAR_MAX_WORKERS" ]]; then
   if ! [[ "$VIASH_PAR_MAX_WORKERS" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--max_workers' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_APPLY_TF" ]]; then
+  if ! [[ "$VIASH_PAR_APPLY_TF" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--apply_tf' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1084,6 +1108,7 @@ par = {
   'max_workers': $( if [ ! -z ${VIASH_PAR_MAX_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_MAX_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'consensus': $( if [ ! -z ${VIASH_PAR_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_CONSENSUS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'static_only': $( if [ ! -z ${VIASH_PAR_STATIC_ONLY+x} ]; then echo "r'${VIASH_PAR_STATIC_ONLY//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi )

@@ -25,14 +25,17 @@ workflow run_wf {
 
   methods = [
     portia,
-    pidc,
+    ennet,
+    grnboost2,
+    scsgl,    
     ppcor,
     tigress
   ]
 
   // construct list of metrics
   metrics = [
-    regression_1
+    regression_1,
+    regression_2
   ]
 
   /****************************

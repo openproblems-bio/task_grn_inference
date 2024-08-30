@@ -516,9 +516,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods granie"
-LABEL org.opencontainers.image.created="2024-08-29T16:43:48Z"
+LABEL org.opencontainers.image.created="2024-08-30T08:08:25Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="144813fcf91cf642040be123316759e56e53696b"
+LABEL org.opencontainers.image.revision="dd969e0eed413b90e2b935e6de09cf738542879d"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

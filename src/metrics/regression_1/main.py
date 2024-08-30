@@ -177,7 +177,8 @@ def main(par):
     gene_names = perturbation_data.var.index.to_numpy()
     net = pd.read_csv(par['prediction'])
     # subset to keep only those links with source as tf
-    net = net[net.source.isin(tf_all)]
+    if par['apply_tf']:
+        net = net[net.source.isin(tf_all)]
 
     subsample = par['subsample']
     reg_type = par['reg_type']
@@ -210,13 +211,15 @@ def main(par):
     net_processed = process_net(net.copy(), gene_names, manipulate)
 
     print(f'Compute metrics for layer: {layer}', flush=True)
+    tfs_cases = [-1]
+    if par['min_tf']:
+        tfs_cases += par['min_tf']
     layer_results = {}  # Store results for this layer
-    for exclude_missing_genes in [False]:  # two settings on target gene
-        for tf_n in [-1]:  # two settings on tfs
+    for exclude_missing_genes in [False, True]:  # two settings on target gene
+        for tf_n in tfs_cases:  # two settings on tfs
             run_key = f'ex({exclude_missing_genes})_tf({tf_n})'
             print(run_key)
             net_subset = net_processed.copy()
-
             # Subset TFs 
             if tf_n == -1:
                 degrees = net_subset.abs().sum(axis=0)
@@ -234,11 +237,12 @@ def main(par):
 
     # Convert results to DataFrame
     df_results = pd.DataFrame(layer_results)
-    # if 'ex(True)_tf(140)' not in df_results.columns:
-    #     df_results['ex(True)_tf(140)'] = df_results['ex(True)_tf(-1)']
-    # if 'ex(False)_tf(140)' not in df_results.columns:
-    #     df_results['ex(False)_tf(140)'] = df_results['ex(False)_tf(-1)']
-    
+    if par['min_tf']:
+        if 'ex(True)_tf(140)' not in df_results.columns:
+            df_results['ex(True)_tf(140)'] = df_results['ex(True)_tf(-1)']
+        if 'ex(False)_tf(140)' not in df_results.columns:
+            df_results['ex(False)_tf(140)'] = df_results['ex(False)_tf(-1)']
+        
     df_results['Mean'] = df_results.mean(axis=1)
     
     return df_results

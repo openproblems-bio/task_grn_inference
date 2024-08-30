@@ -2792,7 +2792,7 @@ meta = [
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2806,7 +2806,7 @@ meta = [
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "output",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2820,7 +2820,7 @@ meta = [
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2834,7 +2834,7 @@ meta = [
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2848,7 +2848,7 @@ meta = [
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2862,7 +2862,7 @@ meta = [
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "output",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2947,7 +2947,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/testdata/create_test_data",
     "viash_version" : "0.8.6",
-    "git_commit" : "144813fcf91cf642040be123316759e56e53696b",
+    "git_commit" : "dd969e0eed413b90e2b935e6de09cf738542879d",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3048,7 +3048,7 @@ adata_atac_s.write(par['multiomics_atac_test'])
 
 # shorten perturbation
 adata_bulk = ad.read_h5ad(par['perturbation_data'])
-adata_bulk[:200, adata_bulk.var_names.isin(adata_rna_s.var_names)].write(par['perturbation_data_test'])
+adata_bulk[:600, adata_bulk.var_names.isin(adata_rna_s.var_names)].write(par['perturbation_data_test'])
 VIASHMAIN
 python -B "$tempscript"
 '''
