@@ -24,11 +24,9 @@ workflow run_wf {
   // ]
 
   methods = [
-    portia,
     ennet,
     grnboost2,
     scsgl,    
-    ppcor,
     tigress
   ]
 

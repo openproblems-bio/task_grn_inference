@@ -18,6 +18,7 @@ par = {
 }
 ## VIASH END
 
+print(par)
 sys.path.append(meta['resources_dir'])
 from main import main
 

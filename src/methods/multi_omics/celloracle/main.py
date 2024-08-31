@@ -141,8 +141,13 @@ def refine_grns(par):
         grn = grn[mask]
         grn = grn[~(grn.coef_abs==0)] # remove those with 0 coeff
         # filter based on z score 
-        z_scores = (grn.coef_abs - grn.coef_abs.mean())/grn.coef_abs.std()
-        mask = z_scores > 2
+        # z_scores = (grn.coef_abs - grn.coef_abs.mean())/grn.coef_abs.std()
+        # mask = z_scores > 2
+        # Sort by absolute coefficient values
+        grn = grn.sort_values(by="coef_abs", ascending=False)
+
+        # Select the top 50,000 links based on absolute weight
+        mask = grn.index[:par['max_n_links']]
         grn = grn.loc[mask, :]
 
         grn = grn[['source', 'target', 'coef_mean']]

@@ -14,7 +14,8 @@ workflow run_wf {
 
   // construct list of metrics
   metrics = [
-    regression_1
+    regression_1,
+    regression_2
   ]
     
   /***************************
@@ -44,7 +45,7 @@ workflow run_wf {
       fromState: [
         perturbation_data: "perturbation_data",
         prediction: "prediction_n",
-        layer: "layer", 
+        layer: "layer",
         subsample: "subsample",
         reg_type: "reg_type",
         method_id: "method_id",

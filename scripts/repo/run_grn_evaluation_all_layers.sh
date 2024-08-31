@@ -1,11 +1,13 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ID="pearson_gb_subsample_RF"
+reg_type=${1} #GB, ridge
+
+RUN_ID="grn_evaluation_${reg_type}"
 resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
 grn_models_folder="${resources_dir}/grn_models"
-reg_type=RF
+
 subsample=-2
 max_workers=10
 
@@ -21,8 +23,7 @@ grn_names=(
     "scglue"
 )
 
-# layers=("pearson" "lognorm" "scgen_pearson" "scgen_lognorm" "seurat_pearson" "seurat_lognorm")
-layers=( "pearson" )
+layers=("pearson" "lognorm" "scgen_pearson" "scgen_lognorm" "seurat_pearson" "seurat_lognorm")
 
 # Start writing to the YAML file
 cat > $param_file << HERE
