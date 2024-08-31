@@ -14,7 +14,8 @@ workflow run_wf {
 
   // construct list of metrics
   metrics = [
-    regression_1
+    regression_1,
+    regression_2
   ]
     
   /***************************
@@ -63,13 +64,14 @@ workflow run_wf {
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
         perturbation_data: "perturbation_data",
-        layer: "layer", 
         prediction: "prediction",
         subsample: "subsample",
         reg_type: "reg_type",
         method_id: "method_id",
         max_workers: "max_workers",
-        consensus: "consensus"
+        consensus: "consensus",
+        layer: "layer",
+        tf_all: "tf_all"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->

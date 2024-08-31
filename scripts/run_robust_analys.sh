@@ -3,7 +3,7 @@
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 
 degrees=(0 10 20 50 100)
-noise_type="$1"
+noise_type="$1" #"net"
 echo $noise_type
 
 RUN_ID="robust_analy_$1"
@@ -19,7 +19,6 @@ grn_models_folder="${resources_dir}/grn_models"
 reg_type=ridge
 subsample=-2
 max_workers=10
-layer=pearson
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -33,7 +32,6 @@ grn_names=(
 )
 
 
-
 # Start writing to the YAML file
 cat > $param_file << HERE
 param_list:
@@ -41,11 +39,11 @@ HERE
 
 append_entry() {
   cat >> $param_file << HERE
-  - id: ${1}_${2}
+  - id: ${1}_${2}_${3}
     perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
-    layer: ${layer}
     reg_type: $reg_type
     method_id: ${2}-${1}
+    layer: ${3}
     subsample: $subsample
     max_workers: $max_workers
     consensus: ${resources_dir}/prior/consensus-num-regulators.json
@@ -55,12 +53,14 @@ append_entry() {
 HERE
 }
 # Loop through grn_names and layers
-for degree in "${degrees[@]}"; do
-    for grn_name in "${grn_names[@]}"; do
-        append_entry "$grn_name" "$degree" 
+layers=(pearson scgen_pearson)
+for layer in "${layers[@]}"; do
+    for degree in "${degrees[@]}"; do
+        for grn_name in "${grn_names[@]}"; do
+            append_entry "$grn_name" "$degree" "$layer"
+        done
     done
-done
-
+done 
 
 # Append the remaining output_state and publish_dir to the YAML file
 cat >> $param_file << HERE

@@ -2954,9 +2954,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems-v2",
           "tag" : "main_build",
-          "localPath" : "/tmp/viash_hub_repo2043568581837476368"
+          "localPath" : "/tmp/viash_hub_repo3994112634522305803"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo2043568581837476368/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo3994112634522305803/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_remote" : "https://github.com/openproblems-bio/openproblems-v2",
@@ -2986,7 +2986,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "dd969e0eed413b90e2b935e6de09cf738542879d",
+          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2"
@@ -3007,7 +3007,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "dd969e0eed413b90e2b935e6de09cf738542879d",
+          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1"
@@ -3028,7 +3028,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "dd969e0eed413b90e2b935e6de09cf738542879d",
+          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
           "executable" : "/nextflow/control_methods/positive_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/positive_control"
@@ -3049,7 +3049,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "dd969e0eed413b90e2b935e6de09cf738542879d",
+          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
           "executable" : "/nextflow/control_methods/negative_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/negative_control"
@@ -3095,8 +3095,7 @@ meta = [
           "lowtime" : "time = 1.h",
           "midtime" : "time = 4.h",
           "hightime" : "time = 8.h",
-          "veryhightime" : "time = 24.h",
-          "veryveryhightime" : "time = 48.h",
+          "onedaytime" : "time = 24.h",
           "threedaystime" : "time = 72.h",
           "oneweektime" : "time = 168.h"
         },
@@ -3113,7 +3112,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.8.6",
-    "git_commit" : "dd969e0eed413b90e2b935e6de09cf738542879d",
+    "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3145,7 +3144,8 @@ workflow run_wf {
 
   // construct list of metrics
   metrics = [
-    regression_1
+    regression_1,
+    regression_2
   ]
     
   /***************************
@@ -3194,13 +3194,14 @@ workflow run_wf {
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
         perturbation_data: "perturbation_data",
-        layer: "layer", 
         prediction: "prediction",
         subsample: "subsample",
         reg_type: "reg_type",
         method_id: "method_id",
         max_workers: "max_workers",
-        consensus: "consensus"
+        consensus: "consensus",
+        layer: "layer",
+        tf_all: "tf_all"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->

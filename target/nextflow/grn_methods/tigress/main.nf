@@ -3034,7 +3034,7 @@ meta = [
       "id" : "nextflow",
       "directives" : {
         "label" : [
-          "midtime",
+          "onedaytime",
           "midmem",
           "highcpu"
         ],
@@ -3057,8 +3057,7 @@ meta = [
           "lowtime" : "time = 1.h",
           "midtime" : "time = 4.h",
           "hightime" : "time = 8.h",
-          "veryhightime" : "time = 24.h",
-          "veryveryhightime" : "time = 48.h",
+          "onedaytime" : "time = 24.h",
           "threedaystime" : "time = 72.h",
           "oneweektime" : "time = 168.h"
         },
@@ -3075,7 +3074,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/tigress",
     "viash_version" : "0.8.6",
-    "git_commit" : "dd969e0eed413b90e2b935e6de09cf738542879d",
+    "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3529,7 +3528,7 @@ meta["defaults"] = [
     "tag" : "build-main"
   },
   "label" : [
-    "midtime",
+    "onedaytime",
     "midmem",
     "highcpu"
   ],

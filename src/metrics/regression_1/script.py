@@ -9,10 +9,12 @@ par = {
   "prediction": "resources/grn-benchmark/grn_models/collectri.csv",
   'score': 'output/score.h5ad',
   'reg_type': 'ridge',
-  'layer': 'lognorm',
+  'layer': 'pearson',
   'subsample': 200,
   'max_workers': 4,
 }
+print(par)
+
 
 ## VIASH END
 sys.path.append(meta["resources_dir"])
