@@ -215,7 +215,7 @@ function ViashHelp {
   echo "        Whether to perform quality control."
   echo ""
   echo "    --cell_topic"
-  echo "        type: file, required parameter, output, file must exist"
+  echo "        type: file, output, file must exist"
   echo "        default: output/cell_topic.csv"
   echo "        Cell-topics prob scores"
 }
@@ -444,9 +444,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "flatbuffers"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenicplus"
-LABEL org.opencontainers.image.created="2024-09-01T10:55:55Z"
+LABEL org.opencontainers.image.created="2024-09-01T11:09:49Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="879ea6029ec1586bbc681ab36cc7d303d0bf317b"
+LABEL org.opencontainers.image.revision="dd81be3f7f000eef9ea82099c168c607a10f2b85"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -833,10 +833,6 @@ fi
 
 
 # check whether required parameters exist
-if [ -z ${VIASH_PAR_CELL_TOPIC+x} ]; then
-  ViashError '--cell_topic' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then
   ViashError 'functionality_name' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
@@ -882,6 +878,9 @@ if [ -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then
 fi
 if [ -z ${VIASH_PAR_QC+x} ]; then
   VIASH_PAR_QC="false"
+fi
+if [ -z ${VIASH_PAR_CELL_TOPIC+x} ]; then
+  VIASH_PAR_CELL_TOPIC="output/cell_topic.csv"
 fi
 
 # check whether required files exist

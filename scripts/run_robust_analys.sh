@@ -7,11 +7,10 @@ noise_type="$1" #"net"
 echo $noise_type
 
 RUN_ID="robust_analy_$1"
-resources_dir="resources"
-publish_dir="output/${RUN_ID}"
+# resources_dir="resources"
+resources_dir="s3://openproblems-data/resources/grn"
 
-# resources_dir="s3://openproblems-data/resources/grn"
-# publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
+publish_dir="${resources_dir}/results/${RUN_ID}"
 
 grn_models_folder="${resources_dir}/grn_models"
 
@@ -48,12 +47,13 @@ append_entry() {
     max_workers: $max_workers
     consensus: ${resources_dir}/prior/consensus-num-regulators.json
     prediction: ${grn_models_folder}/$1.csv
+    tf_all: ${resources_dir}/prior/tf_all.csv
     degree: ${2}
     noise_type: ${noise_type}
 HERE
 }
 # Loop through grn_names and layers
-layers=(pearson scgen_pearson)
+layers=(scgen_pearson)
 for layer in "${layers[@]}"; do
     for degree in "${degrees[@]}"; do
         for grn_name in "${grn_names[@]}"; do

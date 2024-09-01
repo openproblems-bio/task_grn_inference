@@ -21,9 +21,10 @@ functionality:
     - name: --cell_topic
       type: file 
       default: output/cell_topic.csv
-      required: true
+      required: false
       direction: output
       description: "Cell-topics prob scores"
+
 
   resources:
     - type: nextflow_script
@@ -35,4 +36,4 @@ functionality:
 platforms:
   - type: nextflow
     directives:
-      label: [ midtime, midmem, midcpu ]
+      label: [ midtime, highmem, highcpu ]

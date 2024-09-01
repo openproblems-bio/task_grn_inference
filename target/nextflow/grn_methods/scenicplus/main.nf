@@ -2989,7 +2989,7 @@ meta = [
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "output",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -3105,7 +3105,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
+    "git_commit" : "dd81be3f7f000eef9ea82099c168c607a10f2b85",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

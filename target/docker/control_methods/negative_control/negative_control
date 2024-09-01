@@ -185,6 +185,10 @@ function ViashHelp {
   echo "    --prediction"
   echo "        type: file, required parameter, output, file must exist"
   echo "        example: resources/grn-benchmark/grn_models/collectri.csv"
+  echo ""
+  echo "    --tf_all"
+  echo "        type: file, file must exist"
+  echo "        default: resources/prior/tf_all.csv"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -410,9 +414,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component control_methods negative_control"
-LABEL org.opencontainers.image.created="2024-09-01T10:55:55Z"
+LABEL org.opencontainers.image.created="2024-09-01T11:09:49Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="879ea6029ec1586bbc681ab36cc7d303d0bf317b"
+LABEL org.opencontainers.image.revision="dd81be3f7f000eef9ea82099c168c607a10f2b85"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -604,6 +608,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_PREDICTION=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --tf_all)
+            [ -n "$VIASH_PAR_TF_ALL" ] && ViashError Bad arguments for option \'--tf_all\': \'$VIASH_PAR_TF_ALL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TF_ALL="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --tf_all. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --tf_all=*)
+            [ -n "$VIASH_PAR_TF_ALL" ] && ViashError Bad arguments for option \'--tf_all=*\': \'$VIASH_PAR_TF_ALL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TF_ALL=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         ---setup)
             VIASH_MODE='docker_setup'
             VIASH_DOCKER_SETUP_STRATEGY="$2"
@@ -755,10 +770,17 @@ fi
 if [ -z ${VIASH_PAR_LAYER+x} ]; then
   VIASH_PAR_LAYER="scgen_pearson"
 fi
+if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
+  VIASH_PAR_TF_ALL="resources/prior/tf_all.csv"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ] && [ ! -e "$VIASH_PAR_PERTURBATION_DATA" ]; then
   ViashError "Input file '$VIASH_PAR_PERTURBATION_DATA' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
+  ViashError "Input file '$VIASH_PAR_TF_ALL' does not exist."
   exit 1
 fi
 
@@ -821,6 +843,10 @@ if [ ! -z "$VIASH_PAR_PREDICTION" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PREDICTION")" )
   VIASH_PAR_PREDICTION=$(ViashAutodetectMount "$VIASH_PAR_PREDICTION")
   VIASH_CHOWN_VARS+=( "$VIASH_PAR_PREDICTION" )
+fi
+if [ ! -z "$VIASH_PAR_TF_ALL" ]; then
+  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_TF_ALL")" )
+  VIASH_PAR_TF_ALL=$(ViashAutodetectMount "$VIASH_PAR_TF_ALL")
 fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_META_RESOURCES_DIR")" )
@@ -889,7 +915,8 @@ import numpy as np
 par = {
   'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -910,15 +937,21 @@ dep = {
 }
 
 ## VIASH END
+print(par)
+
 print('Reading input data')
 perturbation_data = ad.read_h5ad(par["perturbation_data"])
 gene_names = perturbation_data.var_names.to_numpy()
+tf_all = np.loadtxt(par['tf_all'], dtype=str)
+
+n_tf = 400
+tfs = tf_all[:n_tf]
 
 def create_negative_control(gene_names) -> np.ndarray:
     ratio = [.98, .01, 0.01]
-    n_tf = 400
+    
     net = np.random.choice([0, -1, 1], size=((len(gene_names), n_tf)),p=ratio)
-    net = pd.DataFrame(net, index=gene_names)
+    net = pd.DataFrame(net, index=gene_names, columns=tfs)
     return net
 print('Inferring GRN')
 net = create_negative_control(gene_names)
@@ -927,6 +960,7 @@ pivoted_net = net.reset_index().melt(id_vars='index', var_name='source', value_n
 
 pivoted_net = pivoted_net.rename(columns={'index': 'target'})
 pivoted_net = pivoted_net[pivoted_net['weight'] != 0]
+
 
 print('Saving')
 pivoted_net.to_csv(par["prediction"])
@@ -943,6 +977,9 @@ if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ]; then
 fi
 if [ ! -z "$VIASH_PAR_PREDICTION" ]; then
   VIASH_PAR_PREDICTION=$(ViashStripAutomount "$VIASH_PAR_PREDICTION")
+fi
+if [ ! -z "$VIASH_PAR_TF_ALL" ]; then
+  VIASH_PAR_TF_ALL=$(ViashStripAutomount "$VIASH_PAR_TF_ALL")
 fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_META_RESOURCES_DIR=$(ViashStripAutomount "$VIASH_META_RESOURCES_DIR")

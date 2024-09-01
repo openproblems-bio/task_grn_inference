@@ -215,7 +215,7 @@ function ViashHelp {
   echo "        Whether to perform quality control."
   echo ""
   echo "    --cell_topic"
-  echo "        type: file, required parameter, output, file must exist"
+  echo "        type: file, output, file must exist"
   echo "        default: output/cell_topic.csv"
   echo "        Cell-topics prob scores"
 }
@@ -434,10 +434,6 @@ fi
 
 
 # check whether required parameters exist
-if [ -z ${VIASH_PAR_CELL_TOPIC+x} ]; then
-  ViashError '--cell_topic' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then
   ViashError 'functionality_name' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
@@ -483,6 +479,9 @@ if [ -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then
 fi
 if [ -z ${VIASH_PAR_QC+x} ]; then
   VIASH_PAR_QC="false"
+fi
+if [ -z ${VIASH_PAR_CELL_TOPIC+x} ]; then
+  VIASH_PAR_CELL_TOPIC="output/cell_topic.csv"
 fi
 
 # check whether required files exist

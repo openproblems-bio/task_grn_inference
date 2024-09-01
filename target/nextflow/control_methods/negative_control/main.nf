@@ -2920,6 +2920,20 @@ meta = [
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
+      },
+      {
+        "type" : "file",
+        "name" : "--tf_all",
+        "default" : [
+          "resources/prior/tf_all.csv"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
       }
     ],
     "resources" : [
@@ -3023,7 +3037,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/negative_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
+    "git_commit" : "dd81be3f7f000eef9ea82099c168c607a10f2b85",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3048,7 +3062,8 @@ import numpy as np
 par = {
   'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3069,15 +3084,21 @@ dep = {
 }
 
 ## VIASH END
+print(par)
+
 print('Reading input data')
 perturbation_data = ad.read_h5ad(par["perturbation_data"])
 gene_names = perturbation_data.var_names.to_numpy()
+tf_all = np.loadtxt(par['tf_all'], dtype=str)
+
+n_tf = 400
+tfs = tf_all[:n_tf]
 
 def create_negative_control(gene_names) -> np.ndarray:
     ratio = [.98, .01, 0.01]
-    n_tf = 400
+    
     net = np.random.choice([0, -1, 1], size=((len(gene_names), n_tf)),p=ratio)
-    net = pd.DataFrame(net, index=gene_names)
+    net = pd.DataFrame(net, index=gene_names, columns=tfs)
     return net
 print('Inferring GRN')
 net = create_negative_control(gene_names)
@@ -3086,6 +3107,7 @@ pivoted_net = net.reset_index().melt(id_vars='index', var_name='source', value_n
 
 pivoted_net = pivoted_net.rename(columns={'index': 'target'})
 pivoted_net = pivoted_net[pivoted_net['weight'] != 0]
+
 
 print('Saving')
 pivoted_net.to_csv(par["prediction"])

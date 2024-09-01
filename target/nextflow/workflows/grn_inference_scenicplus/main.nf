@@ -2989,7 +2989,7 @@ meta = [
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "output",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -3047,7 +3047,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
+          "git_commit" : "dd81be3f7f000eef9ea82099c168c607a10f2b85",
           "executable" : "/nextflow/grn_methods/scenicplus/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scenicplus"
@@ -3062,8 +3062,8 @@ meta = [
       "directives" : {
         "label" : [
           "midtime",
-          "midmem",
-          "midcpu"
+          "highmem",
+          "highcpu"
         ],
         "tag" : "$id"
       },
@@ -3101,7 +3101,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/grn_inference_scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
+    "git_commit" : "dd81be3f7f000eef9ea82099c168c607a10f2b85",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3125,9 +3125,7 @@ workflow run_wf {
               multiomics_rna: "multiomics_rna",
               multiomics_atac: "multiomics_atac",
               temp_dir: "temp_dir",
-              num_workers: "num_workers",
-              scplus_mdata: "scplus_mdata", 
-              cell_topic: "cell_topic"
+              num_workers: "num_workers"
               
               ],
       toState: [prediction:"prediction", cell_topic:"cell_topic", scplus_mdata:"scplus_mdata"]
@@ -3156,8 +3154,8 @@ meta["defaults"] = [
   directives: readJsonBlob('''{
   "label" : [
     "midtime",
-    "midmem",
-    "midcpu"
+    "highmem",
+    "highcpu"
   ],
   "tag" : "$id"
 }'''),
