@@ -4,24 +4,27 @@
 reg_type=${1} #GB, ridge
 
 RUN_ID="grn_evaluation_${reg_type}"
-# resources_dir="s3://openproblems-data/resources/grn"
-resources_dir="./resources"
+resources_dir="s3://openproblems-data/resources/grn"
+# resources_dir="./resources"
 publish_dir="${resources_dir}/results/${RUN_ID}"
 grn_models_folder="${resources_dir}/grn_models"
 
 subsample=-2
 max_workers=10
 
-param_file="./params/${RUN_ID}.yaml"
+param_file="./params/${RUN_ID}_figr.yaml"
+
+# grn_names=(
+#     "collectri"
+#     "celloracle"
+#     "scenicplus"
+#     "figr"
+#     "granie"
+#     "scglue"
+# )
 
 grn_names=(
-    "collectri"
-    "celloracle"
-    "scenicplus"
-    "figr"
-    "granie"
-    "scglue"
-)
+    "figr")
 # Start writing to the YAML file
 cat > $param_file << HERE
 param_list:
@@ -47,7 +50,7 @@ HERE
 HERE
   fi
 }
-layers=(pearson scgen_pearson)
+layers=(scgen_pearson)
 # Loop through grn_names and layers
 for layer in "${layers[@]}"; do
   for grn_name in "${grn_names[@]}"; do
@@ -56,17 +59,17 @@ for layer in "${layers[@]}"; do
 done
 
 # # Append negative control
-grn_name="negative_control"
-for layer in "${layers[@]}"; do
-  append_entry "$grn_name" "false" "$layer"
-done
+# grn_name="negative_control"
+# for layer in "${layers[@]}"; do
+#   append_entry "$grn_name" "false" "$layer"
+# done
 
 
-# Append positive controls
-grn_name="positive_control"
-for layer in "${layers[@]}"; do
-  append_entry "$grn_name" "false" "$layer"
-done
+# # Append positive controls
+# grn_name="positive_control"
+# for layer in "${layers[@]}"; do
+#   append_entry "$grn_name" "false" "$layer"
+# done
 
 
 # Append the remaining output_state and publish_dir to the YAML file

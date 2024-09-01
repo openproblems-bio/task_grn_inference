@@ -50,6 +50,11 @@ functionality:
           direction: input
           default: weight
         
+        - name: --tf_all
+          type: file
+          required: false
+          direction: input
+        
         
     - name: Outputs
       arguments:
