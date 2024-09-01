@@ -1,11 +1,11 @@
 #!/bin/bash
 
 RUN_ID="scenicplus"
-resources_dir="s3://openproblems-data/resources_test/grn"
-publish_dir="s3://openproblems-data/resources_test/grn/results/${RUN_ID}"
+# resources_dir="s3://openproblems-data/resources_test/grn"
+# publish_dir="s3://openproblems-data/resources_test/grn/results/${RUN_ID}"
 
-# resources_dir="./resources_test"
-# publish_dir="./output/${RUN_ID}"
+resources_dir="./resources_test"
+publish_dir="./output/${RUN_ID}"
 
 num_workers=10
 
@@ -23,12 +23,12 @@ publish_dir: "$publish_dir"
 HERE
 
 
-# nextflow run . \
-#   -main-script  target/nextflow/workflows/grn_inference_scenicplus/main.nf \
-#   -profile docker \
-#   -with-trace \
-#   -c src/common/nextflow_helpers/labels_ci.config \
-#   -params-file params/${RUN_ID}.yaml
+nextflow run . \
+  -main-script  target/nextflow/workflows/grn_inference_scenicplus/main.nf \
+  -profile docker \
+  -with-trace \
+  -c src/common/nextflow_helpers/labels_ci.config \
+  -params-file params/${RUN_ID}.yaml
 
 
 # ./tw-windows-x86_64.exe launch `
