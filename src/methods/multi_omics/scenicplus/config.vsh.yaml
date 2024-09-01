@@ -27,22 +27,16 @@ functionality:
       required: true
       direction: output
       description: "Cell-topics prob scores"
-    - name: --rankings_db
-      type: file
-      direction: input
-    - name: --scores_db
-      type: file
-      direction: input
-      
-
-      
   resources:
     - type: python_script
       path: script.py
 
 platforms:
   - type: docker
-    image: apassemi/scenicplus:latest
+    image: apassemi/scenicplus:1.0.0
+    setup:
+      - type: python
+        packages: [ flatbuffers ]
   - type: native
   - type: nextflow
     directives:
