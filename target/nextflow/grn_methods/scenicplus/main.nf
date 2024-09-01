@@ -2994,28 +2994,6 @@ meta = [
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
-      },
-      {
-        "type" : "file",
-        "name" : "--rankings_db",
-        "must_exist" : true,
-        "create_parent" : true,
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "file",
-        "name" : "--scores_db",
-        "must_exist" : true,
-        "create_parent" : true,
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
       }
     ],
     "resources" : [
@@ -3059,14 +3037,24 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "apassemi/scenicplus:latest",
+      "image" : "apassemi/scenicplus:1.0.0",
       "target_organization" : "openproblems-bio/task_grn_inference",
       "target_registry" : "ghcr.io",
       "namespace_separator" : "/",
       "resolve_volume" : "Automatic",
       "chown" : true,
       "setup_strategy" : "ifneedbepullelsecachedbuild",
-      "target_image_source" : "https://github.com/openproblems-bio/task_grn_inference"
+      "target_image_source" : "https://github.com/openproblems-bio/task_grn_inference",
+      "setup" : [
+        {
+          "type" : "python",
+          "user" : false,
+          "packages" : [
+            "flatbuffers"
+          ],
+          "upgrade" : true
+        }
+      ]
     },
     {
       "type" : "native",
@@ -3117,7 +3105,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+    "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3142,6 +3130,7 @@ import hashlib
 import shutil
 import requests
 import traceback
+import zipfile
 import subprocess
 import gc
 import gzip
@@ -3153,9 +3142,8 @@ import scanpy as sc
 import pandas as pd
 import anndata
 import pyranges as pr
-from pycistarget.utils import region_names_to_coordinates
-from scenicplus.wrappers.run_pycistarget import run_pycistarget
 import polars
+import mudata
 import scrublet as scr
 from sklearn.manifold import TSNE
 import pycisTopic.loom
@@ -3171,6 +3159,7 @@ from pycisTopic.utils import region_names_to_coordinates
 from pycisTopic.gene_activity import get_gene_activity
 from pycisTopic.loom import export_region_accessibility_to_loom, export_gene_activity_to_loom
 from pycisTopic.clust_vis import find_clusters, run_umap, run_tsne, plot_metadata, plot_topic, cell_topic_heatmap
+from scenicplus.wrappers.run_pycistarget import run_pycistarget
 
 
 ## VIASH START
@@ -3185,9 +3174,7 @@ par = {
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'scplus_mdata': $( if [ ! -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then echo "r'${VIASH_PAR_SCPLUS_MDATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'qc': $( if [ ! -z ${VIASH_PAR_QC+x} ]; then echo "r'${VIASH_PAR_QC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'rankings_db': $( if [ ! -z ${VIASH_PAR_RANKINGS_DB+x} ]; then echo "r'${VIASH_PAR_RANKINGS_DB//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'scores_db': $( if [ ! -z ${VIASH_PAR_SCORES_DB+x} ]; then echo "r'${VIASH_PAR_SCORES_DB//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3219,13 +3206,20 @@ try:
 except NameError:
     pass
 
-par['temp_dir'] = os.path.join(os.path.dirname(par['prediction']), 'scenicplus')
+par['temp_dir'] = os.path.join(os.path.dirname(par['prediction']), 'scenicplus') # TODO
 
 out_dir = par['temp_dir']
 atac_dir = os.path.join(out_dir, 'atac')
 os.makedirs(atac_dir, exist_ok=True)
 
-par['cistopic_object'] = f"{par['temp_dir']}/cistopic_object.pkl"
+par['cistopic_object'] = f'{par["temp_dir"]}/cistopic_object.pkl'
+
+
+###############################################################################################
+###############################################################################################
+### Running pycistopic ########################################################################
+###############################################################################################
+###############################################################################################
 
 # Get list of samples (e.g., donors)
 print('Collect list of samples')
@@ -3272,7 +3266,7 @@ for donor_id in unique_donor_ids:
         sorted_filepath = filepath + '.sorted.tsv'
         os.system(f'sort -k1,1 -k2,2n {filepath} > {sorted_filepath}')
 
-        # Compression
+        # Decompression
         subprocess.run(['bgzip', sorted_filepath, '-o', compressed_filepath])
 
     fragments_dict[donor_id] = compressed_filepath
@@ -3379,6 +3373,16 @@ consensus_peaks.to_bed(
     chain=False
 )
 
+# Download Mallet
+MALLET_PATH = os.path.join(out_dir, 'Mallet-202108', 'bin', 'mallet')
+if not os.path.exists(MALLET_PATH):
+    url = 'https://github.com/mimno/Mallet/releases/download/v202108/Mallet-202108-bin.tar.gz'
+    response = requests.get(url)
+    with open(os.path.join(out_dir, 'Mallet-202108-bin.tar.gz'), 'wb') as f:
+        f.write(response.content)
+    with tarfile.open(os.path.join(out_dir, 'Mallet-202108-bin.tar.gz'), 'r:gz') as f:
+        f.extractall(path=out_dir)
+
 # Download TSS annotations
 os.makedirs(os.path.join(out_dir, 'qc'), exist_ok=True)
 if not os.path.exists(os.path.join(out_dir, 'qc', 'tss.bed')):
@@ -3391,7 +3395,7 @@ if not os.path.exists(os.path.join(out_dir, 'qc', 'tss.bed')):
     ])
 
 # Create cistopic objects
-if not os.path.exists(os.path.join(out_dir, 'cistopic_obj.pkl')):
+if not os.path.exists(par['cistopic_object']):
     if par['qc']:  # Whether to perform quality control
         # Compute QC metrics
         print('Perform QC')
@@ -3484,63 +3488,47 @@ if not os.path.exists(os.path.join(out_dir, 'cistopic_obj.pkl')):
     else:
         cistopic_obj = merge(cistopic_obj_list, is_acc=1, copy=False, split_pattern='-')
     
+    # LDA-based topic modeling
+    print('Run LDA models', flush=True)
+    n_topics = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+    if os.path.exists(MALLET_PATH):
+        models = run_cgs_models_mallet(
+            cistopic_obj,
+            n_topics=n_topics,
+            n_cpu=par['num_workers'],
+            n_iter=500,
+            random_state=555,
+            alpha=50,
+            alpha_by_topic=True,
+            eta=0.1,
+            eta_by_topic=False,
+            mallet_path=MALLET_PATH
+        )
+    else:
+        print('Could not find Mallet. Running the sequential version of LDA instead.')
+        models = run_cgs_models(
+            cistopic_obj,
+            n_topics=n_topics,
+            n_cpu=12,
+            n_iter=500,
+            random_state=555,
+            alpha=50,
+            alpha_by_topic=True,
+            eta=0.1,
+            eta_by_topic=False
+        )
+
+    # Model selection
+    model = evaluate_models(models, select_model=40, return_model=True)
+    cistopic_obj.add_LDA_model(model)
+
     # Save cistopic objects
-    with open(os.path.join(out_dir, 'cistopic_obj.pkl'), 'wb') as f:
+    with open(par['cistopic_object'], 'wb') as f:
         pickle.dump(cistopic_obj, f)
 else:
     # Load cistopic objects
-    with open(os.path.join(out_dir, 'cistopic_obj.pkl'), 'rb') as f:
+    with open(par['cistopic_object'], 'rb') as f:
         cistopic_obj = pickle.load(f)
-
-# Download Mallet
-MALLET_PATH = os.path.join(out_dir, 'Mallet-202108', 'bin', 'mallet')
-if not os.path.exists(MALLET_PATH):
-    url = 'https://github.com/mimno/Mallet/releases/download/v202108/Mallet-202108-bin.tar.gz'
-    response = requests.get(url)
-    with open(os.path.join(out_dir, 'Mallet-202108-bin.tar.gz'), 'wb') as f:
-        f.write(response.content)
-    with tarfile.open(os.path.join(out_dir, 'Mallet-202108-bin.tar.gz'), 'r:gz') as f:
-        f.extractall(path=out_dir)
-
-# LDA-based topic modeling
-print('Run LDA models')
-
-# Topic modeling
-n_topics = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-if os.path.exists(MALLET_PATH):
-    models = run_cgs_models_mallet(
-        cistopic_obj,
-        n_topics=n_topics,
-        n_cpu=par['num_workers'],
-        n_iter=500,
-        random_state=555,
-        alpha=50,
-        alpha_by_topic=True,
-        eta=0.1,
-        eta_by_topic=False,
-        mallet_path=MALLET_PATH
-    )
-else:
-    print('Could not find Mallet. Running the sequential version of LDA instead.')
-    models = run_cgs_models(
-        cistopic_obj,
-        n_topics=n_topics,
-        n_cpu=12,
-        n_iter=500,
-        random_state=555,
-        alpha=50,
-        alpha_by_topic=True,
-        eta=0.1,
-        eta_by_topic=False
-    )
-
-# Model selection
-model = evaluate_models(models, select_model=40, return_model=True)
-cistopic_obj.add_LDA_model(model)
-
-with open(par['cistopic_object'], 'wb') as f:
-    pickle.dump(cistopic_obj, f)
-
     
 cell_topic = cistopic_obj.selected_model.cell_topic.T
 cell_topic.index = cell_topic.index.str.split('-').str[0]
@@ -3607,6 +3595,12 @@ markers_dict = find_diff_features(
     n_cpu=5,
     split_pattern='-'
 )
+
+# Remove empty markers
+for DAR in list(markers_dict.keys()):
+    if len(markers_dict[DAR]) == 0:
+        del markers_dict[DAR]
+
 # Save topics
 folder = os.path.join(out_dir, 'region_sets', 'Topics_otsu')
 os.makedirs(folder, exist_ok=True)
@@ -3686,7 +3680,7 @@ gene_act, weights = get_gene_activity(
 )
 
 # Infer differentially accessible genes
-DAG_markers_dict= find_diff_features(
+DAG_markers_dict = find_diff_features(
     cistopic_obj,
     gene_act,
     variable='cell_type',
@@ -3726,6 +3720,92 @@ export_gene_activity_to_loom(
     split_pattern='-'
 )
 
+
+###############################################################################################
+###############################################################################################
+### Creating custom cistarget database ########################################################
+###############################################################################################
+###############################################################################################
+
+RANKINGS_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db', 'db.regions_vs_motifs.rankings.feather')
+SCORES_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db', 'db.regions_vs_motifs.scores.feather')
+
+if not (os.path.exists(RANKINGS_DB_PATH) and os.path.exists(SCORES_DB_PATH)):
+
+    # Download create_cisTarget_databases
+    os.makedirs(os.path.join(out_dir, 'cistarget-db'), exist_ok=True)
+    if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'create_cisTarget_databases')):
+        with contextlib.chdir(os.path.join(out_dir, 'cistarget-db')):
+            subprocess.run(['git', 'clone', 'https://github.com/aertslab/create_cisTarget_databases'])
+
+    # Download cluster-buster
+    if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'cbust')):
+        urlretrieve('https://resources.aertslab.org/cistarget/programs/cbust', os.path.join(out_dir, 'cistarget-db', 'cbust'))
+    subprocess.run(['chmod', 'a+x', os.path.join(out_dir, 'cistarget-db', 'cbust')])
+
+    # Download motif collection
+    if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public')):
+        urlretrieve(
+            'https://resources.aertslab.org/cistarget/motif_collections/v10nr_clust_public/v10nr_clust_public.zip',
+            os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public.zip')
+        )
+        with zipfile.ZipFile(os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public.zip'), 'r') as zip_ref:
+            zip_ref.extractall(os.path.join(out_dir))
+
+    # Download chromosome sizes
+    if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'hg38.chrom.sizes')):
+        urlretrieve(
+            'https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes',
+            os.path.join(out_dir, 'cistarget-db', 'hg38.chrom.sizes')
+        )
+
+    # Download reference genome
+    if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'hg38.fa')):
+        print('Downloading reference genome', flush=True)
+        if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'hg38.fa.gz')):
+            urlretrieve(
+                'https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz',
+                os.path.join(out_dir, 'cistarget-db', 'hg38.fa.gz')
+            )
+        with gzip.open(os.path.join(out_dir, 'cistarget-db', 'hg38.fa.gz'), 'rb') as f_in:
+            with open(os.path.join(out_dir, 'cistarget-db', 'hg38.fa'), 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+
+    # Prepare fasta from consensus regions
+    if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'hg38.with_1kb_bg_padding.fa')):
+        subprocess.run([
+            os.path.join(out_dir, 'cistarget-db', 'create_cisTarget_databases', 'create_fasta_with_padded_bg_from_bed.sh'),
+            os.path.join(out_dir, 'cistarget-db', 'hg38.fa'),
+            os.path.join(out_dir, 'cistarget-db', 'hg38.chrom.sizes'),
+            os.path.join(out_dir, 'consensus_peak_calling', 'consensus_regions.bed'),
+            os.path.join(out_dir, 'cistarget-db', 'hg38.with_1kb_bg_padding.fa'),
+            '1000',
+            'yes'
+        ])
+
+    # Create cistarget databases
+    with open(os.path.join(out_dir, 'cistarget-db', 'motifs.txt'), 'w') as f:
+        for filename in os.listdir(os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public', 'singletons')):
+            f.write(f'{filename}\\\\n')
+    with contextlib.chdir(os.path.join(out_dir, 'cistarget-db')):
+        subprocess.run([
+            'python',
+            os.path.join(out_dir, 'cistarget-db', 'create_cisTarget_databases', 'create_cistarget_motif_databases.py'),
+            '-f', os.path.join(out_dir, 'cistarget-db', 'hg38.with_1kb_bg_padding.fa'),
+            '-M', os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public', 'singletons'),
+            '-m', os.path.join(out_dir, 'cistarget-db', 'motifs.txt'),
+            '-c', os.path.join(out_dir, 'cistarget-db', 'cbust'),
+            '-o', 'db',
+            '--bgpadding', '1000',
+            '-t', str(par['num_workers'])
+        ])
+
+###############################################################################################
+###############################################################################################
+### Running scenicplus pipeline ###############################################################
+###############################################################################################
+###############################################################################################
+
 os.makedirs(os.path.join(out_dir, 'scRNA'), exist_ok=True)
 
 # Download databases
@@ -3736,48 +3816,9 @@ def download(url: str, filepath: str) -> None:
         return
     print(f'Download {url}...')
     urlretrieve(url, filepath)
-def download_and_checksum(url: str, filepath: str, digest: str) -> None:
-    download(url, filepath)
-    #with open(filepath, 'rb') as f:
-    #    file_hash = hashlib.file_digest(f, 'sha1')
-    #if file_hash.hexdigest() != digest:
-    #    os.remove(filepath)
-    #print(file_hash.hexdigest(), digest)
-    #assert file_hash.hexdigest() == digest
-def download_checksum(url: str, filepath: str) -> str:
-    if not os.path.exists(filepath):
-        response = requests.get(url)
-        with open(filepath, 'w') as f:
-            f.write(response.text)
-    with open(filepath, 'r') as f:
-        s = f.read()
-    return s.split()[0]
-# Define rankings, score and motif annotation databases
-if par['rankings_db']:
-    print("Read tf motif db locally")
-    rankings_db = par['rankings_db']
-    scores_db =  par['scores_db']
-else:
-    print("Downloading tf motif db")
-    url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.rankings.feather.sha1sum.txt'
-    digest = download_checksum(url, os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.rankings.feather.sha1sum.txt'))
-
-    url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.rankings.feather'
-    download_and_checksum(url, os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.rankings.feather'), digest)
-
-    url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.scores.feather.sha1sum.txt'
-    digest = download_checksum(url, os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.scores.feather.sha1sum.txt'))
-
-    url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.scores.feather'
-    download_and_checksum(url, os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.scores.feather'), digest)
-
-    rankings_db = os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.rankings.feather')
-    scores_db =  os.path.join(DB_PATH, 'hg38_screen_v10_clust.regions_vs_motifs.scores.feather')
-
 url = 'https://resources.aertslab.org/cistarget/motif_collections/v10nr_clust_public/snapshots/motifs-v10-nr.hgnc-m0.00001-o0.0.tbl'
 download(url, os.path.join(DB_PATH, 'motifs-v10-nr.hgnc-m0.00001-o0.0.tbl'))
 motif_annotation = os.path.join(DB_PATH, 'motifs-v10-nr.hgnc-m0.00001-o0.0.tbl')
-
 
 print("Preprocess RNA-seq", flush=True)
 # Load scRNA-seq data
@@ -3798,47 +3839,31 @@ sc.pp.calculate_qc_metrics(adata_rna, qc_vars=['mt'], percent_top=None, log1p=Fa
 adata_rna.raw = adata_rna
 sc.pp.normalize_total(adata_rna, target_sum=1e4)
 sc.pp.log1p(adata_rna)
+
+# Change barcodes to match the barcodes in the scATAC-seq data
+bar_codes = [f'{obs_name.replace("-", "")}-{donor_id}' for obs_name, donor_id in zip(adata_rna.obs_names, adata_rna.obs.donor_id)]
+adata_rna.obs_names = bar_codes
+
+# Save scRNA-seq data
 adata_rna.write_h5ad(os.path.join(out_dir, 'rna.h5ad'))
-
-# Load candidate enhancer regions
-with open(os.path.join(out_dir, f'candidate_enhancers/region_bin_topics_otsu.pkl'), 'rb') as f:
-    region_bin_topics_otsu = pickle.load(f)
-with open(os.path.join(out_dir, f'candidate_enhancers/region_bin_topics_top3k.pkl'), 'rb') as f:
-    region_bin_topics_top3k = pickle.load(f)
-with open(os.path.join(out_dir, f'candidate_enhancers/markers_dict.pkl'), 'rb') as f:
-    markers_dict = pickle.load(f)
-
-
-# Convert to dictionary of pyrange objects
-region_sets = {}
-region_sets['topics_otsu'] = {}
-region_sets['topics_top_3'] = {}
-region_sets['DARs'] = {}
-for topic in region_bin_topics_otsu.keys():
-    regions = region_bin_topics_otsu[topic].index[region_bin_topics_otsu[topic].index.str.startswith('chr')] #only keep regions on known chromosomes
-    region_sets['topics_otsu'][topic] = pr.PyRanges(region_names_to_coordinates(regions))
-for topic in region_bin_topics_top3k.keys():
-    regions = region_bin_topics_top3k[topic].index[region_bin_topics_top3k[topic].index.str.startswith('chr')] #only keep regions on known chromosomes
-    region_sets['topics_top_3'][topic] = pr.PyRanges(region_names_to_coordinates(regions))
-for DAR in markers_dict.keys():
-    regions = markers_dict[DAR].index[markers_dict[DAR].index.str.startswith('chr')]
-    region_sets['DARs'][DAR] = pr.PyRanges(region_names_to_coordinates(regions))
 
 # Init scenicplus pipeline
 os.makedirs(os.path.join(out_dir, 'scplus_pipeline'), exist_ok=True)
 os.makedirs(os.path.join(out_dir, 'scplus_pipeline', 'temp'), exist_ok=True)
 subprocess.run(['scenicplus', 'init_snakemake', '--out_dir', os.path.join(out_dir, 'scplus_pipeline')])
-print("snake make initialized", flush=True)
+print('snake make initialized', flush=True)
+
 # Load pipeline settings
 with open(os.path.join(out_dir, 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'r') as f:
     settings = yaml.safe_load(f)
 print('output_data:', settings['output_data'], flush=True)
+
 # Update settings
 settings['input_data']['cisTopic_obj_fname'] = par['cistopic_object']
 settings['input_data']['GEX_anndata_fname'] = os.path.join(out_dir, 'rna.h5ad')
 settings['input_data']['region_set_folder'] = os.path.join(out_dir, 'region_sets')
-settings['input_data']['ctx_db_fname'] = rankings_db
-settings['input_data']['dem_db_fname'] = scores_db
+settings['input_data']['ctx_db_fname'] = RANKINGS_DB_PATH
+settings['input_data']['dem_db_fname'] = SCORES_DB_PATH
 settings['input_data']['path_to_motif_annotations'] = motif_annotation
 settings['params_general']['temp_dir'] = os.path.join(out_dir, 'scplus_pipeline', 'temp')
 settings['params_general']['n_cpu'] = par['num_workers']
@@ -3858,34 +3883,35 @@ settings['params_motif_enrichment']['dem_motif_hit_thr'] = 3.0
 settings['params_motif_enrichment']['dem_max_bg_regions'] = 3000
 settings['params_motif_enrichment']['ctx_auc_threshold'] = 0.005
 settings['params_motif_enrichment']['ctx_nes_threshold'] = 3.0
+settings['params_data_preparation']['bc_transform_func'] = '\\\\"lambda x: f\\\\'{x}\\\\'\\\\"'  # '"lambda x: f''{x}''"'
 settings['params_data_preparation']['is_multiome'] = True
-settings['params_data_preparation']['is_multiome'] = 'key_to_group_by'
+settings['params_data_preparation']['key_to_group_by'] = ''
 settings['params_data_preparation']['nr_cells_per_metacells'] = 5
 settings['params_data_preparation']['species'] = 'hsapiens'
 settings['output_data']['scplus_mdata'] = par['scplus_mdata']
 
-print('output_data:', settings['output_data'], flush=True)
 # Save pipeline settings
+print('output_data:', settings['output_data'], flush=True)
 with open(os.path.join(out_dir, 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'w') as f:
     yaml.dump(settings, f)
 
-# TODO: from this line onward, the code is untested (could not run it locally due to excessive memory requirements)
-print('run snakemake ', flush=True)
 # Run pipeline
-with contextlib.chdir(os.path.join(out_dir, 'scplus_pipeline', 'Snakemake')):
-    subprocess.run([
-        'snakemake',
-        '--cores', str(par['num_workers'])
-    ])
-import mudata
+print('run snakemake ', flush=True)
+if not os.path.exists(par['scplus_mdata']):
+    with contextlib.chdir(os.path.join(out_dir, 'scplus_pipeline', 'Snakemake')):
+        subprocess.run([
+            'snakemake',
+            '--cores', str(par['num_workers']),
+            #'--unlock'
+        ])
 scplus_mdata = mudata.read(par['scplus_mdata'])
-prediction = scplus_mdata.uns["direct_e_regulon_metadata"]
 
+# Save results
+prediction = scplus_mdata.uns['direct_e_regulon_metadata']
+prediction.insert(0, 'source', prediction['TF'])
+prediction.insert(1, 'target', prediction['Gene'])
+prediction.insert(2, 'weight', prediction['importance_x_abs_rho'])
 prediction.to_csv(par['prediction'])
-
-# # Make sure the file is properly formatted, and re-format it if needed
-# filepath = os.path.join(out_dir, 'tf_to_gene_adj.tsv')
-# shutil.copyfile(filepath, par['prediction'])
 VIASHMAIN
 python -B "$tempscript"
 '''

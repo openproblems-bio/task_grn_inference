@@ -3181,7 +3181,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+    "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

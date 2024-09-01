@@ -166,26 +166,6 @@ functionality:
     multiple: false
     multiple_sep: ":"
     dest: "par"
-  - type: "file"
-    name: "--rankings_db"
-    info: null
-    must_exist: true
-    create_parent: true
-    required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
-  - type: "file"
-    name: "--scores_db"
-    info: null
-    must_exist: true
-    create_parent: true
-    required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
   resources:
   - type: "python_script"
     path: "script.py"
@@ -212,7 +192,7 @@ functionality:
 platforms:
 - type: "docker"
   id: "docker"
-  image: "apassemi/scenicplus:latest"
+  image: "apassemi/scenicplus:1.0.0"
   target_organization: "openproblems-bio/task_grn_inference"
   target_registry: "ghcr.io"
   namespace_separator: "/"
@@ -220,6 +200,12 @@ platforms:
   chown: true
   setup_strategy: "ifneedbepullelsecachedbuild"
   target_image_source: "https://github.com/openproblems-bio/task_grn_inference"
+  setup:
+  - type: "python"
+    user: false
+    packages:
+    - "flatbuffers"
+    upgrade: true
   entrypoint: []
   cmd: null
 - type: "native"
@@ -261,5 +247,5 @@ info:
   output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scenicplus"
   executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scenicplus/scenicplus"
   viash_version: "0.8.6"
-  git_commit: "1bd94dead04d2efb29c0e7a8a7f080bfa6192711"
+  git_commit: "879ea6029ec1586bbc681ab36cc7d303d0bf317b"
   git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"

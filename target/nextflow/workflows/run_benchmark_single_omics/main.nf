@@ -2941,9 +2941,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems-v2",
           "tag" : "main_build",
-          "localPath" : "/tmp/viash_hub_repo6675336512414440001"
+          "localPath" : "/tmp/viash_hub_repo8679058707643043236"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo6675336512414440001/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo8679058707643043236/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_remote" : "https://github.com/openproblems-bio/openproblems-v2",
@@ -2973,7 +2973,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+          "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2"
@@ -2994,7 +2994,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+          "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1"
@@ -3015,7 +3015,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+          "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
           "executable" : "/nextflow/control_methods/positive_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/positive_control"
@@ -3036,7 +3036,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+          "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
           "executable" : "/nextflow/control_methods/negative_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/negative_control"
@@ -3057,7 +3057,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+          "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
           "executable" : "/nextflow/grn_methods/portia/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/portia"
@@ -3078,7 +3078,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+          "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
           "executable" : "/nextflow/grn_methods/ennet/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/ennet"
@@ -3099,7 +3099,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+          "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
           "executable" : "/nextflow/grn_methods/genie3/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/genie3"
@@ -3120,7 +3120,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+          "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
           "executable" : "/nextflow/grn_methods/grnboost2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/grnboost2"
@@ -3141,7 +3141,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+          "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
           "executable" : "/nextflow/grn_methods/pidc/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/pidc"
@@ -3162,7 +3162,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+          "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
           "executable" : "/nextflow/grn_methods/ppcor/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/ppcor"
@@ -3183,7 +3183,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+          "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
           "executable" : "/nextflow/grn_methods/scsgl/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scsgl"
@@ -3204,7 +3204,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+          "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
           "executable" : "/nextflow/grn_methods/tigress/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/tigress"
@@ -3267,7 +3267,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_benchmark_single_omics",
     "viash_version" : "0.8.6",
-    "git_commit" : "1bd94dead04d2efb29c0e7a8a7f080bfa6192711",
+    "git_commit" : "879ea6029ec1586bbc681ab36cc7d303d0bf317b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
