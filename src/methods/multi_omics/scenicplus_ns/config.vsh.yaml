@@ -24,12 +24,7 @@ functionality:
       required: false
       direction: output
       description: "Cell-topics prob scores"
-    - name: --prediction
-      type: file 
-      default: output/prediction.csv
-      required: true
-      direction: output
-      description: "GRN"
+
 
   resources:
     - type: nextflow_script
