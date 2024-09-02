@@ -283,19 +283,19 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
 
     # Evaluate GRN
     print(f'Compute metrics for layer: {layer}', flush=True)
-    print(f'Dynamic approach:', flush=True)
-    print(f'Static approach (theta=0):', flush=True)
+    # print(f'Dynamic approach:', flush=True)
+    # print(f'Static approach (theta=0):', flush=True)
     score_static_min = static_approach(grn, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['max_workers'])
     print(f'Static approach (theta=0.5):', flush=True)
     score_static_median = static_approach(grn, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['max_workers'])
-    print(f'Static approach (theta=1):', flush=True)
-    score_static_max = static_approach(grn, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['max_workers'])
+    # print(f'Static approach (theta=1):', flush=True)
+    # score_static_max = static_approach(grn, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['max_workers'])
     # TODO: find a mathematically sound way to combine Z-scores and r2 scores
 
     results = {
-        'static-theta-0.0': [float(score_static_min)],
-        'static-theta-0.5': [float(score_static_median)],
-        'static-theta-1.0': [float(score_static_max)],
+        # 'static-theta-0.0': [float(score_static_min)],
+        'static-theta-0.5': [float(score_static_median)]
+        # 'static-theta-1.0': [float(score_static_max)],
     }
     print(f'Scores on {layer}: {results}')
 
