@@ -7,8 +7,8 @@ noise_type="$1" #"net"
 echo $noise_type
 
 RUN_ID="robust_analy_$1"
-# resources_dir="resources"
-resources_dir="s3://openproblems-data/resources/grn"
+resources_dir="resources"
+# resources_dir="s3://openproblems-data/resources/grn"
 
 publish_dir="${resources_dir}/results/${RUN_ID}"
 
