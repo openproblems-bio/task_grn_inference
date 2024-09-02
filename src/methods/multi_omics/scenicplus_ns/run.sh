@@ -1,11 +1,11 @@
 #!/bin/bash
 
 RUN_ID="scenicplus"
-# resources_dir="s3://openproblems-data/resources_test/grn"
-# publish_dir="s3://openproblems-data/resources_test/grn/results/${RUN_ID}"
+resources_dir="s3://openproblems-data/resources_test/grn"
+publish_dir="s3://openproblems-data/resources_test/grn/results/${RUN_ID}"
 
-resources_dir="./resources_test"
-publish_dir="./output/${RUN_ID}"
+# resources_dir="./resources_test"
+# publish_dir="./output/${RUN_ID}"
 
 num_workers=10
 
