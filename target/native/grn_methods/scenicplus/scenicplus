@@ -185,8 +185,7 @@ function ViashHelp {
   echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"
-  echo "        default: output/grn.csv"
-  echo "        example: resources/grn-benchmark/grn_models/collectri.csv"
+  echo "        example: output/grn.csv"
   echo ""
   echo "    --temp_dir"
   echo "        type: string"
@@ -461,9 +460,6 @@ if [ -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then
 fi
 if [ -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then
   VIASH_PAR_MULTIOMICS_ATAC="resources_test/grn-benchmark/multiomics_atac.h5ad"
-fi
-if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
-  VIASH_PAR_PREDICTION="output/grn.csv"
 fi
 if [ -z ${VIASH_PAR_TEMP_DIR+x} ]; then
   VIASH_PAR_TEMP_DIR="output/temdir"
@@ -1215,7 +1211,7 @@ if not (os.path.exists(RANKINGS_DB_PATH) and os.path.exists(SCORES_DB_PATH)):
             os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public.zip')
         )
         with zipfile.ZipFile(os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public.zip'), 'r') as zip_ref:
-            zip_ref.extractall(os.path.join(out_dir))
+            zip_ref.extractall(os.path.join(out_dir, 'cistarget-db'))
 
     # Download chromosome sizes
     if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'hg38.chrom.sizes')):

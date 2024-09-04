@@ -2889,9 +2889,6 @@ meta = [
           ]
         },
         "example" : [
-          "resources/grn-benchmark/grn_models/collectri.csv"
-        ],
-        "default" : [
           "output/grn.csv"
         ],
         "must_exist" : true,
@@ -3037,7 +3034,7 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "apassemi/scenicplus:1.0.0",
+      "image" : "apassemi/scenicplus:1.0.1",
       "target_organization" : "openproblems-bio/task_grn_inference",
       "target_registry" : "ghcr.io",
       "namespace_separator" : "/",
@@ -3105,7 +3102,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "8f28f560f951f0362d95a2b6d41f1976659c59d9",
+    "git_commit" : "36b0fb4d7d7dcbbc7ac70578fc4d0ae9595d7c4b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3750,7 +3747,7 @@ if not (os.path.exists(RANKINGS_DB_PATH) and os.path.exists(SCORES_DB_PATH)):
             os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public.zip')
         )
         with zipfile.ZipFile(os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public.zip'), 'r') as zip_ref:
-            zip_ref.extractall(os.path.join(out_dir))
+            zip_ref.extractall(os.path.join(out_dir, 'cistarget-db'))
 
     # Download chromosome sizes
     if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'hg38.chrom.sizes')):

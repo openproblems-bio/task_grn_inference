@@ -2889,9 +2889,6 @@ meta = [
           ]
         },
         "example" : [
-          "resources/grn-benchmark/grn_models/collectri.csv"
-        ],
-        "default" : [
           "output/grn.csv"
         ],
         "must_exist" : true,
@@ -3070,7 +3067,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/ennet",
     "viash_version" : "0.8.6",
-    "git_commit" : "8f28f560f951f0362d95a2b6d41f1976659c59d9",
+    "git_commit" : "36b0fb4d7d7dcbbc7ac70578fc4d0ae9595d7c4b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))

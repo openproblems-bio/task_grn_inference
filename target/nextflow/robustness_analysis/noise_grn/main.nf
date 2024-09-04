@@ -2918,7 +2918,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/robustness_analysis/noise_grn",
     "viash_version" : "0.8.6",
-    "git_commit" : "8f28f560f951f0362d95a2b6d41f1976659c59d9",
+    "git_commit" : "36b0fb4d7d7dcbbc7ac70578fc4d0ae9595d7c4b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -2976,7 +2976,7 @@ if type == 'weight': # add noise to weight
   assert 'weight' in prediction.columns 
   print('Add noise to weight')
   std_dev = prediction['weight'].std()
-  noise = np.random.normal(0, degree * std_dev, size=prediction['weight'].shape)
+  noise = np.random.normal(loc=0, scale=degree * std_dev, size=prediction['weight'].shape)
   prediction['weight'] += noise
 
 elif type == 'links': # shuffle source-target-weight

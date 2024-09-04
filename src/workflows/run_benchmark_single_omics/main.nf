@@ -24,16 +24,16 @@ workflow run_wf {
   // ]
 
   methods = [
-    ennet,
-    grnboost2,
-    scsgl,    
-    tigress
+    portia,
+    // ennet
+    grnboost2
+    // scsgl,    
+    // tigress
   ]
 
   // construct list of metrics
   metrics = [
-    regression_1,
-    regression_2
+    regression_1
   ]
 
   /****************************
@@ -87,7 +87,8 @@ workflow run_wf {
           method_id: comp.config.functionality.name,
           prediction: output.prediction
         ]
-      }
+      },
+      auto: [publish: "state"]
     )
 
     // run all metrics

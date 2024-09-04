@@ -185,8 +185,7 @@ function ViashHelp {
   echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"
-  echo "        default: output/grn.csv"
-  echo "        example: resources/grn-benchmark/grn_models/collectri.csv"
+  echo "        example: output/grn.csv"
   echo ""
   echo "    --temp_dir"
   echo "        type: string"
@@ -435,9 +434,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods celloracle"
-LABEL org.opencontainers.image.created="2024-09-02T06:23:51Z"
+LABEL org.opencontainers.image.created="2024-09-04T19:08:28Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="8f28f560f951f0362d95a2b6d41f1976659c59d9"
+LABEL org.opencontainers.image.revision="36b0fb4d7d7dcbbc7ac70578fc4d0ae9595d7c4b"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -840,9 +839,6 @@ if [ -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then
 fi
 if [ -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then
   VIASH_PAR_MULTIOMICS_ATAC="resources_test/grn-benchmark/multiomics_atac.h5ad"
-fi
-if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
-  VIASH_PAR_PREDICTION="output/grn.csv"
 fi
 if [ -z ${VIASH_PAR_TEMP_DIR+x} ]; then
   VIASH_PAR_TEMP_DIR="output/temdir"

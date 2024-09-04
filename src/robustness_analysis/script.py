@@ -23,7 +23,7 @@ if type == 'weight': # add noise to weight
   assert 'weight' in prediction.columns 
   print('Add noise to weight')
   std_dev = prediction['weight'].std()
-  noise = np.random.normal(0, degree * std_dev, size=prediction['weight'].shape)
+  noise = np.random.normal(loc=0, scale=degree * std_dev, size=prediction['weight'].shape)
   prediction['weight'] += noise
 
 elif type == 'links': # shuffle source-target-weight

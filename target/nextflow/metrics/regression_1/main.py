@@ -176,6 +176,7 @@ def main(par):
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
     gene_names = perturbation_data.var.index.to_numpy()
     net = pd.read_csv(par['prediction'])
+    # net['weight'] = net.weight.abs()
     # subset to keep only those links with source as tf
     if par['apply_tf']:
         net = net[net.source.isin(tf_all)]

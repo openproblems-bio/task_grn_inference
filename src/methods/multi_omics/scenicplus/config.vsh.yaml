@@ -33,7 +33,7 @@ functionality:
 
 platforms:
   - type: docker
-    image: apassemi/scenicplus:1.0.0
+    image: apassemi/scenicplus:1.0.1
     setup:
       - type: python
         packages: [ flatbuffers ]

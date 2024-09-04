@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ID="single_omics"
-resources_dir="s3://openproblems-data/resources_test/grn"
-publish_dir="s3://openproblems-data/resources_test/grn/results/${RUN_ID}"
+RUN_ID="single_omics_test"
+# resources_dir="s3://openproblems-data/resources_test/grn"
+# publish_dir="s3://openproblems-data/resources_test/grn/results/${RUN_ID}"
 
-# resources_dir="./resources_test/"
-# publish_dir="output/${RUN_ID}"
+resources_dir="./resources_test/"
+publish_dir="output/${RUN_ID}"
 
 reg_type=ridge
 subsample=-2

@@ -414,9 +414,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component robustness_analysis noise_grn"
-LABEL org.opencontainers.image.created="2024-09-02T06:23:53Z"
+LABEL org.opencontainers.image.created="2024-09-04T19:08:30Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="8f28f560f951f0362d95a2b6d41f1976659c59d9"
+LABEL org.opencontainers.image.revision="36b0fb4d7d7dcbbc7ac70578fc4d0ae9595d7c4b"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -938,7 +938,7 @@ if type == 'weight': # add noise to weight
   assert 'weight' in prediction.columns 
   print('Add noise to weight')
   std_dev = prediction['weight'].std()
-  noise = np.random.normal(0, degree * std_dev, size=prediction['weight'].shape)
+  noise = np.random.normal(loc=0, scale=degree * std_dev, size=prediction['weight'].shape)
   prediction['weight'] += noise
 
 elif type == 'links': # shuffle source-target-weight
