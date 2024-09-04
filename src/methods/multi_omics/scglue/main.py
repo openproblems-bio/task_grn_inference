@@ -141,7 +141,6 @@ def cis_inference(par):
         if attr["qval"] < 0.05
     )
 
-
     scglue.genomics.Bed(atac.var).write_bed(f"{par['temp_dir']}/peaks.bed", ncols=3)
     scglue.genomics.write_links(
         gene2peak,
@@ -149,8 +148,6 @@ def cis_inference(par):
         scglue.genomics.Bed(atac.var),
         f"{par['temp_dir']}/gene2peak.links", keep_attrs=["score"]
     )
-
-
 
     motif_bed = scglue.genomics.read_bed(par['motif_file']) ## http://download.gao-lab.org/GLUE/cisreg/JASPAR2022-hg38.bed.gz
     tfs = pd.Index(motif_bed["name"]).intersection(rna.var_names)

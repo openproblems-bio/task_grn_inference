@@ -23,7 +23,7 @@ functionality:
       __merge__: file_prediction.yaml
       required: false
       direction: output
-      default: output/grn.csv
+      example: output/grn.csv
     - name: --temp_dir
       type: string
       direction: input

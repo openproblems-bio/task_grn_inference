@@ -3,12 +3,12 @@
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 
 degrees=(0 10 20 50 100)
-noise_type="$1" #"net"
+noise_type="$1" #"net", "weight", "sign"
 echo $noise_type
 
-RUN_ID="robust_analy_$1"
-resources_dir="resources"
-# resources_dir="s3://openproblems-data/resources/grn"
+RUN_ID="robust_analy_reg2_$1" 
+# resources_dir="resources"
+resources_dir="s3://openproblems-data/resources/grn"
 
 publish_dir="${resources_dir}/results/${RUN_ID}"
 

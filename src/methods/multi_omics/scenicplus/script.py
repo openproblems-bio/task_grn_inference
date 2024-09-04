@@ -607,7 +607,7 @@ if not (os.path.exists(RANKINGS_DB_PATH) and os.path.exists(SCORES_DB_PATH)):
             os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public.zip')
         )
         with zipfile.ZipFile(os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public.zip'), 'r') as zip_ref:
-            zip_ref.extractall(os.path.join(out_dir))
+            zip_ref.extractall(os.path.join(out_dir, 'cistarget-db'))
 
     # Download chromosome sizes
     if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'hg38.chrom.sizes')):

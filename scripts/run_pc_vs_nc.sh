@@ -4,19 +4,18 @@
 
 subsamples=(-2 -3 -4)
 
-RUN_ID="robust_analy_$1"
-resources_dir="resources"
-publish_dir="output/${RUN_ID}"
+RUN_ID="robust_analy_reg2_$1"
+# resources_dir="resources"
+resources_dir="s3://openproblems-data/resources/grn"
 
-# resources_dir="s3://openproblems-data/resources/grn"
-# publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
+publish_dir="${resources_dir}/${RUN_ID}"
 
 grn_models_folder="${resources_dir}/grn_models"
 
 
 reg_type=ridge
 max_workers=10
-layer=pearson
+layer=scgen_pearson
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -28,7 +27,6 @@ grn_names=(
     "granie"
     "scglue"
 )
-
 
 
 # Start writing to the YAML file
@@ -66,12 +64,12 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
-nextflow run . \
-  -main-script  target/nextflow/workflows/run_robustness_analysis/main.nf \
-  -profile docker \
-  -with-trace \
-  -c src/common/nextflow_helpers/labels_ci.config \
-  -params-file ${param_file}
+# nextflow run . \
+#   -main-script  target/nextflow/workflows/run_robustness_analysis/main.nf \
+#   -profile docker \
+#   -with-trace \
+#   -c src/common/nextflow_helpers/labels_ci.config \
+#   -params-file ${param_file}
 
 # ./tw-windows-x86_64.exe launch `
 #     https://github.com/openproblems-bio/task_grn_benchmark.git `
