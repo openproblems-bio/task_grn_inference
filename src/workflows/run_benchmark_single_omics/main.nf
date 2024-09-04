@@ -12,24 +12,24 @@ workflow run_wf {
   main:
 
   // construct list of methods
+  methods = [
+    portia,
+    ennet,
+    genie3,
+    grnboost2,
+    pidc,
+    ppcor,
+    scsgl,
+    tigress
+  ]
+
   // methods = [
   //   portia,
   //   ennet,
-  //   genie3,
   //   grnboost2,
-  //   pidc,
-  //   ppcor,
-  //   scsgl,
+  //   scsgl,    
   //   tigress
   // ]
-
-  methods = [
-    portia,
-    // ennet
-    grnboost2
-    // scsgl,    
-    // tigress
-  ]
 
   // construct list of metrics
   metrics = [

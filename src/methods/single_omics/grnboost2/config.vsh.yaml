@@ -26,4 +26,4 @@ platforms:
   - type: native
   - type: nextflow
     directives:
-      label: [onedaytime,midmem,midcpu]
+      label: [onedaytime, midmem, midcpu]

@@ -257,6 +257,10 @@ def cis_inference(par):
 
 
 def main(par):
+    import torch
+    print("Is CUDA available:", torch.cuda.is_available())
+    print("Number of GPUs:", torch.cuda.device_count())
+    
     os.makedirs(par['temp_dir'], exist_ok=True)
     print('Reading input files', flush=True)
     rna = ad.read_h5ad(par['multiomics_rna'])
