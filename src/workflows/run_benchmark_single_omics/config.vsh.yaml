@@ -87,4 +87,4 @@ functionality:
 platforms:
   - type: nextflow
     directives:
-      label: [ onedaytime, midmem, highcpu]
+      label: [ threedaystime, midmem, highcpu]

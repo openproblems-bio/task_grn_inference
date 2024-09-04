@@ -2976,7 +2976,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/batch_correction_scgen",
     "viash_version" : "0.8.6",
-    "git_commit" : "36b0fb4d7d7dcbbc7ac70578fc4d0ae9595d7c4b",
+    "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
