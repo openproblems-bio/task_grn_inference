@@ -1,0 +1,1 @@
+viash run src/methods/single_omics/genie3/config.novsh.yaml -- --multiomics_rna resources_test/grn-benchmark/multiomics_rna.h5ad --tfs resources/prior/tf_all.csv --prediction output/genie3/prediction.csv

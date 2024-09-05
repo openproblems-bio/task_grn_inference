@@ -23,12 +23,12 @@ functionality:
               description: "Pseudobulked values using mean approach"
               required: true
 
-      required: false
+      required: true
       direction: input
       default: resources_local/pseudobulked_data_f
       example: resources_test/grn-benchmark/perturbation_data.h5ad 
 
-    - name: --perturbation_data
+    - name: --perturbation_data_n
       type: file
       info:
         label: perturbation
@@ -48,8 +48,8 @@ functionality:
               type: double
               description: "Normalized values using shifted logarithm "
               required: true
-      required: false
-      direction: input
+      required: true
+      direction: output
       default: resources/grn-benchmark/perturbation_data.h5ad 
       example: resources_test/grn-benchmark/perturbation_data.h5ad 
       

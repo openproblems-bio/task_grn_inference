@@ -1,9 +1,8 @@
 __merge__: ../../api/comp_metric.yaml
 functionality:
   name: regression_2
-  namespace: "metrics"
   info:
-    label: Regression 2
+    label: regression_2
     summary: Calculates R2 score for regression 2
     description: |
       Calculates R2 score using regression approach 2.
@@ -11,12 +10,27 @@ functionality:
     - type: python_script
       path: script.py
     - path: main.py
+  arguments:
+    - name: --consensus
+      type: file
+      direction: input
+      must_exist: true
+      default: 'resources/prior/consensus-num-regulators.json'
+      example: 'resources_test/prior/consensus-num-regulators.json'
+    - name: --static_only
+      type: boolean
+      default: true
+    - name: --layer
+      type: string
+      direction: input
+      required: false
+      default: scgen_pearson
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4
     setup:
       - type: python
-        packages: [ lightgbm ]
+        packages: [ lightgbm==4.3.0, numpy==1.26.4 ]
   - type: nextflow
     directives:
       label: [ midtime, highmem, highcpu ]

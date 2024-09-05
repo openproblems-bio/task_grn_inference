@@ -1,0 +1,27 @@
+__merge__: ../../../api/comp_method.yaml
+
+functionality:
+  name: portia
+  namespace: "grn_methods"
+  info:
+    label: portia
+    summary: "GRN inference using PORTIA"
+    description: |
+      GRN inference using PORTIA.
+    documentation_url: https://github.com/AntoinePassemiers/PORTIA
+
+
+  resources:
+    - type: python_script
+      path: script.py
+
+platforms:
+  - type: docker
+    image: continuumio/anaconda3:2024.02-1
+    setup:
+      - type: python
+        packages: [ anndata, numpy, scipy, scikit-learn, portia-grn ]
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

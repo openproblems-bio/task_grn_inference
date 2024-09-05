@@ -88,6 +88,7 @@ class Explanatory_analysis:
         self.n_source = self.net.source.nunique()
         self.n_target = self.net.target.nunique()
         self.ratio_positive_negative =  (self.net.weight>=0).sum()/(self.net.shape[0])
+        return {'n_links': self.n_links, 'n_source':self.n_source, 'n_target':self.n_target, 'ratio_positive_negative':self.ratio_positive_negative}
     def calculate_centrality_stats(self) -> None:
         '''Calculate network centrality metrics such as in and out degree
         '''
@@ -99,7 +100,7 @@ class Explanatory_analysis:
             self.peak_gene = Connectivity(self.peak_gene_net, normalize=False)
             self.n_cres = self.peak_gene_net.source.nunique()
     def plot_cdf(self, values, ax=None, title=''):
-        plot_cumulative_density(values, ax=ax, title=title)
+        return plot_cumulative_density(values, ax=ax, title=title)
     def plot_connectivity(self):
         data_list = [self.tf_gene.out_deg, self.tf_gene.in_deg]
         if self.peak_gene is not None:

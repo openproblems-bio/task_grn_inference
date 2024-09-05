@@ -1,0 +1,42 @@
+functionality:
+  name: noise_grn
+  namespace: "robustness_analysis"
+  info:
+    label: noise_grn
+    summary: Adds noise to the GRNs
+  arguments:
+    - name: --prediction
+      type: file
+      direction: input
+      example: resources/grn_models/collectri.csv
+
+    - name: --prediction_n
+      type: file
+      direction: output 
+      example: resources/grn_models/collectri.csv
+
+    - name: --degree
+      type: integer
+      direction: input
+      default: 20
+      description: the degree of noise to add 
+
+    - name: --noise_type
+      type: string
+      direction: input 
+      default: links
+      # options: links, weight
+
+
+  resources:
+    - type: python_script
+      path: script.py
+platforms:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    setup:
+      - type: python
+        packages: []
+  - type: nextflow
+    directives:
+      label: [ midtime, highmem, highcpu ]

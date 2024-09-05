@@ -68,4 +68,4 @@ adata_atac_s.write(par['multiomics_atac_test'])
 
 # shorten perturbation
 adata_bulk = ad.read_h5ad(par['perturbation_data'])
-adata_bulk[:200, adata_bulk.var_names.isin(adata_rna_s.var_names)].write(par['perturbation_data_test'])
+adata_bulk[:600, adata_bulk.var_names.isin(adata_rna_s.var_names)].write(par['perturbation_data_test'])

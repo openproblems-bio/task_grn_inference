@@ -28,7 +28,7 @@ functionality:
               type: double
               description: "Normalized values using shifted logarithm "
               required: true
-      required: false
+      required: true
       direction: input
       default: resources/grn-benchmark/perturbation_data.h5ad 
     - name: --perturbation_data_bc
@@ -36,39 +36,9 @@ functionality:
       info:
         label: perturbation
         summary: "Perturbation dataset for benchmarking."
-        file_type: h5ad
-        slots:
-          layers:
-            - name: n_counts
-              type: double
-              description: "Pseudobulked values using mean approach"
-              required: true
-            - name: pearson
-              type: double
-              description: "Normalized values using pearson residuals"
-              required: true
-            - name: lognorm
-              type: double
-              description: "Normalized values using shifted logarithm "
-              required: true
-            - name: scgen_lognorm
-              type: double
-              description: "Batch correction using scgen on lognorm data"
-              required: true
-            - name: scgen_pearson
-              type: double
-              description: "Batch correction using scgen on pearson data"
-              required: true
-            - name: seurat_lognorm
-              type: double
-              description: "Batch correction using seurat on lognorm data"
-              required: true
-            - name: seurat_pearson
-              type: double
-              description: "Batch correction using seurat on pearson data"
-              required: true
+        __merge__: ../../../api/file_perturbation_h5ad.yaml
       required: false
-      direction: input
+      direction: output
       default: resources/grn-benchmark/perturbation_data.h5ad 
 
 

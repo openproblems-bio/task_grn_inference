@@ -1,0 +1,32 @@
+__merge__: ../../../api/comp_method.yaml
+
+functionality:
+  name: celloracle
+  namespace: "grn_methods"
+  info:
+    label: celloracle
+    summary: "GRN inference using celloracle"
+    description: |
+      GRN inference using celloracle. 
+    documentation_url: https://morris-lab.github.io/CellOracle.documentation/   
+  arguments:
+    - name: --base_grn
+      type: file
+      direction: output
+      default: output/celloracle/base_grn.csv
+    - name: --links
+      type: file
+      direction: output
+      default: output/celloracle/links.celloracle.links 
+  resources:
+    - type: python_script
+      path: script.py
+    - path: main.py
+platforms:
+  - type: docker
+    image: kenjikamimoto126/celloracle_ubuntu:0.18.0
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

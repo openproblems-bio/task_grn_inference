@@ -104,8 +104,8 @@ approaches to assess both accuracy and comprehensiveness.
 | name               | roles  |
 |:-------------------|:-------|
 | Jalil Nourisa      | author |
-| Robrecht Cannoodt  | author |
 | Antoine Passemiers | author |
+| Robrecht Cannoodt  | author |
 
 ## API
 
