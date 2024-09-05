@@ -44,6 +44,11 @@ functionality:
           required: false
           direction: input
           default: resources/prior/consensus.json
+        - name: --layer
+          type: string
+          required: false
+          direction: input
+          default: pearson
         
     - name: Outputs
       arguments:
