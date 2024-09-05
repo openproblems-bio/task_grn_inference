@@ -25,3 +25,38 @@ More details can be found in section :doc:`evaluation`.
 
 In the future, other prior knowledge can be incorporated in the pipeline to allow for evaluation with binary classification metrics and as an additional control method. 
 
+Installation
+------------
+
+You need to have Docker, Java, and Viash installed. Follow `these instructions <https://openproblems.bio/documentation/fundamentals/requirements/>`_ to install the required dependencies.
+
+Download resources
+------------------
+
+.. code-block:: bash
+
+    git clone git@github.com:openproblems-bio/task_grn_benchmark.git
+
+    cd task_grn_benchmark
+
+    # download resources
+    scripts/download_resources.sh
+
+Infer a GRN
+-----------
+
+.. code-block:: bash
+
+    viash run src/methods/dummy/config.vsh.yaml -- --multiomics_rna resources/grn-benchmark/multiomics_rna.h5ad --multiomics_atac resources/grn-benchmark/multiomics_atac.h5ad --prediction output/dummy.csv
+
+
+Similarly, run the command for other methods.
+
+Evaluate a GRN
+--------------
+
+.. code-block:: bash
+    
+    scripts/run_evaluation.sh --grn resources/grn-benchmark/grn_models/collectri.csv 
+
+Similarly, run the command for other GRN models.
