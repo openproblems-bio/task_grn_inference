@@ -2991,6 +2991,21 @@ meta = [
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
+      },
+      {
+        "type" : "file",
+        "name" : "--grn_extended",
+        "description" : "Source-target-peak triplets",
+        "default" : [
+          "output/grn_extended.csv"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
+        "direction" : "output",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
       }
     ],
     "resources" : [
@@ -3102,7 +3117,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
+    "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3171,7 +3186,8 @@ par = {
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'scplus_mdata': $( if [ ! -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then echo "r'${VIASH_PAR_SCPLUS_MDATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'qc': $( if [ ! -z ${VIASH_PAR_QC+x} ]; then echo "r'${VIASH_PAR_QC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'grn_extended': $( if [ ! -z ${VIASH_PAR_GRN_EXTENDED+x} ]; then echo "r'${VIASH_PAR_GRN_EXTENDED//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3506,7 +3522,7 @@ if not os.path.exists(par['cistopic_object']):
         models = run_cgs_models(
             cistopic_obj,
             n_topics=n_topics,
-            n_cpu=12,
+            n_cpu=par['num_workers'],
             n_iter=500,
             random_state=555,
             alpha=50,
@@ -3685,7 +3701,7 @@ DAG_markers_dict = find_diff_features(
     contrasts=None,
     adjpval_thr=0.05,
     log2fc_thr=np.log2(1.5),
-    n_cpu=5,
+    n_cpu=par['num_workers'],
     split_pattern='-'
 )
 
@@ -3864,11 +3880,11 @@ settings['input_data']['dem_db_fname'] = SCORES_DB_PATH
 settings['input_data']['path_to_motif_annotations'] = motif_annotation
 settings['params_general']['temp_dir'] = os.path.join(out_dir, 'scplus_pipeline', 'temp')
 settings['params_general']['n_cpu'] = par['num_workers']
-settings['params_inference']['quantile_thresholds_region_to_gene'] = '0.85 0.90 0.95'
-settings['params_inference']['top_n_regionTogenes_per_gene'] = '5 10 15'
+settings['params_inference']['quantile_thresholds_region_to_gene'] = '0.7 0.8 0.9'
+settings['params_inference']['top_n_regionTogenes_per_gene'] = '10 15 25'
 settings['params_inference']['region_to_gene_importance_method'] = 'GBM'
 settings['params_inference']['tf_to_gene_importance_method'] = 'GBM'
-settings['params_inference']['rho_threshold'] = 0.03
+settings['params_inference']['rho_threshold'] = 0.0
 settings['params_inference']['region_to_gene_correlation_method'] = 'SR'
 settings['params_inference']['min_target_genes'] = 10
 settings['params_motif_enrichment']['species'] = 'homo_sapiens'
@@ -3904,10 +3920,18 @@ if not os.path.exists(par['scplus_mdata']):
 scplus_mdata = mudata.read(par['scplus_mdata'])
 
 # Save results
-prediction = scplus_mdata.uns['direct_e_regulon_metadata']
-prediction.insert(0, 'source', prediction['TF'])
-prediction.insert(1, 'target', prediction['Gene'])
-prediction.insert(2, 'weight', prediction['importance_x_abs_rho'])
+grn_extended = scplus_mdata.uns['direct_e_regulon_metadata']
+
+grn_extended = grn_extended[['TF', 'Gene', 'rho_TF2G', 'Region']].drop_duplicates().reset_index(drop=True)
+grn_extended = grn_extended[grn_extended.rho_TF2G!=0]
+
+grn_extended.columns = ['source', 'target', 'weight', 'peak']
+
+grn_extended = grn_extended[['source','target','weight']].drop_duplicates(ignore_index=True)
+
+prediction = grn_extended.groupby(['source', 'target'], as_index=False)['weight'].sum()
+
+grn_extended.to_csv(par['grn_extended'])
 prediction.to_csv(par['prediction'])
 VIASHMAIN
 python -B "$tempscript"

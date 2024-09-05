@@ -413,9 +413,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "sctk==0.2.2"
 
 LABEL org.opencontainers.image.description="Companion container for running component perturbation sc_counts"
-LABEL org.opencontainers.image.created="2024-09-05T06:12:07Z"
+LABEL org.opencontainers.image.created="2024-09-05T08:43:46Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="63b40d5108a1396fe72ea483197cd7196ff1ec40"
+LABEL org.opencontainers.image.revision="656771a67a5f44965a787f8fdbe39d3764a23250"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

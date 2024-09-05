@@ -217,6 +217,11 @@ function ViashHelp {
   echo "        type: file, output, file must exist"
   echo "        default: output/cell_topic.csv"
   echo "        Cell-topics prob scores"
+  echo ""
+  echo "    --grn_extended"
+  echo "        type: file, output, file must exist"
+  echo "        default: output/grn_extended.csv"
+  echo "        Source-target-peak triplets"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -443,9 +448,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "flatbuffers"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenicplus"
-LABEL org.opencontainers.image.created="2024-09-05T06:12:07Z"
+LABEL org.opencontainers.image.created="2024-09-05T08:43:47Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="63b40d5108a1396fe72ea483197cd7196ff1ec40"
+LABEL org.opencontainers.image.revision="656771a67a5f44965a787f8fdbe39d3764a23250"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -714,6 +719,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_CELL_TOPIC=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --grn_extended)
+            [ -n "$VIASH_PAR_GRN_EXTENDED" ] && ViashError Bad arguments for option \'--grn_extended\': \'$VIASH_PAR_GRN_EXTENDED\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GRN_EXTENDED="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --grn_extended. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --grn_extended=*)
+            [ -n "$VIASH_PAR_GRN_EXTENDED" ] && ViashError Bad arguments for option \'--grn_extended=*\': \'$VIASH_PAR_GRN_EXTENDED\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GRN_EXTENDED=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         ---setup)
             VIASH_MODE='docker_setup'
             VIASH_DOCKER_SETUP_STRATEGY="$2"
@@ -878,6 +894,9 @@ fi
 if [ -z ${VIASH_PAR_CELL_TOPIC+x} ]; then
   VIASH_PAR_CELL_TOPIC="output/cell_topic.csv"
 fi
+if [ -z ${VIASH_PAR_GRN_EXTENDED+x} ]; then
+  VIASH_PAR_GRN_EXTENDED="output/grn_extended.csv"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
@@ -961,6 +980,9 @@ fi
 if [ ! -z "$VIASH_PAR_CELL_TOPIC" ] && [ ! -d "$(dirname "$VIASH_PAR_CELL_TOPIC")" ]; then
   mkdir -p "$(dirname "$VIASH_PAR_CELL_TOPIC")"
 fi
+if [ ! -z "$VIASH_PAR_GRN_EXTENDED" ] && [ ! -d "$(dirname "$VIASH_PAR_GRN_EXTENDED")" ]; then
+  mkdir -p "$(dirname "$VIASH_PAR_GRN_EXTENDED")"
+fi
 
 # detect volumes from file arguments
 VIASH_CHOWN_VARS=()
@@ -990,6 +1012,11 @@ if [ ! -z "$VIASH_PAR_CELL_TOPIC" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_CELL_TOPIC")" )
   VIASH_PAR_CELL_TOPIC=$(ViashAutodetectMount "$VIASH_PAR_CELL_TOPIC")
   VIASH_CHOWN_VARS+=( "$VIASH_PAR_CELL_TOPIC" )
+fi
+if [ ! -z "$VIASH_PAR_GRN_EXTENDED" ]; then
+  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_GRN_EXTENDED")" )
+  VIASH_PAR_GRN_EXTENDED=$(ViashAutodetectMount "$VIASH_PAR_GRN_EXTENDED")
+  VIASH_CHOWN_VARS+=( "$VIASH_PAR_GRN_EXTENDED" )
 fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_META_RESOURCES_DIR")" )
@@ -1102,7 +1129,8 @@ par = {
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'scplus_mdata': $( if [ ! -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then echo "r'${VIASH_PAR_SCPLUS_MDATA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'qc': $( if [ ! -z ${VIASH_PAR_QC+x} ]; then echo "r'${VIASH_PAR_QC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
-  'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'grn_extended': $( if [ ! -z ${VIASH_PAR_GRN_EXTENDED+x} ]; then echo "r'${VIASH_PAR_GRN_EXTENDED//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1437,7 +1465,7 @@ if not os.path.exists(par['cistopic_object']):
         models = run_cgs_models(
             cistopic_obj,
             n_topics=n_topics,
-            n_cpu=12,
+            n_cpu=par['num_workers'],
             n_iter=500,
             random_state=555,
             alpha=50,
@@ -1616,7 +1644,7 @@ DAG_markers_dict = find_diff_features(
     contrasts=None,
     adjpval_thr=0.05,
     log2fc_thr=np.log2(1.5),
-    n_cpu=5,
+    n_cpu=par['num_workers'],
     split_pattern='-'
 )
 
@@ -1795,11 +1823,11 @@ settings['input_data']['dem_db_fname'] = SCORES_DB_PATH
 settings['input_data']['path_to_motif_annotations'] = motif_annotation
 settings['params_general']['temp_dir'] = os.path.join(out_dir, 'scplus_pipeline', 'temp')
 settings['params_general']['n_cpu'] = par['num_workers']
-settings['params_inference']['quantile_thresholds_region_to_gene'] = '0.85 0.90 0.95'
-settings['params_inference']['top_n_regionTogenes_per_gene'] = '5 10 15'
+settings['params_inference']['quantile_thresholds_region_to_gene'] = '0.7 0.8 0.9'
+settings['params_inference']['top_n_regionTogenes_per_gene'] = '10 15 25'
 settings['params_inference']['region_to_gene_importance_method'] = 'GBM'
 settings['params_inference']['tf_to_gene_importance_method'] = 'GBM'
-settings['params_inference']['rho_threshold'] = 0.03
+settings['params_inference']['rho_threshold'] = 0.0
 settings['params_inference']['region_to_gene_correlation_method'] = 'SR'
 settings['params_inference']['min_target_genes'] = 10
 settings['params_motif_enrichment']['species'] = 'homo_sapiens'
@@ -1835,10 +1863,18 @@ if not os.path.exists(par['scplus_mdata']):
 scplus_mdata = mudata.read(par['scplus_mdata'])
 
 # Save results
-prediction = scplus_mdata.uns['direct_e_regulon_metadata']
-prediction.insert(0, 'source', prediction['TF'])
-prediction.insert(1, 'target', prediction['Gene'])
-prediction.insert(2, 'weight', prediction['importance_x_abs_rho'])
+grn_extended = scplus_mdata.uns['direct_e_regulon_metadata']
+
+grn_extended = grn_extended[['TF', 'Gene', 'rho_TF2G', 'Region']].drop_duplicates().reset_index(drop=True)
+grn_extended = grn_extended[grn_extended.rho_TF2G!=0]
+
+grn_extended.columns = ['source', 'target', 'weight', 'peak']
+
+grn_extended = grn_extended[['source','target','weight']].drop_duplicates(ignore_index=True)
+
+prediction = grn_extended.groupby(['source', 'target'], as_index=False)['weight'].sum()
+
+grn_extended.to_csv(par['grn_extended'])
 prediction.to_csv(par['prediction'])
 VIASHMAIN
 python -B "\$tempscript" &
@@ -1866,6 +1902,9 @@ fi
 if [ ! -z "$VIASH_PAR_CELL_TOPIC" ]; then
   VIASH_PAR_CELL_TOPIC=$(ViashStripAutomount "$VIASH_PAR_CELL_TOPIC")
 fi
+if [ ! -z "$VIASH_PAR_GRN_EXTENDED" ]; then
+  VIASH_PAR_GRN_EXTENDED=$(ViashStripAutomount "$VIASH_PAR_GRN_EXTENDED")
+fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_META_RESOURCES_DIR=$(ViashStripAutomount "$VIASH_META_RESOURCES_DIR")
 fi
@@ -1891,6 +1930,10 @@ if [ ! -z "$VIASH_PAR_SCPLUS_MDATA" ] && [ ! -e "$VIASH_PAR_SCPLUS_MDATA" ]; the
 fi
 if [ ! -z "$VIASH_PAR_CELL_TOPIC" ] && [ ! -e "$VIASH_PAR_CELL_TOPIC" ]; then
   ViashError "Output file '$VIASH_PAR_CELL_TOPIC' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_GRN_EXTENDED" ] && [ ! -e "$VIASH_PAR_GRN_EXTENDED" ]; then
+  ViashError "Output file '$VIASH_PAR_GRN_EXTENDED' does not exist."
   exit 1
 fi
 

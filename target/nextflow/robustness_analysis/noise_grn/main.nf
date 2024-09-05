@@ -2843,7 +2843,7 @@ meta = [
         "type" : "python_script",
         "path" : "script.py",
         "is_executable" : true,
-        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/robustness_analysis/"
+        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/robustness_analysis/permute_grn/"
       }
     ],
     "info" : {
@@ -2914,11 +2914,11 @@ meta = [
     }
   ],
   "info" : {
-    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/robustness_analysis/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/robustness_analysis/permute_grn/config.vsh.yaml",
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/robustness_analysis/noise_grn",
     "viash_version" : "0.8.6",
-    "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
+    "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
