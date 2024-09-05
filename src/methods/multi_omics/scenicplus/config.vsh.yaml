@@ -27,6 +27,12 @@ functionality:
       required: false
       direction: output
       description: "Cell-topics prob scores"
+    - name: --grn_extended
+      type: file 
+      default: output/grn_extended.csv
+      required: false
+      direction: output
+      description: "Source-target-peak triplets"
   resources:
     - type: python_script
       path: script.py

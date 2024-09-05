@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ID="single_omics_all_test"
-resources_dir="s3://openproblems-data/resources_test/grn"
-publish_dir="s3://openproblems-data/resources_test/grn/results/${RUN_ID}"
+RUN_ID="single_omics_all"
+resources_dir="s3://openproblems-data/resources/grn"
+publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
 
 # resources_dir="./resources_test/"
 # publish_dir="output/${RUN_ID}"
@@ -31,21 +31,21 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
-nextflow run . \
-  -main-script  target/nextflow/workflows/run_benchmark_single_omics/main.nf \
-  -profile docker \
-  -with-trace \
-  -c src/common/nextflow_helpers/labels_ci.config \
-  -params-file ${param_file}
+# nextflow run . \
+#   -main-script  target/nextflow/workflows/run_benchmark_single_omics/main.nf \
+#   -profile docker \
+#   -with-trace \
+#   -c src/common/nextflow_helpers/labels_ci.config \
+#   -params-file ${param_file}
 
-./tw-windows-x86_64.exe launch `
-    https://github.com/openproblems-bio/task_grn_benchmark.git `
-    --revision build/main `
-    --pull-latest `
-    --main-script target/nextflow/workflows/run_benchmark_single_omics/main.nf `
-    --workspace 53907369739130 `
-    --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
-    --params-file ./params/single_omics_all_test.yaml `
-    --config src/common/nextflow_helpers/labels_tw.config
+# ./tw-windows-x86_64.exe launch `
+#     https://github.com/openproblems-bio/task_grn_benchmark.git `
+#     --revision build/main `
+#     --pull-latest `
+#     --main-script target/nextflow/workflows/run_benchmark_single_omics/main.nf `
+#     --workspace 53907369739130 `
+#     --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
+#     --params-file ./params/single_omics_all_test.yaml `
+#     --config src/common/nextflow_helpers/labels_tw.config
 
 
