@@ -1,16 +1,17 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ID="single_omics_test"
-# resources_dir="s3://openproblems-data/resources_test/grn"
-# publish_dir="s3://openproblems-data/resources_test/grn/results/${RUN_ID}"
+RUN_ID="single_omics_all_test"
+resources_dir="s3://openproblems-data/resources_test/grn"
+publish_dir="s3://openproblems-data/resources_test/grn/results/${RUN_ID}"
 
-resources_dir="./resources_test/"
-publish_dir="output/${RUN_ID}"
+# resources_dir="./resources_test/"
+# publish_dir="output/${RUN_ID}"
 
 reg_type=ridge
 subsample=-2
 max_workers=10
+layer='pearson'
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -23,6 +24,7 @@ param_list:
     reg_type: $reg_type
     subsample: $subsample
     max_workers: $max_workers
+    layer: $layer
     consensus: ${resources_dir}/prior/consensus-num-regulators.json
     tf_all: ${resources_dir}/prior/tf_all.csv
 output_state: "state.yaml"
@@ -36,14 +38,14 @@ nextflow run . \
   -c src/common/nextflow_helpers/labels_ci.config \
   -params-file ${param_file}
 
-# ./tw-windows-x86_64.exe launch `
-#     https://github.com/openproblems-bio/task_grn_benchmark.git `
-#     --revision build/main `
-#     --pull-latest `
-#     --main-script target/nextflow/workflows/run_grn_evaluation/main.nf `
-#     --workspace 53907369739130 `
-#     --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
-#     --params-file ./params/scgen_pearson_gb_pcs.yaml `
-#     --config src/common/nextflow_helpers/labels_tw.config
+./tw-windows-x86_64.exe launch `
+    https://github.com/openproblems-bio/task_grn_benchmark.git `
+    --revision build/main `
+    --pull-latest `
+    --main-script target/nextflow/workflows/run_benchmark_single_omics/main.nf `
+    --workspace 53907369739130 `
+    --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
+    --params-file ./params/single_omics_all_test.yaml `
+    --config src/common/nextflow_helpers/labels_tw.config
 
 

@@ -5,7 +5,6 @@ RUN_ID="scglue"
 resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
 
-num_workers=20
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -24,12 +23,12 @@ HERE
 
 
 
-./tw-windows-x86_64.exe launch `
-       https://github.com/openproblems-bio/task_grn_benchmark.git `
-       --revision build/main `
-       --pull-latest `
-       --main-script target/nextflow/workflows/grn_inference_scglue/main.nf `
-       --workspace 53907369739130 `
-       --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
-       --params-file ./params/scglue.yaml `
-       --config src/common/nextflow_helpers/labels_tw.config
+# ./tw-windows-x86_64.exe launch `
+#        https://github.com/openproblems-bio/task_grn_benchmark.git `
+#        --revision build/main `
+#        --pull-latest `
+#        --main-script target/nextflow/workflows/grn_inference_scglue/main.nf `
+#        --workspace 53907369739130 `
+#        --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
+#        --params-file ./params/scglue.yaml `
+#        --config src/common/nextflow_helpers/labels_tw.config

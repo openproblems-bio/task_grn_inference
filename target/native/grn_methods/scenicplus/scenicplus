@@ -1188,8 +1188,8 @@ export_gene_activity_to_loom(
 ###############################################################################################
 ###############################################################################################
 
-RANKINGS_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db', 'db.regions_vs_motifs.rankings.feather')
-SCORES_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db', 'db.regions_vs_motifs.scores.feather')
+RANKINGS_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db.regions_vs_motifs.rankings.feather')
+SCORES_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db.regions_vs_motifs.scores.feather')
 
 if not (os.path.exists(RANKINGS_DB_PATH) and os.path.exists(SCORES_DB_PATH)):
 

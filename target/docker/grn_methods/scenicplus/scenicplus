@@ -443,9 +443,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "flatbuffers"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenicplus"
-LABEL org.opencontainers.image.created="2024-09-04T20:07:19Z"
+LABEL org.opencontainers.image.created="2024-09-05T06:12:07Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="a255f9152246549c0470772f7d0ce28618b3e368"
+LABEL org.opencontainers.image.revision="63b40d5108a1396fe72ea483197cd7196ff1ec40"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1655,8 +1655,8 @@ export_gene_activity_to_loom(
 ###############################################################################################
 ###############################################################################################
 
-RANKINGS_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db', 'db.regions_vs_motifs.rankings.feather')
-SCORES_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db', 'db.regions_vs_motifs.scores.feather')
+RANKINGS_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db.regions_vs_motifs.rankings.feather')
+SCORES_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db.regions_vs_motifs.scores.feather')
 
 if not (os.path.exists(RANKINGS_DB_PATH) and os.path.exists(SCORES_DB_PATH)):
 

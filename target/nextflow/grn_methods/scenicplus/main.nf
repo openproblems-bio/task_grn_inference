@@ -3102,7 +3102,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
+    "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3724,8 +3724,8 @@ export_gene_activity_to_loom(
 ###############################################################################################
 ###############################################################################################
 
-RANKINGS_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db', 'db.regions_vs_motifs.rankings.feather')
-SCORES_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db', 'db.regions_vs_motifs.scores.feather')
+RANKINGS_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db.regions_vs_motifs.rankings.feather')
+SCORES_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db.regions_vs_motifs.scores.feather')
 
 if not (os.path.exists(RANKINGS_DB_PATH) and os.path.exists(SCORES_DB_PATH)):
 

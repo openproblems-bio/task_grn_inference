@@ -2891,6 +2891,18 @@ meta = [
             "multiple" : false,
             "multiple_sep" : ":",
             "dest" : "par"
+          },
+          {
+            "type" : "string",
+            "name" : "--layer",
+            "default" : [
+              "pearson"
+            ],
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
           }
         ]
       },
@@ -2941,9 +2953,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems-v2",
           "tag" : "main_build",
-          "localPath" : "/tmp/viash_hub_repo14267278873528619993"
+          "localPath" : "/tmp/viash_hub_repo6746191891940890192"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo14267278873528619993/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo6746191891940890192/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_remote" : "https://github.com/openproblems-bio/openproblems-v2",
@@ -2952,7 +2964,7 @@ meta = [
           "functionalityNamespace" : "common",
           "output" : "/home/runner/work/openproblems-v2/openproblems-v2/target/nextflow/common/extract_metadata",
           "platform" : "nextflow",
-          "git_commit" : "f02ba12fe4c58636f9eb458aab7cbc116b21ffa3",
+          "git_commit" : "4b24f7be3c0337f4470b42ea208fe2575370dbfe",
           "executable" : "/home/runner/work/openproblems-v2/openproblems-v2/target/nextflow/common/extract_metadata/extract_metadata"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/dependencies/github/openproblems-bio/openproblems-v2/main_build/nextflow/common/extract_metadata"
@@ -2973,7 +2985,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
+          "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2"
@@ -2994,7 +3006,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
+          "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1"
@@ -3015,7 +3027,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
+          "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
           "executable" : "/nextflow/control_methods/positive_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/positive_control"
@@ -3036,7 +3048,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
+          "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
           "executable" : "/nextflow/control_methods/negative_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/negative_control"
@@ -3057,7 +3069,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
+          "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
           "executable" : "/nextflow/grn_methods/portia/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/portia"
@@ -3078,7 +3090,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
+          "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
           "executable" : "/nextflow/grn_methods/ennet/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/ennet"
@@ -3099,7 +3111,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
+          "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
           "executable" : "/nextflow/grn_methods/genie3/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/genie3"
@@ -3120,7 +3132,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
+          "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
           "executable" : "/nextflow/grn_methods/grnboost2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/grnboost2"
@@ -3141,7 +3153,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
+          "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
           "executable" : "/nextflow/grn_methods/pidc/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/pidc"
@@ -3162,7 +3174,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
+          "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
           "executable" : "/nextflow/grn_methods/ppcor/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/ppcor"
@@ -3183,7 +3195,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
+          "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
           "executable" : "/nextflow/grn_methods/scsgl/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scsgl"
@@ -3204,7 +3216,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
+          "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
           "executable" : "/nextflow/grn_methods/tigress/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/tigress"
@@ -3267,7 +3279,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_benchmark_single_omics",
     "viash_version" : "0.8.6",
-    "git_commit" : "a255f9152246549c0470772f7d0ce28618b3e368",
+    "git_commit" : "63b40d5108a1396fe72ea483197cd7196ff1ec40",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
   }
 }'''))
@@ -3399,7 +3411,8 @@ workflow run_wf {
         reg_type: "reg_type",
         max_workers: "max_workers",
         consensus: "consensus",
-        tf_all: "tf_all"
+        tf_all: "tf_all",
+        layer:"layer"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->
