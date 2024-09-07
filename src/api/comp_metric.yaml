@@ -12,17 +12,14 @@ functionality:
       __merge__: file_perturbation_h5ad.yaml
       required: false
       direction: input
-      default: resources/grn-benchmark/perturbation_data.h5ad
     - name: --prediction
       __merge__: file_prediction.yaml
       required: true
       direction: input
-      default: resources/grn_models/collectri.csv
     - name: --score
       __merge__: file_score.yaml
       required: false
       direction: output
-      default: out/score.h5ad
     - name: --reg_type
       type: string
       direction: input
@@ -50,7 +47,7 @@ functionality:
     - name: --tf_all
       type: file
       direction: input
-      default: 'resources/prior/tf_all.csv'
+      example: resources_test/prior/tf_all.csv
     - name: --apply_tf
       type: boolean 
       required: false
@@ -63,3 +60,5 @@ functionality:
       path: /src/common/component_tests/run_and_check_output.py
     - path: /resources/grn-benchmark
       dest: resources/grn-benchmark
+    - path: /resources_test/prior
+      dest: resources_test/prior
