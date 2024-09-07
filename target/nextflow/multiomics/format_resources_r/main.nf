@@ -2902,7 +2902,7 @@ meta = [
         "type" : "r_script",
         "path" : "script.R",
         "is_executable" : true,
-        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/multiomics/format_resources_r/"
+        "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/multiomics/format_resources_r/"
       }
     ],
     "info" : {
@@ -2970,12 +2970,12 @@ meta = [
     }
   ],
   "info" : {
-    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/multiomics/format_resources_r/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/multiomics/format_resources_r/config.vsh.yaml",
     "platform" : "nextflow",
-    "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/multiomics/format_resources_r",
+    "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/format_resources_r",
     "viash_version" : "0.8.6",
     "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
-    "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
+    "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
 ]

@@ -2902,7 +2902,7 @@ meta = [
         "type" : "nextflow_script",
         "path" : "main.nf",
         "is_executable" : true,
-        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/create_resources_test/",
+        "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/workflows/create_resources_test/",
         "entrypoint" : "run_wf"
       }
     ],
@@ -2918,20 +2918,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/multiomics/multiome_matrix/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/multiomics/multiome_matrix/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "multiome_matrix",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/multiomics/multiome_matrix/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/multiomics/multiome_matrix/config.vsh.yaml",
           "functionalityNamespace" : "multiomics",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/multiomics/multiome_matrix/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/multiomics/multiome_matrix"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/multiome_matrix"
       },
       {
         "name" : "multiomics/format_resources_r",
@@ -2939,20 +2939,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/multiomics/format_resources_r/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/multiomics/format_resources_r/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "format_resources_r",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/multiomics/format_resources_r/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/multiomics/format_resources_r/config.vsh.yaml",
           "functionalityNamespace" : "multiomics",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/multiomics/format_resources_r/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/multiomics/format_resources_r"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/format_resources_r"
       },
       {
         "name" : "testdata/create_test_data",
@@ -2960,20 +2960,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/test_data/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/test_data/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "create_test_data",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/test_data/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/test_data/config.vsh.yaml",
           "functionalityNamespace" : "testdata",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/testdata/create_test_data/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/testdata/create_test_data"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/testdata/create_test_data"
       }
     ],
     "set_wd_to_resources_dir" : false
@@ -3020,12 +3020,12 @@ meta = [
     }
   ],
   "info" : {
-    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/create_resources_test/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/workflows/create_resources_test/config.vsh.yaml",
     "platform" : "nextflow",
-    "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/create_test_resources",
+    "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/create_test_resources",
     "viash_version" : "0.8.6",
     "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
-    "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
+    "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
 ]

@@ -223,10 +223,10 @@ platforms:
   debug: false
   container: "docker"
 info:
-  config: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/celloracle/config.vsh.yaml"
+  config: "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/multi_omics/celloracle/config.vsh.yaml"
   platform: "native"
-  output: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/native/grn_methods/celloracle"
-  executable: "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/native/grn_methods/celloracle/celloracle"
+  output: "/home/runner/work/task_grn_inference/task_grn_inference/target/native/grn_methods/celloracle"
+  executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/native/grn_methods/celloracle/celloracle"
   viash_version: "0.8.6"
   git_commit: "656771a67a5f44965a787f8fdbe39d3764a23250"
-  git_remote: "https://github.com/openproblems-bio/task_grn_benchmark"
+  git_remote: "https://github.com/openproblems-bio/task_grn_inference"

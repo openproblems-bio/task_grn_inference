@@ -2931,13 +2931,13 @@ meta = [
         "type" : "nextflow_script",
         "path" : "main.nf",
         "is_executable" : true,
-        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/run_benchmark_single_omics/",
+        "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/workflows/run_benchmark_single_omics/",
         "entrypoint" : "run_wf"
       },
       {
         "type" : "file",
         "path" : "../../api/task_info.yaml",
-        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/run_benchmark_single_omics/"
+        "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/workflows/run_benchmark_single_omics/"
       }
     ],
     "info" : {
@@ -2953,9 +2953,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems-v2",
           "tag" : "main_build",
-          "localPath" : "/tmp/viash_hub_repo18123153169999621425"
+          "localPath" : "/tmp/viash_hub_repo1803239778947332967"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo18123153169999621425/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo1803239778947332967/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_remote" : "https://github.com/openproblems-bio/openproblems-v2",
@@ -2967,7 +2967,7 @@ meta = [
           "git_commit" : "4b24f7be3c0337f4470b42ea208fe2575370dbfe",
           "executable" : "/home/runner/work/openproblems-v2/openproblems-v2/target/nextflow/common/extract_metadata/extract_metadata"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/dependencies/github/openproblems-bio/openproblems-v2/main_build/nextflow/common/extract_metadata"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/dependencies/github/openproblems-bio/openproblems-v2/main_build/nextflow/common/extract_metadata"
       },
       {
         "name" : "metrics/regression_2",
@@ -2975,20 +2975,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/metrics/regression_2/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/metrics/regression_2/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "regression_2",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/metrics/regression_2/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/metrics/regression_2/config.vsh.yaml",
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
       },
       {
         "name" : "metrics/regression_1",
@@ -2996,20 +2996,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/metrics/regression_1/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/metrics/regression_1/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "regression_1",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/metrics/regression_1/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/metrics/regression_1/config.vsh.yaml",
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_1"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
       },
       {
         "name" : "control_methods/positive_control",
@@ -3017,20 +3017,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/control_methods/positive_control/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/control_methods/positive_control/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "positive_control",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/control_methods/positive_control/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/control_methods/positive_control/config.vsh.yaml",
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/control_methods/positive_control/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/positive_control"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control"
       },
       {
         "name" : "control_methods/negative_control",
@@ -3038,20 +3038,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/control_methods/negative_control/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/control_methods/negative_control/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "negative_control",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/control_methods/negative_control/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/control_methods/negative_control/config.vsh.yaml",
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/control_methods/negative_control/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/control_methods/negative_control"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/negative_control"
       },
       {
         "name" : "grn_methods/portia",
@@ -3059,20 +3059,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/portia/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/portia/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "portia",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/portia/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/portia/config.vsh.yaml",
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/grn_methods/portia/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/portia"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia"
       },
       {
         "name" : "grn_methods/ennet",
@@ -3080,20 +3080,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/ennet/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/ennet/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "ennet",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/ennet/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/ennet/config.vsh.yaml",
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/grn_methods/ennet/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/ennet"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ennet"
       },
       {
         "name" : "grn_methods/genie3",
@@ -3101,20 +3101,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/genie3/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/genie3/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "genie3",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/genie3/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/genie3/config.vsh.yaml",
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/grn_methods/genie3/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/genie3"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/genie3"
       },
       {
         "name" : "grn_methods/grnboost2",
@@ -3122,20 +3122,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/grnboost2/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/grnboost2/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "grnboost2",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/grnboost2/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/grnboost2/config.vsh.yaml",
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/grn_methods/grnboost2/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/grnboost2"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/grnboost2"
       },
       {
         "name" : "grn_methods/pidc",
@@ -3143,20 +3143,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/pidc/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/pidc/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "pidc",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/pidc/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/pidc/config.vsh.yaml",
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/grn_methods/pidc/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/pidc"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/pidc"
       },
       {
         "name" : "grn_methods/ppcor",
@@ -3164,20 +3164,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/ppcor/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/ppcor/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "ppcor",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/ppcor/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/ppcor/config.vsh.yaml",
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/grn_methods/ppcor/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/ppcor"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ppcor"
       },
       {
         "name" : "grn_methods/scsgl",
@@ -3185,20 +3185,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/scsgl/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/scsgl/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "scsgl",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/scsgl/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/scsgl/config.vsh.yaml",
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/grn_methods/scsgl/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/scsgl"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scsgl"
       },
       {
         "name" : "grn_methods/tigress",
@@ -3206,20 +3206,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/tigress/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/tigress/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "tigress",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/single_omics/tigress/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/tigress/config.vsh.yaml",
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/grn_methods/tigress/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/tigress"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/tigress"
       }
     ],
     "repositories" : [
@@ -3275,12 +3275,12 @@ meta = [
     }
   ],
   "info" : {
-    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/run_benchmark_single_omics/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/workflows/run_benchmark_single_omics/config.vsh.yaml",
     "platform" : "nextflow",
-    "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/run_benchmark_single_omics",
+    "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_benchmark_single_omics",
     "viash_version" : "0.8.6",
     "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
-    "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
+    "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
 ]

@@ -3095,12 +3095,12 @@ meta = [
         "type" : "python_script",
         "path" : "script.py",
         "is_executable" : true,
-        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/metrics/regression_2/"
+        "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/metrics/regression_2/"
       },
       {
         "type" : "file",
         "path" : "main.py",
-        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/metrics/regression_2/"
+        "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/metrics/regression_2/"
       }
     ],
     "test_resources" : [
@@ -3108,13 +3108,13 @@ meta = [
         "type" : "python_script",
         "path" : "src/common/component_tests/run_and_check_output.py",
         "is_executable" : true,
-        "parent" : "file:///home/runner/work/task_grn_benchmark/task_grn_benchmark/"
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       },
       {
         "type" : "file",
         "path" : "resources/grn-benchmark",
         "dest" : "resources/grn-benchmark",
-        "parent" : "file:///home/runner/work/task_grn_benchmark/task_grn_benchmark/"
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
     "info" : {
@@ -3196,12 +3196,12 @@ meta = [
     }
   ],
   "info" : {
-    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/metrics/regression_2/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/metrics/regression_2/config.vsh.yaml",
     "platform" : "nextflow",
-    "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/metrics/regression_2",
+    "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
     "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
-    "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
+    "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
 ]

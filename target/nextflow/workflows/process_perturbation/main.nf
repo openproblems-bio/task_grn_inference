@@ -2890,7 +2890,7 @@ meta = [
         "type" : "nextflow_script",
         "path" : "main.nf",
         "is_executable" : true,
-        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/process_perturbation/",
+        "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/workflows/process_perturbation/",
         "entrypoint" : "run_wf"
       }
     ],
@@ -2899,13 +2899,13 @@ meta = [
         "type" : "python_script",
         "path" : "src/common/component_tests/run_and_check_output.py",
         "is_executable" : true,
-        "parent" : "file:///home/runner/work/task_grn_benchmark/task_grn_benchmark/"
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       },
       {
         "type" : "file",
         "path" : "resources/grn-benchmark",
         "dest" : "resources/grn-benchmark",
-        "parent" : "file:///home/runner/work/task_grn_benchmark/task_grn_benchmark/"
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
     "info" : {
@@ -2920,20 +2920,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/perturbation/sc_counts/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/sc_counts/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "sc_counts",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/perturbation/sc_counts/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/sc_counts/config.vsh.yaml",
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/perturbation/sc_counts/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/sc_counts"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/sc_counts"
       },
       {
         "name" : "perturbation/normalization",
@@ -2941,20 +2941,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/perturbation/normalization/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/normalization/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "normalization",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/perturbation/normalization/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/normalization/config.vsh.yaml",
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/perturbation/normalization/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/normalization"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/normalization"
       },
       {
         "name" : "perturbation/batch_correction_scgen",
@@ -2962,20 +2962,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/perturbation/batch_correction_scgen/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/batch_correction_scgen/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "batch_correction_scgen",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/perturbation/batch_correction_scgen/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/batch_correction_scgen/config.vsh.yaml",
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/perturbation/batch_correction_scgen/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/batch_correction_scgen"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/batch_correction_scgen"
       },
       {
         "name" : "perturbation/batch_correction_seurat",
@@ -2983,20 +2983,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/perturbation/batch_correction_seurat/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/batch_correction_seurat/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "batch_correction_seurat",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/process_data/perturbation/batch_correction_seurat/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/batch_correction_seurat/config.vsh.yaml",
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/perturbation/batch_correction_seurat/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/perturbation/batch_correction_seurat"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/batch_correction_seurat"
       }
     ],
     "set_wd_to_resources_dir" : false
@@ -3043,12 +3043,12 @@ meta = [
     }
   ],
   "info" : {
-    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/workflows/process_perturbation/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/workflows/process_perturbation/config.vsh.yaml",
     "platform" : "nextflow",
-    "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/process_perturbation",
+    "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/process_perturbation",
     "viash_version" : "0.8.6",
     "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
-    "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
+    "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
 ]

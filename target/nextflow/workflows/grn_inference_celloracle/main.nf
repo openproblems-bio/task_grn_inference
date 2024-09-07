@@ -2983,7 +2983,7 @@ meta = [
         "type" : "nextflow_script",
         "path" : "main.nf",
         "is_executable" : true,
-        "parent" : "file:/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/celloracle_ns/",
+        "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/methods/multi_omics/celloracle_ns/",
         "entrypoint" : "run_wf"
       }
     ],
@@ -2992,13 +2992,13 @@ meta = [
         "type" : "python_script",
         "path" : "src/common/component_tests/run_and_check_output.py",
         "is_executable" : true,
-        "parent" : "file:///home/runner/work/task_grn_benchmark/task_grn_benchmark/"
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       },
       {
         "type" : "file",
         "path" : "resources/grn-benchmark",
         "dest" : "resources/grn-benchmark",
-        "parent" : "file:///home/runner/work/task_grn_benchmark/task_grn_benchmark/"
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
     "info" : {
@@ -3019,20 +3019,20 @@ meta = [
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/celloracle/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/multi_omics/celloracle/config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "celloracle",
           "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/celloracle/config.vsh.yaml",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/multi_omics/celloracle/config.vsh.yaml",
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
           "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
           "executable" : "/nextflow/grn_methods/celloracle/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/grn_methods/celloracle"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/celloracle"
       }
     ],
     "set_wd_to_resources_dir" : false
@@ -3079,12 +3079,12 @@ meta = [
     }
   ],
   "info" : {
-    "config" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/src/methods/multi_omics/celloracle_ns/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/multi_omics/celloracle_ns/config.vsh.yaml",
     "platform" : "nextflow",
-    "output" : "/home/runner/work/task_grn_benchmark/task_grn_benchmark/target/nextflow/workflows/grn_inference_celloracle",
+    "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/grn_inference_celloracle",
     "viash_version" : "0.8.6",
     "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
-    "git_remote" : "https://github.com/openproblems-bio/task_grn_benchmark"
+    "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
 ]
