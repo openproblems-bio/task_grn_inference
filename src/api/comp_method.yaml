@@ -43,3 +43,5 @@ functionality:
       path: /src/common/component_tests/run_and_check_output.py
     - path: /resources/grn-benchmark
       dest: resources/grn-benchmark
+    - path: /resources/prior
+      dest: resources/prior

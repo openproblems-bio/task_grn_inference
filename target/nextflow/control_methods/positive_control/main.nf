@@ -2859,7 +2859,7 @@ meta = [
           }
         },
         "example" : [
-          "resources/grn-benchmark/perturbation_data.h5ad"
+          "resources_test/grn-benchmark/perturbation_data.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -3043,7 +3043,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "b9ffc5b1d591e96f69f90e2e98ab887251c34597",
+    "git_commit" : "91b3351fde5327c77b98a0206b999d11b257d756",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

@@ -2993,6 +2993,12 @@ meta = [
         "path" : "resources/grn-benchmark",
         "dest" : "resources/grn-benchmark",
         "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
+      },
+      {
+        "type" : "file",
+        "path" : "resources/prior",
+        "dest" : "resources/prior",
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
     "info" : {
@@ -3023,7 +3029,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "b9ffc5b1d591e96f69f90e2e98ab887251c34597",
+          "git_commit" : "91b3351fde5327c77b98a0206b999d11b257d756",
           "executable" : "/nextflow/grn_methods/celloracle/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/celloracle"
@@ -3077,7 +3083,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/grn_inference_celloracle",
     "viash_version" : "0.8.6",
-    "git_commit" : "b9ffc5b1d591e96f69f90e2e98ab887251c34597",
+    "git_commit" : "91b3351fde5327c77b98a0206b999d11b257d756",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

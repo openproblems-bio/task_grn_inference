@@ -176,7 +176,7 @@ function ViashHelp {
   echo "    --perturbation_data"
   echo "        type: file, file must exist"
   echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
-  echo "        example: resources/grn-benchmark/perturbation_data.h5ad"
+  echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
   echo ""
   echo "    --output"
   echo "        type: file, required parameter, output, file must exist"
