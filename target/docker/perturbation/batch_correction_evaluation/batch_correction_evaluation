@@ -398,7 +398,7 @@ function ViashDockerCheckCommands {
 #   ViashDockerFile
 function ViashDockerfile {
   cat << 'VIASHDOCKER'
-FROM ghcr.io/openproblems-bio/base_images/r:1.1.0
+FROM openproblems/base_r:1.0.0
 
 ENTRYPOINT []
 
@@ -407,9 +407,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.5.0" "scib==1.1.5" "louvain==0.8.2" "rpy2"
 
 LABEL org.opencontainers.image.description="Companion container for running component perturbation batch_correction_evaluation"
-LABEL org.opencontainers.image.created="2024-09-07T20:21:00Z"
+LABEL org.opencontainers.image.created="2024-09-07T21:17:29Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="91b3351fde5327c77b98a0206b999d11b257d756"
+LABEL org.opencontainers.image.revision="e034a0998ad015f59e1571b49a6fbcfeb7a367fe"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
