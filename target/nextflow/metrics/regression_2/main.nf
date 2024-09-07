@@ -2861,9 +2861,6 @@ meta = [
         "example" : [
           "resources/grn-benchmark/perturbation_data.h5ad"
         ],
-        "default" : [
-          "resources/grn-benchmark/perturbation_data.h5ad"
-        ],
         "must_exist" : true,
         "create_parent" : true,
         "required" : false,
@@ -2902,9 +2899,6 @@ meta = [
         },
         "example" : [
           "resources/grn-benchmark/grn_models/collectri.csv"
-        ],
-        "default" : [
-          "resources/grn_models/collectri.csv"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2954,9 +2948,6 @@ meta = [
         },
         "example" : [
           "resources/grn-benchmark/score.csv"
-        ],
-        "default" : [
-          "out/score.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -3025,8 +3016,8 @@ meta = [
       {
         "type" : "file",
         "name" : "--tf_all",
-        "default" : [
-          "resources/prior/tf_all.csv"
+        "example" : [
+          "resources_test/prior/tf_all.csv"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -3115,6 +3106,12 @@ meta = [
         "path" : "resources/grn-benchmark",
         "dest" : "resources/grn-benchmark",
         "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
+      },
+      {
+        "type" : "file",
+        "path" : "resources_test/prior",
+        "dest" : "resources_test/prior",
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
     "info" : {
@@ -3200,7 +3197,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "03f7ce80961bbb07093f94c73f41ca61458a89e8",
+    "git_commit" : "b9ffc5b1d591e96f69f90e2e98ab887251c34597",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

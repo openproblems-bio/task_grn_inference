@@ -408,9 +408,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component multiomics format_data"
-LABEL org.opencontainers.image.created="2024-09-07T19:54:28Z"
+LABEL org.opencontainers.image.created="2024-09-07T20:16:08Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="03f7ce80961bbb07093f94c73f41ca61458a89e8"
+LABEL org.opencontainers.image.revision="b9ffc5b1d591e96f69f90e2e98ab887251c34597"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

@@ -2924,8 +2924,8 @@ meta = [
       {
         "type" : "file",
         "name" : "--tf_all",
-        "default" : [
-          "resources/prior/tf_all.csv"
+        "example" : [
+          "resources_test/prior/tf_all.csv"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2955,6 +2955,12 @@ meta = [
         "type" : "file",
         "path" : "resources/grn-benchmark",
         "dest" : "resources/grn-benchmark",
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
+      },
+      {
+        "type" : "file",
+        "path" : "resources_test/prior",
+        "dest" : "resources_test/prior",
         "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
@@ -3037,7 +3043,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "03f7ce80961bbb07093f94c73f41ca61458a89e8",
+    "git_commit" : "b9ffc5b1d591e96f69f90e2e98ab887251c34597",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

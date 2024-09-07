@@ -2787,7 +2787,7 @@ meta = [
       {
         "type" : "file",
         "name" : "--multiomics_rna_r",
-        "default" : [
+        "example" : [
           "resources_test/grn-benchmark/multiomics_rna.rds"
         ],
         "must_exist" : true,
@@ -2801,7 +2801,7 @@ meta = [
       {
         "type" : "file",
         "name" : "--multiomics_atac_r",
-        "default" : [
+        "example" : [
           "resources_test/grn-benchmark/multiomics_atac.rds"
         ],
         "must_exist" : true,
@@ -2842,9 +2842,6 @@ meta = [
         },
         "example" : [
           "resources/grn-benchmark/grn_models/collectri.csv"
-        ],
-        "default" : [
-          "output/grn.csv"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -3225,7 +3222,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/granie",
     "viash_version" : "0.8.6",
-    "git_commit" : "03f7ce80961bbb07093f94c73f41ca61458a89e8",
+    "git_commit" : "b9ffc5b1d591e96f69f90e2e98ab887251c34597",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

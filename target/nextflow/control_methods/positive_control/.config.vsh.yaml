@@ -105,8 +105,8 @@ functionality:
   - type: "file"
     name: "--tf_all"
     info: null
-    default:
-    - "resources/prior/tf_all.csv"
+    example:
+    - "resources_test/prior/tf_all.csv"
     must_exist: true
     create_parent: true
     required: false
@@ -125,6 +125,9 @@ functionality:
   - type: "file"
     path: "resources/grn-benchmark"
     dest: "resources/grn-benchmark"
+  - type: "file"
+    path: "resources_test/prior"
+    dest: "resources_test/prior"
   info:
     label: "Positive control"
     summary: "Source-target links based on perturbation data"
@@ -192,5 +195,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control/positive_control"
   viash_version: "0.8.6"
-  git_commit: "03f7ce80961bbb07093f94c73f41ca61458a89e8"
+  git_commit: "b9ffc5b1d591e96f69f90e2e98ab887251c34597"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

@@ -2811,9 +2811,6 @@ meta = [
         "example" : [
           "resources/grn-benchmark/multiomics_rna.h5ad"
         ],
-        "default" : [
-          "resources_test/grn-benchmark/multiomics_rna.h5ad"
-        ],
         "must_exist" : true,
         "create_parent" : true,
         "required" : false,
@@ -2848,9 +2845,6 @@ meta = [
         },
         "example" : [
           "resources/grn-benchmark/multiomics_atac.h5ad"
-        ],
-        "default" : [
-          "resources_test/grn-benchmark/multiomics_atac.h5ad"
         ],
         "must_exist" : false,
         "create_parent" : true,
@@ -3063,7 +3057,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia",
     "viash_version" : "0.8.6",
-    "git_commit" : "03f7ce80961bbb07093f94c73f41ca61458a89e8",
+    "git_commit" : "b9ffc5b1d591e96f69f90e2e98ab887251c34597",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

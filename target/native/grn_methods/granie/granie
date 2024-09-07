@@ -175,15 +175,14 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --multiomics_rna_r"
   echo "        type: file, file must exist"
-  echo "        default: resources_test/grn-benchmark/multiomics_rna.rds"
+  echo "        example: resources_test/grn-benchmark/multiomics_rna.rds"
   echo ""
   echo "    --multiomics_atac_r"
   echo "        type: file, file must exist"
-  echo "        default: resources_test/grn-benchmark/multiomics_atac.rds"
+  echo "        example: resources_test/grn-benchmark/multiomics_atac.rds"
   echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"
-  echo "        default: output/grn.csv"
   echo "        example: resources/grn-benchmark/grn_models/collectri.csv"
   echo ""
   echo "    --temp_dir"
@@ -684,15 +683,6 @@ if [ -z ${VIASH_META_TEMP_DIR+x} ]; then
 fi
 
 # filling in defaults
-if [ -z ${VIASH_PAR_MULTIOMICS_RNA_R+x} ]; then
-  VIASH_PAR_MULTIOMICS_RNA_R="resources_test/grn-benchmark/multiomics_rna.rds"
-fi
-if [ -z ${VIASH_PAR_MULTIOMICS_ATAC_R+x} ]; then
-  VIASH_PAR_MULTIOMICS_ATAC_R="resources_test/grn-benchmark/multiomics_atac.rds"
-fi
-if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
-  VIASH_PAR_PREDICTION="output/grn.csv"
-fi
 if [ -z ${VIASH_PAR_TEMP_DIR+x} ]; then
   VIASH_PAR_TEMP_DIR="output/temdir"
 fi
