@@ -2930,7 +2930,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
+          "git_commit" : "03f7ce80961bbb07093f94c73f41ca61458a89e8",
           "executable" : "/nextflow/perturbation/sc_counts/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/sc_counts"
@@ -2951,7 +2951,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
+          "git_commit" : "03f7ce80961bbb07093f94c73f41ca61458a89e8",
           "executable" : "/nextflow/perturbation/normalization/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/normalization"
@@ -2972,7 +2972,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
+          "git_commit" : "03f7ce80961bbb07093f94c73f41ca61458a89e8",
           "executable" : "/nextflow/perturbation/batch_correction_scgen/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/batch_correction_scgen"
@@ -2993,7 +2993,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
+          "git_commit" : "03f7ce80961bbb07093f94c73f41ca61458a89e8",
           "executable" : "/nextflow/perturbation/batch_correction_seurat/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/batch_correction_seurat"
@@ -3047,7 +3047,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/process_perturbation",
     "viash_version" : "0.8.6",
-    "git_commit" : "656771a67a5f44965a787f8fdbe39d3764a23250",
+    "git_commit" : "03f7ce80961bbb07093f94c73f41ca61458a89e8",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
