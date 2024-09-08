@@ -3067,7 +3067,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ennet",
     "viash_version" : "0.8.6",
-    "git_commit" : "11ddcf070be656f617c55de2e6460aaad6ca11e9",
+    "git_commit" : "cfbbe92731bb45413674136c41a3c371383868cf",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

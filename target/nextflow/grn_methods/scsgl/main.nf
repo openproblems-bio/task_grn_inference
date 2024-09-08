@@ -3017,7 +3017,7 @@ meta = [
             "rpy2==3.4.4",
             "numpy==1.20.2",
             "scikit-learn==0.24.1",
-            "yaml"
+            "pyyaml"
           ],
           "upgrade" : true
         }
@@ -3072,7 +3072,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scsgl",
     "viash_version" : "0.8.6",
-    "git_commit" : "11ddcf070be656f617c55de2e6460aaad6ca11e9",
+    "git_commit" : "cfbbe92731bb45413674136c41a3c371383868cf",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

@@ -2954,9 +2954,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems",
           "tag" : "v2.0.0",
-          "localPath" : "/tmp/viash_hub_repo10397732230291509910"
+          "localPath" : "/tmp/viash_hub_repo82095668571470451"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo10397732230291509910/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo82095668571470451/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_tag" : "v1.0.0-1413-gb782e93f",
@@ -2987,7 +2987,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "11ddcf070be656f617c55de2e6460aaad6ca11e9",
+          "git_commit" : "cfbbe92731bb45413674136c41a3c371383868cf",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
@@ -3008,7 +3008,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "11ddcf070be656f617c55de2e6460aaad6ca11e9",
+          "git_commit" : "cfbbe92731bb45413674136c41a3c371383868cf",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
@@ -3029,7 +3029,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "11ddcf070be656f617c55de2e6460aaad6ca11e9",
+          "git_commit" : "cfbbe92731bb45413674136c41a3c371383868cf",
           "executable" : "/nextflow/control_methods/positive_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control"
@@ -3050,7 +3050,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "11ddcf070be656f617c55de2e6460aaad6ca11e9",
+          "git_commit" : "cfbbe92731bb45413674136c41a3c371383868cf",
           "executable" : "/nextflow/control_methods/negative_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/negative_control"
@@ -3113,7 +3113,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.8.6",
-    "git_commit" : "11ddcf070be656f617c55de2e6460aaad6ca11e9",
+    "git_commit" : "cfbbe92731bb45413674136c41a3c371383868cf",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
