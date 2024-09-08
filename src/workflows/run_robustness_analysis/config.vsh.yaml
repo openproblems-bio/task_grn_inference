@@ -77,15 +77,15 @@ functionality:
       path: ../../api/task_info.yaml
   dependencies:
     - name: common/extract_metadata
-      repository: openproblemsv2
+      repository: openproblems
     - name: metrics/regression_1
     - name: metrics/regression_2
     - name: robustness_analysis/noise_grn
   repositories:
-    - name: openproblemsv2
+    - name: openproblems
       type: github
-      repo: openproblems-bio/openproblems-v2
-      tag: main_build
+      repo: openproblems-bio/openproblems
+      tag: v2.0.0
 platforms:
   - type: nextflow
     directives:
