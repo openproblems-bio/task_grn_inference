@@ -32,7 +32,7 @@ functionality:
       default: 4
     - name: --tf_all
       type: file
-      example: resources/prior/tf_all.csv
+      example: resources_test/prior/tf_all.csv
       required: false
     - name: --max_n_links
       type: integer
@@ -41,7 +41,7 @@ functionality:
   test_resources:
     - type: python_script
       path: /src/common/component_tests/run_and_check_output.py
-    - path: /resources/grn-benchmark
-      dest: resources/grn-benchmark
-    - path: /resources/prior
-      dest: resources/prior
+    - path: /resources_test/grn-benchmark
+      dest: resources_test/grn-benchmark
+    - path: /resources_test/prior
+      dest: resources_test/prior
