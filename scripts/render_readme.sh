@@ -7,5 +7,5 @@ set -e
 ../openproblems-v2/bin/create_task_readme \
   --task "grn_benchmark" \
   --task_dir "src" \
-  --github_url "https://github.com/openproblems-bio/task_grn_benchmark/tree/main/" \
+  --github_url "https://github.com/openproblems-bio/task_grn_inference/tree/main/" \
   --output "README.md"

@@ -33,7 +33,7 @@ if [ "$submit" = true ]; then
 
 
   ./tw-windows-x86_64.exe launch `
-        https://github.com/openproblems-bio/task_grn_benchmark.git `
+        https://github.com/openproblems-bio/task_grn_inference.git `
         --revision build/main `
         --pull-latest `
         --main-script target/nextflow/workflows/run_grn_inference/main.nf `
@@ -51,7 +51,7 @@ fi
 
 
 ./tw-windows-x86_64.exe launch `
-       https://github.com/openproblems-bio/task_grn_benchmark.git `
+       https://github.com/openproblems-bio/task_grn_inference.git `
        --revision build/main `
        --pull-latest `
        --main-script target/nextflow/workflows/grn_inference_celloracle/main.nf `

@@ -14,7 +14,7 @@ publish_dir: "$publish_dir"
 HERE
 
 
-  ./tw-windows-x86_64.exe launch  https://github.com/openproblems-bio/task_grn_benchmark.git `
+  ./tw-windows-x86_64.exe launch  https://github.com/openproblems-bio/task_grn_inference.git `
      --revision build/main --pull-latest `
      --main-script target/nextflow/workflows/process_perturbation/main.nf `
      --workspace 53907369739130 --compute-env 6TeIFgV5OY4pJCk8I0bfOh `

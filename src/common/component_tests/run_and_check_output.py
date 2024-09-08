@@ -109,10 +109,16 @@ for arg in config["functionality"]["arguments"]:
     clean_name = re.sub("^--", "", arg["name"])
     new_arg["clean_name"] = clean_name
 
+
     # use example to find test resource file
     if arg["type"] == "file":
+        value = None
         if arg["direction"] == "input":
-            value = f"{meta['resources_dir']}/{arg['example'][0]}"
+            example = arg.get("example")
+            if example:
+                if isinstance(example, list):
+                    example = example[0]
+                value = f"{meta['resources_dir']}/{example}"
         else:
             example = arg.get("example", ["example"])[0]
             ext_res = re.search(r"\.(\w+)$", example)
@@ -123,6 +129,9 @@ for arg in config["functionality"]["arguments"]:
         new_arg["value"] = value
     elif "test_default" in arg_info:
         new_arg["value"] = arg_info["test_default"]
+    
+    if arg["required"]:
+        assert new_arg.get("value") is not None, f"Argument '{clean_name}' is required but has no value"
     
     arguments.append(new_arg)
 
@@ -154,6 +163,7 @@ for argset_name, argset_args in argument_sets.items():
             value = arg["value"]
             if arg["multiple"] and isinstance(value, list):
                 value = arg["multiple_sep"].join(value)
-            cmd.extend([arg["name"], str(value)])
+            if value:
+                cmd.extend([arg["name"], str(value)])
 
     run_and_check_outputs(argset_args, cmd)

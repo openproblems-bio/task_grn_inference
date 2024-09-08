@@ -12,17 +12,16 @@ functionality:
       type: file
       required: false
       direction: input
-      default: resources_test/grn-benchmark/multiomics_rna.rds
+      example: resources_test/grn-benchmark/multiomics_rna.rds
     - name: --multiomics_atac_r
       type: file
       required: false
       direction: input
-      default: resources_test/grn-benchmark/multiomics_atac.rds
+      example: resources_test/grn-benchmark/multiomics_atac.rds
     - name: --prediction
       __merge__: file_prediction.yaml
       required: false
       direction: output
-      default: output/grn.csv
     - name: --temp_dir
       type: string
       direction: input

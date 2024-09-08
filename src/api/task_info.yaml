@@ -19,9 +19,9 @@ readme: |
 
   ## Download resources
   ```bash
-  git clone git@github.com:openproblems-bio/task_grn_benchmark.git
+  git clone git@github.com:openproblems-bio/task_grn_inference.git
 
-  cd task_grn_benchmark
+  cd task_grn_inference
   
   # download resources
   scripts/download_resources.sh
