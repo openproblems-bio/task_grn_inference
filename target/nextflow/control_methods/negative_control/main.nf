@@ -2953,8 +2953,8 @@ meta = [
       },
       {
         "type" : "file",
-        "path" : "resources/grn-benchmark",
-        "dest" : "resources/grn-benchmark",
+        "path" : "resources_test/grn-benchmark",
+        "dest" : "resources_test/grn-benchmark",
         "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       },
       {
@@ -3043,7 +3043,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/negative_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "cfbbe92731bb45413674136c41a3c371383868cf",
+    "git_commit" : "c30a6af27586a8f39efeb366788911c6c527ba9a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

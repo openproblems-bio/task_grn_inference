@@ -195,7 +195,7 @@ function ViashHelp {
   echo ""
   echo "    --tf_all"
   echo "        type: file, file must exist"
-  echo "        example: resources/prior/tf_all.csv"
+  echo "        example: resources_test/prior/tf_all.csv"
   echo ""
   echo "    --max_n_links"
   echo "        type: integer"

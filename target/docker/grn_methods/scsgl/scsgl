@@ -195,7 +195,7 @@ function ViashHelp {
   echo ""
   echo "    --tf_all"
   echo "        type: file, file must exist"
-  echo "        example: resources/prior/tf_all.csv"
+  echo "        example: resources_test/prior/tf_all.csv"
   echo ""
   echo "    --max_n_links"
   echo "        type: integer"
@@ -430,9 +430,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata" "numba==0.53.1" "scipy==1.6.3" "pandas==1.2.4" "rpy2==3.4.4" "numpy==1.20.2" "scikit-learn==0.24.1" "pyyaml"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scsgl"
-LABEL org.opencontainers.image.created="2024-09-08T16:20:06Z"
+LABEL org.opencontainers.image.created="2024-09-08T16:23:08Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="cfbbe92731bb45413674136c41a3c371383868cf"
+LABEL org.opencontainers.image.revision="c30a6af27586a8f39efeb366788911c6c527ba9a"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

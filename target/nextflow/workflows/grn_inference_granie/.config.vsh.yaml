@@ -95,8 +95,8 @@ functionality:
     path: "src/common/component_tests/run_and_check_output.py"
     is_executable: true
   - type: "file"
-    path: "resources/grn-benchmark"
-    dest: "resources/grn-benchmark"
+    path: "resources_test/grn-benchmark"
+    dest: "resources_test/grn-benchmark"
   info:
     label: "grn_inference_granie"
     summary: "Infers GRNs from multiomics data using granie."
@@ -121,7 +121,7 @@ functionality:
       functionalityNamespace: "grn_methods"
       output: ""
       platform: ""
-      git_commit: "cfbbe92731bb45413674136c41a3c371383868cf"
+      git_commit: "c30a6af27586a8f39efeb366788911c6c527ba9a"
       executable: "/nextflow/grn_methods/granie/main.nf"
     writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/granie"
   set_wd_to_resources_dir: false
@@ -163,5 +163,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/grn_inference_granie"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/grn_inference_granie/main.nf"
   viash_version: "0.8.6"
-  git_commit: "cfbbe92731bb45413674136c41a3c371383868cf"
+  git_commit: "c30a6af27586a8f39efeb366788911c6c527ba9a"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
