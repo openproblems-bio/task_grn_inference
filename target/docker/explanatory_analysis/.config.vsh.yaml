@@ -152,5 +152,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/explanatory_analysis"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/explanatory_analysis/explanatory_analysis"
   viash_version: "0.8.6"
-  git_commit: "9b0453aeb76ec3f62b50df9511efb79426b06104"
+  git_commit: "be3713b881f22c73a17c55060905ebc7eb575e74"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
