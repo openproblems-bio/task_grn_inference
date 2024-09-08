@@ -1,0 +1,13 @@
+param_list:
+  - id: GB_figr_scgen_pearson
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: GB
+    method_id: figr
+    subsample: -2
+    max_workers: 10
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+    layer: scgen_pearson
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/figr.csv
+output_state: "state.yaml"
+publish_dir: "s3://openproblems-data/resources/grn/results/grn_evaluation_GB"

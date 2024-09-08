@@ -1,0 +1,267 @@
+param_list:
+  - id: collectri_links_10
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: collectri_links_10
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/collectri.csv
+    degree: 10
+    type: links
+  - id: celloracle_links_10
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: celloracle_links_10
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/celloracle.csv
+    degree: 10
+    type: links
+  - id: scenicplus_links_10
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: scenicplus_links_10
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/scenicplus.csv
+    degree: 10
+    type: links
+  - id: figr_links_10
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: figr_links_10
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/figr.csv
+    degree: 10
+    type: links
+  - id: granie_links_10
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: granie_links_10
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/granie.csv
+    degree: 10
+    type: links
+  - id: scglue_links_10
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: scglue_links_10
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/scglue.csv
+    degree: 10
+    type: links
+  - id: collectri_links_20
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: collectri_links_20
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/collectri.csv
+    degree: 20
+    type: links
+  - id: celloracle_links_20
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: celloracle_links_20
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/celloracle.csv
+    degree: 20
+    type: links
+  - id: scenicplus_links_20
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: scenicplus_links_20
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/scenicplus.csv
+    degree: 20
+    type: links
+  - id: figr_links_20
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: figr_links_20
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/figr.csv
+    degree: 20
+    type: links
+  - id: granie_links_20
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: granie_links_20
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/granie.csv
+    degree: 20
+    type: links
+  - id: scglue_links_20
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: scglue_links_20
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/scglue.csv
+    degree: 20
+    type: links
+  - id: collectri_links_50
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: collectri_links_50
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/collectri.csv
+    degree: 50
+    type: links
+  - id: celloracle_links_50
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: celloracle_links_50
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/celloracle.csv
+    degree: 50
+    type: links
+  - id: scenicplus_links_50
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: scenicplus_links_50
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/scenicplus.csv
+    degree: 50
+    type: links
+  - id: figr_links_50
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: figr_links_50
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/figr.csv
+    degree: 50
+    type: links
+  - id: granie_links_50
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: granie_links_50
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/granie.csv
+    degree: 50
+    type: links
+  - id: scglue_links_50
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: scglue_links_50
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/scglue.csv
+    degree: 50
+    type: links
+  - id: collectri_links_100
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: collectri_links_100
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/collectri.csv
+    degree: 100
+    type: links
+  - id: celloracle_links_100
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: celloracle_links_100
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/celloracle.csv
+    degree: 100
+    type: links
+  - id: scenicplus_links_100
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: scenicplus_links_100
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/scenicplus.csv
+    degree: 100
+    type: links
+  - id: figr_links_100
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: figr_links_100
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/figr.csv
+    degree: 100
+    type: links
+  - id: granie_links_100
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: granie_links_100
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/granie.csv
+    degree: 100
+    type: links
+  - id: scglue_links_100
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    layer: pearson
+    reg_type: ridge
+    method_id: scglue_links_100
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    prediction: s3://openproblems-data/resources/grn/grn_models/scglue.csv
+    degree: 100
+    type: links
+output_state: "state.yaml"
+publish_dir: "s3://openproblems-data/resources/grn/results/robust_analy"

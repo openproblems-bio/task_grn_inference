@@ -1,0 +1,8 @@
+param_list:
+  - id: granie
+    multiomics_rna_r: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.rds
+    multiomics_atac_r: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_atac.rds
+    num_workers: 10
+    subset: True
+output_state: "state.yaml"
+publish_dir: "s3://openproblems-data/resources/grn/results/granie"

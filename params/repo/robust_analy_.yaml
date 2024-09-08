@@ -1,0 +1,603 @@
+param_list:
+  - id: collectri_0_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 0-collectri
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/collectri.csv
+    degree: 0
+    noise_type: 
+  - id: celloracle_0_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 0-celloracle
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/celloracle.csv
+    degree: 0
+    noise_type: 
+  - id: scenicplus_0_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 0-scenicplus
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scenicplus.csv
+    degree: 0
+    noise_type: 
+  - id: figr_0_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 0-figr
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/figr.csv
+    degree: 0
+    noise_type: 
+  - id: granie_0_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 0-granie
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/granie.csv
+    degree: 0
+    noise_type: 
+  - id: scglue_0_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 0-scglue
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scglue.csv
+    degree: 0
+    noise_type: 
+  - id: collectri_10_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 10-collectri
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/collectri.csv
+    degree: 10
+    noise_type: 
+  - id: celloracle_10_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 10-celloracle
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/celloracle.csv
+    degree: 10
+    noise_type: 
+  - id: scenicplus_10_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 10-scenicplus
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scenicplus.csv
+    degree: 10
+    noise_type: 
+  - id: figr_10_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 10-figr
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/figr.csv
+    degree: 10
+    noise_type: 
+  - id: granie_10_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 10-granie
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/granie.csv
+    degree: 10
+    noise_type: 
+  - id: scglue_10_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 10-scglue
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scglue.csv
+    degree: 10
+    noise_type: 
+  - id: collectri_20_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 20-collectri
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/collectri.csv
+    degree: 20
+    noise_type: 
+  - id: celloracle_20_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 20-celloracle
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/celloracle.csv
+    degree: 20
+    noise_type: 
+  - id: scenicplus_20_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 20-scenicplus
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scenicplus.csv
+    degree: 20
+    noise_type: 
+  - id: figr_20_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 20-figr
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/figr.csv
+    degree: 20
+    noise_type: 
+  - id: granie_20_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 20-granie
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/granie.csv
+    degree: 20
+    noise_type: 
+  - id: scglue_20_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 20-scglue
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scglue.csv
+    degree: 20
+    noise_type: 
+  - id: collectri_50_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 50-collectri
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/collectri.csv
+    degree: 50
+    noise_type: 
+  - id: celloracle_50_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 50-celloracle
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/celloracle.csv
+    degree: 50
+    noise_type: 
+  - id: scenicplus_50_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 50-scenicplus
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scenicplus.csv
+    degree: 50
+    noise_type: 
+  - id: figr_50_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 50-figr
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/figr.csv
+    degree: 50
+    noise_type: 
+  - id: granie_50_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 50-granie
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/granie.csv
+    degree: 50
+    noise_type: 
+  - id: scglue_50_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 50-scglue
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scglue.csv
+    degree: 50
+    noise_type: 
+  - id: collectri_100_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 100-collectri
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/collectri.csv
+    degree: 100
+    noise_type: 
+  - id: celloracle_100_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 100-celloracle
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/celloracle.csv
+    degree: 100
+    noise_type: 
+  - id: scenicplus_100_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 100-scenicplus
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scenicplus.csv
+    degree: 100
+    noise_type: 
+  - id: figr_100_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 100-figr
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/figr.csv
+    degree: 100
+    noise_type: 
+  - id: granie_100_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 100-granie
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/granie.csv
+    degree: 100
+    noise_type: 
+  - id: scglue_100_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 100-scglue
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scglue.csv
+    degree: 100
+    noise_type: 
+  - id: collectri_0_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 0-collectri
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/collectri.csv
+    degree: 0
+    noise_type: 
+  - id: celloracle_0_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 0-celloracle
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/celloracle.csv
+    degree: 0
+    noise_type: 
+  - id: scenicplus_0_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 0-scenicplus
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scenicplus.csv
+    degree: 0
+    noise_type: 
+  - id: figr_0_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 0-figr
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/figr.csv
+    degree: 0
+    noise_type: 
+  - id: granie_0_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 0-granie
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/granie.csv
+    degree: 0
+    noise_type: 
+  - id: scglue_0_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 0-scglue
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scglue.csv
+    degree: 0
+    noise_type: 
+  - id: collectri_10_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 10-collectri
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/collectri.csv
+    degree: 10
+    noise_type: 
+  - id: celloracle_10_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 10-celloracle
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/celloracle.csv
+    degree: 10
+    noise_type: 
+  - id: scenicplus_10_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 10-scenicplus
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scenicplus.csv
+    degree: 10
+    noise_type: 
+  - id: figr_10_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 10-figr
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/figr.csv
+    degree: 10
+    noise_type: 
+  - id: granie_10_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 10-granie
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/granie.csv
+    degree: 10
+    noise_type: 
+  - id: scglue_10_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 10-scglue
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scglue.csv
+    degree: 10
+    noise_type: 
+  - id: collectri_20_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 20-collectri
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/collectri.csv
+    degree: 20
+    noise_type: 
+  - id: celloracle_20_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 20-celloracle
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/celloracle.csv
+    degree: 20
+    noise_type: 
+  - id: scenicplus_20_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 20-scenicplus
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scenicplus.csv
+    degree: 20
+    noise_type: 
+  - id: figr_20_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 20-figr
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/figr.csv
+    degree: 20
+    noise_type: 
+  - id: granie_20_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 20-granie
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/granie.csv
+    degree: 20
+    noise_type: 
+  - id: scglue_20_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 20-scglue
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scglue.csv
+    degree: 20
+    noise_type: 
+  - id: collectri_50_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 50-collectri
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/collectri.csv
+    degree: 50
+    noise_type: 
+  - id: celloracle_50_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 50-celloracle
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/celloracle.csv
+    degree: 50
+    noise_type: 
+  - id: scenicplus_50_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 50-scenicplus
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scenicplus.csv
+    degree: 50
+    noise_type: 
+  - id: figr_50_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 50-figr
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/figr.csv
+    degree: 50
+    noise_type: 
+  - id: granie_50_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 50-granie
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/granie.csv
+    degree: 50
+    noise_type: 
+  - id: scglue_50_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 50-scglue
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scglue.csv
+    degree: 50
+    noise_type: 
+  - id: collectri_100_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 100-collectri
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/collectri.csv
+    degree: 100
+    noise_type: 
+  - id: celloracle_100_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 100-celloracle
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/celloracle.csv
+    degree: 100
+    noise_type: 
+  - id: scenicplus_100_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 100-scenicplus
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scenicplus.csv
+    degree: 100
+    noise_type: 
+  - id: figr_100_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 100-figr
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/figr.csv
+    degree: 100
+    noise_type: 
+  - id: granie_100_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 100-granie
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/granie.csv
+    degree: 100
+    noise_type: 
+  - id: scglue_100_scgen_pearson
+    perturbation_data: resources/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: 100-scglue
+    subsample: -2
+    max_workers: 10
+    consensus: resources/prior/consensus-num-regulators.json
+    prediction: resources/grn_models/scglue.csv
+    degree: 100
+    noise_type: 
+output_state: "state.yaml"
+publish_dir: "output/robust_analy_"

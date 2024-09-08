@@ -1,0 +1,300 @@
+  - id: corr-1
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-1
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-2
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-2
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-3
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-3
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-4
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-4
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-5
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-5
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-6
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-6
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-7
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-7
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-8
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-8
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-9
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-9
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-10
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-10
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-1
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-1
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-2
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-2
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-3
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-3
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-4
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-4
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-5
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-5
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-6
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-6
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-7
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-7
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-8
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-8
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-9
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-9
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-10
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-10
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-1
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-1
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-2
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-2
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-3
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-3
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-4
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-4
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-5
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-5
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-6
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-6
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-7
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-7
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-8
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-8
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-9
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-9
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+  - id: corr-10
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    reg_type: ridge
+    method_id: corr-10
+    layer: pearson
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv

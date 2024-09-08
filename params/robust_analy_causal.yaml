@@ -1,0 +1,6 @@
+param_list: "s3://openproblems-data/resources/grn/params/list_robust_analy_causal.yaml"
+output_state: "state.yaml"
+publish_dir: "s3://openproblems-data/resources/grn/results/robust_analy_causal"
+param_list: "s3://openproblems-data/resources/grn/params/list_robust_analy_causal.yaml"
+output_state: "state.yaml"
+publish_dir: "s3://openproblems-data/resources/grn/results/robust_analy_causal"

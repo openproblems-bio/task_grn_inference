@@ -1,0 +1,11 @@
+param_list:
+  - id: ridge
+    perturbation_data: s3://openproblems-data/resources/grn/grn-benchmark/perturbation_data.h5ad
+    multiomics_rna: s3://openproblems-data/resources/grn/grn-benchmark/multiomics_rna.h5ad
+    reg_type: ridge
+    subsample: -2
+    max_workers: 10
+    consensus: s3://openproblems-data/resources/grn/prior/consensus-num-regulators.json
+    tf_all: s3://openproblems-data/resources/grn/prior/tf_all.csv
+output_state: "state.yaml"
+publish_dir: "s3://openproblems-data/resources/grn/results/single_omics"
