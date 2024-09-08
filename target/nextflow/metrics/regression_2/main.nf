@@ -2961,9 +2961,6 @@ meta = [
         "type" : "string",
         "name" : "--reg_type",
         "description" : "name of regretion to use",
-        "info" : {
-          "test_default" : "ridge"
-        },
         "default" : [
           "ridge"
         ],
@@ -2977,9 +2974,6 @@ meta = [
         "type" : "integer",
         "name" : "--subsample",
         "description" : "number of samples randomly drawn from perturbation data",
-        "info" : {
-          "test_default" : 200
-        },
         "default" : [
           -2
         ],
@@ -3197,7 +3191,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "8ca8dfdcaeed5dfc8bc7a81a815b8f043c0d513b",
+    "git_commit" : "2a1f7dc546688769c551feeae3c51860c52318ad",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
