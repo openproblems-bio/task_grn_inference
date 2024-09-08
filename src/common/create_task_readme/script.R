@@ -4,11 +4,11 @@ library(dplyr, quietly = TRUE, warn.conflicts = FALSE)
 
 ## VIASH START
 par <- list(
-  "task" = "batch_integration",
-  "task_dir" = "src/tasks/batch_integration",
-  "output" = "src/tasks/batch_integration/README.md",
+  "task" = "grn_benchmark",
+  "task_dir" = "src",
+  "output" = "README.md",
   "viash_yaml" = "_viash.yaml",
-  "github_url" = "https://github.com/openproblems-bio/openproblems-v2/tree/main/"
+  "github_url" = "https://github.com/openproblems-bio/task_grn_inference/tree/main/"
 )
 meta <- list(
   "resources_dir" = "src/common/helper_functions",
@@ -37,18 +37,26 @@ task_api <- read_task_api(par[["task_dir"]])
 # determine ordering
 root <- .task_graph_get_root(task_api)
 
-r_graph <- render_task_graph(task_api, root)
+r_graph <- tryCatch({
+  render_task_graph(task_api, root)
+}, error = function(e) {
+  stop("Failed to render task graph: ", e$message)
+})
 
 cat("Render API details\n")
 order <- names(igraph::bfs(task_api$task_graph, root)$order)
 r_details <- map_chr(
   order,
   function(file_name) {
-    if (file_name %in% names(task_api$comp_specs)) {
-      render_component(task_api$comp_specs[[file_name]])
-    } else {
-      render_file(task_api$file_specs[[file_name]])
-    }
+    tryCatch({
+      if (file_name %in% names(task_api$comp_specs)) {
+        render_component(task_api$comp_specs[[file_name]])
+      } else {
+        render_file(task_api$file_specs[[file_name]])
+      }
+    }, error = function(e) {
+      stop("Failed to render API details: ", e$message)
+    })
   }
 )
 
