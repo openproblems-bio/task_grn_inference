@@ -1,4 +1,4 @@
-__merge__: ../../../api/comp_test.yaml
+__merge__: ../../../api/unit_test.yaml
 
 functionality:
   name: sc_counts

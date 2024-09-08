@@ -55,6 +55,8 @@ def base_grn(par) -> None:
 def preprocess_rna(par) -> None:
     print("Processing rna data")
     adata = ad.read_h5ad(par['multiomics_rna'])
+    if True: #only one cluster
+        adata.obs['cell_type'] = 'one_cell_type'
     adata.layers["counts"] = adata.X.copy()
     sc.pp.normalize_per_cell(adata, key_n_counts='n_counts_all')
     n_top_genes = min([3000, adata.shape[1]])

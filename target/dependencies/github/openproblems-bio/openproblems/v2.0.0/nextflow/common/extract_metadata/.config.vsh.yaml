@@ -1,7 +1,7 @@
 functionality:
   name: "extract_metadata"
   namespace: "common"
-  version: "main_build"
+  version: "2.0.0"
   argument_groups:
   - name: "Inputs"
     arguments:
@@ -62,13 +62,13 @@ platforms:
 - type: "docker"
   id: "docker"
   image: "openproblems/base_python:1.0.0"
-  target_organization: "openproblems-bio"
+  target_organization: "openproblems-bio/openproblems"
   target_registry: "ghcr.io"
   namespace_separator: "/"
   resolve_volume: "Automatic"
   chown: true
   setup_strategy: "ifneedbepullelsecachedbuild"
-  target_image_source: "https://github.com/openproblems-bio/openproblems-v2"
+  target_image_source: "https://github.com/openproblems-bio/openproblems"
   test_setup:
   - type: "python"
     user: false
@@ -107,10 +107,11 @@ platforms:
   debug: false
   container: "docker"
 info:
-  config: "/home/runner/work/openproblems-v2/openproblems-v2/src/common/extract_metadata/config.vsh.yaml"
+  config: "/home/runner/work/openproblems/openproblems/src/common/extract_metadata/config.vsh.yaml"
   platform: "nextflow"
-  output: "/home/runner/work/openproblems-v2/openproblems-v2/target/nextflow/common/extract_metadata"
-  executable: "/home/runner/work/openproblems-v2/openproblems-v2/target/nextflow/common/extract_metadata/extract_metadata"
-  viash_version: "0.8.0"
-  git_commit: "4b24f7be3c0337f4470b42ea208fe2575370dbfe"
-  git_remote: "https://github.com/openproblems-bio/openproblems-v2"
+  output: "/home/runner/work/openproblems/openproblems/target/nextflow/common/extract_metadata"
+  executable: "/home/runner/work/openproblems/openproblems/target/nextflow/common/extract_metadata/extract_metadata"
+  viash_version: "0.8.6"
+  git_commit: "b782e93f596e0060953ca0260098b8ae2569194b"
+  git_remote: "https://github.com/openproblems-bio/openproblems"
+  git_tag: "v1.0.0-1413-gb782e93f"

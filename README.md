@@ -41,7 +41,7 @@ Similarly, run the command for other methods.
 ## Evaluate a GRN
 
 ``` bash
-scripts/run_evaluation.sh --grn resources/grn-benchmark/grn_models/collectri.csv 
+scripts/benchmark_grn.sh --grn resources/grn-benchmark/models/collectri.csv 
 ```
 
 Similarly, run the command for other GRN models.
@@ -100,11 +100,10 @@ approaches to assess both accuracy and comprehensiveness.
 
 ## Authors & contributors
 
-| name               | roles  |
-|:-------------------|:-------|
-| Jalil Nourisa      | author |
-| Antoine Passemiers | author |
-| Robrecht Cannoodt  | author |
+| name              | roles  |
+|:------------------|:-------|
+| Jalil Nourisa     | author |
+| Robrecht Cannoodt | author |
 
 ## API
 
@@ -115,26 +114,26 @@ flowchart LR
   comp_metric[/"Label"/]
   file_prediction("GRN")
   file_score("Score")
-  file_prior("prior data")
   file_multiomics_rna_h5ad("multiomics rna")
   comp_method[/"Method"/]
   file_multiomics_atac_h5ad("multiomics atac")
+  comp_method_r[/"Method r"/]
   file_perturbation_h5ad---comp_control_method
   file_perturbation_h5ad---comp_metric
   comp_control_method-->file_prediction
   comp_metric-->file_score
   file_prediction---comp_metric
-  file_prior---comp_control_method
   file_multiomics_rna_h5ad---comp_method
   comp_method-->file_prediction
   file_multiomics_atac_h5ad---comp_method
+  comp_method_r-->file_prediction
 ```
 
 ## File format: perturbation
 
 Perturbation dataset for benchmarking.
 
-Example file: `resources/grn-benchmark/perturbation_data.h5ad`
+Example file: `resources_test/grn-benchmark/perturbation_data.h5ad`
 
 Format:
 
@@ -160,15 +159,15 @@ Slot description:
 | `obs["well"]` | `string` | Well name on the plate. |
 | `obs["cell_count"]` | `string` | Number of single cells pseudobulked. |
 | `layers["n_counts"]` | `double` | Pseudobulked values using mean approach. |
-| `layers["pearson"]` | `double` | Normalized values using pearson residuals. |
-| `layers["lognorm"]` | `double` | Normalized values using shifted logarithm . |
+| `layers["pearson"]` | `double` | (*Optional*) Normalized values using pearson residuals. |
+| `layers["lognorm"]` | `double` | (*Optional*) Normalized values using shifted logarithm . |
 
 </div>
 
 ## Component type: Control Method
 
 Path:
-[`src/control_methods`](https://github.com/openproblems-bio/openproblems-v2/tree/main/src/control_methods)
+[`src/control_methods`](https://github.com/openproblems-bio/openproblems/tree/main/src/control_methods)
 
 A control method.
 
@@ -179,16 +178,16 @@ Arguments:
 | Name | Type | Description |
 |:---|:---|:---|
 | `--perturbation_data` | `file` | Perturbation dataset for benchmarking. |
-| `--layer` | `string` | Which layer of pertubation data to use to find tf-gene relationships. Default: `lognorm`. |
-| `--prior_data` | `file` | Prior data used for grn benchmark. |
+| `--layer` | `string` | (*Optional*) Which layer of pertubation data to use to find tf-gene relationships. Default: `scgen_pearson`. |
 | `--prediction` | `file` | (*Output*) GRN prediction. |
+| `--tf_all` | `file` | (*Optional*) NA. |
 
 </div>
 
 ## Component type: Label
 
 Path:
-[`src/metrics`](https://github.com/openproblems-bio/openproblems-v2/tree/main/src/metrics)
+[`src/metrics`](https://github.com/openproblems-bio/openproblems/tree/main/src/metrics)
 
 A metric to evaluate the performance of the inferred GRN
 
@@ -198,11 +197,15 @@ Arguments:
 
 | Name | Type | Description |
 |:---|:---|:---|
-| `--perturbation_data` | `file` | Perturbation dataset for benchmarking. |
+| `--perturbation_data` | `file` | (*Optional*) Perturbation dataset for benchmarking. |
 | `--prediction` | `file` | GRN prediction. |
-| `--score` | `file` | (*Output*) File indicating the score of a metric. |
+| `--score` | `file` | (*Optional, Output*) File indicating the score of a metric. |
 | `--reg_type` | `string` | (*Optional*) name of regretion to use. Default: `ridge`. |
-| `--subsample` | `integer` | (*Optional*) number of samples randomly drawn from perturbation data. Default: `-1`. |
+| `--subsample` | `integer` | (*Optional*) number of samples randomly drawn from perturbation data. Default: `-2`. |
+| `--max_workers` | `integer` | (*Optional*) NA. Default: `4`. |
+| `--method_id` | `string` | (*Optional*) NA. |
+| `--tf_all` | `file` | (*Optional*) NA. |
+| `--apply_tf` | `boolean` | (*Optional*) NA. Default: `TRUE`. |
 
 </div>
 
@@ -210,7 +213,7 @@ Arguments:
 
 GRN prediction
 
-Example file: `resources/grn-benchmark/collectri.csv`
+Example file: `resources_test/grn_models/collectri.csv`
 
 Format:
 
@@ -237,40 +240,14 @@ Slot description:
 
 File indicating the score of a metric.
 
-Example file: `resources/grn-benchmark/score.csv`
-
-Format:
-
-<div class="small">
-
-    Tabular data
-     'accuracy', 'completeness'
-
-</div>
-
-Slot description:
-
-<div class="small">
-
-| Column         | Type     | Description                    |
-|:---------------|:---------|:-------------------------------|
-| `accuracy`     | `string` | (*Optional*) some explanation. |
-| `completeness` | `double` | (*Optional*) some explanation. |
-
-</div>
-
-## File format: prior data
-
-Prior data used for grn benchmark
-
-Example file: `resources/grn-benchmark/prior_data.h5ad`
+Example file: `resources_test/scores/score.h5ad`
 
 Format:
 
 <div class="small">
 
     AnnData object
-     uns: 'tf_list'
+     uns: 'dataset_id', 'method_id', 'metric_ids', 'metric_values'
 
 </div>
 
@@ -280,7 +257,10 @@ Slot description:
 
 | Slot | Type | Description |
 |:---|:---|:---|
-| `uns["tf_list"]` | `list` | List of known tfs obtained from https://resources.aertslab.org/cistarget. |
+| `uns["dataset_id"]` | `string` | A unique identifier for the dataset. |
+| `uns["method_id"]` | `string` | A unique identifier for the method. |
+| `uns["metric_ids"]` | `string` | One or more unique metric identifiers. |
+| `uns["metric_values"]` | `double` | The metric values obtained for the given prediction. Must be of same length as ‘metric_ids’. |
 
 </div>
 
@@ -288,7 +268,7 @@ Slot description:
 
 RNA expression for multiomics data.
 
-Example file: `resources/grn-benchmark/multiomics_rna.h5ad`
+Example file: `resources_test/grn-benchmark/multiomics_rna.h5ad`
 
 Format:
 
@@ -313,7 +293,7 @@ Slot description:
 ## Component type: Method
 
 Path:
-[`src/methods`](https://github.com/openproblems-bio/openproblems-v2/tree/main/src/methods)
+[`src/methods`](https://github.com/openproblems-bio/openproblems/tree/main/src/methods)
 
 A GRN inference method
 
@@ -321,11 +301,15 @@ Arguments:
 
 <div class="small">
 
-| Name                | Type   | Description                                 |
-|:--------------------|:-------|:--------------------------------------------|
-| `--multiomics_rna`  | `file` | RNA expression for multiomics data.         |
+| Name | Type | Description |
+|:---|:---|:---|
+| `--multiomics_rna` | `file` | (*Optional*) RNA expression for multiomics data. |
 | `--multiomics_atac` | `file` | (*Optional*) Peak data for multiomics data. |
-| `--prediction`      | `file` | (*Output*) GRN prediction.                  |
+| `--prediction` | `file` | (*Optional, Output*) GRN prediction. |
+| `--temp_dir` | `string` | (*Optional*) NA. Default: `output/temdir`. |
+| `--num_workers` | `integer` | (*Optional*) NA. Default: `4`. |
+| `--tf_all` | `file` | (*Optional*) NA. |
+| `--max_n_links` | `integer` | (*Optional*) NA. Default: `50000`. |
 
 </div>
 
@@ -333,7 +317,7 @@ Arguments:
 
 Peak data for multiomics data.
 
-Example file: `resources/grn-benchmark/multiomics_atac.h5ad`
+Example file: `resources_test/grn-benchmark/multiomics_atac.h5ad`
 
 Format:
 
@@ -352,6 +336,27 @@ Slot description:
 |:---|:---|:---|
 | `obs["cell_type"]` | `string` | The annotated cell type of each cell based on RNA expression. |
 | `obs["donor_id"]` | `string` | Donor id. |
+
+</div>
+
+## Component type: Method r
+
+Path:
+[`src/methods_r`](https://github.com/openproblems-bio/openproblems/tree/main/src/methods_r)
+
+A GRN inference method
+
+Arguments:
+
+<div class="small">
+
+| Name                  | Type      | Description                                |
+|:----------------------|:----------|:-------------------------------------------|
+| `--multiomics_rna_r`  | `file`    | (*Optional*) NA.                           |
+| `--multiomics_atac_r` | `file`    | (*Optional*) NA.                           |
+| `--prediction`        | `file`    | (*Optional, Output*) GRN prediction.       |
+| `--temp_dir`          | `string`  | (*Optional*) NA. Default: `output/temdir`. |
+| `--num_workers`       | `integer` | (*Optional*) NA. Default: `4`.             |
 
 </div>
 

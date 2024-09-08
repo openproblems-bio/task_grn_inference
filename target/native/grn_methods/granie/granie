@@ -183,7 +183,7 @@ function ViashHelp {
   echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"
-  echo "        example: resources/grn-benchmark/grn_models/collectri.csv"
+  echo "        example: resources_test/grn_models/collectri.csv"
   echo ""
   echo "    --temp_dir"
   echo "        type: string"

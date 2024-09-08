@@ -175,11 +175,11 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --multiomics_rna"
   echo "        type: file, file must exist"
-  echo "        example: resources/grn-benchmark/multiomics_rna.h5ad"
+  echo "        example: resources_test/grn-benchmark/multiomics_rna.h5ad"
   echo ""
   echo "    --multiomics_atac"
   echo "        type: file"
-  echo "        example: resources/grn-benchmark/multiomics_atac.h5ad"
+  echo "        example: resources_test/grn-benchmark/multiomics_atac.h5ad"
   echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"
@@ -427,12 +427,12 @@ apt-get install -y r-base time  && \
 Rscript -e "install.packages('pcaPP')"
 
 RUN pip install --upgrade pip && \
-  pip install --upgrade --no-cache-dir "anndata" "numba==0.53.1" "scipy==1.6.3" "pandas==1.2.4" "rpy2==3.4.4" "numpy==1.20.2" "scikit-learn==0.24.1"
+  pip install --upgrade --no-cache-dir "anndata" "numba==0.53.1" "scipy==1.6.3" "pandas==1.2.4" "rpy2==3.4.4" "numpy==1.20.2" "scikit-learn==0.24.1" "yaml"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scsgl"
-LABEL org.opencontainers.image.created="2024-09-07T21:17:31Z"
+LABEL org.opencontainers.image.created="2024-09-08T08:58:07Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="e034a0998ad015f59e1571b49a6fbcfeb7a367fe"
+LABEL org.opencontainers.image.revision="8ca8dfdcaeed5dfc8bc7a81a815b8f043c0d513b"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

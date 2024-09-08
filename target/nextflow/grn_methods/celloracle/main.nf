@@ -2809,7 +2809,7 @@ meta = [
           }
         },
         "example" : [
-          "resources/grn-benchmark/multiomics_rna.h5ad"
+          "resources_test/grn-benchmark/multiomics_rna.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2844,7 +2844,7 @@ meta = [
           }
         },
         "example" : [
-          "resources/grn-benchmark/multiomics_atac.h5ad"
+          "resources_test/grn-benchmark/multiomics_atac.h5ad"
         ],
         "must_exist" : false,
         "create_parent" : true,
@@ -2948,20 +2948,6 @@ meta = [
         "name" : "--base_grn",
         "default" : [
           "output/celloracle/base_grn.csv"
-        ],
-        "must_exist" : true,
-        "create_parent" : true,
-        "required" : false,
-        "direction" : "output",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "file",
-        "name" : "--links",
-        "default" : [
-          "output/celloracle/links.celloracle.links"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -3082,7 +3068,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/celloracle",
     "viash_version" : "0.8.6",
-    "git_commit" : "e034a0998ad015f59e1571b49a6fbcfeb7a367fe",
+    "git_commit" : "8ca8dfdcaeed5dfc8bc7a81a815b8f043c0d513b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3112,8 +3098,7 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'base_grn': $( if [ ! -z ${VIASH_PAR_BASE_GRN+x} ]; then echo "r'${VIASH_PAR_BASE_GRN//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'links': $( if [ ! -z ${VIASH_PAR_LINKS+x} ]; then echo "r'${VIASH_PAR_LINKS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'base_grn': $( if [ ! -z ${VIASH_PAR_BASE_GRN+x} ]; then echo "r'${VIASH_PAR_BASE_GRN//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3137,7 +3122,7 @@ dep = {
 # meta = {
 #   "resources_dir":'resources'
 # }
-
+par['links'] = f"{par['temp_dir']}/links.celloracle.links" 
 
 sys.path.append(meta["resources_dir"])
 from main import main 

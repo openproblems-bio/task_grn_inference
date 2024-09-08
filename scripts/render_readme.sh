@@ -2,9 +2,7 @@
 
 set -e
 
-[[ ! -d ../openproblems-v2 ]] && echo "You need to clone the openproblems-v2 repository next to this repository" && exit 1
-
-../openproblems-v2/bin/create_task_readme \
+viash run src/common/create_task_readme/config.vsh.yaml -- \
   --task "grn_benchmark" \
   --task_dir "src" \
   --github_url "https://github.com/openproblems-bio/task_grn_inference/tree/main/" \

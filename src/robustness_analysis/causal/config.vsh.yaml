@@ -9,16 +9,24 @@ functionality:
       type: file
       direction: input
       example: resources_test/grn-benchmark/multiomics_rna.h5ad
+      default: resources/grn-benchmark/multiomics_rna.h5ad
     
     - name: --tf_all
       type: file
       direction: input
       example: resources_test/prior/tf_all.csv
+      default: resources/prior/tf_all.csv
 
     - name: --prediction
       type: file
       direction: output 
       example: resources_test/grn_models/collectri.csv
+      default: output/prediction.csv
+    
+    - name: --causal
+      type: boolean 
+      direction: input
+      default: false
 
   resources:
     - type: python_script

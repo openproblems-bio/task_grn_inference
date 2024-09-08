@@ -2809,7 +2809,7 @@ meta = [
           }
         },
         "example" : [
-          "resources/grn-benchmark/multiomics_rna.h5ad"
+          "resources_test/grn-benchmark/multiomics_rna.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2844,7 +2844,7 @@ meta = [
           }
         },
         "example" : [
-          "resources/grn-benchmark/multiomics_atac.h5ad"
+          "resources_test/grn-benchmark/multiomics_atac.h5ad"
         ],
         "must_exist" : false,
         "create_parent" : true,
@@ -3029,7 +3029,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "e034a0998ad015f59e1571b49a6fbcfeb7a367fe",
+          "git_commit" : "8ca8dfdcaeed5dfc8bc7a81a815b8f043c0d513b",
           "executable" : "/nextflow/grn_methods/celloracle/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/celloracle"
@@ -3083,7 +3083,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/grn_inference_celloracle",
     "viash_version" : "0.8.6",
-    "git_commit" : "e034a0998ad015f59e1571b49a6fbcfeb7a367fe",
+    "git_commit" : "8ca8dfdcaeed5dfc8bc7a81a815b8f043c0d513b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

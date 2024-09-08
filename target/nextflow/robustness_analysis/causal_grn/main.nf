@@ -2790,6 +2790,9 @@ meta = [
         "example" : [
           "resources_test/grn-benchmark/multiomics_rna.h5ad"
         ],
+        "default" : [
+          "resources/grn-benchmark/multiomics_rna.h5ad"
+        ],
         "must_exist" : true,
         "create_parent" : true,
         "required" : false,
@@ -2803,6 +2806,9 @@ meta = [
         "name" : "--tf_all",
         "example" : [
           "resources_test/prior/tf_all.csv"
+        ],
+        "default" : [
+          "resources/prior/tf_all.csv"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2818,10 +2824,25 @@ meta = [
         "example" : [
           "resources_test/grn_models/collectri.csv"
         ],
+        "default" : [
+          "output/prediction.csv"
+        ],
         "must_exist" : true,
         "create_parent" : true,
         "required" : false,
         "direction" : "output",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "boolean",
+        "name" : "--causal",
+        "default" : [
+          false
+        ],
+        "required" : false,
+        "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
@@ -2907,7 +2928,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/robustness_analysis/causal_grn",
     "viash_version" : "0.8.6",
-    "git_commit" : "e034a0998ad015f59e1571b49a6fbcfeb7a367fe",
+    "git_commit" : "8ca8dfdcaeed5dfc8bc7a81a815b8f043c0d513b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -2936,7 +2957,8 @@ from sklearn.preprocessing import StandardScaler
 par = {
   'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -2983,12 +3005,15 @@ sc.pp.scale(multiomics_rna)
 print('Create corr net')
 net = create_corr_net(multiomics_rna.X, groups)
 net = pd.DataFrame(net, index=gene_names, columns=gene_names)
-
-net_corr = net.sample(len(tf_all), axis=1)
+if par['causal']:
+    net_corr = net[tf_all]
+else:
+    net_corr = net.sample(len(tf_all), axis=1)
 net_corr = net_corr.reset_index().melt(id_vars='index', var_name='source', value_name='weight')
 net_corr.rename(columns={'index': 'target'}, inplace=True)
 
-print('Output noised GRN')
+
+print('Output GRN')
 net_corr.to_csv(par['prediction'])
 VIASHMAIN
 python -B "$tempscript"

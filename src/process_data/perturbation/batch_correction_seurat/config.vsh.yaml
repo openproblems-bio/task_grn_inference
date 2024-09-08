@@ -1,4 +1,4 @@
-__merge__: ../../../api/comp_test.yaml
+__merge__: ../../../api/unit_test.yaml
 
 functionality:
   name: batch_correction_seurat
@@ -30,7 +30,7 @@ functionality:
               required: true
       required: true
       direction: input
-      default: resources/grn-benchmark/perturbation_data.h5ad 
+      example: resources_test/grn-benchmark/perturbation_data.h5ad 
     - name: --perturbation_data_bc
       type: file
       info:
@@ -39,7 +39,7 @@ functionality:
         __merge__: ../../../api/file_perturbation_h5ad.yaml
       required: false
       direction: output
-      default: resources/grn-benchmark/perturbation_data.h5ad 
+      example: resources_test/grn-benchmark/perturbation_data.h5ad 
 
 
   resources:

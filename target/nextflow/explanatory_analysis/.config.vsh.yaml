@@ -5,6 +5,8 @@ functionality:
   - type: "file"
     name: "--perturbation_data"
     info: null
+    example:
+    - "resources_test/grn-benchmark/perturbation_data.h5ad"
     default:
     - "resources/grn-benchmark/perturbation_data.h5ad"
     must_exist: true
@@ -37,9 +39,9 @@ functionality:
   - type: "file"
     name: "--annot_peak_database"
     info: null
-    default:
+    example:
     - "resources/supplements/annot_peak_database.csv"
-    must_exist: true
+    must_exist: false
     create_parent: true
     required: false
     direction: "input"
@@ -150,5 +152,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/explanatory_analysis"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/explanatory_analysis/explanatory_analysis"
   viash_version: "0.8.6"
-  git_commit: "e034a0998ad015f59e1571b49a6fbcfeb7a367fe"
+  git_commit: "8ca8dfdcaeed5dfc8bc7a81a815b8f043c0d513b"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

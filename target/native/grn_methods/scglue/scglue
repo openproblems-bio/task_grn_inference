@@ -175,11 +175,11 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --multiomics_rna"
   echo "        type: file, file must exist"
-  echo "        example: resources/grn-benchmark/multiomics_rna.h5ad"
+  echo "        example: resources_test/grn-benchmark/multiomics_rna.h5ad"
   echo ""
   echo "    --multiomics_atac"
   echo "        type: file"
-  echo "        example: resources/grn-benchmark/multiomics_atac.h5ad"
+  echo "        example: resources_test/grn-benchmark/multiomics_atac.h5ad"
   echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"
@@ -203,11 +203,11 @@ function ViashHelp {
   echo ""
   echo "    --annotation_file"
   echo "        type: file, file must exist"
-  echo "        default: resources/supplementary/gencode.v45.annotation.gtf.gz"
+  echo "        example: resources_test/supplementary/gencode.v45.annotation.gtf.gz"
   echo ""
   echo "    --motif_file"
   echo "        type: file, file must exist"
-  echo "        default: resources/supplementary/JASPAR2022-hg38.bed.gz"
+  echo "        example: resources_test/supplementary/JASPAR2022-hg38.bed.gz"
 }
 
 # initialise array
@@ -443,12 +443,6 @@ if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
 fi
 if [ -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then
   VIASH_PAR_MAX_N_LINKS="50000"
-fi
-if [ -z ${VIASH_PAR_ANNOTATION_FILE+x} ]; then
-  VIASH_PAR_ANNOTATION_FILE="resources/supplementary/gencode.v45.annotation.gtf.gz"
-fi
-if [ -z ${VIASH_PAR_MOTIF_FILE+x} ]; then
-  VIASH_PAR_MOTIF_FILE="resources/supplementary/JASPAR2022-hg38.bed.gz"
 fi
 
 # check whether required files exist
