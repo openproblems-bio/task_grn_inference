@@ -2,7 +2,7 @@
 
 set -e
 
-[[ ! -d ../openproblems-v2 ]] && echo "You need to clone the openproblems-v2 repository next to this repository" && exit 1
+[[ ! -d ../openproblems-v2 ]] && echo "You need to clone the openproblems repository next to this repository" && exit 1
 
 ../openproblems-v2/bin/create_task_readme \
   --task "grn_benchmark" \

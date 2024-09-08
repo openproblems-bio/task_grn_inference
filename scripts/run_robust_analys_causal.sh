@@ -1,8 +1,8 @@
 #!/bin/bash
-viash ns build --parallel
+# viash ns build --parallel
 RUN_ID="robust_analy_causal" 
-resources_dir="resources"
-# resources_dir="s3://openproblems-data/resources/grn"
+# resources_dir="resources"
+resources_dir="s3://openproblems-data/resources/grn"
 
 publish_dir="${resources_dir}/results/${RUN_ID}"
 
@@ -34,7 +34,7 @@ HERE
 layers=("pearson")  # Array containing the layer(s)
 
 for layer in "${layers[@]}"; do  # Iterate over each layer in the array
-    for iter in {1..100}; do  # Loop from 1 to 100 iterations
+    for iter in {1..10}; do  # Loop from 1 to 100 iterations
         append_entry "$iter" "$layer"  # Execute the append_entry command
     done
 done
@@ -46,10 +46,10 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
-nextflow run . \
-  -main-script  target/nextflow/workflows/run_robustness_analysis_causal/main.nf \
-  -profile docker \
-  -with-trace \
-  -c src/common/nextflow_helpers/labels_ci.config \
-  -params-file ${param_file}
+# nextflow run . \
+#   -main-script  target/nextflow/workflows/run_robustness_analysis_causal/main.nf \
+#   -profile docker \
+#   -with-trace \
+#   -c src/common/nextflow_helpers/labels_ci.config \
+#   -params-file ${param_file}
 

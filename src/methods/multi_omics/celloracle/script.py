@@ -15,7 +15,7 @@ par = {
 # meta = {
 #   "resources_dir":'resources'
 # }
-
+par['links'] = f"{par['temp_dir']}/links.celloracle.links" 
 
 sys.path.append(meta["resources_dir"])
 from main import main 
