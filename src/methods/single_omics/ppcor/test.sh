@@ -1,0 +1,1 @@
+viash run src/methods/single_omics/ppcor/config.novsh.yaml -- --multiomics_rna resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/ppcor/prediction.csv

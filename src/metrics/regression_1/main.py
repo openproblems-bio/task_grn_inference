@@ -69,9 +69,15 @@ def regression_1(
     if reg_type=='ridge':
         regr =  Ridge(**dict(random_state=32))
     elif reg_type=='GB':
-        regr = lightgbm_wrapper(dict(random_state=32, n_estimators=100, min_samples_leaf=2, min_child_samples=1, feature_fraction=0.05, verbosity=-1, max_workers=max_workers))
+        params = dict(random_state=32, 
+                    n_estimators=100, min_samples_leaf=2, min_child_samples=1, 
+                    feature_fraction=0.05, verbosity=-1
+        )
+        regr = lightgbm_wrapper(params, max_workers=max_workers)
     elif reg_type=='RF':
-        regr = lightgbm_wrapper(dict(boosting_type='rf',random_state=32, n_estimators=100,  feature_fraction=0.05, verbosity=-1, max_workers=max_workers))
+        params = dict(boosting_type='rf',random_state=32, n_estimators=100,  
+        feature_fraction=0.05, verbosity=-1)
+        regr = lightgbm_wrapper(params, max_workers)
     else:
         print(f'{reg_type} is not defined')
         raise ValueError("define first")        
@@ -130,10 +136,6 @@ def set_global_seed(seed):
     lightgbm.LGBMRegressor().set_params(random_state=seed)
 
 
-def format_folder(work_dir, exclude_missing_genes, reg_type, theta, tf_n, norm_method, subsample=None):
-    return f'{work_dir}/benchmark/scores/subsample_{subsample}/exclude_missing_genes_{exclude_missing_genes}/{reg_type}/theta_{theta}_tf_n_{tf_n}/{norm_method}'
-
-
 def pivot_grn(net):
     ''' make net to have gene*tf format'''
     df_tmp = net.pivot(index='target', columns='source', values='weight')
@@ -160,39 +162,65 @@ def process_net(net, gene_names, manipulate):
         net = net.map(lambda x: 1 if x>0 else (-1 if x<0 else 0))
     return net
 
+
 def main(par):
     random_state = 42
     set_global_seed(random_state)
     theta = 1 # no subsetting based on theta
     manipulate = None 
     ## read and process input data
+
     print('Reading input files', flush=True)
     
     perturbation_data = ad.read_h5ad(par['perturbation_data'])
+    tf_all = np.loadtxt(par['tf_all'], dtype=str)
     gene_names = perturbation_data.var.index.to_numpy()
     net = pd.read_csv(par['prediction'])
+    # net['weight'] = net.weight.abs()
+    # subset to keep only those links with source as tf
+    if par['apply_tf']:
+        net = net[net.source.isin(tf_all)]
 
     subsample = par['subsample']
     reg_type = par['reg_type']
     max_workers = par['max_workers']
     layer = par["layer"]
-    pert_df = pd.DataFrame(perturbation_data.layers[layer], columns=gene_names)
+    if subsample == -1:
+        pass
+    elif subsample == -2: # one combination of cell_type, sm_name
+        sampled_obs = perturbation_data.obs.groupby(['sm_name', 'cell_type'], observed=False).apply(lambda x: x.sample(1)).reset_index(drop=True)
+        obs = perturbation_data.obs
+        mask = []
+        for _, row in obs.iterrows():
+            mask.append((sampled_obs==row).all(axis=1).any())  
+        perturbation_data = perturbation_data[mask,:]
+    elif subsample == -3: #negative control
+        mask = perturbation_data.obs.sm_name == 'Dimethyl Sulfoxide'
+        perturbation_data = perturbation_data[mask,:]
+    elif subsample == -4: #positive control
+        mask = perturbation_data.obs.sm_name.isin(['Dabrafenib', 'Belinostat'])
+        perturbation_data = perturbation_data[mask,:]
+    else:
+        perturbation_data = perturbation_data[np.random.choice(perturbation_data.n_obs, subsample, replace=False), :]
+    
+    print(perturbation_data.shape)
 
-    if subsample != -1:
-        pert_df = pert_df.sample(n=subsample)
+    pert_df = pd.DataFrame(perturbation_data.layers[layer], columns=gene_names)
     pert_df = pert_df.T  # make it gene*sample
 
     # process net
     net_processed = process_net(net.copy(), gene_names, manipulate)
 
     print(f'Compute metrics for layer: {layer}', flush=True)
+    tfs_cases = [-1]
+    if par['min_tf']:
+        tfs_cases += par['min_tf']
     layer_results = {}  # Store results for this layer
-    for exclude_missing_genes in [True, False]:  # two settings on target gene
-        for tf_n in [-1, 140]:  # two settings on tfs
+    for exclude_missing_genes in [False, True]:  # two settings on target gene
+        for tf_n in tfs_cases:  # two settings on tfs
             run_key = f'ex({exclude_missing_genes})_tf({tf_n})'
             print(run_key)
             net_subset = net_processed.copy()
-
             # Subset TFs 
             if tf_n == -1:
                 degrees = net_subset.abs().sum(axis=0)
@@ -210,11 +238,12 @@ def main(par):
 
     # Convert results to DataFrame
     df_results = pd.DataFrame(layer_results)
-    if 'ex(True)_tf(140)' not in df_results.columns:
-        df_results['ex(True)_tf(140)'] = df_results['ex(True)_tf(-1)']
-    if 'ex(False)_tf(140)' not in df_results.columns:
-        df_results['ex(False)_tf(140)'] = df_results['ex(False)_tf(-1)']
-    
+    if par['min_tf']:
+        if 'ex(True)_tf(140)' not in df_results.columns:
+            df_results['ex(True)_tf(140)'] = df_results['ex(True)_tf(-1)']
+        if 'ex(False)_tf(140)' not in df_results.columns:
+            df_results['ex(False)_tf(140)'] = df_results['ex(False)_tf(-1)']
+        
     df_results['Mean'] = df_results.mean(axis=1)
     
     return df_results

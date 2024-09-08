@@ -7,6 +7,17 @@ functionality:
     summary: Calculates R2 score for regression 1
     description: |
       Calculates R2 score using regression approach 1.
+  arguments:
+    - name: --layer
+      type: string
+      direction: input
+      required: false
+      default: pearson
+    - name: --min_tf
+      type: integer
+      direction: input
+      description: calculate the scores for the given min tfs in addition to the default 
+      required: false
   resources:
     - type: python_script
       path: script.py
@@ -16,7 +27,7 @@ platforms:
     image: ghcr.io/openproblems-bio/base_python:1.0.4
     setup:
       - type: python
-        packages: [ lightgbm ]
+        packages: [ lightgbm==4.3.0, numpy==1.26.4 ]
   - type: nextflow
     directives:
       label: [ midtime, highmem, highcpu ]

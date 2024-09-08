@@ -11,7 +11,7 @@ import scanpy as sc
 ## VIASH START
 par = {
     'pseudobulked_data_f': 'resources/grn-benchmark/perturbation_data.h5ad',
-    'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad'
+    'perturbation_data_n': 'resources/grn-benchmark/perturbation_data.h5ad'
 }
 ## VIASH END
 
@@ -35,4 +35,4 @@ bulk_adata_filtered = ad.read_h5ad(par['pseudobulked_data_f'])
 bulk_adata_n = normalize_func(bulk_adata_filtered)
 print("Normalizing completed")
 print("Writing the file")
-bulk_adata_n.write(par['perturbation_data'])
+bulk_adata_n.write(par['perturbation_data_n'])

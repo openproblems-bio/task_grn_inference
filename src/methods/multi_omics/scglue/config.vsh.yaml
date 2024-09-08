@@ -1,0 +1,45 @@
+__merge__: ../../../api/comp_method.yaml
+
+
+functionality:
+  name: scglue
+  namespace: "grn_methods"
+  info:
+    label: scglue
+    summary: "GRN inference using scglue"
+    description: |
+      GRN inference using scglue. 
+    documentation_url: https://scglue.readthedocs.io/
+  arguments:
+    - name: --annotation_file
+      type: file
+      # default: resources/supplementary/gencode.v45.annotation.gtf.gz
+      example: resources_test/supplementary/gencode.v45.annotation.gtf.gz
+      required: false
+      direction: input
+    - name: --motif_file
+      type: file
+      example: resources_test/supplementary/JASPAR2022-hg38.bed.gz
+      required: false
+      direction: input
+      
+  resources:
+    - type: python_script
+      path: script.py
+    - path: main.py
+
+
+platforms:
+  - type: docker
+    # image: janursa/scglue:19-08-2024
+    image: nvcr.io/nvidia/pytorch:24.06-py3
+    setup:
+      - type: python
+        packages: [ scglue==0.3.2, pyscenic==0.12.1, numpy==1.23.4, scanpy, networkx, pyarrow, cytoolz, scikit-misc, cuda-python]
+      - type: apt
+        packages: [bedtools]
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [oneweektime, midmem, highcpu, gpu]

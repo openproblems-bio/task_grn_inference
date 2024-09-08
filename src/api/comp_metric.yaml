@@ -7,46 +7,47 @@ functionality:
       summary: A metric to evaluate the performance of the inferred GRN
       description: |
         A metric to evaluate the performance of the inferred GRN
-  arguments:
+  arguments: 
     - name: --perturbation_data
       __merge__: file_perturbation_h5ad.yaml
       required: false
       direction: input
-      default: resources/grn-benchmark/perturbation_data.h5ad
     - name: --prediction
       __merge__: file_prediction.yaml
-      required: false
+      required: true
       direction: input
-      default: resources/grn-benchmark/grn_models/collectri.csv
     - name: --score
       __merge__: file_score.yaml
       required: false
       direction: output
-      default: output/score.h5ad
     - name: --reg_type
       type: string
       direction: input
       default: ridge
       description: name of regretion to use
       multiple: false
-      info:
-        test_default: ridge
-    - name: --layer
-      type: string
-      direction: input
-      required: false
-      default: pearson
     - name: --subsample
       type: integer
       direction: input
-      default: -1
+      default: -2
       description: number of samples randomly drawn from perturbation data
-      info:
-        test_default: 200
     - name: --max_workers
       type: integer
       direction: input
       default: 4
+    - name: --method_id 
+      type: string 
+      direction: input 
+      required: false
+      example: collectri
+    - name: --tf_all
+      type: file
+      direction: input
+      example: resources_test/prior/tf_all.csv
+    - name: --apply_tf
+      type: boolean 
+      required: false
+      default: true
 
 
       
@@ -55,3 +56,5 @@ functionality:
       path: /src/common/component_tests/run_and_check_output.py
     - path: /resources/grn-benchmark
       dest: resources/grn-benchmark
+    - path: /resources_test/prior
+      dest: resources_test/prior

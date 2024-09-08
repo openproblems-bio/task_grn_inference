@@ -1,0 +1,97 @@
+
+functionality:
+  name: run_grn_evaluation
+  namespace: "workflows"
+  info:
+    label: run_grn_evaluation
+    summary: "Evaluates GRNs and provides scores using regression analysis."
+
+  argument_groups:
+    - name: Inputs
+      arguments:
+        - name: --perturbation_data
+          type: file
+          direction: input
+        - name: --layer
+          type: string
+          direction: input
+        - name: --prediction
+          type: file
+          direction: input
+          required: false
+        - name: --subsample
+          type: integer
+          direction: input
+          default: 2
+        - name: --reg_type
+          type: string
+          direction: input
+          default: ridge
+        - name: --method_id 
+          type: string 
+          direction: input 
+          required: True
+          example: collectri
+        - name: --max_workers
+          type: integer
+          direction: input
+          required: True
+        - name: --tf_all
+          type: file
+          required: false
+          direction: input
+          default: resources/prior/tf_all.csv
+        - name: --consensus
+          type: file
+          required: false
+          direction: input
+          default: resources/prior/consensus.json
+        
+    - name: Outputs
+      arguments:
+        - name: "--scores"
+          type: file
+          required: true
+          direction: output
+          default: "scores.yaml"
+          # description: A csv file containing the scores with each row corrosponding to a layer.
+          # default: scores.csv
+        - name: "--metric_configs"
+          type: file
+          required: true
+          direction: output
+          default: metric_configs.yaml
+
+    # - name: Arguments
+    #   arguments: 
+    #     - name: "--predictions" 
+    #       type: string
+    #       multiple: true
+    #       description: A list of GRN models 
+    #     - name: "--layers"
+    #       type: string
+    #       multiple: true
+    #       description: A list of GRN models 
+    
+  resources:
+    - type: nextflow_script
+      path: main.nf
+      entrypoint: run_wf
+    - type: file
+      path: ../../api/task_info.yaml
+  dependencies:
+    - name: common/extract_metadata
+      repository: openproblems
+    - name: metrics/regression_2 
+    - name: metrics/regression_1
+    - name: control_methods/positive_control
+    - name: control_methods/negative_control
+  repositories:
+    - name: openproblems
+      type: github
+      repo: openproblems-bio/openproblems
+      tag: v2.0.0
+platforms:
+  - type: nextflow
+    directives:
+      label: [ midtime, midmem, lowcpu ]

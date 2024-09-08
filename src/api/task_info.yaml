@@ -9,7 +9,9 @@ description: |
 
   Due to its flexible nature, the platform can incorporate various benchmark datasets and evaluation methods, using either prior knowledge or feature-based approaches. In the current version, due to the absence of standardized prior knowledge, we use a feature-based approach to benchmark GRNs. Our evaluation utilizes standardized datasets for GRN inference and evaluation, employing multiple regression analysis approaches to assess both accuracy and comprehensiveness.
 
-summary: Benchmarking GRN inference methods
+summary: |
+  Benchmarking GRN inference methods
+  The full documentation is hosted on [ReadTheDocs](https://openproblems-grn-task.readthedocs.io/en/latest/index.html). [![Documentation Status](https://readthedocs.org/projects/grn-inference-benchmarking/badge/?version=latest)](https://grn-inference-benchmarking.readthedocs.io/en/latest/?badge=latest)
 readme: |
   ## Installation
 
@@ -19,9 +21,9 @@ readme: |
 
   ## Download resources
   ```bash
-  git clone git@github.com:openproblems-bio/task_grn_benchmark.git
+  git clone git@github.com:openproblems-bio/task_grn_inference.git
 
-  cd task_grn_benchmark
+  cd task_grn_inference
   
   # download resources
   scripts/download_resources.sh
@@ -58,5 +60,18 @@ authors:
     info:
       github: rcannood
       orcid: "0000-0003-3641-729X"
+  - name: Antoine Passimier 
+    roles: [ contributor ]
+    info:
+      github: AntoinePassemiers
+  - name: Christian Arnold 
+    roles: [ contributor ]
+    info:
+      github: chrarnold
+  - name: Marco Stock
+    roles: [ contributor ]
+    info:
+      github: stkmrc
+
 
 

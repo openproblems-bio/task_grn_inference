@@ -8,8 +8,10 @@ functionality:
   arguments:
     - name: --perturbation_data
       type: file
-      required: true
+      required: false
       direction: input
+      default: resources/grn-benchmark/perturbation_data.h5ad
+      example: resources_test/grn-benchmark/perturbation_data.h5ad
     - name: --tf_gene_net
       type: file
       required: true
@@ -20,14 +22,30 @@ functionality:
       direction: input
     - name: --annot_peak_database
       type: file 
-      required: true 
+      required: false 
       direction: input
-      default: resources/grn-benchmark/supp/annot_peak_database.csv
-    - name: --annot_gene_database
-      type: file 
-      required: true 
-      direction: input
-      default: resources/grn-benchmark/supp/annot_gene_database.csv
+      must_exist: false
+      example: resources/supplements/annot_peak_database.csv
+    # - name: --annot_gene_database
+    #   type: file 
+    #   required: false 
+    #   direction: input
+    #   default: resources/supplements/annot_gene_database.csv
+    - name: --tf_gene_indegee_fig
+      type: file
+      required: false
+      direction: output
+      default: output/tf_gene_indegree.png
+    - name: --tf_gene_outdegee_fig
+      type: file
+      required: false
+      direction: output
+      default: output/tf_gene_outdegree.png
+    - name: --stats
+      type: file
+      required: false
+      direction: output
+      default: output/stats.json
     
   resources:
     - type: python_script
