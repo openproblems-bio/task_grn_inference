@@ -39,11 +39,14 @@ sc.pp.scale(multiomics_rna)
 print('Create corr net')
 net = create_corr_net(multiomics_rna.X, groups)
 net = pd.DataFrame(net, index=gene_names, columns=gene_names)
-
-net_corr = net.sample(len(tf_all), axis=1)
+if par['causal']:
+    net_corr = net[tf_all]
+else:
+    net_corr = net.sample(len(tf_all), axis=1)
 net_corr = net_corr.reset_index().melt(id_vars='index', var_name='source', value_name='weight')
 net_corr.rename(columns={'index': 'target'}, inplace=True)
 
-print('Output noised GRN')
+
+print('Output GRN')
 net_corr.to_csv(par['prediction'])
 
