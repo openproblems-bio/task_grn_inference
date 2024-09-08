@@ -2904,7 +2904,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/format_data",
     "viash_version" : "0.8.6",
-    "git_commit" : "2a1f7dc546688769c551feeae3c51860c52318ad",
+    "git_commit" : "11ddcf070be656f617c55de2e6460aaad6ca11e9",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
