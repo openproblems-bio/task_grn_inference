@@ -1,5 +1,5 @@
 type: file
-example: resources/grn-benchmark/score.csv
+example: resources_test/scores/score.h5ad
 info:
   label: Score
   summary: "File indicating the score of a metric."

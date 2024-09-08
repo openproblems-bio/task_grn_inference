@@ -11,6 +11,7 @@ functionality:
       required: false
       direction: input
       default: resources/grn-benchmark/perturbation_data.h5ad
+      example: resources_test/grn-benchmark/perturbation_data.h5ad
     - name: --tf_gene_net
       type: file
       required: true
@@ -23,7 +24,8 @@ functionality:
       type: file 
       required: false 
       direction: input
-      default: resources/supplements/annot_peak_database.csv
+      must_exist: false
+      example: resources/supplements/annot_peak_database.csv
     # - name: --annot_gene_database
     #   type: file 
     #   required: false 

@@ -1,5 +1,5 @@
 type: file
-example: resources/grn-benchmark/model/
+example: resources_test/grn-benchmark/model/
 info:
   label: Model
   summary: "Optional model output. If no value is passed, the model will be removed at the end of the run."
