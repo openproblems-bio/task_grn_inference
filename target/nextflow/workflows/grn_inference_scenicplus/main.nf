@@ -3056,7 +3056,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "ce35bdae0c28a9004ea6523720d9fcf1d1cfb596",
+          "git_commit" : "9ab1d8f3410ecfa466941bcea2bc10b0cdad7c43",
           "executable" : "/nextflow/grn_methods/scenicplus/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenicplus"
@@ -3110,7 +3110,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/grn_inference_scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "ce35bdae0c28a9004ea6523720d9fcf1d1cfb596",
+    "git_commit" : "9ab1d8f3410ecfa466941bcea2bc10b0cdad7c43",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
