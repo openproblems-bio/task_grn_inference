@@ -151,7 +151,7 @@ preprocessor = Preprocessor(
     result_log1p_key="X_log1p",
     subset_hvg= False,  # 5. whether to subset the raw data to highly variable genes
     hvg_flavor="seurat_v3" if data_is_raw else "cell_ranger",
-    binning=n_bins,  # 6. whether to bin the raw data and to what number of bins
+    binning=n_input_bins,  # 6. whether to bin the raw data and to what number of bins
     result_binned_key="X_binned",  # the key in adata.layers to store the binned data
 )
 preprocessor(adata, batch_key="str_batch")
