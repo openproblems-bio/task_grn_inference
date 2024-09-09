@@ -219,6 +219,18 @@ function ViashHelp {
   echo "        type: file, file must exist"
   echo "        default: resources_test/supplementary/finetuned_scGPT_adamson/vocab.json"
   echo "        example: resources_test/supplementary/finetuned_scGPT_adamson/vocab.json"
+  echo ""
+  echo "    --n_bins"
+  echo "        type: integer"
+  echo "        default: 51"
+  echo ""
+  echo "    --batch_size"
+  echo "        type: integer"
+  echo "        default: 16"
+  echo ""
+  echo "    --condition"
+  echo "        type: string"
+  echo "        default: cell_type"
 }
 
 # initialise array
@@ -357,6 +369,39 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_VOCAB_FILE=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --n_bins)
+            [ -n "$VIASH_PAR_N_BINS" ] && ViashError Bad arguments for option \'--n_bins\': \'$VIASH_PAR_N_BINS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_N_BINS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --n_bins. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --n_bins=*)
+            [ -n "$VIASH_PAR_N_BINS" ] && ViashError Bad arguments for option \'--n_bins=*\': \'$VIASH_PAR_N_BINS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_N_BINS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --batch_size)
+            [ -n "$VIASH_PAR_BATCH_SIZE" ] && ViashError Bad arguments for option \'--batch_size\': \'$VIASH_PAR_BATCH_SIZE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_BATCH_SIZE="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --batch_size. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --batch_size=*)
+            [ -n "$VIASH_PAR_BATCH_SIZE" ] && ViashError Bad arguments for option \'--batch_size=*\': \'$VIASH_PAR_BATCH_SIZE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_BATCH_SIZE=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --condition)
+            [ -n "$VIASH_PAR_CONDITION" ] && ViashError Bad arguments for option \'--condition\': \'$VIASH_PAR_CONDITION\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CONDITION="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --condition. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --condition=*)
+            [ -n "$VIASH_PAR_CONDITION" ] && ViashError Bad arguments for option \'--condition=*\': \'$VIASH_PAR_CONDITION\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CONDITION=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         ---cpus)
             [ -n "$VIASH_META_CPUS" ] && ViashError Bad arguments for option \'---cpus\': \'$VIASH_META_CPUS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_META_CPUS="$2"
@@ -481,6 +526,15 @@ fi
 if [ -z ${VIASH_PAR_VOCAB_FILE+x} ]; then
   VIASH_PAR_VOCAB_FILE="resources_test/supplementary/finetuned_scGPT_adamson/vocab.json"
 fi
+if [ -z ${VIASH_PAR_N_BINS+x} ]; then
+  VIASH_PAR_N_BINS="51"
+fi
+if [ -z ${VIASH_PAR_BATCH_SIZE+x} ]; then
+  VIASH_PAR_BATCH_SIZE="16"
+fi
+if [ -z ${VIASH_PAR_CONDITION+x} ]; then
+  VIASH_PAR_CONDITION="cell_type"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
@@ -514,6 +568,18 @@ fi
 if [[ -n "$VIASH_PAR_MAX_N_LINKS" ]]; then
   if ! [[ "$VIASH_PAR_MAX_N_LINKS" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--max_n_links' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_N_BINS" ]]; then
+  if ! [[ "$VIASH_PAR_N_BINS" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--n_bins' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_BATCH_SIZE" ]]; then
+  if ! [[ "$VIASH_PAR_BATCH_SIZE" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--batch_size' has to be an integer. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -604,18 +670,15 @@ import tqdm
 
 from scipy.sparse import issparse
 import scipy as sp
+import numpy as np
 from einops import rearrange
 from torch.nn.functional import softmax
 from tqdm import tqdm
-import pandas as pd
 
 from torchtext.vocab import Vocab
 from torchtext._torchtext import (
     Vocab as VocabPybind,
 )
-
-sys.path.insert(0, "../")
-
 import scgpt as scg
 from scgpt.tasks import GeneEmbedding
 from scgpt.tokenizer.gene_tokenizer import GeneVocab
@@ -639,7 +702,10 @@ par = {
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'model_file': $( if [ ! -z ${VIASH_PAR_MODEL_FILE+x} ]; then echo "r'${VIASH_PAR_MODEL_FILE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'model_config_file': $( if [ ! -z ${VIASH_PAR_MODEL_CONFIG_FILE+x} ]; then echo "r'${VIASH_PAR_MODEL_CONFIG_FILE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'vocab_file': $( if [ ! -z ${VIASH_PAR_VOCAB_FILE+x} ]; then echo "r'${VIASH_PAR_VOCAB_FILE//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'vocab_file': $( if [ ! -z ${VIASH_PAR_VOCAB_FILE+x} ]; then echo "r'${VIASH_PAR_VOCAB_FILE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'n_bins': $( if [ ! -z ${VIASH_PAR_N_BINS+x} ]; then echo "int(r'${VIASH_PAR_N_BINS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'batch_size': $( if [ ! -z ${VIASH_PAR_BATCH_SIZE+x} ]; then echo "int(r'${VIASH_PAR_BATCH_SIZE//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'condition': $( if [ ! -z ${VIASH_PAR_CONDITION+x} ]; then echo "r'${VIASH_PAR_CONDITION//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -661,20 +727,18 @@ dep = {
 
 ## VIASH END
 
-
 # Load list of putative TFs
 tf_all = np.loadtxt(par['tf_all'], dtype=str)
 
 set_seed(42)
 pad_token = "<pad>"
 special_tokens = [pad_token, "<cls>", "<eoc>"]
-n_hvg = 1200
-n_bins = 51
+
 mask_value = -1
 pad_value = -2
-batch_size = 16
+batch_size = par['batch_size']
 num_attn_layers = 11 
-n_input_bins = n_bins
+n_input_bins = par['n_bins']
 
 
 model_config_file = par['model_config_file']
@@ -741,7 +805,7 @@ model.to(device)
 
 print('Process rna-seq file')
 import scanpy as sc 
-adata = sc.read(par['multiomics_rna.h5ad'])
+adata = sc.read(par['multiomics_rna'])
 adata.obs["celltype"] = adata.obs["cell_type"].astype("category")
 adata.obs["str_batch"] = adata.obs["donor_id"].astype(str)
 data_is_raw = False
@@ -765,16 +829,16 @@ preprocessor = Preprocessor(
 )
 preprocessor(adata, batch_key="str_batch")
 
-print('Subsetting to HVGs')
-sc.pp.highly_variable_genes(
-    adata,
-    layer=None,
-    n_top_genes=n_hvg,
-    batch_key="str_batch",
-    flavor="seurat_v3" if data_is_raw else "cell_ranger",
-    subset=False,
-)
-adata = adata[:, adata.var["highly_variable"]].copy()
+# print('Subsetting to HVGs')
+# sc.pp.highly_variable_genes(
+#     adata,
+#     layer=None,
+#     n_top_genes=n_hvg,
+#     batch_key="str_batch",
+#     flavor="seurat_v3" if data_is_raw else "cell_ranger",
+#     subset=False,
+# )
+# adata = adata[:, adata.var["highly_variable"]].copy()
 
 
 input_layer_key = "X_binned"
@@ -804,7 +868,7 @@ all_gene_ids, all_values = tokenized_all["genes"], tokenized_all["values"]
 
 src_key_padding_mask = all_gene_ids.eq(vocab[pad_token])
 
-condition_ids = np.array(adata.obs["cell_type"].tolist())
+condition_ids = np.array(adata.obs[par['condition']].tolist())
 
 torch.cuda.empty_cache()
 dict_sum_condition = {}
@@ -860,7 +924,7 @@ with torch.no_grad(), torch.cuda.amp.autocast(enabled=True):
             else:
                 dict_sum_condition[c] += outputs[index, :, :]
 print('Average across groups of cell types')
-groups = adata.obs.groupby('cell_type').groups
+groups = adata.obs.groupby([par['condition']]).groups
 dict_sum_condition_mean = dict_sum_condition.copy()
 for i in groups.keys():
     dict_sum_condition_mean[i] = dict_sum_condition_mean[i]/len(groups[i])
@@ -872,6 +936,8 @@ gene_names = vocab.lookup_tokens(gene_vocab_idx)
 print('Format as df, melt, and subset')
 net = pd.DataFrame(mean_grn, columns=gene_names, index=gene_names)
 net = net.iloc[1:, 1:]
+
+tf_all = np.intersect1d(tf_all, gene_names)
 net = net[tf_all]
 
 net_melted = net.reset_index()  # Move index to a column for melting

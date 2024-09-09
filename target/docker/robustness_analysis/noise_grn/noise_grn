@@ -414,9 +414,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component robustness_analysis noise_grn"
-LABEL org.opencontainers.image.created="2024-09-09T12:02:34Z"
+LABEL org.opencontainers.image.created="2024-09-09T13:01:19Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="3379386dc50e1cedce96722e791c0f1178ba778f"
+LABEL org.opencontainers.image.revision="ce35bdae0c28a9004ea6523720d9fcf1d1cfb596"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
