@@ -2957,7 +2957,17 @@ meta = [
       "resolve_volume" : "Automatic",
       "chown" : true,
       "setup_strategy" : "ifneedbepullelsecachedbuild",
-      "target_image_source" : "https://github.com/openproblems-bio/task_grn_inference"
+      "target_image_source" : "https://github.com/openproblems-bio/task_grn_inference",
+      "setup" : [
+        {
+          "type" : "python",
+          "user" : false,
+          "packages" : [
+            "anndata==0.10.9"
+          ],
+          "upgrade" : true
+        }
+      ]
     },
     {
       "type" : "native",
@@ -3008,7 +3018,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/batch_correction_seurat",
     "viash_version" : "0.8.6",
-    "git_commit" : "3d86c5912d779b980be1214f225e3690bd68d6ce",
+    "git_commit" : "886e3c14bc1f166f8d1e3762bdcba2fd9ce7502c",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

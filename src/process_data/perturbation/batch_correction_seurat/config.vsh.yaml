@@ -48,10 +48,9 @@ functionality:
 platforms:
   - type: docker
     image: janursa/batch_correction_seurat:latest
-    # setup:
-    #   - type: r
-    #     bioc: []
-    #     packages: [zellkonverter]
+    setup:
+      - type: python
+        packages: [anndata==0.10.9]
 
   - type: native
   - type: nextflow

@@ -183,7 +183,8 @@ function ViashHelp {
   echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"
-  echo "        example: output/grn.csv"
+  echo "        default: output/prediction.csv"
+  echo "        example: output/prediction.csv"
   echo ""
   echo "    --temp_dir"
   echo "        type: string"
@@ -195,7 +196,8 @@ function ViashHelp {
   echo ""
   echo "    --tf_all"
   echo "        type: file, file must exist"
-  echo "        example: resources_test/prior/tf_all.csv"
+  echo "        default: resources/prior/tf_all.csv"
+  echo "        example: resources/prior/tf_all.csv"
   echo ""
   echo "    --max_n_links"
   echo "        type: integer"
@@ -435,11 +437,17 @@ if [ -z ${VIASH_META_TEMP_DIR+x} ]; then
 fi
 
 # filling in defaults
+if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
+  VIASH_PAR_PREDICTION="output/prediction.csv"
+fi
 if [ -z ${VIASH_PAR_TEMP_DIR+x} ]; then
   VIASH_PAR_TEMP_DIR="output/temdir"
 fi
 if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
   VIASH_PAR_NUM_WORKERS="4"
+fi
+if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
+  VIASH_PAR_TF_ALL="resources/prior/tf_all.csv"
 fi
 if [ -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then
   VIASH_PAR_MAX_N_LINKS="50000"

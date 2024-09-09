@@ -1,12 +1,11 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ID="single_omics_all"
-resources_dir="s3://openproblems-data/resources/grn"
-publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
-
+RUN_ID="single_omics_scgpt"
 # resources_dir="./resources_test/"
-# publish_dir="output/${RUN_ID}"
+resources_dir="s3://openproblems-data/resources_test/grn"
+publish_dir="${resources_dir}/results/${RUN_ID}"
+
 
 reg_type=ridge
 subsample=-2
@@ -27,6 +26,10 @@ param_list:
     layer: $layer
     consensus: ${resources_dir}/prior/consensus-num-regulators.json
     tf_all: ${resources_dir}/prior/tf_all.csv
+    model_file: ${resources_dir}/supplementary/finetuned_scGPT_adamson/best_model.pt
+    model_config_file: ${resources_dir}/supplementary/finetuned_scGPT_adamson/args.json
+    vocab_file: ${resources_dir}/supplementary/finetuned_scGPT_adamson/vocab.json
+
 output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE

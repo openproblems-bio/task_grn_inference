@@ -13,23 +13,17 @@ workflow run_wf {
 
   // construct list of methods
   methods = [
-    portia,
-    ennet,
-    genie3,
-    grnboost2,
-    pidc,
-    ppcor,
-    scsgl,
-    tigress
+    // portia,
+    // ennet,
+    // genie3,
+    // grnboost2,
+    // pidc,
+    // ppcor,
+    // scsgl,
+    // tigress
+    scgpt
   ]
 
-  // methods = [
-  //   portia,
-  //   ennet,
-  //   grnboost2,
-  //   scsgl,    
-  //   tigress
-  // ]
 
   // construct list of metrics
   metrics = [
@@ -80,6 +74,9 @@ workflow run_wf {
         multiomics_rna: "multiomics_rna",
         multiomics_atac: "multiomics_atac",
         tf_all: "tf_all",
+        model_file: "model_file",
+        model_config_file: "model_config_file",
+        vocab_file: "vocab_file"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->

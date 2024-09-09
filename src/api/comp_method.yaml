@@ -21,7 +21,8 @@ functionality:
       __merge__: file_prediction.yaml
       required: false
       direction: output
-      example: output/grn.csv
+      example: output/prediction.csv
+      default: output/prediction.csv
     - name: --temp_dir
       type: string
       direction: input
@@ -32,7 +33,8 @@ functionality:
       default: 4
     - name: --tf_all
       type: file
-      example: resources_test/prior/tf_all.csv
+      example: resources/prior/tf_all.csv
+      default: resources/prior/tf_all.csv
       required: false
     - name: --max_n_links
       type: integer
