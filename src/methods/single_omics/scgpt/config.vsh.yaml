@@ -1,0 +1,42 @@
+__merge__: ../../../api/comp_method.yaml
+
+functionality:
+  name: scgpt
+  namespace: "grn_methods"
+  info:
+    label: scgpt
+    summary: "GRN inference using scGPT"
+    description: |
+      GRN inference using scGPT.
+    documentation_url: https://github.com/bowang-lab/scGPT/blob/main/tutorials/Tutorial_Attention_GRN.ipynb 
+  arguments:
+    - name: --model_file
+      type: file
+      direction: input
+      example: resources_test/supplementary/finetuned_scGPT_adamson/best_model.pt
+      default: resources_test/supplementary/finetuned_scGPT_adamson/best_model.pt
+    - name: --model_config_file
+      type: file
+      direction: input
+      example: resources_test/supplementary/finetuned_scGPT_adamson/args.json
+      default: resources_test/supplementary/finetuned_scGPT_adamson/args.json
+    - name: --vocab_file
+      type: file
+      direction: input
+      example: resources_test/supplementary/finetuned_scGPT_adamson/vocab.json
+      default: resources_test/supplementary/finetuned_scGPT_adamson/vocab.json
+
+  resources:
+    - type: python_script
+      path: script.py
+
+platforms:
+  - type: docker
+    image: xueerchen/scgpt:0.1.7
+    setup:
+      - type: python
+        packages: [  ]
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime, midmem, midcpu]

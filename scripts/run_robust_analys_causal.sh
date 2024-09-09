@@ -39,7 +39,7 @@ for layer in "${layers[@]}"; do  # Iterate over each layer in the array
     done
 done
 
-aws s3 sync params/ "s3://openproblems-data/resources/grn/params"
+aws s3 sync params/ s3://openproblems-data/resources/grn/params
 # Append the remaining output_state and publish_dir to the YAML file
 cat >> $param_file << HERE
 param_list: "${resources_dir}/${params_list_file}"
@@ -53,4 +53,3 @@ HERE
 #   -with-trace \
 #   -c src/common/nextflow_helpers/labels_ci.config \
 #   -params-file ${param_file}
-

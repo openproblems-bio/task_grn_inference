@@ -49,6 +49,15 @@ functionality:
           required: false
           direction: input
           default: pearson
+        - name: --model_file
+          type: file
+          direction: input
+        - name: --model_config_file
+          type: file
+          direction: input
+        - name: --vocab_file
+          type: file
+          direction: input
         
     - name: Outputs
       arguments:
@@ -84,6 +93,7 @@ functionality:
     - name: grn_methods/ppcor
     - name: grn_methods/scsgl
     - name: grn_methods/tigress
+    - name: grn_methods/scgpt
   repositories:
     - name: openproblems
       type: github
