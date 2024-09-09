@@ -25,6 +25,18 @@ functionality:
       direction: input
       example: resources_test/supplementary/finetuned_scGPT_adamson/vocab.json
       default: resources_test/supplementary/finetuned_scGPT_adamson/vocab.json
+    - name: --n_bins
+      type: integer
+      direction: input
+      default: 51
+    - name: --batch_size
+      type: integer
+      direction: input
+      default: 16
+    - name: --condition
+      type: string
+      direction: input
+      default: cell_type
 
   resources:
     - type: python_script
