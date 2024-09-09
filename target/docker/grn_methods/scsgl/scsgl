@@ -432,9 +432,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata" "numba==0.53.1" "scipy==1.6.3" "pandas==1.2.4" "rpy2==3.4.4" "numpy==1.20.2" "scikit-learn==0.24.1" "PyYAML==6.0.2"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scsgl"
-LABEL org.opencontainers.image.created="2024-09-09T10:48:07Z"
+LABEL org.opencontainers.image.created="2024-09-09T12:02:36Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="886e3c14bc1f166f8d1e3762bdcba2fd9ce7502c"
+LABEL org.opencontainers.image.revision="3379386dc50e1cedce96722e791c0f1178ba778f"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
