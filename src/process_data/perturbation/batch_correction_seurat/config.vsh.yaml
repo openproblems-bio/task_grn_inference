@@ -50,7 +50,7 @@ platforms:
     image: janursa/batch_correction_seurat:latest
     setup:
       - type: python
-        packages: [anndata==0.10.9]
+        packages: [anndata]
 
   - type: native
   - type: nextflow

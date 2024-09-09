@@ -48,7 +48,7 @@ HERE
 #     --main-script target/nextflow/workflows/run_benchmark_single_omics/main.nf `
 #     --workspace 53907369739130 `
 #     --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
-#     --params-file ./params/single_omics_all_test.yaml `
+#     --params-file ./params/single_omics_scgpt.yaml `
 #     --config src/common/nextflow_helpers/labels_tw.config
 
 
