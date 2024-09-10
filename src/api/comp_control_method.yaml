@@ -14,6 +14,11 @@ functionality:
       required: false
       direction: input
       default: resources/grn-benchmark/perturbation_data.h5ad
+    - name: --multiomics_rna
+      __merge__: file_multiomics_rna_h5ad.yaml
+      required: false
+      direction: input
+      example: resources_test/grn-benchmark/multiomics_rna.h5ad
     - name: --layer
       type: string
       direction: input

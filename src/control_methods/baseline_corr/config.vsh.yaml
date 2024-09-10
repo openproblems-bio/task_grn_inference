@@ -5,11 +5,8 @@ functionality:
   info:
     label: baseline_corr
     summary: "Baseline based on Pearson corr"
-
   arguments:
-    - name: --multiomics_rna
-      required: false
-      direction: input
+
     - name: --causal
       type: boolean 
       direction: input
@@ -17,8 +14,7 @@ functionality:
     - name: --seed
       type: integer
       direction: input
-
-
+    
   resources:
     - type: python_script
       path: script.py
