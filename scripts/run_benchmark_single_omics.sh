@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ID="single_omics_test"
-resources_dir="./resources_test/"
-# resources_dir="s3://openproblems-data/resources_test/grn"
+RUN_ID="single_omics_try2"
+# resources_dir="./resources_test/"
+resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="${resources_dir}/results/${RUN_ID}"
 
 
@@ -12,7 +12,7 @@ subsample=-2
 max_workers=10
 layer='pearson'
 metric_ids="[regression_1, regression_2]"
-method_ids="[tigress, ennet, scsgl]"
+method_ids="[tigress, ennet, scsgl, pidc]"
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -38,12 +38,12 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
-nextflow run . \
-  -main-script  target/nextflow/workflows/run_benchmark_single_omics/main.nf \
-  -profile docker \
-  -with-trace \
-  -c src/common/nextflow_helpers/labels_ci.config \
-  -params-file ${param_file}
+# nextflow run . \
+#   -main-script  target/nextflow/workflows/run_benchmark_single_omics/main.nf \
+#   -profile docker \
+#   -with-trace \
+#   -c src/common/nextflow_helpers/labels_ci.config \
+#   -params-file ${param_file}
 
 # ./tw-windows-x86_64.exe launch `
 #     https://github.com/openproblems-bio/task_grn_inference.git `
@@ -52,7 +52,7 @@ nextflow run . \
 #     --main-script target/nextflow/workflows/run_benchmark_single_omics/main.nf `
 #     --workspace 53907369739130 `
 #     --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
-#     --params-file ./params/single_omics_scgpt.yaml `
+#     --params-file ./params/single_omics_try2.yaml `
 #     --config src/common/nextflow_helpers/labels_tw.config
 
 
