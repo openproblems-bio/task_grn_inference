@@ -13,21 +13,22 @@ workflow run_wf {
 
   // construct list of methods
   methods = [
-    // portia,
-    // ennet,
-    // genie3,
-    // grnboost2,
-    // pidc,
-    // ppcor,
-    // scsgl,
-    // tigress
+    portia
+    ennet
+    genie3
+    grnboost2
+    pidc
+    ppcor
+    scsgl
+    tigress
     scgpt
   ]
 
 
   // construct list of metrics
   metrics = [
-    regression_1
+    regression_1,
+    regression_2,
   ]
 
   /****************************
@@ -57,6 +58,9 @@ workflow run_wf {
     // run all methods
     | runEach(
       components: methods,
+      filter: { id, state, comp ->
+        !state.method_ids || state.method_ids.contains(comp.config.functionality.name)
+      },
 
       // use the 'filter' argument to only run a defined method or all methods
       // filter: { id, state, comp ->
@@ -91,6 +95,9 @@ workflow run_wf {
     // run all metrics
     | runEach(
       components: metrics,
+      filter: { id, state, comp ->
+        !state.metric_ids || state.metric_ids.contains(comp.config.functionality.name)
+      },
       id: { id, state, comp ->
         id + "." + comp.config.functionality.name
       },

@@ -7,6 +7,9 @@ functionality:
     summary: "Baseline based on Pearson corr"
 
   arguments:
+    - name: --multiomics_rna
+      required: false
+      direction: input
     - name: --causal
       type: boolean 
       direction: input

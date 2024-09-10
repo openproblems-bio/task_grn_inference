@@ -93,11 +93,11 @@ workflow run_wf {
     // run all metrics
     | runEach(
       components: metrics,
-      id: { id, state, comp ->
-        id + "." + comp.config.functionality.name
-      },
       filter: { id, state, comp ->
         !state.metric_ids || state.metric_ids.contains(comp.config.functionality.name)
+      },
+      id: { id, state, comp ->
+        id + "." + comp.config.functionality.name
       },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [

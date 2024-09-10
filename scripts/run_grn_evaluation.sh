@@ -39,6 +39,7 @@ append_entry() {
   - id: ${reg_type}_${1}
     metric_ids: ${metric_ids}
     perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
+    multiomics_rna: ${resources_dir}/grn-benchmark/multiomics_rna.h5ad
     reg_type: $reg_type
     method_id: $1
     subsample: $subsample
