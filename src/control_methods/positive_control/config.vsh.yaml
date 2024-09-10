@@ -6,6 +6,12 @@ functionality:
     summary: Source-target links based on perturbation data
     description: |
       By directly training on perturbation data, positive control is expected to learn more accurate tf-gene connections.
+  arguments:
+    - name: --perturbation_data
+      type: file
+      required: false
+      direction: input
+      default: resources/grn-benchmark/perturbation_data.h5ad
 
   resources:
     - type: python_script

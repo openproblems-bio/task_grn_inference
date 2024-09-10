@@ -2785,129 +2785,6 @@ meta = [
     "version" : "build-main",
     "arguments" : [
       {
-        "type" : "file",
-        "name" : "--perturbation_data",
-        "info" : {
-          "label" : "perturbation",
-          "summary" : "Perturbation dataset for benchmarking.",
-          "file_type" : "h5ad",
-          "slots" : {
-            "obs" : [
-              {
-                "name" : "cell_type",
-                "type" : "string",
-                "description" : "The annotated cell type of each cell based on RNA expression.",
-                "required" : true
-              },
-              {
-                "name" : "sm_name",
-                "type" : "string",
-                "description" : "The primary name for the (parent) compound (in a standardized representation)\nas chosen by LINCS. This is provided to map the data in this experiment to \nthe LINCS Connectivity Map data.\n",
-                "required" : true
-              },
-              {
-                "name" : "donor_id",
-                "type" : "string",
-                "description" : "Donor id",
-                "required" : true
-              },
-              {
-                "name" : "plate_name",
-                "type" : "string",
-                "description" : "Plate name 6 levels",
-                "required" : true
-              },
-              {
-                "name" : "row",
-                "type" : "string",
-                "description" : "Row name on the plate",
-                "required" : true
-              },
-              {
-                "name" : "well",
-                "type" : "string",
-                "description" : "Well name on the plate",
-                "required" : true
-              },
-              {
-                "name" : "cell_count",
-                "type" : "string",
-                "description" : "Number of single cells pseudobulked",
-                "required" : true
-              }
-            ],
-            "layers" : [
-              {
-                "name" : "n_counts",
-                "type" : "double",
-                "description" : "Pseudobulked values using mean approach",
-                "required" : true
-              },
-              {
-                "name" : "pearson",
-                "type" : "double",
-                "description" : "Normalized values using pearson residuals",
-                "required" : false
-              },
-              {
-                "name" : "lognorm",
-                "type" : "double",
-                "description" : "Normalized values using shifted logarithm ",
-                "required" : false
-              }
-            ]
-          }
-        },
-        "example" : [
-          "resources_test/grn-benchmark/perturbation_data.h5ad"
-        ],
-        "default" : [
-          "resources/grn-benchmark/perturbation_data.h5ad"
-        ],
-        "must_exist" : true,
-        "create_parent" : true,
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "file",
-        "name" : "--multiomics_rna",
-        "info" : {
-          "label" : "multiomics rna",
-          "summary" : "RNA expression for multiomics data.",
-          "file_type" : "h5ad",
-          "slots" : {
-            "obs" : [
-              {
-                "name" : "cell_type",
-                "type" : "string",
-                "description" : "The annotated cell type of each cell based on RNA expression.",
-                "required" : true
-              },
-              {
-                "name" : "donor_id",
-                "type" : "string",
-                "description" : "Donor id",
-                "required" : true
-              }
-            ]
-          }
-        },
-        "example" : [
-          "resources_test/grn-benchmark/multiomics_rna.h5ad"
-        ],
-        "must_exist" : true,
-        "create_parent" : true,
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
         "type" : "string",
         "name" : "--layer",
         "description" : "Which layer of pertubation data to use to find tf-gene relationships.",
@@ -2967,6 +2844,20 @@ meta = [
         ],
         "default" : [
           "resources/prior/tf_all.csv"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "file",
+        "name" : "--perturbation_data",
+        "default" : [
+          "resources/grn-benchmark/perturbation_data.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -3084,7 +2975,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/negative_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "1888e69b566fa2d1f9cd51ed640d308b3a3135ac",
+    "git_commit" : "9f6646f97a27df80e9ca8e051af1ff50ca9f9161",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3107,11 +2998,10 @@ import numpy as np
 ## VIASH START
 # The following code has been auto-generated by Viash.
 par = {
-  'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),

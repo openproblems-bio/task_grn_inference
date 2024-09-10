@@ -6,6 +6,13 @@ functionality:
     summary: Source-target links based on random assignment
     description: |
       Randomly assigns regulatory links to tf-target links with a given tf and target list. This is to perform near random.
+  arguments:
+    - name: --perturbation_data
+      type: file
+      required: false
+      direction: input
+      default: resources/grn-benchmark/perturbation_data.h5ad
+    
   resources:
     - type: python_script
       path: script.py

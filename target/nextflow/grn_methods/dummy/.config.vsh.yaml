@@ -102,5 +102,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/dummy"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/dummy/dummy"
   viash_version: "0.8.6"
-  git_commit: "1888e69b566fa2d1f9cd51ed640d308b3a3135ac"
+  git_commit: "9f6646f97a27df80e9ca8e051af1ff50ca9f9161"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
