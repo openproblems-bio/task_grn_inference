@@ -3072,7 +3072,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/pidc",
     "viash_version" : "0.8.6",
-    "git_commit" : "a8da63f10f600b11505dc06a5018bc395db866e1",
+    "git_commit" : "ca5efb98538b804ed2cb43c1ac9311c3a72c77fc",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3133,11 +3133,11 @@ gene_names = adata_rna.var.gene_ids.index.to_numpy()
 df_rna = pd.DataFrame(adata_rna.X.toarray(), index=adata_rna.obs.index, columns=adata_rna.var.index)
 
 # Remove genes with >=90% of zeros
-mask = (np.mean(df_rna.to_numpy() == 0, axis=0) >= 0.9)
+mask = (np.mean(df_rna.to_numpy() == 0, axis=0) >= 0.75)
 df_rna = df_rna.loc[:, ~mask]
 
 # Remove samples with >=90% of zeros
-mask = (np.mean(df_rna.to_numpy() == 0, axis=1) >= 0.9)
+mask = (np.mean(df_rna.to_numpy() == 0, axis=1) >= 0.75)
 df_rna = df_rna.loc[~mask, :]
 
 # (genes x samples) format is needed
@@ -3157,8 +3157,14 @@ subprocess.run([
     os.path.join(par['temp_dir'], 'output.tsv'),
 ])
 
+# Load list of putative TFs
+df = pd.read_csv(par['tf_all'], header=None, names=['gene_name'])
+tfs = set(list(df['gene_name']))
+
 # Re-format output
 df = pd.read_csv(os.path.join(par['temp_dir'], 'output.tsv'), header=None, names=['source', 'target', 'weight'], sep='\\\\t')
+mask = np.asarray([(gene_name in tfs) for gene_name in df['source']], dtype=bool)
+df = df[mask]
 df = df.head(par['max_n_links'])
 df.to_csv(par['prediction'], header=True, sep=',')
 

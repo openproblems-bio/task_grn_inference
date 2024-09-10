@@ -92,9 +92,9 @@ def cross_validate_gene(
     y_pred = np.concatenate(y_pred, axis=0)
     y_target = np.concatenate(y_target, axis=0)
     
-    # results['r2'] = float(r2_score(y_target, y_pred))
-    results['avg-r2'] = float(np.mean(r2s))
-
+    results['r2'] = float(np.clip(r2_score(y_target, y_pred), 0, 1))
+    results['avg-r2'] = float(np.clip(np.mean(r2s), 0, 1))
+    
     return results
 
 
@@ -117,18 +117,19 @@ def learn_background_distribution(
         for _ in range(N_POINTS_TO_ESTIMATE_BACKGROUND):
             j = rng.integers(low=0, high=n_genes)
             random_grn[:, j] = rng.random(size=n_genes)
-            res = cross_validate_gene(
-                estimator_t,
-                X,
-                groups,
-                random_grn,
-                j,
-                n_features=n_features,
-                random_state=SEED,
-                n_jobs=n_jobs
-            )
-            scores.append(res['avg-r2'])
-        
+
+            if n_features > 0:
+                res = cross_validate_gene(
+                    estimator_t,
+                    X,
+                    groups,
+                    random_grn,
+                    j,
+                    n_features=n_features,
+                    random_state=SEED,
+                    n_jobs=n_jobs
+                )
+                scores.append(res['avg-r2'])
         background[n_features] = (np.mean(scores), max(0.001, np.std(scores)))
     background['max'] = background[max_n_regulators]
     return background
@@ -156,8 +157,9 @@ def cross_validate(
     # Perform cross-validation for each gene
     results = []
     for j in tqdm.tqdm(range(n_genes), desc=f'{estimator_t} CV'):
-        res = cross_validate_gene(estimator_t, X, groups, grn, j, n_features=int(n_features[j]),n_jobs=n_jobs)
-        results.append(res)
+        if n_features[j] > 0:
+            res = cross_validate_gene(estimator_t, X, groups, grn, j, n_features=int(n_features[j]),n_jobs=n_jobs)
+            results.append(res)
     
     return {
         'gene_names': list(gene_names),

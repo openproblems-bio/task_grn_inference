@@ -2954,6 +2954,19 @@ meta = [
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
+      },
+      {
+        "type" : "integer",
+        "name" : "--nsplit",
+        "description" : "Number of sample splits to perform in stability selection.",
+        "default" : [
+          25
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
       }
     ],
     "resources" : [
@@ -3089,7 +3102,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/tigress",
     "viash_version" : "0.8.6",
-    "git_commit" : "a8da63f10f600b11505dc06a5018bc395db866e1",
+    "git_commit" : "ca5efb98538b804ed2cb43c1ac9311c3a72c77fc",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3120,7 +3133,8 @@ par <- list(
   "temp_dir" = $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TEMP_DIR" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "num_workers" = $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_NUM_WORKERS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "tf_all" = $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TF_ALL" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "max_n_links" = $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_MAX_N_LINKS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi )
+  "max_n_links" = $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_MAX_N_LINKS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
+  "nsplit" = $( if [ ! -z ${VIASH_PAR_NSPLIT+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_NSPLIT" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi )
 )
 meta <- list(
   "functionality_name" = $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo -n "'"; echo -n "$VIASH_META_FUNCTIONALITY_NAME" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
@@ -3169,7 +3183,14 @@ dat <- read.csv(par\\$tf_all, header = FALSE)
 Tf <- intersect(gene_names, dat\\$V1)
 
 # Run GRN inference method
-grn = tigress(X, tflist = Tf, targetlist = gene_names, allsteps=FALSE, verb=FALSE, usemulticore=TRUE)
+start.time <- Sys.time()
+grn = tigress(
+    X, tflist = gene_names, targetlist = gene_names,
+    nstepsLARS = 5,
+    nsplit = par\\$nsplit,
+    allsteps=FALSE, verb=TRUE, usemulticore=TRUE
+)
+time.taken <- Sys.time() - start.time
 
 # Re-format output
 df <- as.data.frame(as.table(grn))
@@ -3182,8 +3203,6 @@ df <- cbind(index = 1:nrow(df), df)
 
 # Keep top links
 df <- head(df, par\\$max_n_links)
-
-print(df)
 
 # Save results
 write.table(df, par\\$prediction, sep = ",", quote = FALSE, row.names = FALSE)

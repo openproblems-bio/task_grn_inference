@@ -3009,7 +3009,7 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "python:3.8",
+      "image" : "apassemi/scsgl",
       "target_organization" : "openproblems-bio/task_grn_inference",
       "target_registry" : "ghcr.io",
       "namespace_separator" : "/",
@@ -3018,12 +3018,6 @@ meta = [
       "setup_strategy" : "ifneedbepullelsecachedbuild",
       "target_image_source" : "https://github.com/openproblems-bio/task_grn_inference",
       "setup" : [
-        {
-          "type" : "docker",
-          "run" : [
-            "apt-get update && \\\\\napt-get install -y r-base time  && \\\\\nRscript -e \\"install.packages('pcaPP')\\"\n"
-          ]
-        },
         {
           "type" : "python",
           "user" : false,
@@ -3090,7 +3084,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scsgl",
     "viash_version" : "0.8.6",
-    "git_commit" : "a8da63f10f600b11505dc06a5018bc395db866e1",
+    "git_commit" : "ca5efb98538b804ed2cb43c1ac9311c3a72c77fc",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3109,10 +3103,12 @@ import os
 import sys
 import contextlib
 import subprocess
+from itertools import permutations
 
 import anndata
 import numpy as np
 import scipy.sparse
+from scipy.spatial.distance import squareform
 import pandas as pd
 
 
@@ -3147,24 +3143,26 @@ dep = {
 
 ## VIASH END
 
-
 # Load scRNA-seq data
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
 X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X
 
-# Download scSGL
-SCSGL_FOLDER = os.path.join(par['temp_dir'], 'scSGL')
-os.makedirs(par['temp_dir'], exist_ok=True)
-if not os.path.exists(os.path.join(par['temp_dir'], 'scSGL', 'pysrc')):
-    subprocess.run(['git', 'clone', 'https://github.com/Single-Cell-Graph-Learning/scSGL', SCSGL_FOLDER])
-
-# Import pysrc locally (from the cloned repository)
-sys.path.append(SCSGL_FOLDER)
+# Import pysrc locally
+sys.path.append(os.environ['SCSGL_PATH'])
 from pysrc.graphlearning import learn_signed_graph
-from pysrc.evaluation import auc
+
+# Remove genes with >=90% of zeros
+mask = (np.mean(X == 0, axis=0) >= 0.75)
+X = X[:, ~mask]
+gene_names = gene_names[~mask]
+
+# Remove samples with >=90% of zeros
+mask = (np.mean(X == 0, axis=1) >= 0.75)
+X = X[~mask, :]
 
 # Run scSGL
+print('Starting scSGL', flush=True)
 df = learn_signed_graph(
     X.T,
     pos_density=0.45,
@@ -3177,6 +3175,15 @@ df = learn_signed_graph(
 df.rename(columns={'Gene1': 'source', 'Gene2': 'target', 'EdgeWeight': 'weight'}, inplace=True)
 df.reset_index(inplace=True)
 df.drop('index', axis=1, inplace=True, errors='ignore')
+
+# Load list of putative TFs
+df_tfs = pd.read_csv(par['tf_all'], header=None, names=['gene_name'])
+tfs = set(list(df_tfs['gene_name']))
+
+# Ensure first gene in pair is a putative TF
+print(df)
+mask = np.asarray([(gene_name in tfs) for gene_name in df['source']], dtype=bool)
+df = df[mask]
 
 # Sort values
 df = df.sort_values(by='weight', key=abs, ascending=False)

@@ -204,6 +204,11 @@ function ViashHelp {
   echo "    --max_n_links"
   echo "        type: integer"
   echo "        default: 50000"
+  echo ""
+  echo "    --M"
+  echo "        type: integer"
+  echo "        default: 100"
+  echo "        Number of iterations."
 }
 
 # initialise array
@@ -307,6 +312,17 @@ while [[ $# -gt 0 ]]; do
         --max_n_links=*)
             [ -n "$VIASH_PAR_MAX_N_LINKS" ] && ViashError Bad arguments for option \'--max_n_links=*\': \'$VIASH_PAR_MAX_N_LINKS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_MAX_N_LINKS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --M)
+            [ -n "$VIASH_PAR_M" ] && ViashError Bad arguments for option \'--M\': \'$VIASH_PAR_M\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_M="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --M. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --M=*)
+            [ -n "$VIASH_PAR_M" ] && ViashError Bad arguments for option \'--M=*\': \'$VIASH_PAR_M\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_M=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---cpus)
@@ -430,6 +446,9 @@ fi
 if [ -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then
   VIASH_PAR_MAX_N_LINKS="50000"
 fi
+if [ -z ${VIASH_PAR_M+x} ]; then
+  VIASH_PAR_M="100"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
@@ -451,6 +470,12 @@ fi
 if [[ -n "$VIASH_PAR_MAX_N_LINKS" ]]; then
   if ! [[ "$VIASH_PAR_MAX_N_LINKS" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--max_n_links' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_M" ]]; then
+  if ! [[ "$VIASH_PAR_M" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--M' has to be an integer. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -536,7 +561,8 @@ par <- list(
   "temp_dir" = $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TEMP_DIR" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "num_workers" = $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_NUM_WORKERS" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi ),
   "tf_all" = $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TF_ALL" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "max_n_links" = $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_MAX_N_LINKS" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi )
+  "max_n_links" = $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_MAX_N_LINKS" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi ),
+  "M" = $( if [ ! -z ${VIASH_PAR_M+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_M" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi )
 )
 meta <- list(
   "functionality_name" = $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo -n "'"; echo -n "$VIASH_META_FUNCTIONALITY_NAME" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
@@ -585,7 +611,7 @@ Tf <- which(gene_names %in% dat\$V1)
 
 # Run GRN inference method
 K <- matrix(0,nrow(X),ncol(X))
-grn <- ennet(E = X, K = K, Tf = Tf)
+grn <- ennet(E = X, K = K, Tf = Tf, M = par\$M)
 
 # Re-format output
 df <- as.data.frame(as.table(grn))

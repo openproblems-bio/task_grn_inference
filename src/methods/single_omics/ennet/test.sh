@@ -1,1 +1,1 @@
-viash run src/methods/single_omics/ennet/config.novsh.yaml -- --multiomics_rna resources_test/grn-benchmark/multiomics_rna.h5ad --tfs resources/prior/tf_all.csv --prediction output/ennet/prediction.csv
+viash run src/methods/single_omics/ennet/config.vsh.yaml -- --multiomics_rna resources_test/grn-benchmark/multiomics_rna.h5ad --tf_all resources/prior/tf_all.csv --prediction output/ennet/prediction.csv

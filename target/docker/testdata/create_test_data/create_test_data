@@ -420,9 +420,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component testdata create_test_data"
-LABEL org.opencontainers.image.created="2024-09-10T15:25:03Z"
+LABEL org.opencontainers.image.created="2024-09-10T16:03:41Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="a8da63f10f600b11505dc06a5018bc395db866e1"
+LABEL org.opencontainers.image.revision="ca5efb98538b804ed2cb43c1ac9311c3a72c77fc"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

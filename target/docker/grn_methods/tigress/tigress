@@ -204,6 +204,11 @@ function ViashHelp {
   echo "    --max_n_links"
   echo "        type: integer"
   echo "        default: 50000"
+  echo ""
+  echo "    --nsplit"
+  echo "        type: integer"
+  echo "        default: 25"
+  echo "        Number of sample splits to perform in stability selection."
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -432,9 +437,9 @@ RUN Rscript -e 'if (!requireNamespace("remotes", quietly = TRUE)) install.packag
 RUN Rscript -e 'library(devtools); install_github("jpvert/tigress")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods tigress"
-LABEL org.opencontainers.image.created="2024-09-10T15:25:04Z"
+LABEL org.opencontainers.image.created="2024-09-10T16:03:42Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="a8da63f10f600b11505dc06a5018bc395db866e1"
+LABEL org.opencontainers.image.revision="ca5efb98538b804ed2cb43c1ac9311c3a72c77fc"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -670,6 +675,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_MAX_N_LINKS=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --nsplit)
+            [ -n "$VIASH_PAR_NSPLIT" ] && ViashError Bad arguments for option \'--nsplit\': \'$VIASH_PAR_NSPLIT\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_NSPLIT="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --nsplit. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --nsplit=*)
+            [ -n "$VIASH_PAR_NSPLIT" ] && ViashError Bad arguments for option \'--nsplit=*\': \'$VIASH_PAR_NSPLIT\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_NSPLIT=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         ---setup)
             VIASH_MODE='docker_setup'
             VIASH_DOCKER_SETUP_STRATEGY="$2"
@@ -831,6 +847,9 @@ fi
 if [ -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then
   VIASH_PAR_MAX_N_LINKS="50000"
 fi
+if [ -z ${VIASH_PAR_NSPLIT+x} ]; then
+  VIASH_PAR_NSPLIT="25"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
@@ -852,6 +871,12 @@ fi
 if [[ -n "$VIASH_PAR_MAX_N_LINKS" ]]; then
   if ! [[ "$VIASH_PAR_MAX_N_LINKS" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--max_n_links' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_NSPLIT" ]]; then
+  if ! [[ "$VIASH_PAR_NSPLIT" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--nsplit' has to be an integer. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -995,7 +1020,8 @@ par <- list(
   "temp_dir" = $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TEMP_DIR" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "num_workers" = $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_NUM_WORKERS" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi ),
   "tf_all" = $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TF_ALL" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "max_n_links" = $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_MAX_N_LINKS" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi )
+  "max_n_links" = $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_MAX_N_LINKS" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi ),
+  "nsplit" = $( if [ ! -z ${VIASH_PAR_NSPLIT+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_NSPLIT" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi )
 )
 meta <- list(
   "functionality_name" = $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo -n "'"; echo -n "$VIASH_META_FUNCTIONALITY_NAME" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
@@ -1044,7 +1070,14 @@ dat <- read.csv(par\$tf_all, header = FALSE)
 Tf <- intersect(gene_names, dat\$V1)
 
 # Run GRN inference method
-grn = tigress(X, tflist = Tf, targetlist = gene_names, allsteps=FALSE, verb=FALSE, usemulticore=TRUE)
+start.time <- Sys.time()
+grn = tigress(
+    X, tflist = gene_names, targetlist = gene_names,
+    nstepsLARS = 5,
+    nsplit = par\$nsplit,
+    allsteps=FALSE, verb=TRUE, usemulticore=TRUE
+)
+time.taken <- Sys.time() - start.time
 
 # Re-format output
 df <- as.data.frame(as.table(grn))
@@ -1057,8 +1090,6 @@ df <- cbind(index = 1:nrow(df), df)
 
 # Keep top links
 df <- head(df, par\$max_n_links)
-
-print(df)
 
 # Save results
 write.table(df, par\$prediction, sep = ",", quote = FALSE, row.names = FALSE)

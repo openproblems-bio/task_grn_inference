@@ -9,7 +9,11 @@ functionality:
     description: |
       GRN inference using TIGRESS.
     documentation_url: https://rdrr.io/github/jpvert/tigress/man/tigress.html
-  
+  arguments:
+    - name: --nsplit
+      type: integer
+      default: 25
+      description: "Number of sample splits to perform in stability selection."
   resources:
     - type: r_script
       path: script.R

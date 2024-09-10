@@ -8,7 +8,8 @@ par <- list(
     "tf_all" = 'resources/prior/tf_all.csv',
     "prediction" = 'output/ennet/prediction.csv',
     "temp_dir": 'output/ennet',
-    "max_n_links": 50000
+    "max_n_links": 50000,
+    "M": 100
 )
 ## VIASH END
 
@@ -34,7 +35,7 @@ Tf <- which(gene_names %in% dat$V1)
 
 # Run GRN inference method
 K <- matrix(0,nrow(X),ncol(X))
-grn <- ennet(E = X, K = K, Tf = Tf)
+grn <- ennet(E = X, K = K, Tf = Tf, M = par$M)
 
 # Re-format output
 df <- as.data.frame(as.table(grn))

@@ -1,1 +1,2 @@
-viash run src/methods/single_omics/scsgl/config.novsh.yaml -- --multiomics_rna resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/scsgl/prediction.csv
+#viash build src/methods/single_omics/scsgl/config.vsh.yaml --setup cachedbuild
+viash run src/methods/single_omics/scsgl/config.vsh.yaml -- --multiomics_rna resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/scsgl/prediction.csv
