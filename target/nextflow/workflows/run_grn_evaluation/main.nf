@@ -2890,6 +2890,15 @@ meta = [
             "multiple" : false,
             "multiple_sep" : ":",
             "dest" : "par"
+          },
+          {
+            "type" : "boolean",
+            "name" : "--causal",
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
           }
         ]
       },
@@ -2969,9 +2978,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems",
           "tag" : "v2.0.0",
-          "localPath" : "/tmp/viash_hub_repo1746809526785043376"
+          "localPath" : "/tmp/viash_hub_repo3582829287635683853"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo1746809526785043376/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo3582829287635683853/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_tag" : "v1.0.0-1413-gb782e93f",
@@ -3002,7 +3011,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7",
+          "git_commit" : "a8da63f10f600b11505dc06a5018bc395db866e1",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
@@ -3023,7 +3032,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7",
+          "git_commit" : "a8da63f10f600b11505dc06a5018bc395db866e1",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
@@ -3044,7 +3053,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7",
+          "git_commit" : "a8da63f10f600b11505dc06a5018bc395db866e1",
           "executable" : "/nextflow/control_methods/positive_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control"
@@ -3065,10 +3074,31 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7",
+          "git_commit" : "a8da63f10f600b11505dc06a5018bc395db866e1",
           "executable" : "/nextflow/control_methods/negative_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/negative_control"
+      },
+      {
+        "name" : "control_methods/baseline_corr",
+        "repository" : {
+          "type" : "local",
+          "localPath" : ""
+        },
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/control_methods/baseline_corr/config.vsh.yaml",
+        "configInfo" : {
+          "functionalityName" : "baseline_corr",
+          "git_tag" : "",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
+          "viash_version" : "0.8.6",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/control_methods/baseline_corr/config.vsh.yaml",
+          "functionalityNamespace" : "control_methods",
+          "output" : "",
+          "platform" : "",
+          "git_commit" : "a8da63f10f600b11505dc06a5018bc395db866e1",
+          "executable" : "/nextflow/control_methods/baseline_corr/main.nf"
+        },
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/baseline_corr"
       }
     ],
     "repositories" : [
@@ -3128,7 +3158,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.8.6",
-    "git_commit" : "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7",
+    "git_commit" : "a8da63f10f600b11505dc06a5018bc395db866e1",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3141,6 +3171,7 @@ include { regression_2 } from "${meta.resources_dir}/../../../nextflow/metrics/r
 include { regression_1 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_1/main.nf"
 include { positive_control } from "${meta.resources_dir}/../../../nextflow/control_methods/positive_control/main.nf"
 include { negative_control } from "${meta.resources_dir}/../../../nextflow/control_methods/negative_control/main.nf"
+include { baseline_corr } from "${meta.resources_dir}/../../../nextflow/control_methods/baseline_corr/main.nf"
 
 // inner workflow
 // user-provided Nextflow code
@@ -3180,6 +3211,41 @@ workflow run_wf {
         perturbation_data: "perturbation_data",
         layer: "layer",
         tf_all: "tf_all"
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
+    
+    | baseline_corr.run(
+      runIf: { id, state ->
+        state.method_id == 'baseline_corr_causal'
+      },
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        layer: "layer",
+        tf_all: "tf_all",
+        causal: "causal",
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
+
+    | baseline_corr.run(
+      runIf: { id, state ->
+        state.method_id == 'baseline_corr'
+      },
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        layer: "layer",
+        tf_all: "tf_all",
+        causal: "causal",
+        seed: "seed"
       ],
       toState: {id, output, state ->
         state + [

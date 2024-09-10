@@ -93,6 +93,22 @@ functionality:
       multiple: false
       multiple_sep: ":"
       dest: "par"
+    - type: "boolean"
+      name: "--causal"
+      info: null
+      required: false
+      direction: "input"
+      multiple: false
+      multiple_sep: ":"
+      dest: "par"
+    - type: "integer"
+      name: "--seed"
+      info: null
+      required: false
+      direction: "input"
+      multiple: false
+      multiple_sep: ":"
+      dest: "par"
   - name: "Outputs"
     arguments:
     - type: "file"
@@ -119,6 +135,18 @@ functionality:
       multiple: false
       multiple_sep: ":"
       dest: "par"
+  - name: "Arguments"
+    arguments:
+    - type: "string"
+      name: "--metric_ids"
+      description: "A list of metric ids to run. If not specified, all metric will\
+        \ be run."
+      info: null
+      required: false
+      direction: "input"
+      multiple: true
+      multiple_sep: ":"
+      dest: "par"
   resources:
   - type: "nextflow_script"
     path: "main.nf"
@@ -137,8 +165,8 @@ functionality:
       name: ""
       repo: "openproblems-bio/openproblems"
       tag: "v2.0.0"
-      localPath: "/tmp/viash_hub_repo5138647849056842629"
-    foundConfigPath: "/tmp/viash_hub_repo5138647849056842629/target/nextflow/common/extract_metadata/.config.vsh.yaml"
+      localPath: "/tmp/viash_hub_repo3779960674810126542"
+    foundConfigPath: "/tmp/viash_hub_repo3779960674810126542/target/nextflow/common/extract_metadata/.config.vsh.yaml"
     configInfo:
       functionalityName: "extract_metadata"
       git_tag: "v1.0.0-1413-gb782e93f"
@@ -165,7 +193,7 @@ functionality:
       functionalityNamespace: "metrics"
       output: ""
       platform: ""
-      git_commit: "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7"
+      git_commit: "a8da63f10f600b11505dc06a5018bc395db866e1"
       executable: "/nextflow/metrics/regression_1/main.nf"
     writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
   - name: "metrics/regression_2"
@@ -182,26 +210,26 @@ functionality:
       functionalityNamespace: "metrics"
       output: ""
       platform: ""
-      git_commit: "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7"
+      git_commit: "a8da63f10f600b11505dc06a5018bc395db866e1"
       executable: "/nextflow/metrics/regression_2/main.nf"
     writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
-  - name: "robustness_analysis/causal_grn"
+  - name: "control_methods/baseline_corr"
     repository:
       type: "local"
       localPath: ""
-    foundConfigPath: "/home/runner/work/task_grn_inference/task_grn_inference/src/robustness_analysis/causal/config.vsh.yaml"
+    foundConfigPath: "/home/runner/work/task_grn_inference/task_grn_inference/src/control_methods/baseline_corr/config.vsh.yaml"
     configInfo:
-      functionalityName: "causal_grn"
+      functionalityName: "baseline_corr"
       git_tag: ""
       git_remote: "https://github.com/openproblems-bio/task_grn_inference"
       viash_version: "0.8.6"
-      config: "/home/runner/work/task_grn_inference/task_grn_inference/src/robustness_analysis/causal/config.vsh.yaml"
-      functionalityNamespace: "robustness_analysis"
+      config: "/home/runner/work/task_grn_inference/task_grn_inference/src/control_methods/baseline_corr/config.vsh.yaml"
+      functionalityNamespace: "control_methods"
       output: ""
       platform: ""
-      git_commit: "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7"
-      executable: "/nextflow/robustness_analysis/causal_grn/main.nf"
-    writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/robustness_analysis/causal_grn"
+      git_commit: "a8da63f10f600b11505dc06a5018bc395db866e1"
+      executable: "/nextflow/control_methods/baseline_corr/main.nf"
+    writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/baseline_corr"
   repositories:
   - type: "github"
     name: "openproblems"
@@ -247,5 +275,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_robustness_analysis_causal"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_robustness_analysis_causal/main.nf"
   viash_version: "0.8.6"
-  git_commit: "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7"
+  git_commit: "a8da63f10f600b11505dc06a5018bc395db866e1"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

@@ -2887,6 +2887,24 @@ meta = [
             "multiple" : false,
             "multiple_sep" : ":",
             "dest" : "par"
+          },
+          {
+            "type" : "boolean",
+            "name" : "--causal",
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "integer",
+            "name" : "--seed",
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
           }
         ]
       },
@@ -2922,6 +2940,21 @@ meta = [
             "dest" : "par"
           }
         ]
+      },
+      {
+        "name" : "Arguments",
+        "arguments" : [
+          {
+            "type" : "string",
+            "name" : "--metric_ids",
+            "description" : "A list of metric ids to run. If not specified, all metric will be run.",
+            "required" : false,
+            "direction" : "input",
+            "multiple" : true,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          }
+        ]
       }
     ],
     "resources" : [
@@ -2951,9 +2984,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems",
           "tag" : "v2.0.0",
-          "localPath" : "/tmp/viash_hub_repo5138647849056842629"
+          "localPath" : "/tmp/viash_hub_repo3779960674810126542"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo5138647849056842629/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo3779960674810126542/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_tag" : "v1.0.0-1413-gb782e93f",
@@ -2984,7 +3017,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7",
+          "git_commit" : "a8da63f10f600b11505dc06a5018bc395db866e1",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
@@ -3005,31 +3038,31 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7",
+          "git_commit" : "a8da63f10f600b11505dc06a5018bc395db866e1",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
       },
       {
-        "name" : "robustness_analysis/causal_grn",
+        "name" : "control_methods/baseline_corr",
         "repository" : {
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/robustness_analysis/causal/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/control_methods/baseline_corr/config.vsh.yaml",
         "configInfo" : {
-          "functionalityName" : "causal_grn",
+          "functionalityName" : "baseline_corr",
           "git_tag" : "",
           "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/robustness_analysis/causal/config.vsh.yaml",
-          "functionalityNamespace" : "robustness_analysis",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/control_methods/baseline_corr/config.vsh.yaml",
+          "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7",
-          "executable" : "/nextflow/robustness_analysis/causal_grn/main.nf"
+          "git_commit" : "a8da63f10f600b11505dc06a5018bc395db866e1",
+          "executable" : "/nextflow/control_methods/baseline_corr/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/robustness_analysis/causal_grn"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/baseline_corr"
       }
     ],
     "repositories" : [
@@ -3089,7 +3122,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_robustness_analysis_causal",
     "viash_version" : "0.8.6",
-    "git_commit" : "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7",
+    "git_commit" : "a8da63f10f600b11505dc06a5018bc395db866e1",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3100,7 +3133,7 @@ meta["root_dir"] = getRootDir()
 include { extract_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems/v2.0.0/nextflow/common/extract_metadata/main.nf"
 include { regression_1 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_1/main.nf"
 include { regression_2 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_2/main.nf"
-include { causal_grn } from "${meta.resources_dir}/../../../nextflow/robustness_analysis/causal_grn/main.nf"
+include { baseline_corr } from "${meta.resources_dir}/../../../nextflow/control_methods/baseline_corr/main.nf"
 
 // inner workflow
 // user-provided Nextflow code
@@ -3132,18 +3165,25 @@ workflow run_wf {
         [id, state + ["_meta": [join_id: id]]]
       }
     
-    | causal_grn.run(
+    | baseline_corr.run(
       fromState: [
-        multiomics_rna: "multiomics_rna", tf_all: "tf_all"
+        multiomics_rna: "multiomics_rna",
+        tf_all: "tf_all",
+        causal:"causal"
       ],
-      toState: [
-          prediction: "prediction"
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
         ]
+      }
     )
 
     // run all metrics
     | runEach(
       components: metrics,
+      filter: { id, state, comp ->
+        !state.metric_ids || state.metric_ids.contains(comp.config.functionality.name)
+      },
       id: { id, state, comp ->
         id + "." + comp.config.functionality.name
       },

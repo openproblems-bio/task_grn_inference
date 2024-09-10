@@ -56,9 +56,38 @@ functionality:
           required: false
     example:
     - "resources_test/grn-benchmark/perturbation_data.h5ad"
+    default:
+    - "resources/grn-benchmark/perturbation_data.h5ad"
     must_exist: true
     create_parent: true
-    required: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--multiomics_rna"
+    info:
+      label: "multiomics rna"
+      summary: "RNA expression for multiomics data."
+      file_type: "h5ad"
+      slots:
+        obs:
+        - name: "cell_type"
+          type: "string"
+          description: "The annotated cell type of each cell based on RNA expression."
+          required: true
+        - name: "donor_id"
+          type: "string"
+          description: "Donor id"
+          required: true
+    example:
+    - "resources_test/grn-benchmark/multiomics_rna.h5ad"
+    default:
+    - "resources/grn-benchmark/multiomics_rna.h5ad"
+    must_exist: true
+    create_parent: true
+    required: false
     direction: "input"
     multiple: false
     multiple_sep: ":"
@@ -97,7 +126,7 @@ functionality:
     - "resources_test/grn_models/collectri.csv"
     must_exist: true
     create_parent: true
-    required: true
+    required: false
     direction: "output"
     multiple: false
     multiple_sep: ":"
@@ -107,6 +136,8 @@ functionality:
     info: null
     example:
     - "resources_test/prior/tf_all.csv"
+    default:
+    - "resources/prior/tf_all.csv"
     must_exist: true
     create_parent: true
     required: false
@@ -195,5 +226,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/control_methods/negative_control"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/control_methods/negative_control/negative_control"
   viash_version: "0.8.6"
-  git_commit: "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7"
+  git_commit: "a8da63f10f600b11505dc06a5018bc395db866e1"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

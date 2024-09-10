@@ -174,8 +174,14 @@ function ViashHelp {
   echo ""
   echo "Arguments:"
   echo "    --perturbation_data"
-  echo "        type: file, required parameter, file must exist"
+  echo "        type: file, file must exist"
+  echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
   echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
+  echo ""
+  echo "    --multiomics_rna"
+  echo "        type: file, file must exist"
+  echo "        default: resources/grn-benchmark/multiomics_rna.h5ad"
+  echo "        example: resources_test/grn-benchmark/multiomics_rna.h5ad"
   echo ""
   echo "    --layer"
   echo "        type: string"
@@ -183,11 +189,12 @@ function ViashHelp {
   echo "        Which layer of pertubation data to use to find tf-gene relationships."
   echo ""
   echo "    --prediction"
-  echo "        type: file, required parameter, output, file must exist"
+  echo "        type: file, output, file must exist"
   echo "        example: resources_test/grn_models/collectri.csv"
   echo ""
   echo "    --tf_all"
   echo "        type: file, file must exist"
+  echo "        default: resources/prior/tf_all.csv"
   echo "        example: resources_test/prior/tf_all.csv"
 }
 
@@ -414,9 +421,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component control_methods negative_control"
-LABEL org.opencontainers.image.created="2024-09-10T08:00:35Z"
+LABEL org.opencontainers.image.created="2024-09-10T15:25:04Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7"
+LABEL org.opencontainers.image.revision="a8da63f10f600b11505dc06a5018bc395db866e1"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -586,6 +593,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_PERTURBATION_DATA=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --multiomics_rna)
+            [ -n "$VIASH_PAR_MULTIOMICS_RNA" ] && ViashError Bad arguments for option \'--multiomics_rna\': \'$VIASH_PAR_MULTIOMICS_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MULTIOMICS_RNA="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --multiomics_rna. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --multiomics_rna=*)
+            [ -n "$VIASH_PAR_MULTIOMICS_RNA" ] && ViashError Bad arguments for option \'--multiomics_rna=*\': \'$VIASH_PAR_MULTIOMICS_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MULTIOMICS_RNA=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --layer)
             [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_LAYER="$2"
@@ -737,14 +755,6 @@ fi
 
 
 # check whether required parameters exist
-if [ -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then
-  ViashError '--perturbation_data' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
-  ViashError '--prediction' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then
   ViashError 'functionality_name' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
@@ -767,13 +777,26 @@ if [ -z ${VIASH_META_TEMP_DIR+x} ]; then
 fi
 
 # filling in defaults
+if [ -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then
+  VIASH_PAR_PERTURBATION_DATA="resources/grn-benchmark/perturbation_data.h5ad"
+fi
+if [ -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then
+  VIASH_PAR_MULTIOMICS_RNA="resources/grn-benchmark/multiomics_rna.h5ad"
+fi
 if [ -z ${VIASH_PAR_LAYER+x} ]; then
   VIASH_PAR_LAYER="scgen_pearson"
+fi
+if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
+  VIASH_PAR_TF_ALL="resources/prior/tf_all.csv"
 fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ] && [ ! -e "$VIASH_PAR_PERTURBATION_DATA" ]; then
   ViashError "Input file '$VIASH_PAR_PERTURBATION_DATA' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
+  ViashError "Input file '$VIASH_PAR_MULTIOMICS_RNA' does not exist."
   exit 1
 fi
 if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
@@ -835,6 +858,10 @@ VIASH_CHOWN_VARS=()
 if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PERTURBATION_DATA")" )
   VIASH_PAR_PERTURBATION_DATA=$(ViashAutodetectMount "$VIASH_PAR_PERTURBATION_DATA")
+fi
+if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ]; then
+  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_MULTIOMICS_RNA")" )
+  VIASH_PAR_MULTIOMICS_RNA=$(ViashAutodetectMount "$VIASH_PAR_MULTIOMICS_RNA")
 fi
 if [ ! -z "$VIASH_PAR_PREDICTION" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PREDICTION")" )
@@ -911,6 +938,7 @@ import numpy as np
 # The following code has been auto-generated by Viash.
 par = {
   'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi )
@@ -971,6 +999,9 @@ VIASHEOF
 # strip viash automount from file paths
 if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ]; then
   VIASH_PAR_PERTURBATION_DATA=$(ViashStripAutomount "$VIASH_PAR_PERTURBATION_DATA")
+fi
+if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ]; then
+  VIASH_PAR_MULTIOMICS_RNA=$(ViashStripAutomount "$VIASH_PAR_MULTIOMICS_RNA")
 fi
 if [ ! -z "$VIASH_PAR_PREDICTION" ]; then
   VIASH_PAR_PREDICTION=$(ViashStripAutomount "$VIASH_PAR_PREDICTION")

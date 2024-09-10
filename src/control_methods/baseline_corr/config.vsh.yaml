@@ -1,0 +1,32 @@
+__merge__: ../../api/comp_control_method.yaml
+
+functionality:
+  name: baseline_corr
+  info:
+    label: baseline_corr
+    summary: "Baseline based on Pearson corr"
+
+  arguments:
+    - name: --causal
+      type: boolean 
+      direction: input
+      default: false
+    - name: --seed
+      type: integer
+      direction: input
+
+
+  resources:
+    - type: python_script
+      path: script.py
+
+platforms:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    setup:
+      - type: python
+        packages: [  ]
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime, midmem, midcpu]

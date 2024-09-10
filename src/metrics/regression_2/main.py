@@ -95,7 +95,6 @@ def cross_validate_gene(
     # results['r2'] = float(r2_score(y_target, y_pred))
     results['avg-r2'] = float(np.mean(r2s))
 
-    
     return results
 
 
@@ -129,6 +128,7 @@ def learn_background_distribution(
                 n_jobs=n_jobs
             )
             scores.append(res['avg-r2'])
+        
         background[n_features] = (np.mean(scores), max(0.001, np.std(scores)))
     background['max'] = background[max_n_regulators]
     return background
@@ -220,7 +220,8 @@ def static_approach(
         tf_names: Set[str],
         reg_type: str,
         n_jobs:int,
-        n_features_dict:dict
+        n_features_dict:dict,
+        clip_scores:bool
 ) -> float:
 
     # Cross-validate each gene using the inferred GRN to define select input features
@@ -230,8 +231,10 @@ def static_approach(
     for i in range(len(res['scores'])):
         gene_name = res['gene_names'][i]
         if n_features[n_features_dict[gene_name]] != 0:
-            r2.append(res['scores'][i]['avg-r2'])
-
+            score = res['scores'][i]['avg-r2']
+            if clip_scores:
+               score = np.clip(score, 0, 1)
+            r2.append(score)
     # mean_r2_scores = np.asarray([res['scores'][j]['avg-r2'] for j in range(len(res['scores']))])
     mean_r2_scores = float(np.mean(r2))
 
@@ -292,14 +295,15 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     tf_names = np.loadtxt(par['tf_all'], dtype=str)
     if par['apply_tf']==False:
         tf_names = gene_names
+    clip_scores = par['clip_scores']
 
     # Evaluate GRN
     print(f'Compute metrics for layer: {layer}', flush=True)
     # print(f'Dynamic approach:', flush=True)
     print(f'Static approach (theta=0):', flush=True)
-    score_static_min = static_approach(grn, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['max_workers'], n_features_dict=n_features_dict)
+    score_static_min = static_approach(grn, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['max_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
     print(f'Static approach (theta=0.5):', flush=True)
-    score_static_median = static_approach(grn, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['max_workers'], n_features_dict=n_features_dict)
+    score_static_median = static_approach(grn, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['max_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
     # print(f'Static approach (theta=1):', flush=True)
     # score_static_max = static_approach(grn, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['max_workers'])
     # TODO: find a mathematically sound way to combine Z-scores and r2 scores
@@ -309,7 +313,7 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         'static-theta-0.5': [float(score_static_median)]
         # 'static-theta-1.0': [float(score_static_max)],
     }
-    print(f'Scores on {layer}: {results}')
+    # print(f'Scores on {layer}: {results}')
 
     # Add dynamic score
     if not par['static_only']:
