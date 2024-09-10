@@ -71,6 +71,16 @@ functionality:
         #   required: true
         #   direction: output
         #   default: metric_configs.yaml
+    - name: Arguments
+      arguments: 
+        - name: "--method_ids"
+          type: string
+          multiple: true
+          description: A list of method ids to run. If not specified, all methods will be run.
+        - name: "--metric_ids"
+          type: string
+          multiple: true
+          description: A list of metric ids to run. If not specified, all metric will be run.
     
   resources:
     - type: nextflow_script

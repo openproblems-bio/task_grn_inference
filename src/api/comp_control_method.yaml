@@ -18,7 +18,7 @@ functionality:
       __merge__: file_multiomics_rna_h5ad.yaml
       required: false
       direction: input
-      default: resources/grn-benchmark/multiomics_rna.h5ad
+      example: resources_test/grn-benchmark/multiomics_rna.h5ad
     - name: --layer
       type: string
       direction: input

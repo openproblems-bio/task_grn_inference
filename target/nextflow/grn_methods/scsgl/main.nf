@@ -3044,7 +3044,7 @@ meta = [
       "id" : "nextflow",
       "directives" : {
         "label" : [
-          "threedaystime",
+          "onedaytime",
           "midmem",
           "midcpu"
         ],
@@ -3084,7 +3084,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scsgl",
     "viash_version" : "0.8.6",
-    "git_commit" : "e1e727ab273fcceddd2a0b2d31b520e76d3a0cc3",
+    "git_commit" : "1888e69b566fa2d1f9cd51ed640d308b3a3135ac",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3552,7 +3552,7 @@ meta["defaults"] = [
     "tag" : "build-main"
   },
   "label" : [
-    "threedaystime",
+    "onedaytime",
     "midmem",
     "midcpu"
   ],

@@ -5,8 +5,8 @@ functionality:
   info:
     label: baseline_corr
     summary: "Baseline based on Pearson corr"
-
   arguments:
+
     - name: --causal
       type: boolean 
       direction: input
@@ -14,8 +14,7 @@ functionality:
     - name: --seed
       type: integer
       direction: input
-
-
+    
   resources:
     - type: python_script
       path: script.py

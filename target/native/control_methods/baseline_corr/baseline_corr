@@ -180,7 +180,6 @@ function ViashHelp {
   echo ""
   echo "    --multiomics_rna"
   echo "        type: file, file must exist"
-  echo "        default: resources/grn-benchmark/multiomics_rna.h5ad"
   echo "        example: resources_test/grn-benchmark/multiomics_rna.h5ad"
   echo ""
   echo "    --layer"
@@ -410,9 +409,6 @@ fi
 # filling in defaults
 if [ -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then
   VIASH_PAR_PERTURBATION_DATA="resources/grn-benchmark/perturbation_data.h5ad"
-fi
-if [ -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then
-  VIASH_PAR_MULTIOMICS_RNA="resources/grn-benchmark/multiomics_rna.h5ad"
 fi
 if [ -z ${VIASH_PAR_LAYER+x} ]; then
   VIASH_PAR_LAYER="scgen_pearson"
