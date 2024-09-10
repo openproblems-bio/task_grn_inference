@@ -19,6 +19,12 @@ functionality:
       required: false
       direction: input
       example: resources_test/grn-benchmark/multiomics_rna.h5ad
+    - name: --tf_all
+      type: file
+      required: false
+      direction: input
+      example: resources_test/prior/tf_all.csv
+      default: resources/prior/tf_all.csv
   resources:
     - type: python_script
       path: script.py

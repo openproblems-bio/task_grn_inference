@@ -43,12 +43,10 @@ functionality:
     multiple_sep: ":"
     dest: "par"
   - type: "file"
-    name: "--tf_all"
+    name: "--perturbation_data"
     info: null
-    example:
-    - "resources_test/prior/tf_all.csv"
     default:
-    - "resources/prior/tf_all.csv"
+    - "resources/grn-benchmark/perturbation_data.h5ad"
     must_exist: true
     create_parent: true
     required: false
@@ -57,10 +55,12 @@ functionality:
     multiple_sep: ":"
     dest: "par"
   - type: "file"
-    name: "--perturbation_data"
+    name: "--tf_all"
     info: null
+    example:
+    - "resources_test/prior/tf_all.csv"
     default:
-    - "resources/grn-benchmark/perturbation_data.h5ad"
+    - "resources/prior/tf_all.csv"
     must_exist: true
     create_parent: true
     required: false
@@ -149,5 +149,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control/positive_control"
   viash_version: "0.8.6"
-  git_commit: "9f6646f97a27df80e9ca8e051af1ff50ca9f9161"
+  git_commit: "cf3016fc19ad45bc64d991be9f53c88c733a0489"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

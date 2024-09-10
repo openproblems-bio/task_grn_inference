@@ -2838,12 +2838,9 @@ meta = [
       },
       {
         "type" : "file",
-        "name" : "--tf_all",
-        "example" : [
-          "resources_test/prior/tf_all.csv"
-        ],
+        "name" : "--perturbation_data",
         "default" : [
-          "resources/prior/tf_all.csv"
+          "resources/grn-benchmark/perturbation_data.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2855,9 +2852,12 @@ meta = [
       },
       {
         "type" : "file",
-        "name" : "--perturbation_data",
+        "name" : "--tf_all",
+        "example" : [
+          "resources_test/prior/tf_all.csv"
+        ],
         "default" : [
-          "resources/grn-benchmark/perturbation_data.h5ad"
+          "resources/prior/tf_all.csv"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2975,7 +2975,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "9f6646f97a27df80e9ca8e051af1ff50ca9f9161",
+    "git_commit" : "cf3016fc19ad45bc64d991be9f53c88c733a0489",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3003,8 +3003,8 @@ from tqdm import tqdm
 par = {
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),

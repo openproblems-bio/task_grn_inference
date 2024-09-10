@@ -2975,9 +2975,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems",
           "tag" : "v2.0.0",
-          "localPath" : "/tmp/viash_hub_repo14085307938377206122"
+          "localPath" : "/tmp/viash_hub_repo14084544252181728604"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo14085307938377206122/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo14084544252181728604/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_tag" : "v1.0.0-1413-gb782e93f",
@@ -3008,7 +3008,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "9f6646f97a27df80e9ca8e051af1ff50ca9f9161",
+          "git_commit" : "cf3016fc19ad45bc64d991be9f53c88c733a0489",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
@@ -3029,7 +3029,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "9f6646f97a27df80e9ca8e051af1ff50ca9f9161",
+          "git_commit" : "cf3016fc19ad45bc64d991be9f53c88c733a0489",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
@@ -3050,7 +3050,7 @@ meta = [
           "functionalityNamespace" : "robustness_analysis",
           "output" : "",
           "platform" : "",
-          "git_commit" : "9f6646f97a27df80e9ca8e051af1ff50ca9f9161",
+          "git_commit" : "cf3016fc19ad45bc64d991be9f53c88c733a0489",
           "executable" : "/nextflow/robustness_analysis/noise_grn/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/robustness_analysis/noise_grn"
@@ -3113,7 +3113,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_robustness_analysis",
     "viash_version" : "0.8.6",
-    "git_commit" : "9f6646f97a27df80e9ca8e051af1ff50ca9f9161",
+    "git_commit" : "cf3016fc19ad45bc64d991be9f53c88c733a0489",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

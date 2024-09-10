@@ -182,11 +182,6 @@ function ViashHelp {
   echo "        type: file, output, file must exist"
   echo "        example: resources_test/grn_models/collectri.csv"
   echo ""
-  echo "    --tf_all"
-  echo "        type: file, file must exist"
-  echo "        default: resources/prior/tf_all.csv"
-  echo "        example: resources_test/prior/tf_all.csv"
-  echo ""
   echo "    --causal"
   echo "        type: boolean"
   echo "        default: false"
@@ -197,6 +192,11 @@ function ViashHelp {
   echo "    --multiomics_rna"
   echo "        type: file, file must exist"
   echo "        example: resources_test/grn-benchmark/multiomics_rna.h5ad"
+  echo ""
+  echo "    --tf_all"
+  echo "        type: file, file must exist"
+  echo "        default: resources/prior/tf_all.csv"
+  echo "        example: resources_test/prior/tf_all.csv"
 }
 
 # initialise array
@@ -247,17 +247,6 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_PREDICTION=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --tf_all)
-            [ -n "$VIASH_PAR_TF_ALL" ] && ViashError Bad arguments for option \'--tf_all\': \'$VIASH_PAR_TF_ALL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_TF_ALL="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --tf_all. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --tf_all=*)
-            [ -n "$VIASH_PAR_TF_ALL" ] && ViashError Bad arguments for option \'--tf_all=*\': \'$VIASH_PAR_TF_ALL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_TF_ALL=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
         --causal)
             [ -n "$VIASH_PAR_CAUSAL" ] && ViashError Bad arguments for option \'--causal\': \'$VIASH_PAR_CAUSAL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_CAUSAL="$2"
@@ -289,6 +278,17 @@ while [[ $# -gt 0 ]]; do
         --multiomics_rna=*)
             [ -n "$VIASH_PAR_MULTIOMICS_RNA" ] && ViashError Bad arguments for option \'--multiomics_rna=*\': \'$VIASH_PAR_MULTIOMICS_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_MULTIOMICS_RNA=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --tf_all)
+            [ -n "$VIASH_PAR_TF_ALL" ] && ViashError Bad arguments for option \'--tf_all\': \'$VIASH_PAR_TF_ALL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TF_ALL="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --tf_all. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --tf_all=*)
+            [ -n "$VIASH_PAR_TF_ALL" ] && ViashError Bad arguments for option \'--tf_all=*\': \'$VIASH_PAR_TF_ALL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TF_ALL=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---cpus)
@@ -394,20 +394,20 @@ fi
 if [ -z ${VIASH_PAR_LAYER+x} ]; then
   VIASH_PAR_LAYER="scgen_pearson"
 fi
-if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
-  VIASH_PAR_TF_ALL="resources/prior/tf_all.csv"
-fi
 if [ -z ${VIASH_PAR_CAUSAL+x} ]; then
   VIASH_PAR_CAUSAL="false"
 fi
+if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
+  VIASH_PAR_TF_ALL="resources/prior/tf_all.csv"
+fi
 
 # check whether required files exist
-if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
-  ViashError "Input file '$VIASH_PAR_TF_ALL' does not exist."
-  exit 1
-fi
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
   ViashError "Input file '$VIASH_PAR_MULTIOMICS_RNA' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
+  ViashError "Input file '$VIASH_PAR_TF_ALL' does not exist."
   exit 1
 fi
 
@@ -503,10 +503,10 @@ from sklearn.preprocessing import StandardScaler
 par = {
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
-  'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
