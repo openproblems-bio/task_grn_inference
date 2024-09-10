@@ -14,7 +14,11 @@ functionality:
     - name: --seed
       type: integer
       direction: input
-    
+    - name: --multiomics_rna
+      type: file
+      required: false
+      direction: input
+      example: resources_test/grn-benchmark/multiomics_rna.h5ad
   resources:
     - type: python_script
       path: script.py
