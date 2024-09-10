@@ -5,8 +5,8 @@
 reg_type=ridge
 
 RUN_ID="grn_evaluation_so_all_${reg_type}"
-# resources_dir="s3://openproblems-data/resources/grn"
-resources_dir="./resources"
+resources_dir="s3://openproblems-data/resources/grn"
+# resources_dir="./resources"
 publish_dir="${resources_dir}/results/${RUN_ID}"
 grn_models_folder="${resources_dir}/grn_models"
 
@@ -50,16 +50,17 @@ append_entry() {
 HERE
 }
 
-# #Loop through grn_names and layers
-# for grn_name in "${grn_names[@]}"; do
-#   append_entry "$grn_name" 
-# done
+#Loop through grn_names and layers
+for grn_name in "${grn_names[@]}"; do
+  append_entry "$grn_name" 
+done
 
 append_entry_control() {
   cat >> $param_file << HERE
   - id: ${reg_type}_${1}
     metric_ids: ${metric_ids}
     perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
+    multiomics_rna: ${resources_dir}/grn-benchmark/multiomics_rna.h5ad
     reg_type: $reg_type
     method_id: $1
     subsample: $subsample
@@ -71,8 +72,8 @@ append_entry_control() {
 HERE
 }
 # controls
-# append_entry_control "negative_control" ""
-# append_entry_control "positive_control" ""
+append_entry_control "negative_control" "False"
+append_entry_control "positive_control" "False"
 append_entry_control "baseline_corr_causal" "True"
 append_entry_control "baseline_corr" "False"
 
@@ -82,12 +83,12 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
-nextflow run . \
-  -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
-  -profile docker \
-  -with-trace \
-  -c src/common/nextflow_helpers/labels_ci.config \
-  -params-file ${param_file}
+# nextflow run . \
+#   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
+#   -profile docker \
+#   -with-trace \
+#   -c src/common/nextflow_helpers/labels_ci.config \
+#   -params-file ${param_file}
 
 # ./tw-windows-x86_64.exe launch `
 #     https://github.com/openproblems-bio/task_grn_inference.git `
