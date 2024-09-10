@@ -8,7 +8,8 @@ par <- list(
     "tf_all" = 'resources/prior/tf_all.csv',
     "prediction" = 'output/tigress/prediction.csv',
     "temp_dir": 'output/tigress',
-    "max_n_links": 50000
+    "max_n_links": 50000,
+    "nsplit": 25
 )
 ## VIASH END
 
@@ -34,7 +35,14 @@ dat <- read.csv(par$tf_all, header = FALSE)
 Tf <- intersect(gene_names, dat$V1)
 
 # Run GRN inference method
-grn = tigress(X, tflist = Tf, targetlist = gene_names, allsteps=FALSE, verb=FALSE, usemulticore=TRUE)
+start.time <- Sys.time()
+grn = tigress(
+    X, tflist = gene_names, targetlist = gene_names,
+    nstepsLARS = 5,
+    nsplit = par$nsplit,
+    allsteps=FALSE, verb=TRUE, usemulticore=TRUE
+)
+time.taken <- Sys.time() - start.time
 
 # Re-format output
 df <- as.data.frame(as.table(grn))
@@ -47,8 +55,6 @@ df <- cbind(index = 1:nrow(df), df)
 
 # Keep top links
 df <- head(df, par$max_n_links)
-
-print(df)
 
 # Save results
 write.table(df, par$prediction, sep = ",", quote = FALSE, row.names = FALSE)
