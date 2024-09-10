@@ -12,6 +12,9 @@ functionality:
         - name: --perturbation_data
           type: file
           direction: input
+        - name: --multiomics_rna
+          type: file
+          direction: input
         - name: --layer
           type: string
           direction: input

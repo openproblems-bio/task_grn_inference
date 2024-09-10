@@ -221,5 +221,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/native/grn_methods/grnboost2"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/native/grn_methods/grnboost2/grnboost2"
   viash_version: "0.8.6"
-  git_commit: "ca5efb98538b804ed2cb43c1ac9311c3a72c77fc"
+  git_commit: "e1e727ab273fcceddd2a0b2d31b520e76d3a0cc3"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
