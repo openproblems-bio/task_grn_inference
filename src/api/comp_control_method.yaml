@@ -11,8 +11,14 @@ functionality:
   arguments:
     - name: --perturbation_data
       __merge__: file_perturbation_h5ad.yaml
-      required: true
+      required: false
       direction: input
+      default: resources/grn-benchmark/perturbation_data.h5ad
+    - name: --multiomics_rna
+      __merge__: file_multiomics_rna_h5ad.yaml
+      required: false
+      direction: input
+      default: resources/grn-benchmark/multiomics_rna.h5ad
     - name: --layer
       type: string
       direction: input
@@ -21,13 +27,14 @@ functionality:
       required: false
     - name: --prediction
       __merge__: file_prediction.yaml
-      required: true
+      required: false
       direction: output
     - name: --tf_all
       type: file
       required: false
       direction: input
       example: resources_test/prior/tf_all.csv
+      default: resources/prior/tf_all.csv
 
       
   test_resources:

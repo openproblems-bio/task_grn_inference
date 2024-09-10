@@ -46,6 +46,10 @@ functionality:
           required: false
           direction: input
           default: resources/prior/consensus.json
+        - name: --causal
+          type: boolean
+          required: false
+          direction: input
         
     - name: Outputs
       arguments:
@@ -69,6 +73,7 @@ functionality:
           multiple: true
           description: A list of metric ids to run. If not specified, all metric will be run.
     
+
   resources:
     - type: nextflow_script
       path: main.nf
@@ -82,6 +87,7 @@ functionality:
     - name: metrics/regression_1
     - name: control_methods/positive_control
     - name: control_methods/negative_control
+    - name: control_methods/baseline_corr
   repositories:
     - name: openproblems
       type: github

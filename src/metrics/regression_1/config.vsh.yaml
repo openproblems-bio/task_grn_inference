@@ -12,7 +12,7 @@ functionality:
       type: string
       direction: input
       required: false
-      default: pearson
+      default: scgen_pearson
     - name: --min_tf
       type: integer
       direction: input

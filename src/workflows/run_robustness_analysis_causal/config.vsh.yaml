@@ -42,6 +42,14 @@ functionality:
           type: file
           required: false
           direction: input
+        - name: --causal
+          type: boolean
+          required: false
+          direction: input
+        - name: --seed
+          type: integer
+          required: false
+          direction: input
         
         
     - name: Outputs
@@ -56,6 +64,12 @@ functionality:
           required: true
           direction: output
           default: metric_configs.yaml
+    - name: Arguments
+      arguments: 
+        - name: "--metric_ids"
+          type: string
+          multiple: true
+          description: A list of metric ids to run. If not specified, all metric will be run.
     
   resources:
     - type: nextflow_script
@@ -68,7 +82,7 @@ functionality:
       repository: openproblems
     - name: metrics/regression_1
     - name: metrics/regression_2
-    - name: robustness_analysis/causal_grn
+    - name: control_methods/baseline_corr
   repositories:
     - name: openproblems
       type: github
