@@ -41,6 +41,41 @@ workflow run_wf {
         ]
       }
     )
+    
+    | baseline_corr.run(
+      runIf: { id, state ->
+        state.method_id == 'baseline_corr_causal'
+      },
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        layer: "layer",
+        tf_all: "tf_all",
+        causal: "causal",
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
+
+    | baseline_corr.run(
+      runIf: { id, state ->
+        state.method_id == 'baseline_corr'
+      },
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        layer: "layer",
+        tf_all: "tf_all",
+        causal: "causal",
+        seed: "seed"
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
     | negative_control.run(
       runIf: { id, state ->
         state.method_id == 'negative_control'
@@ -60,6 +95,9 @@ workflow run_wf {
       components: metrics,
       id: { id, state, comp ->
         id + "." + comp.config.functionality.name
+      },
+      filter: { id, state, comp ->
+        !state.metric_ids || state.metric_ids.contains(comp.config.functionality.name)
       },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [

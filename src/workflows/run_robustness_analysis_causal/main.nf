@@ -26,18 +26,25 @@ workflow run_wf {
         [id, state + ["_meta": [join_id: id]]]
       }
     
-    | causal_grn.run(
+    | baseline_corr.run(
       fromState: [
-        multiomics_rna: "multiomics_rna", tf_all: "tf_all"
+        multiomics_rna: "multiomics_rna",
+        tf_all: "tf_all",
+        causal:"causal"
       ],
-      toState: [
-          prediction: "prediction"
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
         ]
+      }
     )
 
     // run all metrics
     | runEach(
       components: metrics,
+      filter: { id, state, comp ->
+        !state.metric_ids || state.metric_ids.contains(comp.config.functionality.name)
+      },
       id: { id, state, comp ->
         id + "." + comp.config.functionality.name
       },

@@ -117,6 +117,7 @@ def learn_background_distribution(
         for _ in range(N_POINTS_TO_ESTIMATE_BACKGROUND):
             j = rng.integers(low=0, high=n_genes)
             random_grn[:, j] = rng.random(size=n_genes)
+
             if n_features > 0:
                 res = cross_validate_gene(
                     estimator_t,
@@ -220,15 +221,27 @@ def static_approach(
         gene_names: List[str],
         tf_names: Set[str],
         reg_type: str,
-        n_jobs:int
+        n_jobs:int,
+        n_features_dict:dict,
+        clip_scores:bool
 ) -> float:
 
     # Cross-validate each gene using the inferred GRN to define select input features
     res = cross_validate(reg_type, gene_names, tf_names, X, groups, grn, n_features, n_jobs=n_jobs)
-    mean_r2_scores = np.asarray([res['scores'][j]['avg-r2'] for j in range(len(res['scores']))])
-    mean_r2_scores = mean_r2_scores[mean_r2_scores>-10]
+    r2 = []
 
-    return np.mean(mean_r2_scores)
+    for i in range(len(res['scores'])):
+        gene_name = res['gene_names'][i]
+        if n_features[n_features_dict[gene_name]] != 0:
+            score = res['scores'][i]['avg-r2']
+            if clip_scores:
+               score = np.clip(score, 0, 1)
+            r2.append(score)
+    # mean_r2_scores = np.asarray([res['scores'][j]['avg-r2'] for j in range(len(res['scores']))])
+    mean_r2_scores = float(np.mean(r2))
+
+    # return np.mean(mean_r2_scores)
+    return mean_r2_scores
 
 
 def main(par: Dict[str, Any]) -> pd.DataFrame:
@@ -273,6 +286,9 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     # Load consensus numbers of putative regulators
     with open(par['consensus'], 'r') as f:
         data = json.load(f)
+    gene_names_ = np.asarray(list(data.keys()), dtype=object)
+    n_features_dict = {gene_name: i for i, gene_name in enumerate(gene_names_)}
+
     n_features_theta_min = np.asarray([data[gene_name]['0'] for gene_name in gene_names], dtype=int)
     n_features_theta_median = np.asarray([data[gene_name]['0.5'] for gene_name in gene_names], dtype=int)
     n_features_theta_max = np.asarray([data[gene_name]['1'] for gene_name in gene_names], dtype=int)
@@ -281,24 +297,25 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     tf_names = np.loadtxt(par['tf_all'], dtype=str)
     if par['apply_tf']==False:
         tf_names = gene_names
+    clip_scores = par['clip_scores']
 
     # Evaluate GRN
     print(f'Compute metrics for layer: {layer}', flush=True)
     # print(f'Dynamic approach:', flush=True)
-    # print(f'Static approach (theta=0):', flush=True)
-    score_static_min = static_approach(grn, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['max_workers'])
+    print(f'Static approach (theta=0):', flush=True)
+    score_static_min = static_approach(grn, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['max_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
     print(f'Static approach (theta=0.5):', flush=True)
-    score_static_median = static_approach(grn, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['max_workers'])
+    score_static_median = static_approach(grn, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['max_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
     # print(f'Static approach (theta=1):', flush=True)
     # score_static_max = static_approach(grn, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['max_workers'])
     # TODO: find a mathematically sound way to combine Z-scores and r2 scores
 
     results = {
-        # 'static-theta-0.0': [float(score_static_min)],
+        'static-theta-0.0': [float(score_static_min)],
         'static-theta-0.5': [float(score_static_median)]
         # 'static-theta-1.0': [float(score_static_max)],
     }
-    print(f'Scores on {layer}: {results}')
+    # print(f'Scores on {layer}: {results}')
 
     # Add dynamic score
     if not par['static_only']:

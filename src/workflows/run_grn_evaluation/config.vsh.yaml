@@ -46,6 +46,10 @@ functionality:
           required: false
           direction: input
           default: resources/prior/consensus.json
+        - name: --causal
+          type: boolean
+          required: false
+          direction: input
         
     - name: Outputs
       arguments:
@@ -62,17 +66,14 @@ functionality:
           direction: output
           default: metric_configs.yaml
 
-    # - name: Arguments
-    #   arguments: 
-    #     - name: "--predictions" 
-    #       type: string
-    #       multiple: true
-    #       description: A list of GRN models 
-    #     - name: "--layers"
-    #       type: string
-    #       multiple: true
-    #       description: A list of GRN models 
+    - name: Arguments
+      arguments: 
+        - name: "--metric_ids"
+          type: string
+          multiple: true
+          description: A list of metric ids to run. If not specified, all metric will be run.
     
+
   resources:
     - type: nextflow_script
       path: main.nf
@@ -86,6 +87,7 @@ functionality:
     - name: metrics/regression_1
     - name: control_methods/positive_control
     - name: control_methods/negative_control
+    - name: control_methods/baseline_corr
   repositories:
     - name: openproblems
       type: github
