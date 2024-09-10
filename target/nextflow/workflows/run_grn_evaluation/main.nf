@@ -2925,6 +2925,21 @@ meta = [
             "dest" : "par"
           }
         ]
+      },
+      {
+        "name" : "Arguments",
+        "arguments" : [
+          {
+            "type" : "string",
+            "name" : "--metric_ids",
+            "description" : "A list of metric ids to run. If not specified, all metric will be run.",
+            "required" : false,
+            "direction" : "input",
+            "multiple" : true,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          }
+        ]
       }
     ],
     "resources" : [
@@ -2954,9 +2969,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems",
           "tag" : "v2.0.0",
-          "localPath" : "/tmp/viash_hub_repo9608215931318286568"
+          "localPath" : "/tmp/viash_hub_repo1746809526785043376"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo9608215931318286568/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo1746809526785043376/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_tag" : "v1.0.0-1413-gb782e93f",
@@ -2987,7 +3002,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "9ab1d8f3410ecfa466941bcea2bc10b0cdad7c43",
+          "git_commit" : "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
@@ -3008,7 +3023,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "9ab1d8f3410ecfa466941bcea2bc10b0cdad7c43",
+          "git_commit" : "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
@@ -3029,7 +3044,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "9ab1d8f3410ecfa466941bcea2bc10b0cdad7c43",
+          "git_commit" : "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7",
           "executable" : "/nextflow/control_methods/positive_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control"
@@ -3050,7 +3065,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "9ab1d8f3410ecfa466941bcea2bc10b0cdad7c43",
+          "git_commit" : "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7",
           "executable" : "/nextflow/control_methods/negative_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/negative_control"
@@ -3113,7 +3128,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.8.6",
-    "git_commit" : "9ab1d8f3410ecfa466941bcea2bc10b0cdad7c43",
+    "git_commit" : "a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3191,6 +3206,9 @@ workflow run_wf {
       components: metrics,
       id: { id, state, comp ->
         id + "." + comp.config.functionality.name
+      },
+      filter: { id, state, comp ->
+        !state.metric_ids || state.metric_ids.contains(comp.config.functionality.name)
       },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [

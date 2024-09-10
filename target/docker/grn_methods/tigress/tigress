@@ -430,9 +430,9 @@ RUN Rscript -e 'if (!requireNamespace("remotes", quietly = TRUE)) install.packag
 RUN Rscript -e 'library(devtools); install_github("jpvert/tigress")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods tigress"
-LABEL org.opencontainers.image.created="2024-09-09T13:26:05Z"
+LABEL org.opencontainers.image.created="2024-09-10T08:00:35Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="9ab1d8f3410ecfa466941bcea2bc10b0cdad7c43"
+LABEL org.opencontainers.image.revision="a63a2eb45af5f1e78e8d7258ab9d60f2c09e30a7"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

@@ -3,28 +3,22 @@
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 reg_type=${1} #GB, ridge
 
-RUN_ID="grn_evaluation_${reg_type}"
-resources_dir="s3://openproblems-data/resources/grn"
-# resources_dir="./resources"
+RUN_ID="grn_evaluation_so_${reg_type}"
+# resources_dir="s3://openproblems-data/resources/grn"
+resources_dir="./resources"
 publish_dir="${resources_dir}/results/${RUN_ID}"
 grn_models_folder="${resources_dir}/grn_models"
 
 subsample=-2
 max_workers=10
+layer=pearson
+metric_ids="[regression_1]"
 
-param_file="./params/${RUN_ID}_figr.yaml"
-
-# grn_names=(
-#     "collectri"
-#     "celloracle"
-#     "scenicplus"
-#     "figr"
-#     "granie"
-#     "scglue"
-# )
+param_file="./params/${RUN_ID}.yaml"
 
 grn_names=(
-    "figr")
+    "genie3"
+    )
 # Start writing to the YAML file
 cat > $param_file << HERE
 param_list:
@@ -33,6 +27,7 @@ HERE
 append_entry() {
   cat >> $param_file << HERE
   - id: ${reg_type}_${1}_${3}
+    metric_ids: ${metric_ids}
     perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
     reg_type: $reg_type
     method_id: $1
@@ -41,6 +36,7 @@ append_entry() {
     tf_all: ${resources_dir}/prior/tf_all.csv
     layer: ${3}
     consensus: ${resources_dir}/prior/consensus-num-regulators.json
+
 HERE
 
   # Conditionally append the prediction line if the second argument is "true"
@@ -50,13 +46,13 @@ HERE
 HERE
   fi
 }
-layers=(scgen_pearson)
+
 # Loop through grn_names and layers
-for layer in "${layers[@]}"; do
-  for grn_name in "${grn_names[@]}"; do
-    append_entry "$grn_name" "true" "$layer"
-  done
+
+for grn_name in "${grn_names[@]}"; do
+  append_entry "$grn_name" "true" "$layer"
 done
+
 
 # # Append negative control
 # grn_name="negative_control"

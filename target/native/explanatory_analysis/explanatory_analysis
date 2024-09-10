@@ -562,6 +562,7 @@ tf_gene_net = pd.read_csv(par["tf_gene_net"])
 info_obj = Explanatory_analysis(net=tf_gene_net)
 print("Calculate basic stats")
 stats = info_obj.calculate_basic_stats()
+print(stats)
 print("Outputting stats to :", par['stats'])
 with open(par['stats'], 'w') as ff:
   json.dump(stats, ff)

@@ -61,6 +61,9 @@ workflow run_wf {
       id: { id, state, comp ->
         id + "." + comp.config.functionality.name
       },
+      filter: { id, state, comp ->
+        !state.metric_ids || state.metric_ids.contains(comp.config.functionality.name)
+      },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
         perturbation_data: "perturbation_data",

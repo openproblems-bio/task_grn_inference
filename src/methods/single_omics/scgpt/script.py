@@ -14,6 +14,7 @@ import seaborn as sns
 import networkx as nx
 import pandas as pd
 import tqdm
+import os
 # import gseapy as gp
 # from gears import PertData, GEARS
 
@@ -53,6 +54,13 @@ par = {
   'condition': 'cell_type'
 }
 ## VIASH END
+
+# os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:50"
+initial_memory = torch.cuda.memory_allocated()
+def monitor_memory():
+  used_memory = torch.cuda.memory_allocated()
+  data_moved = used_memory - initial_memory
+  print(f"Data moved to GPU: {data_moved} bytes")
 
 # Load list of putative TFs
 tf_all = np.loadtxt(par['tf_all'], dtype=str)
@@ -128,6 +136,7 @@ except:
         model.load_state_dict(model_dict)
 
 model.to(device)
+monitor_memory()
 
 
 print('Process rna-seq file')
@@ -201,6 +210,7 @@ torch.cuda.empty_cache()
 dict_sum_condition = {}
 print('Extract gene gene links from attention layer')
 model.eval()
+monitor_memory()
 with torch.no_grad(), torch.cuda.amp.autocast(enabled=True):
     M = all_gene_ids.size(1)
     N = all_gene_ids.size(0)
@@ -210,6 +220,7 @@ with torch.no_grad(), torch.cuda.amp.autocast(enabled=True):
         outputs = np.zeros((batch_size, M, M), dtype=np.float32)
         # Replicate the operations in model forward pass
         src_embs = model.encoder(torch.tensor(all_gene_ids[i : i + batch_size], dtype=torch.long).to(device))
+        # monitor_memory()
         val_embs = model.value_encoder(torch.tensor(all_values[i : i + batch_size], dtype=torch.float).to(device))
         total_embs = src_embs + val_embs
         total_embs = model.bn(total_embs.permute(0, 2, 1)).permute(0, 2, 1)
