@@ -29,3 +29,4 @@ work
 # IDE related
 .idea
 .vscode
+docs/build
