@@ -122,11 +122,7 @@ def regression_1(
         regr.fit(X_tr, Y_tr)
         y_pred[mask_va & mask_shared_genes, :] = regr.predict(X[mask_va & mask_shared_genes, :])
 
-    score_r2  = r2_score(y_true, y_pred, multioutput='variance_weighted') #uniform_average', 'variance_weighted
-
-    mean_score_r2 = r2_score(y_true, y_pred, multioutput='variance_weighted')
-    # gene_scores_r2 = r2_score(y_true.T, y_pred.T, multioutput='raw_values')
-
+    mean_score_r2  = r2_score(y_true, y_pred, multioutput='variance_weighted') #uniform_average', 'variance_weighted
     output = dict(mean_score_r2=mean_score_r2)
     return output
 
@@ -238,11 +234,11 @@ def main(par):
 
     # Convert results to DataFrame
     df_results = pd.DataFrame(layer_results)
-    if par['min_tf']:
-        if 'ex(True)_tf(140)' not in df_results.columns:
-            df_results['ex(True)_tf(140)'] = df_results['ex(True)_tf(-1)']
-        if 'ex(False)_tf(140)' not in df_results.columns:
-            df_results['ex(False)_tf(140)'] = df_results['ex(False)_tf(-1)']
+    # if par['min_tf']:
+    #     if 'ex(True)_tf(140)' not in df_results.columns:
+    #         df_results['ex(True)_tf(140)'] = df_results['ex(True)_tf(-1)']
+    #     if 'ex(False)_tf(140)' not in df_results.columns:
+    #         df_results['ex(False)_tf(140)'] = df_results['ex(False)_tf(-1)']
         
     df_results['Mean'] = df_results.mean(axis=1)
     
