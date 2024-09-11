@@ -4,18 +4,20 @@ import numpy as np
 import anndata as ad
 import scanpy as sc
 from tqdm import tqdm
-from sklearn.preprocessing import StandardScaler
+from scipy.stats import spearmanr
 
 ## VIASH START
 par = {
 }
 ## VIASH END
-def create_corr_net(X: np.ndarray, groups: np.ndarray):
+def create_corr_net(X: np.ndarray, groups: np.ndarray, method="pearson"):
     grns = []
     for group in tqdm(np.unique(groups), desc="Processing groups"):
         X_sub = X[groups == group, :]
-        X_sub = StandardScaler().fit_transform(X_sub)
-        grn = np.dot(X_sub.T, X_sub) / X_sub.shape[0]
+        if method is "pearson":
+            grn = np.corrcoef(X_sub.T)
+        elif method is "spearman":
+            grn = spearmanr(X_sub).statistic
         grns.append(grn)
     return np.mean(grns, axis=0)
 print('Read data')
