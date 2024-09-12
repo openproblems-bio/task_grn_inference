@@ -4,7 +4,7 @@
 # reg_type=${1} #GB, ridge
 reg_type=ridge
 
-RUN_ID="grn_evaluation_so_all_${reg_type}"
+RUN_ID="grn_evaluation_all_${reg_type}"
 # resources_dir="s3://openproblems-data/resources/grn"
 resources_dir="./resources"
 publish_dir="${resources_dir}/results/${RUN_ID}"
@@ -13,7 +13,7 @@ grn_models_folder="${resources_dir}/grn_models"
 subsample=-2
 max_workers=10
 layer=scgen_pearson
-metric_ids="[regression_1]"
+metric_ids="[regression_1, regression_2]"
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -74,6 +74,9 @@ HERE
   if [ -n "$5" ]; then
     echo "    metacell: ${5}" >> $param_file
   fi
+  if [ -n "$6" ]; then
+    echo "    impute: ${6}" >> $param_file
+  fi
 }
 
 # #Loop through grn_names and layers
@@ -86,10 +89,11 @@ HERE
 # append_entry_control "positive_control" "False" ""
 # append_entry_control "baseline_pearson" "False" "pearson"
 # append_entry_control "baseline_dotproduct" "False" "dotproduct"
-append_entry_control "baseline_pearson_causal" "True" "pearson" 
+# append_entry_control "baseline_pearson_causal" "True" "pearson" 
 append_entry_control "baseline_dotproduct_causal" "True" "dotproduct" 
-append_entry_control "baseline_dotproduct_causal_cell_type" "True" "dotproduct" "true"
-append_entry_control "baseline_dotproduct_causal_metacell" "True" "dotproduct" "false" "true"
+# append_entry_control "baseline_dotproduct_causal_cell_type" "True" "dotproduct" "true"
+# append_entry_control "baseline_dotproduct_causal_metacell" "True" "dotproduct" "false" "true"
+append_entry_control "baseline_dotproduct_causal_impute" "True" "dotproduct" "false" "false" "true"
 # append_entry_control "baseline_corr_causal_spearman" "True" "spearman"
 
 

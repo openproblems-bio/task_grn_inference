@@ -2923,6 +2923,19 @@ meta = [
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
+      },
+      {
+        "type" : "boolean",
+        "name" : "--impute",
+        "description" : "whether to impute scRNA-seq",
+        "default" : [
+          false
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
       }
     ],
     "resources" : [
@@ -2982,6 +2995,9 @@ meta = [
         {
           "type" : "python",
           "user" : false,
+          "packages" : [
+            "magic-impute"
+          ],
           "upgrade" : true
         }
       ]
@@ -3035,7 +3051,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/baseline_corr",
     "viash_version" : "0.8.6",
-    "git_commit" : "5db75e1bcc21122be07e613429e112d8519c0732",
+    "git_commit" : "45144825ebae0977f43a73fc134ba821eb06089b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3069,7 +3085,8 @@ par = {
   'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'corr_method': $( if [ ! -z ${VIASH_PAR_CORR_METHOD+x} ]; then echo "r'${VIASH_PAR_CORR_METHOD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'metacell': $( if [ ! -z ${VIASH_PAR_METACELL+x} ]; then echo "r'${VIASH_PAR_METACELL//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
+  'metacell': $( if [ ! -z ${VIASH_PAR_METACELL+x} ]; then echo "r'${VIASH_PAR_METACELL//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'impute': $( if [ ! -z ${VIASH_PAR_IMPUTE+x} ]; then echo "r'${VIASH_PAR_IMPUTE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3095,8 +3112,10 @@ def create_corr_net(X: np.ndarray, groups: np.ndarray, method="pearson"):
     for group in tqdm(np.unique(groups), desc="Processing groups"):
         X_sub = X[groups == group, :]
         if method == "dotproduct":
+            print('dotproduct')
             net = X_sub.T.dot(X_sub)
         elif method == "pearson":
+            print('pearson')
             net = np.corrcoef(X_sub.T)
         elif method == "spearman":
             net = spearmanr(X_sub).statistic
@@ -3104,8 +3123,10 @@ def create_corr_net(X: np.ndarray, groups: np.ndarray, method="pearson"):
         
         net = pd.DataFrame(net, index=gene_names, columns=gene_names)
         if par['causal']:
+            print('causal')
             net = net[tf_all]
         else:
+            print('non causal')
             net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
         
         net = net.reset_index().melt(id_vars='index', var_name='source', value_name='weight')
@@ -3124,7 +3145,9 @@ def create_corr_net(X: np.ndarray, groups: np.ndarray, method="pearson"):
 print('Read data')
 multiomics_rna = ad.read_h5ad(par["multiomics_rna"])
 # multiomics_rna = multiomics_rna[:,:2000] #TODO: togo
+ 
 if par['metacell']:
+    print('metacell')
     def create_meta_cells(df, n_cells=15):
         meta_x = []
         for i in range(0, df.shape[0], n_cells):
@@ -3151,6 +3174,32 @@ sc.pp.normalize_total(multiomics_rna)
 sc.pp.log1p(multiomics_rna)
 sc.pp.scale(multiomics_rna)
 
+if par['impute']:
+    print("imputing")
+    # import magic
+    # import scprep
+    
+    # magic_operator = magic.MAGIC()
+    
+    # multiomics_rna = magic_operator.fit_transform(multiomics_rna)
+    from sklearn.impute import KNNImputer
+    import numpy as np
+
+    print("Imputing with KNN")
+
+    # Convert to dense if the matrix is sparse
+    if sc.sparse.issparse(multiomics_rna.X):
+        multiomics_rna_dense = multiomics_rna.X.toarray()
+    else:
+        multiomics_rna_dense = multiomics_rna.X
+
+    # Apply KNN imputation
+    knn_imputer = KNNImputer(n_neighbors=5)  # You can adjust the number of neighbors
+    multiomics_rna_imputed = knn_imputer.fit_transform(multiomics_rna_dense)
+
+    # Update the AnnData object with the imputed values
+    multiomics_rna.X = multiomics_rna_imputed
+    print('zero ration: ', (multiomics_rna.X==0).sum()/multiomics_rna.size)
 print('Create corr net')
 net = create_corr_net(multiomics_rna.X, groups, par['corr_method'])
 

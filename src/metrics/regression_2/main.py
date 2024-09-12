@@ -277,10 +277,10 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     # Load inferred GRN
     print(f'Loading GRN', flush=True)
     grn = load_grn(par['prediction'], gene_names)
-    if 'cell_type' in grn.columns:
-        print('Non specific')
-        grn.drop(columns=['cell_type'], inplace=True)
-        grn = grn.groupby(['source', 'target']).mean().reset_index()
+    # if 'cell_type' in grn.columns:
+    #     print('Non specific')
+    #     grn.drop(columns=['cell_type'], inplace=True)
+    #     grn = grn.groupby(['source', 'target']).mean().reset_index()
     
     # Load and standardize perturbation data
     layer = par['layer']

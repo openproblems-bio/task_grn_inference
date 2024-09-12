@@ -35,6 +35,12 @@ functionality:
       direction: input
       default: false
       description: whether to pseudobulk scRNA-seq with metacells
+    - name: --impute
+      type: boolean
+      direction: input
+      default: false
+      description: whether to impute scRNA-seq
+    
   resources:
     - type: python_script
       path: script.py
@@ -44,7 +50,7 @@ platforms:
     image: ghcr.io/openproblems-bio/base_python:1.0.4
     setup:
       - type: python
-        packages: [  ]
+        packages: [ magic-impute ]
   - type: native
   - type: nextflow
     directives:

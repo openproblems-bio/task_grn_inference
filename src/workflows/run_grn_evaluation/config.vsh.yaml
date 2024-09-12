@@ -68,6 +68,11 @@ functionality:
           required: false
           direction: input
           default: false
+        - name: --impute
+          type: boolean
+          required: false
+          direction: input
+          default: false
         
     - name: Outputs
       arguments:
