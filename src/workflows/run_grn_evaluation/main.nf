@@ -114,6 +114,25 @@ workflow run_wf {
     )
     | baseline_corr.run(
       runIf: { id, state ->
+        state.method_id == 'baseline_dotproduct_causal_impute'
+      },
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        layer: "layer",
+        tf_all: "tf_all",
+        causal: "causal",
+        corr_method: "corr_method",
+        metacell: "metacell",
+        impute: "impute"
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
+    | baseline_corr.run(
+      runIf: { id, state ->
         state.method_id == 'baseline_corr_causal_spearman'
       },
       fromState: [
