@@ -53,6 +53,21 @@ functionality:
           type: boolean
           required: false
           direction: input
+        - name: --corr_method
+          type: string
+          required: false
+          direction: input
+          default: pearson
+        - name: --cell_type_specific
+          type: boolean
+          required: false
+          direction: input
+          default: false
+        - name: --metacell
+          type: boolean
+          required: false
+          direction: input
+          default: false
         
     - name: Outputs
       arguments:

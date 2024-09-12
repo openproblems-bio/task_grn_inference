@@ -19,6 +19,11 @@ functionality:
       __merge__: file_prediction.yaml
       required: false
       direction: output
+    - name: --tf_all
+      type: file
+      required: true
+      direction: input
+      example: resources_test/prior/tf_all.csv
 
 
       

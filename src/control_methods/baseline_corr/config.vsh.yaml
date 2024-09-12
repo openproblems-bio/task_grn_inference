@@ -16,15 +16,25 @@ functionality:
       direction: input
     - name: --multiomics_rna
       type: file
-      required: false
+      required: true
       direction: input
       example: resources_test/grn-benchmark/multiomics_rna.h5ad
-    - name: --tf_all
-      type: file
+    - name: --corr_method
+      type: string
       required: false
       direction: input
-      example: resources_test/prior/tf_all.csv
-      default: resources/prior/tf_all.csv
+      default: dotproduct
+      description: corr method.
+    - name: --cell_type_specific
+      type: boolean
+      direction: input
+      default: false
+      description: whether to result cell type specific grn. if not, the mean of weights are taken
+    - name: --metacell
+      type: boolean
+      direction: input
+      default: false
+      description: whether to pseudobulk scRNA-seq with metacells
   resources:
     - type: python_script
       path: script.py

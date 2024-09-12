@@ -44,13 +44,84 @@ workflow run_wf {
     
     | baseline_corr.run(
       runIf: { id, state ->
-        state.method_id == 'baseline_corr_causal'
+        state.method_id == 'baseline_pearson_causal'
       },
       fromState: [
         multiomics_rna: "multiomics_rna",
         layer: "layer",
         tf_all: "tf_all",
         causal: "causal",
+        corr_method: "corr_method"
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
+    | baseline_corr.run(
+      runIf: { id, state ->
+        state.method_id == 'baseline_dotproduct_causal'
+      },
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        layer: "layer",
+        tf_all: "tf_all",
+        causal: "causal",
+        corr_method: "corr_method"
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
+    | baseline_corr.run(
+      runIf: { id, state ->
+        state.method_id == 'baseline_dotproduct_causal_cell_type'
+      },
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        layer: "layer",
+        tf_all: "tf_all",
+        causal: "causal",
+        corr_method: "corr_method",
+        cell_type_specific: "cell_type_specific"
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
+    | baseline_corr.run(
+      runIf: { id, state ->
+        state.method_id == 'baseline_dotproduct_causal_metacell'
+      },
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        layer: "layer",
+        tf_all: "tf_all",
+        causal: "causal",
+        corr_method: "corr_method",
+        metacell: "metacell"
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
+    | baseline_corr.run(
+      runIf: { id, state ->
+        state.method_id == 'baseline_corr_causal_spearman'
+      },
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        layer: "layer",
+        tf_all: "tf_all",
+        causal: "causal",
+        corr_method: "corr_method"
       ],
       toState: {id, output, state ->
         state + [
@@ -81,7 +152,8 @@ workflow run_wf {
         state.method_id == 'negative_control'
       },
       fromState: [
-        perturbation_data: "perturbation_data"
+        perturbation_data: "perturbation_data",
+        tf_all: "tf_all",
       ],
       toState: {id, output, state ->
         state + [
