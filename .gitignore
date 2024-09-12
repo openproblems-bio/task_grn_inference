@@ -1,0 +1,31 @@
+# mac os x
+.DS_Store
+
+# related to files
+params*
+resources*
+output/
+target/
+out/
+local/
+datasets_raw/
+state*
+trace*
+tw-*
+
+# related to python
+.ipynb_checkpoints
+__pycache__/
+
+# ?
+.$*
+bin*
+bin/
+
+# related to nextflow
+work
+.nextflow*
+
+# IDE related
+.idea
+.vscode

@@ -5,15 +5,15 @@
 reg_type=ridge
 
 RUN_ID="grn_evaluation_so_all_${reg_type}"
-resources_dir="s3://openproblems-data/resources/grn"
-# resources_dir="./resources"
+# resources_dir="s3://openproblems-data/resources/grn"
+resources_dir="./resources"
 publish_dir="${resources_dir}/results/${RUN_ID}"
 grn_models_folder="${resources_dir}/grn_models"
 
 subsample=-2
 max_workers=10
 layer=scgen_pearson
-metric_ids="[regression_1, regression_2]"
+metric_ids="[regression_1]"
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -51,11 +51,6 @@ append_entry() {
 HERE
 }
 
-#Loop through grn_names and layers
-for grn_name in "${grn_names[@]}"; do
-  append_entry "$grn_name" 
-done
-
 append_entry_control() {
   cat >> $param_file << HERE
   - id: ${reg_type}_${1}
@@ -70,13 +65,33 @@ append_entry_control() {
     layer: ${layer}
     consensus: ${resources_dir}/prior/consensus-num-regulators.json
     causal: ${2}
+    corr_method: ${3}
+    prediction: ${resources_dir}/grn_models/collectri.csv
 HERE
+  if [ -n "$4" ]; then
+    echo "    cell_type_specific: ${4}" >> $param_file
+  fi
+  if [ -n "$5" ]; then
+    echo "    metacell: ${5}" >> $param_file
+  fi
 }
-# controls
-append_entry_control "negative_control" "False"
-append_entry_control "positive_control" "False"
-append_entry_control "baseline_corr_causal" "True"
-append_entry_control "baseline_corr" "False"
+
+# #Loop through grn_names and layers
+# for grn_name in "${grn_names[@]}"; do
+#   append_entry "$grn_name" 
+# done
+
+## controls
+# append_entry_control "negative_control" "False" ""
+# append_entry_control "positive_control" "False" ""
+# append_entry_control "baseline_pearson" "False" "pearson"
+# append_entry_control "baseline_dotproduct" "False" "dotproduct"
+append_entry_control "baseline_pearson_causal" "True" "pearson" 
+append_entry_control "baseline_dotproduct_causal" "True" "dotproduct" 
+append_entry_control "baseline_dotproduct_causal_cell_type" "True" "dotproduct" "true"
+append_entry_control "baseline_dotproduct_causal_metacell" "True" "dotproduct" "false" "true"
+# append_entry_control "baseline_corr_causal_spearman" "True" "spearman"
+
 
 # Append the remaining output_state and publish_dir to the YAML file
 cat >> $param_file << HERE
@@ -84,12 +99,12 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
-# nextflow run . \
-#   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
-#   -profile docker \
-#   -with-trace \
-#   -c src/common/nextflow_helpers/labels_ci.config \
-#   -params-file ${param_file}
+nextflow run . \
+  -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
+  -profile docker \
+  -with-trace \
+  -c src/common/nextflow_helpers/labels_ci.config \
+  -params-file ${param_file}
 
 # ./tw-windows-x86_64.exe launch `
 #     https://github.com/openproblems-bio/task_grn_inference.git `

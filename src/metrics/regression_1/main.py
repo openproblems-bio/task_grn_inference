@@ -51,45 +51,29 @@ def cv_5(genes_n):
     np.random.shuffle(groups)
     return groups
 
-
-def regression_1(
-            net: pd.DataFrame, 
-            train_df: pd.DataFrame,
-            reg_type: str = 'GB',
-            exclude_missing_genes: bool = False,
-            verbose: int = 0,
-            max_workers: int = 4) -> None: 
-    """
-    net: a df with index as genes and columns as tfs
-    train_df: a df with index as genes and columns as samples
-    """
-    gene_names = train_df.index.to_numpy()
-    gene_names_grn = net.index.to_numpy()
-    # determine regressor 
-    if reg_type=='ridge':
-        regr =  Ridge(**dict(random_state=32))
-    elif reg_type=='GB':
-        params = dict(random_state=32, 
-                    n_estimators=100, min_samples_leaf=2, min_child_samples=1, 
-                    feature_fraction=0.05, verbosity=-1
-        )
-        regr = lightgbm_wrapper(params, max_workers=max_workers)
-    elif reg_type=='RF':
-        params = dict(boosting_type='rf',random_state=32, n_estimators=100,  
-        feature_fraction=0.05, verbosity=-1)
-        regr = lightgbm_wrapper(params, max_workers)
+def cross_validation(net, prturb_adata, par:dict):
+    gene_names = prturb_adata.var_names
+    net = process_net(net.copy(), gene_names)
+    net_subset = net.copy()
+    # Subset TFs 
+    if par['tf_n'] == -1:
+        degrees = net.abs().sum(axis=0)
+        net = net.loc[:, degrees >= degrees.quantile((1 - par['theta']))]
     else:
-        print(f'{reg_type} is not defined')
-        raise ValueError("define first")        
+        degrees = net.abs().sum(axis=0)
+        net = net[degrees.nlargest(tf_n).index]
+
+    gene_names_grn = net.index.to_numpy()   
     
     n_tfs = net.shape[1]
     # construct feature and target space
-    if exclude_missing_genes:
+    if par['exclude_missing_genes']:
         included_genes = gene_names_grn
     else:
         included_genes = gene_names
     
     X_df = pd.DataFrame(np.zeros((len(included_genes), n_tfs)), index=included_genes)
+    train_df = pd.DataFrame(prturb_adata.X, columns=gene_names).T
     Y_df = train_df.loc[included_genes,:]
 
     mask_shared_genes = X_df.index.isin(net.index)
@@ -111,18 +95,64 @@ def regression_1(
     y_true = Y.copy()
 
     unique_groups = np.unique(groups)
+    
+    # determine regressor 
+    reg_type = par['reg_type']
+    if reg_type=='ridge':
+        regr =  Ridge(**dict(random_state=32))
+    elif reg_type=='GB':
+        params = dict(random_state=32, 
+                    n_estimators=100, min_samples_leaf=2, min_child_samples=1, 
+                    feature_fraction=0.05, verbosity=-1
+        )
+        regr = lightgbm_wrapper(params, max_workers=max_workers)
+    elif reg_type=='RF':
+        params = dict(boosting_type='rf',random_state=32, n_estimators=100,  
+        feature_fraction=0.05, verbosity=-1)
+        regr = lightgbm_wrapper(params, max_workers)
+    else:
+        print(f'{reg_type} is not defined')
+        raise ValueError("define first")  
 
     for group in tqdm(unique_groups, desc="Processing groups"):
         mask_va = groups == group
         mask_tr = ~mask_va
-        # Use logical AND to combine masks correctly
         X_tr = X[mask_tr & mask_shared_genes, :]
         Y_tr = Y[mask_tr & mask_shared_genes, :]
-
         regr.fit(X_tr, Y_tr)
         y_pred[mask_va & mask_shared_genes, :] = regr.predict(X[mask_va & mask_shared_genes, :])
+    return y_true, y_pred
 
-    mean_score_r2  = r2_score(y_true, y_pred, multioutput='variance_weighted') #uniform_average', 'variance_weighted
+def regression_1(
+            net: pd.DataFrame, 
+            prturb_adata: ad.AnnData,
+            par:dict,
+            verbose: int = 0,
+            max_workers: int = 4) -> None: 
+    """
+    net: a df with index as genes and columns as tfs
+    prturb_adata: a adata 
+    """
+       
+    gene_names = prturb_adata.var_names
+    cell_types = prturb_adata.obs.cell_type.unique()
+    score_list = []
+    for cell_type in cell_types:
+        print(f'----cross validate for {cell_type}----')
+        # check if net is cell type specific 
+        if 'cell_type' in net.columns:
+            if cell_type not in net.cell_type.unique():
+                raise ValueError(f'{cell_type} is not present in grn.')
+            net_sub = net[net.cell_type==cell_type]
+        else:
+            net_sub = net
+                
+        prturb_adata_sub = prturb_adata[prturb_adata.obs.cell_type==cell_type,:]
+        y_true_sub, y_pred_sub = cross_validation(net_sub, prturb_adata_sub, par)
+
+        score = r2_score(y_true_sub, y_pred_sub, multioutput='variance_weighted')
+        score_list.append(score)
+    mean_score_r2 = np.mean(score_list)
     output = dict(mean_score_r2=mean_score_r2)
     return output
 
@@ -146,23 +176,20 @@ def degree_centrality(net, source='source', target='target', normalize=False):
     return counts
 
 
-def process_net(net, gene_names, manipulate):
+def process_net(net, gene_names):
     # Remove self-regulations
     net = net[net['source'] != net['target']]
     # pivot
     net = pivot_grn(net)
     # subset 
     net = net[net.index.isin(gene_names)]
-    # sign or shuffle
-    if manipulate=='signed':
-        net = net.map(lambda x: 1 if x>0 else (-1 if x<0 else 0))
     return net
 
 
 def main(par):
     random_state = 42
     set_global_seed(random_state)
-    theta = 1 # no subsetting based on theta
+    par['theta'] = 1 # no subsetting based on theta
     manipulate = None 
     ## read and process input data
 
@@ -178,7 +205,6 @@ def main(par):
         net = net[net.source.isin(tf_all)]
 
     subsample = par['subsample']
-    reg_type = par['reg_type']
     max_workers = par['max_workers']
     layer = par["layer"]
     if subsample == -1:
@@ -200,12 +226,10 @@ def main(par):
         perturbation_data = perturbation_data[np.random.choice(perturbation_data.n_obs, subsample, replace=False), :]
     
     print(perturbation_data.shape)
+    
+    perturbation_data.X = perturbation_data.layers[layer]
 
-    pert_df = pd.DataFrame(perturbation_data.layers[layer], columns=gene_names)
-    pert_df = pert_df.T  # make it gene*sample
-
-    # process net
-    net_processed = process_net(net.copy(), gene_names, manipulate)
+    
 
     print(f'Compute metrics for layer: {layer}', flush=True)
     tfs_cases = [-1]
@@ -214,21 +238,12 @@ def main(par):
     layer_results = {}  # Store results for this layer
     for exclude_missing_genes in [False, True]:  # two settings on target gene
         for tf_n in tfs_cases:  # two settings on tfs
+            par['exclude_missing_genes'] = exclude_missing_genes
+            par['tf_n'] = tf_n
             run_key = f'ex({exclude_missing_genes})_tf({tf_n})'
             print(run_key)
-            net_subset = net_processed.copy()
-            # Subset TFs 
-            if tf_n == -1:
-                degrees = net_subset.abs().sum(axis=0)
-                net_subset = net_subset.loc[:, degrees >= degrees.quantile((1 - theta))]
-            else:
-                if tf_n > net_subset.shape[1]:
-                    print(f'Skip running because tf_n ({tf_n}) is bigger than net.shape[1] ({net_subset.shape[1]})')
-                    continue
-                degrees = net_subset.abs().sum(axis=0)
-                net_subset = net_subset[degrees.nlargest(tf_n).index]
-
-            output = regression_1(net_subset, pert_df, exclude_missing_genes=exclude_missing_genes, reg_type=reg_type, max_workers=max_workers)
+            
+            output = regression_1(net, perturbation_data, par=par, max_workers=max_workers)
             
             layer_results[run_key] = [output['mean_score_r2']]
 
