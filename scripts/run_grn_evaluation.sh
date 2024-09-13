@@ -2,19 +2,19 @@
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 # reg_type=${1} #GB, ridge
-viash ns build --parallel
+# viash ns build --parallel
 reg_type=ridge
 
 RUN_ID="grn_evaluation_all_${reg_type}"
-# resources_dir="s3://openproblems-data/resources/grn"
-resources_dir="./resources"
+resources_dir="s3://openproblems-data/resources/grn"
+# resources_dir="./resources"
 publish_dir="${resources_dir}/results/${RUN_ID}"
 grn_models_folder="${resources_dir}/grn_models"
 
 subsample=-2
 max_workers=10
 layer=scgen_pearson
-metric_ids="[regression_1]"
+metric_ids="[regression_1, regression_2]"
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -33,10 +33,9 @@ grn_names=(
 
 baseline_models=(
     baseline_pearson
-    baseline_dotproduct
-    baseline_dotproduct_causal
-    baseline_dotproduct_causal_celltype
-    baseline_dotproduct_causal_metacell
+    baseline_pearson_causal
+    baseline_pearson_causal_celltype
+    baseline_pearson_causal_metacell
     positive_control
     )
 # Start writing to the YAML file
@@ -62,11 +61,11 @@ HERE
 }
 
 
-# folder=${grn_models_folder}
-# # Loop through grn_names and layers
-# for grn_name in "${grn_names[@]}"; do
-#   append_entry "$grn_name"  "$folder"
-# done
+folder=${grn_models_folder}
+# Loop through grn_names and layers
+for grn_name in "${grn_names[@]}"; do
+  append_entry "$grn_name"  "$folder"
+done
 
 folder=${grn_models_folder}/baselines
 for grn_name in "${baseline_models[@]}"; do
@@ -80,13 +79,13 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
-nextflow run . \
-  -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
-  -profile docker \
-  -with-trace \
-  -c src/common/nextflow_helpers/labels_ci.config \
-  -params-file ${param_file}
-subl resources/results/grn_evaluation_all_ridge/scores.yaml
+# nextflow run . \
+#   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
+#   -profile docker \
+#   -with-trace \
+#   -c src/common/nextflow_helpers/labels_ci.config \
+#   -params-file ${param_file}
+# subl resources/results/grn_evaluation_all_ridge/scores.yaml
 
 # ./tw-windows-x86_64.exe launch `
 #     https://github.com/openproblems-bio/task_grn_inference.git `

@@ -76,11 +76,7 @@ workflow run_wf {
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
         multiomics_rna: "multiomics_rna",
-        multiomics_atac: "multiomics_atac",
         tf_all: "tf_all",
-        model_file: "model_file",
-        model_config_file: "model_config_file",
-        vocab_file: "vocab_file"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->
