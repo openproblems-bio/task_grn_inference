@@ -32,6 +32,7 @@ workflow run_wf {
       },
       fromState: [
         perturbation_data: "perturbation_data",
+        multiomics_rna: "multiomics_rna",
         layer: "layer",
         tf_all: "tf_all"
       ],
@@ -175,6 +176,7 @@ workflow run_wf {
       },
       fromState: [
         perturbation_data: "perturbation_data",
+        multiomics_rna: "multiomics_rna",
         tf_all: "tf_all",
       ],
       toState: {id, output, state ->

@@ -59,6 +59,9 @@ functionality:
       direction: input
       required: false
       default: scgen_pearson
+    - name: --max_n_links
+      type: integer
+      default: 50000
 
 
       

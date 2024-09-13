@@ -15,7 +15,7 @@ functionality:
       example: resources_test/grn-benchmark/multiomics_rna.h5ad
     - name: --prediction
       __merge__: file_prediction.yaml
-      required: true
+      required: false
       direction: output
       example: resources_test/grn_models/collectri.csv
     - name: --tf_all

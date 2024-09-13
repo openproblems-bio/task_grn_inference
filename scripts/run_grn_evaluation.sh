@@ -6,15 +6,15 @@ viash ns build --parallel
 reg_type=ridge
 
 RUN_ID="grn_evaluation_all_${reg_type}"
-# resources_dir="s3://openproblems-data/resources/grn"
-resources_dir="./resources"
+resources_dir="s3://openproblems-data/resources/grn"
+# resources_dir="./resources"
 publish_dir="${resources_dir}/results/${RUN_ID}"
 grn_models_folder="${resources_dir}/grn_models"
 
 subsample=-2
 max_workers=10
 layer=scgen_pearson
-metric_ids="[regression_1]"
+metric_ids="[regression_1, regression_2]"
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -75,21 +75,21 @@ HERE
 
 }
 
-#Loop through grn_names and layers
-# for grn_name in "${grn_names[@]}"; do
-#   append_entry "$grn_name" 
-# done
+Loop through grn_names and layers
+for grn_name in "${grn_names[@]}"; do
+  append_entry "$grn_name" 
+done
 
 ## controls
-# append_entry_control "negative_control" "" "" "false" "false" "false"
-# append_entry_control "positive_control" "" "" "false" "false" "false"
-append_entry_control "baseline_pearson" "False" "pearson" "false" "false" "false"
-append_entry_control "baseline_dotproduct" "False" "dotproduct" "false" "false" "false"
-append_entry_control "baseline_dotproduct_causal" "True" "dotproduct" "false" "false" "false"
-append_entry_control "baseline_dotproduct_causal_cell_type" "True" "dotproduct" "true" "false" "false"
-append_entry_control "baseline_dotproduct_causal_metacell" "True" "dotproduct" "false" "true" "false"
-append_entry_control "baseline_dotproduct_causal_impute" "True" "dotproduct" "false" "false" "true"
-# append_entry_control "baseline_corr_causal_spearman" "True" "spearman"
+append_entry_control "negative_control" "" "" "false" "false" "false"
+append_entry_control "positive_control" "" "" "false" "false" "false"
+append_entry_control "baseline_pearson" "false" "pearson" "false" "false" "false"
+append_entry_control "baseline_dotproduct" "false" "dotproduct" "false" "false" "false"
+append_entry_control "baseline_dotproduct_causal" "true" "dotproduct" "false" "false" "false"
+append_entry_control "baseline_dotproduct_causal_cell_type" "true" "dotproduct" "true" "false" "false"
+append_entry_control "baseline_dotproduct_causal_metacell" "true" "dotproduct" "false" "true" "false"
+append_entry_control "baseline_dotproduct_causal_impute" "true" "dotproduct" "false" "false" "true"
+append_entry_control "baseline_corr_causal_spearman" "true" "spearman"
 
 
 # Append the remaining output_state and publish_dir to the YAML file
@@ -98,13 +98,13 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
-nextflow run . \
-  -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
-  -profile docker \
-  -with-trace \
-  -c src/common/nextflow_helpers/labels_ci.config \
-  -params-file ${param_file}
-subl resources/results/grn_evaluation_all_ridge/scores.yaml
+# nextflow run . \
+#   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
+#   -profile docker \
+#   -with-trace \
+#   -c src/common/nextflow_helpers/labels_ci.config \
+#   -params-file ${param_file}
+# subl resources/results/grn_evaluation_all_ridge/scores.yaml
 
 # ./tw-windows-x86_64.exe launch `
 #     https://github.com/openproblems-bio/task_grn_inference.git `
