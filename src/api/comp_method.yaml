@@ -10,37 +10,38 @@ functionality:
   arguments:
     - name: --multiomics_rna
       __merge__: file_multiomics_rna_h5ad.yaml
-      required: false
+      required: true
       direction: input
-      default: resources/grn-benchmark/multiomics_rna.h5ad
-    - name: --multiomics_atac
-      __merge__: file_multiomics_atac_h5ad.yaml
-      required: false
-      direction: input
-      must_exist: false
-      default: resources/grn-benchmark/multiomics_atac.h5ad
+      example: resources_test/grn-benchmark/multiomics_rna.h5ad
     - name: --prediction
       __merge__: file_prediction.yaml
-      required: false
+      required: true
       direction: output
-      example: output/prediction.csv
-      default: output/prediction.csv
-    - name: --temp_dir
-      type: string
+      example: resources_test/grn_models/collectri.csv
+    - name: --tf_all
+      type: file
+      required: true
       direction: input
-      default: output/temdir
+      example: resources_test/prior/tf_all.csv
+    - name: --max_n_links
+      type: integer
+      default: 50000
     - name: --num_workers
       type: integer
       direction: input
       default: 4
-    - name: --tf_all
-      type: file
-      example: resources/prior/tf_all.csv
-      default: resources/prior/tf_all.csv
-      required: false
-    - name: --max_n_links
+    - name: --temp_dir
+      type: string
+      direction: input
+      default: output/temdir
+    - name: --seed
       type: integer
-      default: 50000
+      direction: input
+      default: 32
+
+
+
+    
 
   test_resources:
     - type: python_script

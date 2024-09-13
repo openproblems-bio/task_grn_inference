@@ -175,17 +175,14 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --perturbation_counts"
   echo "        type: file, required parameter, file must exist"
-  echo "        default: resources/datasets_raw/perturbation_counts.h5ad"
   echo "        example: resources_test/datasets_raw/perturbation_counts.h5ad"
   echo ""
   echo "    --pseudobulked_data"
-  echo "        type: file, required parameter, output, file must exist"
-  echo "        default: resources_local/pseudobulked_data.h5ad"
+  echo "        type: file, output, file must exist"
   echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
   echo ""
   echo "    --pseudobulked_data_f"
-  echo "        type: file, required parameter, output, file must exist"
-  echo "        default: resources_local/pseudobulked_data_f.h5ad"
+  echo "        type: file, output, file must exist"
   echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
 }
 
@@ -328,14 +325,6 @@ fi
 # check whether required parameters exist
 if [ -z ${VIASH_PAR_PERTURBATION_COUNTS+x} ]; then
   ViashError '--perturbation_counts' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_PSEUDOBULKED_DATA+x} ]; then
-  ViashError '--pseudobulked_data' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_PSEUDOBULKED_DATA_F+x} ]; then
-  ViashError '--pseudobulked_data_f' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then

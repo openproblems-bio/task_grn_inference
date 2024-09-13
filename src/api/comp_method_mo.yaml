@@ -1,0 +1,17 @@
+__merge__: comp_method.yaml
+
+functionality:
+  info:
+    type: methods
+    type_info:
+      label: Method
+      summary: A GRN inference method for multiomics grn
+      description: |
+        A method for inferring GRN from atac and rna data.
+  arguments:
+      - name: --multiomics_atac
+        __merge__: file_multiomics_atac_h5ad.yaml
+        required: true
+        direction: input
+        must_exist: false
+        example: resources_test/grn-benchmark/multiomics_atac.h5ad

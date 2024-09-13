@@ -174,36 +174,32 @@ function ViashHelp {
   echo ""
   echo "Arguments:"
   echo "    --multiomics_rna"
-  echo "        type: file, file must exist"
-  echo "        default: resources/grn-benchmark/multiomics_rna.h5ad"
+  echo "        type: file, required parameter, file must exist"
   echo "        example: resources_test/grn-benchmark/multiomics_rna.h5ad"
   echo ""
-  echo "    --multiomics_atac"
-  echo "        type: file"
-  echo "        default: resources/grn-benchmark/multiomics_atac.h5ad"
-  echo "        example: resources_test/grn-benchmark/multiomics_atac.h5ad"
-  echo ""
   echo "    --prediction"
-  echo "        type: file, output, file must exist"
-  echo "        default: output/prediction.csv"
-  echo "        example: output/prediction.csv"
+  echo "        type: file, required parameter, output, file must exist"
+  echo "        example: resources_test/grn_models/collectri.csv"
   echo ""
-  echo "    --temp_dir"
-  echo "        type: string"
-  echo "        default: output/temdir"
+  echo "    --tf_all"
+  echo "        type: file, required parameter, file must exist"
+  echo "        example: resources_test/prior/tf_all.csv"
+  echo ""
+  echo "    --max_n_links"
+  echo "        type: integer"
+  echo "        default: 50000"
   echo ""
   echo "    --num_workers"
   echo "        type: integer"
   echo "        default: 4"
   echo ""
-  echo "    --tf_all"
-  echo "        type: file, file must exist"
-  echo "        default: resources/prior/tf_all.csv"
-  echo "        example: resources/prior/tf_all.csv"
+  echo "    --temp_dir"
+  echo "        type: string"
+  echo "        default: output/temdir"
   echo ""
-  echo "    --max_n_links"
+  echo "    --seed"
   echo "        type: integer"
-  echo "        default: 50000"
+  echo "        default: 32"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -432,9 +428,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods genie3"
-LABEL org.opencontainers.image.created="2024-09-12T18:31:24Z"
+LABEL org.opencontainers.image.created="2024-09-13T08:23:14Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="45144825ebae0977f43a73fc134ba821eb06089b"
+LABEL org.opencontainers.image.revision="85c6435c5128d87ece01e29806151c230a6cb03e"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -604,17 +600,6 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_MULTIOMICS_RNA=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --multiomics_atac)
-            [ -n "$VIASH_PAR_MULTIOMICS_ATAC" ] && ViashError Bad arguments for option \'--multiomics_atac\': \'$VIASH_PAR_MULTIOMICS_ATAC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_MULTIOMICS_ATAC="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --multiomics_atac. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --multiomics_atac=*)
-            [ -n "$VIASH_PAR_MULTIOMICS_ATAC" ] && ViashError Bad arguments for option \'--multiomics_atac=*\': \'$VIASH_PAR_MULTIOMICS_ATAC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_MULTIOMICS_ATAC=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
         --prediction)
             [ -n "$VIASH_PAR_PREDICTION" ] && ViashError Bad arguments for option \'--prediction\': \'$VIASH_PAR_PREDICTION\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_PREDICTION="$2"
@@ -624,28 +609,6 @@ while [[ $# -gt 0 ]]; do
         --prediction=*)
             [ -n "$VIASH_PAR_PREDICTION" ] && ViashError Bad arguments for option \'--prediction=*\': \'$VIASH_PAR_PREDICTION\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_PREDICTION=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --temp_dir)
-            [ -n "$VIASH_PAR_TEMP_DIR" ] && ViashError Bad arguments for option \'--temp_dir\': \'$VIASH_PAR_TEMP_DIR\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_TEMP_DIR="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --temp_dir. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --temp_dir=*)
-            [ -n "$VIASH_PAR_TEMP_DIR" ] && ViashError Bad arguments for option \'--temp_dir=*\': \'$VIASH_PAR_TEMP_DIR\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_TEMP_DIR=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --num_workers)
-            [ -n "$VIASH_PAR_NUM_WORKERS" ] && ViashError Bad arguments for option \'--num_workers\': \'$VIASH_PAR_NUM_WORKERS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_NUM_WORKERS="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --num_workers. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --num_workers=*)
-            [ -n "$VIASH_PAR_NUM_WORKERS" ] && ViashError Bad arguments for option \'--num_workers=*\': \'$VIASH_PAR_NUM_WORKERS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_NUM_WORKERS=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --tf_all)
@@ -668,6 +631,39 @@ while [[ $# -gt 0 ]]; do
         --max_n_links=*)
             [ -n "$VIASH_PAR_MAX_N_LINKS" ] && ViashError Bad arguments for option \'--max_n_links=*\': \'$VIASH_PAR_MAX_N_LINKS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_MAX_N_LINKS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --num_workers)
+            [ -n "$VIASH_PAR_NUM_WORKERS" ] && ViashError Bad arguments for option \'--num_workers\': \'$VIASH_PAR_NUM_WORKERS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_NUM_WORKERS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --num_workers. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --num_workers=*)
+            [ -n "$VIASH_PAR_NUM_WORKERS" ] && ViashError Bad arguments for option \'--num_workers=*\': \'$VIASH_PAR_NUM_WORKERS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_NUM_WORKERS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --temp_dir)
+            [ -n "$VIASH_PAR_TEMP_DIR" ] && ViashError Bad arguments for option \'--temp_dir\': \'$VIASH_PAR_TEMP_DIR\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TEMP_DIR="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --temp_dir. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --temp_dir=*)
+            [ -n "$VIASH_PAR_TEMP_DIR" ] && ViashError Bad arguments for option \'--temp_dir=*\': \'$VIASH_PAR_TEMP_DIR\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TEMP_DIR=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --seed)
+            [ -n "$VIASH_PAR_SEED" ] && ViashError Bad arguments for option \'--seed\': \'$VIASH_PAR_SEED\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_SEED="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --seed. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --seed=*)
+            [ -n "$VIASH_PAR_SEED" ] && ViashError Bad arguments for option \'--seed=*\': \'$VIASH_PAR_SEED\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_SEED=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---setup)
@@ -788,6 +784,18 @@ fi
 
 
 # check whether required parameters exist
+if [ -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then
+  ViashError '--multiomics_rna' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
+if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
+  ViashError '--prediction' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
+if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
+  ViashError '--tf_all' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then
   ViashError 'functionality_name' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
@@ -810,26 +818,17 @@ if [ -z ${VIASH_META_TEMP_DIR+x} ]; then
 fi
 
 # filling in defaults
-if [ -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then
-  VIASH_PAR_MULTIOMICS_RNA="resources/grn-benchmark/multiomics_rna.h5ad"
-fi
-if [ -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then
-  VIASH_PAR_MULTIOMICS_ATAC="resources/grn-benchmark/multiomics_atac.h5ad"
-fi
-if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
-  VIASH_PAR_PREDICTION="output/prediction.csv"
-fi
-if [ -z ${VIASH_PAR_TEMP_DIR+x} ]; then
-  VIASH_PAR_TEMP_DIR="output/temdir"
+if [ -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then
+  VIASH_PAR_MAX_N_LINKS="50000"
 fi
 if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
   VIASH_PAR_NUM_WORKERS="4"
 fi
-if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
-  VIASH_PAR_TF_ALL="resources/prior/tf_all.csv"
+if [ -z ${VIASH_PAR_TEMP_DIR+x} ]; then
+  VIASH_PAR_TEMP_DIR="output/temdir"
 fi
-if [ -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then
-  VIASH_PAR_MAX_N_LINKS="50000"
+if [ -z ${VIASH_PAR_SEED+x} ]; then
+  VIASH_PAR_SEED="32"
 fi
 
 # check whether required files exist
@@ -843,15 +842,21 @@ if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
 fi
 
 # check whether parameters values are of the right type
+if [[ -n "$VIASH_PAR_MAX_N_LINKS" ]]; then
+  if ! [[ "$VIASH_PAR_MAX_N_LINKS" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--max_n_links' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
 if [[ -n "$VIASH_PAR_NUM_WORKERS" ]]; then
   if ! [[ "$VIASH_PAR_NUM_WORKERS" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--num_workers' has to be an integer. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
-if [[ -n "$VIASH_PAR_MAX_N_LINKS" ]]; then
-  if ! [[ "$VIASH_PAR_MAX_N_LINKS" =~ ^[-+]?[0-9]+$ ]]; then
-    ViashError '--max_n_links' has to be an integer. Use "--help" to get more information on the parameters.
+if [[ -n "$VIASH_PAR_SEED" ]]; then
+  if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -908,10 +913,6 @@ VIASH_CHOWN_VARS=()
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_MULTIOMICS_RNA")" )
   VIASH_PAR_MULTIOMICS_RNA=$(ViashAutodetectMount "$VIASH_PAR_MULTIOMICS_RNA")
-fi
-if [ ! -z "$VIASH_PAR_MULTIOMICS_ATAC" ]; then
-  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_MULTIOMICS_ATAC")" )
-  VIASH_PAR_MULTIOMICS_ATAC=$(ViashAutodetectMount "$VIASH_PAR_MULTIOMICS_ATAC")
 fi
 if [ ! -z "$VIASH_PAR_PREDICTION" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PREDICTION")" )
@@ -992,12 +993,12 @@ from distributed import Client
 # The following code has been auto-generated by Viash.
 par = {
   'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'multiomics_atac': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_ATAC//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi )
+  'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1064,9 +1065,6 @@ VIASHEOF
 # strip viash automount from file paths
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ]; then
   VIASH_PAR_MULTIOMICS_RNA=$(ViashStripAutomount "$VIASH_PAR_MULTIOMICS_RNA")
-fi
-if [ ! -z "$VIASH_PAR_MULTIOMICS_ATAC" ]; then
-  VIASH_PAR_MULTIOMICS_ATAC=$(ViashStripAutomount "$VIASH_PAR_MULTIOMICS_ATAC")
 fi
 if [ ! -z "$VIASH_PAR_PREDICTION" ]; then
   VIASH_PAR_PREDICTION=$(ViashStripAutomount "$VIASH_PAR_PREDICTION")

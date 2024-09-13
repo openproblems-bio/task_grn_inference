@@ -12,17 +12,19 @@ functionality:
       __merge__: file_perturbation_h5ad.yaml
       required: false
       direction: input
-      default: resources/grn-benchmark/perturbation_data.h5ad
     - name: --prediction
       __merge__: file_prediction.yaml
       required: true
       direction: input
-  
     - name: --score
       __merge__: file_score.yaml
       required: false
       direction: output
-      default: output/score.h5ad
+    - name: --tf_all
+      type: file
+      direction: input
+      required: true
+      example: resources_test/prior/tf_all.csv
     - name: --reg_type
       type: string
       direction: input
@@ -43,11 +45,6 @@ functionality:
       direction: input 
       required: false
       example: collectri
-    - name: --tf_all
-      type: file
-      direction: input
-      example: resources_test/prior/tf_all.csv
-      default: resources/prior/tf_all.csv
     - name: --apply_tf
       type: boolean 
       required: false
@@ -57,6 +54,11 @@ functionality:
       required: false
       default: true
       description: clips the r2 scores for each gene to make them within [0, 1]
+    - name: --layer
+      type: string
+      direction: input
+      required: false
+      default: scgen_pearson
 
 
       

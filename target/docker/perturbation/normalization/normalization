@@ -175,12 +175,10 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --pseudobulked_data_f"
   echo "        type: file, required parameter, file must exist"
-  echo "        default: resources_local/pseudobulked_data_f"
   echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
   echo ""
   echo "    --perturbation_data_n"
-  echo "        type: file, required parameter, output, file must exist"
-  echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
+  echo "        type: file, output, file must exist"
   echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
 }
 
@@ -408,9 +406,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "sctk==0.2.2"
 
 LABEL org.opencontainers.image.description="Companion container for running component perturbation normalization"
-LABEL org.opencontainers.image.created="2024-09-12T18:31:24Z"
+LABEL org.opencontainers.image.created="2024-09-13T08:23:12Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="45144825ebae0977f43a73fc134ba821eb06089b"
+LABEL org.opencontainers.image.revision="85c6435c5128d87ece01e29806151c230a6cb03e"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -711,10 +709,6 @@ fi
 # check whether required parameters exist
 if [ -z ${VIASH_PAR_PSEUDOBULKED_DATA_F+x} ]; then
   ViashError '--pseudobulked_data_f' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_PERTURBATION_DATA_N+x} ]; then
-  ViashError '--perturbation_data_n' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then

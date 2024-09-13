@@ -8,14 +8,13 @@ functionality:
   arguments:
     - name: --perturbation_data
       __merge__: ../../../api/file_perturbation_h5ad.yaml
-      required: false
+      required: true
       direction: input
-      default: resources/grn-benchmark/perturbation_data.h5ad
     - name: --output
       type: file
-      required: true 
+      required: false 
       direction: output
-      default: output/batch_correction_metrics.csv
+      example: resources_test/results/batch_correction_metrics.csv
 
   resources:
     - type: python_script

@@ -7,7 +7,6 @@ functionality:
     label: normalization
     summary: "Normalize pseudobulked data"
 
-
   arguments:
 
     - name: --pseudobulked_data_f
@@ -25,7 +24,6 @@ functionality:
 
       required: true
       direction: input
-      default: resources_local/pseudobulked_data_f
       example: resources_test/grn-benchmark/perturbation_data.h5ad 
 
     - name: --perturbation_data_n
@@ -48,9 +46,8 @@ functionality:
               type: double
               description: "Normalized values using shifted logarithm "
               required: true
-      required: true
+      required: false
       direction: output
-      default: resources/grn-benchmark/perturbation_data.h5ad 
       example: resources_test/grn-benchmark/perturbation_data.h5ad 
       
 

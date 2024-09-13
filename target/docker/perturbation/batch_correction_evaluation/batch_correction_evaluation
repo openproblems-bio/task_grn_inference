@@ -174,13 +174,12 @@ function ViashHelp {
   echo ""
   echo "Arguments:"
   echo "    --perturbation_data"
-  echo "        type: file, file must exist"
-  echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
+  echo "        type: file, required parameter, file must exist"
   echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
   echo ""
   echo "    --output"
-  echo "        type: file, required parameter, output, file must exist"
-  echo "        default: output/batch_correction_metrics.csv"
+  echo "        type: file, output, file must exist"
+  echo "        example: resources_test/results/batch_correction_metrics.csv"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -407,9 +406,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.5.0" "scib==1.1.5" "louvain==0.8.2" "rpy2"
 
 LABEL org.opencontainers.image.description="Companion container for running component perturbation batch_correction_evaluation"
-LABEL org.opencontainers.image.created="2024-09-12T18:31:24Z"
+LABEL org.opencontainers.image.created="2024-09-13T08:23:13Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="45144825ebae0977f43a73fc134ba821eb06089b"
+LABEL org.opencontainers.image.revision="85c6435c5128d87ece01e29806151c230a6cb03e"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -708,8 +707,8 @@ fi
 
 
 # check whether required parameters exist
-if [ -z ${VIASH_PAR_OUTPUT+x} ]; then
-  ViashError '--output' is a required argument. Use "--help" to get more information on the parameters.
+if [ -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then
+  ViashError '--perturbation_data' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then
@@ -731,11 +730,6 @@ fi
 if [ -z ${VIASH_META_TEMP_DIR+x} ]; then
   ViashError 'temp_dir' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
-fi
-
-# filling in defaults
-if [ -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then
-  VIASH_PAR_PERTURBATION_DATA="resources/grn-benchmark/perturbation_data.h5ad"
 fi
 
 # check whether required files exist

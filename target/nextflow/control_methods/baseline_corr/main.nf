@@ -2785,13 +2785,35 @@ meta = [
     "version" : "build-main",
     "arguments" : [
       {
-        "type" : "string",
-        "name" : "--layer",
-        "description" : "Which layer of pertubation data to use to find tf-gene relationships.",
-        "default" : [
-          "scgen_pearson"
+        "type" : "file",
+        "name" : "--multiomics_rna",
+        "info" : {
+          "label" : "multiomics rna",
+          "summary" : "RNA expression for multiomics data.",
+          "file_type" : "h5ad",
+          "slots" : {
+            "obs" : [
+              {
+                "name" : "cell_type",
+                "type" : "string",
+                "description" : "The annotated cell type of each cell based on RNA expression.",
+                "required" : true
+              },
+              {
+                "name" : "donor_id",
+                "type" : "string",
+                "description" : "Donor id",
+                "required" : true
+              }
+            ]
+          }
+        },
+        "example" : [
+          "resources_test/grn-benchmark/multiomics_rna.h5ad"
         ],
-        "required" : false,
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : true,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2830,7 +2852,7 @@ meta = [
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : false,
+        "required" : true,
         "direction" : "output",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2851,10 +2873,34 @@ meta = [
         "dest" : "par"
       },
       {
-        "type" : "boolean",
-        "name" : "--causal",
+        "type" : "integer",
+        "name" : "--max_n_links",
         "default" : [
-          false
+          50000
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "integer",
+        "name" : "--num_workers",
+        "default" : [
+          4
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "string",
+        "name" : "--temp_dir",
+        "default" : [
+          "output/temdir"
         ],
         "required" : false,
         "direction" : "input",
@@ -2865,6 +2911,9 @@ meta = [
       {
         "type" : "integer",
         "name" : "--seed",
+        "default" : [
+          32
+        ],
         "required" : false,
         "direction" : "input",
         "multiple" : false,
@@ -2872,14 +2921,12 @@ meta = [
         "dest" : "par"
       },
       {
-        "type" : "file",
-        "name" : "--multiomics_rna",
-        "example" : [
-          "resources_test/grn-benchmark/multiomics_rna.h5ad"
+        "type" : "boolean",
+        "name" : "--causal",
+        "default" : [
+          false
         ],
-        "must_exist" : true,
-        "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2964,16 +3011,22 @@ meta = [
         "path" : "resources_test/prior",
         "dest" : "resources_test/prior",
         "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
+      },
+      {
+        "type" : "file",
+        "path" : "resources_test/supplementary",
+        "dest" : "resources_test/supplementary",
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
     "info" : {
       "label" : "baseline_corr",
-      "summary" : "Baseline based on Pearson corr",
-      "type" : "control_method",
+      "summary" : "Baseline based on correlation",
+      "type" : "methods",
       "type_info" : {
-        "label" : "Control Method",
-        "summary" : "A control method.",
-        "description" : "A control method to serve as a quality control for the GRN inference benchmark.\n"
+        "label" : "Method",
+        "summary" : "A GRN inference method",
+        "description" : "A method for inferring GRN from expression data.\n"
       }
     },
     "status" : "enabled",
@@ -2995,9 +3048,6 @@ meta = [
         {
           "type" : "python",
           "user" : false,
-          "packages" : [
-            "magic-impute"
-          ],
           "upgrade" : true
         }
       ]
@@ -3051,7 +3101,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/baseline_corr",
     "viash_version" : "0.8.6",
-    "git_commit" : "45144825ebae0977f43a73fc134ba821eb06089b",
+    "git_commit" : "85c6435c5128d87ece01e29806151c230a6cb03e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3077,12 +3127,14 @@ from scipy.stats import spearmanr
 ## VIASH START
 # The following code has been auto-generated by Viash.
 par = {
-  'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
+  'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
+  'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'corr_method': $( if [ ! -z ${VIASH_PAR_CORR_METHOD+x} ]; then echo "r'${VIASH_PAR_CORR_METHOD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'metacell': $( if [ ! -z ${VIASH_PAR_METACELL+x} ]; then echo "r'${VIASH_PAR_METACELL//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
@@ -3144,7 +3196,7 @@ def create_corr_net(X: np.ndarray, groups: np.ndarray, method="pearson"):
     return grn
 print('Read data')
 multiomics_rna = ad.read_h5ad(par["multiomics_rna"])
-# multiomics_rna = multiomics_rna[:,:2000] #TODO: togo
+multiomics_rna = multiomics_rna[:,:2000] #TODO: togo
  
 if par['metacell']:
     print('metacell')

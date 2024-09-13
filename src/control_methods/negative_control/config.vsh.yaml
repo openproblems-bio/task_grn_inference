@@ -1,6 +1,7 @@
-__merge__: ../../api/comp_control_method.yaml
+__merge__: ../../api/comp_method.yaml
 functionality:
   name: negative_control
+  namespace: control_methods
   info:
     label: Negative control
     summary: Source-target links based on random assignment
@@ -9,9 +10,9 @@ functionality:
   arguments:
     - name: --perturbation_data
       type: file
-      required: false
+      required: true
       direction: input
-      default: resources/grn-benchmark/perturbation_data.h5ad
+      example: resources_test/grn-benchmark/perturbation_data.h5ad
     
   resources:
     - type: python_script

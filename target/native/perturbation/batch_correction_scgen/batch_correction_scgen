@@ -175,12 +175,10 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --perturbation_data_n"
   echo "        type: file, required parameter, file must exist"
-  echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
   echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
   echo ""
   echo "    --perturbation_data_bc"
-  echo "        type: file, required parameter, output, file must exist"
-  echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
+  echo "        type: file, output, file must exist"
   echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
 }
 
@@ -312,10 +310,6 @@ fi
 # check whether required parameters exist
 if [ -z ${VIASH_PAR_PERTURBATION_DATA_N+x} ]; then
   ViashError '--perturbation_data_n' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_PERTURBATION_DATA_BC+x} ]; then
-  ViashError '--perturbation_data_bc' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then

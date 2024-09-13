@@ -8,11 +8,6 @@ functionality:
     description: |
       Calculates R2 score using regression approach 1.
   arguments:
-    - name: --layer
-      type: string
-      direction: input
-      required: false
-      default: scgen_pearson
     - name: --min_tf
       type: integer
       direction: input

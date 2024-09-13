@@ -32,14 +32,9 @@ functionality:
       direction: input
       example: resources_test/grn-benchmark/perturbation_data.h5ad 
     - name: --perturbation_data_bc
-      type: file
-      info:
-        label: perturbation
-        summary: "Perturbation dataset for benchmarking."
-        __merge__: ../../../api/file_perturbation_h5ad.yaml
+      __merge__: ../../../api/file_perturbation_h5ad.yaml
       required: false
       direction: output
-      example: resources_test/grn-benchmark/perturbation_data.h5ad 
 
 
   resources:

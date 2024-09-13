@@ -14,17 +14,14 @@ functionality:
     - name: --consensus
       type: file
       direction: input
-      must_exist: true
-      default: 'resources/prior/consensus-num-regulators.json'
+      must_exist: false
+      required: true
       example: 'resources_test/prior/consensus-num-regulators.json'
     - name: --static_only
+      direction: input
       type: boolean
       default: true
-    - name: --layer
-      type: string
-      direction: input
-      required: false
-      default: scgen_pearson
+
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4

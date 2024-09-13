@@ -173,29 +173,37 @@ function ViashHelp {
   echo "baseline_corr build-main"
   echo ""
   echo "Arguments:"
-  echo "    --layer"
-  echo "        type: string"
-  echo "        default: scgen_pearson"
-  echo "        Which layer of pertubation data to use to find tf-gene relationships."
+  echo "    --multiomics_rna"
+  echo "        type: file, required parameter, file must exist"
+  echo "        example: resources_test/grn-benchmark/multiomics_rna.h5ad"
   echo ""
   echo "    --prediction"
-  echo "        type: file, output, file must exist"
+  echo "        type: file, required parameter, output, file must exist"
   echo "        example: resources_test/grn_models/collectri.csv"
   echo ""
   echo "    --tf_all"
   echo "        type: file, required parameter, file must exist"
   echo "        example: resources_test/prior/tf_all.csv"
   echo ""
-  echo "    --causal"
-  echo "        type: boolean"
-  echo "        default: false"
+  echo "    --max_n_links"
+  echo "        type: integer"
+  echo "        default: 50000"
+  echo ""
+  echo "    --num_workers"
+  echo "        type: integer"
+  echo "        default: 4"
+  echo ""
+  echo "    --temp_dir"
+  echo "        type: string"
+  echo "        default: output/temdir"
   echo ""
   echo "    --seed"
   echo "        type: integer"
+  echo "        default: 32"
   echo ""
-  echo "    --multiomics_rna"
-  echo "        type: file, required parameter, file must exist"
-  echo "        example: resources_test/grn-benchmark/multiomics_rna.h5ad"
+  echo "    --causal"
+  echo "        type: boolean"
+  echo "        default: false"
   echo ""
   echo "    --corr_method"
   echo "        type: string"
@@ -245,15 +253,15 @@ while [[ $# -gt 0 ]]; do
             echo "baseline_corr build-main"
             exit
             ;;
-        --layer)
-            [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_LAYER="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --layer. Use "--help" to get more information on the parameters. && exit 1
+        --multiomics_rna)
+            [ -n "$VIASH_PAR_MULTIOMICS_RNA" ] && ViashError Bad arguments for option \'--multiomics_rna\': \'$VIASH_PAR_MULTIOMICS_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MULTIOMICS_RNA="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --multiomics_rna. Use "--help" to get more information on the parameters. && exit 1
             shift 2
             ;;
-        --layer=*)
-            [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer=*\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_LAYER=$(ViashRemoveFlags "$1")
+        --multiomics_rna=*)
+            [ -n "$VIASH_PAR_MULTIOMICS_RNA" ] && ViashError Bad arguments for option \'--multiomics_rna=*\': \'$VIASH_PAR_MULTIOMICS_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MULTIOMICS_RNA=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --prediction)
@@ -278,15 +286,37 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_TF_ALL=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --causal)
-            [ -n "$VIASH_PAR_CAUSAL" ] && ViashError Bad arguments for option \'--causal\': \'$VIASH_PAR_CAUSAL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CAUSAL="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --causal. Use "--help" to get more information on the parameters. && exit 1
+        --max_n_links)
+            [ -n "$VIASH_PAR_MAX_N_LINKS" ] && ViashError Bad arguments for option \'--max_n_links\': \'$VIASH_PAR_MAX_N_LINKS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MAX_N_LINKS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --max_n_links. Use "--help" to get more information on the parameters. && exit 1
             shift 2
             ;;
-        --causal=*)
-            [ -n "$VIASH_PAR_CAUSAL" ] && ViashError Bad arguments for option \'--causal=*\': \'$VIASH_PAR_CAUSAL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CAUSAL=$(ViashRemoveFlags "$1")
+        --max_n_links=*)
+            [ -n "$VIASH_PAR_MAX_N_LINKS" ] && ViashError Bad arguments for option \'--max_n_links=*\': \'$VIASH_PAR_MAX_N_LINKS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MAX_N_LINKS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --num_workers)
+            [ -n "$VIASH_PAR_NUM_WORKERS" ] && ViashError Bad arguments for option \'--num_workers\': \'$VIASH_PAR_NUM_WORKERS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_NUM_WORKERS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --num_workers. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --num_workers=*)
+            [ -n "$VIASH_PAR_NUM_WORKERS" ] && ViashError Bad arguments for option \'--num_workers=*\': \'$VIASH_PAR_NUM_WORKERS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_NUM_WORKERS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --temp_dir)
+            [ -n "$VIASH_PAR_TEMP_DIR" ] && ViashError Bad arguments for option \'--temp_dir\': \'$VIASH_PAR_TEMP_DIR\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TEMP_DIR="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --temp_dir. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --temp_dir=*)
+            [ -n "$VIASH_PAR_TEMP_DIR" ] && ViashError Bad arguments for option \'--temp_dir=*\': \'$VIASH_PAR_TEMP_DIR\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TEMP_DIR=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --seed)
@@ -300,15 +330,15 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_SEED=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --multiomics_rna)
-            [ -n "$VIASH_PAR_MULTIOMICS_RNA" ] && ViashError Bad arguments for option \'--multiomics_rna\': \'$VIASH_PAR_MULTIOMICS_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_MULTIOMICS_RNA="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --multiomics_rna. Use "--help" to get more information on the parameters. && exit 1
+        --causal)
+            [ -n "$VIASH_PAR_CAUSAL" ] && ViashError Bad arguments for option \'--causal\': \'$VIASH_PAR_CAUSAL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CAUSAL="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --causal. Use "--help" to get more information on the parameters. && exit 1
             shift 2
             ;;
-        --multiomics_rna=*)
-            [ -n "$VIASH_PAR_MULTIOMICS_RNA" ] && ViashError Bad arguments for option \'--multiomics_rna=*\': \'$VIASH_PAR_MULTIOMICS_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_MULTIOMICS_RNA=$(ViashRemoveFlags "$1")
+        --causal=*)
+            [ -n "$VIASH_PAR_CAUSAL" ] && ViashError Bad arguments for option \'--causal=*\': \'$VIASH_PAR_CAUSAL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CAUSAL=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --corr_method)
@@ -433,12 +463,16 @@ fi
 
 
 # check whether required parameters exist
-if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
-  ViashError '--tf_all' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
 if [ -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then
   ViashError '--multiomics_rna' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
+if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
+  ViashError '--prediction' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
+if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
+  ViashError '--tf_all' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then
@@ -463,8 +497,17 @@ if [ -z ${VIASH_META_TEMP_DIR+x} ]; then
 fi
 
 # filling in defaults
-if [ -z ${VIASH_PAR_LAYER+x} ]; then
-  VIASH_PAR_LAYER="scgen_pearson"
+if [ -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then
+  VIASH_PAR_MAX_N_LINKS="50000"
+fi
+if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
+  VIASH_PAR_NUM_WORKERS="4"
+fi
+if [ -z ${VIASH_PAR_TEMP_DIR+x} ]; then
+  VIASH_PAR_TEMP_DIR="output/temdir"
+fi
+if [ -z ${VIASH_PAR_SEED+x} ]; then
+  VIASH_PAR_SEED="32"
 fi
 if [ -z ${VIASH_PAR_CAUSAL+x} ]; then
   VIASH_PAR_CAUSAL="false"
@@ -483,25 +526,37 @@ if [ -z ${VIASH_PAR_IMPUTE+x} ]; then
 fi
 
 # check whether required files exist
-if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
-  ViashError "Input file '$VIASH_PAR_TF_ALL' does not exist."
-  exit 1
-fi
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
   ViashError "Input file '$VIASH_PAR_MULTIOMICS_RNA' does not exist."
   exit 1
 fi
+if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
+  ViashError "Input file '$VIASH_PAR_TF_ALL' does not exist."
+  exit 1
+fi
 
 # check whether parameters values are of the right type
-if [[ -n "$VIASH_PAR_CAUSAL" ]]; then
-  if ! [[ "$VIASH_PAR_CAUSAL" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--causal' has to be a boolean. Use "--help" to get more information on the parameters.
+if [[ -n "$VIASH_PAR_MAX_N_LINKS" ]]; then
+  if ! [[ "$VIASH_PAR_MAX_N_LINKS" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--max_n_links' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_NUM_WORKERS" ]]; then
+  if ! [[ "$VIASH_PAR_NUM_WORKERS" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--num_workers' has to be an integer. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
 if [[ -n "$VIASH_PAR_SEED" ]]; then
   if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_CAUSAL" ]]; then
+  if ! [[ "$VIASH_PAR_CAUSAL" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--causal' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -600,12 +655,14 @@ from scipy.stats import spearmanr
 ## VIASH START
 # The following code has been auto-generated by Viash.
 par = {
-  'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
+  'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
-  'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'corr_method': $( if [ ! -z ${VIASH_PAR_CORR_METHOD+x} ]; then echo "r'${VIASH_PAR_CORR_METHOD//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'metacell': $( if [ ! -z ${VIASH_PAR_METACELL+x} ]; then echo "r'${VIASH_PAR_METACELL//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
@@ -667,7 +724,7 @@ def create_corr_net(X: np.ndarray, groups: np.ndarray, method="pearson"):
     return grn
 print('Read data')
 multiomics_rna = ad.read_h5ad(par["multiomics_rna"])
-# multiomics_rna = multiomics_rna[:,:2000] #TODO: togo
+multiomics_rna = multiomics_rna[:,:2000] #TODO: togo
  
 if par['metacell']:
     print('metacell')

@@ -37,57 +37,52 @@ functionality:
     info:
       label: "perturbation"
       summary: "Perturbation dataset for benchmarking."
-      type: "file"
-      example: "resources_test/grn-benchmark/perturbation_data.h5ad"
-      info:
-        label: "perturbation"
-        summary: "Perturbation dataset for benchmarking."
-        file_type: "h5ad"
-        slots:
-          obs:
-          - name: "cell_type"
-            type: "string"
-            description: "The annotated cell type of each cell based on RNA expression."
-            required: true
-          - name: "sm_name"
-            type: "string"
-            description: "The primary name for the (parent) compound (in a standardized\
-              \ representation)\nas chosen by LINCS. This is provided to map the data\
-              \ in this experiment to \nthe LINCS Connectivity Map data.\n"
-            required: true
-          - name: "donor_id"
-            type: "string"
-            description: "Donor id"
-            required: true
-          - name: "plate_name"
-            type: "string"
-            description: "Plate name 6 levels"
-            required: true
-          - name: "row"
-            type: "string"
-            description: "Row name on the plate"
-            required: true
-          - name: "well"
-            type: "string"
-            description: "Well name on the plate"
-            required: true
-          - name: "cell_count"
-            type: "string"
-            description: "Number of single cells pseudobulked"
-            required: true
-          layers:
-          - name: "n_counts"
-            type: "double"
-            description: "Pseudobulked values using mean approach"
-            required: true
-          - name: "pearson"
-            type: "double"
-            description: "Normalized values using pearson residuals"
-            required: false
-          - name: "lognorm"
-            type: "double"
-            description: "Normalized values using shifted logarithm "
-            required: false
+      file_type: "h5ad"
+      slots:
+        obs:
+        - name: "cell_type"
+          type: "string"
+          description: "The annotated cell type of each cell based on RNA expression."
+          required: true
+        - name: "sm_name"
+          type: "string"
+          description: "The primary name for the (parent) compound (in a standardized\
+            \ representation)\nas chosen by LINCS. This is provided to map the data\
+            \ in this experiment to \nthe LINCS Connectivity Map data.\n"
+          required: true
+        - name: "donor_id"
+          type: "string"
+          description: "Donor id"
+          required: true
+        - name: "plate_name"
+          type: "string"
+          description: "Plate name 6 levels"
+          required: true
+        - name: "row"
+          type: "string"
+          description: "Row name on the plate"
+          required: true
+        - name: "well"
+          type: "string"
+          description: "Well name on the plate"
+          required: true
+        - name: "cell_count"
+          type: "string"
+          description: "Number of single cells pseudobulked"
+          required: true
+        layers:
+        - name: "n_counts"
+          type: "double"
+          description: "Pseudobulked values using mean approach"
+          required: true
+        - name: "pearson"
+          type: "double"
+          description: "Normalized values using pearson residuals"
+          required: false
+        - name: "lognorm"
+          type: "double"
+          description: "Normalized values using shifted logarithm "
+          required: false
     example:
     - "resources_test/grn-benchmark/perturbation_data.h5ad"
     must_exist: true
@@ -171,5 +166,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/perturbation/batch_correction_seurat"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/perturbation/batch_correction_seurat/batch_correction_seurat"
   viash_version: "0.8.6"
-  git_commit: "45144825ebae0977f43a73fc134ba821eb06089b"
+  git_commit: "85c6435c5128d87ece01e29806151c230a6cb03e"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
