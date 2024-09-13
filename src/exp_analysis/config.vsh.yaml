@@ -10,22 +10,23 @@ functionality:
       type: file
       required: false
       direction: input
-      default: resources/grn-benchmark/perturbation_data.h5ad
       example: resources_test/grn-benchmark/perturbation_data.h5ad
-    - name: --tf_gene_net
+    - name: --prediction
       type: file
       required: true
       direction: input
+      example: resources_test/grn_models/collectri.csv
     - name: --peak_gene_net
       type: file
       required: false
       direction: input
+      example: resources_test/peak_gene_models/collectri.csv
     - name: --annot_peak_database
       type: file 
       required: false 
       direction: input
       must_exist: false
-      example: resources/supplements/annot_peak_database.csv
+      example: resources_test/supplementary/annot_peak_database.csv
     # - name: --annot_gene_database
     #   type: file 
     #   required: false 
