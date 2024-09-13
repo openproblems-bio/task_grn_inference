@@ -93,34 +93,16 @@ sc.pp.scale(multiomics_rna)
 
 if par['impute']:
     print("imputing")
-    # import magic
-    # import scprep
+    import magic
+    import scprep
     
-    # magic_operator = magic.MAGIC()
+    magic_operator = magic.MAGIC()
     
-    # multiomics_rna = magic_operator.fit_transform(multiomics_rna)
-    from sklearn.impute import KNNImputer
-    import numpy as np
-
-    print("Imputing with KNN")
-
-    # Convert to dense if the matrix is sparse
-    if sc.sparse.issparse(multiomics_rna.X):
-        multiomics_rna_dense = multiomics_rna.X.toarray()
-    else:
-        multiomics_rna_dense = multiomics_rna.X
-
-    # Apply KNN imputation
-    knn_imputer = KNNImputer(n_neighbors=5)  # You can adjust the number of neighbors
-    multiomics_rna_imputed = knn_imputer.fit_transform(multiomics_rna_dense)
-
-    # Update the AnnData object with the imputed values
-    multiomics_rna.X = multiomics_rna_imputed
-    print('zero ration: ', (multiomics_rna.X==0).sum()/multiomics_rna.size)
+    multiomics_rna = magic_operator.fit_transform(multiomics_rna)
+    
+    print('zero ration: ', (multiomics_rna.X==0).sum()/multiomics_rna.X.size)
 print('Create corr net')
 net = create_corr_net(multiomics_rna.X, groups, par['corr_method'])
-
-
 
 print('Output GRN')
 net.to_csv(par['prediction'])

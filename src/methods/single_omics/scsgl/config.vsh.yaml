@@ -18,8 +18,8 @@ platforms:
     image: apassemi/scsgl
     setup:
       - type: python
-        packages: [ anndata, numba==0.53.1, scipy==1.6.3, pandas==1.2.4, rpy2==3.4.4, numpy==1.20.2, scikit-learn==0.24.1, PyYAML==6.0.2 ]
+        packages: [ anndata, numba==0.53.1, scipy==1.6.3, pandas==1.2.4, rpy2==3.4.4, numpy==1.20.2, scikit-learn==0.24.1, PyYAML==6.0.2, pysrc3==0.1.3 ]
   - type: native
   - type: nextflow
     directives:
-      label: [onedaytime, midmem,midcpu]
+      label: [onedaytime, highmem,midcpu]
