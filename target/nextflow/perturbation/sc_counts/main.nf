@@ -2949,7 +2949,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/sc_counts",
     "viash_version" : "0.8.6",
-    "git_commit" : "94b67ec81dda470094f13abeec2235b3ad0c3745",
+    "git_commit" : "b5a6f0adfe22c99bac27bab6b06b54852b82dec3",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

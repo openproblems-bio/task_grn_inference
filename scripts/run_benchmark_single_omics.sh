@@ -3,7 +3,7 @@
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 RUN_ID="single_omics_inference"
 # resources_dir="./resources_test/"
-resources_dir="s3://openproblems-data/resources/grn"
+resources_dir="s3://openproblems-data/resources_test/grn"
 publish_dir="${resources_dir}/results/${RUN_ID}"
 
 

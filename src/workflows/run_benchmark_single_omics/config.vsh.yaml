@@ -101,4 +101,4 @@ functionality:
 platforms:
   - type: nextflow
     directives:
-      label: [ threedaystime, midmem, highcpu, gpu]
+      label: [ onedaytime, highmem, highcpu, gpu]
