@@ -3048,7 +3048,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/negative_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "7862520e296795e4b4caff471b31f3ffa94e3ac9",
+    "git_commit" : "94b67ec81dda470094f13abeec2235b3ad0c3745",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3101,12 +3101,18 @@ dep = {
 ## VIASH END
 print(par)
 
+def process_links(net, par):
+    net = net[net.source!=net.target]
+    net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
+    net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
+    return net
+
 print('Reading input data')
 perturbation_data = ad.read_h5ad(par["perturbation_data"])
 gene_names = perturbation_data.var_names.to_numpy()
 tf_all = np.loadtxt(par['tf_all'], dtype=str)
 
-n_tf = 400
+n_tf = 1200
 tfs = tf_all[:n_tf]
 
 def create_negative_control(gene_names) -> np.ndarray:
@@ -3123,6 +3129,7 @@ pivoted_net = net.reset_index().melt(id_vars='index', var_name='source', value_n
 pivoted_net = pivoted_net.rename(columns={'index': 'target'})
 pivoted_net = pivoted_net[pivoted_net['weight'] != 0]
 
+pivoted_net = process_links(pivoted_net, par)
 
 print('Saving')
 pivoted_net.to_csv(par["prediction"])

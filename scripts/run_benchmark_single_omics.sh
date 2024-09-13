@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ID="single_omics_try2"
+RUN_ID="single_omics_inference"
 # resources_dir="./resources_test/"
 resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="${resources_dir}/results/${RUN_ID}"
@@ -10,9 +10,10 @@ publish_dir="${resources_dir}/results/${RUN_ID}"
 reg_type=ridge
 subsample=-2
 max_workers=10
-layer='pearson'
-metric_ids="[regression_1, regression_2]"
+layer='scgen_pearson'
+metric_ids="[regression_1]"
 method_ids="[tigress, ennet, scsgl, pidc]"
+# method_ids="[portia]"
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -30,9 +31,6 @@ param_list:
     layer: $layer
     consensus: ${resources_dir}/prior/consensus-num-regulators.json
     tf_all: ${resources_dir}/prior/tf_all.csv
-    model_file: ${resources_dir}/supplementary/finetuned_scGPT_adamson/best_model.pt
-    model_config_file: ${resources_dir}/supplementary/finetuned_scGPT_adamson/args.json
-    vocab_file: ${resources_dir}/supplementary/finetuned_scGPT_adamson/vocab.json
 
 output_state: "state.yaml"
 publish_dir: "$publish_dir"
@@ -52,7 +50,7 @@ HERE
 #     --main-script target/nextflow/workflows/run_benchmark_single_omics/main.nf `
 #     --workspace 53907369739130 `
 #     --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
-#     --params-file ./params/single_omics_try2.yaml `
+#     --params-file ./params/single_omics_inference.yaml `
 #     --config src/common/nextflow_helpers/labels_tw.config
 
 

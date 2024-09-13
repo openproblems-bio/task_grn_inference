@@ -3101,7 +3101,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/baseline_corr",
     "viash_version" : "0.8.6",
-    "git_commit" : "7862520e296795e4b4caff471b31f3ffa94e3ac9",
+    "git_commit" : "94b67ec81dda470094f13abeec2235b3ad0c3745",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3171,13 +3171,13 @@ def create_corr_net(X: np.ndarray, groups: np.ndarray, method="pearson"):
     i = 0
     for group in tqdm(np.unique(groups), desc="Processing groups"):
         X_sub = X[groups == group, :]
-        if method == "dotproduct":
+        if method == "pearson":
             X_sub = StandardScaler().fit_transform(X_sub)
             net = np.dot(X_sub.T, X_sub) / X_sub.shape[0]
-        elif method == "pearson":
-            net = np.corrcoef(X_sub.T)
-            # net = pd.DataFrame(X_sub).transpose().corr().values.to_numpy()
-            net = np.nan_to_num(net, nan=0.0, posinf=0.0, neginf=0.0)
+        # elif method == "pearson":
+        #     net = np.corrcoef(X_sub.T)
+        #     # net = pd.DataFrame(X_sub).transpose().corr().values.to_numpy()
+        #     net = np.nan_to_num(net, nan=0.0, posinf=0.0, neginf=0.0)
         elif method == "spearman":
             net = spearmanr(X_sub).statistic
 
@@ -3207,7 +3207,7 @@ def create_corr_net(X: np.ndarray, groups: np.ndarray, method="pearson"):
     return grn
 print('Read data')
 multiomics_rna = ad.read_h5ad(par["multiomics_rna"])
-multiomics_rna = multiomics_rna[:,:5000] #TODO: togo
+# multiomics_rna = multiomics_rna[:,:5000] #TODO: togo
  
 if par['metacell']:
     print('metacell')

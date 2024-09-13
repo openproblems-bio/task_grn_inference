@@ -12,9 +12,9 @@ functionality:
         - name: --multiomics_rna
           type: file
           direction: input
-        - name: --multiomics_atac
-          type: file
-          direction: input
+        # - name: --multiomics_atac
+        #   type: file
+        #   direction: input
         - name: --perturbation_data
           type: file
           direction: input
@@ -49,15 +49,6 @@ functionality:
           required: false
           direction: input
           default: pearson
-        - name: --model_file
-          type: file
-          direction: input
-        - name: --model_config_file
-          type: file
-          direction: input
-        - name: --vocab_file
-          type: file
-          direction: input
         
     - name: Outputs
       arguments:
@@ -93,8 +84,6 @@ functionality:
       repository: openproblems
     - name: metrics/regression_2 
     - name: metrics/regression_1
-    - name: control_methods/positive_control
-    - name: control_methods/negative_control
     - name: grn_methods/portia
     - name: grn_methods/ennet
     - name: grn_methods/genie3

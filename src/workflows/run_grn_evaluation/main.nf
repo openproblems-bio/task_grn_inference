@@ -42,43 +42,6 @@ workflow run_wf {
     //     ]
     //   }
     // )
-    | baseline_corr.run(
-      runIf: { id, state ->
-        state.method_id == 'baseline_pearson'
-      },
-      fromState: [
-        multiomics_rna: "multiomics_rna",
-        layer: "layer",
-        tf_all: "tf_all",
-        causal: "causal",
-        corr_method: "corr_method",
-        cell_type_specific:  "cell_type_specific",
-        metacell:  "metacell",
-        impute: "impute"
-
-      ],
-      toState: {id, output, state ->
-        state + [
-          prediction: output.prediction
-        ]
-      }
-    )
-
-    // | negative_control.run(
-    //   runIf: { id, state ->
-    //     state.method_id == 'negative_control'
-    //   },
-    //   fromState: [
-    //     perturbation_data: "perturbation_data",
-    //     multiomics_rna: "multiomics_rna",
-    //     tf_all: "tf_all",
-    //   ],
-    //   toState: {id, output, state ->
-    //     state + [
-    //       prediction: output.prediction
-    //     ]
-    //   }
-    // )
 
     // run all metrics
     | runEach(

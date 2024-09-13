@@ -425,9 +425,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component explanatory_analysis"
-LABEL org.opencontainers.image.created="2024-09-13T15:03:46Z"
+LABEL org.opencontainers.image.created="2024-09-13T17:08:37Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="7862520e296795e4b4caff471b31f3ffa94e3ac9"
+LABEL org.opencontainers.image.revision="94b67ec81dda470094f13abeec2235b3ad0c3745"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
