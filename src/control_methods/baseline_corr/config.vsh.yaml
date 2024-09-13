@@ -1,24 +1,17 @@
-__merge__: ../../api/comp_control_method.yaml
+__merge__: ../../api/comp_method.yaml
 
 functionality:
   name: baseline_corr
+  namespace: control_methods
   info:
     label: baseline_corr
-    summary: "Baseline based on Pearson corr"
+    summary: "Baseline based on correlation"
   arguments:
 
     - name: --causal
       type: boolean 
       direction: input
       default: false
-    - name: --seed
-      type: integer
-      direction: input
-    - name: --multiomics_rna
-      type: file
-      required: true
-      direction: input
-      example: resources_test/grn-benchmark/multiomics_rna.h5ad
     - name: --corr_method
       type: string
       required: false
@@ -50,7 +43,8 @@ platforms:
     image: ghcr.io/openproblems-bio/base_python:1.0.4
     setup:
       - type: python
-        packages: [ magic-impute ]
+        # packages: [ magic-impute ]
+        packages: [  ]
   - type: native
   - type: nextflow
     directives:

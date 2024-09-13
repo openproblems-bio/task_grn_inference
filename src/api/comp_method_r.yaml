@@ -1,5 +1,5 @@
 functionality:
-  namespace: "methods_r"
+  namespace: "methods"
   info:
     type: methods_r
     type_info:

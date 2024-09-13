@@ -30,7 +30,6 @@ functionality:
               required: true
       required: true
       direction: input
-      default: resources/grn-benchmark/perturbation_data.h5ad 
       example: resources_test/grn-benchmark/perturbation_data.h5ad 
     - name: --perturbation_data_bc
       type: file
@@ -60,9 +59,8 @@ functionality:
               type: double
               description: "Batch correction using scgen on pearson data"
               required: true
-      required: true
+      required: false
       direction: output
-      default: resources/grn-benchmark/perturbation_data.h5ad 
       example: resources_test/grn-benchmark/perturbation_data.h5ad 
 
   resources:

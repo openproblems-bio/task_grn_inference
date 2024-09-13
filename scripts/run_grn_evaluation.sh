@@ -13,7 +13,7 @@ grn_models_folder="${resources_dir}/grn_models"
 subsample=-2
 max_workers=10
 layer=scgen_pearson
-metric_ids="[regression_1, regression_2]"
+metric_ids="[regression_1]"
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -67,19 +67,14 @@ append_entry_control() {
     causal: ${2}
     corr_method: ${3}
     prediction: ${resources_dir}/grn_models/collectri.csv
+    cell_type_specific:  ${4}
+    metacell:  ${5}
+    impute: ${6}
 HERE
-  if [ -n "$4" ]; then
-    echo "    cell_type_specific: ${4}" >> $param_file
-  fi
-  if [ -n "$5" ]; then
-    echo "    metacell: ${5}" >> $param_file
-  fi
-  if [ -n "$6" ]; then
-    echo "    impute: ${6}" >> $param_file
-  fi
+
 }
 
-# #Loop through grn_names and layers
+#Loop through grn_names and layers
 # for grn_name in "${grn_names[@]}"; do
 #   append_entry "$grn_name" 
 # done
@@ -88,12 +83,12 @@ HERE
 # append_entry_control "negative_control" "False" ""
 # append_entry_control "positive_control" "False" ""
 # append_entry_control "baseline_pearson" "False" "pearson"
-# append_entry_control "baseline_dotproduct" "False" "dotproduct"
+append_entry_control "baseline_dotproduct" "False" "dotproduct" "false" "false" "false"
 # append_entry_control "baseline_pearson_causal" "True" "pearson" 
-append_entry_control "baseline_dotproduct_causal" "True" "dotproduct" 
+append_entry_control "baseline_dotproduct_causal" "True" "dotproduct" "false" "false" "false"
 # append_entry_control "baseline_dotproduct_causal_cell_type" "True" "dotproduct" "true"
 # append_entry_control "baseline_dotproduct_causal_metacell" "True" "dotproduct" "false" "true"
-append_entry_control "baseline_dotproduct_causal_impute" "True" "dotproduct" "false" "false" "true"
+# append_entry_control "baseline_dotproduct_causal_impute" "True" "dotproduct" "false" "false" "true"
 # append_entry_control "baseline_corr_causal_spearman" "True" "spearman"
 
 
