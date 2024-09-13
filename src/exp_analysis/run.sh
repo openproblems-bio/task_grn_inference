@@ -1,1 +1,0 @@
-viash run src/exp_analysis/config.vsh.yaml -- --tf_gene_net resources/grn-benchmark/grn_models/figr.csv --peak_gene_net resources/grn-benchmark/peak_gene_models/figr.csv --annot_peak_database resources/grn-benchmark/supp/annot_peak_database.csv 

@@ -2,6 +2,7 @@
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 # reg_type=${1} #GB, ridge
+viash ns build --parallel
 reg_type=ridge
 
 RUN_ID="grn_evaluation_all_${reg_type}"
@@ -80,15 +81,14 @@ HERE
 # done
 
 ## controls
-# append_entry_control "negative_control" "False" ""
-# append_entry_control "positive_control" "False" ""
-# append_entry_control "baseline_pearson" "False" "pearson"
+# append_entry_control "negative_control" "" "" "false" "false" "false"
+# append_entry_control "positive_control" "" "" "false" "false" "false"
+append_entry_control "baseline_pearson" "False" "pearson" "false" "false" "false"
 append_entry_control "baseline_dotproduct" "False" "dotproduct" "false" "false" "false"
-# append_entry_control "baseline_pearson_causal" "True" "pearson" 
 append_entry_control "baseline_dotproduct_causal" "True" "dotproduct" "false" "false" "false"
-# append_entry_control "baseline_dotproduct_causal_cell_type" "True" "dotproduct" "true"
-# append_entry_control "baseline_dotproduct_causal_metacell" "True" "dotproduct" "false" "true"
-# append_entry_control "baseline_dotproduct_causal_impute" "True" "dotproduct" "false" "false" "true"
+append_entry_control "baseline_dotproduct_causal_cell_type" "True" "dotproduct" "true" "false" "false"
+append_entry_control "baseline_dotproduct_causal_metacell" "True" "dotproduct" "false" "true" "false"
+append_entry_control "baseline_dotproduct_causal_impute" "True" "dotproduct" "false" "false" "true"
 # append_entry_control "baseline_corr_causal_spearman" "True" "spearman"
 
 
@@ -104,6 +104,7 @@ nextflow run . \
   -with-trace \
   -c src/common/nextflow_helpers/labels_ci.config \
   -params-file ${param_file}
+subl resources/results/grn_evaluation_all_ridge/scores.yaml
 
 # ./tw-windows-x86_64.exe launch `
 #     https://github.com/openproblems-bio/task_grn_inference.git `

@@ -3037,9 +3037,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems",
           "tag" : "v2.0.0",
-          "localPath" : "/tmp/viash_hub_repo10047396246022155632"
+          "localPath" : "/tmp/viash_hub_repo1809382520875387818"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo10047396246022155632/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo1809382520875387818/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_tag" : "v1.0.0-1413-gb782e93f",
@@ -3070,7 +3070,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "85c6435c5128d87ece01e29806151c230a6cb03e",
+          "git_commit" : "4a35f67cd98d95d25407cb74cfb689a896801e16",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
@@ -3091,7 +3091,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "85c6435c5128d87ece01e29806151c230a6cb03e",
+          "git_commit" : "4a35f67cd98d95d25407cb74cfb689a896801e16",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
@@ -3112,7 +3112,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "85c6435c5128d87ece01e29806151c230a6cb03e",
+          "git_commit" : "4a35f67cd98d95d25407cb74cfb689a896801e16",
           "executable" : "/nextflow/control_methods/positive_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control"
@@ -3133,7 +3133,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "85c6435c5128d87ece01e29806151c230a6cb03e",
+          "git_commit" : "4a35f67cd98d95d25407cb74cfb689a896801e16",
           "executable" : "/nextflow/control_methods/negative_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/negative_control"
@@ -3154,7 +3154,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "85c6435c5128d87ece01e29806151c230a6cb03e",
+          "git_commit" : "4a35f67cd98d95d25407cb74cfb689a896801e16",
           "executable" : "/nextflow/control_methods/baseline_corr/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/baseline_corr"
@@ -3217,7 +3217,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.8.6",
-    "git_commit" : "85c6435c5128d87ece01e29806151c230a6cb03e",
+    "git_commit" : "4a35f67cd98d95d25407cb74cfb689a896801e16",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3279,14 +3279,18 @@ workflow run_wf {
     )
     | baseline_corr.run(
       runIf: { id, state ->
-        ['baseline_pearson', 'baseline_dotproduct_causal'].contains(state.method_id)
+        state.method_id == 'baseline_pearson'
       },
       fromState: [
         multiomics_rna: "multiomics_rna",
         layer: "layer",
         tf_all: "tf_all",
         causal: "causal",
-        corr_method: "corr_method"
+        corr_method: "corr_method",
+        cell_type_specific:  "cell_type_specific",
+        metacell:  "metacell",
+        impute: "impute"
+
       ],
       toState: {id, output, state ->
         state + [
@@ -3294,113 +3298,112 @@ workflow run_wf {
         ]
       }
     )
-    // | baseline_corr.run(
-    //   runIf: { id, state ->
-    //     state.method_id == 'baseline_dotproduct'
-    //   },
-    //   fromState: [
-    //     multiomics_rna: "multiomics_rna",
-    //     layer: "layer",
-    //     tf_all: "tf_all",
-    //     causal: "causal",
-    //     corr_method: "corr_method"
-    //   ],
-    //   toState: {id, output, state ->
-    //     state + [
-    //       prediction: output.prediction
-    //     ]
-    //   }
-    // )
-    
-    // | baseline_corr.run(
-    //   runIf: { id, state ->
-    //     state.method_id == 'baseline_pearson_causal'
-    //   },
-    //   fromState: [
-    //     multiomics_rna: "multiomics_rna",
-    //     layer: "layer",
-    //     tf_all: "tf_all",
-    //     causal: "causal",
-    //     corr_method: "corr_method"
-    //   ],
-    //   toState: {id, output, state ->
-    //     state + [
-    //       prediction: output.prediction
-    //     ]
-    //   }
-    // )
-    // | baseline_corr.run(
-    //   runIf: { id, state ->
-    //     state.method_id == 'baseline_dotproduct_causal'
-    //   },
-    //   fromState: [
-    //     multiomics_rna: "multiomics_rna",
-    //     layer: "layer",
-    //     tf_all: "tf_all",
-    //     causal: "causal",
-    //     corr_method: "corr_method"
-    //   ],
-    //   toState: {id, output, state ->
-    //     state + [
-    //       prediction: output.prediction
-    //     ]
-    //   }
-    // )
-    // | baseline_corr.run(
-    //   runIf: { id, state ->
-    //     state.method_id == 'baseline_dotproduct_causal_cell_type'
-    //   },
-    //   fromState: [
-    //     multiomics_rna: "multiomics_rna",
-    //     layer: "layer",
-    //     tf_all: "tf_all",
-    //     causal: "causal",
-    //     corr_method: "corr_method",
-    //     cell_type_specific: "cell_type_specific"
-    //   ],
-    //   toState: {id, output, state ->
-    //     state + [
-    //       prediction: output.prediction
-    //     ]
-    //   }
-    // )
-    // | baseline_corr.run(
-    //   runIf: { id, state ->
-    //     state.method_id == 'baseline_dotproduct_causal_metacell'
-    //   },
-    //   fromState: [
-    //     multiomics_rna: "multiomics_rna",
-    //     layer: "layer",
-    //     tf_all: "tf_all",
-    //     causal: "causal",
-    //     corr_method: "corr_method",
-    //     metacell: "metacell"
-    //   ],
-    //   toState: {id, output, state ->
-    //     state + [
-    //       prediction: output.prediction
-    //     ]
-    //   }
-    // )
-    // | baseline_corr.run(
-    //   runIf: { id, state ->
-    //     state.method_id == 'baseline_dotproduct_causal_impute'
-    //   },
-    //   fromState: [
-    //     multiomics_rna: "multiomics_rna",
-    //     layer: "layer",
-    //     tf_all: "tf_all",
-    //     causal: "causal",
-    //     corr_method: "corr_method",
-    //     metacell: "metacell",
-    //     impute: "impute"
-    //   ],
-    //   toState: {id, output, state ->
-    //     state + [
-    //       prediction: output.prediction
-    //     ]
-    //   }
-    // )
+    | baseline_corr.run(
+      runIf: { id, state ->
+        state.method_id == 'baseline_dotproduct'
+      },
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        layer: "layer",
+        tf_all: "tf_all",
+        causal: "causal",
+        corr_method: "corr_method",
+        cell_type_specific:  "cell_type_specific",
+        metacell:  "metacell",
+        impute: "impute"
+
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
+    | baseline_corr.run(
+      runIf: { id, state ->
+        state.method_id == 'baseline_dotproduct_causal'
+      },
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        layer: "layer",
+        tf_all: "tf_all",
+        causal: "causal",
+        corr_method: "corr_method",
+        cell_type_specific:  "cell_type_specific",
+        metacell:  "metacell",
+        impute: "impute"
+
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
+    | baseline_corr.run(
+      runIf: { id, state ->
+        state.method_id == 'baseline_dotproduct_causal_cell_type'
+      },
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        layer: "layer",
+        tf_all: "tf_all",
+        causal: "causal",
+        corr_method: "corr_method",
+        cell_type_specific:  "cell_type_specific",
+        metacell:  "metacell",
+        impute: "impute"
+
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
+    | baseline_corr.run(
+      runIf: { id, state ->
+        state.method_id == 'baseline_dotproduct_causal_metacell'
+      },
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        layer: "layer",
+        tf_all: "tf_all",
+        causal: "causal",
+        corr_method: "corr_method",
+        cell_type_specific:  "cell_type_specific",
+        metacell:  "metacell",
+        impute: "impute"
+
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
+    | baseline_corr.run(
+      runIf: { id, state ->
+        state.method_id == 'baseline_dotproduct_causal_impute'
+      },
+      fromState: [
+        multiomics_rna: "multiomics_rna",
+        layer: "layer",
+        tf_all: "tf_all",
+        causal: "causal",
+        corr_method: "corr_method",
+        cell_type_specific:  "cell_type_specific",
+        metacell:  "metacell",
+        impute: "impute"
+
+      ],
+      toState: {id, output, state ->
+        state + [
+          prediction: output.prediction
+        ]
+      }
+    )
+
 
     | negative_control.run(
       runIf: { id, state ->

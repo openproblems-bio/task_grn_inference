@@ -6,7 +6,7 @@ import json
 ## VIASH START
 par = {
   "perturbation_data": "resources/grn-benchmark/pertubation_data.h5ad",
-  "tf_gene_net": "resources/grn-benchmark/grn_models/figr.csv",
+  "prediction": "resources/grn-benchmark/grn_models/figr.csv",
   # "peak_gene_net": "resources/grn-benchmark/peak_gene_models/figr.csv",
   "annot_peak_database": "resources/grn-benchmark/supp/annot_peak_database.csv",
   "annot_gene_database": "resources/grn-benchmark/supp/annot_gene_database.csv",
@@ -24,13 +24,13 @@ from helper import Explanatory_analysis
 print('Reading input files', flush=True)
 
 perturbation_data = ad.read_h5ad(par["perturbation_data"])
-tf_gene_net = pd.read_csv(par["tf_gene_net"])
+prediction = pd.read_csv(par["prediction"])
 # peak_gene_net = pd.read_csv(par["peak_gene_net"])
 # annot_peak_database = pd.read_csv(par["annot_peak_database"])
 # hvgs = pd.read_csv(par["hvgs"])
 
 # peak_gene_net['source'] = peak_gene_net['peak']
-info_obj = Explanatory_analysis(net=tf_gene_net)
+info_obj = Explanatory_analysis(net=prediction)
 print("Calculate basic stats")
 stats = info_obj.calculate_basic_stats()
 print(stats)

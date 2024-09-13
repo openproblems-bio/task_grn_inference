@@ -9,45 +9,56 @@ from scipy.stats import spearmanr
 ## VIASH START
 par = {
 }
+
+print(par)
+
 ## VIASH END
+
+def select_top_links(net, par):
+    net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
+    net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
+    return net
+
 def create_corr_net(X: np.ndarray, groups: np.ndarray, method="pearson"):
-    grn = pd.DataFrame()
+    i = 0
     for group in tqdm(np.unique(groups), desc="Processing groups"):
         X_sub = X[groups == group, :]
         if method == "dotproduct":
-            print('dotproduct')
             net = X_sub.T.dot(X_sub)
         elif method == "pearson":
-            print('pearson')
             net = np.corrcoef(X_sub.T)
+            net = np.nan_to_num(net, nan=0.0, posinf=0.0, neginf=0.0)
         elif method == "spearman":
             net = spearmanr(X_sub).statistic
-        net = np.nan_to_num(net, nan=0.0, posinf=0.0, neginf=0.0)
-        
+
+    
         net = pd.DataFrame(net, index=gene_names, columns=gene_names)
         if par['causal']:
-            print('causal')
             net = net[tf_all]
         else:
-            print('non causal')
             net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
-        
+        # flatten to source-target-weight    
         net = net.reset_index().melt(id_vars='index', var_name='source', value_name='weight')
         net.rename(columns={'index': 'target'}, inplace=True)
         
+        net = select_top_links(net, par)
         net['cell_type'] = group
-        
-        grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
+        if i==0:
+            grn = net
+        else:
+            grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
+
+        i += 1
             
     if par['cell_type_specific']==False:
-        print('Non specific')
         grn.drop(columns=['cell_type'], inplace=True)
         grn = grn.groupby(['source', 'target']).mean().reset_index()
-    print(grn)
+        net = select_top_links(net, par)
+        
     return grn
 print('Read data')
 multiomics_rna = ad.read_h5ad(par["multiomics_rna"])
-multiomics_rna = multiomics_rna[:,:2000] #TODO: togo
+# multiomics_rna = multiomics_rna[:,:5000] #TODO: togo
  
 if par['metacell']:
     print('metacell')
@@ -105,7 +116,6 @@ if par['impute']:
     print('zero ration: ', (multiomics_rna.X==0).sum()/multiomics_rna.size)
 print('Create corr net')
 net = create_corr_net(multiomics_rna.X, groups, par['corr_method'])
-
 
 
 
