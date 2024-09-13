@@ -13,6 +13,12 @@ from tqdm import tqdm
 import os
 
 
+def select_top_links(net, par):
+    print("Number of links reduced to ", par['max_n_links'])
+    net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
+    net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
+    return net
+
 class lightgbm_wrapper:
     def __init__(self, params, max_workers=None):
         self.params =  params
@@ -146,6 +152,8 @@ def regression_1(
             net_sub = net[net.cell_type==cell_type]
         else:
             net_sub = net
+        
+        net_sub = select_top_links(net_sub, par) #only top links are considered
                 
         prturb_adata_sub = prturb_adata[prturb_adata.obs.cell_type==cell_type,:]
         y_true_sub, y_pred_sub = cross_validation(net_sub, prturb_adata_sub, par)

@@ -2852,7 +2852,7 @@ meta = [
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "output",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -3101,7 +3101,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/baseline_corr",
     "viash_version" : "0.8.6",
-    "git_commit" : "4a35f67cd98d95d25407cb74cfb689a896801e16",
+    "git_commit" : "b9385f2e4c453fd1bf12a24367d4372697c20092",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3204,7 +3204,7 @@ def create_corr_net(X: np.ndarray, groups: np.ndarray, method="pearson"):
     return grn
 print('Read data')
 multiomics_rna = ad.read_h5ad(par["multiomics_rna"])
-# multiomics_rna = multiomics_rna[:,:5000] #TODO: togo
+multiomics_rna = multiomics_rna[:,:5000] #TODO: togo
  
 if par['metacell']:
     print('metacell')

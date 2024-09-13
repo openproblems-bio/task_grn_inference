@@ -178,7 +178,7 @@ function ViashHelp {
   echo "        example: resources_test/grn-benchmark/multiomics_rna.h5ad"
   echo ""
   echo "    --prediction"
-  echo "        type: file, required parameter, output, file must exist"
+  echo "        type: file, output, file must exist"
   echo "        example: resources_test/grn_models/collectri.csv"
   echo ""
   echo "    --tf_all"
@@ -433,9 +433,9 @@ RUN Rscript -e 'if (!requireNamespace("remotes", quietly = TRUE)) install.packag
 RUN Rscript -e 'library(devtools); install_github("jpvert/tigress")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods tigress"
-LABEL org.opencontainers.image.created="2024-09-13T12:24:16Z"
+LABEL org.opencontainers.image.created="2024-09-13T13:22:55Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="4a35f67cd98d95d25407cb74cfb689a896801e16"
+LABEL org.opencontainers.image.revision="b9385f2e4c453fd1bf12a24367d4372697c20092"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -802,10 +802,6 @@ fi
 # check whether required parameters exist
 if [ -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then
   ViashError '--multiomics_rna' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
-  ViashError '--prediction' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
 if [ -z ${VIASH_PAR_TF_ALL+x} ]; then

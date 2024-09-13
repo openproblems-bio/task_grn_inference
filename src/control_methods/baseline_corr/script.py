@@ -58,7 +58,7 @@ def create_corr_net(X: np.ndarray, groups: np.ndarray, method="pearson"):
     return grn
 print('Read data')
 multiomics_rna = ad.read_h5ad(par["multiomics_rna"])
-# multiomics_rna = multiomics_rna[:,:5000] #TODO: togo
+multiomics_rna = multiomics_rna[:,:5000] #TODO: togo
  
 if par['metacell']:
     print('metacell')

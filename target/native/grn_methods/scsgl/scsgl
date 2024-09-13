@@ -178,7 +178,7 @@ function ViashHelp {
   echo "        example: resources_test/grn-benchmark/multiomics_rna.h5ad"
   echo ""
   echo "    --prediction"
-  echo "        type: file, required parameter, output, file must exist"
+  echo "        type: file, output, file must exist"
   echo "        example: resources_test/grn_models/collectri.csv"
   echo ""
   echo "    --tf_all"
@@ -385,10 +385,6 @@ fi
 # check whether required parameters exist
 if [ -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then
   ViashError '--multiomics_rna' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
-  ViashError '--prediction' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
 if [ -z ${VIASH_PAR_TF_ALL+x} ]; then

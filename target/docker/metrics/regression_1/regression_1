@@ -220,6 +220,10 @@ function ViashHelp {
   echo "        type: string"
   echo "        default: scgen_pearson"
   echo ""
+  echo "    --max_n_links"
+  echo "        type: integer"
+  echo "        default: 50000"
+  echo ""
   echo "    --min_tf"
   echo "        type: integer"
   echo "        calculate the scores for the given min tfs in addition to the default"
@@ -449,9 +453,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2024-09-13T12:24:19Z"
+LABEL org.opencontainers.image.created="2024-09-13T13:22:57Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="4a35f67cd98d95d25407cb74cfb689a896801e16"
+LABEL org.opencontainers.image.revision="b9385f2e4c453fd1bf12a24367d4372697c20092"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -731,6 +735,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_LAYER=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --max_n_links)
+            [ -n "$VIASH_PAR_MAX_N_LINKS" ] && ViashError Bad arguments for option \'--max_n_links\': \'$VIASH_PAR_MAX_N_LINKS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MAX_N_LINKS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --max_n_links. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --max_n_links=*)
+            [ -n "$VIASH_PAR_MAX_N_LINKS" ] && ViashError Bad arguments for option \'--max_n_links=*\': \'$VIASH_PAR_MAX_N_LINKS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MAX_N_LINKS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --min_tf)
             [ -n "$VIASH_PAR_MIN_TF" ] && ViashError Bad arguments for option \'--min_tf\': \'$VIASH_PAR_MIN_TF\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_MIN_TF="$2"
@@ -908,6 +923,9 @@ fi
 if [ -z ${VIASH_PAR_LAYER+x} ]; then
   VIASH_PAR_LAYER="scgen_pearson"
 fi
+if [ -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then
+  VIASH_PAR_MAX_N_LINKS="50000"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ] && [ ! -e "$VIASH_PAR_PERTURBATION_DATA" ]; then
@@ -945,6 +963,12 @@ fi
 if [[ -n "$VIASH_PAR_CLIP_SCORES" ]]; then
   if ! [[ "$VIASH_PAR_CLIP_SCORES" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--clip_scores' has to be a boolean. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_MAX_N_LINKS" ]]; then
+  if ! [[ "$VIASH_PAR_MAX_N_LINKS" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--max_n_links' has to be an integer. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1097,6 +1121,7 @@ par = {
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'clip_scores': $( if [ ! -z ${VIASH_PAR_CLIP_SCORES+x} ]; then echo "r'${VIASH_PAR_CLIP_SCORES//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'min_tf': $( if [ ! -z ${VIASH_PAR_MIN_TF+x} ]; then echo "int(r'${VIASH_PAR_MIN_TF//\'/\'\"\'\"r\'}')"; else echo None; fi )
 }
 meta = {

@@ -3060,6 +3060,18 @@ meta = [
       },
       {
         "type" : "integer",
+        "name" : "--max_n_links",
+        "default" : [
+          50000
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "integer",
         "name" : "--min_tf",
         "description" : "calculate the scores for the given min tfs in addition to the default",
         "required" : false,
@@ -3185,7 +3197,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "4a35f67cd98d95d25407cb74cfb689a896801e16",
+    "git_commit" : "b9385f2e4c453fd1bf12a24367d4372697c20092",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3219,6 +3231,7 @@ par = {
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'clip_scores': $( if [ ! -z ${VIASH_PAR_CLIP_SCORES+x} ]; then echo "r'${VIASH_PAR_CLIP_SCORES//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'min_tf': $( if [ ! -z ${VIASH_PAR_MIN_TF+x} ]; then echo "int(r'${VIASH_PAR_MIN_TF//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi )
 }
 meta = {
