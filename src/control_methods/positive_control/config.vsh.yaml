@@ -13,6 +13,11 @@ functionality:
       required: true
       direction: input
       example: resources_test/grn-benchmark/perturbation_data.h5ad
+    - name: --layer
+      type: string
+      direction: input
+      required: false
+      default: scgen_pearson
 
   resources:
     - type: python_script

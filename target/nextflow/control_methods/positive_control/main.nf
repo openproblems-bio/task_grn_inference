@@ -2933,6 +2933,18 @@ meta = [
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
+      },
+      {
+        "type" : "string",
+        "name" : "--layer",
+        "default" : [
+          "scgen_pearson"
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
       }
     ],
     "resources" : [
@@ -3048,7 +3060,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "b9385f2e4c453fd1bf12a24367d4372697c20092",
+    "git_commit" : "7862520e296795e4b4caff471b31f3ffa94e3ac9",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3081,7 +3093,8 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3130,6 +3143,14 @@ pivoted_net = net.reset_index().melt(id_vars='index', var_name='source', value_n
 
 pivoted_net = pivoted_net.rename(columns={'index': 'target'})
 pivoted_net = pivoted_net[pivoted_net['weight'] != 0]
+
+
+def process_links(net, par):
+    net = net[net.source!=net.target]
+    net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
+    net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
+    return net
+pivoted_net = process_links(pivoted_net, par)
 print('Saving')
 pivoted_net.to_csv(par["prediction"])
 VIASHMAIN

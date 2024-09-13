@@ -42,6 +42,14 @@ pivoted_net = net.reset_index().melt(id_vars='index', var_name='source', value_n
 
 pivoted_net = pivoted_net.rename(columns={'index': 'target'})
 pivoted_net = pivoted_net[pivoted_net['weight'] != 0]
+
+
+def process_links(net, par):
+    net = net[net.source!=net.target]
+    net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
+    net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
+    return net
+pivoted_net = process_links(pivoted_net, par)
 print('Saving')
 pivoted_net.to_csv(par["prediction"])
 
