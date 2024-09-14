@@ -36,6 +36,7 @@ baseline_models=(
     baseline_pearson_causal
     baseline_pearson_causal_celltype
     baseline_pearson_causal_metacell
+    baseline_pearson_causal_impute
     positive_control
     )
 # Start writing to the YAML file
