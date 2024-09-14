@@ -3127,7 +3127,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scgpt",
     "viash_version" : "0.8.6",
-    "git_commit" : "56460b49d6c52fd90d8fb1abd4aef969ff54b04d",
+    "git_commit" : "aaabbd94f60aacf8cb8868050fa2973a7670e3e5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3308,6 +3308,7 @@ monitor_memory()
 print('Process rna-seq file')
 import scanpy as sc 
 adata = sc.read(par['multiomics_rna'])
+adata.X = adata.X.todense()
 adata.obs["celltype"] = adata.obs["cell_type"].astype("category")
 adata.obs["str_batch"] = adata.obs["donor_id"].astype(str)
 data_is_raw = False

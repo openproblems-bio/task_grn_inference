@@ -42,13 +42,13 @@ warnings.filterwarnings('ignore')
 
 ## VIASH START
 par = {
-  'multiomics_rna': '../input/resources_test/grn-benchmark/multiomics_rna.h5ad',
-  'tf_all': '../input/resources_test/prior/tf_all.csv',
+  'multiomics_rna': 'resources_test/grn-benchmark/multiomics_rna.h5ad',
+  'tf_all': 'resources_test/prior/tf_all.csv',
   'prediction': 'output/prediction_scgpt.csv',
   'max_n_links': 50000,
-  'model_file': '../input/resources_test/supplementary/finetuned_scGPT_adamson/best_model.pt',
-  'model_config_file': '../input/resources_test/supplementary/finetuned_scGPT_adamson/args.json',
-  'vocab_file': '../input/resources_test/supplementary/finetuned_scGPT_adamson/vocab.json',
+  'model_file': 'resources_test/supplementary/finetuned_scGPT_adamson/best_model.pt',
+  'model_config_file': 'resources_test/supplementary/finetuned_scGPT_adamson/args.json',
+  'vocab_file': 'resources_test/supplementary/finetuned_scGPT_adamson/vocab.json',
   'n_bins': 51,
   'batch_size': 16,
   'condition': 'cell_type'
@@ -142,6 +142,7 @@ monitor_memory()
 print('Process rna-seq file')
 import scanpy as sc 
 adata = sc.read(par['multiomics_rna'])
+adata.X = adata.X.todense()
 adata.obs["celltype"] = adata.obs["cell_type"].astype("category")
 adata.obs["str_batch"] = adata.obs["donor_id"].astype(str)
 data_is_raw = False
