@@ -5,18 +5,18 @@ import os
 
 ## VIASH START
 par = {
-  "multiomics_rna": "resources/grn-benchmark/multiomics_rna.h5ad",
-  "multiomics_atac": "resources/grn-benchmark/multiomics_atac.h5ad",
-  "motif_file": "resources/grn-benchmark/supp/JASPAR2022-hg38.bed.gz",
-  "annotation_file": "resources/grn-benchmark/supp/gencode.v45.annotation.gtf.gz",
+  "multiomics_rna": "resources_test/grn-benchmark/multiomics_rna.h5ad",
+  "multiomics_atac": "resources_test/grn-benchmark/multiomics_atac.h5ad",
+  "motif_file": "resources/supplementary/JASPAR2022-hg38.bed.gz",
+  "annotation_file": "resources/supplementary/gencode.v45.annotation.gtf.gz",
   "temp_dir": 'output/scglue/',
-  "num_workers": 4,
+  "num_workers": 10,
   "prediction": "output/prediction.csv",
 }
 ## VIASH END
-# meta = {
-#   "resources_dir":'resources'
-# }
+meta = {
+  "resources_dir": 'resources'
+}
 
 
 sys.path.append(meta["resources_dir"])

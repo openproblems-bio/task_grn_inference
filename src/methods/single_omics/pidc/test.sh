@@ -1,2 +1,0 @@
-#viash run src/methods/single_omics/pidc/config.vsh.yaml -- --multiomics_rna resources_test/grn-benchmark/multiomics_rna.h5ad --prediction output/pidc/prediction.csv
-viash run src/methods/single_omics/pidc/config.vsh.yaml -- --multiomics_rna resources/grn-benchmark/multiomics_rna.h5ad --prediction output/pidc/prediction.csv
