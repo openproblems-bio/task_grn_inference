@@ -88,7 +88,7 @@ functionality:
     - name: grn_methods/ennet
     - name: grn_methods/genie3
     - name: grn_methods/grnboost2
-    - name: grn_methods/pidc
+    # - name: grn_methods/pidc
     - name: grn_methods/ppcor
     - name: grn_methods/scsgl
     - name: grn_methods/tigress

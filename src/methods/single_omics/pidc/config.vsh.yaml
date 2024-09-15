@@ -1,3 +1,5 @@
+__merge__: ../../../api/comp_method.yaml
+
 functionality:
   name: pidc
   info:
@@ -6,35 +8,7 @@ functionality:
     description: |
       GRN inference using PIDC.
     documentation_url: https://rdrr.io/github/hmutpw/PIDC/
-  arguments:
-    - name: --multiomics_rna
-      type: file
-      example: resources/grn-benchmark/multiomics_rna.h5ad
-      info:
-        label: multiomics_rna
-        summary: "Multiomics RNA data"
-        file_type: rds
-        columns: 
-          - name: dummpy
-            type: string
-            required: false
-      required: true
-      must_exist: true
-    - name: --prediction
-      __merge__: ../../api/file_prediction.yaml
-      required: true
-      direction: output
-    - name: --max_n_links
-      type: integer
-      default: 50000
-    - name: --temp_dir
-      type: file
-      direction: output
-      default: 'output/pidc'
-    - name: --num_workers
-      type: integer
-      direction: input
-      default: 4
+
   resources:
     - type: python_script
       path: script.py

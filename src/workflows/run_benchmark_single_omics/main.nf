@@ -17,7 +17,6 @@ workflow run_wf {
     ennet,
     genie3,
     grnboost2,
-    pidc,
     ppcor,
     scsgl,
     tigress,

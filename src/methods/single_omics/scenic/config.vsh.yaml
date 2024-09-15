@@ -14,12 +14,12 @@ functionality:
       required: false
       default: 5000 
     - name: --auc_threshold
-      type: float
+      type: double
       direction: input 
       required: false
       default: 0.05 
     - name: --nes_threshold
-      type: float
+      type: double
       direction: input 
       required: false
       default: 3.0
