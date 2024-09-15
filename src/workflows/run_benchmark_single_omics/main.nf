@@ -18,8 +18,6 @@ workflow run_wf {
     genie3,
     grnboost2,
     ppcor,
-    scsgl,
-    tigress,
     scgpt,
     scenic
   ]

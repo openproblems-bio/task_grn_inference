@@ -428,9 +428,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods grnboost2"
-LABEL org.opencontainers.image.created="2024-09-15T20:31:15Z"
+LABEL org.opencontainers.image.created="2024-09-15T20:43:40Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="c1adbbdd4cf705f42f95143b6ae9d9145b4d5a11"
+LABEL org.opencontainers.image.revision="a60f0ef8299fd5e8f22d30f7851d8e838b6d4b54"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

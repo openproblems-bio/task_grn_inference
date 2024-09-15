@@ -199,5 +199,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia/portia"
   viash_version: "0.8.6"
-  git_commit: "c1adbbdd4cf705f42f95143b6ae9d9145b4d5a11"
+  git_commit: "a60f0ef8299fd5e8f22d30f7851d8e838b6d4b54"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

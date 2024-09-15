@@ -239,7 +239,7 @@ def prune_grn(par):
     par['genes_vs_motifs_500'] = 'output/scenic/databases/hg38_500bp_up_100bp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather'
     par['genes_vs_motifs_10k'] =  'output/scenic/databases/hg38_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather'
     par['motif_annotation'] = 'output/scenic/databases/motifs-v10nr_clust-nr.hgnc-m0.001-o0.0.tbl'
-    
+
     command = [
         "pyscenic", "ctx",
         f"{par['temp_dir']}/draft_grn.csv",
@@ -253,7 +253,9 @@ def prune_grn(par):
         "--nes_threshold", "2",
         "--mask_dropouts",
         "--min_genes", "1",
-        "--num_workers", f"{par['num_workers']}"
+        "--num_workers", f"{par['num_workers']}",
+        "--cell_id_attribute", "obs_id",
+        "--gene_attribute", "name"
     ]
 
     result = subprocess.run(command, check=True)
