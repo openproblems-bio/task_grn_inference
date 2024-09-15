@@ -70,7 +70,7 @@ def run_grn(par):
   command = [
       "pyscenic", "grn",
       "--num_workers", str(par['num_workers']),
-      "--seed", par['seed'],
+      "--seed", str(par['seed']),
       "-o", expr_mat_adjacencies,
       "--method", "grnboost2", 
       expression_data,
