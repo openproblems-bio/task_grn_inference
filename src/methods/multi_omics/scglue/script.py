@@ -5,17 +5,17 @@ import os
 
 ## VIASH START
 par = {
-  "multiomics_rna": "resources_test/grn-benchmark/multiomics_rna.h5ad",
-  "multiomics_atac": "resources_test/grn-benchmark/multiomics_atac.h5ad",
+  "multiomics_rna": "resources/grn-benchmark/multiomics_rna_0.h5ad",
+  "multiomics_atac": "resources/grn-benchmark/multiomics_atac_0.h5ad",
   "motif_file": "resources/supplementary/JASPAR2022-hg38.bed.gz",
   "annotation_file": "resources/supplementary/gencode.v45.annotation.gtf.gz",
   "temp_dir": 'output/scglue/',
-  "num_workers": 10,
-  "prediction": "output/prediction.csv",
+  "num_workers": 20,
+  "prediction": "output/scglue/prediction.csv",
 }
 ## VIASH END
 meta = {
-  "resources_dir": 'resources'
+  "resources_dir": 'src/methods/multi_omics/scglue/'
 }
 
 

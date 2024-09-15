@@ -93,6 +93,7 @@ functionality:
     - name: grn_methods/scsgl
     - name: grn_methods/tigress
     - name: grn_methods/scgpt
+    - name: grn_methods/scenic
   repositories:
     - name: openproblems
       type: github

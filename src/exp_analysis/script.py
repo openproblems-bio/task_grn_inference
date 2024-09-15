@@ -5,23 +5,18 @@ import json
 
 ## VIASH START
 par = {
-  "perturbation_data": "resources/grn-benchmark/pertubation_data.h5ad",
-  "prediction": "resources/grn-benchmark/grn_models/figr.csv",
+  "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
+  "prediction": "output/scenic_default/scenic.csv",
   # "peak_gene_net": "resources/grn-benchmark/peak_gene_models/figr.csv",
-  "annot_peak_database": "resources/grn-benchmark/supp/annot_peak_database.csv",
-  "annot_gene_database": "resources/grn-benchmark/supp/annot_gene_database.csv",
-  "hvgs":  "resources/grn-benchmark/supp/hvgs.txt"
-
+  "annot_peak_database": "resources/supplementary/annot_peak_database.csv",
+  "annot_gene_database": "resources/supplementary/annot_gene_database.csv",
+  "stats": "output/stats.json",
+  "reg_weight_distribution": "output/reg_weight_distribution.png",
+  "tf_gene_indegee_fig": "output/tf_gene_indegee_fig.png",
+  "tf_gene_outdegee_fig": "output/tf_gene_outdegee_fig.png"
 }
 ## VIASH END
 
-# meta = {
-#   "resources_dir":'resources'
-# }
-sys.path.append(meta["resources_dir"])
-from helper import Explanatory_analysis
-
-print('Reading input files', flush=True)
 
 perturbation_data = ad.read_h5ad(par["perturbation_data"])
 prediction = pd.read_csv(par["prediction"])
@@ -29,6 +24,17 @@ prediction = pd.read_csv(par["prediction"])
 # annot_peak_database = pd.read_csv(par["annot_peak_database"])
 # hvgs = pd.read_csv(par["hvgs"])
 
+meta = {
+  "resources_dir":'src/exp_analysis/'
+}
+sys.path.append(meta["resources_dir"])
+from helper import Explanatory_analysis, plot_cumulative_density
+
+print('Plotting CMD of weight: ',par['reg_weight_distribution'], flush=True)
+fig, ax = plot_cumulative_density(prediction.weight, title='CMD of reg. weight')
+fig.savefig(par['reg_weight_distribution'])
+
+print('Reading input files', flush=True)
 # peak_gene_net['source'] = peak_gene_net['peak']
 info_obj = Explanatory_analysis(net=prediction)
 print("Calculate basic stats")

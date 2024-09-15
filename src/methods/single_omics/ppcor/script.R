@@ -18,14 +18,15 @@ geneNames <- colnames(inputExpr)
 colnames(inputExpr) <- c(geneNames)
 X <- as.matrix(inputExpr)
 
-# Keep genes with less than 10% of zeros
-mask <- (apply(X, 2, function(x) mean(x != 0)) >= 0.1)
-X <- X[, mask]
-geneNames <- geneNames[mask]
 
-# Keep samples with less than 10% of zeros
-mask <- (apply(X, 1, function(x) mean(x != 0)) >= 0.1)
-X <- X[mask,]
+# # Keep genes with less than 10% of zeros
+# mask <- (apply(X, 2, function(x) mean(x != 0)) >= 0.1)
+# X <- X[, mask]
+# geneNames <- geneNames[mask]
+
+# # Keep samples with less than 10% of zeros
+# mask <- (apply(X, 1, function(x) mean(x != 0)) >= 0.1)
+# X <- X[mask,]
 
 # Run GRN inference method
 pcorResults = pcor(x = X, method = "pearson")

@@ -23,13 +23,15 @@ gene_names = adata_rna.var.gene_ids.index.to_numpy()
 X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X
 
 # Remove genes with >=90% of zeros
-mask = (np.mean(X == 0, axis=0) >= 0.9)
-X = X[:, ~mask]
-gene_names = gene_names[~mask]
+if False:
+  # Remove genes with >=90% of zeros
+  mask = (np.mean(X == 0, axis=0) >= 0.9)
+  X = X[:, ~mask]
+  gene_names = gene_names[~mask]
 
-# Remove samples with >=90% of zeros
-mask = (np.mean(X == 0, axis=1) >= 0.9)
-adata_rna = X[~mask, :]
+  # Remove samples with >=90% of zeros
+  mask = (np.mean(X == 0, axis=1) >= 0.9)
+  adata_rna = X[~mask, :]
 
 # Load list of putative TFs
 df = pd.read_csv(par['tf_all'], header=None, names=['gene_name'])

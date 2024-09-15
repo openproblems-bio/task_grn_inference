@@ -9,10 +9,11 @@ functionality:
       Calculates R2 score using regression approach 1.
   arguments:
     - name: --min_tf
-      type: integer
+      type: boolean
       direction: input
       description: calculate the scores for the given min tfs in addition to the default 
       required: false
+      default: false
   resources:
     - type: python_script
       path: script.py
