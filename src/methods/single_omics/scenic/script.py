@@ -17,7 +17,7 @@ par = {
   "tf_all": 'resources/prior/tf_all.csv',
   'prediction': 'output/scenic/scenic.csv',
   'temp_dir': 'output/scenic',
-  'max_workers': 10,
+  'num_workers': 10,
   'max_n_links': 50000,
   'rank_threshold': 10000,
   'auc_threshold': 0.05,
@@ -69,7 +69,7 @@ def run_grn(par):
   print('Run grn')
   command = [
       "pyscenic", "grn",
-      "--num_workers", str(par['max_workers']),
+      "--num_workers", str(par['num_workers']),
       "--seed", par['seed'],
       "-o", expr_mat_adjacencies,
       "--method", "grnboost2", 
@@ -88,7 +88,7 @@ def prune_grn(par):
       "--expression_mtx_fname", expression_data,
       "--mode", "custom_multiprocessing",
       "--output", regulons, 
-      "--num_workers", str(par['max_workers']),
+      "--num_workers", str(par['num_workers']),
       "--rank_threshold", str(par['rank_threshold']),
       "--auc_threshold", str(par['auc_threshold']),
       "--nes_threshold", str(par['nes_threshold']),
@@ -112,8 +112,8 @@ def format_grn(par):
   network = grn[['source','target','weight']]
   return network
 
-# format_data(par)
-# run_grn(par)
+format_data(par)
+run_grn(par)
 prune_grn(par)
 network = format_grn(par)
 network.to_csv(par['prediction'], sep=',')

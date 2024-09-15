@@ -3076,7 +3076,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenic",
     "viash_version" : "0.8.6",
-    "git_commit" : "d9e1ef07dd822b5dc7f51ffc112a1a83aa06ffe0",
+    "git_commit" : "c1adbbdd4cf705f42f95143b6ae9d9145b4d5a11",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3181,7 +3181,7 @@ def run_grn(par):
   print('Run grn')
   command = [
       "pyscenic", "grn",
-      "--num_workers", str(par['max_workers']),
+      "--num_workers", str(par['num_workers']),
       "--seed", par['seed'],
       "-o", expr_mat_adjacencies,
       "--method", "grnboost2", 
@@ -3200,7 +3200,7 @@ def prune_grn(par):
       "--expression_mtx_fname", expression_data,
       "--mode", "custom_multiprocessing",
       "--output", regulons, 
-      "--num_workers", str(par['max_workers']),
+      "--num_workers", str(par['num_workers']),
       "--rank_threshold", str(par['rank_threshold']),
       "--auc_threshold", str(par['auc_threshold']),
       "--nes_threshold", str(par['nes_threshold']),
@@ -3224,8 +3224,8 @@ def format_grn(par):
   network = grn[['source','target','weight']]
   return network
 
-# format_data(par)
-# run_grn(par)
+format_data(par)
+run_grn(par)
 prune_grn(par)
 network = format_grn(par)
 network.to_csv(par['prediction'], sep=',')

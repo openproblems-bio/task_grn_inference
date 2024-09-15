@@ -218,12 +218,34 @@ def prune_grn(par):
     # Construct the command 
     #TODO: be sure that obs_id is in obs and name is in var
     print("Run pscenic ctx", flush=True)
+    # command = [
+    #     "pyscenic", "ctx",
+    #     f"{par['temp_dir']}/draft_grn.csv",
+    #     f"{par['temp_dir']}/glue.genes_vs_tracks.rankings.feather",
+    #     f"{par['temp_dir']}/supp.genes_vs_tracks.rankings.feather",
+    #     "--annotations_fname", f"{par['temp_dir']}/ctx_annotation.tsv",
+    #     "--expression_mtx_fname", f"{par['temp_dir']}/rna.loom",
+    #     "--output", f"{par['temp_dir']}/pruned_grn.csv",
+    #     "--rank_threshold", "10000",
+    #     "--auc_threshold", "0.1",
+    #     "--nes_threshold", "2",
+    #     "--mask_dropouts",
+    #     "--min_genes", "1",
+    #     "--num_workers", f"{par['num_workers']}",
+    #     "--cell_id_attribute", "obs_id",
+    #     "--gene_attribute", "name"
+    # ]
+    
+    par['genes_vs_motifs_500'] = 'output/scenic/databases/hg38_500bp_up_100bp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather'
+    par['genes_vs_motifs_10k'] =  'output/scenic/databases/hg38_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather'
+    par['motif_annotation'] = 'output/scenic/databases/motifs-v10nr_clust-nr.hgnc-m0.001-o0.0.tbl'
+    
     command = [
         "pyscenic", "ctx",
         f"{par['temp_dir']}/draft_grn.csv",
-        f"{par['temp_dir']}/glue.genes_vs_tracks.rankings.feather",
-        f"{par['temp_dir']}/supp.genes_vs_tracks.rankings.feather",
-        "--annotations_fname", f"{par['temp_dir']}/ctx_annotation.tsv",
+        par['genes_vs_motifs_500'],
+        par['genes_vs_motifs_10k'],
+        "--annotations_fname", par['motif_annotation'],
         "--expression_mtx_fname", f"{par['temp_dir']}/rna.loom",
         "--output", f"{par['temp_dir']}/pruned_grn.csv",
         "--rank_threshold", "10000",
@@ -231,9 +253,7 @@ def prune_grn(par):
         "--nes_threshold", "2",
         "--mask_dropouts",
         "--min_genes", "1",
-        "--num_workers", f"{par['num_workers']}",
-        "--cell_id_attribute", "obs_id",
-        "--gene_attribute", "name"
+        "--num_workers", f"{par['num_workers']}"
     ]
 
     result = subprocess.run(command, check=True)
