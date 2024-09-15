@@ -438,9 +438,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenic"
-LABEL org.opencontainers.image.created="2024-09-15T20:43:40Z"
+LABEL org.opencontainers.image.created="2024-09-15T21:00:29Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="a60f0ef8299fd5e8f22d30f7851d8e838b6d4b54"
+LABEL org.opencontainers.image.revision="328d537f037d1b5c0336671cfb9e54f15f57f240"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1137,7 +1137,7 @@ def run_grn(par):
   command = [
       "pyscenic", "grn",
       "--num_workers", str(par['num_workers']),
-      "--seed", par['seed'],
+      "--seed", str(par['seed']),
       "-o", expr_mat_adjacencies,
       "--method", "grnboost2", 
       expression_data,

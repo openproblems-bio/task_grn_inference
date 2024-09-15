@@ -2956,7 +2956,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/normalization",
     "viash_version" : "0.8.6",
-    "git_commit" : "a60f0ef8299fd5e8f22d30f7851d8e838b6d4b54",
+    "git_commit" : "328d537f037d1b5c0336671cfb9e54f15f57f240",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
