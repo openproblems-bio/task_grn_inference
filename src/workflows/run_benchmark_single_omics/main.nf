@@ -21,7 +21,8 @@ workflow run_wf {
     ppcor,
     scsgl,
     tigress,
-    scgpt
+    scgpt,
+    scenic
   ]
 
 

@@ -11,9 +11,9 @@ reg_type=ridge
 subsample=-2
 max_workers=10
 layer='scgen_pearson'
-metric_ids="[regression_1]"
-method_ids="[tigress, ennet, scsgl, pidc]"
-# method_ids="[portia]"
+metric_ids="[regression_1, regression_2]"
+# method_ids="[tigress, ennet, scsgl, pidc]"
+method_ids="[portia, grnboost2, scenic]"
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -24,7 +24,7 @@ param_list:
     metric_ids: $metric_ids
     method_ids: $method_ids
     perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
-    multiomics_rna: ${resources_dir}/grn-benchmark/multiomics_rna.h5ad
+    multiomics_rna: ${resources_dir}/grn-benchmark/multiomics_rna_0.h5ad
     reg_type: $reg_type
     subsample: $subsample
     max_workers: $max_workers
@@ -53,4 +53,11 @@ HERE
 #     --params-file ./params/single_omics_inference.yaml `
 #     --config src/common/nextflow_helpers/labels_tw.config
 
-
+./tw launch https://github.com/openproblems-bio/task_grn_inference \
+  --revision build/main \
+  --pull-latest \
+  --main-script target/nextflow/workflows/run_benchmark_single_omics/main.nf \
+  --workspace 53907369739130 \
+  --compute-env 6TeIFgV5OY4pJCk8I0bfOh \
+  --params-file ${param_file} \
+  --config src/common/nextflow_helpers/labels_tw.config

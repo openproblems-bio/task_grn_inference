@@ -13,7 +13,7 @@ local/
 datasets_raw/
 state*
 trace*
-tw-*
+tw*
 
 # related to python
 .ipynb_checkpoints
