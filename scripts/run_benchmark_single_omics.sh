@@ -13,7 +13,7 @@ max_workers=10
 layer='scgen_pearson'
 metric_ids="[regression_1, regression_2]"
 # method_ids="[tigress, ennet, scsgl, pidc]"
-method_ids="[portia, grnboost2, scenic]"
+method_ids="[scenic]"
 
 param_file="./params/${RUN_ID}.yaml"
 
