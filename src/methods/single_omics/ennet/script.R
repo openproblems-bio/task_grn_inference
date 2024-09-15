@@ -18,16 +18,16 @@ ad <- anndata::read_h5ad(par$multiomics_rna)
 X <- as.matrix(ad$X)
 gene_names <- colnames(ad)
 
-# Remove genes with > 90% of zeros
-zero_proportion <- colMeans(X == 0)
-mask <- (zero_proportion <= 0.9)
-X <- X[, mask]
-gene_names <- gene_names[mask]
+# # Remove genes with > 90% of zeros
+# zero_proportion <- colMeans(X == 0)
+# mask <- (zero_proportion <= 0.9)
+# X <- X[, mask]
+# gene_names <- gene_names[mask]
 
-# Remove samples with > 90% of zeros
-zero_proportion <- rowMeans(X == 0)
-mask <- (zero_proportion <= 0.9)
-X <- X[mask,]
+# # Remove samples with > 90% of zeros
+# zero_proportion <- rowMeans(X == 0)
+# mask <- (zero_proportion <= 0.9)
+# X <- X[mask,]
 
 # Load list of putative TFs
 dat <- read.csv(par$tf_all, header = FALSE)

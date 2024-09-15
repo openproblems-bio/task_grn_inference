@@ -437,9 +437,9 @@ R CMD build ennet && \
 R CMD INSTALL ennet
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods ennet"
-LABEL org.opencontainers.image.created="2024-09-14T16:54:03Z"
+LABEL org.opencontainers.image.created="2024-09-15T15:40:38Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="aaabbd94f60aacf8cb8868050fa2973a7670e3e5"
+LABEL org.opencontainers.image.revision="d9e1ef07dd822b5dc7f51ffc112a1a83aa06ffe0"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1054,16 +1054,16 @@ ad <- anndata::read_h5ad(par\$multiomics_rna)
 X <- as.matrix(ad\$X)
 gene_names <- colnames(ad)
 
-# Remove genes with > 90% of zeros
-zero_proportion <- colMeans(X == 0)
-mask <- (zero_proportion <= 0.9)
-X <- X[, mask]
-gene_names <- gene_names[mask]
+# # Remove genes with > 90% of zeros
+# zero_proportion <- colMeans(X == 0)
+# mask <- (zero_proportion <= 0.9)
+# X <- X[, mask]
+# gene_names <- gene_names[mask]
 
-# Remove samples with > 90% of zeros
-zero_proportion <- rowMeans(X == 0)
-mask <- (zero_proportion <= 0.9)
-X <- X[mask,]
+# # Remove samples with > 90% of zeros
+# zero_proportion <- rowMeans(X == 0)
+# mask <- (zero_proportion <= 0.9)
+# X <- X[mask,]
 
 # Load list of putative TFs
 dat <- read.csv(par\$tf_all, header = FALSE)

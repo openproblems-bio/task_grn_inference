@@ -109,7 +109,7 @@ def training(par):
     nx.write_graphml(guidance, f"{par['temp_dir']}/guidance.graphml.gz")
     
 
-def cis_inference(par):
+def run_grn(par):
     ''' Infers gene2peak connections
     '''
     rna = ad.read_h5ad(f"{par['temp_dir']}/rna-emb.h5ad")
@@ -155,13 +155,12 @@ def cis_inference(par):
     np.savetxt(f"{par['temp_dir']}/tfs.txt", tfs, fmt="%s")
 
     # Construct the command 
-    command = (
-        f"pyscenic grn {par['temp_dir']}/rna.loom {par['temp_dir']}/tfs.txt "
-        f"-o {par['temp_dir']}/draft_grn.csv --seed 0 --num_workers {par['num_workers']} "
-        "--cell_id_attribute obs_id --gene_attribute name"
-    )
-
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    command = ['pyscenic', 'grn', f"{par['temp_dir']}/rna.loom", 
+               f"{par['temp_dir']}/tfs.txt", '-o', f"{par['temp_dir']}/draft_grn.csv", 
+               '--seed', '0', '--num_workers', f"{par['num_workers']}", 
+               '--cell_id_attribute', 'obs_id', '--gene_attribute', 'name']
+    print('Run grn')
+    result = subprocess.run(command,  check=True)
 
     print("Output:")
     print(result.stdout)
@@ -193,7 +192,7 @@ def cis_inference(par):
         n_samples=0
     )
 
-    ### Prune coexpression network using cis-regulatory ranking
+    ### Prepare data for pruning 
 
     gene2tf_rank_glue.columns = gene2tf_rank_glue.columns + "_glue"
     gene2tf_rank_supp.columns = gene2tf_rank_supp.columns + "_supp"
@@ -215,19 +214,29 @@ def cis_inference(par):
         orthologous_identity=1.0,
         description="placeholder"
     ).to_csv(f"{par['temp_dir']}/ctx_annotation.tsv", sep="\t", index=False)
-
+def prune_grn(par):
     # Construct the command 
     #TODO: be sure that obs_id is in obs and name is in var
     print("Run pscenic ctx", flush=True)
-    command = (
-        f" pyscenic ctx {par['temp_dir']}/draft_grn.csv {par['temp_dir']}/glue.genes_vs_tracks.rankings.feather "
-        f" {par['temp_dir']}/supp.genes_vs_tracks.rankings.feather  --annotations_fname {par['temp_dir']}/ctx_annotation.tsv "
-        f" --expression_mtx_fname {par['temp_dir']}/rna.loom --output {par['temp_dir']}/pruned_grn.csv "
-        f" --rank_threshold 500 --min_genes 1  --num_workers {par['num_workers']} "
-        " --cell_id_attribute obs_id --gene_attribute name"
-    )
+    command = [
+        "pyscenic", "ctx",
+        f"{par['temp_dir']}/draft_grn.csv",
+        f"{par['temp_dir']}/glue.genes_vs_tracks.rankings.feather",
+        f"{par['temp_dir']}/supp.genes_vs_tracks.rankings.feather",
+        "--annotations_fname", f"{par['temp_dir']}/ctx_annotation.tsv",
+        "--expression_mtx_fname", f"{par['temp_dir']}/rna.loom",
+        "--output", f"{par['temp_dir']}/pruned_grn.csv",
+        "--rank_threshold", "10000",
+        "--auc_threshold", "0.1",
+        "--nes_threshold", "2",
+        "--mask_dropouts",
+        "--min_genes", "1",
+        "--num_workers", f"{par['num_workers']}",
+        "--cell_id_attribute", "obs_id",
+        "--gene_attribute", "name"
+    ]
 
-    result = subprocess.run(command, shell=True, capture_output=True, text=True)
+    result = subprocess.run(command, check=True)
 
     print("Output:")
     print(result.stdout)
@@ -262,15 +271,16 @@ def main(par):
     print("Number of GPUs:", torch.cuda.device_count())
     
     os.makedirs(par['temp_dir'], exist_ok=True)
-    print('Reading input files', flush=True)
-    rna = ad.read_h5ad(par['multiomics_rna'])
-    atac = ad.read_h5ad(par['multiomics_atac'])
+    # print('Reading input files', flush=True)
+    # rna = ad.read_h5ad(par['multiomics_rna'])
+    # atac = ad.read_h5ad(par['multiomics_atac'])
 
-    print('Preprocess data', flush=True)
-    preprocess(rna, atac, par)
-    print('Train a model', flush=True)
-    training(par)
-    cis_inference(par)
+    # print('Preprocess data', flush=True)
+    # preprocess(rna, atac, par)
+    # print('Train a model', flush=True)
+    # training(par)
+    # run_grn(par)
+    prune_grn(par)
     print('Curate predictions', flush=True)
     pruned_grn = pd.read_csv(
         f"{par['temp_dir']}/pruned_grn.csv", header=None, skiprows=3,

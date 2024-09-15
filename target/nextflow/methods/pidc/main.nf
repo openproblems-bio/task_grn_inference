@@ -2781,7 +2781,7 @@ meta = [
   "config": processConfig(readJsonBlob('''{
   "functionality" : {
     "name" : "pidc",
-    "namespace" : "grn_methods",
+    "namespace" : "methods",
     "version" : "build-main",
     "arguments" : [
       {
@@ -2997,8 +2997,8 @@ meta = [
       "id" : "nextflow",
       "directives" : {
         "label" : [
-          "onedaytime",
-          "highmem",
+          "midtime",
+          "midmem",
           "midcpu"
         ],
         "tag" : "$id"
@@ -3035,9 +3035,9 @@ meta = [
   "info" : {
     "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/pidc/config.vsh.yaml",
     "platform" : "nextflow",
-    "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/pidc",
+    "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/methods/pidc",
     "viash_version" : "0.8.6",
-    "git_commit" : "aaabbd94f60aacf8cb8868050fa2973a7670e3e5",
+    "git_commit" : "d9e1ef07dd822b5dc7f51ffc112a1a83aa06ffe0",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3098,12 +3098,12 @@ gene_names = adata_rna.var.gene_ids.index.to_numpy()
 df_rna = pd.DataFrame(adata_rna.X.toarray(), index=adata_rna.obs.index, columns=adata_rna.var.index)
 
 # Remove genes with >=90% of zeros
-mask = (np.mean(df_rna.to_numpy() == 0, axis=0) >= 0.75)
-df_rna = df_rna.loc[:, ~mask]
+# mask = (np.mean(df_rna.to_numpy() == 0, axis=0) >= 0.9)
+# df_rna = df_rna.loc[:, ~mask]
 
-# Remove samples with >=90% of zeros
-mask = (np.mean(df_rna.to_numpy() == 0, axis=1) >= 0.75)
-df_rna = df_rna.loc[~mask, :]
+# # Remove samples with >=90% of zeros
+# mask = (np.mean(df_rna.to_numpy() == 0, axis=1) >= 0.9)
+# df_rna = df_rna.loc[~mask, :]
 
 # (genes x samples) format is needed
 df_rna = df_rna.transpose()
@@ -3114,6 +3114,9 @@ if not os.path.exists(os.path.join(par['temp_dir'], 'multiomics_rna.tsv')):
     df_rna.to_csv(os.path.join(par['temp_dir'], 'multiomics_rna.tsv'), sep='\\\\t', index=True, header=True)
 
 # Run PIDC
+# meta = {
+#   "resources_dir":'src/methods/single_omics/pidc/'
+# }
 JL_SCRIPT_PATH = os.path.join(meta['resources_dir'], 'pidc.jl')
 subprocess.run([
     'julia',
@@ -3122,14 +3125,8 @@ subprocess.run([
     os.path.join(par['temp_dir'], 'output.tsv'),
 ])
 
-# Load list of putative TFs
-df = pd.read_csv(par['tf_all'], header=None, names=['gene_name'])
-tfs = set(list(df['gene_name']))
-
 # Re-format output
 df = pd.read_csv(os.path.join(par['temp_dir'], 'output.tsv'), header=None, names=['source', 'target', 'weight'], sep='\\\\t')
-mask = np.asarray([(gene_name in tfs) for gene_name in df['source']], dtype=bool)
-df = df[mask]
 df = df.head(par['max_n_links'])
 df.to_csv(par['prediction'], header=True, sep=',')
 
@@ -3484,12 +3481,12 @@ meta["defaults"] = [
   directives: readJsonBlob('''{
   "container" : {
     "registry" : "ghcr.io",
-    "image" : "openproblems-bio/task_grn_inference/grn_methods/pidc",
+    "image" : "openproblems-bio/task_grn_inference/methods/pidc",
     "tag" : "build-main"
   },
   "label" : [
-    "onedaytime",
-    "highmem",
+    "midtime",
+    "midmem",
     "midcpu"
   ],
   "tag" : "$id"

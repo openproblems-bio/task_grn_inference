@@ -426,9 +426,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata" "numba==0.53.1" "scipy==1.6.3" "pandas==1.2.4" "rpy2==3.4.4" "numpy==1.20.2" "scikit-learn==0.24.1" "PyYAML==6.0.2" "pysrc3==0.1.3"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scsgl"
-LABEL org.opencontainers.image.created="2024-09-14T16:54:04Z"
+LABEL org.opencontainers.image.created="2024-09-15T15:40:38Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="aaabbd94f60aacf8cb8868050fa2973a7670e3e5"
+LABEL org.opencontainers.image.revision="d9e1ef07dd822b5dc7f51ffc112a1a83aa06ffe0"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1028,13 +1028,13 @@ sys.path.append(os.environ['SCSGL_PATH'])
 from pysrc.graphlearning import learn_signed_graph
 
 # Remove genes with >=90% of zeros
-mask = (np.mean(X == 0, axis=0) >= 0.75)
-X = X[:, ~mask]
-gene_names = gene_names[~mask]
+# mask = (np.mean(X == 0, axis=0) >= 0.75)
+# X = X[:, ~mask]
+# gene_names = gene_names[~mask]
 
-# Remove samples with >=90% of zeros
-mask = (np.mean(X == 0, axis=1) >= 0.75)
-X = X[~mask, :]
+# # Remove samples with >=90% of zeros
+# mask = (np.mean(X == 0, axis=1) >= 0.75)
+# X = X[~mask, :]
 
 # Run scSGL
 print('Starting scSGL', flush=True)

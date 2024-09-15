@@ -40,6 +40,8 @@ from scgpt.preprocess import Preprocessor
 os.environ["KMP_WARNINGS"] = "off"
 warnings.filterwarnings('ignore')
 
+# torch._dynamo.config.optimize_ddp = False
+
 ## VIASH START
 par = {
   'multiomics_rna': 'resources_test/grn-benchmark/multiomics_rna.h5ad',

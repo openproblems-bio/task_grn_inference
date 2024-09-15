@@ -575,13 +575,13 @@ sys.path.append(os.environ['SCSGL_PATH'])
 from pysrc.graphlearning import learn_signed_graph
 
 # Remove genes with >=90% of zeros
-mask = (np.mean(X == 0, axis=0) >= 0.75)
-X = X[:, ~mask]
-gene_names = gene_names[~mask]
+# mask = (np.mean(X == 0, axis=0) >= 0.75)
+# X = X[:, ~mask]
+# gene_names = gene_names[~mask]
 
-# Remove samples with >=90% of zeros
-mask = (np.mean(X == 0, axis=1) >= 0.75)
-X = X[~mask, :]
+# # Remove samples with >=90% of zeros
+# mask = (np.mean(X == 0, axis=1) >= 0.75)
+# X = X[~mask, :]
 
 # Run scSGL
 print('Starting scSGL', flush=True)

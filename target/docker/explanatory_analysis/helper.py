@@ -11,7 +11,6 @@ def degree_centrality(net, source='source', target='target', normalize=False):
         total_targets = net[target].nunique()
         counts = counts/total_targets
     return counts
-
 def plot_cumulative_density(data, title='', ax=None, s=1, **kwdgs):
     # Step 1: Sort the data
     sorted_data = np.sort(data)
@@ -25,11 +24,14 @@ def plot_cumulative_density(data, title='', ax=None, s=1, **kwdgs):
     else:
     	fig = None
     ax.step(sorted_data, cdf, where='post', label=title, **kwdgs)
-    ax.set_xlabel('Data')
+    ax.set_xlabel('Weight')
     ax.set_ylabel('Cumulative Density')
     ax.set_title(title)
-    # ax.grid(True)
+    ax.grid(True)
     return fig, ax
+
+
+
 class Connectivity:
     def __init__(self, net, **kwargs):
         self.out_deg = degree_centrality(net, source='source', target='target',  **kwargs)

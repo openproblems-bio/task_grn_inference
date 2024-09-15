@@ -2880,6 +2880,20 @@ meta = [
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
+      },
+      {
+        "type" : "file",
+        "name" : "--reg_weight_distribution",
+        "default" : [
+          "output/reg_weight_distribution.png"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
+        "direction" : "output",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
       }
     ],
     "resources" : [
@@ -2971,7 +2985,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/explanatory_analysis",
     "viash_version" : "0.8.6",
-    "git_commit" : "aaabbd94f60aacf8cb8868050fa2973a7670e3e5",
+    "git_commit" : "d9e1ef07dd822b5dc7f51ffc112a1a83aa06ffe0",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3000,7 +3014,8 @@ par = {
   'annot_peak_database': $( if [ ! -z ${VIASH_PAR_ANNOT_PEAK_DATABASE+x} ]; then echo "r'${VIASH_PAR_ANNOT_PEAK_DATABASE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'tf_gene_indegee_fig': $( if [ ! -z ${VIASH_PAR_TF_GENE_INDEGEE_FIG+x} ]; then echo "r'${VIASH_PAR_TF_GENE_INDEGEE_FIG//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'tf_gene_outdegee_fig': $( if [ ! -z ${VIASH_PAR_TF_GENE_OUTDEGEE_FIG+x} ]; then echo "r'${VIASH_PAR_TF_GENE_OUTDEGEE_FIG//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'stats': $( if [ ! -z ${VIASH_PAR_STATS+x} ]; then echo "r'${VIASH_PAR_STATS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'stats': $( if [ ! -z ${VIASH_PAR_STATS+x} ]; then echo "r'${VIASH_PAR_STATS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'reg_weight_distribution': $( if [ ! -z ${VIASH_PAR_REG_WEIGHT_DISTRIBUTION+x} ]; then echo "r'${VIASH_PAR_REG_WEIGHT_DISTRIBUTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3022,13 +3037,6 @@ dep = {
 
 ## VIASH END
 
-# meta = {
-#   "resources_dir":'resources'
-# }
-sys.path.append(meta["resources_dir"])
-from helper import Explanatory_analysis
-
-print('Reading input files', flush=True)
 
 perturbation_data = ad.read_h5ad(par["perturbation_data"])
 prediction = pd.read_csv(par["prediction"])
@@ -3036,6 +3044,17 @@ prediction = pd.read_csv(par["prediction"])
 # annot_peak_database = pd.read_csv(par["annot_peak_database"])
 # hvgs = pd.read_csv(par["hvgs"])
 
+meta = {
+  "resources_dir":'src/exp_analysis/'
+}
+sys.path.append(meta["resources_dir"])
+from helper import Explanatory_analysis, plot_cumulative_density
+
+print('Plotting CMD of weight: ',par['reg_weight_distribution'], flush=True)
+fig, ax = plot_cumulative_density(prediction.weight, title='CMD of reg. weight')
+fig.savefig(par['reg_weight_distribution'])
+
+print('Reading input files', flush=True)
 # peak_gene_net['source'] = peak_gene_net['peak']
 info_obj = Explanatory_analysis(net=prediction)
 print("Calculate basic stats")

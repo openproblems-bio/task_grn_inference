@@ -3050,7 +3050,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scsgl",
     "viash_version" : "0.8.6",
-    "git_commit" : "aaabbd94f60aacf8cb8868050fa2973a7670e3e5",
+    "git_commit" : "d9e1ef07dd822b5dc7f51ffc112a1a83aa06ffe0",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3119,13 +3119,13 @@ sys.path.append(os.environ['SCSGL_PATH'])
 from pysrc.graphlearning import learn_signed_graph
 
 # Remove genes with >=90% of zeros
-mask = (np.mean(X == 0, axis=0) >= 0.75)
-X = X[:, ~mask]
-gene_names = gene_names[~mask]
+# mask = (np.mean(X == 0, axis=0) >= 0.75)
+# X = X[:, ~mask]
+# gene_names = gene_names[~mask]
 
-# Remove samples with >=90% of zeros
-mask = (np.mean(X == 0, axis=1) >= 0.75)
-X = X[~mask, :]
+# # Remove samples with >=90% of zeros
+# mask = (np.mean(X == 0, axis=1) >= 0.75)
+# X = X[~mask, :]
 
 # Run scSGL
 print('Starting scSGL', flush=True)

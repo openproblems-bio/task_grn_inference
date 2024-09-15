@@ -200,6 +200,18 @@ function ViashHelp {
   echo "    --seed"
   echo "        type: integer"
   echo "        default: 32"
+  echo ""
+  echo "    --rank_threshold"
+  echo "        type: integer"
+  echo "        default: 5000"
+  echo ""
+  echo "    --auc_threshold"
+  echo "        type: double"
+  echo "        default: 0.05"
+  echo ""
+  echo "    --nes_threshold"
+  echo "        type: double"
+  echo "        default: 3.0"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -426,9 +438,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenic"
-LABEL org.opencontainers.image.created="2024-09-14T16:54:04Z"
+LABEL org.opencontainers.image.created="2024-09-15T15:40:39Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="aaabbd94f60aacf8cb8868050fa2973a7670e3e5"
+LABEL org.opencontainers.image.revision="d9e1ef07dd822b5dc7f51ffc112a1a83aa06ffe0"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -664,6 +676,39 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_SEED=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --rank_threshold)
+            [ -n "$VIASH_PAR_RANK_THRESHOLD" ] && ViashError Bad arguments for option \'--rank_threshold\': \'$VIASH_PAR_RANK_THRESHOLD\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_RANK_THRESHOLD="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --rank_threshold. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --rank_threshold=*)
+            [ -n "$VIASH_PAR_RANK_THRESHOLD" ] && ViashError Bad arguments for option \'--rank_threshold=*\': \'$VIASH_PAR_RANK_THRESHOLD\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_RANK_THRESHOLD=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --auc_threshold)
+            [ -n "$VIASH_PAR_AUC_THRESHOLD" ] && ViashError Bad arguments for option \'--auc_threshold\': \'$VIASH_PAR_AUC_THRESHOLD\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_AUC_THRESHOLD="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --auc_threshold. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --auc_threshold=*)
+            [ -n "$VIASH_PAR_AUC_THRESHOLD" ] && ViashError Bad arguments for option \'--auc_threshold=*\': \'$VIASH_PAR_AUC_THRESHOLD\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_AUC_THRESHOLD=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --nes_threshold)
+            [ -n "$VIASH_PAR_NES_THRESHOLD" ] && ViashError Bad arguments for option \'--nes_threshold\': \'$VIASH_PAR_NES_THRESHOLD\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_NES_THRESHOLD="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --nes_threshold. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --nes_threshold=*)
+            [ -n "$VIASH_PAR_NES_THRESHOLD" ] && ViashError Bad arguments for option \'--nes_threshold=*\': \'$VIASH_PAR_NES_THRESHOLD\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_NES_THRESHOLD=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         ---setup)
             VIASH_MODE='docker_setup'
             VIASH_DOCKER_SETUP_STRATEGY="$2"
@@ -824,6 +869,15 @@ fi
 if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
+if [ -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then
+  VIASH_PAR_RANK_THRESHOLD="5000"
+fi
+if [ -z ${VIASH_PAR_AUC_THRESHOLD+x} ]; then
+  VIASH_PAR_AUC_THRESHOLD="0.05"
+fi
+if [ -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then
+  VIASH_PAR_NES_THRESHOLD="3.0"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
@@ -851,6 +905,24 @@ fi
 if [[ -n "$VIASH_PAR_SEED" ]]; then
   if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_RANK_THRESHOLD" ]]; then
+  if ! [[ "$VIASH_PAR_RANK_THRESHOLD" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--rank_threshold' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_AUC_THRESHOLD" ]]; then
+  if ! [[ "$VIASH_PAR_AUC_THRESHOLD" =~ ^[-+]?(\.[0-9]+|[0-9]+(\.[0-9]*)?)([eE][-+]?[0-9]+)?$ ]]; then
+    ViashError '--auc_threshold' has to be a double. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_NES_THRESHOLD" ]]; then
+  if ! [[ "$VIASH_PAR_NES_THRESHOLD" =~ ^[-+]?(\.[0-9]+|[0-9]+(\.[0-9]*)?)([eE][-+]?[0-9]+)?$ ]]; then
+    ViashError '--nes_threshold' has to be a double. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -975,17 +1047,12 @@ trap clean_up EXIT
 trap interrupt INT SIGINT
 cat > "\$tempscript" << 'VIASHMAIN'
 import os
-
 import anndata
 import numpy as np
 import pandas as pd
-# from contextlib_chdir import chdir 
 import subprocess
-# from urllib.request import urlretrieve
-import zipfile
-from arboreto.algo import grnboost2
-from distributed import Client
 import ast
+import requests
 
 # wget https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/refseq_r80/mc_v10_clust/gene_based/hg38_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather
 
@@ -1001,7 +1068,10 @@ par = {
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi )
+  'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'rank_threshold': $( if [ ! -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then echo "int(r'${VIASH_PAR_RANK_THRESHOLD//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'auc_threshold': $( if [ ! -z ${VIASH_PAR_AUC_THRESHOLD+x} ]; then echo "float(r'${VIASH_PAR_AUC_THRESHOLD//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "float(r'${VIASH_PAR_NES_THRESHOLD//\'/\'\"\'\"r\'}')"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1024,143 +1094,95 @@ dep = {
 ## VIASH END
 os.makedirs(par['temp_dir'], exist_ok=True)
 
-out_dir = 'resources_local'
-RANKINGS_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db.regions_vs_motifs.rankings.feather')
-SCORES_DB_PATH = os.path.join(out_dir, 'cistarget-db', 'db.regions_vs_motifs.scores.feather')
-
-# if not (os.path.exists(RANKINGS_DB_PATH) and os.path.exists(SCORES_DB_PATH)):
-
-#     # Download create_cisTarget_databases
-#     os.makedirs(os.path.join(out_dir, 'cistarget-db'), exist_ok=True)
-#     if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'create_cisTarget_databases')):
-#         with chdir(os.path.join(out_dir, 'cistarget-db')):
-#             subprocess.run(['git', 'clone', 'https://github.com/aertslab/create_cisTarget_databases'])
-
-#     # Download cluster-buster
-#     if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'cbust')):
-#         urlretrieve('https://resources.aertslab.org/cistarget/programs/cbust', os.path.join(out_dir, 'cistarget-db', 'cbust'))
-#     subprocess.run(['chmod', 'a+x', os.path.join(out_dir, 'cistarget-db', 'cbust')])
-
-#     # Download motif collection
-#     if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public')):
-#         urlretrieve(
-#             'https://resources.aertslab.org/cistarget/motif_collections/v10nr_clust_public/v10nr_clust_public.zip',
-#             os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public.zip')
-#         )
-#         with zipfile.ZipFile(os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public.zip'), 'r') as zip_ref:
-#             zip_ref.extractall(os.path.join(out_dir, 'cistarget-db'))
-
-#     # Download chromosome sizes
-#     if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'hg38.chrom.sizes')):
-#         urlretrieve(
-#             'https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes',
-#             os.path.join(out_dir, 'cistarget-db', 'hg38.chrom.sizes')
-#         )
-
-#     # Download reference genome
-#     if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'hg38.fa')):
-#         print('Downloading reference genome', flush=True)
-#         if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'hg38.fa.gz')):
-#             urlretrieve(
-#                 'https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/hg38.fa.gz',
-#                 os.path.join(out_dir, 'cistarget-db', 'hg38.fa.gz')
-#             )
-#         with gzip.open(os.path.join(out_dir, 'cistarget-db', 'hg38.fa.gz'), 'rb') as f_in:
-#             with open(os.path.join(out_dir, 'cistarget-db', 'hg38.fa'), 'wb') as f_out:
-#                 shutil.copyfileobj(f_in, f_out)
-
-#     # Prepare fasta from consensus regions
-#     if not os.path.exists(os.path.join(out_dir, 'cistarget-db', 'hg38.with_1kb_bg_padding.fa')):
-#         subprocess.run([
-#             os.path.join(out_dir, 'cistarget-db', 'create_cisTarget_databases', 'create_fasta_with_padded_bg_from_bed.sh'),
-#             os.path.join(out_dir, 'cistarget-db', 'hg38.fa'),
-#             os.path.join(out_dir, 'cistarget-db', 'hg38.chrom.sizes'),
-#             os.path.join(out_dir, 'consensus_peak_calling', 'consensus_regions.bed'),
-#             os.path.join(out_dir, 'cistarget-db', 'hg38.with_1kb_bg_padding.fa'),
-#             '1000',
-#             'yes'
-#         ])
-
-#     # Create cistarget databases
-#     with open(os.path.join(out_dir, 'cistarget-db', 'motifs.txt'), 'w') as f:
-#         for filename in os.listdir(os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public', 'singletons')):
-#             f.write(f'{filename}\\n')
-#     with chdir(os.path.join(out_dir, 'cistarget-db')):
-#         subprocess.run([
-#             'python',
-#             os.path.join(out_dir, 'cistarget-db', 'create_cisTarget_databases', 'create_cistarget_motif_databases.py'),
-#             '-f', os.path.join(out_dir, 'cistarget-db', 'hg38.with_1kb_bg_padding.fa'),
-#             '-M', os.path.join(out_dir, 'cistarget-db', 'v10nr_clust_public', 'singletons'),
-#             '-m', os.path.join(out_dir, 'cistarget-db', 'motifs.txt'),
-#             '-c', os.path.join(out_dir, 'cistarget-db', 'cbust'),
-#             '-o', 'db',
-#             '--bgpadding', '1000',
-#             '-t', str(par['num_workers'])
-#         ])
-
-
-
-
-# Load scRNA-seq data
-adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-adata_rna = adata_rna[adata_rna.obs.donor_id=='donor_0',] #TODO: to go
-gene_names = adata_rna.var.gene_ids.index.to_numpy()
-X = adata_rna.X.toarray()
-
 # Load list of putative TFs
 # df = pd.read_csv(par["tf_all"], header=None, names=['gene_name'])
 # tfs = set(list(df['gene_name']))
 # tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
 
-# format output
-expression_data = os.path.join(par['temp_dir'], "expression_data.tsv")
+databases = f"{par['temp_dir']}/databases/"
+os.makedirs(databases, exist_ok=True)
 
-pd.DataFrame(X, columns=gene_names).to_csv(expression_data, sep='\\t', index=False)
+par['motif_annotation'] = f'{databases}/motifs-v10nr_clust-nr.hgnc-m0.001-o0.0.tbl'
+par['genes_vs_motifs_10k'] = f'{databases}/hg38_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather'
+par['genes_vs_motifs_500'] = f'{databases}/hg38_500bp_up_100bp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather'
 
+if not (os.path.exists(par['motif_annotation'])):
+  print('downloading motif_annotation')
+  response = requests.get("https://resources.aertslab.org/cistarget/motif2tf/motifs-v10nr_clust-nr.hgnc-m0.001-o0.0.tbl")
+  with open(par['motif_annotation'], "wb") as file:
+      file.write(response.content)
+if not (os.path.exists(par['genes_vs_motifs_10k'])):
+  print('downloading genes_vs_motifs_10k')
+  response = requests.get("https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/refseq_r80/mc_v10_clust/gene_based/hg38_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather")
+  with open(par['genes_vs_motifs_10k'], "wb") as file:
+      file.write(response.content)
+if not (os.path.exists(par['genes_vs_motifs_500'])):
+  print('downloading genes_vs_motifs_500')
+  response = requests.get("https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/refseq_r80/mc_v10_clust/gene_based/hg38_500bp_up_100bp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather")
+  with open(par['genes_vs_motifs_500'], "wb") as file:
+      file.write(response.content)
 expr_mat_adjacencies =  os.path.join(par['temp_dir'], "expr_mat_adjacencies.tsv")
-
-
-print('Run grn')
-command = [
-    "pyscenic", "grn",
-    "--num_workers", par['max_workers'],
-    "--seed", par['seed'],
-    "-o", expr_mat_adjacencies,
-    expression_data,
-    par['tf_all'],
-    
-]
-subprocess.run(command, check=True)
-
-
-print('Run prune')
+expression_data = os.path.join(par['temp_dir'], "expression_data.tsv")
 regulons = f"{par['temp_dir']}/regulons.csv"
-command = [
-    "pyscenic", "ctx",
-    expr_mat_adjacencies, par['genes_vs_motifs_500'], par['genes_vs_motifs_10k'],
-    "--annotations_fname", par['motif_annotation'], 
-    "--expression_mtx_fname", expression_data,
-    "--mode", "custom_multiprocessing",
-    "--output", regulons, 
-    "--num_workers", par['max_workers']
-]
-subprocess.run(command, check=True)
 
-print('Format regulons')
-regulons = pd.read_csv(regulons, index_col=0, skiprows=1)['TargetGenes'].reset_index().iloc[1:,:]
+def format_data(par):
+  print('Read data')
+  adata_rna = anndata.read_h5ad(par['multiomics_rna'])  
+  gene_names = adata_rna.var_names
+  pd.DataFrame(adata_rna.X.todense(), columns=gene_names).to_csv(expression_data, sep='\\t', index=False)
+  
 
-def format_it(df):
-    values = df['TargetGenes'].values[0]
-    genes = []
-    weights = []
-    for value in ast.literal_eval(values):
-      genes.append(value[0])
-      weights.append(value[1])
-    return pd.DataFrame({'target':genes, 'weight':weights})
-grn = regulons.groupby('index').apply(lambda df: format_it(df)).reset_index().rename(columns={'index':'source'})
-network = grn[['source','target','weight']]
+def run_grn(par):
+  print('Run grn')
+  command = [
+      "pyscenic", "grn",
+      "--num_workers", str(par['max_workers']),
+      "--seed", par['seed'],
+      "-o", expr_mat_adjacencies,
+      "--method", "grnboost2", 
+      expression_data,
+      par['tf_all']
+  ]
+  subprocess.run(command, check=True)
 
+def prune_grn(par):
+  print('Run prune')
+  
+  command = [
+      "pyscenic", "ctx",
+      expr_mat_adjacencies, par['genes_vs_motifs_500'], par['genes_vs_motifs_10k'],
+      "--annotations_fname", par['motif_annotation'], 
+      "--expression_mtx_fname", expression_data,
+      "--mode", "custom_multiprocessing",
+      "--output", regulons, 
+      "--num_workers", str(par['max_workers']),
+      "--rank_threshold", str(par['rank_threshold']),
+      "--auc_threshold", str(par['auc_threshold']),
+      "--nes_threshold", str(par['nes_threshold']),
+  ]
 
+  subprocess.run(command, check=True)
+def format_grn(par):
+    
+  print('Format regulons')
+  regulons_df = pd.read_csv(regulons, index_col=0, skiprows=1)['TargetGenes'].reset_index().iloc[1:,:]
+
+  def format_it(df):
+      values = df['TargetGenes'].values[0]
+      genes = []
+      weights = []
+      for value in ast.literal_eval(values):
+        genes.append(value[0])
+        weights.append(value[1])
+      return pd.DataFrame({'target':genes, 'weight':weights})
+  grn = regulons_df.groupby('index').apply(lambda df: format_it(df)).reset_index().rename(columns={'index':'source'})
+  network = grn[['source','target','weight']]
+  return network
+
+# format_data(par)
+# run_grn(par)
+prune_grn(par)
+network = format_grn(par)
 network.to_csv(par['prediction'], sep=',')
 
 print('Finished.')

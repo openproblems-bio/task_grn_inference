@@ -152,8 +152,8 @@ def regression_1(
             net_sub = net[net.cell_type==cell_type]
         else:
             net_sub = net
-        
-        net_sub = select_top_links(net_sub, par) #only top links are considered
+        if len(net_sub)>par['max_n_links']:
+            net_sub = select_top_links(net_sub, par) #only top links are considered
                 
         prturb_adata_sub = prturb_adata[prturb_adata.obs.cell_type==cell_type,:]
         y_true_sub, y_pred_sub = cross_validation(net_sub, prturb_adata_sub, par)
@@ -242,7 +242,7 @@ def main(par):
     print(f'Compute metrics for layer: {layer}', flush=True)
     tfs_cases = [-1]
     if par['min_tf']:
-        tfs_cases += par['min_tf']
+        tfs_cases += 30
     layer_results = {}  # Store results for this layer
     for exclude_missing_genes in [False, True]:  # two settings on target gene
         for tf_n in tfs_cases:  # two settings on tfs

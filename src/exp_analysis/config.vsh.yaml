@@ -47,6 +47,12 @@ functionality:
       required: false
       direction: output
       default: output/stats.json
+    - name: --reg_weight_distribution
+      type: file
+      required: false
+      direction: output
+      default: output/reg_weight_distribution.png
+      
     
   resources:
     - type: python_script

@@ -225,7 +225,8 @@ function ViashHelp {
   echo "        default: 50000"
   echo ""
   echo "    --min_tf"
-  echo "        type: integer"
+  echo "        type: boolean"
+  echo "        default: false"
   echo "        calculate the scores for the given min tfs in addition to the default"
 }
 
@@ -453,9 +454,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2024-09-14T16:54:05Z"
+LABEL org.opencontainers.image.created="2024-09-15T15:40:40Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="aaabbd94f60aacf8cb8868050fa2973a7670e3e5"
+LABEL org.opencontainers.image.revision="d9e1ef07dd822b5dc7f51ffc112a1a83aa06ffe0"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -926,6 +927,9 @@ fi
 if [ -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then
   VIASH_PAR_MAX_N_LINKS="50000"
 fi
+if [ -z ${VIASH_PAR_MIN_TF+x} ]; then
+  VIASH_PAR_MIN_TF="false"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ] && [ ! -e "$VIASH_PAR_PERTURBATION_DATA" ]; then
@@ -973,8 +977,8 @@ if [[ -n "$VIASH_PAR_MAX_N_LINKS" ]]; then
   fi
 fi
 if [[ -n "$VIASH_PAR_MIN_TF" ]]; then
-  if ! [[ "$VIASH_PAR_MIN_TF" =~ ^[-+]?[0-9]+$ ]]; then
-    ViashError '--min_tf' has to be an integer. Use "--help" to get more information on the parameters.
+  if ! [[ "$VIASH_PAR_MIN_TF" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--min_tf' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1122,7 +1126,7 @@ par = {
   'clip_scores': $( if [ ! -z ${VIASH_PAR_CLIP_SCORES+x} ]; then echo "r'${VIASH_PAR_CLIP_SCORES//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
-  'min_tf': $( if [ ! -z ${VIASH_PAR_MIN_TF+x} ]; then echo "int(r'${VIASH_PAR_MIN_TF//\'/\'\"\'\"r\'}')"; else echo None; fi )
+  'min_tf': $( if [ ! -z ${VIASH_PAR_MIN_TF+x} ]; then echo "r'${VIASH_PAR_MIN_TF//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1143,6 +1147,9 @@ dep = {
 }
 
 ## VIASH END
+meta = {
+  "resources_dir":'src/metrics/regression_1/'
+}
 sys.path.append(meta["resources_dir"])
 from main import main 
 

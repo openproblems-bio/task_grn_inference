@@ -423,10 +423,10 @@ ENTRYPOINT []
 
  
 RUN :
-LABEL org.opencontainers.image.description="Companion container for running component grn_methods pidc"
-LABEL org.opencontainers.image.created="2024-09-14T16:54:03Z"
+LABEL org.opencontainers.image.description="Companion container for running component methods pidc"
+LABEL org.opencontainers.image.created="2024-09-15T15:40:38Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="aaabbd94f60aacf8cb8868050fa2973a7670e3e5"
+LABEL org.opencontainers.image.revision="d9e1ef07dd822b5dc7f51ffc112a1a83aa06ffe0"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -726,14 +726,14 @@ eval set -- $VIASH_POSITIONAL_ARGS
 ViashDockerInstallationCheck
 
 if [ $VIASH_MODE == "docker_setup" ]; then
-  ViashDockerSetup 'ghcr.io/openproblems-bio/task_grn_inference/grn_methods/pidc:build-main' "$VIASH_DOCKER_SETUP_STRATEGY"
+  ViashDockerSetup 'ghcr.io/openproblems-bio/task_grn_inference/methods/pidc:build-main' "$VIASH_DOCKER_SETUP_STRATEGY"
   exit 0
 fi
-ViashDockerSetup 'ghcr.io/openproblems-bio/task_grn_inference/grn_methods/pidc:build-main' ifneedbepullelsecachedbuild
+ViashDockerSetup 'ghcr.io/openproblems-bio/task_grn_inference/methods/pidc:build-main' ifneedbepullelsecachedbuild
 
 if [ $VIASH_MODE == "docker_debug" ]; then
-  ViashNotice "+ docker run --entrypoint=bash -i --rm -v "$(pwd)":/pwd --workdir /pwd -t 'ghcr.io/openproblems-bio/task_grn_inference/grn_methods/pidc:build-main'"
-  docker run --entrypoint=bash -i --rm -v "$(pwd)":/pwd --workdir /pwd -t 'ghcr.io/openproblems-bio/task_grn_inference/grn_methods/pidc:build-main'
+  ViashNotice "+ docker run --entrypoint=bash -i --rm -v "$(pwd)":/pwd --workdir /pwd -t 'ghcr.io/openproblems-bio/task_grn_inference/methods/pidc:build-main'"
+  docker run --entrypoint=bash -i --rm -v "$(pwd)":/pwd --workdir /pwd -t 'ghcr.io/openproblems-bio/task_grn_inference/methods/pidc:build-main'
   exit 0
 fi
 
@@ -939,7 +939,7 @@ VIASH_UNIQUE_MOUNTS=($(for val in "${VIASH_EXTRA_MOUNTS[@]}"; do echo "$val"; do
 function ViashPerformChown {
   if (( ${#VIASH_CHOWN_VARS[@]} )); then
     set +e
-    eval docker run --entrypoint=bash -i --rm ${VIASH_UNIQUE_MOUNTS[@]} ghcr.io/openproblems-bio/task_grn_inference/grn_methods/pidc:build-main -c "'chown $(id -u):$(id -g) --silent --recursive ${VIASH_CHOWN_VARS[@]}'"
+    eval docker run --entrypoint=bash -i --rm ${VIASH_UNIQUE_MOUNTS[@]} ghcr.io/openproblems-bio/task_grn_inference/methods/pidc:build-main -c "'chown $(id -u):$(id -g) --silent --recursive ${VIASH_CHOWN_VARS[@]}'"
     set -e
   fi
 }
@@ -958,8 +958,8 @@ fi
 # set dependency paths
 
 
-ViashDebug "Running command: $(echo docker run --entrypoint=bash -i --rm ${VIASH_UNIQUE_MOUNTS[@]} $VIASH_EXTRA_DOCKER_ARGS ghcr.io/openproblems-bio/task_grn_inference/grn_methods/pidc:build-main)"
-cat << VIASHEOF | eval docker run --entrypoint=bash -i --rm ${VIASH_UNIQUE_MOUNTS[@]} $VIASH_EXTRA_DOCKER_ARGS ghcr.io/openproblems-bio/task_grn_inference/grn_methods/pidc:build-main
+ViashDebug "Running command: $(echo docker run --entrypoint=bash -i --rm ${VIASH_UNIQUE_MOUNTS[@]} $VIASH_EXTRA_DOCKER_ARGS ghcr.io/openproblems-bio/task_grn_inference/methods/pidc:build-main)"
+cat << VIASHEOF | eval docker run --entrypoint=bash -i --rm ${VIASH_UNIQUE_MOUNTS[@]} $VIASH_EXTRA_DOCKER_ARGS ghcr.io/openproblems-bio/task_grn_inference/methods/pidc:build-main
 set -e
 tempscript=\$(mktemp "$VIASH_META_TEMP_DIR/viash-run-pidc-XXXXXX").py
 function clean_up {
@@ -1018,12 +1018,12 @@ gene_names = adata_rna.var.gene_ids.index.to_numpy()
 df_rna = pd.DataFrame(adata_rna.X.toarray(), index=adata_rna.obs.index, columns=adata_rna.var.index)
 
 # Remove genes with >=90% of zeros
-mask = (np.mean(df_rna.to_numpy() == 0, axis=0) >= 0.75)
-df_rna = df_rna.loc[:, ~mask]
+# mask = (np.mean(df_rna.to_numpy() == 0, axis=0) >= 0.9)
+# df_rna = df_rna.loc[:, ~mask]
 
-# Remove samples with >=90% of zeros
-mask = (np.mean(df_rna.to_numpy() == 0, axis=1) >= 0.75)
-df_rna = df_rna.loc[~mask, :]
+# # Remove samples with >=90% of zeros
+# mask = (np.mean(df_rna.to_numpy() == 0, axis=1) >= 0.9)
+# df_rna = df_rna.loc[~mask, :]
 
 # (genes x samples) format is needed
 df_rna = df_rna.transpose()
@@ -1034,6 +1034,9 @@ if not os.path.exists(os.path.join(par['temp_dir'], 'multiomics_rna.tsv')):
     df_rna.to_csv(os.path.join(par['temp_dir'], 'multiomics_rna.tsv'), sep='\\t', index=True, header=True)
 
 # Run PIDC
+# meta = {
+#   "resources_dir":'src/methods/single_omics/pidc/'
+# }
 JL_SCRIPT_PATH = os.path.join(meta['resources_dir'], 'pidc.jl')
 subprocess.run([
     'julia',
@@ -1042,14 +1045,8 @@ subprocess.run([
     os.path.join(par['temp_dir'], 'output.tsv'),
 ])
 
-# Load list of putative TFs
-df = pd.read_csv(par['tf_all'], header=None, names=['gene_name'])
-tfs = set(list(df['gene_name']))
-
 # Re-format output
 df = pd.read_csv(os.path.join(par['temp_dir'], 'output.tsv'), header=None, names=['source', 'target', 'weight'], sep='\\t')
-mask = np.asarray([(gene_name in tfs) for gene_name in df['source']], dtype=bool)
-df = df[mask]
 df = df.head(par['max_n_links'])
 df.to_csv(par['prediction'], header=True, sep=',')
 

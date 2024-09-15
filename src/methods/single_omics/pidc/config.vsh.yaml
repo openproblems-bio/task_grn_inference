@@ -2,14 +2,13 @@ __merge__: ../../../api/comp_method.yaml
 
 functionality:
   name: pidc
-  namespace: "grn_methods"
   info:
     label: pidc
     summary: "GRN inference using PIDC"
     description: |
       GRN inference using PIDC.
     documentation_url: https://rdrr.io/github/hmutpw/PIDC/
-  
+
   resources:
     - type: python_script
       path: script.py
@@ -22,4 +21,4 @@ platforms:
   - type: native
   - type: nextflow
     directives:
-      label: [onedaytime, highmem,midcpu]
+      label: [midtime,midmem,midcpu]

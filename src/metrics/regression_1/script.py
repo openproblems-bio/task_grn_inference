@@ -6,17 +6,22 @@ import numpy as np
 ## VIASH START
 par = {
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
-  "prediction": "resources/grn-benchmark/grn_models/collectri.csv",
+  "tf_all": "resources/prior/tf_all.csv",
+  "prediction": "output/scenic/scenic.csv",
+  "method_id": "scenic",
+  "min_tf": False,
+  "max_n_links": 50000,
+  "apply_tf": "true",
   'score': 'output/score.h5ad',
   'reg_type': 'ridge',
   'layer': 'pearson',
   'subsample': 200,
   'max_workers': 4,
 }
-print(par)
-
-
 ## VIASH END
+meta = {
+  "resources_dir":'src/metrics/regression_1/'
+}
 sys.path.append(meta["resources_dir"])
 from main import main 
 

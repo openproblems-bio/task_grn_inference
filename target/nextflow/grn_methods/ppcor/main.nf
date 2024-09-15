@@ -3043,7 +3043,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.8.6",
-    "git_commit" : "aaabbd94f60aacf8cb8868050fa2973a7670e3e5",
+    "git_commit" : "d9e1ef07dd822b5dc7f51ffc112a1a83aa06ffe0",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3108,14 +3108,15 @@ geneNames <- colnames(inputExpr)
 colnames(inputExpr) <- c(geneNames)
 X <- as.matrix(inputExpr)
 
-# Keep genes with less than 10% of zeros
-mask <- (apply(X, 2, function(x) mean(x != 0)) >= 0.1)
-X <- X[, mask]
-geneNames <- geneNames[mask]
 
-# Keep samples with less than 10% of zeros
-mask <- (apply(X, 1, function(x) mean(x != 0)) >= 0.1)
-X <- X[mask,]
+# # Keep genes with less than 10% of zeros
+# mask <- (apply(X, 2, function(x) mean(x != 0)) >= 0.1)
+# X <- X[, mask]
+# geneNames <- geneNames[mask]
+
+# # Keep samples with less than 10% of zeros
+# mask <- (apply(X, 1, function(x) mean(x != 0)) >= 0.1)
+# X <- X[mask,]
 
 # Run GRN inference method
 pcorResults = pcor(x = X, method = "pearson")

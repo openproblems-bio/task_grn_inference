@@ -426,9 +426,9 @@ RUN Rscript -e 'if (!requireNamespace("remotes", quietly = TRUE)) install.packag
   Rscript -e 'remotes::install_cran(c("ppcor", "anndata", "dplyr"), repos = "https://cran.rstudio.com")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods ppcor"
-LABEL org.opencontainers.image.created="2024-09-14T16:54:03Z"
+LABEL org.opencontainers.image.created="2024-09-15T15:40:38Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="aaabbd94f60aacf8cb8868050fa2973a7670e3e5"
+LABEL org.opencontainers.image.revision="d9e1ef07dd822b5dc7f51ffc112a1a83aa06ffe0"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1024,14 +1024,15 @@ geneNames <- colnames(inputExpr)
 colnames(inputExpr) <- c(geneNames)
 X <- as.matrix(inputExpr)
 
-# Keep genes with less than 10% of zeros
-mask <- (apply(X, 2, function(x) mean(x != 0)) >= 0.1)
-X <- X[, mask]
-geneNames <- geneNames[mask]
 
-# Keep samples with less than 10% of zeros
-mask <- (apply(X, 1, function(x) mean(x != 0)) >= 0.1)
-X <- X[mask,]
+# # Keep genes with less than 10% of zeros
+# mask <- (apply(X, 2, function(x) mean(x != 0)) >= 0.1)
+# X <- X[, mask]
+# geneNames <- geneNames[mask]
+
+# # Keep samples with less than 10% of zeros
+# mask <- (apply(X, 1, function(x) mean(x != 0)) >= 0.1)
+# X <- X[mask,]
 
 # Run GRN inference method
 pcorResults = pcor(x = X, method = "pearson")

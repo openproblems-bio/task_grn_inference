@@ -3067,7 +3067,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/tigress",
     "viash_version" : "0.8.6",
-    "git_commit" : "aaabbd94f60aacf8cb8868050fa2973a7670e3e5",
+    "git_commit" : "d9e1ef07dd822b5dc7f51ffc112a1a83aa06ffe0",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3132,16 +3132,16 @@ X <- as.matrix(ad\\$X)
 gene_names <- colnames(ad)
 
 # Remove genes with > 90% of zeros
-zero_proportion <- colMeans(X == 0)
-mask <- (zero_proportion <= 0.9)
-X <- X[, mask]
-gene_names <- gene_names[mask]
-colnames(X) <- gene_names
+# zero_proportion <- colMeans(X == 0)
+# mask <- (zero_proportion <= 0.9)
+# X <- X[, mask]
+# gene_names <- gene_names[mask]
+# colnames(X) <- gene_names
 
-# Remove samples with > 90% of zeros
-zero_proportion <- rowMeans(X == 0)
-mask <- (zero_proportion <= 0.9)
-X <- X[mask,]
+# # Remove samples with > 90% of zeros
+# zero_proportion <- rowMeans(X == 0)
+# mask <- (zero_proportion <= 0.9)
+# X <- X[mask,]
 
 # Load list of putative TFs
 dat <- read.csv(par\\$tf_all, header = FALSE)
