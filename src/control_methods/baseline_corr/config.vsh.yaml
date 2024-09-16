@@ -18,11 +18,6 @@ functionality:
       direction: input
       default: dotproduct
       description: corr method.
-    - name: --cell_type_specific
-      type: boolean
-      direction: input
-      default: false
-      description: whether to result cell type specific grn. if not, the mean of weights are taken
     - name: --metacell
       type: boolean
       direction: input
@@ -33,7 +28,7 @@ functionality:
       direction: input
       default: false
       description: whether to impute scRNA-seq
-    
+
   resources:
     - type: python_script
       path: script.py

@@ -1,1 +1,1 @@
-viash run src/methods/single_omics/portia/config.novsh.yaml -- --multiomics_rna resources/grn-benchmark/multiomics_rna.h5ad --tfs resources/prior/tf_all.csv --prediction output/portia/prediction.csv
+viash run src/methods/single_omics/portia/config.vsh.yaml -- --multiomics_rna resources/grn-benchmark/multiomics_rna_0.h5ad --tf_all resources/prior/tf_all.csv --prediction output/portia/prediction.csv

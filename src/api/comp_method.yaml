@@ -38,6 +38,10 @@ functionality:
       type: integer
       direction: input
       default: 32
+    - name: --cell_type_specific
+      type: boolean
+      direction: input
+      default: true
 
 
 
