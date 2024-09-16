@@ -2922,6 +2922,18 @@ meta = [
       },
       {
         "type" : "boolean",
+        "name" : "--cell_type_specific",
+        "default" : [
+          true
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "boolean",
         "name" : "--causal",
         "default" : [
           false
@@ -2938,19 +2950,6 @@ meta = [
         "description" : "corr method.",
         "default" : [
           "dotproduct"
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "boolean",
-        "name" : "--cell_type_specific",
-        "description" : "whether to result cell type specific grn. if not, the mean of weights are taken",
-        "default" : [
-          false
         ],
         "required" : false,
         "direction" : "input",
@@ -3101,7 +3100,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/baseline_corr",
     "viash_version" : "0.8.6",
-    "git_commit" : "328d537f037d1b5c0336671cfb9e54f15f57f240",
+    "git_commit" : "423be33b2c0e789f3c220a042650a4d4d0fd78b5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3135,9 +3134,9 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
+  'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'corr_method': $( if [ ! -z ${VIASH_PAR_CORR_METHOD+x} ]; then echo "r'${VIASH_PAR_CORR_METHOD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'metacell': $( if [ ! -z ${VIASH_PAR_METACELL+x} ]; then echo "r'${VIASH_PAR_METACELL//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'impute': $( if [ ! -z ${VIASH_PAR_IMPUTE+x} ]; then echo "r'${VIASH_PAR_IMPUTE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
@@ -3160,6 +3159,7 @@ dep = {
 }
 
 ## VIASH END
+print(par)
 
 def process_links(net, par):
     net = net[net.source!=net.target]
@@ -3167,43 +3167,44 @@ def process_links(net, par):
     net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
     return net
 
-def create_corr_net(X: np.ndarray, groups: np.ndarray, method="pearson"):
-    i = 0
-    for group in tqdm(np.unique(groups), desc="Processing groups"):
-        X_sub = X[groups == group, :]
-        if method == "pearson":
-            X_sub = StandardScaler().fit_transform(X_sub)
-            net = np.dot(X_sub.T, X_sub) / X_sub.shape[0]
-        # elif method == "pearson":
-        #     net = np.corrcoef(X_sub.T)
-        #     # net = pd.DataFrame(X_sub).transpose().corr().values.to_numpy()
-        #     net = np.nan_to_num(net, nan=0.0, posinf=0.0, neginf=0.0)
-        elif method == "spearman":
-            net = spearmanr(X_sub).statistic
+def corr_net(X, gene_names, par):
+    if par['corr_method'] == "pearson":
+        X = StandardScaler().fit_transform(X)
+        net = np.dot(X.T, X) / X.shape[0]
+    elif par['corr_method'] == "spearman":
+        net = spearmanr(X).statistic
+    net = pd.DataFrame(net, index=gene_names, columns=gene_names)
 
+    if par['causal']:
+        net = net[tf_all]
+    else:
+        net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
+    net = net.reset_index()
+    index_name = net.columns[0]
+    net = net.melt(id_vars=index_name, var_name='source', value_name='weight')
     
-        net = pd.DataFrame(net, index=gene_names, columns=gene_names)
-        if par['causal']:
-            net = net[tf_all]
-        else:
-            net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
-        # flatten to source-target-weight    
-        net = net.reset_index().melt(id_vars='index', var_name='source', value_name='weight')
-        net.rename(columns={'index': 'target'}, inplace=True)
-        
-        net = process_links(net, par)
-        net['cell_type'] = group
-        if i==0:
-            grn = net
-        else:
-            grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
+    net.rename(columns={index_name: 'target'}, inplace=True)
+    net = process_links(net, par)
+    
+    return net
 
-        i += 1
-            
-    if par['cell_type_specific']==False:
-        grn.drop(columns=['cell_type'], inplace=True)
-        grn = grn.groupby(['source', 'target']).mean().reset_index()
-        grn = process_links(grn, par)        
+def create_corr_net(X, gene_names, groups, par):
+    if par['cell_type_specific']:
+        i = 0
+        for group in tqdm(np.unique(groups), desc="Processing groups"):
+            X_sub = X[groups == group, :]
+            net = corr_net(X_sub, gene_names, par)
+            net['cell_type'] = group
+            if i==0:
+                grn = net
+            else:
+                grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
+            i += 1
+    else:
+        grn = corr_net(X, gene_names, par)
+        # grn.drop(columns=['cell_type'], inplace=True)
+        # grn = grn.groupby(['source', 'target']).mean().reset_index()
+        # grn = process_links(grn, par)        
     return grn
 print('Read data')
 multiomics_rna = ad.read_h5ad(par["multiomics_rna"])
@@ -3248,7 +3249,7 @@ if par['impute']:
     
     print('zero ration: ', (multiomics_rna.X==0).sum()/multiomics_rna.X.size)
 print('Create corr net')
-net = create_corr_net(multiomics_rna.X, groups, par['corr_method'])
+net = create_corr_net(multiomics_rna.X, multiomics_rna.var_names, groups, par)
 
 print('Output GRN')
 net.to_csv(par['prediction'])

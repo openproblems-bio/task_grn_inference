@@ -201,6 +201,10 @@ function ViashHelp {
   echo "        type: integer"
   echo "        default: 32"
   echo ""
+  echo "    --cell_type_specific"
+  echo "        type: boolean"
+  echo "        default: true"
+  echo ""
   echo "    --causal"
   echo "        type: boolean"
   echo "        default: false"
@@ -209,12 +213,6 @@ function ViashHelp {
   echo "        type: string"
   echo "        default: dotproduct"
   echo "        corr method."
-  echo ""
-  echo "    --cell_type_specific"
-  echo "        type: boolean"
-  echo "        default: false"
-  echo "        whether to result cell type specific grn. if not, the mean of weights"
-  echo "        are taken"
   echo ""
   echo "    --metacell"
   echo "        type: boolean"
@@ -450,9 +448,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component control_methods baseline_corr"
-LABEL org.opencontainers.image.created="2024-09-15T21:00:28Z"
+LABEL org.opencontainers.image.created="2024-09-16T15:07:34Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="328d537f037d1b5c0336671cfb9e54f15f57f240"
+LABEL org.opencontainers.image.revision="423be33b2c0e789f3c220a042650a4d4d0fd78b5"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -688,6 +686,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_SEED=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --cell_type_specific)
+            [ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ] && ViashError Bad arguments for option \'--cell_type_specific\': \'$VIASH_PAR_CELL_TYPE_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CELL_TYPE_SPECIFIC="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --cell_type_specific. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --cell_type_specific=*)
+            [ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ] && ViashError Bad arguments for option \'--cell_type_specific=*\': \'$VIASH_PAR_CELL_TYPE_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CELL_TYPE_SPECIFIC=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --causal)
             [ -n "$VIASH_PAR_CAUSAL" ] && ViashError Bad arguments for option \'--causal\': \'$VIASH_PAR_CAUSAL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_CAUSAL="$2"
@@ -708,17 +717,6 @@ while [[ $# -gt 0 ]]; do
         --corr_method=*)
             [ -n "$VIASH_PAR_CORR_METHOD" ] && ViashError Bad arguments for option \'--corr_method=*\': \'$VIASH_PAR_CORR_METHOD\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_CORR_METHOD=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --cell_type_specific)
-            [ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ] && ViashError Bad arguments for option \'--cell_type_specific\': \'$VIASH_PAR_CELL_TYPE_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CELL_TYPE_SPECIFIC="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --cell_type_specific. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --cell_type_specific=*)
-            [ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ] && ViashError Bad arguments for option \'--cell_type_specific=*\': \'$VIASH_PAR_CELL_TYPE_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CELL_TYPE_SPECIFIC=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --metacell)
@@ -903,14 +901,14 @@ fi
 if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
+if [ -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then
+  VIASH_PAR_CELL_TYPE_SPECIFIC="true"
+fi
 if [ -z ${VIASH_PAR_CAUSAL+x} ]; then
   VIASH_PAR_CAUSAL="false"
 fi
 if [ -z ${VIASH_PAR_CORR_METHOD+x} ]; then
   VIASH_PAR_CORR_METHOD="dotproduct"
-fi
-if [ -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then
-  VIASH_PAR_CELL_TYPE_SPECIFIC="false"
 fi
 if [ -z ${VIASH_PAR_METACELL+x} ]; then
   VIASH_PAR_METACELL="false"
@@ -948,15 +946,15 @@ if [[ -n "$VIASH_PAR_SEED" ]]; then
     exit 1
   fi
 fi
-if [[ -n "$VIASH_PAR_CAUSAL" ]]; then
-  if ! [[ "$VIASH_PAR_CAUSAL" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--causal' has to be a boolean. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
 if [[ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ]]; then
   if ! [[ "$VIASH_PAR_CELL_TYPE_SPECIFIC" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--cell_type_specific' has to be a boolean. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_CAUSAL" ]]; then
+  if ! [[ "$VIASH_PAR_CAUSAL" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--causal' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1111,9 +1109,9 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'corr_method': $( if [ ! -z ${VIASH_PAR_CORR_METHOD+x} ]; then echo "r'${VIASH_PAR_CORR_METHOD//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'metacell': $( if [ ! -z ${VIASH_PAR_METACELL+x} ]; then echo "r'${VIASH_PAR_METACELL//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'impute': $( if [ ! -z ${VIASH_PAR_IMPUTE+x} ]; then echo "r'${VIASH_PAR_IMPUTE//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
 }
@@ -1136,6 +1134,7 @@ dep = {
 }
 
 ## VIASH END
+print(par)
 
 def process_links(net, par):
     net = net[net.source!=net.target]
@@ -1143,43 +1142,44 @@ def process_links(net, par):
     net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
     return net
 
-def create_corr_net(X: np.ndarray, groups: np.ndarray, method="pearson"):
-    i = 0
-    for group in tqdm(np.unique(groups), desc="Processing groups"):
-        X_sub = X[groups == group, :]
-        if method == "pearson":
-            X_sub = StandardScaler().fit_transform(X_sub)
-            net = np.dot(X_sub.T, X_sub) / X_sub.shape[0]
-        # elif method == "pearson":
-        #     net = np.corrcoef(X_sub.T)
-        #     # net = pd.DataFrame(X_sub).transpose().corr().values.to_numpy()
-        #     net = np.nan_to_num(net, nan=0.0, posinf=0.0, neginf=0.0)
-        elif method == "spearman":
-            net = spearmanr(X_sub).statistic
+def corr_net(X, gene_names, par):
+    if par['corr_method'] == "pearson":
+        X = StandardScaler().fit_transform(X)
+        net = np.dot(X.T, X) / X.shape[0]
+    elif par['corr_method'] == "spearman":
+        net = spearmanr(X).statistic
+    net = pd.DataFrame(net, index=gene_names, columns=gene_names)
 
+    if par['causal']:
+        net = net[tf_all]
+    else:
+        net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
+    net = net.reset_index()
+    index_name = net.columns[0]
+    net = net.melt(id_vars=index_name, var_name='source', value_name='weight')
     
-        net = pd.DataFrame(net, index=gene_names, columns=gene_names)
-        if par['causal']:
-            net = net[tf_all]
-        else:
-            net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
-        # flatten to source-target-weight    
-        net = net.reset_index().melt(id_vars='index', var_name='source', value_name='weight')
-        net.rename(columns={'index': 'target'}, inplace=True)
-        
-        net = process_links(net, par)
-        net['cell_type'] = group
-        if i==0:
-            grn = net
-        else:
-            grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
+    net.rename(columns={index_name: 'target'}, inplace=True)
+    net = process_links(net, par)
+    
+    return net
 
-        i += 1
-            
-    if par['cell_type_specific']==False:
-        grn.drop(columns=['cell_type'], inplace=True)
-        grn = grn.groupby(['source', 'target']).mean().reset_index()
-        grn = process_links(grn, par)        
+def create_corr_net(X, gene_names, groups, par):
+    if par['cell_type_specific']:
+        i = 0
+        for group in tqdm(np.unique(groups), desc="Processing groups"):
+            X_sub = X[groups == group, :]
+            net = corr_net(X_sub, gene_names, par)
+            net['cell_type'] = group
+            if i==0:
+                grn = net
+            else:
+                grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
+            i += 1
+    else:
+        grn = corr_net(X, gene_names, par)
+        # grn.drop(columns=['cell_type'], inplace=True)
+        # grn = grn.groupby(['source', 'target']).mean().reset_index()
+        # grn = process_links(grn, par)        
     return grn
 print('Read data')
 multiomics_rna = ad.read_h5ad(par["multiomics_rna"])
@@ -1224,7 +1224,7 @@ if par['impute']:
     
     print('zero ration: ', (multiomics_rna.X==0).sum()/multiomics_rna.X.size)
 print('Create corr net')
-net = create_corr_net(multiomics_rna.X, groups, par['corr_method'])
+net = create_corr_net(multiomics_rna.X, multiomics_rna.var_names, groups, par)
 
 print('Output GRN')
 net.to_csv(par['prediction'])

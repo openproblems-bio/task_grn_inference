@@ -2919,6 +2919,18 @@ meta = [
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
+      },
+      {
+        "type" : "boolean",
+        "name" : "--cell_type_specific",
+        "default" : [
+          true
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
       }
     ],
     "resources" : [
@@ -3046,7 +3058,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia",
     "viash_version" : "0.8.6",
-    "git_commit" : "328d537f037d1b5c0336671cfb9e54f15f57f240",
+    "git_commit" : "423be33b2c0e789f3c220a042650a4d4d0fd78b5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3079,7 +3091,8 @@ par = {
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi )
+  'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
+  'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3103,10 +3116,16 @@ dep = {
 
 
 # Load scRNA-seq data
+print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
 X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X
 
+def process_links(net, par):
+  net = net[net.source!=net.target]
+  net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
+  net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
+  return net
 # Remove genes with >=90% of zeros
 if False:
   # Remove genes with >=90% of zeros
@@ -3118,24 +3137,55 @@ if False:
   mask = (np.mean(X == 0, axis=1) >= 0.9)
   adata_rna = X[~mask, :]
 
+
 # Load list of putative TFs
-df = pd.read_csv(par['tf_all'], header=None, names=['gene_name'])
-tfs = set(list(df['gene_name']))
+tfs = np.loadtxt(par['tf_all'], dtype=str)
 tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
 
 # GRN inference
-dataset = pt.GeneExpressionDataset()
-for exp_id, data in enumerate(X):
-    dataset.add(pt.Experiment(exp_id, data))
-M_bar = pt.run(dataset, method='no-transform')
+def infer_grn(X, gene_names):
+  print('Inferring grn')
+  dataset = pt.GeneExpressionDataset()
+  for exp_id, data in enumerate(X):
+      dataset.add(pt.Experiment(exp_id, data))
+  M_bar = pt.run(dataset, method='no-transform')
 
-print(M_bar.shape)
+  ranked_scores = pt.rank_scores(M_bar, gene_names)
+  sources, targets, weights = zip(*[(gene_a, gene_b, score) for gene_a, gene_b, score in ranked_scores])
 
-# Save inferred GRN
-with open(par['prediction'], 'w') as f:
-    f.write(f',source,target,weight\\\\n')
-    for i, (gene_a, gene_b, score) in enumerate(pt.rank_scores(M_bar, gene_names, limit=par['max_n_links'])):
-        f.write(f'{i},{gene_a},{gene_b},{score}\\\\n')
+  grn = pd.DataFrame({'source':sources, 'target':targets, 'weight':weights})
+  print(grn.shape)
+  grn = grn[grn.source.isin(tf_names)]
+
+  grn = process_links(grn, par)
+  return grn
+
+groups = adata_rna.obs.cell_type.unique()
+i = 0
+for group in tqdm(np.unique(groups), desc="Processing groups"):
+  X_sub = X[groups == group, :]
+  
+  net = infer_grn(X_sub, gene_names)
+  net['cell_type'] = group
+  if i==0:
+      grn = net
+  else:
+      grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
+
+  i += 1
+        
+grn.drop(columns=['cell_type'], inplace=True)
+grn = grn.groupby(['source', 'target']).mean().reset_index()
+grn = process_links(grn, par)        
+
+grn.to_csv(par['prediction'])
+
+
+# # Save inferred GRN
+# with open(par['prediction'], 'w') as f:
+#     f.write(f',source,target,weight\\\\n')
+#     for i, (gene_a, gene_b, score) in enumerate(pt.rank_scores(M_bar, gene_names, limit=par['max_n_links'])):
+#         f.write(f'{i},{gene_a},{gene_b},{score}\\\\n')
 
 print('Finished.')
 VIASHMAIN

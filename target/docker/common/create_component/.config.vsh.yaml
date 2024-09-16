@@ -150,5 +150,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/common/create_component"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/common/create_component/create_component"
   viash_version: "0.8.6"
-  git_commit: "328d537f037d1b5c0336671cfb9e54f15f57f240"
+  git_commit: "423be33b2c0e789f3c220a042650a4d4d0fd78b5"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

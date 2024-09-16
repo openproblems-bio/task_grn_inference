@@ -9,11 +9,17 @@ from sklearn.preprocessing import StandardScaler
 
 ## VIASH START
 par = {
+    'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
+    'tf_all': 'resources/prior/tf_all.csv',
+    'causal': True,
+    'metacell': False,
+    'cell_type_specific': True,
+    'impute': False,
+    'max_n_links': 50000,
+    'corr_method': 'pearson'
 }
-
-print(par)
-
 ## VIASH END
+print(par)
 
 def process_links(net, par):
     net = net[net.source!=net.target]
@@ -21,43 +27,44 @@ def process_links(net, par):
     net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
     return net
 
-def create_corr_net(X: np.ndarray, groups: np.ndarray, method="pearson"):
-    i = 0
-    for group in tqdm(np.unique(groups), desc="Processing groups"):
-        X_sub = X[groups == group, :]
-        if method == "pearson":
-            X_sub = StandardScaler().fit_transform(X_sub)
-            net = np.dot(X_sub.T, X_sub) / X_sub.shape[0]
-        # elif method == "pearson":
-        #     net = np.corrcoef(X_sub.T)
-        #     # net = pd.DataFrame(X_sub).transpose().corr().values.to_numpy()
-        #     net = np.nan_to_num(net, nan=0.0, posinf=0.0, neginf=0.0)
-        elif method == "spearman":
-            net = spearmanr(X_sub).statistic
+def corr_net(X, gene_names, par):
+    if par['corr_method'] == "pearson":
+        X = StandardScaler().fit_transform(X)
+        net = np.dot(X.T, X) / X.shape[0]
+    elif par['corr_method'] == "spearman":
+        net = spearmanr(X).statistic
+    net = pd.DataFrame(net, index=gene_names, columns=gene_names)
 
+    if par['causal']:
+        net = net[tf_all]
+    else:
+        net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
+    net = net.reset_index()
+    index_name = net.columns[0]
+    net = net.melt(id_vars=index_name, var_name='source', value_name='weight')
     
-        net = pd.DataFrame(net, index=gene_names, columns=gene_names)
-        if par['causal']:
-            net = net[tf_all]
-        else:
-            net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
-        # flatten to source-target-weight    
-        net = net.reset_index().melt(id_vars='index', var_name='source', value_name='weight')
-        net.rename(columns={'index': 'target'}, inplace=True)
-        
-        net = process_links(net, par)
-        net['cell_type'] = group
-        if i==0:
-            grn = net
-        else:
-            grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
+    net.rename(columns={index_name: 'target'}, inplace=True)
+    net = process_links(net, par)
+    
+    return net
 
-        i += 1
-            
-    if par['cell_type_specific']==False:
-        grn.drop(columns=['cell_type'], inplace=True)
-        grn = grn.groupby(['source', 'target']).mean().reset_index()
-        grn = process_links(grn, par)        
+def create_corr_net(X, gene_names, groups, par):
+    if par['cell_type_specific']:
+        i = 0
+        for group in tqdm(np.unique(groups), desc="Processing groups"):
+            X_sub = X[groups == group, :]
+            net = corr_net(X_sub, gene_names, par)
+            net['cell_type'] = group
+            if i==0:
+                grn = net
+            else:
+                grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
+            i += 1
+    else:
+        grn = corr_net(X, gene_names, par)
+        # grn.drop(columns=['cell_type'], inplace=True)
+        # grn = grn.groupby(['source', 'target']).mean().reset_index()
+        # grn = process_links(grn, par)        
     return grn
 print('Read data')
 multiomics_rna = ad.read_h5ad(par["multiomics_rna"])
@@ -102,7 +109,7 @@ if par['impute']:
     
     print('zero ration: ', (multiomics_rna.X==0).sum()/multiomics_rna.X.size)
 print('Create corr net')
-net = create_corr_net(multiomics_rna.X, groups, par['corr_method'])
+net = create_corr_net(multiomics_rna.X, multiomics_rna.var_names, groups, par)
 
 print('Output GRN')
 net.to_csv(par['prediction'])

@@ -201,6 +201,10 @@ function ViashHelp {
   echo "        type: integer"
   echo "        default: 32"
   echo ""
+  echo "    --cell_type_specific"
+  echo "        type: boolean"
+  echo "        default: true"
+  echo ""
   echo "    --M"
   echo "        type: integer"
   echo "        default: 100"
@@ -437,9 +441,9 @@ R CMD build ennet && \
 R CMD INSTALL ennet
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods ennet"
-LABEL org.opencontainers.image.created="2024-09-15T21:00:29Z"
+LABEL org.opencontainers.image.created="2024-09-16T15:07:33Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="328d537f037d1b5c0336671cfb9e54f15f57f240"
+LABEL org.opencontainers.image.revision="423be33b2c0e789f3c220a042650a4d4d0fd78b5"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -675,6 +679,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_SEED=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --cell_type_specific)
+            [ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ] && ViashError Bad arguments for option \'--cell_type_specific\': \'$VIASH_PAR_CELL_TYPE_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CELL_TYPE_SPECIFIC="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --cell_type_specific. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --cell_type_specific=*)
+            [ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ] && ViashError Bad arguments for option \'--cell_type_specific=*\': \'$VIASH_PAR_CELL_TYPE_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CELL_TYPE_SPECIFIC=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --M)
             [ -n "$VIASH_PAR_M" ] && ViashError Bad arguments for option \'--M\': \'$VIASH_PAR_M\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_M="$2"
@@ -846,6 +861,9 @@ fi
 if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
+if [ -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then
+  VIASH_PAR_CELL_TYPE_SPECIFIC="true"
+fi
 if [ -z ${VIASH_PAR_M+x} ]; then
   VIASH_PAR_M="100"
 fi
@@ -876,6 +894,12 @@ fi
 if [[ -n "$VIASH_PAR_SEED" ]]; then
   if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ]]; then
+  if ! [[ "$VIASH_PAR_CELL_TYPE_SPECIFIC" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--cell_type_specific' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1022,6 +1046,7 @@ par <- list(
   "num_workers" = $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_NUM_WORKERS" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi ),
   "temp_dir" = $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TEMP_DIR" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi ),
+  "cell_type_specific" = $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" | sed "s#['\\]#\\\\&#g"; echo "'))"; else echo NULL; fi ),
   "M" = $( if [ ! -z ${VIASH_PAR_M+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_M" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi )
 )
 meta <- list(

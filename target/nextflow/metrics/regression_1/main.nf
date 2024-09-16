@@ -3200,7 +3200,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "328d537f037d1b5c0336671cfb9e54f15f57f240",
+    "git_commit" : "423be33b2c0e789f3c220a042650a4d4d0fd78b5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3256,9 +3256,9 @@ dep = {
 }
 
 ## VIASH END
-meta = {
-  "resources_dir":'src/metrics/regression_1/'
-}
+# meta = {
+#   "resources_dir":'src/metrics/regression_1/'
+# }
 sys.path.append(meta["resources_dir"])
 from main import main 
 

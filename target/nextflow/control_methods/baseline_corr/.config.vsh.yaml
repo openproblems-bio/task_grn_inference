@@ -109,6 +109,16 @@ functionality:
     multiple_sep: ":"
     dest: "par"
   - type: "boolean"
+    name: "--cell_type_specific"
+    info: null
+    default:
+    - true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "boolean"
     name: "--causal"
     info: null
     default:
@@ -124,18 +134,6 @@ functionality:
     info: null
     default:
     - "dotproduct"
-    required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
-  - type: "boolean"
-    name: "--cell_type_specific"
-    description: "whether to result cell type specific grn. if not, the mean of weights\
-      \ are taken"
-    info: null
-    default:
-    - false
     required: false
     direction: "input"
     multiple: false
@@ -246,5 +244,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/baseline_corr"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/baseline_corr/baseline_corr"
   viash_version: "0.8.6"
-  git_commit: "328d537f037d1b5c0336671cfb9e54f15f57f240"
+  git_commit: "423be33b2c0e789f3c220a042650a4d4d0fd78b5"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
