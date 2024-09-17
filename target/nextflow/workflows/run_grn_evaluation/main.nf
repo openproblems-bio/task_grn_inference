@@ -2799,17 +2799,6 @@ meta = [
             "dest" : "par"
           },
           {
-            "type" : "file",
-            "name" : "--multiomics_rna",
-            "must_exist" : true,
-            "create_parent" : true,
-            "required" : false,
-            "direction" : "input",
-            "multiple" : false,
-            "multiple_sep" : ":",
-            "dest" : "par"
-          },
-          {
             "type" : "string",
             "name" : "--layer",
             "required" : false,
@@ -2980,9 +2969,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems",
           "tag" : "v2.0.0",
-          "localPath" : "/tmp/viash_hub_repo2783135605614662654"
+          "localPath" : "/tmp/viash_hub_repo3787878110908303751"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo2783135605614662654/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo3787878110908303751/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_tag" : "v1.0.0-1413-gb782e93f",
@@ -3013,7 +3002,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "fb851e790c5831639af97bf94b166fe24ee2ee52",
+          "git_commit" : "aa3da45ad18f1c24ee24aee91bac4f2295acf4b0",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
@@ -3034,7 +3023,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "fb851e790c5831639af97bf94b166fe24ee2ee52",
+          "git_commit" : "aa3da45ad18f1c24ee24aee91bac4f2295acf4b0",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
@@ -3097,7 +3086,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.8.6",
-    "git_commit" : "fb851e790c5831639af97bf94b166fe24ee2ee52",
+    "git_commit" : "aa3da45ad18f1c24ee24aee91bac4f2295acf4b0",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
