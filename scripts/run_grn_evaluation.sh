@@ -5,11 +5,11 @@
 # viash ns build --parallel
 reg_type=ridge
 
-RUN_ID="grn_evaluation_all_${reg_type}"
+RUN_ID="celltype_donor_0_subset_${reg_type}"
 resources_dir="s3://openproblems-data/resources/grn"
 # resources_dir="./resources"
 publish_dir="${resources_dir}/results/${RUN_ID}"
-grn_models_folder="${resources_dir}/grn_models"
+grn_models_folder="${resources_dir}/grn_models/donor_0_celltype"
 
 subsample=-2
 max_workers=10
@@ -19,26 +19,20 @@ metric_ids="[regression_1, regression_2]"
 param_file="./params/${RUN_ID}.yaml"
 
 grn_names=(
-    "scglue"
-    "scenicplus"
-    "celloracle"
-    "granie"
-    "figr"
-    "collectri"
-    "genie3"
+    # "scglue"
+    # "scenicplus"
+    # "celloracle"
+    # "granie"
+    # "figr"
+    # "collectri"
+    # "genie3"
     "grnboost2"
-    "ppcor"
+    # "ppcor"
     "portia"
+    "positive_control"
+    "pearson_causal"
     )
 
-baseline_models=(
-    baseline_pearson
-    baseline_pearson_causal
-    baseline_pearson_causal_celltype
-    baseline_pearson_causal_metacell
-    baseline_pearson_causal_impute
-    positive_control
-    )
 # Start writing to the YAML file
 cat > $param_file << HERE
 param_list:
@@ -57,22 +51,14 @@ append_entry() {
     tf_all: ${resources_dir}/prior/tf_all.csv
     layer: ${layer}
     consensus: ${resources_dir}/prior/consensus-num-regulators.json
-    prediction: ${2}/$1.csv
+    prediction: ${grn_models_folder}/$1.csv
 HERE
 }
 
-
-folder=${grn_models_folder}
 # Loop through grn_names and layers
 for grn_name in "${grn_names[@]}"; do
-  append_entry "$grn_name"  "$folder"
+  append_entry "$grn_name"  
 done
-
-folder=${grn_models_folder}/baselines
-for grn_name in "${baseline_models[@]}"; do
-  append_entry "$grn_name" "$folder" 
-done
-
 
 # Append the remaining output_state and publish_dir to the YAML file
 cat >> $param_file << HERE
@@ -99,3 +85,11 @@ HERE
 #     --config src/common/nextflow_helpers/labels_tw.config
 
 
+./tw launch https://github.com/openproblems-bio/task_grn_inference \
+  --revision build/main \
+  --pull-latest \
+  --main-script target/nextflow/workflows/run_grn_evaluation/main.nf \
+  --workspace 53907369739130 \
+  --compute-env 6TeIFgV5OY4pJCk8I0bfOh \
+  --params-file ${param_file} \
+  --config src/common/nextflow_helpers/labels_tw.config
