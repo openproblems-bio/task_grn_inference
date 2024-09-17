@@ -82,12 +82,13 @@ del adata_atac
 def process_atac(par):
     print("---Run pre-process started ---", flush=True)
     # Create one individual ATAC-seq file per donor
+    adata_atac = anndata.read_h5ad(par['multiomics_atac'])
     fragments_dict = {}
     for donor_id in unique_donor_ids:
         filepath = os.path.join(atac_dir, f'{donor_id}.tsv')
         if not os.path.exists(filepath):
             print(f'Create tsv file {filepath}')
-            adata_atac = anndata.read_h5ad(par['multiomics_atac'])
+            
             adata_atac.obs.cell_type = [s.replace(' ', '_') for s in adata_atac.obs.cell_type]
             adata_atac.obs.donor_id = [s.replace(' ', '_') for s in adata_atac.obs.donor_id]
             adata_atac_one_donor = adata_atac[adata_atac.obs.donor_id == donor_id]
@@ -97,7 +98,7 @@ def process_atac(par):
             counts = coo_matrix.data
             row_names = adata_atac_one_donor.obs.index[rows]
             coord_names = adata_atac_one_donor.var.index[cols]
-            del adata_atac, adata_atac_one_donor
+            del adata_atac_one_donor
             gc.collect()
             d = {
                 'chromosome': np.asarray([s.split(':')[0] for s in coord_names]),
@@ -147,6 +148,7 @@ def process_atac(par):
         names=['Chromosome', 'End']
     )
     chromsizes.insert(1, 'Start', 0)
+    
 
     print(f'Start pseudobulking')
     os.makedirs(os.path.join(par['temp_dir'], 'consensus_peak_calling'), exist_ok=True)

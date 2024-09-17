@@ -154,7 +154,7 @@ def run_grn(par):
     rna[:, np.union1d(genes, tfs)].write_loom(f"{par['temp_dir']}/rna.loom")
     np.savetxt(f"{par['temp_dir']}/tfs.txt", tfs, fmt="%s")
 
-    # Construct the command 
+    #Construct the command 
     command = ['pyscenic', 'grn', f"{par['temp_dir']}/rna.loom", 
                f"{par['temp_dir']}/tfs.txt", '-o', f"{par['temp_dir']}/draft_grn.csv", 
                '--seed', '0', '--num_workers', f"{par['num_workers']}", 
@@ -171,7 +171,15 @@ def run_grn(par):
         print("Command executed successfully")
     else:
         print("Command failed with return code", result.returncode)
+def create_prior(par):
+    atac = ad.read_h5ad(f"{par['temp_dir']}/atac-emb.h5ad")
+    rna = ad.read_h5ad(f"{par['temp_dir']}/rna-emb.h5ad")
+    motif_bed = scglue.genomics.read_bed(par['motif_file'])
+    fs = pd.Index(motif_bed["name"]).intersection(rna.var_names)
 
+    atac.var["name"] = atac.var_names
+
+    peaks = atac.var.index
 
     print("Generate TF cis-regulatory ranking bridged by ATAC peaks", flush=True)
     peak_bed = scglue.genomics.Bed(atac.var.loc[peaks])
@@ -193,6 +201,7 @@ def run_grn(par):
     )
 
     ### Prepare data for pruning 
+    print("Prepare data for pruning ")
 
     gene2tf_rank_glue.columns = gene2tf_rank_glue.columns + "_glue"
     gene2tf_rank_supp.columns = gene2tf_rank_supp.columns + "_supp"
@@ -298,11 +307,12 @@ def main(par):
     rna = ad.read_h5ad(par['multiomics_rna'])
     atac = ad.read_h5ad(par['multiomics_atac'])
 
-    print('Preprocess data', flush=True)
-    preprocess(rna, atac, par)
-    print('Train a model', flush=True)
-    training(par)
-    run_grn(par)
+    # print('Preprocess data', flush=True)
+    # preprocess(rna, atac, par)
+    # print('Train a model', flush=True)
+    # training(par)
+    # run_grn(par)
+    create_prior(par)
     prune_grn(par)
     print('Curate predictions', flush=True)
     pruned_grn = pd.read_csv(

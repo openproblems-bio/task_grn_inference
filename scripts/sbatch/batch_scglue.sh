@@ -5,7 +5,9 @@
 #SBATCH --error=logs/%j.err
 #SBATCH --mail-type=END
 #SBATCH --mail-user=jalil.nourisa@gmail.com
-#SBATCH --cpus-per-task=20
 #SBATCH --mem=64G 
+#SBATCH --partition=gpu  
+#SBATCH --cpus-per-task=20  
+#SBATCH --gres=gpu:1 
 
-singularity exec ../../images/scglue python src/methods/multi_omics/scglue/script.py 
+singularity exec --nv ../../images/scglue python src/methods/multi_omics/scglue/script.py 
