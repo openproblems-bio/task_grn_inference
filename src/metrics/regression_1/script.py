@@ -7,7 +7,7 @@ import numpy as np
 par = {
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
   "tf_all": "resources/prior/tf_all.csv",
-  "prediction": "output/portia_celltype_0.csv",
+  "prediction": "resources/grn_models/donor_0_celltype/grnboost2.csv",
   "method_id": "scenic",
   "min_tf": False,
   "max_n_links": 50000,

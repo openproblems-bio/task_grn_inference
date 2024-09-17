@@ -8,16 +8,25 @@ import numpy as np
 par = {
     'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
     'layer': 'scgen_pearson',
-    'prediction': 'resources/grn_models/collectri.csv',
-    'tfs': 'resources/prior/tf_all.csv',
-    'consensus': 'resources/grn-benchmark/consensus-num-regulators.json',
+    "prediction": "resources/grn_models/donor_0_celltype/grnboost2.csv",
+    'tf_all': 'resources/prior/tf_all.csv',
+    "max_n_links": 50000,
+    'consensus': 'resources/prior/consensus-num-regulators.json',
     'score': 'output/score_regression2.csv',
     'reg_type': 'ridge',
-    'static_only': True
+    'static_only': True,
+    'layer': 'scgen_pearson',
+    'subsample': -2,
+    'max_workers': 4,
+    'apply_tf': True,
+    'clip_scores': True,
+    'method_id': 'grnboost'
     
 }
 ## VIASH END
-
+# meta = {
+#   "resources_dir":'src/metrics/regression_1/'
+# }
 print(par)
 sys.path.append(meta['resources_dir'])
 from main import main

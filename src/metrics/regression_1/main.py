@@ -211,6 +211,10 @@ def main(par):
     # subset to keep only those links with source as tf
     if par['apply_tf']:
         net = net[net.source.isin(tf_all)]
+    # if 'cell_type' in net.columns:
+    #     print('Taking mean of cell type specific grns')
+    #     net.drop(columns=['cell_type'], inplace=True)
+    #     net = net.groupby(['source', 'target']).mean().reset_index()
 
     subsample = par['subsample']
     max_workers = par['max_workers']
