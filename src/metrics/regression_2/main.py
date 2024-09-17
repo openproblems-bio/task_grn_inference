@@ -16,17 +16,30 @@ from sklearn.metrics import r2_score, mean_squared_error
 SEED = 0xCAFE
 N_POINTS_TO_ESTIMATE_BACKGROUND = 20
 
+def select_top_links(net, par):
+    print("Number of links reduced to ", par['max_n_links'])
+    net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
+    net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
+    return net
 
-def load_grn(filepath: str, gene_names: np.ndarray) -> np.ndarray:
+def load_grn(filepath: str, gene_names: np.ndarray, par: Dict[str, Any]) -> np.ndarray:
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
     A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
     df = pd.read_csv(filepath, sep=',', header='infer', index_col=0)
+    if 'cell_type' in df.columns:
+        print('Taking mean of cell type specific grns')
+        df.drop(columns=['cell_type'], inplace=True)
+        df = df.groupby(['source', 'target']).mean().reset_index()
+
     for source, target, weight in zip(df['source'], df['target'], df['weight']):
         if (source not in gene_dict) or (target not in gene_dict):
             continue
         i = gene_dict[source]
         j = gene_dict[target]
         A[i, j] = float(weight)
+    if df.shape[0] > par['max_n_links']:
+        df = select_top_links(df, par)
+    print(df)
     return A
 
 
@@ -276,12 +289,8 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     
     # Load inferred GRN
     print(f'Loading GRN', flush=True)
-    grn = load_grn(par['prediction'], gene_names)
-    # if 'cell_type' in grn.columns:
-    #     print('Non specific')
-    #     grn.drop(columns=['cell_type'], inplace=True)
-    #     grn = grn.groupby(['source', 'target']).mean().reset_index()
-    
+    grn = load_grn(par['prediction'], gene_names, par)
+
     # Load and standardize perturbation data
     layer = par['layer']
     X = perturbation_data.layers[layer]

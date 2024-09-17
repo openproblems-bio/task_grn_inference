@@ -3012,7 +3012,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/batch_correction_seurat",
     "viash_version" : "0.8.6",
-    "git_commit" : "aa3da45ad18f1c24ee24aee91bac4f2295acf4b0",
+    "git_commit" : "ada50990cdaa1e501c61c67d2528e1fdfe3b0c4b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

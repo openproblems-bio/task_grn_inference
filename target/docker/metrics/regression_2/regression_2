@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_2"
-LABEL org.opencontainers.image.created="2024-09-17T06:15:01Z"
+LABEL org.opencontainers.image.created="2024-09-17T07:03:52Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="aa3da45ad18f1c24ee24aee91bac4f2295acf4b0"
+LABEL org.opencontainers.image.revision="ada50990cdaa1e501c61c67d2528e1fdfe3b0c4b"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1171,7 +1171,9 @@ dep = {
 }
 
 ## VIASH END
-
+# meta = {
+#   "resources_dir":'src/metrics/regression_1/'
+# }
 print(par)
 sys.path.append(meta['resources_dir'])
 from main import main
