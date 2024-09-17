@@ -10,11 +10,11 @@ from tqdm import tqdm
 
 ## VIASH START
 par = {
-  'multiomics_rna': 'resources/resources_test/grn-benchmark/multiomics_rna.h5ad',
+  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna_0.h5ad',
   "tf_all": 'resources/prior/tf_all.csv',
-  'prediction': 'output/grnboost2/prediction.csv',
-  'max_n_links': 50000
-}
+  'prediction': 'output/grnboost2_donor_0.csv',
+  'max_n_links': 50000,
+  'cell_type_specific': True}
 ## VIASH END
 
 def process_links(net, par):
@@ -24,7 +24,6 @@ def process_links(net, par):
   return net
 # Load scRNA-seq data
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-adata_rna = adata_rna[:100, :100]
 groups = adata_rna.obs.cell_type
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
 X = adata_rna.X.toarray()
@@ -59,7 +58,7 @@ if par['cell_type_specific']:
             grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
         i += 1
 else:
-    grn = infer_grn(X, gene_names, par)       
+    grn = infer_grn(X, par)       
 
 # Save inferred GRN
 grn.to_csv(par['prediction'], sep=',')
