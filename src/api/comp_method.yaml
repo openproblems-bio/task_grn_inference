@@ -41,7 +41,7 @@ functionality:
     - name: --cell_type_specific
       type: boolean
       direction: input
-      default: true
+      default: false
 
 
 

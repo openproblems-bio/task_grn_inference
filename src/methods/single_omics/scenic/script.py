@@ -17,7 +17,7 @@ par = {
   "tf_all": 'resources/prior/tf_all.csv',
   'prediction': 'output/scenic/scenic.csv',
   'temp_dir': 'output/scenic',
-  'num_workers': 10,
+  'num_workers': 20,
   'max_n_links': 50000,
   'rank_threshold': 10000,
   'auc_threshold': 0.05,

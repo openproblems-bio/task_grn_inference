@@ -3,13 +3,13 @@
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 # reg_type=${1} #GB, ridge
 # viash ns build --parallel
-reg_type=ridge
+reg_type=${2}
 
-RUN_ID="celltype_donor_0_subset_${reg_type}"
+RUN_ID=${1}_${2}
 resources_dir="s3://openproblems-data/resources/grn"
 # resources_dir="./resources"
 publish_dir="${resources_dir}/results/${RUN_ID}"
-grn_models_folder="${resources_dir}/grn_models/donor_0_celltype"
+grn_models_folder="${resources_dir}/grn_models/alldonors_default"
 
 subsample=-2
 max_workers=10
@@ -19,18 +19,19 @@ metric_ids="[regression_1, regression_2]"
 param_file="./params/${RUN_ID}.yaml"
 
 grn_names=(
-    # "scglue"
-    # "scenicplus"
-    # "celloracle"
-    # "granie"
-    # "figr"
-    # "collectri"
-    # "genie3"
+    "scglue"
+    "scenicplus"
+    "celloracle"
+    "granie"
+    "figr"
+    "collectri"
+    "genie3"
     "grnboost2"
-    # "ppcor"
+    "ppcor"
     "portia"
     "positive_control"
     "pearson_causal"
+    "pearson"
     )
 
 # Start writing to the YAML file
