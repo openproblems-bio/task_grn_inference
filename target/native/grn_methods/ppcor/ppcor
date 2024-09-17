@@ -203,7 +203,7 @@ function ViashHelp {
   echo ""
   echo "    --cell_type_specific"
   echo "        type: boolean"
-  echo "        default: true"
+  echo "        default: false"
 }
 
 # initialise array
@@ -441,7 +441,7 @@ if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
 if [ -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then
-  VIASH_PAR_CELL_TYPE_SPECIFIC="true"
+  VIASH_PAR_CELL_TYPE_SPECIFIC="false"
 fi
 
 # check whether required files exist

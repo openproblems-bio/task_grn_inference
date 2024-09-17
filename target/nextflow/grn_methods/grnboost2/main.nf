@@ -2924,7 +2924,7 @@ meta = [
         "type" : "boolean",
         "name" : "--cell_type_specific",
         "default" : [
-          true
+          false
         ],
         "required" : false,
         "direction" : "input",
@@ -3060,7 +3060,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/grnboost2",
     "viash_version" : "0.8.6",
-    "git_commit" : "ada50990cdaa1e501c61c67d2528e1fdfe3b0c4b",
+    "git_commit" : "3dd394882f00b33b9b943c37fb54116d663c3f7c",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3083,6 +3083,10 @@ import pandas as pd
 from arboreto.algo import grnboost2
 from distributed import Client, LocalCluster
 from tqdm import tqdm
+import subprocess 
+import scanpy as sc
+
+
 
 
 ## VIASH START
@@ -3124,29 +3128,34 @@ def process_links(net, par):
   return net
 # Load scRNA-seq data
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
+print('Noramlize data')
+sc.pp.normalize_total(adata_rna)
+sc.pp.log1p(adata_rna)
+sc.pp.scale(adata_rna)
 groups = adata_rna.obs.cell_type
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
-X = adata_rna.X.toarray()
+X = adata_rna.X
 
 # Load list of putative TFs
 tfs = np.loadtxt(par["tf_all"], dtype=str)
 tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
 
-# GRN inference
-client = Client(processes=False)
 
-def infer_grn(X, par):
-  print("Infer grn", flush=True)
-  
-  network = grnboost2(X, client_or_address=client, gene_names=gene_names, tf_names=tf_names)
-  network.rename(columns={'TF': 'source', 'target': 'target', 'importance': 'weight'}, inplace=True)
-  network.reset_index(drop=True, inplace=True)
-  network = process_links(network, par)
-  
-  return network
 
 
 if par['cell_type_specific']:
+    # GRN inference
+  client = Client(processes=False)
+
+  def infer_grn(X, par):
+    print("Infer grn", flush=True)
+    
+    network = grnboost2(X, client_or_address=client, gene_names=gene_names, tf_names=tf_names)
+    network.rename(columns={'TF': 'source', 'target': 'target', 'importance': 'weight'}, inplace=True)
+    network.reset_index(drop=True, inplace=True)
+    network = process_links(network, par)
+    
+    return network
     i = 0
     for group in tqdm(np.unique(groups), desc="Processing groups"):
         X_sub = X[groups == group, :]
@@ -3158,7 +3167,17 @@ if par['cell_type_specific']:
             grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
         i += 1
 else:
-    grn = infer_grn(X, par)       
+  local_cluster = LocalCluster(n_workers=10, 
+                             threads_per_worker=1)
+
+  custom_client = Client(local_cluster)
+  network = grnboost2(X, client_or_address=custom_client, gene_names=gene_names, tf_names=tf_names)
+  network.rename(columns={'TF': 'source', 'target': 'target', 'importance': 'weight'}, inplace=True)
+  network.reset_index(drop=True, inplace=True)
+  grn = process_links(network, par)
+  custom_client.close()
+  local_cluster.close()
+           
 
 # Save inferred GRN
 grn.to_csv(par['prediction'], sep=',')

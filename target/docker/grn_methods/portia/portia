@@ -203,7 +203,7 @@ function ViashHelp {
   echo ""
   echo "    --cell_type_specific"
   echo "        type: boolean"
-  echo "        default: true"
+  echo "        default: false"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -430,9 +430,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata" "numpy" "scipy" "scikit-learn" "portia-grn"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods portia"
-LABEL org.opencontainers.image.created="2024-09-17T07:03:51Z"
+LABEL org.opencontainers.image.created="2024-09-17T16:11:15Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="ada50990cdaa1e501c61c67d2528e1fdfe3b0c4b"
+LABEL org.opencontainers.image.revision="3dd394882f00b33b9b943c37fb54116d663c3f7c"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -840,7 +840,7 @@ if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
 if [ -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then
-  VIASH_PAR_CELL_TYPE_SPECIFIC="true"
+  VIASH_PAR_CELL_TYPE_SPECIFIC="false"
 fi
 
 # check whether required files exist

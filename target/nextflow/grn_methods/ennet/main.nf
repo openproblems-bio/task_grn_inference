@@ -2924,7 +2924,7 @@ meta = [
         "type" : "boolean",
         "name" : "--cell_type_specific",
         "default" : [
-          true
+          false
         ],
         "required" : false,
         "direction" : "input",
@@ -3075,7 +3075,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ennet",
     "viash_version" : "0.8.6",
-    "git_commit" : "ada50990cdaa1e501c61c67d2528e1fdfe3b0c4b",
+    "git_commit" : "3dd394882f00b33b9b943c37fb54116d663c3f7c",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

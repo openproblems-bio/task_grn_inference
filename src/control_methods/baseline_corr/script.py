@@ -9,15 +9,16 @@ from sklearn.preprocessing import StandardScaler
 
 ## VIASH START
 par = {
-    'multiomics_rna': 'resources/grn-benchmark/perturbation_data.h5ad',
+    'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
     'tf_all': 'resources/prior/tf_all.csv',
-    'causal': True,
+    'causal': False,
     'metacell': False,
-    'cell_type_specific': True,
+    'cell_type_specific': False,
     'impute': False,
     'max_n_links': 50000,
     'corr_method': 'pearson',
-    'prediction': 'resources/grn_models/positive_control.csv'
+    'prediction': 'resources/grn_models/alldonors_default/pearson.csv',
+    "seed": 32
 }
 ## VIASH END
 print(par)
