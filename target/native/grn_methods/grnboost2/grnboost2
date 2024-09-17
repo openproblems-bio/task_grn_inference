@@ -594,7 +594,6 @@ def process_links(net, par):
   return net
 # Load scRNA-seq data
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-adata_rna = adata_rna[:100, :100]
 groups = adata_rna.obs.cell_type
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
 X = adata_rna.X.toarray()
@@ -629,7 +628,7 @@ if par['cell_type_specific']:
             grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
         i += 1
 else:
-    grn = infer_grn(X, gene_names, par)       
+    grn = infer_grn(X, par)       
 
 # Save inferred GRN
 grn.to_csv(par['prediction'], sep=',')

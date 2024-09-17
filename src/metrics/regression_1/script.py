@@ -7,21 +7,21 @@ import numpy as np
 par = {
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
   "tf_all": "resources/prior/tf_all.csv",
-  "prediction": "output/scenic/scenic.csv",
+  "prediction": "output/portia_celltype_0.csv",
   "method_id": "scenic",
   "min_tf": False,
   "max_n_links": 50000,
   "apply_tf": "true",
   'score': 'output/score.h5ad',
   'reg_type': 'ridge',
-  'layer': 'pearson',
-  'subsample': 200,
+  'layer': 'scgen_pearson',
+  'subsample': -2,
   'max_workers': 4,
 }
 ## VIASH END
-# meta = {
-#   "resources_dir":'src/metrics/regression_1/'
-# }
+meta = {
+  "resources_dir":'src/metrics/regression_1/'
+}
 sys.path.append(meta["resources_dir"])
 from main import main 
 

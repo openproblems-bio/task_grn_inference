@@ -183,7 +183,7 @@ def run_grn(par):
         region_lens=atac.var.loc[peaks, "chromEnd"] - atac.var.loc[peaks, "chromStart"],
         random_state=0)
 
-    flank_bed = scglue.genomics.Bed(rna.var.loc[genes]).strand_specific_start_site().expand(500, 500)
+    flank_bed = scglue.genomics.Bed(rna.var.loc[genes]).strand_specific_start_site().expand(10000, 10000)
     flank2tf = scglue.genomics.window_graph(flank_bed, motif_bed, 0, right_sorted=True)
 
     gene2flank = nx.Graph([(g, g) for g in genes])
@@ -241,16 +241,17 @@ def prune_grn(par):
     par['motif_annotation'] = 'output/scenic/databases/motifs-v10nr_clust-nr.hgnc-m0.001-o0.0.tbl'
 
     command = [
-        "pyscenic", "ctx",
+        "pyscenic", "ctx", 
         f"{par['temp_dir']}/draft_grn.csv",
-        par['genes_vs_motifs_500'],
-        par['genes_vs_motifs_10k'],
-        "--annotations_fname", par['motif_annotation'],
+        f"{par['temp_dir']}/glue.genes_vs_tracks.rankings.feather",
+        f"{par['temp_dir']}/supp.genes_vs_tracks.rankings.feather",
+        "--annotations_fname", f"{par['temp_dir']}/ctx_annotation.tsv",
         "--expression_mtx_fname", f"{par['temp_dir']}/rna.loom",
         "--output", f"{par['temp_dir']}/pruned_grn.csv",
-        "--rank_threshold", "10000",
-        "--auc_threshold", "0.1",
-        "--nes_threshold", "2",
+        # "--top_n_targets", "100",
+        # "--rank_threshold", "1500",
+        # "--auc_threshold", "0.1",
+        # "--nes_threshold", "0",
         "--mask_dropouts",
         "--min_genes", "1",
         "--num_workers", f"{par['num_workers']}",
@@ -293,15 +294,15 @@ def main(par):
     print("Number of GPUs:", torch.cuda.device_count())
     
     os.makedirs(par['temp_dir'], exist_ok=True)
-    # print('Reading input files', flush=True)
-    # rna = ad.read_h5ad(par['multiomics_rna'])
-    # atac = ad.read_h5ad(par['multiomics_atac'])
+    print('Reading input files', flush=True)
+    rna = ad.read_h5ad(par['multiomics_rna'])
+    atac = ad.read_h5ad(par['multiomics_atac'])
 
-    # print('Preprocess data', flush=True)
-    # preprocess(rna, atac, par)
-    # print('Train a model', flush=True)
-    # training(par)
-    # run_grn(par)
+    print('Preprocess data', flush=True)
+    preprocess(rna, atac, par)
+    print('Train a model', flush=True)
+    training(par)
+    run_grn(par)
     prune_grn(par)
     print('Curate predictions', flush=True)
     pruned_grn = pd.read_csv(

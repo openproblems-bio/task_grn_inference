@@ -3060,7 +3060,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/grnboost2",
     "viash_version" : "0.8.6",
-    "git_commit" : "423be33b2c0e789f3c220a042650a4d4d0fd78b5",
+    "git_commit" : "fb851e790c5831639af97bf94b166fe24ee2ee52",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3124,7 +3124,6 @@ def process_links(net, par):
   return net
 # Load scRNA-seq data
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-adata_rna = adata_rna[:100, :100]
 groups = adata_rna.obs.cell_type
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
 X = adata_rna.X.toarray()
@@ -3159,7 +3158,7 @@ if par['cell_type_specific']:
             grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
         i += 1
 else:
-    grn = infer_grn(X, gene_names, par)       
+    grn = infer_grn(X, par)       
 
 # Save inferred GRN
 grn.to_csv(par['prediction'], sep=',')

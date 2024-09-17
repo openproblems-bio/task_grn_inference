@@ -9,9 +9,9 @@ par = {
   "multiomics_atac": "resources/grn-benchmark/multiomics_atac_0.h5ad",
   "motif_file": "resources/supplementary/JASPAR2022-hg38.bed.gz",
   "annotation_file": "resources/supplementary/gencode.v45.annotation.gtf.gz",
-  "temp_dir": 'output/scglue/',
+  "temp_dir": 'output/scglue_ext/',
   "num_workers": 20,
-  "prediction": "output/scglue/prediction.csv",
+  "prediction": "resources/scglue/prediction.csv",
 }
 ## VIASH END
 meta = {

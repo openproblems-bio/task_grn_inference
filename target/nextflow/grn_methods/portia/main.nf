@@ -3058,7 +3058,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia",
     "viash_version" : "0.8.6",
-    "git_commit" : "423be33b2c0e789f3c220a042650a4d4d0fd78b5",
+    "git_commit" : "fb851e790c5831639af97bf94b166fe24ee2ee52",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3080,6 +3080,7 @@ import numpy as np
 import pandas as pd
 import scipy.sparse
 import portia as pt
+from tqdm import tqdm
 
 
 ## VIASH START
@@ -3126,17 +3127,6 @@ def process_links(net, par):
   net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
   net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
   return net
-# Remove genes with >=90% of zeros
-if False:
-  # Remove genes with >=90% of zeros
-  mask = (np.mean(X == 0, axis=0) >= 0.9)
-  X = X[:, ~mask]
-  gene_names = gene_names[~mask]
-
-  # Remove samples with >=90% of zeros
-  mask = (np.mean(X == 0, axis=1) >= 0.9)
-  adata_rna = X[~mask, :]
-
 
 # Load list of putative TFs
 tfs = np.loadtxt(par['tf_all'], dtype=str)
@@ -3160,26 +3150,25 @@ def infer_grn(X, gene_names):
   grn = process_links(grn, par)
   return grn
 
-groups = adata_rna.obs.cell_type.unique()
-i = 0
-for group in tqdm(np.unique(groups), desc="Processing groups"):
-  X_sub = X[groups == group, :]
-  
-  net = infer_grn(X_sub, gene_names)
-  net['cell_type'] = group
-  if i==0:
-      grn = net
-  else:
-      grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
+if par['cell_type_specific']:
+  groups = adata_rna.obs.cell_type
+  i = 0
+  for group in tqdm(np.unique(groups), desc="Processing groups"):
+    X_sub = X[groups == group, :]
+    
+    net = infer_grn(X_sub, gene_names)
+    net['cell_type'] = group
+    if i==0:
+        grn = net
+    else:
+        grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
 
-  i += 1
+    i += 1
         
-grn.drop(columns=['cell_type'], inplace=True)
-grn = grn.groupby(['source', 'target']).mean().reset_index()
-grn = process_links(grn, par)        
+else:
+  grn = infer_grn(X, gene_names)
 
 grn.to_csv(par['prediction'])
-
 
 # # Save inferred GRN
 # with open(par['prediction'], 'w') as f:

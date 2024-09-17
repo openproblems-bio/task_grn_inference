@@ -108,8 +108,6 @@ functionality:
       repository: openproblems
     - name: metrics/regression_2 
     - name: metrics/regression_1
-    - name: control_methods/negative_control
-    - name: control_methods/baseline_corr
   repositories:
     - name: openproblems
       type: github

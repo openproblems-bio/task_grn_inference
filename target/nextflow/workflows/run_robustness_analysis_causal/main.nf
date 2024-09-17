@@ -2984,9 +2984,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems",
           "tag" : "v2.0.0",
-          "localPath" : "/tmp/viash_hub_repo16952239197825886999"
+          "localPath" : "/tmp/viash_hub_repo129059872621099270"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo16952239197825886999/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo129059872621099270/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_tag" : "v1.0.0-1413-gb782e93f",
@@ -3017,7 +3017,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "423be33b2c0e789f3c220a042650a4d4d0fd78b5",
+          "git_commit" : "fb851e790c5831639af97bf94b166fe24ee2ee52",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
@@ -3038,7 +3038,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "423be33b2c0e789f3c220a042650a4d4d0fd78b5",
+          "git_commit" : "fb851e790c5831639af97bf94b166fe24ee2ee52",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
@@ -3059,7 +3059,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "423be33b2c0e789f3c220a042650a4d4d0fd78b5",
+          "git_commit" : "fb851e790c5831639af97bf94b166fe24ee2ee52",
           "executable" : "/nextflow/control_methods/baseline_corr/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/baseline_corr"
@@ -3122,7 +3122,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_robustness_analysis_causal",
     "viash_version" : "0.8.6",
-    "git_commit" : "423be33b2c0e789f3c220a042650a4d4d0fd78b5",
+    "git_commit" : "fb851e790c5831639af97bf94b166fe24ee2ee52",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
