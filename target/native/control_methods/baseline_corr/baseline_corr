@@ -757,9 +757,7 @@ groups = multiomics_rna.obs.cell_type
 tf_all = np.intersect1d(tf_all, gene_names)
 
 print('Noramlize data')
-sc.pp.normalize_total(multiomics_rna)
-sc.pp.log1p(multiomics_rna)
-sc.pp.scale(multiomics_rna)
+multiomics_rna.X = multiomics_rna.layers['lognorm'] 
 
 if par['impute']:
     print("imputing")

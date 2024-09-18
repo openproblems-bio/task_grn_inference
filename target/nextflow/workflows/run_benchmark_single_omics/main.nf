@@ -2967,9 +2967,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems",
           "tag" : "v2.0.0",
-          "localPath" : "/tmp/viash_hub_repo1542581214721898466"
+          "localPath" : "/tmp/viash_hub_repo16565088273402976941"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo1542581214721898466/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo16565088273402976941/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_tag" : "v1.0.0-1413-gb782e93f",
@@ -3000,7 +3000,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "e7a9781f1e77339a879199abf5977d777cf27ece",
+          "git_commit" : "d11df98602c3733c3f42b2b07a89a58f829b9a76",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
@@ -3021,7 +3021,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "e7a9781f1e77339a879199abf5977d777cf27ece",
+          "git_commit" : "d11df98602c3733c3f42b2b07a89a58f829b9a76",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
@@ -3042,7 +3042,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "e7a9781f1e77339a879199abf5977d777cf27ece",
+          "git_commit" : "d11df98602c3733c3f42b2b07a89a58f829b9a76",
           "executable" : "/nextflow/grn_methods/portia/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia"
@@ -3063,7 +3063,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "e7a9781f1e77339a879199abf5977d777cf27ece",
+          "git_commit" : "d11df98602c3733c3f42b2b07a89a58f829b9a76",
           "executable" : "/nextflow/grn_methods/ennet/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ennet"
@@ -3084,7 +3084,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "e7a9781f1e77339a879199abf5977d777cf27ece",
+          "git_commit" : "d11df98602c3733c3f42b2b07a89a58f829b9a76",
           "executable" : "/nextflow/grn_methods/genie3/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/genie3"
@@ -3105,7 +3105,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "e7a9781f1e77339a879199abf5977d777cf27ece",
+          "git_commit" : "d11df98602c3733c3f42b2b07a89a58f829b9a76",
           "executable" : "/nextflow/grn_methods/grnboost2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/grnboost2"
@@ -3126,7 +3126,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "e7a9781f1e77339a879199abf5977d777cf27ece",
+          "git_commit" : "d11df98602c3733c3f42b2b07a89a58f829b9a76",
           "executable" : "/nextflow/grn_methods/ppcor/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ppcor"
@@ -3147,7 +3147,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "e7a9781f1e77339a879199abf5977d777cf27ece",
+          "git_commit" : "d11df98602c3733c3f42b2b07a89a58f829b9a76",
           "executable" : "/nextflow/grn_methods/scgpt/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scgpt"
@@ -3168,7 +3168,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "e7a9781f1e77339a879199abf5977d777cf27ece",
+          "git_commit" : "d11df98602c3733c3f42b2b07a89a58f829b9a76",
           "executable" : "/nextflow/grn_methods/scenic/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenic"
@@ -3232,7 +3232,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_benchmark_single_omics",
     "viash_version" : "0.8.6",
-    "git_commit" : "e7a9781f1e77339a879199abf5977d777cf27ece",
+    "git_commit" : "d11df98602c3733c3f42b2b07a89a58f829b9a76",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

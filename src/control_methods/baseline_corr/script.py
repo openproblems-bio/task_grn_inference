@@ -9,15 +9,15 @@ from sklearn.preprocessing import StandardScaler
 
 ## VIASH START
 par = {
-    'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
+    'multiomics_rna': 'resources/grn-benchmark/multiomics_rna_0.h5ad',
     'tf_all': 'resources/prior/tf_all.csv',
-    'causal': False,
+    'causal': True,
     'metacell': False,
     'cell_type_specific': False,
     'impute': False,
     'max_n_links': 50000,
     'corr_method': 'pearson',
-    'prediction': 'resources/grn_models/alldonors_default/pearson.csv',
+    'prediction': 'resources/grn_models/donor_0_default/pearson_causal.csv',
     "seed": 32
 }
 ## VIASH END
@@ -96,9 +96,7 @@ groups = multiomics_rna.obs.cell_type
 tf_all = np.intersect1d(tf_all, gene_names)
 
 print('Noramlize data')
-sc.pp.normalize_total(multiomics_rna)
-sc.pp.log1p(multiomics_rna)
-sc.pp.scale(multiomics_rna)
+multiomics_rna.X = multiomics_rna.layers['lognorm'] 
 
 if par['impute']:
     print("imputing")

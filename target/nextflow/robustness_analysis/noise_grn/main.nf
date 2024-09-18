@@ -2918,7 +2918,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/robustness_analysis/noise_grn",
     "viash_version" : "0.8.6",
-    "git_commit" : "e7a9781f1e77339a879199abf5977d777cf27ece",
+    "git_commit" : "d11df98602c3733c3f42b2b07a89a58f829b9a76",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
