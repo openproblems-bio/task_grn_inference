@@ -610,9 +610,10 @@ def infer_grn(X, gene_names):
   dataset = pt.GeneExpressionDataset()
   for exp_id, data in enumerate(X):
       dataset.add(pt.Experiment(exp_id, data))
+  
   M_bar = pt.run(dataset, method='no-transform')
-
-  ranked_scores = pt.rank_scores(M_bar, gene_names)
+  limit = min([10000000, X.size])
+  ranked_scores = pt.rank_scores(M_bar, gene_names, limit=limit)
   sources, targets, weights = zip(*[(gene_a, gene_b, score) for gene_a, gene_b, score in ranked_scores])
 
   grn = pd.DataFrame({'source':sources, 'target':targets, 'weight':weights})

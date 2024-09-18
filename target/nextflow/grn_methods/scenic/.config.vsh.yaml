@@ -178,7 +178,7 @@ functionality:
 platforms:
 - type: "docker"
   id: "docker"
-  image: "janursa/scenicplus:19-08-2024"
+  image: "aertslab/pyscenic:0.12.1"
   target_organization: "openproblems-bio/task_grn_inference"
   target_registry: "ghcr.io"
   namespace_separator: "/"
@@ -233,5 +233,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenic"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenic/scenic"
   viash_version: "0.8.6"
-  git_commit: "f95029d8d6a4949ae23b2e2c99249c7807f3c41f"
+  git_commit: "51aba978da8201f3bdde9bd9e3c1f29e49c73672"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

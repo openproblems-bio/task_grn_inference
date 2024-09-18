@@ -3058,7 +3058,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia",
     "viash_version" : "0.8.6",
-    "git_commit" : "f95029d8d6a4949ae23b2e2c99249c7807f3c41f",
+    "git_commit" : "51aba978da8201f3bdde9bd9e3c1f29e49c73672",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3138,9 +3138,10 @@ def infer_grn(X, gene_names):
   dataset = pt.GeneExpressionDataset()
   for exp_id, data in enumerate(X):
       dataset.add(pt.Experiment(exp_id, data))
+  
   M_bar = pt.run(dataset, method='no-transform')
-
-  ranked_scores = pt.rank_scores(M_bar, gene_names)
+  limit = min([10000000, X.size])
+  ranked_scores = pt.rank_scores(M_bar, gene_names, limit=limit)
   sources, targets, weights = zip(*[(gene_a, gene_b, score) for gene_a, gene_b, score in ranked_scores])
 
   grn = pd.DataFrame({'source':sources, 'target':targets, 'weight':weights})

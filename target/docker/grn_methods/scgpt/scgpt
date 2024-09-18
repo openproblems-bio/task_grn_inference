@@ -458,9 +458,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scgpt"
-LABEL org.opencontainers.image.created="2024-09-18T08:09:01Z"
+LABEL org.opencontainers.image.created="2024-09-18T14:00:11Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="f95029d8d6a4949ae23b2e2c99249c7807f3c41f"
+LABEL org.opencontainers.image.revision="51aba978da8201f3bdde9bd9e3c1f29e49c73672"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

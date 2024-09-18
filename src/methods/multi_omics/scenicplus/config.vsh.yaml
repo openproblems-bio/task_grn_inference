@@ -1,4 +1,4 @@
-__merge__: ../../../api/comp_method_mo.yaml
+__merge__: ../../../api/comp_method.yaml
 
 
 functionality:
@@ -39,10 +39,12 @@ functionality:
 
 platforms:
   - type: docker
-    image: apassemi/scenicplus:1.0.1
-    setup:
-      - type: python
-        packages: [ flatbuffers ]
+    # image: apassemi/scenicplus:1.0.1
+    # image: vanallenlab/scenicplus_x86_64:initial
+    image: aertslab/pyscenic:0.12.1
+    # setup:
+    #   - type: python
+    #     packages: [ flatbuffers ]
   - type: native
   - type: nextflow
     directives:

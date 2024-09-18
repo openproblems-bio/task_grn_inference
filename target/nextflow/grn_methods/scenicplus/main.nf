@@ -2934,41 +2934,6 @@ meta = [
       },
       {
         "type" : "file",
-        "name" : "--multiomics_atac",
-        "info" : {
-          "label" : "multiomics atac",
-          "summary" : "Peak data for multiomics data.",
-          "file_type" : "h5ad",
-          "slots" : {
-            "obs" : [
-              {
-                "name" : "cell_type",
-                "type" : "string",
-                "description" : "The annotated cell type of each cell based on RNA expression.",
-                "required" : true
-              },
-              {
-                "name" : "donor_id",
-                "type" : "string",
-                "description" : "Donor id",
-                "required" : true
-              }
-            ]
-          }
-        },
-        "example" : [
-          "resources_test/grn-benchmark/multiomics_atac.h5ad"
-        ],
-        "must_exist" : false,
-        "create_parent" : true,
-        "required" : true,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "file",
         "name" : "--scplus_mdata",
         "description" : "Main output object.",
         "default" : [
@@ -3068,8 +3033,8 @@ meta = [
       "type" : "methods",
       "type_info" : {
         "label" : "Method",
-        "summary" : "A GRN inference method for multiomics grn",
-        "description" : "A method for inferring GRN from atac and rna data.\n"
+        "summary" : "A GRN inference method",
+        "description" : "A method for inferring GRN from expression data.\n"
       }
     },
     "status" : "enabled",
@@ -3079,24 +3044,14 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "apassemi/scenicplus:1.0.1",
+      "image" : "aertslab/pyscenic:0.12.1",
       "target_organization" : "openproblems-bio/task_grn_inference",
       "target_registry" : "ghcr.io",
       "namespace_separator" : "/",
       "resolve_volume" : "Automatic",
       "chown" : true,
       "setup_strategy" : "ifneedbepullelsecachedbuild",
-      "target_image_source" : "https://github.com/openproblems-bio/task_grn_inference",
-      "setup" : [
-        {
-          "type" : "python",
-          "user" : false,
-          "packages" : [
-            "flatbuffers"
-          ],
-          "upgrade" : true
-        }
-      ]
+      "target_image_source" : "https://github.com/openproblems-bio/task_grn_inference"
     },
     {
       "type" : "native",
@@ -3147,7 +3102,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "f95029d8d6a4949ae23b2e2c99249c7807f3c41f",
+    "git_commit" : "51aba978da8201f3bdde9bd9e3c1f29e49c73672",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3163,19 +3118,19 @@ def innerWorkflowFactory(args) {
 tempscript=".viash_script.sh"
 cat > "$tempscript" << VIASHMAIN
 import os
-import sys
-import yaml
-import pickle
-import tempfile
-import contextlib
-import hashlib
-import shutil
-import requests
-import traceback
-import subprocess
-import gc
-import gzip
-import tarfile
+# import sys
+# import yaml
+# import pickle
+# import tempfile
+# import contextlib
+# import hashlib
+# import shutil
+# import requests
+# import traceback
+# import subprocess
+# import gc
+# import gzip
+# import tarfile
 # from urllib.request import urlretrieve
 
 # import numpy as np
@@ -3215,7 +3170,6 @@ par = {
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'multiomics_atac': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_ATAC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'scplus_mdata': $( if [ ! -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then echo "r'${VIASH_PAR_SCPLUS_MDATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'qc': $( if [ ! -z ${VIASH_PAR_QC+x} ]; then echo "r'${VIASH_PAR_QC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3247,8 +3201,10 @@ dep = {
 # setattr(pycisTopic.loom, 'TSNE', TSNE)
 # os.environ['MALLET_MEMORY'] = '200G'
 
-atac_dir = f"output/scenicplus/atac/"
-os.makedirs(atac_dir)
+atac_dir = f"output/gulack/"
+print(atac_dir)
+os.makedirs(atac_dir, exist_ok=True)
+os.makedirs(f'{atac_dir}/atac', exist_ok=True)
 raise ValueError('here')
 
 # Get list of samples (e.g., donors)

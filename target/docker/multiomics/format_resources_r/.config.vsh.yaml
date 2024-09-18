@@ -160,5 +160,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/multiomics/format_resources_r"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/multiomics/format_resources_r/format_resources_r"
   viash_version: "0.8.6"
-  git_commit: "f95029d8d6a4949ae23b2e2c99249c7807f3c41f"
+  git_commit: "51aba978da8201f3bdde9bd9e3c1f29e49c73672"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
