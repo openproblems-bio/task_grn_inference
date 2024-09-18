@@ -30,7 +30,8 @@ functionality:
 
 platforms:
   - type: docker
-    image: aertslab/pyscenic:0.12.1
+    # image: aertslab/pyscenic:0.12.1
+    image: janursa/scenicplus:19-08-2024
     setup:
     #   - type: docker
     #     run: |
