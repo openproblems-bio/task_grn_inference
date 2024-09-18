@@ -19,7 +19,14 @@ workflow run_wf {
     grnboost2,
     ppcor,
     scgpt,
-    scenic
+    scenic,
+
+    pearson_corr,
+    pearson_causal,
+    negative_control,
+    positive_control,
+
+    celloracle
   ]
 
 
@@ -47,7 +54,6 @@ workflow run_wf {
     //     ]
     //   }
     // )
-    
   /***************************
    * RUN METHODS AND METRICS *
    ***************************/
@@ -74,7 +80,11 @@ workflow run_wf {
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
         multiomics_rna: "multiomics_rna",
+        multiomics_atac: "multiomics_atac",
         tf_all: "tf_all",
+        perturbation_data:"perturbation_data",
+        cell_type_specific:"cell_type_specific"
+
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->
@@ -105,7 +115,8 @@ workflow run_wf {
         max_workers: "max_workers",
         consensus: "consensus",
         tf_all: "tf_all",
-        layer:"layer"
+        layer:"layer",
+        cell_type_specific:"cell_type_specific"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->

@@ -7,7 +7,6 @@ functionality:
     label: baseline_corr
     summary: "Baseline based on correlation"
   arguments:
-
     - name: --causal
       type: boolean 
       direction: input

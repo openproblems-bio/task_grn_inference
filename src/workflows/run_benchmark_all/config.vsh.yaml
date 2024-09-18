@@ -1,9 +1,9 @@
 
 functionality:
-  name: run_benchmark_single_omics
+  name: run_benchmark
   namespace: "workflows"
   info:
-    label: run_benchmark_single_omics
+    label: run_benchmark
     summary: "Infer GRNs and evaluate each prediction for single omics grns"
 
   argument_groups:
@@ -12,9 +12,9 @@ functionality:
         - name: --multiomics_rna
           type: file
           direction: input
-        # - name: --multiomics_atac
-        #   type: file
-        #   direction: input
+        - name: --multiomics_atac
+          type: file
+          direction: input
         - name: --perturbation_data
           type: file
           direction: input
@@ -49,6 +49,12 @@ functionality:
           required: false
           direction: input
           default: pearson
+        - name: --cell_type_specific
+          type: boolean
+          required: false
+          direction: input
+          default: true
+          
         
     - name: Outputs
       arguments:
@@ -92,8 +98,13 @@ functionality:
     - name: grn_methods/ppcor
     # - name: grn_methods/scsgl
     # - name: grn_methods/tigress
+    - name: grn_methods/celloracle
     - name: grn_methods/scgpt
     - name: grn_methods/scenic
+    - name: control_methods/pearson_corr
+    - name: control_methods/pearson_causal
+    - name: control_methods/negative_control
+    - name: control_methods/positive_control
   repositories:
     - name: openproblems
       type: github
