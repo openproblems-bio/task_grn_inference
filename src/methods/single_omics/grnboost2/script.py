@@ -26,7 +26,7 @@ def process_links(net, par):
   return net
 # Load scRNA-seq data
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-adata_rna.X = adata_rna.layers['lognorm'] #TODO: fix this
+# adata_rna.X = adata_rna.layers['lognorm'] #TODO: fix this
 groups = adata_rna.obs.cell_type
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
 X = adata_rna.X
@@ -48,7 +48,7 @@ def infer_grn(X, par):
   
   return network
 
-
+# par['cell_type_specific'] = False
 if par['cell_type_specific']:
     i = 0
     for group in tqdm(np.unique(groups), desc="Processing groups"):

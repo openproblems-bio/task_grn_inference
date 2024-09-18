@@ -51,7 +51,8 @@ def corr_net(X, gene_names, par):
     return net
 
 def create_corr_net(X, gene_names, groups, par):
-    if par['cell_type_specific']:
+    # if par['cell_type_specific']:
+    if True:
         i = 0
         for group in tqdm(np.unique(groups), desc="Processing groups"):
             X_sub = X[groups == group, :]
@@ -96,7 +97,9 @@ groups = multiomics_rna.obs.cell_type
 tf_all = np.intersect1d(tf_all, gene_names)
 
 print('Noramlize data')
-multiomics_rna.X = multiomics_rna.layers['lognorm'] 
+sc.pp.normalize_total(multiomics_rna)
+sc.pp.log1p(multiomics_rna)
+sc.pp.scale(multiomics_rna)
 
 if par['impute']:
     print("imputing")

@@ -203,7 +203,7 @@ function ViashHelp {
   echo ""
   echo "    --cell_type_specific"
   echo "        type: boolean"
-  echo "        default: false"
+  echo "        default: true"
   echo ""
   echo "    --M"
   echo "        type: integer"
@@ -457,7 +457,7 @@ if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
 if [ -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then
-  VIASH_PAR_CELL_TYPE_SPECIFIC="false"
+  VIASH_PAR_CELL_TYPE_SPECIFIC="true"
 fi
 if [ -z ${VIASH_PAR_M+x} ]; then
   VIASH_PAR_M="100"

@@ -203,7 +203,7 @@ function ViashHelp {
   echo ""
   echo "    --cell_type_specific"
   echo "        type: boolean"
-  echo "        default: false"
+  echo "        default: true"
   echo ""
   echo "    --model_file"
   echo "        type: file, file must exist"
@@ -536,7 +536,7 @@ if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
 if [ -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then
-  VIASH_PAR_CELL_TYPE_SPECIFIC="false"
+  VIASH_PAR_CELL_TYPE_SPECIFIC="true"
 fi
 if [ -z ${VIASH_PAR_MODEL_FILE+x} ]; then
   VIASH_PAR_MODEL_FILE="resources_test/supplementary/finetuned_scGPT_adamson/best_model.pt"

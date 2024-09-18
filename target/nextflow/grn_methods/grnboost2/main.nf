@@ -2924,7 +2924,7 @@ meta = [
         "type" : "boolean",
         "name" : "--cell_type_specific",
         "default" : [
-          false
+          true
         ],
         "required" : false,
         "direction" : "input",
@@ -3060,7 +3060,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/grnboost2",
     "viash_version" : "0.8.6",
-    "git_commit" : "d11df98602c3733c3f42b2b07a89a58f829b9a76",
+    "git_commit" : "f95029d8d6a4949ae23b2e2c99249c7807f3c41f",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3126,7 +3126,7 @@ def process_links(net, par):
   return net
 # Load scRNA-seq data
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-adata_rna.X = adata_rna.layers['lognorm'] #TODO: fix this
+# adata_rna.X = adata_rna.layers['lognorm'] #TODO: fix this
 groups = adata_rna.obs.cell_type
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
 X = adata_rna.X
@@ -3148,7 +3148,7 @@ def infer_grn(X, par):
   
   return network
 
-
+# par['cell_type_specific'] = False
 if par['cell_type_specific']:
     i = 0
     for group in tqdm(np.unique(groups), desc="Processing groups"):

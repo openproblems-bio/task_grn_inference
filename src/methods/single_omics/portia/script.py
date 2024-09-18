@@ -52,7 +52,7 @@ def infer_grn(X, gene_names):
 
   grn = process_links(grn, par)
   return grn
-
+# par['cell_type_specific'] = False
 if par['cell_type_specific']:
   groups = adata_rna.obs.cell_type
   i = 0

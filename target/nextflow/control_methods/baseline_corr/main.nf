@@ -2924,7 +2924,7 @@ meta = [
         "type" : "boolean",
         "name" : "--cell_type_specific",
         "default" : [
-          false
+          true
         ],
         "required" : false,
         "direction" : "input",
@@ -3100,7 +3100,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/baseline_corr",
     "viash_version" : "0.8.6",
-    "git_commit" : "d11df98602c3733c3f42b2b07a89a58f829b9a76",
+    "git_commit" : "f95029d8d6a4949ae23b2e2c99249c7807f3c41f",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3189,7 +3189,8 @@ def corr_net(X, gene_names, par):
     return net
 
 def create_corr_net(X, gene_names, groups, par):
-    if par['cell_type_specific']:
+    # if par['cell_type_specific']:
+    if True:
         i = 0
         for group in tqdm(np.unique(groups), desc="Processing groups"):
             X_sub = X[groups == group, :]
@@ -3234,7 +3235,9 @@ groups = multiomics_rna.obs.cell_type
 tf_all = np.intersect1d(tf_all, gene_names)
 
 print('Noramlize data')
-multiomics_rna.X = multiomics_rna.layers['lognorm'] 
+sc.pp.normalize_total(multiomics_rna)
+sc.pp.log1p(multiomics_rna)
+sc.pp.scale(multiomics_rna)
 
 if par['impute']:
     print("imputing")

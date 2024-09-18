@@ -203,7 +203,7 @@ function ViashHelp {
   echo ""
   echo "    --cell_type_specific"
   echo "        type: boolean"
-  echo "        default: false"
+  echo "        default: true"
   echo ""
   echo "    --M"
   echo "        type: integer"
@@ -441,9 +441,9 @@ R CMD build ennet && \
 R CMD INSTALL ennet
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods ennet"
-LABEL org.opencontainers.image.created="2024-09-18T06:27:14Z"
+LABEL org.opencontainers.image.created="2024-09-18T08:09:00Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="d11df98602c3733c3f42b2b07a89a58f829b9a76"
+LABEL org.opencontainers.image.revision="f95029d8d6a4949ae23b2e2c99249c7807f3c41f"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -862,7 +862,7 @@ if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
 if [ -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then
-  VIASH_PAR_CELL_TYPE_SPECIFIC="false"
+  VIASH_PAR_CELL_TYPE_SPECIFIC="true"
 fi
 if [ -z ${VIASH_PAR_M+x} ]; then
   VIASH_PAR_M="100"

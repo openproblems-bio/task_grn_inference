@@ -2924,7 +2924,7 @@ meta = [
         "type" : "boolean",
         "name" : "--cell_type_specific",
         "default" : [
-          false
+          true
         ],
         "required" : false,
         "direction" : "input",
@@ -3020,7 +3020,7 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "aertslab/pyscenic:0.12.1",
+      "image" : "janursa/scenicplus:19-08-2024",
       "target_organization" : "openproblems-bio/task_grn_inference",
       "target_registry" : "ghcr.io",
       "namespace_separator" : "/",
@@ -3088,7 +3088,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenic",
     "viash_version" : "0.8.6",
-    "git_commit" : "d11df98602c3733c3f42b2b07a89a58f829b9a76",
+    "git_commit" : "f95029d8d6a4949ae23b2e2c99249c7807f3c41f",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

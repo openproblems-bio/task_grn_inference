@@ -12,32 +12,33 @@ import subprocess
 import gc
 import gzip
 import tarfile
-from urllib.request import urlretrieve
+# from urllib.request import urlretrieve
 
-import numpy as np
-import scanpy as sc
-import pandas as pd
-import anndata
-import pyranges as pr
-from pycistarget.utils import region_names_to_coordinates
-from scenicplus.wrappers.run_pycistarget import run_pycistarget
-import polars
-import scrublet as scr
-from sklearn.manifold import TSNE
-import pycisTopic.loom
-from pycisTopic.pseudobulk_peak_calling import export_pseudobulk, peak_calling
-from pycisTopic.iterative_peak_calling import get_consensus_peaks
-from pycisTopic.cistopic_class import create_cistopic_object_from_fragments, merge
-from pycisTopic.qc import get_barcodes_passing_qc_for_sample
-from pycisTopic.lda_models import evaluate_models, run_cgs_models, run_cgs_models_mallet
-from pycisTopic.topic_binarization import binarize_topics
-from pycisTopic.topic_qc import compute_topic_metrics, plot_topic_qc, topic_annotation
-from pycisTopic.diff_features import impute_accessibility, normalize_scores, find_highly_variable_features, find_diff_features
-from pycisTopic.utils import region_names_to_coordinates
-from pycisTopic.gene_activity import get_gene_activity
-from pycisTopic.loom import export_region_accessibility_to_loom, export_gene_activity_to_loom
-from pycisTopic.clust_vis import find_clusters, run_umap, run_tsne, plot_metadata, plot_topic, cell_topic_heatmap
-
+# import numpy as np
+# import scanpy as sc
+# import pandas as pd
+# import anndata
+# import pyranges as pr
+# from pycistarget.utils import region_names_to_coordinates
+# from scenicplus.wrappers.run_pycistarget import run_pycistarget
+# import polars
+# import scrublet as scr
+# from sklearn.manifold import TSNE
+# import pycisTopic.loom
+# from pycisTopic.pseudobulk_peak_calling import export_pseudobulk, peak_calling
+# from pycisTopic.iterative_peak_calling import get_consensus_peaks
+# from pycisTopic.cistopic_class import create_cistopic_object_from_fragments, merge
+# from pycisTopic.qc import get_barcodes_passing_qc_for_sample
+# from pycisTopic.lda_models import evaluate_models, run_cgs_models, run_cgs_models_mallet
+# from pycisTopic.topic_binarization import binarize_topics
+# from pycisTopic.topic_qc import compute_topic_metrics, plot_topic_qc, topic_annotation
+# from pycisTopic.diff_features import impute_accessibility, normalize_scores, find_highly_variable_features, find_diff_features
+# from pycisTopic.utils import region_names_to_coordinates
+# from pycisTopic.gene_activity import get_gene_activity
+# from pycisTopic.loom import export_region_accessibility_to_loom, export_gene_activity_to_loom
+# from pycisTopic.clust_vis import find_clusters, run_umap, run_tsne, plot_metadata, plot_topic, cell_topic_heatmap
+# import gzip
+# import shutil
 
 ## VIASH START
 par = {
@@ -51,26 +52,16 @@ par = {
   'cell_topic': 'output/scenicplus/cell_topic.csv',
 }
 ## VIASH END
-## installing missing software. #TODO: fix this later
-try:
-    subprocess.run(['yum', '-y', 'install', 'htslib'], check=True)
-    print("htslib installed successfully.")
-except subprocess.CalledProcessError as e:
-    print(f"Installation failed: {e}")
+
 
 # Bug in pycistopic: Import is missing in pycisTopic.loom,
 # so TSNE must be dynamically added to the library's namespace.
-setattr(pycisTopic.loom, 'TSNE', TSNE)
+# setattr(pycisTopic.loom, 'TSNE', TSNE)
+# os.environ['MALLET_MEMORY'] = '200G'
 
-os.environ['MALLET_MEMORY'] = '200G'
-try:
-    sys.path.append(meta['resources_dir'])
-except NameError:
-    pass
-
-par['temp_dir'] = par['temp_dir']
-atac_dir = os.path.join(par['temp_dir'], 'atac')
-os.makedirs(atac_dir, exist_ok=True)
+atac_dir = f"output/scenicplus/atac/"
+os.makedirs(atac_dir)
+raise ValueError('here')
 
 # Get list of samples (e.g., donors)
 print('Collect list of samples')
@@ -121,7 +112,12 @@ def process_atac(par):
             os.system(f'sort -k1,1 -k2,2n {filepath} > {sorted_filepath}')
 
             # Compression
-            subprocess.run(['bgzip', sorted_filepath, '-o', compressed_filepath])
+            # subprocess.run(['bgzip', sorted_filepath, '-o', compressed_filepath])
+            with open(sorted_filepath, 'rb') as f_in:
+                with gzip.open(compressed_filepath, 'wb') as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+                    
+            print(f'File compressed and saved as {compressed_filepath}')
 
         fragments_dict[donor_id] = compressed_filepath
 

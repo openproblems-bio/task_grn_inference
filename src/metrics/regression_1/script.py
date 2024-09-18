@@ -19,9 +19,9 @@ par = {
   'max_workers': 4,
 }
 ## VIASH END
-meta = {
-  "resources_dir":'src/metrics/regression_1/'
-}
+# meta = {
+#   "resources_dir":'src/metrics/regression_1/'
+# }
 sys.path.append(meta["resources_dir"])
 from main import main 
 
