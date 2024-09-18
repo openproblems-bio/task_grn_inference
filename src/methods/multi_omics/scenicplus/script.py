@@ -1,17 +1,17 @@
 import os
-import sys
-import yaml
-import pickle
-import tempfile
-import contextlib
-import hashlib
-import shutil
-import requests
-import traceback
-import subprocess
-import gc
-import gzip
-import tarfile
+# import sys
+# import yaml
+# import pickle
+# import tempfile
+# import contextlib
+# import hashlib
+# import shutil
+# import requests
+# import traceback
+# import subprocess
+# import gc
+# import gzip
+# import tarfile
 # from urllib.request import urlretrieve
 
 # import numpy as np
@@ -59,8 +59,10 @@ par = {
 # setattr(pycisTopic.loom, 'TSNE', TSNE)
 # os.environ['MALLET_MEMORY'] = '200G'
 
-atac_dir = f"output/scenicplus/atac/"
-os.makedirs(atac_dir)
+atac_dir = f"output/gulack/"
+print(atac_dir)
+os.makedirs(atac_dir, exist_ok=True)
+os.makedirs(f'{atac_dir}/atac', exist_ok=True)
 raise ValueError('here')
 
 # Get list of samples (e.g., donors)
