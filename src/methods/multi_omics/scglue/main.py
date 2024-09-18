@@ -155,22 +155,22 @@ def run_grn(par):
     np.savetxt(f"{par['temp_dir']}/tfs.txt", tfs, fmt="%s")
 
     #Construct the command 
-    # command = ['pyscenic', 'grn', f"{par['temp_dir']}/rna.loom", 
-    #            f"{par['temp_dir']}/tfs.txt", '-o', f"{par['temp_dir']}/draft_grn.csv", 
-    #            '--seed', '0', '--num_workers', f"{par['num_workers']}", 
-    #            '--cell_id_attribute', 'obs_id', '--gene_attribute', 'name']
-    # print('Run grn')
-    # result = subprocess.run(command,  check=True)
+    command = ['pyscenic', 'grn', f"{par['temp_dir']}/rna.loom", 
+               f"{par['temp_dir']}/tfs.txt", '-o', f"{par['temp_dir']}/draft_grn.csv", 
+               '--seed', '0', '--num_workers', f"{par['num_workers']}", 
+               '--cell_id_attribute', 'obs_id', '--gene_attribute', 'name']
+    print('Run grn')
+    result = subprocess.run(command,  check=True)
 
-    # print("Output:")
-    # print(result.stdout)
-    # print("Error:")
-    # print(result.stderr)
+    print("Output:")
+    print(result.stdout)
+    print("Error:")
+    print(result.stderr)
 
-    # if result.returncode == 0:
-    #     print("Command executed successfully")
-    # else:
-    #     print("Command failed with return code", result.returncode)
+    if result.returncode == 0:
+        print("Command executed successfully")
+    else:
+        print("Command failed with return code", result.returncode)
 
 
     print("Generate TF cis-regulatory ranking bridged by ATAC peaks", flush=True)
@@ -217,30 +217,8 @@ def run_grn(par):
     ).to_csv(f"{par['temp_dir']}/ctx_annotation.tsv", sep="\t", index=False)
 def prune_grn(par):
     # Construct the command 
-    #TODO: be sure that obs_id is in obs and name is in var
-    print("Run pscenic ctx", flush=True)
-    # command = [
-    #     "pyscenic", "ctx",
-    #     f"{par['temp_dir']}/draft_grn.csv",
-    #     f"{par['temp_dir']}/glue.genes_vs_tracks.rankings.feather",
-    #     f"{par['temp_dir']}/supp.genes_vs_tracks.rankings.feather",
-    #     "--annotations_fname", f"{par['temp_dir']}/ctx_annotation.tsv",
-    #     "--expression_mtx_fname", f"{par['temp_dir']}/rna.loom",
-    #     "--output", f"{par['temp_dir']}/pruned_grn.csv",
-    #     "--rank_threshold", "10000",
-    #     "--auc_threshold", "0.1",
-    #     "--nes_threshold", "2",
-    #     "--mask_dropouts",
-    #     "--min_genes", "1",
-    #     "--num_workers", f"{par['num_workers']}",
-    #     "--cell_id_attribute", "obs_id",
-    #     "--gene_attribute", "name"
-    # ]
     
-    par['genes_vs_motifs_500'] = 'output/scenic/databases/hg38_500bp_up_100bp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather'
-    par['genes_vs_motifs_10k'] =  'output/scenic/databases/hg38_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather'
-    par['motif_annotation'] = 'output/scenic/databases/motifs-v10nr_clust-nr.hgnc-m0.001-o0.0.tbl'
-
+    print("Run pscenic ctx", flush=True)
     command = [
         "pyscenic", "ctx", 
         f"{par['temp_dir']}/draft_grn.csv",
@@ -249,14 +227,13 @@ def prune_grn(par):
         "--annotations_fname", f"{par['temp_dir']}/ctx_annotation.tsv",
         "--expression_mtx_fname", f"{par['temp_dir']}/rna.loom",
         "--output", f"{par['temp_dir']}/pruned_grn.csv",
-        # "--top_n_targets", "100",
-        # "--rank_threshold", "1500",
+        "--top_n_targets", str(par['top_n_targets']),
+        "--rank_threshold", str(par['rank_threshold']),
         # "--auc_threshold", "0.1",
-        # "--nes_threshold", "0",
-        "--mask_dropouts",
+        "--nes_threshold", str(par['nes_threshold']), 
         "--min_genes", "1",
         "--num_workers", f"{par['num_workers']}",
-        "--cell_id_attribute", "obs_id",
+        "--cell_id_attribute", "obs_id", # be sure that obs_id is in obs and name is in var
         "--gene_attribute", "name"
     ]
 
@@ -272,22 +249,6 @@ def prune_grn(par):
     else:
         print("pyscenic ctx failed with return code", result.returncode)
 
-# def download_prior(par):
-#     # get gene annotation
-#     response = requests.get("https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.annotation.gtf.gz")
-#     par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
-#     if response.status_code == 200:
-#         # Write the content to a file
-#         with open(par['annotation_file'], 'wb') as file:
-#             file.write(response.content)
-#         print(f"File downloaded and saved as gencode.v45.annotation.gtf.gz")
-#     else:
-#         print(f"Failed to download the gencode.v45.annotation.gtf.gz. Status code: {response.status_code}")
-
-
-    
-#     annotation_file
-
 
 def main(par):
     import torch
@@ -299,10 +260,10 @@ def main(par):
     rna = ad.read_h5ad(par['multiomics_rna'])
     atac = ad.read_h5ad(par['multiomics_atac'])
 
-    # print('Preprocess data', flush=True)
-    # preprocess(rna, atac, par)
-    # print('Train a model', flush=True)
-    # training(par)
+    print('Preprocess data', flush=True)
+    preprocess(rna, atac, par)
+    print('Train a model', flush=True)
+    training(par)
     run_grn(par)
     prune_grn(par)
     print('Curate predictions', flush=True)

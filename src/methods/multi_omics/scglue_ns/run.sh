@@ -2,7 +2,7 @@
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
 RUN_ID="scglue"
-resources_dir="s3://openproblems-data/resources/grn"
+resources_dir="s3://openproblems-data/resources_test/grn"
 publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
 
 
@@ -13,8 +13,6 @@ param_list:
   - id: ${RUN_ID}
     multiomics_rna: ${resources_dir}/grn-benchmark/multiomics_rna.h5ad
     multiomics_atac: ${resources_dir}/grn-benchmark/multiomics_atac.h5ad
-    annotation_file: ${resources_dir}/supplementary/gencode.v45.annotation.gtf.gz
-    motif_file: ${resources_dir}/supplementary/JASPAR2022-hg38.bed.gz
     num_workers: $num_workers
     temp_dir: ./tmp/grn
 output_state: "state.yaml"

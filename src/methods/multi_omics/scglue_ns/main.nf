@@ -6,12 +6,11 @@ workflow run_wf {
   output_ch = input_ch
 
     | scglue.run(
-      fromState: [multiomics_rna: "multiomics_rna",
+      fromState: [
+              multiomics_rna: "multiomics_rna",
               multiomics_atac: "multiomics_atac",
               temp_dir: "temp_dir",
-              num_workers: "num_workers",
-              annotation_file: "annotation_file",
-              motif_file: "motif_file"
+              num_workers: "num_workers"
               ],
       toState: [prediction:"prediction"]
     )
