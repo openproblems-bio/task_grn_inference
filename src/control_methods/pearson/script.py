@@ -12,8 +12,8 @@ par = {
 }
 ## VIASH END
 print(par)
-import sys
-sys.path.append('./src/utils')
+# import sys
+# sys.path.append('./src/utils')
 from util import create_corr_net
 
 par['causal'] = False
