@@ -15,6 +15,7 @@ functionality:
   resources:
     - type: python_script
       path: script.py
+    - path: /src/utils/util.py
 
 platforms:
   - type: docker
