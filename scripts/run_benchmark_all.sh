@@ -12,6 +12,8 @@ max_workers=10
 layer='scgen_pearson'
 metric_ids="[regression_1, regression_2]"
 cell_type_specific=true #for controls
+normalize=false
+only_hvgs=false
 # method_ids="[tigress, ennet, scsgl, pidc]"
 method_ids="[pearson_corr, pearson_causal, positive_control]"
 
@@ -33,6 +35,8 @@ param_list:
     consensus: ${resources_dir}/prior/consensus-num-regulators.json
     tf_all: ${resources_dir}/prior/tf_all.csv
     cell_type_specific: ${cell_type_specific}
+    normalize: ${normalize}
+    only_hvgs: ${only_hvgs}
 
 output_state: "state.yaml"
 publish_dir: "$publish_dir"

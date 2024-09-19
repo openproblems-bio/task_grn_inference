@@ -3119,7 +3119,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia",
     "viash_version" : "0.8.6",
-    "git_commit" : "2da5f2827e7328b2011a1962c9cd8a3ad8ccbd2e",
+    "git_commit" : "094a88f0315e31e9cbce634b4c99eef084146256",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

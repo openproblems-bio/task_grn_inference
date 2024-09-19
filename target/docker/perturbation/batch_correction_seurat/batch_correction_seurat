@@ -406,9 +406,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata"
 
 LABEL org.opencontainers.image.description="Companion container for running component perturbation batch_correction_seurat"
-LABEL org.opencontainers.image.created="2024-09-19T14:03:36Z"
+LABEL org.opencontainers.image.created="2024-09-19T14:14:01Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="2da5f2827e7328b2011a1962c9cd8a3ad8ccbd2e"
+LABEL org.opencontainers.image.revision="094a88f0315e31e9cbce634b4c99eef084146256"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
