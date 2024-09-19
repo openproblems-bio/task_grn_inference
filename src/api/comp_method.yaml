@@ -58,11 +58,8 @@ functionality:
       default: false
       description: subset rna seq data to only 7000 hvgs to reduce dimensionality
 
-
-
-
   resources:
-    - path: ../utils/util.py
+    - path: /src/utils/util.py
 
   test_resources:
     - type: python_script
