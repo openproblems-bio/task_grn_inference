@@ -13,6 +13,8 @@ functionality:
   resources:
     - type: r_script
       path: script.R
+    - path: /src/utils/util.py
+      dest: util.py
 
 platforms:
   - type: docker
