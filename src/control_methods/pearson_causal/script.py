@@ -9,8 +9,8 @@ par = {
     "seed": 32
 }
 ## VIASH END
-# import sys
-# sys.path.append('./src/utils')
+import sys
+sys.path.append(meta["resources_dir"])
 from util import create_corr_net
 
 print('Create causal corr net')

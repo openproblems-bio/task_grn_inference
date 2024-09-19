@@ -12,7 +12,7 @@ functionality:
       path: script.py
 
     - path: /src/utils/util.py
-
+      dest: util.py
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4

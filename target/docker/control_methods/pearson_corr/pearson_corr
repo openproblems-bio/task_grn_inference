@@ -444,9 +444,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component control_methods pearson_corr"
-LABEL org.opencontainers.image.created="2024-09-19T14:38:49Z"
+LABEL org.opencontainers.image.created="2024-09-19T15:48:09Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="0f9772f48551c21886f6983c0d7441bd6f0582be"
+LABEL org.opencontainers.image.revision="1f617709f57ed76c054dc83b6681c6d406c2647a"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1106,9 +1106,8 @@ dep = {
 }
 
 ## VIASH END
-print(par)
-# import sys
-# sys.path.append('./src/utils')
+import sys
+sys.path.append(meta["resources_dir"])
 from util import create_corr_net
 
 par['causal'] = False

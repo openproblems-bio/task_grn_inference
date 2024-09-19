@@ -3004,6 +3004,7 @@ meta = [
       {
         "type" : "file",
         "path" : "src/utils/util.py",
+        "dest" : "util.py",
         "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
@@ -3115,7 +3116,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/pearson_causal",
     "viash_version" : "0.8.6",
-    "git_commit" : "0f9772f48551c21886f6983c0d7441bd6f0582be",
+    "git_commit" : "1f617709f57ed76c054dc83b6681c6d406c2647a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3165,8 +3166,8 @@ dep = {
 }
 
 ## VIASH END
-# import sys
-# sys.path.append('./src/utils')
+import sys
+sys.path.append(meta["resources_dir"])
 from util import create_corr_net
 
 print('Create causal corr net')
