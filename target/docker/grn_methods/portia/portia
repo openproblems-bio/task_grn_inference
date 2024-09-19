@@ -177,6 +177,10 @@ function ViashHelp {
   echo "        type: file, required parameter, file must exist"
   echo "        example: resources_test/grn-benchmark/multiomics_rna.h5ad"
   echo ""
+  echo "    --multiomics_atac"
+  echo "        type: file, file must exist"
+  echo "        example: resources_test/grn-benchmark/multiomics_atac.h5ad"
+  echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"
   echo "        example: resources_test/grn_models/collectri.csv"
@@ -204,6 +208,10 @@ function ViashHelp {
   echo "    --cell_type_specific"
   echo "        type: boolean"
   echo "        default: true"
+  echo ""
+  echo "    --normalize"
+  echo "        type: boolean"
+  echo "        default: false"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -430,9 +438,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata" "numpy" "scipy" "scikit-learn" "portia-grn"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods portia"
-LABEL org.opencontainers.image.created="2024-09-18T14:00:09Z"
+LABEL org.opencontainers.image.created="2024-09-19T08:22:24Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="51aba978da8201f3bdde9bd9e3c1f29e49c73672"
+LABEL org.opencontainers.image.revision="229421448ccbffe98e7be0a0d822ecbe37d6b280"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -602,6 +610,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_MULTIOMICS_RNA=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --multiomics_atac)
+            [ -n "$VIASH_PAR_MULTIOMICS_ATAC" ] && ViashError Bad arguments for option \'--multiomics_atac\': \'$VIASH_PAR_MULTIOMICS_ATAC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MULTIOMICS_ATAC="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --multiomics_atac. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --multiomics_atac=*)
+            [ -n "$VIASH_PAR_MULTIOMICS_ATAC" ] && ViashError Bad arguments for option \'--multiomics_atac=*\': \'$VIASH_PAR_MULTIOMICS_ATAC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MULTIOMICS_ATAC=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --prediction)
             [ -n "$VIASH_PAR_PREDICTION" ] && ViashError Bad arguments for option \'--prediction\': \'$VIASH_PAR_PREDICTION\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_PREDICTION="$2"
@@ -677,6 +696,17 @@ while [[ $# -gt 0 ]]; do
         --cell_type_specific=*)
             [ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ] && ViashError Bad arguments for option \'--cell_type_specific=*\': \'$VIASH_PAR_CELL_TYPE_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_CELL_TYPE_SPECIFIC=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --normalize)
+            [ -n "$VIASH_PAR_NORMALIZE" ] && ViashError Bad arguments for option \'--normalize\': \'$VIASH_PAR_NORMALIZE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_NORMALIZE="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --normalize. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --normalize=*)
+            [ -n "$VIASH_PAR_NORMALIZE" ] && ViashError Bad arguments for option \'--normalize=*\': \'$VIASH_PAR_NORMALIZE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_NORMALIZE=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---setup)
@@ -842,10 +872,17 @@ fi
 if [ -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then
   VIASH_PAR_CELL_TYPE_SPECIFIC="true"
 fi
+if [ -z ${VIASH_PAR_NORMALIZE+x} ]; then
+  VIASH_PAR_NORMALIZE="false"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
   ViashError "Input file '$VIASH_PAR_MULTIOMICS_RNA' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_MULTIOMICS_ATAC" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_ATAC" ]; then
+  ViashError "Input file '$VIASH_PAR_MULTIOMICS_ATAC' does not exist."
   exit 1
 fi
 if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
@@ -875,6 +912,12 @@ fi
 if [[ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ]]; then
   if ! [[ "$VIASH_PAR_CELL_TYPE_SPECIFIC" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--cell_type_specific' has to be a boolean. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_NORMALIZE" ]]; then
+  if ! [[ "$VIASH_PAR_NORMALIZE" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--normalize' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -931,6 +974,10 @@ VIASH_CHOWN_VARS=()
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_MULTIOMICS_RNA")" )
   VIASH_PAR_MULTIOMICS_RNA=$(ViashAutodetectMount "$VIASH_PAR_MULTIOMICS_RNA")
+fi
+if [ ! -z "$VIASH_PAR_MULTIOMICS_ATAC" ]; then
+  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_MULTIOMICS_ATAC")" )
+  VIASH_PAR_MULTIOMICS_ATAC=$(ViashAutodetectMount "$VIASH_PAR_MULTIOMICS_ATAC")
 fi
 if [ ! -z "$VIASH_PAR_PREDICTION" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PREDICTION")" )
@@ -1012,13 +1059,15 @@ from tqdm import tqdm
 # The following code has been auto-generated by Viash.
 par = {
   'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'multiomics_atac': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_ATAC//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
-  'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
+  'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
+  'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1113,6 +1162,9 @@ VIASHEOF
 # strip viash automount from file paths
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ]; then
   VIASH_PAR_MULTIOMICS_RNA=$(ViashStripAutomount "$VIASH_PAR_MULTIOMICS_RNA")
+fi
+if [ ! -z "$VIASH_PAR_MULTIOMICS_ATAC" ]; then
+  VIASH_PAR_MULTIOMICS_ATAC=$(ViashStripAutomount "$VIASH_PAR_MULTIOMICS_ATAC")
 fi
 if [ ! -z "$VIASH_PAR_PREDICTION" ]; then
   VIASH_PAR_PREDICTION=$(ViashStripAutomount "$VIASH_PAR_PREDICTION")

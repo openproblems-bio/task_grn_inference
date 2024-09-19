@@ -2821,6 +2821,41 @@ meta = [
       },
       {
         "type" : "file",
+        "name" : "--multiomics_atac",
+        "info" : {
+          "label" : "multiomics atac",
+          "summary" : "Peak data for multiomics data.",
+          "file_type" : "h5ad",
+          "slots" : {
+            "obs" : [
+              {
+                "name" : "cell_type",
+                "type" : "string",
+                "description" : "The annotated cell type of each cell based on RNA expression.",
+                "required" : true
+              },
+              {
+                "name" : "donor_id",
+                "type" : "string",
+                "description" : "Donor id",
+                "required" : true
+              }
+            ]
+          }
+        },
+        "example" : [
+          "resources_test/grn-benchmark/multiomics_atac.h5ad"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "file",
         "name" : "--prediction",
         "info" : {
           "label" : "GRN",
@@ -2925,6 +2960,18 @@ meta = [
         "name" : "--cell_type_specific",
         "default" : [
           true
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "boolean",
+        "name" : "--normalize",
+        "default" : [
+          false
         ],
         "required" : false,
         "direction" : "input",
@@ -3102,7 +3149,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "51aba978da8201f3bdde9bd9e3c1f29e49c73672",
+    "git_commit" : "229421448ccbffe98e7be0a0d822ecbe37d6b280",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3118,51 +3165,55 @@ def innerWorkflowFactory(args) {
 tempscript=".viash_script.sh"
 cat > "$tempscript" << VIASHMAIN
 import os
-# import sys
-# import yaml
-# import pickle
-# import tempfile
-# import contextlib
-# import hashlib
-# import shutil
-# import requests
-# import traceback
-# import subprocess
-# import gc
-# import gzip
-# import tarfile
-# from urllib.request import urlretrieve
+import sys
+import yaml
+import pickle
+import tempfile
+import contextlib
+import hashlib
+import shutil
+import requests
+import traceback
+import subprocess
+import gc
+import gzip
+import tarfile
+import shutil
+import numpy as np
+import scanpy as sc
+import pandas as pd
+import anndata
+import pyranges as pr
+import pysam
 
-# import numpy as np
-# import scanpy as sc
-# import pandas as pd
-# import anndata
-# import pyranges as pr
-# from pycistarget.utils import region_names_to_coordinates
-# from scenicplus.wrappers.run_pycistarget import run_pycistarget
-# import polars
-# import scrublet as scr
-# from sklearn.manifold import TSNE
-# import pycisTopic.loom
-# from pycisTopic.pseudobulk_peak_calling import export_pseudobulk, peak_calling
-# from pycisTopic.iterative_peak_calling import get_consensus_peaks
-# from pycisTopic.cistopic_class import create_cistopic_object_from_fragments, merge
-# from pycisTopic.qc import get_barcodes_passing_qc_for_sample
-# from pycisTopic.lda_models import evaluate_models, run_cgs_models, run_cgs_models_mallet
-# from pycisTopic.topic_binarization import binarize_topics
-# from pycisTopic.topic_qc import compute_topic_metrics, plot_topic_qc, topic_annotation
-# from pycisTopic.diff_features import impute_accessibility, normalize_scores, find_highly_variable_features, find_diff_features
-# from pycisTopic.utils import region_names_to_coordinates
-# from pycisTopic.gene_activity import get_gene_activity
-# from pycisTopic.loom import export_region_accessibility_to_loom, export_gene_activity_to_loom
-# from pycisTopic.clust_vis import find_clusters, run_umap, run_tsne, plot_metadata, plot_topic, cell_topic_heatmap
-# import gzip
-# import shutil
+
+from urllib.request import urlretrieve
+
+
+from pycistarget.utils import region_names_to_coordinates
+from scenicplus.wrappers.run_pycistarget import run_pycistarget
+import polars
+import scrublet as scr
+from sklearn.manifold import TSNE
+import pycisTopic.loom
+from pycisTopic.pseudobulk_peak_calling import export_pseudobulk, peak_calling
+from pycisTopic.iterative_peak_calling import get_consensus_peaks
+from pycisTopic.cistopic_class import create_cistopic_object_from_fragments, merge
+from pycisTopic.qc import get_barcodes_passing_qc_for_sample
+from pycisTopic.lda_models import evaluate_models, run_cgs_models, run_cgs_models_mallet
+from pycisTopic.topic_binarization import binarize_topics
+from pycisTopic.topic_qc import compute_topic_metrics, plot_topic_qc, topic_annotation
+from pycisTopic.diff_features import impute_accessibility, normalize_scores, find_highly_variable_features, find_diff_features
+from pycisTopic.utils import region_names_to_coordinates
+from pycisTopic.gene_activity import get_gene_activity
+from pycisTopic.loom import export_region_accessibility_to_loom, export_gene_activity_to_loom
+from pycisTopic.clust_vis import find_clusters, run_umap, run_tsne, plot_metadata, plot_topic, cell_topic_heatmap
 
 ## VIASH START
 # The following code has been auto-generated by Viash.
 par = {
   'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'multiomics_atac': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_ATAC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
@@ -3170,6 +3221,7 @@ par = {
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'scplus_mdata': $( if [ ! -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then echo "r'${VIASH_PAR_SCPLUS_MDATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'qc': $( if [ ! -z ${VIASH_PAR_QC+x} ]; then echo "r'${VIASH_PAR_QC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3194,36 +3246,26 @@ dep = {
 }
 
 ## VIASH END
-
-
 # Bug in pycistopic: Import is missing in pycisTopic.loom,
 # so TSNE must be dynamically added to the library's namespace.
-# setattr(pycisTopic.loom, 'TSNE', TSNE)
-# os.environ['MALLET_MEMORY'] = '200G'
+setattr(pycisTopic.loom, 'TSNE', TSNE)
+os.environ['MALLET_MEMORY'] = '200G'
 
-atac_dir = f"output/gulack/"
-print(atac_dir)
+atac_dir = f"{par['temp_dir']}/atac/"
 os.makedirs(atac_dir, exist_ok=True)
-os.makedirs(f'{atac_dir}/atac', exist_ok=True)
-raise ValueError('here')
 
-# Get list of samples (e.g., donors)
-print('Collect list of samples')
-adata_atac = anndata.read_h5ad(par['multiomics_atac'])
-unique_donor_ids = [s.replace(' ', '_') for s in adata_atac.obs.donor_id.cat.categories]
-unique_cell_types = [s.replace(' ', '_') for s in adata_atac.obs.cell_type.cat.categories]
-del adata_atac
 
 def process_atac(par):
     print("---Run pre-process started ---", flush=True)
     # Create one individual ATAC-seq file per donor
     adata_atac = anndata.read_h5ad(par['multiomics_atac'])
+    unique_donor_ids = [s.replace(' ', '_') for s in adata_atac.obs.donor_id.cat.categories]
+    unique_cell_types = [s.replace(' ', '_') for s in adata_atac.obs.cell_type.cat.categories]
     fragments_dict = {}
     for donor_id in unique_donor_ids:
         filepath = os.path.join(atac_dir, f'{donor_id}.tsv')
         if not os.path.exists(filepath):
             print(f'Create tsv file {filepath}')
-            
             adata_atac.obs.cell_type = [s.replace(' ', '_') for s in adata_atac.obs.cell_type]
             adata_atac.obs.donor_id = [s.replace(' ', '_') for s in adata_atac.obs.donor_id]
             adata_atac_one_donor = adata_atac[adata_atac.obs.donor_id == donor_id]
@@ -3244,31 +3286,24 @@ def process_atac(par):
             }
             df = pd.DataFrame(d, copy=False)
             df.to_csv(filepath, sep='\\\\t', index=False, header=False)
-
         # Compress tsv file
         compressed_filepath = filepath + '.gz'
         if not os.path.exists(compressed_filepath):
-
             print(f'Sort and compress tsv file {filepath}')
-
             # Sort file by genomic coordinates
             sorted_filepath = filepath + '.sorted.tsv'
             os.system(f'sort -k1,1 -k2,2n {filepath} > {sorted_filepath}')
-
             # Compression
-            # subprocess.run(['bgzip', sorted_filepath, '-o', compressed_filepath])
-            with open(sorted_filepath, 'rb') as f_in:
-                with gzip.open(compressed_filepath, 'wb') as f_out:
-                    shutil.copyfileobj(f_in, f_out)
-                    
+            subprocess.run(['bgzip', sorted_filepath, '-o', compressed_filepath])     
             print(f'File compressed and saved as {compressed_filepath}')
 
         fragments_dict[donor_id] = compressed_filepath
 
-        # Index file using tabix
-        if not os.path.exists(compressed_filepath + '.tbi'):
+        # # Index file using tabix
+        if not os.path.exists(compressed_filepath + '.tbi'): #pip install --user pytabix
             print(f'Index compressed file {compressed_filepath} using tabix')
             subprocess.run(['tabix', compressed_filepath, '-p', 'bed'])
+        
 
     # Collect cell metadata
     print(f'Collect cell metadata')
@@ -3317,7 +3352,7 @@ def process_atac(par):
             bed_path=os.path.join(par['temp_dir'], 'consensus_peak_calling/pseudobulk_bed_files'),
             bigwig_path=os.path.join(par['temp_dir'], 'consensus_peak_calling/pseudobulk_bw_files'),
             path_to_fragments=fragments_dict,
-            n_cpu=10,
+            n_cpu=par['num_workers'],
             temp_dir=os.path.join(par['temp_dir'], 'consensus_peak_calling/tmp'),
             split_pattern='-',
         )
@@ -3338,7 +3373,7 @@ def process_atac(par):
         bed_paths=bed_paths,
         outdir=os.path.join(os.path.join(par['temp_dir'], 'consensus_peak_calling/MACS')),
         genome_size='hs',
-        n_cpu=10,
+        n_cpu=par['num_workers'],
         input_format='BEDPE',
         shift=73,
         ext_size=146,
@@ -3386,7 +3421,6 @@ def run_cistopic(par):
         return 
     print("---Run cistopic---", flush=True)
     if par['qc']:  # Whether to perform quality control
-
         # Compute QC metrics
         print('Perform QC')
         for donor_id in unique_donor_ids:
@@ -3436,7 +3470,7 @@ def run_cistopic(par):
                 path_to_blacklist=os.path.join(par['temp_dir'], 'hg38-blacklist.v2.bed'),
                 metrics=sample_metrics,
                 valid_bc=sample_id_to_barcodes_passing_filters[sample_id],
-                n_cpu=10,
+                n_cpu=par['num_workers'],
                 project=donor_id,
                 split_pattern='-'
             )
@@ -3450,7 +3484,7 @@ def run_cistopic(par):
                 path_to_fragments=fragments_dict[donor_id],
                 path_to_regions=os.path.join(par['temp_dir'], 'consensus_peak_calling/consensus_regions.bed'),
                 path_to_blacklist=os.path.join(par['temp_dir'], 'hg38-blacklist.v2.bed'),
-                n_cpu=10,
+                n_cpu=par['num_workers'],
                 project=donor_id,
                 split_pattern='-'
             )

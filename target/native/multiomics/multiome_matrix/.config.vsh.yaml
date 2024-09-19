@@ -160,5 +160,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/native/multiomics/multiome_matrix"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/native/multiomics/multiome_matrix/multiome_matrix"
   viash_version: "0.8.6"
-  git_commit: "51aba978da8201f3bdde9bd9e3c1f29e49c73672"
+  git_commit: "229421448ccbffe98e7be0a0d822ecbe37d6b280"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

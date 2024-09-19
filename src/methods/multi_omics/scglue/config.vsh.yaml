@@ -1,4 +1,4 @@
-__merge__: ../../../api/comp_method_mo.yaml
+__merge__: ../../../api/comp_method.yaml
 
 
 functionality:
@@ -11,23 +11,25 @@ functionality:
       GRN inference using scglue. 
     documentation_url: https://scglue.readthedocs.io/
   arguments:
-    - name: --annotation_file
-      type: file
-      # default: resources/supplementary/gencode.v45.annotation.gtf.gz
-      example: resources_test/supplementary/gencode.v45.annotation.gtf.gz
+    - name: --top_n_targets
+      type: string
       required: false
       direction: input
-    - name: --motif_file
-      type: file
-      example: resources_test/supplementary/JASPAR2022-hg38.bed.gz
+      default: 100
+    - name: --rank_threshold
+      type: string
       required: false
       direction: input
-      
+      default: 1500
+    - name: --nes_threshold
+      type: string
+      required: false
+      direction: input
+      default: 1.5
   resources:
     - type: python_script
       path: script.py
     - path: main.py
-
 
 platforms:
   - type: docker

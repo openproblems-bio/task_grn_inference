@@ -32,7 +32,7 @@ functionality:
     - name: --batch_size
       type: integer
       direction: input
-      default: 16
+      default: 10
     - name: --condition
       type: string
       direction: input

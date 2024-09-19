@@ -2821,6 +2821,41 @@ meta = [
       },
       {
         "type" : "file",
+        "name" : "--multiomics_atac",
+        "info" : {
+          "label" : "multiomics atac",
+          "summary" : "Peak data for multiomics data.",
+          "file_type" : "h5ad",
+          "slots" : {
+            "obs" : [
+              {
+                "name" : "cell_type",
+                "type" : "string",
+                "description" : "The annotated cell type of each cell based on RNA expression.",
+                "required" : true
+              },
+              {
+                "name" : "donor_id",
+                "type" : "string",
+                "description" : "Donor id",
+                "required" : true
+              }
+            ]
+          }
+        },
+        "example" : [
+          "resources_test/grn-benchmark/multiomics_atac.h5ad"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "file",
         "name" : "--prediction",
         "info" : {
           "label" : "GRN",
@@ -2925,6 +2960,18 @@ meta = [
         "name" : "--cell_type_specific",
         "default" : [
           true
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "boolean",
+        "name" : "--normalize",
+        "default" : [
+          false
         ],
         "required" : false,
         "direction" : "input",
@@ -3055,7 +3102,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.8.6",
-    "git_commit" : "51aba978da8201f3bdde9bd9e3c1f29e49c73672",
+    "git_commit" : "229421448ccbffe98e7be0a0d822ecbe37d6b280",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3081,13 +3128,15 @@ library(dplyr)
 
 par <- list(
   "multiomics_rna" = $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_MULTIOMICS_RNA" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
+  "multiomics_atac" = $( if [ ! -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_MULTIOMICS_ATAC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "prediction" = $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PREDICTION" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "tf_all" = $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TF_ALL" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "max_n_links" = $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_MAX_N_LINKS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "num_workers" = $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_NUM_WORKERS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "temp_dir" = $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TEMP_DIR" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
-  "cell_type_specific" = $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi )
+  "cell_type_specific" = $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi ),
+  "normalize" = $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_NORMALIZE" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi )
 )
 meta <- list(
   "functionality_name" = $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo -n "'"; echo -n "$VIASH_META_FUNCTIONALITY_NAME" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
@@ -3120,16 +3169,6 @@ inputExpr <- ad\\$X
 geneNames <- colnames(inputExpr)
 colnames(inputExpr) <- c(geneNames)
 X <- as.matrix(inputExpr)
-
-
-# # Keep genes with less than 10% of zeros
-# mask <- (apply(X, 2, function(x) mean(x != 0)) >= 0.1)
-# X <- X[, mask]
-# geneNames <- geneNames[mask]
-
-# # Keep samples with less than 10% of zeros
-# mask <- (apply(X, 1, function(x) mean(x != 0)) >= 0.1)
-# X <- X[mask,]
 
 # Run GRN inference method
 pcorResults = pcor(x = X, method = "pearson")

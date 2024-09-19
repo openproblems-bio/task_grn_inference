@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ID="benchmark_donor_0_default"
+RUN_ID="benchmark_donor_0_baselines_specific"
 # resources_dir="./resources_test/"
 resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="${resources_dir}/results/${RUN_ID}"
@@ -11,9 +11,9 @@ subsample=-2
 max_workers=10
 layer='scgen_pearson'
 metric_ids="[regression_1, regression_2]"
-cell_type_specific=false #for controls
+cell_type_specific=true #for controls
 # method_ids="[tigress, ennet, scsgl, pidc]"
-method_ids="[pearson_corr, pearson_causal, positive_control, portia, grnboost2]"
+method_ids="[pearson_corr, pearson_causal, positive_control]"
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -45,21 +45,21 @@ HERE
 #   -c src/common/nextflow_helpers/labels_ci.config \
 #   -params-file ${param_file}
 
-./tw-windows-x86_64.exe launch `
-    https://github.com/openproblems-bio/task_grn_inference.git `
-    --revision build/main `
-    --pull-latest `
-    --main-script target/nextflow/workflows/run_benchmark/main.nf `
-    --workspace 53907369739130 `
-    --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
-    --params-file ./params/benchmark_donor_0_default.yaml `
-    --config src/common/nextflow_helpers/labels_tw.config
+# ./tw-windows-x86_64.exe launch `
+#     https://github.com/openproblems-bio/task_grn_inference.git `
+#     --revision build/main `
+#     --pull-latest `
+#     --main-script target/nextflow/workflows/run_benchmark/main.nf `
+#     --workspace 53907369739130 `
+#     --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
+#     --params-file ./params/benchmark_donor_0_default.yaml `
+#     --config src/common/nextflow_helpers/labels_tw.config
 
-# ./tw launch https://github.com/openproblems-bio/task_grn_inference \
-#   --revision build/main \
-#   --pull-latest \
-#   --main-script target/nextflow/workflows/run_benchmark/main.nf \
-#   --workspace 53907369739130 \
-#   --compute-env 6TeIFgV5OY4pJCk8I0bfOh \
-#   --params-file ${param_file} \
-#   --config src/common/nextflow_helpers/labels_tw.config
+./tw launch https://github.com/openproblems-bio/task_grn_inference \
+  --revision build/main \
+  --pull-latest \
+  --main-script target/nextflow/workflows/run_benchmark/main.nf \
+  --workspace 53907369739130 \
+  --compute-env 6TeIFgV5OY4pJCk8I0bfOh \
+  --params-file ${param_file} \
+  --config src/common/nextflow_helpers/labels_tw.config
