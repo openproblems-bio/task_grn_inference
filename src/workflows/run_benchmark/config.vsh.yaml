@@ -54,6 +54,14 @@ functionality:
           required: false
           direction: input
           default: true
+        - name: --normalize
+          type: boolean
+          required: false
+          direction: input
+        - name: --only_hvgs
+          type: boolean
+          required: false
+          direction: input
           
         
     - name: Outputs
