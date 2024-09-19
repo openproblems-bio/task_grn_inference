@@ -406,9 +406,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.5.0" "scib==1.1.5" "louvain==0.8.2" "rpy2"
 
 LABEL org.opencontainers.image.description="Companion container for running component perturbation batch_correction_evaluation"
-LABEL org.opencontainers.image.created="2024-09-19T08:22:24Z"
+LABEL org.opencontainers.image.created="2024-09-19T14:03:35Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="229421448ccbffe98e7be0a0d822ecbe37d6b280"
+LABEL org.opencontainers.image.revision="2da5f2827e7328b2011a1962c9cd8a3ad8ccbd2e"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

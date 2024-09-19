@@ -147,5 +147,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/perturbation/batch_correction_evaluation"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/perturbation/batch_correction_evaluation/batch_correction_evaluation"
   viash_version: "0.8.6"
-  git_commit: "229421448ccbffe98e7be0a0d822ecbe37d6b280"
+  git_commit: "2da5f2827e7328b2011a1962c9cd8a3ad8ccbd2e"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

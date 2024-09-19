@@ -51,11 +51,12 @@ functionality:
       type: boolean
       direction: input
       default: false
-
-
-
-
-    
+      description: normalize rna seq data before inference. currently, it's only applicable to baseline models
+    - name: --only_hvgs
+      type: boolean
+      direction: input
+      default: false
+      description: subset rna seq data to only 7000 hvgs to reduce dimensionality
 
   test_resources:
     - type: python_script

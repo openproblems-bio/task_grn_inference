@@ -212,6 +212,13 @@ function ViashHelp {
   echo "    --normalize"
   echo "        type: boolean"
   echo "        default: false"
+  echo "        normalize rna seq data before inference. currently, it's only applicable"
+  echo "        to baseline models"
+  echo ""
+  echo "    --only_hvgs"
+  echo "        type: boolean"
+  echo "        default: false"
+  echo "        subset rna seq data to only 7000 hvgs to reduce dimensionality"
   echo ""
   echo "    --perturbation_data"
   echo "        type: file, required parameter, file must exist"
@@ -441,9 +448,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component control_methods positive_control"
-LABEL org.opencontainers.image.created="2024-09-19T08:22:26Z"
+LABEL org.opencontainers.image.created="2024-09-19T14:03:38Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="229421448ccbffe98e7be0a0d822ecbe37d6b280"
+LABEL org.opencontainers.image.revision="2da5f2827e7328b2011a1962c9cd8a3ad8ccbd2e"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -712,6 +719,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_NORMALIZE=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --only_hvgs)
+            [ -n "$VIASH_PAR_ONLY_HVGS" ] && ViashError Bad arguments for option \'--only_hvgs\': \'$VIASH_PAR_ONLY_HVGS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_ONLY_HVGS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --only_hvgs. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --only_hvgs=*)
+            [ -n "$VIASH_PAR_ONLY_HVGS" ] && ViashError Bad arguments for option \'--only_hvgs=*\': \'$VIASH_PAR_ONLY_HVGS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_ONLY_HVGS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --perturbation_data)
             [ -n "$VIASH_PAR_PERTURBATION_DATA" ] && ViashError Bad arguments for option \'--perturbation_data\': \'$VIASH_PAR_PERTURBATION_DATA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_PERTURBATION_DATA="$2"
@@ -893,6 +911,9 @@ fi
 if [ -z ${VIASH_PAR_NORMALIZE+x} ]; then
   VIASH_PAR_NORMALIZE="false"
 fi
+if [ -z ${VIASH_PAR_ONLY_HVGS+x} ]; then
+  VIASH_PAR_ONLY_HVGS="false"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
@@ -940,6 +961,12 @@ fi
 if [[ -n "$VIASH_PAR_NORMALIZE" ]]; then
   if ! [[ "$VIASH_PAR_NORMALIZE" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--normalize' has to be a boolean. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_ONLY_HVGS" ]]; then
+  if ! [[ "$VIASH_PAR_ONLY_HVGS" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--only_hvgs' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1093,6 +1120,7 @@ par = {
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
+  'only_hvgs': $( if [ ! -z ${VIASH_PAR_ONLY_HVGS+x} ]; then echo "r'${VIASH_PAR_ONLY_HVGS//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
@@ -1114,62 +1142,16 @@ dep = {
 }
 
 ## VIASH END
-print(par)
+# import sys
+# sys.path.append('./src/utils')
+from util import create_corr_net
 
-def process_links(net, par):
-    net = net[net.source!=net.target]
-    net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
-    net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
-    return net
+print('Create causal corr net')
+par['causal'] = True
+par['multiomics_rna'] = par['perturbation_data']
+par['only_hvgs'] = False
 
-def corr_net(X, gene_names, par):
-    X = StandardScaler().fit_transform(X)
-    net = np.dot(X.T, X) / X.shape[0]
-    net = pd.DataFrame(net, index=gene_names, columns=gene_names)
-    
-    net = net[tf_all]
-    net = net.reset_index()
-    index_name = net.columns[0]
-    net = net.melt(id_vars=index_name, var_name='source', value_name='weight')
-    
-    net.rename(columns={index_name: 'target'}, inplace=True)
-    net = process_links(net, par)
-    
-    return net
-
-def create_corr_net(X, gene_names, groups, par):
-    if par['cell_type_specific']:
-        i = 0
-        for group in tqdm(np.unique(groups), desc="Processing groups"):
-            X_sub = X[groups == group, :]
-            net = corr_net(X_sub, gene_names, par)
-            net['cell_type'] = group
-            if i==0:
-                grn = net
-            else:
-                grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
-            i += 1
-    else:
-        grn = corr_net(X, gene_names, par)    
-    return grn
-print('Read data')
-multiomics_rna = ad.read_h5ad(par["perturbation_data"])
- 
-
-if par['normalize']:
-    print('Noramlize data')
-    sc.pp.normalize_total(multiomics_rna)
-    sc.pp.log1p(multiomics_rna)
-    sc.pp.scale(multiomics_rna)
-    
-gene_names = multiomics_rna.var_names.to_numpy()
-tf_all = np.loadtxt(par['tf_all'], dtype=str)
-groups = multiomics_rna.obs.cell_type
-tf_all = np.intersect1d(tf_all, gene_names)
-
-
-print('Create corr net')
-net = create_corr_net(multiomics_rna.X, multiomics_rna.var_names, groups, par)
+net = create_corr_net(par)
 
 print('Output GRN')
 net.to_csv(par['prediction'])

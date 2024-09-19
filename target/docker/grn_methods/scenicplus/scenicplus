@@ -212,6 +212,13 @@ function ViashHelp {
   echo "    --normalize"
   echo "        type: boolean"
   echo "        default: false"
+  echo "        normalize rna seq data before inference. currently, it's only applicable"
+  echo "        to baseline models"
+  echo ""
+  echo "    --only_hvgs"
+  echo "        type: boolean"
+  echo "        default: false"
+  echo "        subset rna seq data to only 7000 hvgs to reduce dimensionality"
   echo ""
   echo "    --scplus_mdata"
   echo "        type: file, output, file must exist"
@@ -456,9 +463,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenicplus"
-LABEL org.opencontainers.image.created="2024-09-19T08:22:25Z"
+LABEL org.opencontainers.image.created="2024-09-19T14:03:36Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="229421448ccbffe98e7be0a0d822ecbe37d6b280"
+LABEL org.opencontainers.image.revision="2da5f2827e7328b2011a1962c9cd8a3ad8ccbd2e"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -727,6 +734,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_NORMALIZE=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --only_hvgs)
+            [ -n "$VIASH_PAR_ONLY_HVGS" ] && ViashError Bad arguments for option \'--only_hvgs\': \'$VIASH_PAR_ONLY_HVGS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_ONLY_HVGS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --only_hvgs. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --only_hvgs=*)
+            [ -n "$VIASH_PAR_ONLY_HVGS" ] && ViashError Bad arguments for option \'--only_hvgs=*\': \'$VIASH_PAR_ONLY_HVGS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_ONLY_HVGS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --scplus_mdata)
             [ -n "$VIASH_PAR_SCPLUS_MDATA" ] && ViashError Bad arguments for option \'--scplus_mdata\': \'$VIASH_PAR_SCPLUS_MDATA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_SCPLUS_MDATA="$2"
@@ -937,6 +955,9 @@ fi
 if [ -z ${VIASH_PAR_NORMALIZE+x} ]; then
   VIASH_PAR_NORMALIZE="false"
 fi
+if [ -z ${VIASH_PAR_ONLY_HVGS+x} ]; then
+  VIASH_PAR_ONLY_HVGS="false"
+fi
 if [ -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then
   VIASH_PAR_SCPLUS_MDATA="scplus_mdata.h5mu"
 fi
@@ -992,6 +1013,12 @@ fi
 if [[ -n "$VIASH_PAR_NORMALIZE" ]]; then
   if ! [[ "$VIASH_PAR_NORMALIZE" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--normalize' has to be a boolean. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_ONLY_HVGS" ]]; then
+  if ! [[ "$VIASH_PAR_ONLY_HVGS" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--only_hvgs' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1207,6 +1234,7 @@ par = {
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
+  'only_hvgs': $( if [ ! -z ${VIASH_PAR_ONLY_HVGS+x} ]; then echo "r'${VIASH_PAR_ONLY_HVGS//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'scplus_mdata': $( if [ ! -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then echo "r'${VIASH_PAR_SCPLUS_MDATA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'qc': $( if [ ! -z ${VIASH_PAR_QC+x} ]; then echo "r'${VIASH_PAR_QC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\'/\'\"\'\"r\'}'"; else echo None; fi ),
