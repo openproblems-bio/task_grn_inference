@@ -13,9 +13,9 @@ par = {
   "prediction": "output/celloracle_test.h5ad",
 }
 ## VIASH END
-meta = {
-  "resources_dir":'src/methods/multi_omics/celloracle'
-}
+# meta = {
+#   "resources_dir":'src/methods/multi_omics/celloracle'
+# }
 par['links'] = f"{par['temp_dir']}/links.celloracle.links" 
 
 sys.path.append(meta["resources_dir"])

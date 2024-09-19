@@ -11,9 +11,8 @@ par = {
     'normalize': False
 }
 ## VIASH END
-print(par)
-# import sys
-# sys.path.append('./src/utils')
+import sys
+sys.path.append(meta["resources_dir"])
 from util import create_corr_net
 
 par['causal'] = False
