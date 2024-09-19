@@ -16,7 +16,7 @@ par = {
   'reg_type': 'ridge',
   'layer': 'scgen_pearson',
   'subsample': -2,
-  'max_workers': 4,
+  'num_workers': 4,
 }
 ## VIASH END
 # meta = {

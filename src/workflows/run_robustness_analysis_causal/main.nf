@@ -56,7 +56,7 @@ workflow run_wf {
         subsample: "subsample",
         reg_type: "reg_type",
         method_id: "method_id",
-        max_workers: "max_workers",
+        num_workers: "num_workers",
         consensus: "consensus",
         tf_all: "tf_all"
       ],

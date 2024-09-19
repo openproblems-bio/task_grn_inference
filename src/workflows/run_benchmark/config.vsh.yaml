@@ -30,7 +30,7 @@ functionality:
           type: string
           direction: input
           default: ridge
-        - name: --max_workers
+        - name: --num_workers
           type: integer
           direction: input
           required: True

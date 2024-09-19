@@ -30,7 +30,7 @@ functionality:
           direction: input 
           required: True
           example: collectri
-        - name: --max_workers
+        - name: --num_workers
           type: integer
           direction: input
           required: True

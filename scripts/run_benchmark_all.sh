@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ID="benchmark_donor_0_baselines"
-resources_dir="./resources/"
-# resources_dir="s3://openproblems-data/resources/grn"
+RUN_ID="benchmark_donor_0_baselines_nonspecific_notnormalized"
+# resources_dir="./resources/"
+resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="${resources_dir}/results/${RUN_ID}"
 
 reg_type=ridge
@@ -12,7 +12,7 @@ max_workers=10
 layer='scgen_pearson'
 metric_ids="[regression_1, regression_2]"
 cell_type_specific=false #for controls
-normalize=true
+normalize=false
 only_hvgs=false
 # method_ids="[tigress, ennet, scsgl, pidc]"
 method_ids="[pearson_corr, pearson_causal, positive_control]"
@@ -42,12 +42,12 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
-nextflow run . \
-  -main-script  target/nextflow/workflows/run_benchmark/main.nf \
-  -profile docker \
-  -with-trace \
-  -c src/common/nextflow_helpers/labels_ci.config \
-  -params-file ${param_file}
+# nextflow run . \
+#   -main-script  target/nextflow/workflows/run_benchmark/main.nf \
+#   -profile docker \
+#   -with-trace \
+#   -c src/common/nextflow_helpers/labels_ci.config \
+#   -params-file ${param_file}
 
 # ./tw-windows-x86_64.exe launch `
 #     https://github.com/openproblems-bio/task_grn_inference.git `
@@ -59,11 +59,11 @@ nextflow run . \
 #     --params-file ./params/benchmark_donor_0_default.yaml `
 #     --config src/common/nextflow_helpers/labels_tw.config
 
-# ./tw launch https://github.com/openproblems-bio/task_grn_inference \
-#   --revision build/main \
-#   --pull-latest \
-#   --main-script target/nextflow/workflows/run_benchmark/main.nf \
-#   --workspace 53907369739130 \
-#   --compute-env 6TeIFgV5OY4pJCk8I0bfOh \
-#   --params-file ${param_file} \
-#   --config src/common/nextflow_helpers/labels_tw.config
+./tw launch https://github.com/openproblems-bio/task_grn_inference \
+  --revision build/main \
+  --pull-latest \
+  --main-script target/nextflow/workflows/run_benchmark/main.nf \
+  --workspace 53907369739130 \
+  --compute-env 6TeIFgV5OY4pJCk8I0bfOh \
+  --params-file ${param_file} \
+  --config src/common/nextflow_helpers/labels_tw.config

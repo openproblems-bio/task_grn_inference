@@ -17,7 +17,7 @@ par = {
     'static_only': True,
     'layer': 'scgen_pearson',
     'subsample': -2,
-    'max_workers': 4,
+    'num_workers': 4,
     'apply_tf': True,
     'clip_scores': True,
     'method_id': 'grnboost'
