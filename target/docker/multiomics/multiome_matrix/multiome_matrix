@@ -428,9 +428,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component multiomics multiome_matrix"
-LABEL org.opencontainers.image.created="2024-09-19T15:48:07Z"
+LABEL org.opencontainers.image.created="2024-09-19T16:35:32Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="1f617709f57ed76c054dc83b6681c6d406c2647a"
+LABEL org.opencontainers.image.revision="f15751f274ebd78544d7e3f38cbea765096538c8"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

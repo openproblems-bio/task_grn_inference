@@ -19,9 +19,9 @@ def corr_net(X, gene_names, par, tf_all, causal=False):
     net = np.dot(X.T, X) / X.shape[0]
     net = pd.DataFrame(net, index=gene_names, columns=gene_names)  
     if causal:  
-        net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
-    else:
         net = net[tf_all]
+    else:
+        net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
     net = net.reset_index()
     index_name = net.columns[0]
     net = net.melt(id_vars=index_name, var_name='source', value_name='weight')
@@ -60,6 +60,7 @@ def create_corr_net(par):
     
     X = multiomics_rna.X
     if par['cell_type_specific']:
+        print('cell_type_specific')
         i = 0
         for group in tqdm(np.unique(groups), desc="Processing groups"):
             X_sub = X[groups == group, :]

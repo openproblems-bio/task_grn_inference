@@ -83,7 +83,10 @@ workflow run_wf {
         multiomics_atac: "multiomics_atac",
         tf_all: "tf_all",
         perturbation_data:"perturbation_data",
-        cell_type_specific:"cell_type_specific"
+        cell_type_specific:"cell_type_specific",
+        normalize:"normalize",
+        only_hvgs:"only_hvgs",
+        num_workers:"num_workers"
 
       ],
       // use 'toState' to publish that component's outputs to the overall state
@@ -112,7 +115,7 @@ workflow run_wf {
         method_id: "method_id", 
         subsample: "subsample",
         reg_type: "reg_type",
-        max_workers: "max_workers",
+        num_workers: "num_workers",
         consensus: "consensus",
         tf_all: "tf_all",
         layer:"layer",

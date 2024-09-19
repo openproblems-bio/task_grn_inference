@@ -217,7 +217,7 @@ def main(par):
     #     net = net.groupby(['source', 'target']).mean().reset_index()
 
     subsample = par['subsample']
-    max_workers = par['max_workers']
+    max_workers = par['num_workers']
     layer = par["layer"]
     if subsample == -1:
         pass

@@ -36,7 +36,7 @@ functionality:
       direction: input
       default: -2
       description: number of samples randomly drawn from perturbation data
-    - name: --max_workers
+    - name: --num_workers
       type: integer
       direction: input
       default: 4
