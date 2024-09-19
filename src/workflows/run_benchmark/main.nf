@@ -14,7 +14,6 @@ workflow run_wf {
   // construct list of methods
   methods = [
     portia,
-    ennet,
     genie3,
     grnboost2,
     ppcor,

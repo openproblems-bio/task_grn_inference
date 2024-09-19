@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ID="benchmark_donor_0_baselines_specific"
+RUN_ID="benchmark_donor_0_baselines_nonspecific_notnormalized"
 # resources_dir="./resources_test/"
 resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="${resources_dir}/results/${RUN_ID}"
@@ -11,7 +11,7 @@ subsample=-2
 max_workers=10
 layer='scgen_pearson'
 metric_ids="[regression_1, regression_2]"
-cell_type_specific=true #for controls
+cell_type_specific=false #for controls
 normalize=false
 only_hvgs=false
 # method_ids="[tigress, ennet, scsgl, pidc]"
