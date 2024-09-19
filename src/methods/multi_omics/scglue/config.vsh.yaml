@@ -1,4 +1,4 @@
-__merge__: ../../../api/comp_method_mo.yaml
+__merge__: ../../../api/comp_method.yaml
 
 
 functionality:
@@ -26,13 +26,10 @@ functionality:
       required: false
       direction: input
       default: 1.5
-   
-      
   resources:
     - type: python_script
       path: script.py
     - path: main.py
-
 
 platforms:
   - type: docker
