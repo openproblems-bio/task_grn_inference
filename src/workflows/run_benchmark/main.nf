@@ -26,7 +26,8 @@ workflow run_wf {
     negative_control,
     positive_control,
 
-    celloracle
+    celloracle,
+    scglue
   ]
 
 

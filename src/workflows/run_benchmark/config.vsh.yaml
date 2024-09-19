@@ -90,21 +90,29 @@ functionality:
       repository: openproblems
     - name: metrics/regression_2 
     - name: metrics/regression_1
+    # ---- single omics
     - name: grn_methods/portia
-    - name: grn_methods/ennet
-    - name: grn_methods/genie3
     - name: grn_methods/grnboost2
-    # - name: grn_methods/pidc
-    - name: grn_methods/ppcor
-    # - name: grn_methods/scsgl
-    # - name: grn_methods/tigress
-    - name: grn_methods/celloracle
-    - name: grn_methods/scgpt
     - name: grn_methods/scenic
+    - name: grn_methods/genie3
+
+    - name: grn_methods/ppcor #needs docker image
+    - name: grn_methods/scgpt 
+    
+    # ---- multiomics 
+    - name: grn_methods/celloracle
+    - name: grn_methods/scglue
+    # ---- baselines
     - name: control_methods/pearson_corr
     - name: control_methods/pearson_causal
     - name: control_methods/negative_control
     - name: control_methods/positive_control
+    # -- needs development
+    # - name: grn_methods/pidc
+    # - name: grn_methods/scsgl
+    # - name: grn_methods/tigress
+    # - name: grn_methods/ennet
+
   repositories:
     - name: openproblems
       type: github

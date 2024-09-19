@@ -4,7 +4,7 @@ library(dplyr)
 
 ## VIASH START
 par <- list(
-    "multiomics_rna" = 'resources/resources_test/grn-benchmark/multiomics_rna.h5ad',
+    "multiomics_rna" = 'resources_test/grn-benchmark/multiomics_rna.h5ad',
     "prediction" = 'output/ppcor/prediction.csv',
     "temp_dir": 'output/ppcor',
     "max_n_links": 50000
@@ -17,16 +17,6 @@ inputExpr <- ad$X
 geneNames <- colnames(inputExpr)
 colnames(inputExpr) <- c(geneNames)
 X <- as.matrix(inputExpr)
-
-
-# # Keep genes with less than 10% of zeros
-# mask <- (apply(X, 2, function(x) mean(x != 0)) >= 0.1)
-# X <- X[, mask]
-# geneNames <- geneNames[mask]
-
-# # Keep samples with less than 10% of zeros
-# mask <- (apply(X, 1, function(x) mean(x != 0)) >= 0.1)
-# X <- X[mask,]
 
 # Run GRN inference method
 pcorResults = pcor(x = X, method = "pearson")

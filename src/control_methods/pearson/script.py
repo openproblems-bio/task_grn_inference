@@ -63,11 +63,11 @@ gene_names = multiomics_rna.var_names.to_numpy()
 tf_all = np.loadtxt(par['tf_all'], dtype=str)
 groups = multiomics_rna.obs.cell_type
 tf_all = np.intersect1d(tf_all, gene_names)
-
-print('Noramlize data')
-sc.pp.normalize_total(multiomics_rna)
-sc.pp.log1p(multiomics_rna)
-sc.pp.scale(multiomics_rna)
+if par['normalize']:
+    print('Noramlize data')
+    sc.pp.normalize_total(multiomics_rna)
+    sc.pp.log1p(multiomics_rna)
+    sc.pp.scale(multiomics_rna)
 
 print('Create corr net')
 net = create_corr_net(multiomics_rna.X, multiomics_rna.var_names, groups, par)

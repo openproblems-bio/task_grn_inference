@@ -47,6 +47,10 @@ functionality:
       type: boolean
       direction: input
       default: true
+    - name: --normalize
+      type: boolean
+      direction: input
+      default: false
 
 
 
