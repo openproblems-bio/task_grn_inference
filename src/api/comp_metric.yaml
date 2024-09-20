@@ -62,6 +62,10 @@ functionality:
     - name: --max_n_links
       type: integer
       default: 50000
+    - name: --verbose
+      type: integer
+      default: 2
+      direction: input
 
 
       
