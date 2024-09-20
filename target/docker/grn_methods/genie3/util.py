@@ -5,6 +5,14 @@ from tqdm import tqdm
 from sklearn.preprocessing import StandardScaler
 import scipy.sparse as sp
 
+def verbose_print(verbose_level, message, level):
+    if level <= verbose_level:
+        print(message)
+def verbose_tqdm(iterable, desc, level, verbose_level):  
+    if level <= verbose_level:
+        return tqdm(iterable, desc=desc)
+    else:
+        return iterable  # Return the iterable without a progress bar
 
 
 def process_links(net, par):

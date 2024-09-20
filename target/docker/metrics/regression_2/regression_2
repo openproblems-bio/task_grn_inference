@@ -224,6 +224,10 @@ function ViashHelp {
   echo "        type: integer"
   echo "        default: 50000"
   echo ""
+  echo "    --verbose"
+  echo "        type: integer"
+  echo "        default: 2"
+  echo ""
   echo "    --consensus"
   echo "        type: file, required parameter"
   echo "        example: resources_test/prior/consensus-num-regulators.json"
@@ -457,9 +461,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_2"
-LABEL org.opencontainers.image.created="2024-09-20T11:41:28Z"
+LABEL org.opencontainers.image.created="2024-09-20T14:36:23Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="ec0eeb6592a6493eb04bd7d4bc41f935188ca21e"
+LABEL org.opencontainers.image.revision="730b9e49e77d03cf02f35758e732f01a0f6f2687"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -750,6 +754,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_MAX_N_LINKS=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --verbose)
+            [ -n "$VIASH_PAR_VERBOSE" ] && ViashError Bad arguments for option \'--verbose\': \'$VIASH_PAR_VERBOSE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_VERBOSE="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --verbose. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --verbose=*)
+            [ -n "$VIASH_PAR_VERBOSE" ] && ViashError Bad arguments for option \'--verbose=*\': \'$VIASH_PAR_VERBOSE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_VERBOSE=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --consensus)
             [ -n "$VIASH_PAR_CONSENSUS" ] && ViashError Bad arguments for option \'--consensus\': \'$VIASH_PAR_CONSENSUS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_CONSENSUS="$2"
@@ -945,6 +960,9 @@ fi
 if [ -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then
   VIASH_PAR_MAX_N_LINKS="50000"
 fi
+if [ -z ${VIASH_PAR_VERBOSE+x} ]; then
+  VIASH_PAR_VERBOSE="2"
+fi
 if [ -z ${VIASH_PAR_STATIC_ONLY+x} ]; then
   VIASH_PAR_STATIC_ONLY="true"
 fi
@@ -991,6 +1009,12 @@ fi
 if [[ -n "$VIASH_PAR_MAX_N_LINKS" ]]; then
   if ! [[ "$VIASH_PAR_MAX_N_LINKS" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--max_n_links' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_VERBOSE" ]]; then
+  if ! [[ "$VIASH_PAR_VERBOSE" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--verbose' has to be an integer. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1149,6 +1173,7 @@ par = {
   'clip_scores': $( if [ ! -z ${VIASH_PAR_CLIP_SCORES+x} ]; then echo "r'${VIASH_PAR_CLIP_SCORES//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'verbose': $( if [ ! -z ${VIASH_PAR_VERBOSE+x} ]; then echo "int(r'${VIASH_PAR_VERBOSE//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'consensus': $( if [ ! -z ${VIASH_PAR_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_CONSENSUS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'static_only': $( if [ ! -z ${VIASH_PAR_STATIC_ONLY+x} ]; then echo "r'${VIASH_PAR_STATIC_ONLY//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
 }

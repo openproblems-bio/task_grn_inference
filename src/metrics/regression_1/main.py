@@ -9,15 +9,9 @@ from concurrent.futures import ThreadPoolExecutor
 import pandas as pd
 import anndata as ad
 from tqdm import tqdm
-
+from util import verbose_print, process_links, verbose_tqdm
 import os
 
-
-def select_top_links(net, par):
-    print("Number of links reduced to ", par['max_n_links'])
-    net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
-    net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
-    return net
 
 class lightgbm_wrapper:
     def __init__(self, params, max_workers=None):
@@ -117,10 +111,9 @@ def cross_validation(net, prturb_adata, par:dict):
         feature_fraction=0.05, verbosity=-1)
         regr = lightgbm_wrapper(params, max_workers)
     else:
-        print(f'{reg_type} is not defined')
-        raise ValueError("define first")  
+        raise ValueError(f"{reg_type} is not defined.")  
 
-    for group in tqdm(unique_groups, desc="Processing groups"):
+    for group in verbose_tqdm(unique_groups, "Processing groups", 2, par['verbose']):
         mask_va = groups == group
         mask_tr = ~mask_va
         X_tr = X[mask_tr & mask_shared_genes, :]
@@ -144,7 +137,7 @@ def regression_1(
     cell_types = prturb_adata.obs.cell_type.unique()
     score_list = []
     for cell_type in cell_types:
-        print(f'----cross validate for {cell_type}----')
+        verbose_print(par['verbose'], f'----cross validate for {cell_type}----', 2)
         # check if net is cell type specific 
         if 'cell_type' in net.columns:
             if cell_type not in net.cell_type.unique():
@@ -152,8 +145,9 @@ def regression_1(
             net_sub = net[net.cell_type==cell_type]
         else:
             net_sub = net
-        if len(net_sub)>par['max_n_links']:
-            net_sub = select_top_links(net_sub, par) #only top links are considered
+        if (len(net_sub)>par['max_n_links']) and (par['max_n_links']!=-1):
+            net_sub = process_links(net_sub, par) #only top links are considered
+            verbose_print(par['verbose'], f"Number of links reduced to {par['max_n_links']}", 2)
                 
         prturb_adata_sub = prturb_adata[prturb_adata.obs.cell_type==cell_type,:]
         y_true_sub, y_pred_sub = cross_validation(net_sub, prturb_adata_sub, par)
@@ -201,7 +195,7 @@ def main(par):
     manipulate = None 
     ## read and process input data
 
-    print('Reading input files', flush=True)
+    verbose_print(par['verbose'], 'Reading input files', 3)
     
     perturbation_data = ad.read_h5ad(par['perturbation_data'])
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
@@ -236,14 +230,13 @@ def main(par):
         perturbation_data = perturbation_data[mask,:]
     else:
         perturbation_data = perturbation_data[np.random.choice(perturbation_data.n_obs, subsample, replace=False), :]
-    
-    print(perturbation_data.shape)
-    
+    verbose_print(par['verbose'], perturbation_data.shape,4)    
     perturbation_data.X = perturbation_data.layers[layer]
 
     
 
-    print(f'Compute metrics for layer: {layer}', flush=True)
+    verbose_print(par['verbose'], f'Compute metrics for layer: {layer}',  3)    
+
     tfs_cases = [-1]
     if par['min_tf']:
         tfs_cases += 30
@@ -253,7 +246,7 @@ def main(par):
             par['exclude_missing_genes'] = exclude_missing_genes
             par['tf_n'] = tf_n
             run_key = f'ex({exclude_missing_genes})_tf({tf_n})'
-            print(run_key)
+            verbose_print(par['verbose'], f'Run for metric: {run_key}',  3)
             
             output = regression_1(net, perturbation_data, par=par, max_workers=max_workers)
             

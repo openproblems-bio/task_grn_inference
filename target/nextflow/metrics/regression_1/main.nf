@@ -3071,6 +3071,18 @@ meta = [
         "dest" : "par"
       },
       {
+        "type" : "integer",
+        "name" : "--verbose",
+        "default" : [
+          2
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
         "type" : "boolean",
         "name" : "--min_tf",
         "description" : "calculate the scores for the given min tfs in addition to the default",
@@ -3095,6 +3107,12 @@ meta = [
         "type" : "file",
         "path" : "main.py",
         "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/metrics/regression_1/"
+      },
+      {
+        "type" : "file",
+        "path" : "src/utils/util.py",
+        "dest" : "util.py",
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
     "test_resources" : [
@@ -3200,7 +3218,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "ec0eeb6592a6493eb04bd7d4bc41f935188ca21e",
+    "git_commit" : "730b9e49e77d03cf02f35758e732f01a0f6f2687",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3235,6 +3253,7 @@ par = {
   'clip_scores': $( if [ ! -z ${VIASH_PAR_CLIP_SCORES+x} ]; then echo "r'${VIASH_PAR_CLIP_SCORES//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
+  'verbose': $( if [ ! -z ${VIASH_PAR_VERBOSE+x} ]; then echo "int(r'${VIASH_PAR_VERBOSE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'min_tf': $( if [ ! -z ${VIASH_PAR_MIN_TF+x} ]; then echo "r'${VIASH_PAR_MIN_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
