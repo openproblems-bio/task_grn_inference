@@ -620,9 +620,10 @@ import os
 import anndata
 import numpy as np
 import pandas as pd
-import scanpy as sc 
 from arboreto.algo import genie3
 from distributed import Client
+import scipy.sparse as sp
+
 
 
 ## VIASH START
@@ -660,11 +661,14 @@ dep = {
 
 ## VIASH END
 
-
-print('Load scRNA-seq data')
+# Load scRNA-seq data
+print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
+
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
-X = adata_rna.X.toarray()
+if sp.issparse(adata_rna.X):
+    adata_rna.X = adata_rna.X.toarray()
+X = adata_rna.X
 
 # Load list of putative TFs
 df = pd.read_csv(par["tf_all"], header=None, names=['gene_name'])

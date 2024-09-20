@@ -5,19 +5,27 @@ import os
 import requests
 ## VIASH START
 par = {
-  "multiomics_rna": "resources/grn-benchmark/multiomics_rna_0.h5ad",
-  "multiomics_atac": "resources/grn-benchmark/multiomics_atac_0.h5ad",
+  "multiomics_rna": "resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad",
+  "multiomics_atac": "resources/grn-benchmark/multiomics_atac_d0.h5ad",
   "temp_dir": 'output/scglue/',
   "num_workers": 20,
-  "prediction": "output/scglue/prediction.csv",
+  "prediction": "output/scglue_d0_hvg.csv",
+  "max_n_links": 50000,
   "nes_threshold": 1.5,
   "rank_threshold": 1500,
-  "top_n_targets": 100
+  "top_n_targets": 100,
+  'normalize': False
 }
 ## VIASH END
-# meta = {
-#   "resources_dir": 'src/methods/multi_omics/scglue/'
-# }
+
+import sys
+meta= {
+  "util_dir": 'src/utils/',
+  "resources_dir": 'src/methods/multi_omics/scglue'
+}
+sys.path.append(meta["util_dir"])
+sys.path.append(meta["resources_dir"])
+from main import main 
 
 def download_annotation(par):
     # get gene annotation
@@ -40,7 +48,8 @@ def download_motifs(par):
         print(f"File downloaded and saved to {par['motif_file']}")
     else:
         print(f"Failed to download the {tag}. Status code: {response.status_code}")
-      
+os.makedirs(par['temp_dir'], exist_ok=True)
+
 print("Downloading prior started")
 download_annotation(par)
 print("Downloading prior ended")
@@ -49,13 +58,12 @@ print("Downloading motifs started")
 download_motifs(par)
 print("Downloading motifs ended")
 
-sys.path.append(meta["resources_dir"])
-from main import main 
-os.makedirs(par['temp_dir'], exist_ok=True)
+
 prediction = main(par)
 
 print('Write output to file', flush=True)
 prediction.to_csv(par["prediction"])
+
 
 
 

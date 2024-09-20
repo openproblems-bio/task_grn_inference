@@ -694,6 +694,7 @@ import pandas as pd
 import subprocess
 import ast
 import requests
+import scipy.sparse as sp
 
 # wget https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/refseq_r80/mc_v10_clust/gene_based/hg38_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather
 
@@ -743,12 +744,7 @@ meta= {
   "resources_dir": 'src/utils/'
 }
 sys.path.append(meta["resources_dir"])
-from util import process_data, process_links
-par['normalize']=False
-# Load scRNA-seq data
-print('Reading data')
-adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-process_data(adata_rna, par)
+from util import process_links
 
 os.makedirs(par['temp_dir'], exist_ok=True)
 
@@ -779,6 +775,14 @@ expr_mat_adjacencies =  os.path.join(par['temp_dir'], "expr_mat_adjacencies.tsv"
 expression_data = os.path.join(par['temp_dir'], "expression_data.tsv")
 regulons = f"{par['temp_dir']}/regulons.csv"
 
+def format_data(par):
+  print('Read data')
+  adata_rna = anndata.read_h5ad(par['multiomics_rna'])  
+  gene_names = adata_rna.var_names
+  if sp.issparse(adata_rna.X):
+    adata_rna.X = adata_rna.X.toarray()
+  pd.DataFrame(adata_rna.X, columns=gene_names).to_csv(expression_data, sep='\\t', index=False)
+  
 
 def run_grn(par):
   print('Run grn')

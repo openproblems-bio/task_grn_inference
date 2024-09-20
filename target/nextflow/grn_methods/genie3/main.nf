@@ -3127,7 +3127,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/genie3",
     "viash_version" : "0.8.6",
-    "git_commit" : "730b9e49e77d03cf02f35758e732f01a0f6f2687",
+    "git_commit" : "ae79f6ec1ce8bb690a17161ef1518708ac932cc1",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3147,9 +3147,10 @@ import os
 import anndata
 import numpy as np
 import pandas as pd
-import scanpy as sc 
 from arboreto.algo import genie3
 from distributed import Client
+import scipy.sparse as sp
+
 
 
 ## VIASH START
@@ -3187,11 +3188,14 @@ dep = {
 
 ## VIASH END
 
-
-print('Load scRNA-seq data')
+# Load scRNA-seq data
+print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
+
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
-X = adata_rna.X.toarray()
+if sp.issparse(adata_rna.X):
+    adata_rna.X = adata_rna.X.toarray()
+X = adata_rna.X
 
 # Load list of putative TFs
 df = pd.read_csv(par["tf_all"], header=None, names=['gene_name'])

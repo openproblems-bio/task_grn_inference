@@ -1,37 +1,51 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-# reg_type=${1} #GB, ridge
 # viash ns build --parallel
-reg_type=${2}
 
-RUN_ID=${1}_${2}
+RUN_ID="d0_hvgs_binarized"
 resources_dir="s3://openproblems-data/resources/grn"
 # resources_dir="./resources"
 publish_dir="${resources_dir}/results/${RUN_ID}"
-grn_models_folder="${resources_dir}/grn_models/alldonors_default"
+grn_models_folder="${resources_dir}/grn_models/d0_hvgs/binarized"
 
+reg_type="ridge"
 subsample=-2
-max_workers=10
+num_workers=10
 layer=scgen_pearson
 metric_ids="[regression_1, regression_2]"
 
 param_file="./params/${RUN_ID}.yaml"
 
+# grn_names=(
+#     "scglue"
+#     "scenicplus"
+#     "celloracle"
+#     "granie"
+#     "figr"
+#     "collectri"
+#     "genie3"
+#     "grnboost2"
+#     "ppcor"
+#     "portia"
+#     "positive_control"
+#     "pearson_causal"
+#     "pearson"
+#     )
 grn_names=(
     "scglue"
-    "scenicplus"
     "celloracle"
-    "granie"
-    "figr"
-    "collectri"
-    "genie3"
+
     "grnboost2"
+    "genie3"
     "ppcor"
+    "scenic"
     "portia"
+
     "positive_control"
     "pearson_causal"
-    "pearson"
+    "pearson_corr"
+    
     )
 
 # Start writing to the YAML file
@@ -47,7 +61,7 @@ append_entry() {
     reg_type: $reg_type
     method_id: $1
     subsample: $subsample
-    max_workers: $max_workers
+    num_workers: $num_workers
     tf_all: ${resources_dir}/prior/tf_all.csv
     layer: ${layer}
     consensus: ${resources_dir}/prior/consensus-num-regulators.json

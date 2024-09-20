@@ -3,26 +3,30 @@ import os
 import anndata
 import numpy as np
 import pandas as pd
-import scanpy as sc 
 from arboreto.algo import genie3
 from distributed import Client
+import scipy.sparse as sp
+
 
 
 ## VIASH START
 par = {
-  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna_0.h5ad',
+  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad',
   "tf_all": 'resources/prior/tf_all.csv',
-  'prediction': 'output//genie3_donor0.csv',
+  'prediction': 'output/genie3_donor0_hvg.csv',
   'max_n_links': 50000,
-  'only_hvgs': True
+  'normalize': False
 }
 ## VIASH END
 
-
-print('Load scRNA-seq data')
+# Load scRNA-seq data
+print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
+
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
-X = adata_rna.X.toarray()
+if sp.issparse(adata_rna.X):
+    adata_rna.X = adata_rna.X.toarray()
+X = adata_rna.X
 
 # Load list of putative TFs
 df = pd.read_csv(par["tf_all"], header=None, names=['gene_name'])

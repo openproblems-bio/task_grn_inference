@@ -14,6 +14,11 @@ functionality:
       description: calculate the scores for the given min tfs in addition to the default 
       required: false
       default: false
+    - name: --binarize
+      type: boolean 
+      direction: input 
+      description: whether to binarize the weight
+      default: true
   resources:
     - type: python_script
       path: script.py

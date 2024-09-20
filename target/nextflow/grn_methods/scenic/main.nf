@@ -3149,7 +3149,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenic",
     "viash_version" : "0.8.6",
-    "git_commit" : "730b9e49e77d03cf02f35758e732f01a0f6f2687",
+    "git_commit" : "ae79f6ec1ce8bb690a17161ef1518708ac932cc1",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3171,6 +3171,7 @@ import pandas as pd
 import subprocess
 import ast
 import requests
+import scipy.sparse as sp
 
 # wget https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/refseq_r80/mc_v10_clust/gene_based/hg38_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather
 
@@ -3220,12 +3221,7 @@ meta= {
   "resources_dir": 'src/utils/'
 }
 sys.path.append(meta["resources_dir"])
-from util import process_data, process_links
-par['normalize']=False
-# Load scRNA-seq data
-print('Reading data')
-adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-process_data(adata_rna, par)
+from util import process_links
 
 os.makedirs(par['temp_dir'], exist_ok=True)
 
@@ -3256,6 +3252,14 @@ expr_mat_adjacencies =  os.path.join(par['temp_dir'], "expr_mat_adjacencies.tsv"
 expression_data = os.path.join(par['temp_dir'], "expression_data.tsv")
 regulons = f"{par['temp_dir']}/regulons.csv"
 
+def format_data(par):
+  print('Read data')
+  adata_rna = anndata.read_h5ad(par['multiomics_rna'])  
+  gene_names = adata_rna.var_names
+  if sp.issparse(adata_rna.X):
+    adata_rna.X = adata_rna.X.toarray()
+  pd.DataFrame(adata_rna.X, columns=gene_names).to_csv(expression_data, sep='\\\\t', index=False)
+  
 
 def run_grn(par):
   print('Run grn')

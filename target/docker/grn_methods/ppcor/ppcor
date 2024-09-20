@@ -445,9 +445,9 @@ RUN Rscript -e 'if (!requireNamespace("remotes", quietly = TRUE)) install.packag
   Rscript -e 'remotes::install_cran(c("ppcor", "anndata", "dplyr"), repos = "https://cran.rstudio.com")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods ppcor"
-LABEL org.opencontainers.image.created="2024-09-20T14:36:22Z"
+LABEL org.opencontainers.image.created="2024-09-20T18:30:45Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="730b9e49e77d03cf02f35758e732f01a0f6f2687"
+LABEL org.opencontainers.image.revision="ae79f6ec1ce8bb690a17161ef1518708ac932cc1"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1118,9 +1118,11 @@ options(.viash_orig_warn)
 rm(.viash_orig_warn)
 
 ## VIASH END
-
+print(par)
+print(dim(par))
 # input expression data
 ad <- anndata::read_h5ad(par\$multiomics_rna)
+
 inputExpr <- ad\$X
 geneNames <- colnames(inputExpr)
 colnames(inputExpr) <- c(geneNames)

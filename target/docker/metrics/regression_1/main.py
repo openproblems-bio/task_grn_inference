@@ -187,7 +187,14 @@ def process_net(net, gene_names):
     net = net[net.index.isin(gene_names)]
     return net
 
-
+def binarize_weight(weight):
+    if weight > 0:
+        return 1
+    elif weight < 0:
+        return -1
+    else:
+        return 0
+    
 def main(par):
     random_state = 42
     set_global_seed(random_state)
@@ -203,6 +210,8 @@ def main(par):
     net = pd.read_csv(par['prediction'])
     # net['weight'] = net.weight.abs()
     # subset to keep only those links with source as tf
+    if par['binarize']:
+        net['weight'] = net['weight'].apply(binarize_weight)
     if par['apply_tf']:
         net = net[net.source.isin(tf_all)]
     # if 'cell_type' in net.columns:

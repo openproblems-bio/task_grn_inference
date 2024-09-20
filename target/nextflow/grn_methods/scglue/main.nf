@@ -3173,7 +3173,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scglue",
     "viash_version" : "0.8.6",
-    "git_commit" : "730b9e49e77d03cf02f35758e732f01a0f6f2687",
+    "git_commit" : "ae79f6ec1ce8bb690a17161ef1518708ac932cc1",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3230,9 +3230,15 @@ dep = {
 }
 
 ## VIASH END
-# meta = {
-#   "resources_dir": 'src/methods/multi_omics/scglue/'
-# }
+
+import sys
+meta= {
+  "util_dir": 'src/utils/',
+  "resources_dir": 'src/methods/multi_omics/scglue'
+}
+sys.path.append(meta["util_dir"])
+sys.path.append(meta["resources_dir"])
+from main import main 
 
 def download_annotation(par):
     # get gene annotation
@@ -3255,7 +3261,8 @@ def download_motifs(par):
         print(f"File downloaded and saved to {par['motif_file']}")
     else:
         print(f"Failed to download the {tag}. Status code: {response.status_code}")
-      
+os.makedirs(par['temp_dir'], exist_ok=True)
+
 print("Downloading prior started")
 download_annotation(par)
 print("Downloading prior ended")
@@ -3264,9 +3271,7 @@ print("Downloading motifs started")
 download_motifs(par)
 print("Downloading motifs ended")
 
-sys.path.append(meta["resources_dir"])
-from main import main 
-os.makedirs(par['temp_dir'], exist_ok=True)
+
 prediction = main(par)
 
 print('Write output to file', flush=True)

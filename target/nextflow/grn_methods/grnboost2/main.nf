@@ -3127,7 +3127,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/grnboost2",
     "viash_version" : "0.8.6",
-    "git_commit" : "730b9e49e77d03cf02f35758e732f01a0f6f2687",
+    "git_commit" : "ae79f6ec1ce8bb690a17161ef1518708ac932cc1",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3194,12 +3194,10 @@ meta= {
   "resources_dir": 'src/utils/'
 }
 sys.path.append(meta["resources_dir"])
-from util import process_data, process_links
-par['normalize']=False
+from util import process_links
 # Load scRNA-seq data
 print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-process_data(adata_rna, par)
 
 groups = adata_rna.obs.cell_type
 gene_names = adata_rna.var.gene_ids.index.to_numpy()

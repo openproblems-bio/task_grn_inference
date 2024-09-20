@@ -10,6 +10,7 @@ import pandas as pd
 import numpy as np
 from ast import literal_eval
 import requests
+import torch
 
 def preprocess(rna, atac, par):
     rna.layers["counts"] = rna.X.copy()
@@ -251,17 +252,21 @@ def prune_grn(par):
 
 
 def main(par):
-    import torch
+    
     print("Is CUDA available:", torch.cuda.is_available())
     print("Number of GPUs:", torch.cuda.device_count())
     
-    os.makedirs(par['temp_dir'], exist_ok=True)
     print('Reading input files', flush=True)
     rna = ad.read_h5ad(par['multiomics_rna'])
     atac = ad.read_h5ad(par['multiomics_atac'])
+    
+    from util import process_links
+    # Load scRNA-seq data
+    print('Reading data')
 
     print('Preprocess data', flush=True)
     preprocess(rna, atac, par)
+    
     print('Train a model', flush=True)
     training(par)
     run_grn(par)
@@ -283,6 +288,8 @@ def main(par):
     scglue_grn = pd.DataFrame(np.stack([tfs_list, target_list, weight_list], axis=1), columns=['source','target','weight'])
     scglue_grn.weight = scglue_grn.weight.astype(float)
     scglue_grn = scglue_grn.drop_duplicates().reset_index(drop=True)
+    
+    scglue_grn = process_links(scglue_grn, par)
 
     return scglue_grn
     

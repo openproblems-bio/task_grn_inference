@@ -661,9 +661,11 @@ options(.viash_orig_warn)
 rm(.viash_orig_warn)
 
 ## VIASH END
-
+print(par)
+print(dim(par))
 # input expression data
 ad <- anndata::read_h5ad(par\$multiomics_rna)
+
 inputExpr <- ad\$X
 geneNames <- colnames(inputExpr)
 colnames(inputExpr) <- c(geneNames)
