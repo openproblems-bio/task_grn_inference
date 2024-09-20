@@ -10,7 +10,7 @@ from tqdm import tqdm
 
 ## VIASH START
 par = {
-  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna_0.h5ad',
+  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad',
   'tf_all': 'resources/prior/tf_all.csv',
   'prediction': 'output/portia_donor_0_hvgs.csv',
   'max_n_links': 50000,
@@ -24,12 +24,10 @@ meta= {
   "resources_dir": 'src/utils/'
 }
 sys.path.append(meta["resources_dir"])
-from util import process_data, process_links
-par['normalize']=False
+from util import process_links
 # Load scRNA-seq data
 print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-process_data(adata_rna, par)
 
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
 X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X

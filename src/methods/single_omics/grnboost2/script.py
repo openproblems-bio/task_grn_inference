@@ -12,13 +12,12 @@ import subprocess
 
 ## VIASH START
 par = {
-  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna_0.h5ad',
+  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad',
   "tf_all": 'resources/prior/tf_all.csv',
   'prediction': 'output/grnboost2_donor_0_hvg.csv',
   'max_n_links': 50000,
   'cell_type_specific': False,
-  'normalize': False,
-  'only_hvgs': True
+  'normalize': False
 }
 ## VIASH END
 
@@ -27,12 +26,10 @@ meta= {
   "resources_dir": 'src/utils/'
 }
 sys.path.append(meta["resources_dir"])
-from util import process_data, process_links
-par['normalize']=False
+from util import process_links
 # Load scRNA-seq data
 print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-process_data(adata_rna, par)
 
 groups = adata_rna.obs.cell_type
 gene_names = adata_rna.var.gene_ids.index.to_numpy()

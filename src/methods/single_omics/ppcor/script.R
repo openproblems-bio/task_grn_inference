@@ -4,15 +4,16 @@ library(dplyr)
 
 ## VIASH START
 par <- list(
-    "multiomics_rna" = 'resources_test/grn-benchmark/multiomics_rna.h5ad',
-    "prediction" = 'output/ppcor/prediction.csv',
-    "temp_dir": 'output/ppcor',
-    "max_n_links": 50000
+  multiomics_rna = 'resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad',
+  prediction = 'output/ppcor_d0_hvg.csv',
+  max_n_links = 50000
 )
 ## VIASH END
-
+print(par)
+print(dim(par))
 # input expression data
 ad <- anndata::read_h5ad(par$multiomics_rna)
+
 inputExpr <- ad$X
 geneNames <- colnames(inputExpr)
 colnames(inputExpr) <- c(geneNames)

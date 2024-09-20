@@ -1,6 +1,5 @@
 #!/bin/bash
-#SBATCH --time=12:00:00
-#SBATCH --job-name=scglue_donor_0
+#SBATCH --time=48:00:00
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --mail-type=END

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ID="donor_0_normalized_noncelltype_hvg"
+RUN_ID="celloracle_d0_hvg"
 # resources_dir="./resources/"
 resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="${resources_dir}/results/${RUN_ID}"
@@ -12,10 +12,11 @@ num_workers=10
 layer='scgen_pearson'
 metric_ids="[regression_1, regression_2]"
 cell_type_specific=false #for controls
-normalize=true
+normalize=false
 only_hvgs=true
 # method_ids="[tigress, ennet, scsgl, pidc]"
-method_ids="[pearson_corr, pearson_causal, positive_control]"
+# method_ids="[pearson_corr, pearson_causal, positive_control]"
+method_ids="[celloracle]"
 
 param_file="./params/${RUN_ID}.yaml"
 
