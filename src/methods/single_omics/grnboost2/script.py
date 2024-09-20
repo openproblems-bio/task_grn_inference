@@ -14,19 +14,26 @@ import subprocess
 par = {
   'multiomics_rna': 'resources/grn-benchmark/multiomics_rna_0.h5ad',
   "tf_all": 'resources/prior/tf_all.csv',
-  'prediction': 'output/grnboost2_donor_0.csv',
+  'prediction': 'output/grnboost2_donor_0_hvg.csv',
   'max_n_links': 50000,
-  'cell_type_specific': False}
+  'cell_type_specific': False,
+  'normalize': False,
+  'only_hvgs': True
+}
 ## VIASH END
 
-def process_links(net, par):
-  net = net[net.source!=net.target]
-  net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
-  net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
-  return net
+import sys
+meta= {
+  "resources_dir": 'src/utils/'
+}
+sys.path.append(meta["resources_dir"])
+from util import process_data, process_links
+par['normalize']=False
 # Load scRNA-seq data
+print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-# adata_rna.X = adata_rna.layers['lognorm'] #TODO: fix this
+process_data(adata_rna, par)
+
 groups = adata_rna.obs.cell_type
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
 X = adata_rna.X

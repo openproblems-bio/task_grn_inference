@@ -3000,6 +3000,12 @@ meta = [
         "path" : "script.py",
         "is_executable" : true,
         "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/genie3/"
+      },
+      {
+        "type" : "file",
+        "path" : "src/utils/util.py",
+        "dest" : "util.py",
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
     "test_resources" : [
@@ -3121,7 +3127,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/genie3",
     "viash_version" : "0.8.6",
-    "git_commit" : "f15751f274ebd78544d7e3f38cbea765096538c8",
+    "git_commit" : "ec0eeb6592a6493eb04bd7d4bc41f935188ca21e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

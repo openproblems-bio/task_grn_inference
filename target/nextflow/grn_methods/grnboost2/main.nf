@@ -3000,6 +3000,12 @@ meta = [
         "path" : "script.py",
         "is_executable" : true,
         "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/grnboost2/"
+      },
+      {
+        "type" : "file",
+        "path" : "src/utils/util.py",
+        "dest" : "util.py",
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
     "test_resources" : [
@@ -3121,7 +3127,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/grnboost2",
     "viash_version" : "0.8.6",
-    "git_commit" : "f15751f274ebd78544d7e3f38cbea765096538c8",
+    "git_commit" : "ec0eeb6592a6493eb04bd7d4bc41f935188ca21e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3183,14 +3189,18 @@ dep = {
 
 ## VIASH END
 
-def process_links(net, par):
-  net = net[net.source!=net.target]
-  net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
-  net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
-  return net
+import sys
+meta= {
+  "resources_dir": 'src/utils/'
+}
+sys.path.append(meta["resources_dir"])
+from util import process_data, process_links
+par['normalize']=False
 # Load scRNA-seq data
+print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-# adata_rna.X = adata_rna.layers['lognorm'] #TODO: fix this
+process_data(adata_rna, par)
+
 groups = adata_rna.obs.cell_type
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
 X = adata_rna.X

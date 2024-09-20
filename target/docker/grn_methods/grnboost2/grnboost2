@@ -447,9 +447,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods grnboost2"
-LABEL org.opencontainers.image.created="2024-09-19T16:35:32Z"
+LABEL org.opencontainers.image.created="2024-09-20T11:41:28Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="f15751f274ebd78544d7e3f38cbea765096538c8"
+LABEL org.opencontainers.image.revision="ec0eeb6592a6493eb04bd7d4bc41f935188ca21e"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1121,14 +1121,18 @@ dep = {
 
 ## VIASH END
 
-def process_links(net, par):
-  net = net[net.source!=net.target]
-  net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
-  net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
-  return net
+import sys
+meta= {
+  "resources_dir": 'src/utils/'
+}
+sys.path.append(meta["resources_dir"])
+from util import process_data, process_links
+par['normalize']=False
 # Load scRNA-seq data
+print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-# adata_rna.X = adata_rna.layers['lognorm'] #TODO: fix this
+process_data(adata_rna, par)
+
 groups = adata_rna.obs.cell_type
 gene_names = adata_rna.var.gene_ids.index.to_numpy()
 X = adata_rna.X

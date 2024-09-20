@@ -3149,7 +3149,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenic",
     "viash_version" : "0.8.6",
-    "git_commit" : "f15751f274ebd78544d7e3f38cbea765096538c8",
+    "git_commit" : "ec0eeb6592a6493eb04bd7d4bc41f935188ca21e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3214,12 +3214,20 @@ dep = {
 }
 
 ## VIASH END
-os.makedirs(par['temp_dir'], exist_ok=True)
 
-# Load list of putative TFs
-# df = pd.read_csv(par["tf_all"], header=None, names=['gene_name'])
-# tfs = set(list(df['gene_name']))
-# tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
+import sys
+meta= {
+  "resources_dir": 'src/utils/'
+}
+sys.path.append(meta["resources_dir"])
+from util import process_data, process_links
+par['normalize']=False
+# Load scRNA-seq data
+print('Reading data')
+adata_rna = anndata.read_h5ad(par['multiomics_rna'])
+process_data(adata_rna, par)
+
+os.makedirs(par['temp_dir'], exist_ok=True)
 
 databases = f"{par['temp_dir']}/databases/"
 os.makedirs(databases, exist_ok=True)
@@ -3243,16 +3251,11 @@ if not (os.path.exists(par['genes_vs_motifs_500'])):
   response = requests.get("https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/refseq_r80/mc_v10_clust/gene_based/hg38_500bp_up_100bp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather")
   with open(par['genes_vs_motifs_500'], "wb") as file:
       file.write(response.content)
+      
 expr_mat_adjacencies =  os.path.join(par['temp_dir'], "expr_mat_adjacencies.tsv")
 expression_data = os.path.join(par['temp_dir'], "expression_data.tsv")
 regulons = f"{par['temp_dir']}/regulons.csv"
 
-def format_data(par):
-  print('Read data')
-  adata_rna = anndata.read_h5ad(par['multiomics_rna'])  
-  gene_names = adata_rna.var_names
-  pd.DataFrame(adata_rna.X.todense(), columns=gene_names).to_csv(expression_data, sep='\\\\t', index=False)
-  
 
 def run_grn(par):
   print('Run grn')

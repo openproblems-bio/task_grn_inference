@@ -170,6 +170,9 @@ functionality:
   - type: "python_script"
     path: "script.py"
     is_executable: true
+  - type: "file"
+    path: "src/utils/util.py"
+    dest: "util.py"
   test_resources:
   - type: "python_script"
     path: "src/common/component_tests/run_and_check_output.py"
@@ -256,5 +259,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/native/grn_methods/grnboost2"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/native/grn_methods/grnboost2/grnboost2"
   viash_version: "0.8.6"
-  git_commit: "f15751f274ebd78544d7e3f38cbea765096538c8"
+  git_commit: "ec0eeb6592a6493eb04bd7d4bc41f935188ca21e"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

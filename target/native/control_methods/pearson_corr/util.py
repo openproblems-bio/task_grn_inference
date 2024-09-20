@@ -2,7 +2,6 @@ import pandas as pd
 import anndata as ad 
 import numpy as np 
 from tqdm import tqdm
-import scanpy as sc 
 from sklearn.preprocessing import StandardScaler
 import scipy.sparse as sp
 
@@ -33,6 +32,7 @@ def corr_net(X, gene_names, par, tf_all, causal=False):
 
 def process_data(adata, par):
     if par['normalize']:
+        import scanpy as sc
         print('Noramlize data')
         sc.pp.normalize_total(adata)
         sc.pp.log1p(adata)
