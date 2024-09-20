@@ -448,9 +448,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component control_methods negative_control"
-LABEL org.opencontainers.image.created="2024-09-20T18:30:45Z"
+LABEL org.opencontainers.image.created="2024-09-20T20:11:16Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="ae79f6ec1ce8bb690a17161ef1518708ac932cc1"
+LABEL org.opencontainers.image.revision="b1d37ce35345e3d9162ae83f44f0f47515a084d0"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1142,8 +1142,8 @@ print(par)
 
 def process_links(net, par):
     net = net[net.source!=net.target]
-    net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
-    net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
+    net = net.sample(par['max_n_links'])
+    print(net)
     return net
 
 print('Reading input data')
@@ -1151,7 +1151,7 @@ perturbation_data = ad.read_h5ad(par["perturbation_data"])
 gene_names = perturbation_data.var_names.to_numpy()
 tf_all = np.loadtxt(par['tf_all'], dtype=str)
 
-n_tf = 1200
+n_tf = 500
 tfs = tf_all[:n_tf]
 
 def create_negative_control(gene_names) -> np.ndarray:

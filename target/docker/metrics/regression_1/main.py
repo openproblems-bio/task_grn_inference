@@ -148,7 +148,8 @@ def regression_1(
         if (len(net_sub)>par['max_n_links']) and (par['max_n_links']!=-1):
             net_sub = process_links(net_sub, par) #only top links are considered
             verbose_print(par['verbose'], f"Number of links reduced to {par['max_n_links']}", 2)
-                
+        if par['binarize']:
+            net['weight'] = net['weight'].apply(binarize_weight)        
         prturb_adata_sub = prturb_adata[prturb_adata.obs.cell_type==cell_type,:]
         y_true_sub, y_pred_sub = cross_validation(net_sub, prturb_adata_sub, par)
 
@@ -210,8 +211,7 @@ def main(par):
     net = pd.read_csv(par['prediction'])
     # net['weight'] = net.weight.abs()
     # subset to keep only those links with source as tf
-    if par['binarize']:
-        net['weight'] = net['weight'].apply(binarize_weight)
+    
     if par['apply_tf']:
         net = net[net.source.isin(tf_all)]
     # if 'cell_type' in net.columns:

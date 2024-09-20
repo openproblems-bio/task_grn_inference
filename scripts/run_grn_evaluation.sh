@@ -1,13 +1,11 @@
 #!/bin/bash
 
-# RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-# viash ns build --parallel
-
-RUN_ID="d0_hvgs_binarized"
+RUN_ID="d0_hvgs"
+echo $RUN_ID
 resources_dir="s3://openproblems-data/resources/grn"
 # resources_dir="./resources"
 publish_dir="${resources_dir}/results/${RUN_ID}"
-grn_models_folder="${resources_dir}/grn_models/d0_hvgs/binarized"
+grn_models_folder="${resources_dir}/grn_models/d0_hvgs"
 
 reg_type="ridge"
 subsample=-2
@@ -41,11 +39,13 @@ grn_names=(
     "ppcor"
     "scenic"
     "portia"
-
+    
+    "negative_control"
     "positive_control"
     "pearson_causal"
     "pearson_corr"
-    
+
+    "collectri"
     )
 
 # Start writing to the YAML file

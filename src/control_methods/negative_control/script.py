@@ -6,16 +6,17 @@ import numpy as np
 ## VIASH START
 par = {
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
-  "prediction": "output/negative_control.csv",
-  "tf_all": "resources/prior/tf_all.csv"
+  "prediction": "resources/grn_models/default/negative_control.csv",
+  "tf_all": "resources/prior/tf_all.csv",
+  "max_n_links": 50000
 }
 ## VIASH END
 print(par)
 
 def process_links(net, par):
     net = net[net.source!=net.target]
-    net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
-    net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
+    net = net.sample(par['max_n_links'])
+    print(net)
     return net
 
 print('Reading input data')
@@ -23,7 +24,7 @@ perturbation_data = ad.read_h5ad(par["perturbation_data"])
 gene_names = perturbation_data.var_names.to_numpy()
 tf_all = np.loadtxt(par['tf_all'], dtype=str)
 
-n_tf = 1200
+n_tf = 500
 tfs = tf_all[:n_tf]
 
 def create_negative_control(gene_names) -> np.ndarray:
