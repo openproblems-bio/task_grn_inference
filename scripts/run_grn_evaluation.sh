@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-reg_type="ridge"
 # viash ns build --parallel
 
-RUN_ID="d0_hvgs"
+RUN_ID="d0_hvgs_binarized"
 resources_dir="s3://openproblems-data/resources/grn"
 # resources_dir="./resources"
 publish_dir="${resources_dir}/results/${RUN_ID}"
-grn_models_folder="${resources_dir}/grn_models/d0_hvgs"
+grn_models_folder="${resources_dir}/grn_models/d0_hvgs/binarized"
 
+reg_type="ridge"
 subsample=-2
 num_workers=10
 layer=scgen_pearson
@@ -35,12 +35,17 @@ param_file="./params/${RUN_ID}.yaml"
 grn_names=(
     "scglue"
     "celloracle"
+
     "grnboost2"
+    "genie3"
     "ppcor"
+    "scenic"
     "portia"
+
     "positive_control"
     "pearson_causal"
     "pearson_corr"
+    
     )
 
 # Start writing to the YAML file
