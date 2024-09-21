@@ -7,7 +7,6 @@ par = {
     'max_n_links': 50000,
     'prediction': 'resources/grn_models/donor_0_default/pearson.csv',
     "seed": 32,
-    'only_hvgs': True,
     'normalize': False
 }
 ## VIASH END
