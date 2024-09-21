@@ -85,7 +85,6 @@ workflow run_wf {
         perturbation_data:"perturbation_data",
         cell_type_specific:"cell_type_specific",
         normalize:"normalize",
-        only_hvgs:"only_hvgs",
         num_workers:"num_workers"
 
       ],

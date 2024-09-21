@@ -50,10 +50,6 @@ def process_data(adata, par):
         adata.X = adata.X.toarray()  # You can also use .todense(), but .toarray() gives a NumPy array directly
     else:
         print("adata.X is already dense.")
-    if par['only_hvgs']:
-        print('Subsetting data to hvgs')
-        adata = adata[:, adata.var.hvg_counts]
-        print('New dimension of data: ', adata.shape)
         
 def create_corr_net(par):
     print(par)

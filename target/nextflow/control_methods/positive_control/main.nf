@@ -3130,7 +3130,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "b1d37ce35345e3d9162ae83f44f0f47515a084d0",
+    "git_commit" : "916d854b0df3629c86769b495c90dcfb528e7559",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

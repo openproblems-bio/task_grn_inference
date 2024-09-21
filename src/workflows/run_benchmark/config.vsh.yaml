@@ -58,10 +58,7 @@ functionality:
           type: boolean
           required: false
           direction: input
-        - name: --only_hvgs
-          type: boolean
-          required: false
-          direction: input
+
           
         
     - name: Outputs

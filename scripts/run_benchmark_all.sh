@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-RUN_ID="celloracle_d0_hvg"
+RUN_ID="d0_hvgs_baseline"
 # resources_dir="./resources/"
 resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="${resources_dir}/results/${RUN_ID}"
@@ -13,10 +12,7 @@ layer='scgen_pearson'
 metric_ids="[regression_1, regression_2]"
 cell_type_specific=false #for controls
 normalize=false
-only_hvgs=true
-# method_ids="[tigress, ennet, scsgl, pidc]"
-# method_ids="[pearson_corr, pearson_causal, positive_control]"
-method_ids="[celloracle]"
+method_ids="[pearson_corr, pearson_causal, positive_control]"
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -27,7 +23,7 @@ param_list:
     metric_ids: $metric_ids
     method_ids: $method_ids
     perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
-    multiomics_rna: ${resources_dir}/grn-benchmark/multiomics_rna_0.h5ad
+    multiomics_rna: ${resources_dir}/grn-benchmark/multiomics_rna_0_hvgs.h5ad
     multiomics_atac: ${resources_dir}/grn-benchmark/multiomics_atac_0.h5ad
     reg_type: $reg_type
     subsample: $subsample
@@ -37,7 +33,6 @@ param_list:
     tf_all: ${resources_dir}/prior/tf_all.csv
     cell_type_specific: ${cell_type_specific}
     normalize: ${normalize}
-    only_hvgs: ${only_hvgs}
 
 output_state: "state.yaml"
 publish_dir: "$publish_dir"
