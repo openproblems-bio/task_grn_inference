@@ -445,9 +445,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata" "numpy" "scipy" "scikit-learn" "portia-grn"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods portia"
-LABEL org.opencontainers.image.created="2024-09-21T10:10:02Z"
+LABEL org.opencontainers.image.created="2024-09-22T16:54:44Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="916d854b0df3629c86769b495c90dcfb528e7559"
+LABEL org.opencontainers.image.revision="3ee6fbaa52201fef2ae8ab8c967e92344aa40d93"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1141,7 +1141,7 @@ def infer_grn(X, gene_names):
       dataset.add(pt.Experiment(exp_id, data))
   
   M_bar = pt.run(dataset, method='no-transform')
-  limit = min([10000000, X.size])
+  limit = min([500000, X.size])
   ranked_scores = pt.rank_scores(M_bar, gene_names, limit=limit)
   sources, targets, weights = zip(*[(gene_a, gene_b, score) for gene_a, gene_b, score in ranked_scores])
 

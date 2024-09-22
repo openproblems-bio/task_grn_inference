@@ -11,6 +11,10 @@ import anndata as ad
 from tqdm import tqdm
 from util import verbose_print, process_links, verbose_tqdm
 import os
+import warnings
+
+warnings.filterwarnings("ignore", category=FutureWarning)
+
 
 
 class lightgbm_wrapper:
@@ -54,14 +58,6 @@ def cv_5(genes_n):
 def cross_validation(net, prturb_adata, par:dict):
     gene_names = prturb_adata.var_names
     net = process_net(net.copy(), gene_names)
-    net_subset = net.copy()
-    # Subset TFs 
-    if par['tf_n'] == -1:
-        degrees = net.abs().sum(axis=0)
-        net = net.loc[:, degrees >= degrees.quantile((1 - par['theta']))]
-    else:
-        degrees = net.abs().sum(axis=0)
-        net = net[degrees.nlargest(tf_n).index]
 
     gene_names_grn = net.index.to_numpy()   
     
@@ -105,11 +101,11 @@ def cross_validation(net, prturb_adata, par:dict):
                     n_estimators=100, min_samples_leaf=2, min_child_samples=1, 
                     feature_fraction=0.05, verbosity=-1
         )
-        regr = lightgbm_wrapper(params, max_workers=max_workers)
+        regr = lightgbm_wrapper(params, max_workers=par['num_workers'])
     elif reg_type=='RF':
         params = dict(boosting_type='rf',random_state=32, n_estimators=100,  
         feature_fraction=0.05, verbosity=-1)
-        regr = lightgbm_wrapper(params, max_workers)
+        regr = lightgbm_wrapper(params, max_workers=par['num_workers'])
     else:
         raise ValueError(f"{reg_type} is not defined.")  
 
@@ -246,29 +242,11 @@ def main(par):
 
     verbose_print(par['verbose'], f'Compute metrics for layer: {layer}',  3)    
 
-    tfs_cases = [-1]
-    if par['min_tf']:
-        tfs_cases += 30
-    layer_results = {}  # Store results for this layer
-    for exclude_missing_genes in [False, True]:  # two settings on target gene
-        for tf_n in tfs_cases:  # two settings on tfs
-            par['exclude_missing_genes'] = exclude_missing_genes
-            par['tf_n'] = tf_n
-            run_key = f'ex({exclude_missing_genes})_tf({tf_n})'
-            verbose_print(par['verbose'], f'Run for metric: {run_key}',  3)
-            
-            output = regression_1(net, perturbation_data, par=par, max_workers=max_workers)
-            
-            layer_results[run_key] = [output['mean_score_r2']]
+    results = {}    
+    par['exclude_missing_genes'] = False
+    results['S1'] = [regression_1(net, perturbation_data, par=par, max_workers=max_workers)['mean_score_r2']]
+    par['exclude_missing_genes'] = True
+    results['S2'] = [regression_1(net, perturbation_data, par=par, max_workers=max_workers)['mean_score_r2']]
 
-    # Convert results to DataFrame
-    df_results = pd.DataFrame(layer_results)
-    # if par['min_tf']:
-    #     if 'ex(True)_tf(140)' not in df_results.columns:
-    #         df_results['ex(True)_tf(140)'] = df_results['ex(True)_tf(-1)']
-    #     if 'ex(False)_tf(140)' not in df_results.columns:
-    #         df_results['ex(False)_tf(140)'] = df_results['ex(False)_tf(-1)']
-        
-    df_results['Mean'] = df_results.mean(axis=1)
-    
+    df_results = pd.DataFrame(results)
     return df_results

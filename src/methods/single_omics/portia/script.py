@@ -44,7 +44,7 @@ def infer_grn(X, gene_names):
       dataset.add(pt.Experiment(exp_id, data))
   
   M_bar = pt.run(dataset, method='no-transform')
-  limit = min([10000000, X.size])
+  limit = min([500000, X.size])
   ranked_scores = pt.rank_scores(M_bar, gene_names, limit=limit)
   sources, targets, weights = zip(*[(gene_a, gene_b, score) for gene_a, gene_b, score in ranked_scores])
 

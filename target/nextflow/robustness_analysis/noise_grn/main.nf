@@ -2918,7 +2918,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/robustness_analysis/noise_grn",
     "viash_version" : "0.8.6",
-    "git_commit" : "916d854b0df3629c86769b495c90dcfb528e7559",
+    "git_commit" : "3ee6fbaa52201fef2ae8ab8c967e92344aa40d93",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -2979,12 +2979,6 @@ if type == 'weight': # add noise to weight
   noise = np.random.normal(loc=0, scale=degree * std_dev, size=prediction['weight'].shape)
   prediction['weight'] += noise
 
-elif type == 'links': # shuffle source-target-weight
-  print('Permute links')
-  num_rows_to_permute = int(len(prediction) * degree)
-  permute_indices = np.random.choice(prediction.index, size=num_rows_to_permute, replace=False)
-  prediction.loc[permute_indices, 'weight'] = np.random.permutation(prediction.loc[permute_indices, 'weight'].values)
-
 elif type == 'net': # shuffle source-target matrix
   print('Permute links')
     
@@ -2994,7 +2988,7 @@ elif type == 'net': # shuffle source-target matrix
   # Fill NaNs with 0 or a value of your choice
   pivot_df.fillna(0, inplace=True)
 
-  # 2. Randomly choose 20% of the matrix to shuffle
+  # 2. Randomly choose degree% of the matrix to shuffle
   matrix_flattened = pivot_df.values.flatten()
   n_elements = len(matrix_flattened)
   n_shuffle = int(n_elements * degree)

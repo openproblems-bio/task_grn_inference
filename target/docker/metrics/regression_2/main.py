@@ -11,23 +11,19 @@ from sklearn.preprocessing import LabelEncoder, RobustScaler, StandardScaler
 from sklearn.model_selection import GroupKFold, LeaveOneGroupOut
 from sklearn.linear_model import Ridge
 from sklearn.metrics import r2_score, mean_squared_error
+from util import verbose_print, process_links, verbose_tqdm
 
 
 SEED = 0xCAFE
 N_POINTS_TO_ESTIMATE_BACKGROUND = 20
 
-def select_top_links(net, par):
-    print("Number of links reduced to ", par['max_n_links'])
-    net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
-    net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
-    return net
 
 def load_grn(filepath: str, gene_names: np.ndarray, par: Dict[str, Any]) -> np.ndarray:
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
     A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
     df = pd.read_csv(filepath, sep=',', header='infer', index_col=0)
     if 'cell_type' in df.columns:
-        print('Taking mean of cell type specific grns')
+        verbose_print(par['verbose'], 'Taking mean of cell type specific grns', 3)
         df.drop(columns=['cell_type'], inplace=True)
         df = df.groupby(['source', 'target']).mean().reset_index()
 
@@ -38,8 +34,8 @@ def load_grn(filepath: str, gene_names: np.ndarray, par: Dict[str, Any]) -> np.n
         j = gene_dict[target]
         A[i, j] = float(weight)
     if df.shape[0] > par['max_n_links']:
-        df = select_top_links(df, par)
-    print(df)
+        verbose_print(par['verbose'], f"Reducing number of links to {par['max_n_links']}", 3)
+        df = process_links(df, par)
     return A
 
 
@@ -265,7 +261,7 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     random.seed(random_state)
     lightgbm.LGBMRegressor().set_params(random_state=random_state)
 
-    print('Reading input files', flush=True)
+    verbose_print(par['verbose'], "Reading input files", 3)
     
     # Load perturbation data
     perturbation_data = ad.read_h5ad(par['perturbation_data'])
@@ -287,8 +283,7 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     groups = LabelEncoder().fit_transform(perturbation_data.obs.plate_name)
 
     
-    # Load inferred GRN
-    print(f'Loading GRN', flush=True)
+
     grn = load_grn(par['prediction'], gene_names, par)
 
     # Load and standardize perturbation data
@@ -313,11 +308,11 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     clip_scores = par['clip_scores']
 
     # Evaluate GRN
-    print(f'Compute metrics for layer: {layer}', flush=True)
+    verbose_print(par['verbose'], f'Compute metrics for layer: {layer}', 3)
     # print(f'Dynamic approach:', flush=True)
-    print(f'Static approach (theta=0):', flush=True)
+    verbose_print(par['verbose'], f'Static approach (theta=0):', 3)
     score_static_min = static_approach(grn, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
-    print(f'Static approach (theta=0.5):', flush=True)
+    verbose_print(par['verbose'], f'Static approach (theta=0.5):', 3)
     score_static_median = static_approach(grn, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
     # print(f'Static approach (theta=1):', flush=True)
     # score_static_max = static_approach(grn, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
@@ -328,7 +323,6 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         'static-theta-0.5': [float(score_static_median)]
         # 'static-theta-1.0': [float(score_static_max)],
     }
-    # print(f'Scores on {layer}: {results}')
 
     # Add dynamic score
     if not par['static_only']:
@@ -339,6 +333,5 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
 
     # Convert results to DataFrame
     df_results = pd.DataFrame(results)
-    df_results['Mean'] = df_results.mean(axis=1)
     
     return df_results

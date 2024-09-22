@@ -13,3 +13,6 @@
 
 
 # sbatch --job-name=tigress_donor0_hvg  scripts/sbatch/single_omics_R.sh tigress tigress 
+
+
+# sbatch --job-name=tigress_donor0_hvg  scripts/sbatch/calculate_scores.sh
