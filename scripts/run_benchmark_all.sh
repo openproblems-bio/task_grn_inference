@@ -23,8 +23,8 @@ param_list:
     metric_ids: $metric_ids
     method_ids: $method_ids
     perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
-    multiomics_rna: ${resources_dir}/grn-benchmark/multiomics_rna_0_hvgs.h5ad
-    multiomics_atac: ${resources_dir}/grn-benchmark/multiomics_atac_0.h5ad
+    multiomics_rna: ${resources_dir}/grn-benchmark/multiomics_rna_d0_hvg.h5ad
+    multiomics_atac: ${resources_dir}/grn-benchmark/multiomics_atac_d0.h5ad
     reg_type: $reg_type
     subsample: $subsample
     num_workers: $num_workers

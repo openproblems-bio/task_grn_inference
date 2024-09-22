@@ -11,8 +11,8 @@ import numpy as np
 ## VIASH START
 par = {
     'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
-    'grn_folder': 'resources/grn-benchmark/grn_models',
-    'grns': 'figr.csv,scenicplus.csv',
+    'grn_folder': 'resources/grn-benchmark/grn_models/d0_hvg',
+    'grns': 'pearson_corr, pearson_causal, portia, ppcor, genie3, grnboost2, scenic, scglue, celloracle',
     'output': 'resources/grn-benchmark/consensus-num-regulators.json'
 }
 ## VIASH END
@@ -31,7 +31,7 @@ print(par['grns'])
 # Load inferred GRNs
 grns = []
 for filename in par['grns'].split(','):
-    filepath = os.path.join(par['grn_folder'], filename)
+    filepath = os.path.join(par['grn_folder'], f'{filename}.csv')
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
     A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
     df = pd.read_csv(filepath, sep=',', header='infer', index_col=0)

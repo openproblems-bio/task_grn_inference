@@ -1,18 +1,16 @@
 #!/bin/bash
 
-# RUN_ID="run_$(date +%Y-%m-%d_%H-%M-%S)"
-
 degrees=(0 10 20 50 100)
 noise_type="$1" #"net", "weight", "sign"
 echo $noise_type
 
-RUN_ID="robust_analy_reg2_$1" 
+RUN_ID="robust_analy_$1" 
 # resources_dir="resources"
 resources_dir="s3://openproblems-data/resources/grn"
 
 publish_dir="${resources_dir}/results/${RUN_ID}"
 
-grn_models_folder="${resources_dir}/grn_models"
+grn_models_folder="${resources_dir}/grn_models/d0_hvgs"
 
 
 reg_type=ridge
@@ -22,12 +20,18 @@ max_workers=10
 param_file="./params/${RUN_ID}.yaml"
 
 grn_names=(
-    "collectri"
-    "celloracle"
-    "scenicplus"
-    "figr"
-    "granie"
-    "scglue"
+    'collectri'
+    'negative_control'
+    'positive_control'
+    'pearson_corr'
+    'pearson_causal'
+    'portia'
+    'ppcor'
+    'genie3'
+    'grnboost2'
+    'scenic'
+    'scglue'
+    'celloracle'
 )
 
 
@@ -35,6 +39,7 @@ grn_names=(
 cat > $param_file << HERE
 param_list:
 HERE
+
 
 append_entry() {
   cat >> $param_file << HERE

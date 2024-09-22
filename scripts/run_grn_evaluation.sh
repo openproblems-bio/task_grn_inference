@@ -47,7 +47,7 @@ grn_names=(
 
     "collectri"
     )
-
+echo $grn_names
 # Start writing to the YAML file
 cat > $param_file << HERE
 param_list:

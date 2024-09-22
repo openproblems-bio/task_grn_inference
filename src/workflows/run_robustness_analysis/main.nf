@@ -14,7 +14,7 @@ workflow run_wf {
 
   // construct list of metrics
   metrics = [
-    // regression_1,
+    regression_1,
     regression_2
   ]
     
@@ -52,6 +52,7 @@ workflow run_wf {
         num_workers: "num_workers",
         consensus: "consensus",
         tf_all: "tf_all"
+        
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->
