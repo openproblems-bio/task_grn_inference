@@ -73,10 +73,19 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
-nextflow run . \
-  -main-script  target/nextflow/workflows/run_robustness_analysis/main.nf \
-  -profile docker \
-  -with-trace \
-  -c src/common/nextflow_helpers/labels_ci.config \
-  -params-file ${param_file}
+# nextflow run . \
+#   -main-script  target/nextflow/workflows/run_robustness_analysis/main.nf \
+#   -profile docker \
+#   -with-trace \
+#   -c src/common/nextflow_helpers/labels_ci.config \
+#   -params-file ${param_file}
+
+./tw launch https://github.com/openproblems-bio/run_robustness_analysis \
+  --revision build/main \
+  --pull-latest \
+  --main-script target/nextflow/workflows/run_grn_evaluation/main.nf \
+  --workspace 53907369739130 \
+  --compute-env 6TeIFgV5OY4pJCk8I0bfOh \
+  --params-file ${param_file} \
+  --config src/common/nextflow_helpers/labels_tw.config
 
