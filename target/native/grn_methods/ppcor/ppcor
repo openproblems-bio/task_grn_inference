@@ -214,11 +214,6 @@ function ViashHelp {
   echo "        default: false"
   echo "        normalize rna seq data before inference. currently, it's only applicable"
   echo "        to baseline models"
-  echo ""
-  echo "    --only_hvgs"
-  echo "        type: boolean"
-  echo "        default: false"
-  echo "        subset rna seq data to only 7000 hvgs to reduce dimensionality"
 }
 
 # initialise array
@@ -357,17 +352,6 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_NORMALIZE=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --only_hvgs)
-            [ -n "$VIASH_PAR_ONLY_HVGS" ] && ViashError Bad arguments for option \'--only_hvgs\': \'$VIASH_PAR_ONLY_HVGS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_ONLY_HVGS="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --only_hvgs. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --only_hvgs=*)
-            [ -n "$VIASH_PAR_ONLY_HVGS" ] && ViashError Bad arguments for option \'--only_hvgs=*\': \'$VIASH_PAR_ONLY_HVGS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_ONLY_HVGS=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
         ---cpus)
             [ -n "$VIASH_META_CPUS" ] && ViashError Bad arguments for option \'---cpus\': \'$VIASH_META_CPUS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_META_CPUS="$2"
@@ -494,9 +478,6 @@ fi
 if [ -z ${VIASH_PAR_NORMALIZE+x} ]; then
   VIASH_PAR_NORMALIZE="false"
 fi
-if [ -z ${VIASH_PAR_ONLY_HVGS+x} ]; then
-  VIASH_PAR_ONLY_HVGS="false"
-fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
@@ -540,12 +521,6 @@ fi
 if [[ -n "$VIASH_PAR_NORMALIZE" ]]; then
   if ! [[ "$VIASH_PAR_NORMALIZE" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--normalize' has to be a boolean. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_ONLY_HVGS" ]]; then
-  if ! [[ "$VIASH_PAR_ONLY_HVGS" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--only_hvgs' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -634,8 +609,7 @@ par <- list(
   "temp_dir" = $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TEMP_DIR" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi ),
   "cell_type_specific" = $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" | sed "s#['\\]#\\\\&#g"; echo "'))"; else echo NULL; fi ),
-  "normalize" = $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_NORMALIZE" | sed "s#['\\]#\\\\&#g"; echo "'))"; else echo NULL; fi ),
-  "only_hvgs" = $( if [ ! -z ${VIASH_PAR_ONLY_HVGS+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_ONLY_HVGS" | sed "s#['\\]#\\\\&#g"; echo "'))"; else echo NULL; fi )
+  "normalize" = $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_NORMALIZE" | sed "s#['\\]#\\\\&#g"; echo "'))"; else echo NULL; fi )
 )
 meta <- list(
   "functionality_name" = $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo -n "'"; echo -n "$VIASH_META_FUNCTIONALITY_NAME" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),

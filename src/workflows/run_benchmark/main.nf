@@ -21,7 +21,6 @@ workflow run_wf {
     scenic,
 
     pearson_corr,
-    pearson_causal,
     negative_control,
     positive_control,
 

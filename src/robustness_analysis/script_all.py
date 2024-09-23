@@ -43,7 +43,6 @@ os.makedirs(f"{par['write_dir']}/tmp/", exist_ok=True)
 def run_reg(par):
   from metrics.regression_1.main import main 
   reg1 = main(par)
-  return reg1
   from metrics.regression_2.main import main 
   reg2 = main(par)
   score = pd.concat([reg1, reg2], axis=1)
@@ -98,6 +97,7 @@ if True:
     'static_only': True,
     'clip_scores': True,
     'layer': 'scgen_pearson',
+    'seed': 32
   }
 
   # # run for corr 
@@ -124,7 +124,7 @@ if True:
   par['prediction'] = f"{par['write_dir']}/corr/corr_causal.csv"
   par['causal'] = True
   net = create_corr_net(par)
+
   net.to_csv(par['prediction'])
   score = run_reg(par)
-  print(score)
   score.to_csv(f"{par['write_dir']}/corr/scores_causal.csv")

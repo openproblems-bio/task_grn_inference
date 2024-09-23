@@ -109,7 +109,6 @@ functionality:
     - name: grn_methods/scglue
     # ---- baselines
     - name: control_methods/pearson_corr
-    - name: control_methods/pearson_causal
     - name: control_methods/negative_control
     - name: control_methods/positive_control
     # -- needs development

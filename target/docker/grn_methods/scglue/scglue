@@ -215,11 +215,6 @@ function ViashHelp {
   echo "        normalize rna seq data before inference. currently, it's only applicable"
   echo "        to baseline models"
   echo ""
-  echo "    --only_hvgs"
-  echo "        type: boolean"
-  echo "        default: false"
-  echo "        subset rna seq data to only 7000 hvgs to reduce dimensionality"
-  echo ""
   echo "    --top_n_targets"
   echo "        type: string"
   echo "        default: 100"
@@ -461,9 +456,9 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scglue"
-LABEL org.opencontainers.image.created="2024-09-23T15:15:44Z"
+LABEL org.opencontainers.image.created="2024-09-23T16:52:30Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="347b16044d81f1609b1091b1ca2c5543a4037777"
+LABEL org.opencontainers.image.revision="59b4e9fa5671966ccf444a6008dc2f9048482b7f"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -732,17 +727,6 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_NORMALIZE=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --only_hvgs)
-            [ -n "$VIASH_PAR_ONLY_HVGS" ] && ViashError Bad arguments for option \'--only_hvgs\': \'$VIASH_PAR_ONLY_HVGS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_ONLY_HVGS="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --only_hvgs. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --only_hvgs=*)
-            [ -n "$VIASH_PAR_ONLY_HVGS" ] && ViashError Bad arguments for option \'--only_hvgs=*\': \'$VIASH_PAR_ONLY_HVGS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_ONLY_HVGS=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
         --top_n_targets)
             [ -n "$VIASH_PAR_TOP_N_TARGETS" ] && ViashError Bad arguments for option \'--top_n_targets\': \'$VIASH_PAR_TOP_N_TARGETS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_TOP_N_TARGETS="$2"
@@ -942,9 +926,6 @@ fi
 if [ -z ${VIASH_PAR_NORMALIZE+x} ]; then
   VIASH_PAR_NORMALIZE="false"
 fi
-if [ -z ${VIASH_PAR_ONLY_HVGS+x} ]; then
-  VIASH_PAR_ONLY_HVGS="false"
-fi
 if [ -z ${VIASH_PAR_TOP_N_TARGETS+x} ]; then
   VIASH_PAR_TOP_N_TARGETS="100"
 fi
@@ -997,12 +978,6 @@ fi
 if [[ -n "$VIASH_PAR_NORMALIZE" ]]; then
   if ! [[ "$VIASH_PAR_NORMALIZE" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--normalize' has to be a boolean. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_ONLY_HVGS" ]]; then
-  if ! [[ "$VIASH_PAR_ONLY_HVGS" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--only_hvgs' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1148,7 +1123,6 @@ par = {
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
-  'only_hvgs': $( if [ ! -z ${VIASH_PAR_ONLY_HVGS+x} ]; then echo "r'${VIASH_PAR_ONLY_HVGS//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'top_n_targets': $( if [ ! -z ${VIASH_PAR_TOP_N_TARGETS+x} ]; then echo "r'${VIASH_PAR_TOP_N_TARGETS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'rank_threshold': $( if [ ! -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_RANK_THRESHOLD//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_NES_THRESHOLD//\'/\'\"\'\"r\'}'"; else echo None; fi )

@@ -3120,6 +3120,12 @@ meta = [
         "type" : "file",
         "path" : "main.py",
         "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/metrics/regression_2/"
+      },
+      {
+        "type" : "file",
+        "path" : "src/utils/util.py",
+        "dest" : "util.py",
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
     "test_resources" : [
@@ -3225,7 +3231,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+    "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

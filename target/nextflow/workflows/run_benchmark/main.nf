@@ -2999,9 +2999,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems",
           "tag" : "v2.0.0",
-          "localPath" : "/tmp/viash_hub_repo14105418863515931952"
+          "localPath" : "/tmp/viash_hub_repo4145642796967991849"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo14105418863515931952/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo4145642796967991849/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_tag" : "v1.0.0-1413-gb782e93f",
@@ -3032,7 +3032,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+          "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
@@ -3053,7 +3053,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+          "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
@@ -3074,7 +3074,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+          "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
           "executable" : "/nextflow/grn_methods/portia/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia"
@@ -3095,7 +3095,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+          "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
           "executable" : "/nextflow/grn_methods/grnboost2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/grnboost2"
@@ -3116,7 +3116,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+          "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
           "executable" : "/nextflow/grn_methods/scenic/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenic"
@@ -3137,7 +3137,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+          "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
           "executable" : "/nextflow/grn_methods/genie3/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/genie3"
@@ -3158,7 +3158,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+          "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
           "executable" : "/nextflow/grn_methods/ppcor/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ppcor"
@@ -3179,7 +3179,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+          "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
           "executable" : "/nextflow/grn_methods/scgpt/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scgpt"
@@ -3200,7 +3200,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+          "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
           "executable" : "/nextflow/grn_methods/celloracle/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/celloracle"
@@ -3221,7 +3221,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+          "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
           "executable" : "/nextflow/grn_methods/scglue/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scglue"
@@ -3242,31 +3242,10 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+          "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
           "executable" : "/nextflow/control_methods/pearson_corr/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/pearson_corr"
-      },
-      {
-        "name" : "control_methods/pearson_causal",
-        "repository" : {
-          "type" : "local",
-          "localPath" : ""
-        },
-        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/control_methods/pearson_causal/config.vsh.yaml",
-        "configInfo" : {
-          "functionalityName" : "pearson_causal",
-          "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
-          "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/control_methods/pearson_causal/config.vsh.yaml",
-          "functionalityNamespace" : "control_methods",
-          "output" : "",
-          "platform" : "",
-          "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
-          "executable" : "/nextflow/control_methods/pearson_causal/main.nf"
-        },
-        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/pearson_causal"
       },
       {
         "name" : "control_methods/negative_control",
@@ -3284,7 +3263,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+          "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
           "executable" : "/nextflow/control_methods/negative_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/negative_control"
@@ -3305,7 +3284,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+          "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
           "executable" : "/nextflow/control_methods/positive_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control"
@@ -3369,7 +3348,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_benchmark",
     "viash_version" : "0.8.6",
-    "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
+    "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3389,7 +3368,6 @@ include { scgpt } from "${meta.resources_dir}/../../../nextflow/grn_methods/scgp
 include { celloracle } from "${meta.resources_dir}/../../../nextflow/grn_methods/celloracle/main.nf"
 include { scglue } from "${meta.resources_dir}/../../../nextflow/grn_methods/scglue/main.nf"
 include { pearson_corr } from "${meta.resources_dir}/../../../nextflow/control_methods/pearson_corr/main.nf"
-include { pearson_causal } from "${meta.resources_dir}/../../../nextflow/control_methods/pearson_causal/main.nf"
 include { negative_control } from "${meta.resources_dir}/../../../nextflow/control_methods/negative_control/main.nf"
 include { positive_control } from "${meta.resources_dir}/../../../nextflow/control_methods/positive_control/main.nf"
 
@@ -3418,7 +3396,6 @@ workflow run_wf {
     scenic,
 
     pearson_corr,
-    pearson_causal,
     negative_control,
     positive_control,
 
