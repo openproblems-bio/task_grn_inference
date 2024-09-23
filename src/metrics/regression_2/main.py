@@ -254,7 +254,6 @@ def static_approach(
 
 
 def main(par: Dict[str, Any]) -> pd.DataFrame:
-
     # Set global seed for reproducibility purposes
     random_state = SEED
     np.random.seed(random_state)
@@ -281,8 +280,6 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     gene_names = perturbation_data.var.index.to_numpy()
     n_genes = len(gene_names)
     groups = LabelEncoder().fit_transform(perturbation_data.obs.plate_name)
-
-    
 
     grn = load_grn(par['prediction'], gene_names, par)
 

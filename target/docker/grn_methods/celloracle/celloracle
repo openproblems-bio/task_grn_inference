@@ -207,7 +207,7 @@ function ViashHelp {
   echo ""
   echo "    --cell_type_specific"
   echo "        type: boolean"
-  echo "        default: true"
+  echo "        default: false"
   echo ""
   echo "    --normalize"
   echo "        type: boolean"
@@ -447,9 +447,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods celloracle"
-LABEL org.opencontainers.image.created="2024-09-22T16:54:45Z"
+LABEL org.opencontainers.image.created="2024-09-23T15:15:44Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="3ee6fbaa52201fef2ae8ab8c967e92344aa40d93"
+LABEL org.opencontainers.image.revision="347b16044d81f1609b1091b1ca2c5543a4037777"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -901,7 +901,7 @@ if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
 if [ -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then
-  VIASH_PAR_CELL_TYPE_SPECIFIC="true"
+  VIASH_PAR_CELL_TYPE_SPECIFIC="false"
 fi
 if [ -z ${VIASH_PAR_NORMALIZE+x} ]; then
   VIASH_PAR_NORMALIZE="false"

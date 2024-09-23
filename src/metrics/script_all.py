@@ -8,16 +8,17 @@ import os
 par = {
   'reg_type': 'ridge',
   'read_dir': "resources/grn_models/d0_hvgs",
-  'write_dir': "resources/results/d0_hvgs_ridge",
+  'write_dir': "resources/results/scores",
   'methods': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'pearson_causal',  'portia', 'ppcor', 'genie3', 'grnboost2', 'scenic', 'scglue', 'celloracle'],
+  # 'layers': ['lognorm', 'pearson', 'seurat_lognorm', 'seurat_pearson', 'scgen_lognorm', 'scgen_pearson'],
+  'layers': ['seurat_lognorm', 'seurat_pearson'],
 
+  # 'layers': ['scgen_pearson'],
 
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
   "tf_all": "resources/prior/tf_all.csv",
-  "min_tf": False,
   "max_n_links": 50000,
   "apply_tf": "true",
-  'layer': 'scgen_pearson',
   'subsample': -2,
   'num_workers': 4,
   'verbose': 1,
@@ -29,25 +30,28 @@ par = {
 }
 # VIASH END
 meta = {
-  "resources_dir": 'src/metrics/regression_2/',
+  "resources_dir": 'src/metrics/',
   "util": 'src/utils'
 }
 sys.path.append(meta["resources_dir"])
 sys.path.append(meta["util"])
-from main import main 
-
 
 os.makedirs(par['write_dir'], exist_ok=True)
 
-
-for i, method in enumerate(par['methods']):
-  par['prediction'] = f"{par['read_dir']}/{method}.csv"
-  prediction = main(par)
-  prediction.index = [method]
-  if i==0:
-    df_all = prediction
-  else:
-    df_all = pd.concat([df_all, prediction])
-  df_all.to_csv(f"{par['write_dir']}/reg2.csv")
-  print(df_all)
+for layer in par['layers']:
+  par['layer'] = layer
+  for i, method in enumerate(par['methods']):
+    par['prediction'] = f"{par['read_dir']}/{method}.csv"
+    from regression_1.main import main 
+    reg1 = main(par)
+    from regression_2.main import main 
+    reg2 = main(par)
+    score = pd.concat([reg1, reg2], axis=1)
+    score.index = [method]
+    if i==0:
+      df_all = score
+    else:
+      df_all = pd.concat([df_all, score])
+    df_all.to_csv(f"{par['write_dir']}/{layer}-{par['reg_type']}.csv")
+    print(df_all)
   

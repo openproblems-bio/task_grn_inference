@@ -2959,7 +2959,7 @@ meta = [
         "type" : "boolean",
         "name" : "--cell_type_specific",
         "default" : [
-          true
+          false
         ],
         "required" : false,
         "direction" : "input",
@@ -3127,7 +3127,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/grnboost2",
     "viash_version" : "0.8.6",
-    "git_commit" : "3ee6fbaa52201fef2ae8ab8c967e92344aa40d93",
+    "git_commit" : "347b16044d81f1609b1091b1ca2c5543a4037777",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3151,7 +3151,16 @@ from arboreto.algo import grnboost2
 from distributed import Client, LocalCluster
 from tqdm import tqdm
 import subprocess 
+import argparse
+import sys
 
+# Handle command-line arguments
+parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
+parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--prediction', type=str, help='Path to the prediction file')
+parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
+parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
+args = parser.parse_args()
 
 
 ## VIASH START
@@ -3189,18 +3198,33 @@ dep = {
 
 ## VIASH END
 
-import sys
 meta= {
   "resources_dir": 'src/utils/'
 }
+
+# Update par passed from the command line
+if args.multiomics_rna:
+    par['multiomics_rna'] = args.multiomics_rna
+if args.prediction:
+    par['prediction'] = args.prediction
+if args.tf_all:
+    par['tf_all'] = args.tf_all
+    
+if args.resources_dir:
+    meta['resources_dir'] = args.resources_dir    
+
+print(par)
+
 sys.path.append(meta["resources_dir"])
-from util import process_links
+from util import process_links, basic_qc
 # Load scRNA-seq data
 print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
+print('Shape before QC: ', adata_rna.shape)
+adata_rna = basic_qc(adata_rna)
+print('Shape after QC: ', adata_rna.shape)
 
-groups = adata_rna.obs.cell_type
-gene_names = adata_rna.var.gene_ids.index.to_numpy()
+gene_names = adata_rna.var_names
 X = adata_rna.X
 
 # Load list of putative TFs
@@ -3222,6 +3246,7 @@ def infer_grn(X, par):
 
 # par['cell_type_specific'] = False
 if par['cell_type_specific']:
+    groups = adata_rna.obs.cell_type
     i = 0
     for group in tqdm(np.unique(groups), desc="Processing groups"):
         X_sub = X[groups == group, :]
