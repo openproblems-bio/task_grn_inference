@@ -10,6 +10,8 @@ functionality:
     - type: python_script
       path: script.py
     - path: main.py
+    - path: /src/utils/util.py
+      dest: util.py
   arguments:
     - name: --consensus
       type: file

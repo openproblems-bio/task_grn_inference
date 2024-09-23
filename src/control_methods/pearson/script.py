@@ -14,7 +14,7 @@ import sys
 sys.path.append(meta["resources_dir"])
 from util import create_corr_net
 
-par['causal'] = False
+par['causal'] = True
 net = create_corr_net(par)
 print('Output GRN')
 net.to_csv(par['prediction'])
