@@ -7,7 +7,7 @@ import random
 
 par = {
   'reg_type': 'ridge',
-  'read_dir': "resources/grn_models/d0_hvgs",
+  'read_dir': "resources/grn_models/d0_hvg",
   'write_dir': "resources/results/robustness_analysis",
   'degrees': [0, 10, 20, 50, 100],
   'noise_types': ["net", "sign"],
@@ -49,7 +49,7 @@ def run_reg(par):
   return score 
   
 #------ noise types and degrees ------#
-if False:
+if True:
   for noise_type in par['noise_types']: # run for each noise type (net, sign, weight)
     for degree in par['degrees']: # run for each degree
       for i, method in enumerate(par['methods']): # run for each method
@@ -75,7 +75,7 @@ if False:
         print(df_all)
 
 #------ causal vs corr ------#
-if True:
+if False:
   from util import create_corr_net
   par = {
     'reg_type': 'ridge',
@@ -100,25 +100,25 @@ if True:
     'seed': 32
   }
 
-  # # run for corr 
-  # os.makedirs(f"{par['write_dir']}/corr/", exist_ok=True)
-  # par['causal'] = False
-  # for i in range(100):
-  #   par['causal']
-  #   par['prediction'] = f"{par['write_dir']}/corr/corr.csv"
-  #   par['seed'] = i
-  #   random.seed(par['seed'])
-  #   print('seed :', par['seed'])
+  # run for corr 
+  os.makedirs(f"{par['write_dir']}/corr/", exist_ok=True)
+  par['causal'] = False
+  for i in range(100):
+    par['causal']
+    par['prediction'] = f"{par['write_dir']}/corr/corr.csv"
+    par['seed'] = i
+    random.seed(par['seed'])
+    print('seed :', par['seed'])
     
-  #   net = create_corr_net(par)
-  #   net.to_csv(par['prediction'])
-  #   score = run_reg(par)
-  #   if i == 0:
-  #     scores_corr = score 
-  #   else:
-  #     scores_corr = pd.concat([score, scores_corr], axis=0)
-  #   print(scores_corr)
-  #   scores_corr.to_csv(f"{par['write_dir']}/corr/scores_corr.csv")
+    net = create_corr_net(par)
+    net.to_csv(par['prediction'])
+    score = run_reg(par)
+    if i == 0:
+      scores_corr = score 
+    else:
+      scores_corr = pd.concat([score, scores_corr], axis=0)
+    print(scores_corr)
+    scores_corr.to_csv(f"{par['write_dir']}/corr/scores_corr.csv")
     
   # run for causal corr
   par['prediction'] = f"{par['write_dir']}/corr/corr_causal.csv"

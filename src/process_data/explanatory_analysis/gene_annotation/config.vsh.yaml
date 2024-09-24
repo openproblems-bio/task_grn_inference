@@ -1,0 +1,29 @@
+
+functionality:
+  name: gene_annotation
+  namespace: exp_analysis
+  info:
+    label: gene_annotation
+    summary: "Annotate genes"
+  
+  arguments:
+    - name: --gene_annotations
+      type: file
+      required: false
+      direction: output
+      example: resources/prior/gene_annotations.txt
+
+  resources:
+    - type: python_script
+      path: script.py
+platforms:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    # setup:
+    #   - type: python
+    #     packages: [ sctk==0.2.2]
+
+  - type: native
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

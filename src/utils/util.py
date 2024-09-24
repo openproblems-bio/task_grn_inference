@@ -5,6 +5,16 @@ from tqdm import tqdm
 from sklearn.preprocessing import StandardScaler
 import scipy.sparse as sp
 
+colors_blind = [
+    '#E69F00',  # Orange
+    '#56B4E9',  # Sky Blue
+    '#009E73',  # Bluish Green
+    '#F0E442',  # Yellow
+    '#0072B2',  # Blue
+    '#D55E00',  # Vermillion
+    '#CC79A7']  # Reddish Purple
+
+
 def verbose_print(verbose_level, message, level):
     if level <= verbose_level:
         print(message)

@@ -6,12 +6,7 @@ functionality:
     summary: "Explanatory analysis of inferred GRN to provide insights about network topology and annotations"
 
   arguments:
-    - name: --perturbation_data
-      type: file
-      required: false
-      direction: input
-      example: resources_test/grn-benchmark/perturbation_data.h5ad
-    - name: --prediction
+    - name: --grn_model
       type: file
       required: true
       direction: input
@@ -20,43 +15,41 @@ functionality:
       type: file
       required: false
       direction: input
-      example: resources_test/peak_gene_models/collectri.csv
+      example: resources_test/grn_models/peak_gene_models/figr.csv
     - name: --annot_peak_database
       type: file 
       required: false 
       direction: input
       must_exist: false
-      example: resources_test/supplementary/annot_peak_database.csv
-    # - name: --annot_gene_database
-    #   type: file 
-    #   required: false 
-    #   direction: input
-    #   default: resources/supplements/annot_gene_database.csv
-    - name: --tf_gene_indegee_fig
-      type: file
-      required: false
-      direction: output
-      default: output/tf_gene_indegree.png
-    - name: --tf_gene_outdegee_fig
-      type: file
-      required: false
-      direction: output
-      default: output/tf_gene_outdegree.png
+      example: resources_test/prior/annot_peak_database.csv
+
+
     - name: --stats
       type: file
       required: false
       direction: output
-      default: output/stats.json
-    - name: --reg_weight_distribution
+      example: output/stats.json
+    - name: --indegee_fig
       type: file
       required: false
       direction: output
-      default: output/reg_weight_distribution.png
+      example: output/indegee_fig.png
+    - name: --outdegee_fig
+      type: file
+      required: false
+      direction: output
+      example: output/outdegee_fig.png
+    - name: --weight_cdf
+      type: file
+      required: false
+      direction: output
+      example: output/weight_cdf.png
       
     
   resources:
     - type: python_script
       path: script.py
+    - path: main.py
     - path: helper.py
 platforms:
   - type: docker
