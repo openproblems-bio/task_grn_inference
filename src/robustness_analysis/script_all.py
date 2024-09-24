@@ -11,7 +11,7 @@ par = {
   'write_dir': "resources/results/robustness_analysis",
   'degrees': [0, 10, 20, 50, 100],
   'noise_types': ["net", "sign"],
-  'methods': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'pearson_causal',  'portia', 'ppcor', 'genie3', 'grnboost2', 'scenic', 'scglue', 'celloracle'],
+  'methods': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'genie3', 'grnboost2', 'scenic', 'scglue', 'celloracle'],
   
 
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",

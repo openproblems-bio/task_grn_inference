@@ -458,9 +458,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenicplus"
-LABEL org.opencontainers.image.created="2024-09-23T16:52:31Z"
+LABEL org.opencontainers.image.created="2024-09-24T07:37:09Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="59b4e9fa5671966ccf444a6008dc2f9048482b7f"
+LABEL org.opencontainers.image.revision="65092761d7987e083b5e44c9da10ba660d1b505a"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

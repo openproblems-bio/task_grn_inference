@@ -3117,7 +3117,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "59b4e9fa5671966ccf444a6008dc2f9048482b7f",
+    "git_commit" : "65092761d7987e083b5e44c9da10ba660d1b505a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3182,8 +3182,6 @@ from util import create_corr_net
 print('Create causal corr net')
 par['causal'] = True
 par['multiomics_rna'] = par['perturbation_data']
-par['only_hvgs'] = False
-
 net = create_corr_net(par)
 
 print('Output GRN')

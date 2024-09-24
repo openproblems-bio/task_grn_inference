@@ -663,8 +663,6 @@ from util import create_corr_net
 print('Create causal corr net')
 par['causal'] = True
 par['multiomics_rna'] = par['perturbation_data']
-par['only_hvgs'] = False
-
 net = create_corr_net(par)
 
 print('Output GRN')

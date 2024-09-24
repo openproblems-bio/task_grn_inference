@@ -12,7 +12,7 @@ layer='scgen_pearson'
 metric_ids="[regression_1, regression_2]"
 cell_type_specific=false #for controls
 normalize=false
-method_ids="[pearson_corr, pearson_causal, positive_control]"
+method_ids="[pearson_corr, positive_control]"
 
 param_file="./params/${RUN_ID}.yaml"
 
