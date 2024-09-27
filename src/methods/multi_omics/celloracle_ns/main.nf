@@ -9,7 +9,8 @@ workflow run_wf {
       fromState: [multiomics_rna: "multiomics_rna",
               multiomics_atac: "multiomics_atac",
               temp_dir: "temp_dir",
-              num_workers: "num_workers"
+              num_workers: "num_workers",
+              max_n_links: "max_n_links"
               ],
       toState: [prediction:"prediction", base_grn: "base_grn", links: "links"]
     )

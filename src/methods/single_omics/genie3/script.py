@@ -19,6 +19,27 @@ par = {
 }
 ## VIASH END
 
+import argparse
+parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
+parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--prediction', type=str, help='Path to the prediction file')
+parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
+parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
+parser.add_argument('--num_workers', type=str, help='Number of cores')
+args = parser.parse_args()
+
+if args.multiomics_rna:
+    par['multiomics_rna'] = args.multiomics_rna
+if args.prediction:
+    par['prediction'] = args.prediction
+if args.tf_all:
+    par['tf_all'] = args.tf_all
+if args.num_workers:
+    par['num_workers'] = args.num_workers
+    
+if args.resources_dir:
+    meta['resources_dir'] = args.resources_dir  
+    
 # Load scRNA-seq data
 print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])

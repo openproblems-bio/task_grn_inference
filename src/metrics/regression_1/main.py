@@ -74,7 +74,7 @@ def cross_validation(net, prturb_adata, par:dict):
 
     mask_shared_genes = X_df.index.isin(net.index)
     
-    # fill the actuall regulatory links
+    # fill the actual regulatory links
     X_df.loc[mask_shared_genes, :] = net.values
     X = X_df.values.copy()
 

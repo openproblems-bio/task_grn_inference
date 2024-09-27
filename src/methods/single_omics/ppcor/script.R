@@ -4,8 +4,8 @@ library(dplyr)
 
 ## VIASH START
 par <- list(
-  multiomics_rna = 'resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad',
-  prediction = 'output/ppcor_d0_hvg.csv',
+  multiomics_rna = 'resources/grn-benchmark/multiomics_rna.h5ad',
+  prediction = 'resources/grn_models/ppcor.csv',
   max_n_links = 50000
 )
 ## VIASH END

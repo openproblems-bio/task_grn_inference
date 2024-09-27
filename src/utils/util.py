@@ -24,23 +24,29 @@ def verbose_tqdm(iterable, desc, level, verbose_level):
     else:
         return iterable  # Return the iterable without a progress bar
 
-def basic_qc(adata, min_genes_per_cell = 200, max_genes_per_cell = 5000, max_mt_frac = 0.05, min_cells_per_gene = 10):
+def basic_qc(adata, min_genes_per_cell = 200, max_genes_per_cell = 5000, min_cells_per_gene = 10):
     mt = adata.var_names.str.startswith('MT-')
 
     # 1. stats
     total_counts = adata.X.sum(axis=1)
     n_genes_by_counts = (adata.X > 0).sum(axis=1)
-    mt_frac = adata[:, mt].X.sum(axis=1) / total_counts
+    # mt_frac = adata[:, mt].X.sum(axis=1) / total_counts
+    
+    low_gene_filter = (n_genes_by_counts < min_genes_per_cell)
+    high_gene_filter = (n_genes_by_counts > max_genes_per_cell)
+    # mt_filter = mt_frac > max_mt_frac
 
     # 2. Filter cells
-    mask_cells=  (n_genes_by_counts > min_genes_per_cell)& \
-                 (n_genes_by_counts < max_genes_per_cell)&\
-                 (mt_frac < max_mt_frac)
+    print(f'Number of cells removed: below min gene {low_gene_filter.sum()}, exceed max gene {high_gene_filter.sum()}')
+    mask_cells=  (~low_gene_filter)& \
+                 (~high_gene_filter)
+                #  (~mt_filter)
     # 3. Filter genes
     n_cells = (adata.X!=0).sum(axis=0)
     mask_genes = n_cells>min_cells_per_gene
 
     return adata[mask_cells, mask_genes]
+
 def process_links(net, par):
     net = net[net.source!=net.target]
     net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)

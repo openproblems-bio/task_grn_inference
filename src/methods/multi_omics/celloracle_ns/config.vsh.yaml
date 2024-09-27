@@ -12,10 +12,11 @@ functionality:
       type: file
       direction: output
       default: output/celloracle/base_grn.csv
-    - name: --links
-      type: file
-      direction: output
-      default: output/celloracle/links.celloracle.links
+      
+    # - name: --links
+    #   type: file
+    #   direction: output
+    #   default: output/celloracle/links.celloracle.links
   resources:
     - type: nextflow_script
       path: main.nf

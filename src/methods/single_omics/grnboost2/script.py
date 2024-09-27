@@ -7,17 +7,7 @@ from arboreto.algo import grnboost2
 from distributed import Client, LocalCluster
 from tqdm import tqdm
 import subprocess 
-import argparse
 import sys
-
-# Handle command-line arguments
-parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
-parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-args = parser.parse_args()
-
 
 ## VIASH START
 par = {
@@ -26,7 +16,8 @@ par = {
   'prediction': 'output/grnboost2_donor_0_hvg.csv',
   'max_n_links': 50000,
   'cell_type_specific': False,
-  'normalize': False
+  'normalize': False,
+  'qc': False
 }
 ## VIASH END
 
@@ -34,16 +25,31 @@ meta= {
   "resources_dir": 'src/utils/'
 }
 
-# Update par passed from the command line
+# Handle command-line arguments
+
+import argparse
+parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
+parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--prediction', type=str, help='Path to the prediction file')
+parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
+parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
+parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--qc', action='store_true', help='Whether to do QC or not')
+args = parser.parse_args()
+
 if args.multiomics_rna:
     par['multiomics_rna'] = args.multiomics_rna
 if args.prediction:
     par['prediction'] = args.prediction
 if args.tf_all:
     par['tf_all'] = args.tf_all
+if args.num_workers:
+    par['num_workers'] = args.num_workers
+if args.qc:
+    par['qc'] = args.qc
     
 if args.resources_dir:
-    meta['resources_dir'] = args.resources_dir    
+    meta['resources_dir'] = args.resources_dir   
 
 print(par)
 
@@ -52,9 +58,10 @@ from util import process_links, basic_qc
 # Load scRNA-seq data
 print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-print('Shape before QC: ', adata_rna.shape)
-adata_rna = basic_qc(adata_rna)
-print('Shape after QC: ', adata_rna.shape)
+if par['qc']:
+    print('Shape before QC: ', adata_rna.shape)
+    adata_rna = basic_qc(adata_rna)
+    print('Shape after QC: ', adata_rna.shape)
 
 gene_names = adata_rna.var_names
 X = adata_rna.X
