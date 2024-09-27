@@ -8,6 +8,7 @@ workflow run_wf {
     | celloracle.run(
       fromState: [multiomics_rna: "multiomics_rna",
               multiomics_atac: "multiomics_atac",
+              tf_all: "tf_all",
               temp_dir: "temp_dir",
               num_workers: "num_workers",
               max_n_links: "max_n_links"

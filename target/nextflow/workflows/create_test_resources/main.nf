@@ -2928,7 +2928,7 @@ meta = [
           "functionalityNamespace" : "multiomics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "4e4a976cef3709a67b6307592364d62a1fdff4a0",
+          "git_commit" : "73ab6fb0822caffe391d95fc218c0cf372d7d4eb",
           "executable" : "/nextflow/multiomics/multiome_matrix/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/multiome_matrix"
@@ -2949,7 +2949,7 @@ meta = [
           "functionalityNamespace" : "multiomics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "4e4a976cef3709a67b6307592364d62a1fdff4a0",
+          "git_commit" : "73ab6fb0822caffe391d95fc218c0cf372d7d4eb",
           "executable" : "/nextflow/multiomics/format_resources_r/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/format_resources_r"
@@ -2970,7 +2970,7 @@ meta = [
           "functionalityNamespace" : "testdata",
           "output" : "",
           "platform" : "",
-          "git_commit" : "4e4a976cef3709a67b6307592364d62a1fdff4a0",
+          "git_commit" : "73ab6fb0822caffe391d95fc218c0cf372d7d4eb",
           "executable" : "/nextflow/testdata/create_test_data/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/testdata/create_test_data"
@@ -3024,7 +3024,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/create_test_resources",
     "viash_version" : "0.8.6",
-    "git_commit" : "4e4a976cef3709a67b6307592364d62a1fdff4a0",
+    "git_commit" : "73ab6fb0822caffe391d95fc218c0cf372d7d4eb",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
