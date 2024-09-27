@@ -101,35 +101,7 @@ class Exp_analysis:
         if colors is not None:
             for label, color in zip(ax.get_yticklabels(), colors):
                 label.set_color(color)
-    def role_analysis(self, top_q=None) -> pd.DataFrame:
-        '''
-            Vester's sensitivity analysis. 
-                - active_sum: active sum. Sum along rows of the influence matrix and it indicates how much does a variable influence all the others.
-                - passive_sum: passive sum. Its is the sum along columns of the influence matrix and it indicates how sensitive a variable is, how does it react to the influence of others
-                - Active: +AS, -PS
-                - Passive: -AS, -PS
-                - Critical: +AS, +PS
-                - neutral: -AS, -PS
-        ------------------------------------------------------
-        inputs: net (DataFrame)
-        top_q: top quantile
-        output: VSA (DataFrame) -> genename: active_sum, passive_sum, Role
-        '''
-        # active sum and passive sum
-        net = self.net.copy()  
-        net = net[net.weight>net.weight.quantile(top_q)]
-        gene_names = np.union1d(net.source.unique(), net.target.unique())
-        active_sum = np.asarray([sum(net.query(f"source == '{gene}'")['weight']) for gene in gene_names])
-        passive_sum = np.asarray([sum(net.query(f"target == '{gene}'")['weight']) for gene in gene_names])
-
-        # define the roles ['Buffering', 'Passive', 'Active', 'Critical'] -> [0, 1, 2, 3]
-        active_sum_threhsold = np.quantile(active_sum, 0.9)
-        passive_sum_threhsold = np.quantile(passive_sum, 0.9)
-        # active_sum, passive_sum = standardize_array(active_sum), standardize_array(passive_sum)
-        roles = [2*as_flag+ps_flag for as_flag, ps_flag in zip(active_sum>active_sum_threhsold, passive_sum>passive_sum_threhsold)]
-        self.roles = pd.DataFrame(data={'gene_name': gene_names, 'active_sum': active_sum, 'passive_sum': passive_sum, 'role':roles })
-        self.roles.set_index('gene_name',inplace=True)
-        return self.roles
+    
     
     def top_edges(self, quantile=0.95):
         grn = self.net 
