@@ -440,9 +440,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata" "numpy" "scipy" "scikit-learn" "portia-grn"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods portia"
-LABEL org.opencontainers.image.created="2024-09-24T07:37:07Z"
+LABEL org.opencontainers.image.created="2024-09-27T06:42:30Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="65092761d7987e083b5e44c9da10ba660d1b505a"
+LABEL org.opencontainers.image.revision="4e4a976cef3709a67b6307592364d62a1fdff4a0"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1090,10 +1090,33 @@ dep = {
 }
 
 ## VIASH END
+
 import sys
 meta= {
   "resources_dir": 'src/utils/'
 }
+
+import argparse
+parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
+parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--prediction', type=str, help='Path to the prediction file')
+parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
+parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
+parser.add_argument('--num_workers', type=str, help='Number of cores')
+args = parser.parse_args()
+
+if args.multiomics_rna:
+    par['multiomics_rna'] = args.multiomics_rna
+if args.prediction:
+    par['prediction'] = args.prediction
+if args.tf_all:
+    par['tf_all'] = args.tf_all
+if args.num_workers:
+    par['num_workers'] = args.num_workers
+    
+if args.resources_dir:
+    meta['resources_dir'] = args.resources_dir   
+    
 sys.path.append(meta["resources_dir"])
 from util import process_links
 # Load scRNA-seq data
@@ -1115,7 +1138,7 @@ def infer_grn(X, gene_names):
       dataset.add(pt.Experiment(exp_id, data))
   
   M_bar = pt.run(dataset, method='no-transform')
-  limit = min([500000, X.size])
+  limit = min([200000, X.size])
   ranked_scores = pt.rank_scores(M_bar, gene_names, limit=limit)
   sources, targets, weights = zip(*[(gene_a, gene_b, score) for gene_a, gene_b, score in ranked_scores])
 

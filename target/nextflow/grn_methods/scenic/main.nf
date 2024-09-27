@@ -3136,7 +3136,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenic",
     "viash_version" : "0.8.6",
-    "git_commit" : "65092761d7987e083b5e44c9da10ba660d1b505a",
+    "git_commit" : "4e4a976cef3709a67b6307592364d62a1fdff4a0",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3206,6 +3206,29 @@ import sys
 meta= {
   "resources_dir": 'src/utils/'
 }
+
+
+import argparse
+parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
+parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--prediction', type=str, help='Path to the prediction file')
+parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
+parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
+parser.add_argument('--num_workers', type=str, help='Number of cores')
+args = parser.parse_args()
+
+if args.multiomics_rna:
+    par['multiomics_rna'] = args.multiomics_rna
+if args.prediction:
+    par['prediction'] = args.prediction
+if args.tf_all:
+    par['tf_all'] = args.tf_all
+if args.num_workers:
+    par['num_workers'] = args.num_workers
+    
+if args.resources_dir:
+    meta['resources_dir'] = args.resources_dir  
+    
 sys.path.append(meta["resources_dir"])
 from util import process_links
 

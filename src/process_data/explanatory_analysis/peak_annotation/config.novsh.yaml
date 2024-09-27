@@ -1,6 +1,7 @@
 
 functionality:
   name: peak_annotation
+  namespace: exp_analysis
   info:
     label: peak_annotation
     summary: "Annotating peaks in multiomics data"

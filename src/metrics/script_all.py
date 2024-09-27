@@ -7,8 +7,8 @@ import os
 ## VIASH START
 par = {
   'reg_type': 'ridge',
-  'read_dir': "resources/grn_models/d0_hvgs",
-  'write_dir': "resources/results/scores",
+  'read_dir': "resources/grn_models/d0_hvg",
+  'write_dir': "resources/results/scores/d0_hvg",
   'methods': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'genie3', 'grnboost2', 'scenic', 'scglue', 'celloracle'],
   'layers': ['lognorm', 'pearson', 'seurat_lognorm', 'seurat_pearson', 'scgen_lognorm', 'scgen_pearson'],
 

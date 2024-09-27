@@ -1,0 +1,39 @@
+
+__merge__: ../../../api/comp_method.yaml
+
+functionality:
+  name: grn_inference_scenicplus
+  namespace: "workflows"
+  info:
+    label: grn_inference_scenicplus
+    summary: "Infers GRNs from multiomics data using scenicplus."
+  arguments:
+    - name: --scplus_mdata
+      type: file
+      required: false
+      direction: output
+      description: "Main output object."
+      default: "scplus_mdata.h5mu"
+    - name: --qc
+      type: boolean
+      default: false
+      description: "Whether to perform quality control."
+    - name: --cell_topic
+      type: file 
+      default: output/cell_topic.csv
+      required: false
+      direction: output
+      description: "Cell-topics prob scores"
+
+
+  resources:
+    - type: nextflow_script
+      path: main.nf
+      entrypoint: run_wf
+  dependencies:
+    - name: grn_methods/scenicplus 
+
+platforms:
+  - type: nextflow
+    directives:
+      label: [ midtime, highmem, highcpu ]

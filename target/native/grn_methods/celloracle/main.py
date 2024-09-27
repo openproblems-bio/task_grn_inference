@@ -159,10 +159,9 @@ def refine_grns(par):
         print(cell_type, 'links:', len(grn), ' TFs: ', grn.source.unique().shape[0], ' target: ', grn.target.unique().shape[0],)    
         grn['cell_type'] = cell_type
         grn_stack.append(grn)
-    celloracle_grn = pd.concat(grn_stack).reset_index(drop=True)
-    grn = celloracle_grn.groupby(['source', 'target'])['weight'].apply(np.mean).to_frame().reset_index()
+    grn = pd.concat(grn_stack).reset_index(drop=True)
+    grn = grn.groupby(['source', 'target'])['weight'].apply(np.mean).to_frame().reset_index()
     return grn
-
 
 def main(par):
     os.makedirs(par['temp_dir'], exist_ok=True)
