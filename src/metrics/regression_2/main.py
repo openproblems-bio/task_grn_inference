@@ -20,22 +20,23 @@ N_POINTS_TO_ESTIMATE_BACKGROUND = 20
 
 def load_grn(filepath: str, gene_names: np.ndarray, par: Dict[str, Any]) -> np.ndarray:
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
-    A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
-    df = pd.read_csv(filepath, sep=',', header='infer', index_col=0)
+    df = pd.read_csv(filepath, sep=',', header='infer')
     if 'cell_type' in df.columns:
         verbose_print(par['verbose'], 'Taking mean of cell type specific grns', 3)
         df.drop(columns=['cell_type'], inplace=True)
         df = df.groupby(['source', 'target']).mean().reset_index()
-
+    # keep only top n links
+    if df.shape[0] > par['max_n_links']:
+        verbose_print(par['verbose'], f"Reducing number of links to {par['max_n_links']}", 3)
+        df = process_links(df, par)
+    # convert to matrix
+    A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
     for source, target, weight in zip(df['source'], df['target'], df['weight']):
         if (source not in gene_dict) or (target not in gene_dict):
             continue
         i = gene_dict[source]
         j = gene_dict[target]
         A[i, j] = float(weight)
-    if df.shape[0] > par['max_n_links']:
-        verbose_print(par['verbose'], f"Reducing number of links to {par['max_n_links']}", 3)
-        df = process_links(df, par)
     return A
 
 

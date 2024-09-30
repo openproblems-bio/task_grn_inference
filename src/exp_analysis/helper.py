@@ -65,6 +65,63 @@ def plot_cumulative_density(data, title='', ax=None, s=1, **kwdgs):
 #         self.out_deg = degree_centrality(net, source='source', target='target',  **kwargs)
 #         self.in_deg = degree_centrality(net, source='target', target='source',  **kwargs)
         
+class VSA_analysis:
+    '''Vester's sensitivity analysis. 
+                - active_sum: active sum. Sum along rows of the influence matrix and it indicates how much does a variable influence all the others.
+                - passive_sum: passive sum. Its is the sum along columns of the influence matrix and it indicates how sensitive a variable is, how does it react to the influence of others
+    '''
+    def __init__(self, sample: pd.DataFrame, control: pd.DataFrame, mode='weight', top_q_net = 0.75, critical_change_q_t: float = 0.75):
+        # - keep only top quantile links
+        control = control[control.weight > control.weight.quantile(top_q_net)]
+        sample = sample[sample.weight > sample.weight.quantile(top_q_net)]
+        
+        print('Determine roles')
+        self.vsa_control = self.determine_roles(control)
+        self.vsa_sample = self.determine_roles(sample)
+        print('Determine role change')
+        self.oo = self.diff_roles(self.vsa_control, self.vsa_sample, critical_change_q_t)
+        
+    @staticmethod
+    def determine_roles(net, mode='weight', top_q_role=0.9) -> pd.DataFrame:
+        # active sum and passive sum 
+        gene_names = np.union1d(net.source.unique(), net.target.unique())
+        if mode=='weight':
+            active_sum = np.asarray([sum(net.query(f"source == '{gene}'")['weight']) for gene in gene_names])
+            passive_sum = np.asarray([sum(net.query(f"target == '{gene}'")['weight']) for gene in gene_names])
+        else:
+            raise ValueError('define first')
+
+        # define the roles ['Buffering', 'Passive', 'Active', 'Critical'] -> [0, 1, 2, 3]
+        active_sum_threhsold = np.quantile(active_sum, top_q_role)
+        passive_sum_threhsold = np.quantile(passive_sum, top_q_role)
+        # active_sum, passive_sum = standardize_array(active_sum), standardize_array(passive_sum)
+        roles = [2*as_flag+ps_flag for as_flag, ps_flag in zip(active_sum>active_sum_threhsold, passive_sum>passive_sum_threhsold)]
+        roles = pd.DataFrame(data={'gene_name': gene_names, 'active_sum': active_sum, 'passive_sum': passive_sum, 'role':roles })
+        roles.set_index('gene_name',inplace=True)
+        return roles
+    @staticmethod
+    def diff_roles(control: pd.DataFrame, sample: pd.DataFrame, critical_change_q_t: float=.75) -> pd.DataFrame:
+        '''
+        Find the distance in the role from control to sample, and flags the top changes.
+        '''
+        # - match the index
+        common_genes = pd.Index(np.union1d(sample.index, control.index))
+        control = control.reindex(common_genes).fillna(0)
+        sample = sample.reindex(common_genes).fillna(0)
+        # - calculate distance 
+        as_distance = (sample['active_sum'] - control['active_sum'])
+        ps_distance = (sample['passive_sum'] - control['passive_sum'])
+        overall_distance = as_distance**2 + ps_distance**2
+        df_distance = pd.DataFrame({'as_distance':as_distance, 'ps_distance':ps_distance, 'overall_distance':overall_distance}, index=common_genes)
+
+        # df_distance = df_distance.assign(passive_sum_c=control['passive_sum'], active_sum_c=control['active_sum'])
+        # df_distance = df_distance.assign(passive_sum_s=sample['passive_sum'], active_sum_s=sample['active_sum'])
+
+        # - define x top percentile as the cut-off value to determine critical role change
+        # df_distance['critical_change_as'] = df_distance['as_distance'] > df_distance['as_distance'].quantile(critical_change_q_t)
+        # df_distance['critical_change_ps'] = df_distance['ps_distance'] > df_distance['ps_distance'].quantile(critical_change_q_t)
+        # df_distance['critical_change_overall'] = df_distance['overall_distance'] > df_distance['overall_distance'].quantile(critical_change_q_t)
+        return df_distance
 class Exp_analysis:
     '''
     This class provides functions for explanatory analysis of GRNs
@@ -101,8 +158,6 @@ class Exp_analysis:
         if colors is not None:
             for label, color in zip(ax.get_yticklabels(), colors):
                 label.set_color(color)
-    
-    
     def top_edges(self, quantile=0.95):
         grn = self.net 
         grn = grn[grn.weight>grn.weight.quantile(quantile)]
@@ -118,7 +173,6 @@ class Exp_analysis:
         c_weight = determine_centrality(self.net, mode='weight')
         
         self.sources = c_weight.merge(c_degree, left_index=True, right_index=True)
-    
     # def calculate_centrality_stats(self) -> None:
     #     '''Calculate network centrality metrics such as in and out degree
     #     '''
@@ -164,6 +218,9 @@ class Exp_analysis:
         # gene_annot.values
         self.gene_annot = {key:round((value*100/len(self.targets)), 1) for key, value in gene_annot.items()}
         return self.gene_annot
+    def analyse_roles(self, ref_net, **kwargs):
+        self.vsa_obj = VSA_analysis(self.net, ref_net,**kwargs)
+        self.vsa_results = self.vsa_obj.oo
 def plot_interactions(interaction_df: pd.DataFrame, min_subset_size=None, min_degree=None, color_map=None) -> plt.Figure: 
     """Upset plot of interactions
 

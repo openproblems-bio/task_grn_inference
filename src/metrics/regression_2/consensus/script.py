@@ -11,11 +11,21 @@ import numpy as np
 ## VIASH START
 par = {
     'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
-    'grn_folder': 'resources/grn-benchmark/grn_models/d0_hvg',
-    'grns': 'pearson_corr, pearson_causal, portia, ppcor, genie3, grnboost2, scenic, scglue, celloracle',
+    # 'models_dir': 'resources/grn-benchmark/grn_models/d0_hvg',
+    # 'models': [pearson_corr, pearson_causal, portia, ppcor, genie3, grnboost2, scenic, scglue, celloracle],
     'output': 'resources/grn-benchmark/consensus-num-regulators.json'
 }
 ## VIASH END
+import argparse
+parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
+parser.add_argument('--models_dir', type=str, help='where to read the models')
+parser.add_argument('--models', nargs='+', help="List of models to process", required=True)
+
+args = parser.parse_args()
+if args.models_dir:
+    par['models_dir'] = args.models_dir
+if args.models:
+    par['models'] = args.models
 
 
 # Load perturbation data
@@ -26,12 +36,12 @@ except:
     gene_names = adata_rna.var.index.to_numpy()
 
 print(par['perturbation_data'])
-print(par['grns'])
+print(par['models'])
 
 # Load inferred GRNs
 grns = []
-for filename in par['grns'].split(','):
-    filepath = os.path.join(par['grn_folder'], f'{filename}.csv')
+for filename in par['models']:
+    filepath = os.path.join(par['models_dir'], f'{filename}.csv')
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
     A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
     df = pd.read_csv(filepath, sep=',', header='infer', index_col=0)
