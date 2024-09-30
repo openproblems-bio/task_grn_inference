@@ -8,4 +8,4 @@
 #SBATCH --mem=64G 
 #SBATCH --cpus-per-task=20  
 
-python src/metrics/script_all.py
+python src/metrics/script_all.py 

@@ -26,7 +26,7 @@ def verbose_tqdm(iterable, desc, level, verbose_level):
 
 def basic_qc(adata, min_genes_per_cell = 200, max_genes_per_cell = 5000, min_cells_per_gene = 10):
     mt = adata.var_names.str.startswith('MT-')
-
+    print('shape before ', adata.shape)
     # 1. stats
     total_counts = adata.X.sum(axis=1)
     n_genes_by_counts = (adata.X > 0).sum(axis=1)
@@ -37,15 +37,16 @@ def basic_qc(adata, min_genes_per_cell = 200, max_genes_per_cell = 5000, min_cel
     # mt_filter = mt_frac > max_mt_frac
 
     # 2. Filter cells
-    print(f'Number of cells removed: below min gene {low_gene_filter.sum()}, exceed max gene {high_gene_filter.sum()}')
+    # print(f'Number of cells removed: below min gene {low_gene_filter.sum()}, exceed max gene {high_gene_filter.sum()}')
     mask_cells=  (~low_gene_filter)& \
                  (~high_gene_filter)
                 #  (~mt_filter)
     # 3. Filter genes
     n_cells = (adata.X!=0).sum(axis=0)
     mask_genes = n_cells>min_cells_per_gene
-
-    return adata[mask_cells, mask_genes]
+    adata_f = adata[mask_cells, mask_genes]
+    print('shape after ', adata_f.shape)
+    return adata_f
 
 def process_links(net, par):
     net = net[net.source!=net.target]
