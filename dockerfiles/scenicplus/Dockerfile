@@ -8,15 +8,11 @@ RUN git checkout fa55dae55203951c0c42e359b65a28010cd544f6
 RUN pip install .
 WORKDIR ..
 
-# Install HTSlib and tabix
-RUN git clone https://github.com/samtools/htslib.git
-WORKDIR htslib/
-RUN autoreconf -i
-RUN git submodule update --init --recursive
-RUN ./configure
-RUN make
-RUN make install
-WORKDIR ..
+# Install missing Python dependencies
+RUN pip install flatbuffers
+
+# Install Tabix (from htslib)
+RUN apt update && apt install -y tabix bedtools
 
 # Install Java
 RUN apt update
