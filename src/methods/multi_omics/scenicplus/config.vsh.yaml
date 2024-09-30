@@ -39,12 +39,9 @@ functionality:
 
 platforms:
   - type: docker
-    # image: apassemi/scenicplus:1.0.1
+    image: apassemi/scenicplus:1.0.4
     # image: vanallenlab/scenicplus_x86_64:initial
-    image: aertslab/pyscenic:0.12.1
-    # setup:
-    #   - type: python
-    #     packages: [ flatbuffers ]
+    #image: aertslab/pyscenic:0.12.1
   - type: native
   - type: nextflow
     directives:
