@@ -12,7 +12,11 @@ from ast import literal_eval
 import requests
 import torch
 
-def preprocess(rna, atac, par):
+def preprocess(par):
+    print('Reading input files', flush=True)
+    rna = ad.read_h5ad(par['multiomics_rna'])
+    atac = ad.read_h5ad(par['multiomics_atac'])
+    
     rna.layers["counts"] = rna.X.copy()
     sc.pp.highly_variable_genes(rna, n_top_genes=2000, flavor="seurat_v3")
     sc.pp.normalize_total(rna)
@@ -46,22 +50,22 @@ def preprocess(rna, atac, par):
     scglue.graph.check_graph(guidance, [rna, atac])
     
     column_names = [
-    "chrom",
-    "gene_type",
-    "gene_id",
-    "hgnc_id",
-    "havana_gene",
-    "tag",
-    "score",
-    "strand",
-    "thickStart",
-    "thickEnd",
-    "itemRgb",
-    "blockCount",
-    "blockSizes",
-    "blockStarts",
-    "artif_dupl",
-    "highly_variable_rank"
+        "chrom",
+        "gene_type",
+        "gene_id",
+        "hgnc_id",
+        "havana_gene",
+        "tag",
+        "score",
+        "strand",
+        "thickStart",
+        "thickEnd",
+        "itemRgb",
+        "blockCount",
+        "blockSizes",
+        "blockStarts",
+        "artif_dupl",
+        "highly_variable_rank"
     ]
     rna.var[column_names] = rna.var[column_names].astype(str)
 
@@ -75,14 +79,18 @@ def training(par):
     atac = ad.read_h5ad(f"{par['temp_dir']}/atac.h5ad")
     guidance = nx.read_graphml(f"{par['temp_dir']}/guidance.graphml.gz")
     scglue.models.configure_dataset(
-        rna, "NB", use_highly_variable=False,
-        use_layer="counts", use_rep="X_pca"
+        rna, "NB", use_highly_variable=True,
+        use_layer="counts", use_rep="X_pca", use_batch='donor_id', use_cell_type='cell_type'
     )
     scglue.models.configure_dataset(
-        atac, "NB", use_highly_variable=False,
-        use_rep="X_lsi"
+        atac, "NB", use_highly_variable=True,
+        use_rep="X_lsi", use_batch='donor_id', use_cell_type='cell_type'
     )
-    
+    if False:
+        guidance_hvf = guidance.subgraph(chain(
+            rna.var.query("highly_variable").index,
+            atac.var.query("highly_variable").index
+        )).copy()
 
     glue = scglue.models.fit_SCGLUE(
         {"rna": rna, "atac": atac}, guidance,
@@ -91,15 +99,18 @@ def training(par):
 
     glue.save(f"{par['temp_dir']}/glue.dill")
 
-    dx = scglue.models.integration_consistency(
-        glue, {"rna": rna, "atac": atac}, guidance
-    )
+    if True: # consistency score
+        dx = scglue.models.integration_consistency(
+            glue, {"rna": rna, "atac": atac}, guidance
+        )
+        dx.to_csv(f"{par['temp_dir']}/consistency_scores.csv")
 
     rna.obsm["X_glue"] = glue.encode_data("rna", rna)
     atac.obsm["X_glue"] = glue.encode_data("atac", atac)
-    combined = ad.concat([rna, atac])
-    sc.pp.neighbors(combined, use_rep="X_glue", metric="cosine")
-    sc.tl.umap(combined)
+    if False:
+        combined = ad.concat([rna, atac])
+        sc.pp.neighbors(combined, use_rep="X_glue", metric="cosine")
+        sc.tl.umap(combined)
     feature_embeddings = glue.encode_graph(guidance)
     feature_embeddings = pd.DataFrame(feature_embeddings, index=glue.vertices)
     rna.varm["X_glue"] = feature_embeddings.reindex(rna.var_names).to_numpy()
@@ -135,7 +146,6 @@ def run_grn(par):
         features, feature_embeddings,
         skeleton=skeleton, random_state=0
     )
-
 
     gene2peak = reginf.edge_subgraph(
         e for e, attr in dict(reginf.edges).items()
@@ -218,8 +228,8 @@ def run_grn(par):
     ).to_csv(f"{par['temp_dir']}/ctx_annotation.tsv", sep="\t", index=False)
 def prune_grn(par):
     # Construct the command 
-    
-    print("Run pscenic ctx", flush=True)
+    print(par)
+    print("Run pyscenic ctx", flush=True)
     command = [
         "pyscenic", "ctx", 
         f"{par['temp_dir']}/draft_grn.csv",
@@ -228,10 +238,10 @@ def prune_grn(par):
         "--annotations_fname", f"{par['temp_dir']}/ctx_annotation.tsv",
         "--expression_mtx_fname", f"{par['temp_dir']}/rna.loom",
         "--output", f"{par['temp_dir']}/pruned_grn.csv",
-        "--top_n_targets", str(par['top_n_targets']),
-        "--rank_threshold", str(par['rank_threshold']),
+        # "--top_n_targets", str(par['top_n_targets']),
+        # "--rank_threshold", str(par['rank_threshold']),
         # "--auc_threshold", "0.1",
-        "--nes_threshold", str(par['nes_threshold']), 
+        # "--nes_threshold", str(par['nes_threshold']), 
         "--min_genes", "1",
         "--num_workers", f"{par['num_workers']}",
         "--cell_id_attribute", "obs_id", # be sure that obs_id is in obs and name is in var
@@ -251,24 +261,58 @@ def prune_grn(par):
         print("pyscenic ctx failed with return code", result.returncode)
 
 
+def download_annotation(par):
+    # get gene annotation
+    par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
+    if not os.path.exists(par['annotation_file']):
+        print("Downloading prior started")
+    
+        response = requests.get("https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.annotation.gtf.gz")
+        
+        if response.status_code == 200:
+            with open(par['annotation_file'], 'wb') as file:
+                file.write(response.content)
+            print(f"File downloaded and saved to {par['annotation_file']}")
+        else:
+            print(f"Failed to download the gencode.v45.annotation.gtf.gz. Status code: {response.status_code}")
+        print("Downloading prior ended")
+def download_motifs(par):
+    # get gene annotation
+    tag = "JASPAR2022-hg38.bed.gz"
+    par['motif_file'] = f"{par['temp_dir']}/{tag}"
+    if not os.path.exists(par['motif_file']):
+        print("Downloading motif started")
+        response = requests.get(f"http://download.gao-lab.org/GLUE/cisreg/{tag}")
+        
+        if response.status_code == 200:
+            with open(par['motif_file'], 'wb') as file:
+                file.write(response.content)
+            print(f"File downloaded and saved to {par['motif_file']}")
+        else:
+            print(f"Failed to download the motif file. Status code: {response.status_code}")
+        print("Downloading motif ended")
+
 def main(par):
     
     print("Is CUDA available:", torch.cuda.is_available())
     print("Number of GPUs:", torch.cuda.device_count())
     
-    print('Reading input files', flush=True)
-    rna = ad.read_h5ad(par['multiomics_rna'])
-    atac = ad.read_h5ad(par['multiomics_atac'])
+    
     
     from util import process_links
     # Load scRNA-seq data
-    print('Reading data')
+    os.makedirs(par['temp_dir'], exist_ok=True)
 
-    print('Preprocess data', flush=True)
-    preprocess(rna, atac, par)
+    download_annotation(par)
+
+    download_motifs(par)
+
+
+    # print('Preprocess data', flush=True)
+    # preprocess(par)
     
-    print('Train a model', flush=True)
-    training(par)
+    # print('Train a model', flush=True)
+    # training(par)
     run_grn(par)
     prune_grn(par)
     print('Curate predictions', flush=True)

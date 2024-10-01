@@ -406,9 +406,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "sctk==0.2.2"
 
 LABEL org.opencontainers.image.description="Companion container for running component perturbation normalization"
-LABEL org.opencontainers.image.created="2024-09-30T08:46:05Z"
+LABEL org.opencontainers.image.created="2024-10-01T18:00:04Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="24aab52b409aa1a89234d381a16e8490454c006b"
+LABEL org.opencontainers.image.revision="92cf7a563586f113e11a64839328885feb2d0b6d"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -906,12 +906,13 @@ def normalize_func(bulk_adata):
     bulk_adata.layers['lognorm'] = bulk_adata_c.X
     
     return bulk_adata
-print("reading the file")
-bulk_adata_filtered = ad.read_h5ad(par['pseudobulked_data_f'])
-bulk_adata_n = normalize_func(bulk_adata_filtered)
-print("Normalizing completed")
-print("Writing the file")
-bulk_adata_n.write(par['perturbation_data_n'])
+if __name__ == '__main__':
+    print("reading the file")
+    bulk_adata_filtered = ad.read_h5ad(par['pseudobulked_data_f'])
+    bulk_adata_n = normalize_func(bulk_adata_filtered)
+    print("Normalizing completed")
+    print("Writing the file")
+    bulk_adata_n.write(par['perturbation_data_n'])
 VIASHMAIN
 python -B "\$tempscript" &
 wait "\$!"

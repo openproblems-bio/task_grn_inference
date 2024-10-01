@@ -59,7 +59,7 @@ def corr_net(X, gene_names, par, tf_all, causal=False):
     net = np.dot(X.T, X) / X.shape[0]
     net = pd.DataFrame(net, index=gene_names, columns=gene_names)  
     if causal:  
-        print('Causal subsetting')
+        print('TF subsetting')
         net = net[tf_all]
     else:
         print('Random subsetting')

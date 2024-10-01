@@ -7,19 +7,18 @@ import random
 
 par = {
   'reg_type': 'ridge',
-  'read_dir': "resources/grn_models/d0_hvg",
+  'read_dir': "resources/grn_models/",
   'write_dir': "resources/results/robustness_analysis",
   'degrees': [0, 10, 20, 50, 100],
   'noise_types': ["net", "sign"],
-  'methods': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'genie3', 'grnboost2', 'scenic', 'scglue', 'celloracle'],
-  
+  'methods': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle'],
+
 
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
   "tf_all": "resources/prior/tf_all.csv",
   "max_n_links": 50000,
   "apply_tf": "true",
   'subsample': -2,
-  'num_workers': 4,
   'verbose': 3,
   'binarize': True,
   'num_workers': 20,

@@ -9,9 +9,10 @@ par = {
   'reg_type': 'ridge',
   'models_dir': "resources/grn_models/",
   'scores_dir': "resources/scores/",
+  'thetas': np.arange(0, 1, .1),
   
   'methods': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle'],
-  'layers': ['scgen_pearson', 'lognorm', 'pearson', 'seurat_lognorm', 'seurat_pearson', 'scgen_lognorm'],
+  'layers': ['scgen_pearson'],
 
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
   "tf_all": "resources/prior/tf_all.csv",
@@ -59,16 +60,19 @@ for layer in par['layers']:
   par['layer'] = layer
   for i, method in enumerate(par['methods']):
     par['prediction'] = f"{par['models_dir']}/{method}.csv"
-    from regression_1.main import main 
-    reg1 = main(par)
-    from regression_2.main import main 
-    reg2 = main(par)
-    score = pd.concat([reg1, reg2], axis=1)
-    score.index = [method]
-    if i==0:
-      df_all = score
-    else:
-      df_all = pd.concat([df_all, score])
-    df_all.to_csv(f"{par['scores_dir']}/{layer}-{par['reg_type']}.csv")
-    print(df_all)
-  
+      for theta in par['thetas']:
+      
+        
+        # from regression_1.main import main 
+        # reg1 = main(par)
+        from regression_2.main import main 
+        score = main(par)
+        # score = pd.concat([reg1, reg2], axis=1)
+        score.index = [method]
+        if i==0:
+          df_all = score
+        else:
+          df_all = pd.concat([df_all, score])
+        df_all.to_csv(f"{par['scores_dir']}/{layer}-{par['reg_type']}.csv")
+        print(df_all)
+    

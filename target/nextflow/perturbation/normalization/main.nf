@@ -2956,7 +2956,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/normalization",
     "viash_version" : "0.8.6",
-    "git_commit" : "24aab52b409aa1a89234d381a16e8490454c006b",
+    "git_commit" : "92cf7a563586f113e11a64839328885feb2d0b6d",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3022,12 +3022,13 @@ def normalize_func(bulk_adata):
     bulk_adata.layers['lognorm'] = bulk_adata_c.X
     
     return bulk_adata
-print("reading the file")
-bulk_adata_filtered = ad.read_h5ad(par['pseudobulked_data_f'])
-bulk_adata_n = normalize_func(bulk_adata_filtered)
-print("Normalizing completed")
-print("Writing the file")
-bulk_adata_n.write(par['perturbation_data_n'])
+if __name__ == '__main__':
+    print("reading the file")
+    bulk_adata_filtered = ad.read_h5ad(par['pseudobulked_data_f'])
+    bulk_adata_n = normalize_func(bulk_adata_filtered)
+    print("Normalizing completed")
+    print("Writing the file")
+    bulk_adata_n.write(par['perturbation_data_n'])
 VIASHMAIN
 python -B "$tempscript"
 '''

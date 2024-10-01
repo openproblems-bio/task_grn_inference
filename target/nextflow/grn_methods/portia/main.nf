@@ -3112,7 +3112,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia",
     "viash_version" : "0.8.6",
-    "git_commit" : "24aab52b409aa1a89234d381a16e8490454c006b",
+    "git_commit" : "92cf7a563586f113e11a64839328885feb2d0b6d",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3203,23 +3203,25 @@ from util import process_links
 print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
 
-gene_names = adata_rna.var.gene_ids.index.to_numpy()
+gene_names = adata_rna.var_names
 X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X
 
 # Load list of putative TFs
 tfs = np.loadtxt(par['tf_all'], dtype=str)
 tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
+tf_idx = np.asarray([i for i, gene_name in enumerate(gene_names) if gene_name in tf_names], dtype=int)
+
 
 # GRN inference
 def infer_grn(X, gene_names):
   print('Inferring grn')
   dataset = pt.GeneExpressionDataset()
+  
   for exp_id, data in enumerate(X):
       dataset.add(pt.Experiment(exp_id, data))
   
-  M_bar = pt.run(dataset, method='no-transform')
-  limit = min([200000, X.size])
-  ranked_scores = pt.rank_scores(M_bar, gene_names, limit=limit)
+  M_bar = pt.run(dataset, tf_idx=tf_idx, method='no-transform')
+  ranked_scores = pt.rank_scores(M_bar, gene_names, limit=par['max_n_links'])
   sources, targets, weights = zip(*[(gene_a, gene_b, score) for gene_a, gene_b, score in ranked_scores])
 
   grn = pd.DataFrame({'source':sources, 'target':targets, 'weight':weights})
@@ -3229,31 +3231,9 @@ def infer_grn(X, gene_names):
   grn = process_links(grn, par)
   return grn
 # par['cell_type_specific'] = False
-if par['cell_type_specific']:
-  groups = adata_rna.obs.cell_type
-  i = 0
-  for group in tqdm(np.unique(groups), desc="Processing groups"):
-    X_sub = X[groups == group, :]
-    
-    net = infer_grn(X_sub, gene_names)
-    net['cell_type'] = group
-    if i==0:
-        grn = net
-    else:
-        grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
-
-    i += 1
-        
-else:
-  grn = infer_grn(X, gene_names)
+grn = infer_grn(X, gene_names)
 
 grn.to_csv(par['prediction'])
-
-# # Save inferred GRN
-# with open(par['prediction'], 'w') as f:
-#     f.write(f',source,target,weight\\\\n')
-#     for i, (gene_a, gene_b, score) in enumerate(pt.rank_scores(M_bar, gene_names, limit=par['max_n_links'])):
-#         f.write(f'{i},{gene_a},{gene_b},{score}\\\\n')
 
 print('Finished.')
 VIASHMAIN

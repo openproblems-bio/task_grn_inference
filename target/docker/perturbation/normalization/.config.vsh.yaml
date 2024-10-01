@@ -127,5 +127,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/perturbation/normalization"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/perturbation/normalization/normalization"
   viash_version: "0.8.6"
-  git_commit: "24aab52b409aa1a89234d381a16e8490454c006b"
+  git_commit: "92cf7a563586f113e11a64839328885feb2d0b6d"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

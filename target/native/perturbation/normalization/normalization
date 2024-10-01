@@ -457,12 +457,13 @@ def normalize_func(bulk_adata):
     bulk_adata.layers['lognorm'] = bulk_adata_c.X
     
     return bulk_adata
-print("reading the file")
-bulk_adata_filtered = ad.read_h5ad(par['pseudobulked_data_f'])
-bulk_adata_n = normalize_func(bulk_adata_filtered)
-print("Normalizing completed")
-print("Writing the file")
-bulk_adata_n.write(par['perturbation_data_n'])
+if __name__ == '__main__':
+    print("reading the file")
+    bulk_adata_filtered = ad.read_h5ad(par['pseudobulked_data_f'])
+    bulk_adata_n = normalize_func(bulk_adata_filtered)
+    print("Normalizing completed")
+    print("Writing the file")
+    bulk_adata_n.write(par['perturbation_data_n'])
 VIASHMAIN
 python -B "\$tempscript" &
 wait "\$!"
