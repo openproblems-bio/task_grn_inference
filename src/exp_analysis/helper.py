@@ -42,9 +42,106 @@ def determine_centrality(net, source='source', target='target', normalize=False,
     else:
         raise ValueError('Define first')
     return centrality
+def calculate_feature_distance(sample: pd.DataFrame, control: pd.DataFrame, top_n=None):
+    ''' calculates eclidean distance for given features'''
+    if top_n is not None:
+        sample = sample.sort_values(by='feature_rank')[:top_n] # to control the noise 
+    
+    entries_common = pd.Index(np.intersect1d(sample.index, control.index)) 
+    control = control.reindex(entries_common)
+    # - for feature (raw), missing values are 0
+    control['feature'] = control['feature'].fillna(0)
+    # - for feaure rank, missing values are maximum
+    control['feature_rank'] = control['feature_rank'].fillna(max(control['feature_rank']))
+    
+    distance_raw = sample['feature'] - control['feature'] # euclidean  
+    distance_rank = control['feature_rank'] -sample['feature_rank'] # euclidean  
+    
+    distance_df = pd.DataFrame({'distance_raw':distance_raw, 'distance_rank':distance_rank}, index=entries_common)
+    return distance_df 
+def cosine_similarity(nets_dict, col_name='source', weight_col='weight', figsize=(4, 4)):
+    from itertools import combinations
+    from sklearn.metrics.pairwise import cosine_similarity
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    import numpy as np
+    
+    # 1. Extract the source-target-weight triples from each network
+    nets_names = list(nets_dict.keys())
+    nets = list(nets_dict.values())
 
+    # 2. Create a union of all possible links (source-target) to form a "vector space"
+    all_links = set()
+    for net in nets:
+        all_links.update(net[col_name])
+    all_links = sorted(list(all_links))  # Sort to keep consistent ordering
 
-def plot_cumulative_density(data, title='', ax=None, s=1, **kwdgs):
+    # 3. Create a matrix where each entry represents the weight of a link for each network
+    weighted_matrix = np.zeros((len(nets), len(all_links)))
+    
+    for i, net in enumerate(nets):
+        net_links = net[col_name]
+        link_to_weight = {link: weight for link, weight in zip(net_links, net[weight_col])}
+        for j, link in enumerate(all_links):
+            weighted_matrix[i, j] = link_to_weight.get(link, 0)  # Use 0 if link not present in net
+
+    # 4. Compute the pairwise cosine similarity between all networks based on weights
+    cosine_sim_matrix = cosine_similarity(weighted_matrix)
+    for i in range(cosine_sim_matrix.shape[0]):
+        for j in range(cosine_sim_matrix.shape[1]):
+            if i>=j:
+                cosine_sim_matrix[i,j]=np.NaN
+
+    # 5. Visualize the Cosine Similarity matrix as a heatmap
+    fig, ax = plt.subplots(1, 1, figsize=figsize)
+    
+    sns.heatmap(cosine_sim_matrix, annot=True, cmap="coolwarm", xticklabels=nets_names, yticklabels=nets_names, ax=ax)
+    ax.grid(True)
+    ax.set_title('Cosine Similarity')
+
+    # Rotate x labels for readability
+    plt.xticks(rotation=45, ha='right')
+    
+    return cosine_sim_matrix, fig
+
+def jaccard_similarity(nets_dict, col_name='link', figsize=(4, 4)):
+    from itertools import combinations
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    import numpy as np
+    # 1. Extract the source-target pairs from each network as a set of tuples
+    nets_names = list(nets_dict.keys())
+    nets = list(nets_dict.values())
+    if col_name is None:
+        link_sets = [set(net.index.values) for net in nets]
+    else:
+        link_sets = [set(net[col_name].unique()) for net in nets]
+    # 2. Initialize an empty matrix for storing pairwise Jaccard similarities
+    n = len(nets)
+    jaccard_matrix = np.zeros((n, n))
+
+    # 3. Compute the pairwise Jaccard similarity
+    for i, j in combinations(range(n), 2):
+        A = link_sets[i]
+        B = link_sets[j]
+        intersection = len(A.intersection(B))
+        union = len(A.union(B))
+        jaccard_similarity = intersection / union if union != 0 else 0
+        jaccard_matrix[i, j] = jaccard_similarity
+        jaccard_matrix[j, i] = np.NaN
+    # Fill diagonal with 1s (as similarity of a network with itself is 1)
+    np.fill_diagonal(jaccard_matrix, np.NaN)
+    # 4. Visualize the Jaccard matrix as a heatmap
+    fig, ax = plt.subplots(1, 1, figsize=figsize)
+    sns.heatmap(jaccard_matrix, annot=True, cmap="coolwarm", xticklabels=nets_names, yticklabels=nets_names, ax=ax)
+    ax.grid(True)
+    ax.set_title('Jaccard Similarity')
+    # Rotate x labels for readability
+    plt.xticks(rotation=45, ha='right')
+
+    return jaccard_matrix, fig
+
+def plot_cumulative_density(data, title='', ax=None, s=1, x_label='Weight', **kwdgs):
     # Sort the data
     sorted_data = np.sort(data)
     # Compute the cumulative density values
@@ -54,16 +151,16 @@ def plot_cumulative_density(data, title='', ax=None, s=1, **kwdgs):
     else:
     	fig = None
     ax.step(sorted_data, cdf, where='post', label=title, **kwdgs)
-    ax.set_xlabel('Weight')
+    ax.set_xlabel(x_label)
     ax.set_ylabel('Cumulative Density')
     ax.set_title(title)
     ax.grid(True)
     return fig, ax
 
-# class Connectivity:
-#     def __init__(self, net, **kwargs):
-#         self.out_deg = degree_centrality(net, source='source', target='target',  **kwargs)
-#         self.in_deg = degree_centrality(net, source='target', target='source',  **kwargs)
+class Connectivity:
+    def __init__(self, net, **kwargs):
+        self.out_deg = determine_centrality(net, source='source', target='target',  **kwargs)
+        self.in_deg = determine_centrality(net, source='target', target='source',  **kwargs)
         
 class VSA_analysis:
     '''Vester's sensitivity analysis. 
@@ -134,8 +231,6 @@ class Exp_analysis:
         self.peak_gene_net = peak_gene_net
         self.tfs = net.source.unique()
         self.targets = net.target.unique()
-        if peak_gene_net is not None:
-            self.cres = peak_gene_net.source.unique()
         # check duplicates
         dup_flag = False
         if 'cell_type' in net.columns:
@@ -147,7 +242,8 @@ class Exp_analysis:
         if dup_flag:
             raise ValueError('The network has duplicated source target combinations.')
         self.peak_annot = None
-    def plot_centrality(self, df, title='',ax=None, xlabel='Degree', ylabel='Gene', colors=None):
+    @staticmethod
+    def plot_centrality_barh(df, title='',ax=None, xlabel='Degree', ylabel='Gene', colors=None):
         if ax==None:
             fig, ax = plt.subplots(figsize=(10, 6))
         df['degree'].plot(kind='barh', color='skyblue', ax=ax)  # Pass ax to the plot method
@@ -162,37 +258,44 @@ class Exp_analysis:
         grn = self.net 
         grn = grn[grn.weight>grn.weight.quantile(quantile)]
         return grn.link.values
-    def calculate_basic_stats(self):
-        
+    def calculate_basic_stats(self): 
         self.stats = dict({'n_links': self.net.shape[0], 'n_source': self.net.source.nunique(), 
                     'n_target': self.net.target.nunique(), 'ratio_positive_negative':(self.net.weight>=0).sum()/(self.net.shape[0])},
                     )
         return self.stats
-    def determine_source_properties(self):
-        c_degree = determine_centrality(self.net, mode='degree')
-        c_weight = determine_centrality(self.net, mode='weight')
-        
-        self.sources = c_weight.merge(c_degree, left_index=True, right_index=True)
-    # def calculate_centrality_stats(self) -> None:
-    #     '''Calculate network centrality metrics such as in and out degree
-    #     '''
-    #     self.tf_gene = Connectivity(self.net, normalize=False)
-    #     if self.peak_gene_net is None:
-    #         self.peak_gene = None
-    #         self.n_cres = None
-    #     else:
-    #         self.peak_gene = Connectivity(self.peak_gene_net, normalize=False)
-    #         self.n_cres = self.peak_gene_net.source.nunique()
+    def calculate_centrality(self) -> None:
+        '''Calculate network centrality metrics such as in and out degree
+        '''
+        self.tf_gene = Connectivity(self.net, normalize=False)
+        if self.peak_gene_net is None:
+            self.peak_gene = None
+        else:
+            peak_gene_net = self.peak_gene_net
+            peak_gene_net.rename(columns={'peak':'source'},inplace=True)
+            self.peak_gene = Connectivity(peak_gene_net, normalize=False)
+    def plot_centrality(self, values, **kywds):
+        return plot_cumulative_density(values, **kywds)
     def plot_grn_cdf(self, ax=None, title=''):
         values_n = self.net.weight/self.net.weight.max()
         return plot_cumulative_density(values_n, ax=ax, title=title)
-    def plot_cumulative_density(self, values, **kywds):
+    @staticmethod
+    def plot_cumulative_density(values, **kywds):
         return plot_cumulative_density(values, **kywds)
-
+    @staticmethod
+    def subset_quantile(df, col_name='weight', top_q=0.95, top_n=None, ascending=False):
+        if top_n is None:
+            df = df[df[col_name] > df[col_name].quantile(top_q)]
+        else:
+            df = df.sort_values(by=col_name, ascending=ascending, key=abs)[:top_n]
+        return df
     def annotate_peaks(self, annotation_df) -> dict[str, float]:
         '''Annotate peaks with associated regions on genome.
         '''
-        peaks = self.format_peak(self.cres)
+        if self.peak_gene_net is None:
+            print('Peak gene net is not given. Peak annoation is skipped.')
+            return
+        peaks = self.peak_gene_net.peak.unique()
+        peaks = self.format_peak(peaks)
         annotation_df = annotation_df[annotation_df.peak.isin(peaks)]
         value_counts = annotation_df.annotation.value_counts()
         sum_values = value_counts.sum()
@@ -218,9 +321,23 @@ class Exp_analysis:
         # gene_annot.values
         self.gene_annot = {key:round((value*100/len(self.targets)), 1) for key, value in gene_annot.items()}
         return self.gene_annot
-    def analyse_roles(self, ref_net, **kwargs):
-        self.vsa_obj = VSA_analysis(self.net, ref_net,**kwargs)
-        self.vsa_results = self.vsa_obj.oo
+    @staticmethod
+    def calculate_feature(net, feature='active_sum_weight'):
+        '''calculate the feature value, e.v. active sum, using net.'''
+        if feature=='active_sum_weight':
+            net.loc[:, 'weight'] = net.weight.abs()
+            df = net.groupby('source')['weight'].sum().to_frame()
+        elif feature=='active_sum_degree':
+            df = net.groupby('source').size().to_frame()
+        elif feature=='passive_sum_degree':
+            df = net.groupby('target').size().to_frame()
+        else:
+            raise ValueError('define first')
+        df.columns = ['feature']
+        df['feature_rank'] = df.rank(ascending=False)
+        return df
+    
+
 def plot_interactions(interaction_df: pd.DataFrame, min_subset_size=None, min_degree=None, color_map=None) -> plt.Figure: 
     """Upset plot of interactions
 
