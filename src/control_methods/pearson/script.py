@@ -21,6 +21,8 @@ parser.add_argument('--prediction', type=str, help='Path to the prediction file'
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--no_tf_subsetting', action='store_true', default=False, help='Whether to subset based on tf')
+
 args = parser.parse_args()
 
 if args.multiomics_rna:
@@ -31,6 +33,8 @@ if args.tf_all:
     par['tf_all'] = args.tf_all
 if args.num_workers:
     par['num_workers'] = args.num_workers
+if args.no_tf_subsetting:
+    par['no_tf_subsetting'] = args.no_tf_subsetting
     
 if args.resources_dir:
     meta['resources_dir'] = args.resources_dir  

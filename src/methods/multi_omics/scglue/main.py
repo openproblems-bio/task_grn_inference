@@ -149,7 +149,7 @@ def run_grn(par):
 
     gene2peak = reginf.edge_subgraph(
         e for e, attr in dict(reginf.edges).items()
-        if attr["qval"] < 0.05
+        if attr["qval"] < 0.1
     )
 
     scglue.genomics.Bed(atac.var).write_bed(f"{par['temp_dir']}/peaks.bed", ncols=3)
@@ -166,22 +166,23 @@ def run_grn(par):
     np.savetxt(f"{par['temp_dir']}/tfs.txt", tfs, fmt="%s")
 
     #Construct the command 
-    command = ['pyscenic', 'grn', f"{par['temp_dir']}/rna.loom", 
-               f"{par['temp_dir']}/tfs.txt", '-o', f"{par['temp_dir']}/draft_grn.csv", 
-               '--seed', '0', '--num_workers', f"{par['num_workers']}", 
-               '--cell_id_attribute', 'obs_id', '--gene_attribute', 'name']
-    print('Run grn')
-    result = subprocess.run(command,  check=True)
+    if False:
+        command = ['pyscenic', 'grn', f"{par['temp_dir']}/rna.loom", 
+                f"{par['temp_dir']}/tfs.txt", '-o', f"{par['temp_dir']}/draft_grn.csv", 
+                '--seed', '0', '--num_workers', f"{par['num_workers']}", 
+                '--cell_id_attribute', 'obs_id', '--gene_attribute', 'name']
+        print('Run grn')
+        result = subprocess.run(command,  check=True)
 
-    print("Output:")
-    print(result.stdout)
-    print("Error:")
-    print(result.stderr)
+        print("Output:")
+        print(result.stdout)
+        print("Error:")
+        print(result.stderr)
 
-    if result.returncode == 0:
-        print("Command executed successfully")
-    else:
-        print("Command failed with return code", result.returncode)
+        if result.returncode == 0:
+            print("Command executed successfully")
+        else:
+            print("Command failed with return code", result.returncode)
 
 
     print("Generate TF cis-regulatory ranking bridged by ATAC peaks", flush=True)
@@ -238,10 +239,10 @@ def prune_grn(par):
         "--annotations_fname", f"{par['temp_dir']}/ctx_annotation.tsv",
         "--expression_mtx_fname", f"{par['temp_dir']}/rna.loom",
         "--output", f"{par['temp_dir']}/pruned_grn.csv",
-        # "--top_n_targets", str(par['top_n_targets']),
+        "--top_n_targets", str(par['top_n_targets']),
         # "--rank_threshold", str(par['rank_threshold']),
-        # "--auc_threshold", "0.1",
-        # "--nes_threshold", str(par['nes_threshold']), 
+        "--auc_threshold", "0.1",
+        "--nes_threshold", str(par['nes_threshold']), 
         "--min_genes", "1",
         "--num_workers", f"{par['num_workers']}",
         "--cell_id_attribute", "obs_id", # be sure that obs_id is in obs and name is in var
@@ -333,7 +334,7 @@ def main(par):
     scglue_grn.weight = scglue_grn.weight.astype(float)
     scglue_grn = scglue_grn.drop_duplicates().reset_index(drop=True)
     
-    scglue_grn = process_links(scglue_grn, par)
+    # scglue_grn = process_links(scglue_grn, par)
 
     return scglue_grn
     

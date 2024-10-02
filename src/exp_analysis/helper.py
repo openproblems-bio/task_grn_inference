@@ -89,7 +89,7 @@ def cosine_similarity(nets_dict, col_name='source', weight_col='weight', figsize
     cosine_sim_matrix = cosine_similarity(weighted_matrix)
     for i in range(cosine_sim_matrix.shape[0]):
         for j in range(cosine_sim_matrix.shape[1]):
-            if i>=j:
+            if i==j:
                 cosine_sim_matrix[i,j]=np.NaN
 
     # 5. Visualize the Cosine Similarity matrix as a heatmap
@@ -128,7 +128,7 @@ def jaccard_similarity(nets_dict, col_name='link', figsize=(4, 4)):
         union = len(A.union(B))
         jaccard_similarity = intersection / union if union != 0 else 0
         jaccard_matrix[i, j] = jaccard_similarity
-        jaccard_matrix[j, i] = np.NaN
+        jaccard_matrix[j, i] = jaccard_similarity
     # Fill diagonal with 1s (as similarity of a network with itself is 1)
     np.fill_diagonal(jaccard_matrix, np.NaN)
     # 4. Visualize the Jaccard matrix as a heatmap

@@ -54,16 +54,19 @@ def process_links(net, par):
     net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
     return net
 
-def corr_net(X, gene_names, par, tf_all, causal=False):
+def corr_net(X, gene_names, par, tf_all):
     X = StandardScaler().fit_transform(X)
     net = np.dot(X.T, X) / X.shape[0]
     net = pd.DataFrame(net, index=gene_names, columns=gene_names)  
-    if causal:  
-        print('TF subsetting')
-        net = net[tf_all]
+    if 'no_tf_subsetting' in par:
+        pass
     else:
-        print('Random subsetting')
-        net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
+        if par['causal']:  
+            print('TF subsetting')
+            net = net[tf_all]
+        else:
+            print('Random subsetting')
+            net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
     net = net.reset_index()
     index_name = net.columns[0]
     net = net.melt(id_vars=index_name, var_name='source', value_name='weight')
@@ -94,16 +97,16 @@ def create_corr_net(par):
     process_data(multiomics_rna, par)
     gene_names = multiomics_rna.var_names.to_numpy()
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
-    groups = multiomics_rna.obs.cell_type
     tf_all = np.intersect1d(tf_all, gene_names)
     
     X = multiomics_rna.X
     if par['cell_type_specific']:
+        groups = multiomics_rna.obs.cell_type
         print('cell_type_specific')
         i = 0
         for group in tqdm(np.unique(groups), desc="Processing groups"):
             X_sub = X[groups == group, :]
-            net = corr_net(X_sub, gene_names, par, tf_all, par['causal'])
+            net = corr_net(X_sub, gene_names, par, tf_all)
             net['cell_type'] = group
             if i==0:
                 grn = net
@@ -111,5 +114,5 @@ def create_corr_net(par):
                 grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
             i += 1
     else:
-        grn = corr_net(X, gene_names, par, tf_all, par['causal'])    
+        grn = corr_net(X, gene_names, par, tf_all)    
     return grn

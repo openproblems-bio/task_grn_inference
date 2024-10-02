@@ -133,6 +133,7 @@ for donor_id in unique_donor_ids:
     if not os.path.exists(compressed_filepath + '.tbi'):
         print(f'Index compressed file {compressed_filepath} using tabix')
         subprocess.run(['tabix', compressed_filepath, '-p', 'bed'])
+        # subprocess.run(['tabix', compressed_filepath, '-p', 'bed', '-s', '1', '-b', '2', '-e', '3', '-f'])
 
 # Collect cell metadata
 print(f'Collect cell metadata')
@@ -196,6 +197,7 @@ with open(os.path.join(out_dir, 'consensus_peak_calling/bed_paths.tsv')) as f:
         bed_paths.update({v: p})
 
 # Call peaks using MACS2
+print('Call peaks using MACS2')
 narrow_peak_dict = peak_calling(
     macs_path = 'macs2',
     bed_paths=bed_paths,
@@ -218,6 +220,7 @@ if not os.path.exists(os.path.join(out_dir, 'hg38-blacklist.v2.bed')):
         f.write(response.text)
 
 # Consensus peak calling
+print('Consensus peak calling')
 consensus_peaks = get_consensus_peaks(
     narrow_peaks_dict=narrow_peak_dict,
     peak_half_width=250,
@@ -241,7 +244,8 @@ if not os.path.exists(MALLET_PATH):
     with tarfile.open(os.path.join(out_dir, 'Mallet-202108-bin.tar.gz'), 'r:gz') as f:
         f.extractall(path=out_dir)
 
-# Download TSS annotations
+# run pycistopic
+print('run pycistopic')
 os.makedirs(os.path.join(out_dir, 'qc'), exist_ok=True)
 if not os.path.exists(os.path.join(out_dir, 'qc', 'tss.bed')):
     subprocess.run([
@@ -330,16 +334,20 @@ if not os.path.exists(par['cistopic_object']):
         cistopic_obj_list[i].add_cell_data(cell_data, split_pattern='-')
 
     # Infer doublets using scrublet
-    print('Infer doublets using scrublet')
-    for i in range(len(cistopic_obj_list)):
-        scrub = scr.Scrublet(cistopic_obj_list[i].fragment_matrix.T, expected_doublet_rate=0.1)
-        doublet_scores, predicted_doublets = scrub.scrub_doublets()
-        scrub.plot_histogram();
-        scrub.call_doublets(threshold=0.22)
-        scrub.plot_histogram();
-        scrublet = pd.DataFrame([scrub.doublet_scores_obs_, scrub.predicted_doublets_], columns=cistopic_obj.cell_names, index=['Doublet_scores_fragments', 'Predicted_doublets_fragments']).T
-        cistopic_obj_list[i].add_cell_data(scrublet, split_pattern='-')
-
+    # print('Infer doublets using scrublet')
+    # for i in range(len(cistopic_obj_list)):
+    #     print(f'step 1')
+    #     scrub = scr.Scrublet(cistopic_obj_list[i].fragment_matrix.T, expected_doublet_rate=0.1)
+    #     print(f'step 2')
+    #     doublet_scores, predicted_doublets = scrub.scrub_doublets()
+    #     print(f'step 3')
+    #     scrub.call_doublets(threshold=0.22)
+    #     print(f'step 4')
+    #     scrublet = pd.DataFrame([scrub.doublet_scores_obs_, scrub.predicted_doublets_], columns=cistopic_obj.cell_names, index=['Doublet_scores_fragments', 'Predicted_doublets_fragments']).T
+    #     print(f'step 5')
+    #     cistopic_obj_list[i].add_cell_data(scrublet, split_pattern='-')
+    # The code is printing the message "Infer doublets using scrublet completed" in Python.
+    # print('Infer doublets using scrublet completed')
     # Combine samples into a single cistopic object
     if len(cistopic_obj_list) == 1:
         cistopic_obj = cistopic_obj_list[0]
