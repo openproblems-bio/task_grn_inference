@@ -226,6 +226,11 @@ function ViashHelp {
   echo "    --nes_threshold"
   echo "        type: string"
   echo "        default: 1.5"
+  echo ""
+  echo "    --extend_range"
+  echo "        type: integer"
+  echo "        default: 0"
+  echo "        extending range of promotors to connect to peak"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -456,9 +461,9 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scglue"
-LABEL org.opencontainers.image.created="2024-10-01T18:00:06Z"
+LABEL org.opencontainers.image.created="2024-10-04T21:17:17Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="92cf7a563586f113e11a64839328885feb2d0b6d"
+LABEL org.opencontainers.image.revision="885a27d00b987b43d994c8ed66c8638af93e2e5e"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -760,6 +765,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_NES_THRESHOLD=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --extend_range)
+            [ -n "$VIASH_PAR_EXTEND_RANGE" ] && ViashError Bad arguments for option \'--extend_range\': \'$VIASH_PAR_EXTEND_RANGE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_EXTEND_RANGE="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --extend_range. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --extend_range=*)
+            [ -n "$VIASH_PAR_EXTEND_RANGE" ] && ViashError Bad arguments for option \'--extend_range=*\': \'$VIASH_PAR_EXTEND_RANGE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_EXTEND_RANGE=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         ---setup)
             VIASH_MODE='docker_setup'
             VIASH_DOCKER_SETUP_STRATEGY="$2"
@@ -935,6 +951,9 @@ fi
 if [ -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then
   VIASH_PAR_NES_THRESHOLD="1.5"
 fi
+if [ -z ${VIASH_PAR_EXTEND_RANGE+x} ]; then
+  VIASH_PAR_EXTEND_RANGE="0"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
@@ -978,6 +997,12 @@ fi
 if [[ -n "$VIASH_PAR_NORMALIZE" ]]; then
   if ! [[ "$VIASH_PAR_NORMALIZE" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--normalize' has to be a boolean. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_EXTEND_RANGE" ]]; then
+  if ! [[ "$VIASH_PAR_EXTEND_RANGE" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--extend_range' has to be an integer. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1125,7 +1150,8 @@ par = {
   'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'top_n_targets': $( if [ ! -z ${VIASH_PAR_TOP_N_TARGETS+x} ]; then echo "r'${VIASH_PAR_TOP_N_TARGETS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'rank_threshold': $( if [ ! -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_RANK_THRESHOLD//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_NES_THRESHOLD//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_NES_THRESHOLD//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'extend_range': $( if [ ! -z ${VIASH_PAR_EXTEND_RANGE+x} ]; then echo "int(r'${VIASH_PAR_EXTEND_RANGE//\'/\'\"\'\"r\'}')"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1181,7 +1207,6 @@ if args.resources_dir:
 sys.path.append(meta["util_dir"])
 sys.path.append(meta["resources_dir"])
 from main import main 
-
 
 prediction = main(par)
 

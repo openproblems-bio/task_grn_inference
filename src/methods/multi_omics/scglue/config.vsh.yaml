@@ -26,6 +26,12 @@ functionality:
       required: false
       direction: input
       default: 1.5
+    - name: --extend_range
+      type: integer
+      required: false
+      direction: input
+      default: 0
+      description: extending range of promotors to connect to peak
   resources:
     - type: python_script
       path: script.py

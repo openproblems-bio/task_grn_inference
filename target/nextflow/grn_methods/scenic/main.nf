@@ -3142,7 +3142,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenic",
     "viash_version" : "0.8.6",
-    "git_commit" : "92cf7a563586f113e11a64839328885feb2d0b6d",
+    "git_commit" : "885a27d00b987b43d994c8ed66c8638af93e2e5e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3317,8 +3317,8 @@ def main(par):
   par['expression_data'] = os.path.join(par['temp_dir'], "expression_data.tsv")
   par['regulons'] = f"{par['temp_dir']}/regulons.csv"
   
-  # format_data(par)
-  # run_grn(par)
+  format_data(par)
+  run_grn(par)
   prune_grn(par)
   network = format_grn(par)
   return network

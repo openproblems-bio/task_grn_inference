@@ -452,9 +452,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenic"
-LABEL org.opencontainers.image.created="2024-10-01T18:00:04Z"
+LABEL org.opencontainers.image.created="2024-10-04T21:17:16Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="92cf7a563586f113e11a64839328885feb2d0b6d"
+LABEL org.opencontainers.image.revision="885a27d00b987b43d994c8ed66c8638af93e2e5e"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1279,8 +1279,8 @@ def main(par):
   par['expression_data'] = os.path.join(par['temp_dir'], "expression_data.tsv")
   par['regulons'] = f"{par['temp_dir']}/regulons.csv"
   
-  # format_data(par)
-  # run_grn(par)
+  format_data(par)
+  run_grn(par)
   prune_grn(par)
   network = format_grn(par)
   return network

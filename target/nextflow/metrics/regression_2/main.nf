@@ -3231,7 +3231,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "92cf7a563586f113e11a64839328885feb2d0b6d",
+    "git_commit" : "885a27d00b987b43d994c8ed66c8638af93e2e5e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

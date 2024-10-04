@@ -59,7 +59,7 @@ def calculate_feature_distance(sample: pd.DataFrame, control: pd.DataFrame, top_
     
     distance_df = pd.DataFrame({'distance_raw':distance_raw, 'distance_rank':distance_rank}, index=entries_common)
     return distance_df 
-def cosine_similarity(nets_dict, col_name='source', weight_col='weight', figsize=(4, 4)):
+def cosine_similarity(nets_dict, col_name='source', weight_col='weight', figsize=(4, 4), title='Cosine Similarity', ax=None):
     from itertools import combinations
     from sklearn.metrics.pairwise import cosine_similarity
     import seaborn as sns
@@ -89,22 +89,24 @@ def cosine_similarity(nets_dict, col_name='source', weight_col='weight', figsize
     cosine_sim_matrix = cosine_similarity(weighted_matrix)
     for i in range(cosine_sim_matrix.shape[0]):
         for j in range(cosine_sim_matrix.shape[1]):
-            if i>=j:
+            if i==j:
                 cosine_sim_matrix[i,j]=np.NaN
-
-    # 5. Visualize the Cosine Similarity matrix as a heatmap
-    fig, ax = plt.subplots(1, 1, figsize=figsize)
+    if ax is None:
+        # 5. Visualize the Cosine Similarity matrix as a heatmap
+        fig, ax = plt.subplots(1, 1, figsize=figsize)
+    else:
+        fig = None
     
     sns.heatmap(cosine_sim_matrix, annot=True, cmap="coolwarm", xticklabels=nets_names, yticklabels=nets_names, ax=ax)
-    ax.grid(True)
-    ax.set_title('Cosine Similarity')
+    ax.grid(False)
+    ax.set_title(title)
 
     # Rotate x labels for readability
     plt.xticks(rotation=45, ha='right')
     
     return cosine_sim_matrix, fig
 
-def jaccard_similarity(nets_dict, col_name='link', figsize=(4, 4)):
+def jaccard_similarity(nets_dict, col_name='link', figsize=(4, 4), title='jaccard Similarity', ax=None):
     from itertools import combinations
     import seaborn as sns
     import matplotlib.pyplot as plt
@@ -128,14 +130,17 @@ def jaccard_similarity(nets_dict, col_name='link', figsize=(4, 4)):
         union = len(A.union(B))
         jaccard_similarity = intersection / union if union != 0 else 0
         jaccard_matrix[i, j] = jaccard_similarity
-        jaccard_matrix[j, i] = np.NaN
+        jaccard_matrix[j, i] = jaccard_similarity
     # Fill diagonal with 1s (as similarity of a network with itself is 1)
     np.fill_diagonal(jaccard_matrix, np.NaN)
     # 4. Visualize the Jaccard matrix as a heatmap
-    fig, ax = plt.subplots(1, 1, figsize=figsize)
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=figsize)
+    else:
+        fig = None
     sns.heatmap(jaccard_matrix, annot=True, cmap="coolwarm", xticklabels=nets_names, yticklabels=nets_names, ax=ax)
-    ax.grid(True)
-    ax.set_title('Jaccard Similarity')
+    ax.grid(False)
+    ax.set_title(title)
     # Rotate x labels for readability
     plt.xticks(rotation=45, ha='right')
 
@@ -225,7 +230,7 @@ class Exp_analysis:
     '''
     def __init__(self, net, peak_gene_net=None):
         self.net = net 
-        self.net.weight = minmax_scale(self.net.weight)
+        # self.net.weight = minmax_scale(self.net.weight)
         self.net['link'] = self.net['source'].astype(str) + '_' + self.net['target'].astype(str)
 
         self.peak_gene_net = peak_gene_net
@@ -354,7 +359,7 @@ def plot_interactions(interaction_df: pd.DataFrame, min_subset_size=None, min_de
     out_dict = upsetplot.plot(upsetplot.from_indicators(indicators=lambda a: a==True, data=interaction_df), fig=fig, 
             show_counts=True, 
             show_percentages = '{:.0%}',
-            sort_by='cardinality', 
+            # sort_by='cardinality', 
             # min_subset_size =".1%", # min interaction to show
             min_subset_size = min_subset_size, # min interaction to show
             min_degree=min_degree,
@@ -372,9 +377,10 @@ def plot_interactions(interaction_df: pd.DataFrame, min_subset_size=None, min_de
     methods_order = [label.get_text() for label in matrix_ax.get_yticklabels()]
     # methods_order.reverse()
     print(methods_order)
+    colors = colors_blind+colors_blind
     for i_bar, bar in enumerate(totals_ax.patches):
         if color_map is None:
-            bar.set_facecolor(colors_blind[i_bar])
+            bar.set_facecolor(colors[i_bar])
         else:
             bar.set_facecolor(color_map[methods_order[i_bar]])
         bar.set_edgecolor('white')
@@ -384,7 +390,7 @@ def plot_interactions(interaction_df: pd.DataFrame, min_subset_size=None, min_de
         bar.set_edgecolor('black')
         bar.set_linewidth(.4)
 
-    for bar, new_color in zip(shading_ax.patches, colors_blind):
+    for bar, new_color in zip(shading_ax.patches, colors):
         bar.set_facecolor(new_color)
         bar.set_alpha(.1)
         bar.set_edgecolor('black')

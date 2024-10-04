@@ -3103,7 +3103,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/pearson_corr",
     "viash_version" : "0.8.6",
-    "git_commit" : "92cf7a563586f113e11a64839328885feb2d0b6d",
+    "git_commit" : "885a27d00b987b43d994c8ed66c8638af93e2e5e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3163,6 +3163,12 @@ parser.add_argument('--prediction', type=str, help='Path to the prediction file'
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--no_tf_subsetting', action='store_true', default=False, help='Whether to subset based on tf')
+parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
+parser.add_argument('--corr_t', type=str, help='Threshold cuttoff for correlation.')
+parser.add_argument('--layer', type=str, help='Which layer of adata to use.')
+
+
 args = parser.parse_args()
 
 if args.multiomics_rna:
@@ -3173,6 +3179,14 @@ if args.tf_all:
     par['tf_all'] = args.tf_all
 if args.num_workers:
     par['num_workers'] = args.num_workers
+if args.no_tf_subsetting:
+    par['no_tf_subsetting'] = args.no_tf_subsetting
+if args.max_n_links:
+    par['max_n_links'] = int(args.max_n_links)
+if args.corr_t:
+    par['corr_t'] = float(args.corr_t)
+if args.layer:
+    par['layer'] = args.layer
     
 if args.resources_dir:
     meta['resources_dir'] = args.resources_dir  

@@ -226,6 +226,11 @@ function ViashHelp {
   echo "    --nes_threshold"
   echo "        type: string"
   echo "        default: 1.5"
+  echo ""
+  echo "    --extend_range"
+  echo "        type: integer"
+  echo "        default: 0"
+  echo "        extending range of promotors to connect to peak"
 }
 
 # initialise array
@@ -397,6 +402,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_NES_THRESHOLD=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --extend_range)
+            [ -n "$VIASH_PAR_EXTEND_RANGE" ] && ViashError Bad arguments for option \'--extend_range\': \'$VIASH_PAR_EXTEND_RANGE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_EXTEND_RANGE="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --extend_range. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --extend_range=*)
+            [ -n "$VIASH_PAR_EXTEND_RANGE" ] && ViashError Bad arguments for option \'--extend_range=*\': \'$VIASH_PAR_EXTEND_RANGE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_EXTEND_RANGE=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         ---cpus)
             [ -n "$VIASH_META_CPUS" ] && ViashError Bad arguments for option \'---cpus\': \'$VIASH_META_CPUS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_META_CPUS="$2"
@@ -532,6 +548,9 @@ fi
 if [ -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then
   VIASH_PAR_NES_THRESHOLD="1.5"
 fi
+if [ -z ${VIASH_PAR_EXTEND_RANGE+x} ]; then
+  VIASH_PAR_EXTEND_RANGE="0"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
@@ -575,6 +594,12 @@ fi
 if [[ -n "$VIASH_PAR_NORMALIZE" ]]; then
   if ! [[ "$VIASH_PAR_NORMALIZE" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--normalize' has to be a boolean. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_EXTEND_RANGE" ]]; then
+  if ! [[ "$VIASH_PAR_EXTEND_RANGE" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--extend_range' has to be an integer. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -664,7 +689,8 @@ par = {
   'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'top_n_targets': $( if [ ! -z ${VIASH_PAR_TOP_N_TARGETS+x} ]; then echo "r'${VIASH_PAR_TOP_N_TARGETS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'rank_threshold': $( if [ ! -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_RANK_THRESHOLD//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_NES_THRESHOLD//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_NES_THRESHOLD//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'extend_range': $( if [ ! -z ${VIASH_PAR_EXTEND_RANGE+x} ]; then echo "int(r'${VIASH_PAR_EXTEND_RANGE//\'/\'\"\'\"r\'}')"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -720,7 +746,6 @@ if args.resources_dir:
 sys.path.append(meta["util_dir"])
 sys.path.append(meta["resources_dir"])
 from main import main 
-
 
 prediction = main(par)
 

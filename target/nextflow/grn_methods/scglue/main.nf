@@ -3015,6 +3015,19 @@ meta = [
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
+      },
+      {
+        "type" : "integer",
+        "name" : "--extend_range",
+        "description" : "extending range of promotors to connect to peak",
+        "default" : [
+          0
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
       }
     ],
     "resources" : [
@@ -3160,7 +3173,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scglue",
     "viash_version" : "0.8.6",
-    "git_commit" : "92cf7a563586f113e11a64839328885feb2d0b6d",
+    "git_commit" : "885a27d00b987b43d994c8ed66c8638af93e2e5e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3195,7 +3208,8 @@ par = {
   'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'top_n_targets': $( if [ ! -z ${VIASH_PAR_TOP_N_TARGETS+x} ]; then echo "r'${VIASH_PAR_TOP_N_TARGETS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'rank_threshold': $( if [ ! -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_RANK_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_NES_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_NES_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'extend_range': $( if [ ! -z ${VIASH_PAR_EXTEND_RANGE+x} ]; then echo "int(r'${VIASH_PAR_EXTEND_RANGE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3251,7 +3265,6 @@ if args.resources_dir:
 sys.path.append(meta["util_dir"])
 sys.path.append(meta["resources_dir"])
 from main import main 
-
 
 prediction = main(par)
 

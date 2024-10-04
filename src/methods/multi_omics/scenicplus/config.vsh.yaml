@@ -36,6 +36,7 @@ functionality:
   resources:
     - type: python_script
       path: script.py
+    - path: main.py
 
 platforms:
   - type: docker

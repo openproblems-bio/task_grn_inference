@@ -53,24 +53,51 @@ def process_links(net, par):
     net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
     net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
     return net
+def efficient_melting(net, gene_names, par):
+    '''to replace pandas melting'''
+    upper_triangle_indices = np.triu_indices_from(net, k=1)
 
-def corr_net(X, gene_names, par, tf_all, causal=False):
-    X = StandardScaler().fit_transform(X)
-    net = np.dot(X.T, X) / X.shape[0]
-    net = pd.DataFrame(net, index=gene_names, columns=gene_names)  
-    if causal:  
-        print('TF subsetting')
-        net = net[tf_all]
+    # Extract the source and target gene names based on the indices
+    sources = np.array(gene_names)[upper_triangle_indices[0]]
+    targets = np.array(gene_names)[upper_triangle_indices[1]]
+
+    # Extract the corresponding correlation values
+    weights = net[upper_triangle_indices]
+    # apply mask 
+    mask = np.abs(weights)>par['corr_t']
+    # Create a structured array
+    data = np.column_stack((targets[mask], sources[mask], weights[mask]))
+
+    # Convert to DataFrame
+    print('conver to df')
+    net = pd.DataFrame(data, columns=['target', 'source', 'weight'])
+    return net
+    
+
+def corr_net(X, gene_names, par, tf_all):
+    print('calculate correlation')
+    if False:
+        X = StandardScaler().fit_transform(X)
+        net = np.dot(X.T, X) / X.shape[0]
     else:
-        print('Random subsetting')
-        net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
-    net = net.reset_index()
-    index_name = net.columns[0]
-    net = net.melt(id_vars=index_name, var_name='source', value_name='weight')
-    
-    net.rename(columns={index_name: 'target'}, inplace=True)
+        net = np.corrcoef(X.T)
+    print('process corr results')
+    if 'no_tf_subsetting' in par:
+        pass
+    else:
+        # # Convert to a DataFrame with gene names as both row and column indices
+        net = pd.DataFrame(net, index=gene_names, columns=gene_names)
+        if par['causal']:  
+            print('TF subsetting')
+            net = net[tf_all]
+        else:
+            print('Random subsetting')
+            net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
+        net = net.values()
+
+    net = efficient_melting(net, gene_names, par)
     net = process_links(net, par)
-    
+    print('Corr results are ready')
     return net
 
 def process_data(adata, par):
@@ -94,16 +121,20 @@ def create_corr_net(par):
     process_data(multiomics_rna, par)
     gene_names = multiomics_rna.var_names.to_numpy()
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
-    groups = multiomics_rna.obs.cell_type
     tf_all = np.intersect1d(tf_all, gene_names)
     
-    X = multiomics_rna.X
+    if 'layer' in par:
+        print(par['layer'])
+        X = multiomics_rna.layers[par['layer']]
+    else:
+        X = multiomics_rna.X
     if par['cell_type_specific']:
+        groups = multiomics_rna.obs.cell_type
         print('cell_type_specific')
         i = 0
         for group in tqdm(np.unique(groups), desc="Processing groups"):
             X_sub = X[groups == group, :]
-            net = corr_net(X_sub, gene_names, par, tf_all, par['causal'])
+            net = corr_net(X_sub, gene_names, par, tf_all)
             net['cell_type'] = group
             if i==0:
                 grn = net
@@ -111,5 +142,5 @@ def create_corr_net(par):
                 grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
             i += 1
     else:
-        grn = corr_net(X, gene_names, par, tf_all, par['causal'])    
+        grn = corr_net(X, gene_names, par, tf_all)    
     return grn

@@ -11,7 +11,7 @@ par <- list(
   multiomics_rna_r = "resources_test/grn-benchmark/multiomics_rna.rds",
   multiomics_atac_r = "resources_test/grn-benchmark/multiomics_atac.rds",
   temp_dir =  "output/figr/",
-  cell_topic = "resources_test/prior/cell_topic.csv",
+  cell_topic = "resources/prior/cell_topic_d0_hvg.csv",
   num_workers = 2,
   n_topics = 48,
   peak_gene = "output/figr/peak_gene.csv",
