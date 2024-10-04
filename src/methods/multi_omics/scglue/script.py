@@ -14,7 +14,8 @@ par = {
   "nes_threshold": 1.5,
   "rank_threshold": 1500,
   "top_n_targets": 100,
-  'normalize': False
+  'normalize': False,
+  'extend_range': 150000
 }
 ## VIASH END
 
@@ -52,7 +53,6 @@ if args.resources_dir:
 sys.path.append(meta["util_dir"])
 sys.path.append(meta["resources_dir"])
 from main import main 
-
 
 prediction = main(par)
 

@@ -45,7 +45,7 @@ def preprocess(par):
     atac.var["chromStart"] = split.map(lambda x: x[1]).astype(int)
     atac.var["chromEnd"] = split.map(lambda x: x[2]).astype(int)
     
-    guidance = scglue.genomics.rna_anchored_guidance_graph(rna, atac)
+    guidance = scglue.genomics.rna_anchored_guidance_graph(rna, atac, extend_range=par['extend_range'])
     
     scglue.graph.check_graph(guidance, [rna, atac])
     
@@ -120,7 +120,6 @@ def training(par):
     atac.write(f"{par['temp_dir']}/atac-emb.h5ad", compression="gzip")
     nx.write_graphml(guidance, f"{par['temp_dir']}/guidance.graphml.gz")
     
-
 def run_grn(par):
     ''' Infers gene2peak connections
     '''
@@ -260,8 +259,6 @@ def prune_grn(par):
         print("pyscenic ctx executed successfully")
     else:
         print("pyscenic ctx failed with return code", result.returncode)
-
-
 def download_annotation(par):
     # get gene annotation
     par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
@@ -309,11 +306,11 @@ def main(par):
     download_motifs(par)
 
 
-    # print('Preprocess data', flush=True)
-    # preprocess(par)
+    print('Preprocess data', flush=True)
+    preprocess(par)
     
-    # print('Train a model', flush=True)
-    # training(par)
+    print('Train a model', flush=True)
+    training(par)
     run_grn(par)
     prune_grn(par)
     print('Curate predictions', flush=True)

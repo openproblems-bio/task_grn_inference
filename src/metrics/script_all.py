@@ -7,10 +7,10 @@ import os
 ## VIASH START
 par = {
   'reg_type': 'ridge',
-  'models_dir': "resources/grn_models/",
+  'models_dir': "resources/grn_models/d0_hvg",
   'scores_dir': "resources/scores/",
   
-  'methods': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle'],
+  'methods': [ 'scenicplus', 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle'],
   'layers': ['scgen_pearson', 'lognorm', 'pearson', 'seurat_lognorm', 'seurat_pearson', 'scgen_lognorm'],
 
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",

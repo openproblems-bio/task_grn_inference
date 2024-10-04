@@ -22,6 +22,10 @@ parser.add_argument('--resources_dir', type=str, help='Path to the prediction fi
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
 parser.add_argument('--no_tf_subsetting', action='store_true', default=False, help='Whether to subset based on tf')
+parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
+parser.add_argument('--corr_t', type=str, help='Threshold cuttoff for correlation.')
+parser.add_argument('--layer', type=str, help='Which layer of adata to use.')
+
 
 args = parser.parse_args()
 
@@ -35,6 +39,12 @@ if args.num_workers:
     par['num_workers'] = args.num_workers
 if args.no_tf_subsetting:
     par['no_tf_subsetting'] = args.no_tf_subsetting
+if args.max_n_links:
+    par['max_n_links'] = int(args.max_n_links)
+if args.corr_t:
+    par['corr_t'] = float(args.corr_t)
+if args.layer:
+    par['layer'] = args.layer
     
 if args.resources_dir:
     meta['resources_dir'] = args.resources_dir  
