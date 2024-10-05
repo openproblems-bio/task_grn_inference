@@ -27,7 +27,6 @@ def preprocess(par):
     sc.tl.umap(rna)
     print('step 1 completed')
     
-    
     scglue.data.lsi(atac, n_components=100, n_iter=15)
     sc.pp.neighbors(atac, use_rep="X_lsi", metric="cosine")
     sc.tl.umap(atac)
@@ -164,8 +163,8 @@ def run_grn(par):
     rna[:, np.union1d(genes, tfs)].write_loom(f"{par['temp_dir']}/rna.loom")
     np.savetxt(f"{par['temp_dir']}/tfs.txt", tfs, fmt="%s")
 
-    #Construct the command 
-    if False:
+    # pyscenic grn
+    if True:
         command = ['pyscenic', 'grn', f"{par['temp_dir']}/rna.loom", 
                 f"{par['temp_dir']}/tfs.txt", '-o', f"{par['temp_dir']}/draft_grn.csv", 
                 '--seed', '0', '--num_workers', f"{par['num_workers']}", 
@@ -182,7 +181,6 @@ def run_grn(par):
             print("Command executed successfully")
         else:
             print("Command failed with return code", result.returncode)
-
 
     print("Generate TF cis-regulatory ranking bridged by ATAC peaks", flush=True)
     peak_bed = scglue.genomics.Bed(atac.var.loc[peaks])
@@ -300,18 +298,17 @@ def main(par):
     from util import process_links
     # Load scRNA-seq data
     os.makedirs(par['temp_dir'], exist_ok=True)
-
+    print('----- download_annotation ---- ', flush=True)
     download_annotation(par)
-
+    print('----- download_motifs ---- ', flush=True)
     download_motifs(par)
-
-
-    print('Preprocess data', flush=True)
+    print('----- preprocess ---- ', flush=True)
     preprocess(par)
-    
-    print('Train a model', flush=True)
+    print('----- training ---- ', flush=True)
     training(par)
+    print('----- run_grn ---- ', flush=True)
     run_grn(par)
+    print('----- prune_grn ---- ', flush=True)
     prune_grn(par)
     print('Curate predictions', flush=True)
     pruned_grn = pd.read_csv(

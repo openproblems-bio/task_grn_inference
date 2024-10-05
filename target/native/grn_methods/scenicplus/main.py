@@ -15,6 +15,7 @@ import gc
 import gzip
 import tarfile
 from urllib.request import urlretrieve
+import json
 
 import flatbuffers
 import numpy as np
@@ -50,9 +51,7 @@ try:
 except NameError:
     pass
 
-def process_peak_cistopic(par):
-    atac_dir = os.path.join(par['temp_dir'], 'atac')
-    os.makedirs(atac_dir, exist_ok=True)
+def process_peak(par):
     # Get list of samples (e.g., donors)
     print('Collect list of samples')
     adata_atac = anndata.read_h5ad(par['multiomics_atac'])
@@ -64,7 +63,7 @@ def process_peak_cistopic(par):
     # Create one individual ATAC-seq file per donor
     fragments_dict = {}
     for donor_id in unique_donor_ids:
-        filepath = os.path.join(atac_dir, f'{donor_id}.tsv')
+        filepath = os.path.join(par['atac_dir'], f'{donor_id}.tsv')
         print(f'Create tsv file {filepath}')
         adata_atac.obs.cell_type = [s.replace(' ', '_') for s in adata_atac.obs.cell_type]
         adata_atac.obs.donor_id = [s.replace(' ', '_') for s in adata_atac.obs.donor_id]
@@ -103,7 +102,9 @@ def process_peak_cistopic(par):
         # Index file using tabix
         print(f'Index compressed file {compressed_filepath} using tabix')
         subprocess.run(['tabix', compressed_filepath, '-p', 'bed'])
-
+    
+    with open(f"{par['fragments_dict']}", 'w') as f:
+        json.dump(fragments_dict, f)
     # Collect cell metadata
     print(f'Collect cell metadata')
     donor_ids = [s.replace(' ', '_') for s in adata_atac.obs.donor_id]
@@ -195,15 +196,27 @@ def process_peak_cistopic(par):
     # Create cistopic objects
 
     # Download Mallet
-    MALLET_PATH = os.path.join(par['temp_dir'], 'Mallet-202108', 'bin', 'mallet')
-    if not os.path.exists(MALLET_PATH):
+    
+    if not os.path.exists(par['MALLET_PATH']):
         url = 'https://github.com/mimno/Mallet/releases/download/v202108/Mallet-202108-bin.tar.gz'
         response = requests.get(url)
         with open(os.path.join(par['temp_dir'], 'Mallet-202108-bin.tar.gz'), 'wb') as f:
             f.write(response.content)
         with tarfile.open(os.path.join(par['temp_dir'], 'Mallet-202108-bin.tar.gz'), 'r:gz') as f:
             f.extractall(path=par['temp_dir'])
-
+def run_cistopic(par):
+    adata_atac = anndata.read_h5ad(par['multiomics_atac'])
+    unique_donor_ids = [s.replace(' ', '_') for s in adata_atac.obs.donor_id.cat.categories]
+    print(unique_donor_ids)
+    unique_cell_types = [s.replace(' ', '_') for s in adata_atac.obs.cell_type.cat.categories]
+    
+    cell_data = pd.DataFrame({
+        'cell_type': [s.replace(' ', '_') for s in adata_atac.obs.cell_type.to_numpy()],
+        'donor_id': [s.replace(' ', '_') for s in adata_atac.obs.donor_id.to_numpy()]
+    }, index=index, copy=False)
+    
+    with open(f"{par['fragments_dict']}", 'r') as f:
+        fragments_dict = json.load(f)
     # run pycistopic
     print('get tss')
     os.makedirs(os.path.join(par['temp_dir'], 'qc'), exist_ok=True)
@@ -219,7 +232,7 @@ def process_peak_cistopic(par):
         # Compute QC metrics
         print('Perform QC')
         for donor_id in unique_donor_ids:
-            filepath = os.path.join(atac_dir, f'{donor_id}.tsv.gz')
+            filepath = os.path.join(par['atac_dir'], f'{donor_id}.tsv.gz')
             subprocess.run([
                 'pycistopic', 'qc',
                 '--fragments', os.path.join(par['temp_dir'], 'qc', 'tss.bed'),
@@ -309,12 +322,13 @@ def process_peak_cistopic(par):
     if len(cistopic_obj_list) == 1:
         cistopic_obj = cistopic_obj_list[0]
     else:
-        cistopic_obj = merge(cistopic_obj_list, is_acc=1, copy=False, split_pattern='-')
+        cistopic_obj = merge(cistopic_obj_list, is_acc=1, split_pattern='-')
     
     # LDA-based topic modeling
     print('Run LDA models', flush=True)
-    n_topics = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-    if os.path.exists(MALLET_PATH):
+    # n_topics = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+    n_topics = [40] #TODO: fix this
+    if os.path.exists(par['MALLET_PATH']):
         models = run_cgs_models_mallet(
             cistopic_obj,
             n_topics=n_topics,
@@ -325,7 +339,7 @@ def process_peak_cistopic(par):
             alpha_by_topic=True,
             eta=0.1,
             eta_by_topic=False,
-            mallet_path=MALLET_PATH
+            mallet_path=par['MALLET_PATH']
         )
     else:
         print('Could not find Mallet. Running the sequential version of LDA instead.')
@@ -547,19 +561,20 @@ def process_topics(par):
 
 # Download databases
 def download_databases(par):
-    # Download list of blacklist regions
-    print('Download list of blacklist regions')
-    url = 'https://raw.githubusercontent.com/aertslab/pycisTopic/d6a2f8c832c14faae07def1d3ad8755531f50ad5/blacklist/hg38-blacklist.v2.bed'
-    if not os.path.exists(par['blacklist_path']):
-        response = requests.get(url)
-        with open(par['blacklist_path'], 'w') as f:
-            f.write(response.text)
-    
     def download(url: str, filepath: str) -> None:
         if os.path.exists(filepath):
             return
         print(f'Download {url}...')
         urlretrieve(url, filepath)
+    # Download list of blacklist regions
+    print('Download list of blacklist regions')
+    url = 'https://raw.githubusercontent.com/aertslab/pycisTopic/d6a2f8c832c14faae07def1d3ad8755531f50ad5/blacklist/hg38-blacklist.v2.bed'
+    if not os.path.exists(par['blacklist_path']):
+        # response = requests.get(url)
+        # with open(par['blacklist_path'], 'w') as f:
+        #     f.write(response.text)
+        download(url, par['blacklist_path'])
+    
     url = 'https://resources.aertslab.org/cistarget/motif_collections/v10nr_clust_public/snapshots/motifs-v10-nr.hgnc-m0.00001-o0.0.tbl'
     if not os.path.exists(par['motif_annotation']):
         download(url, par['motif_annotation'])

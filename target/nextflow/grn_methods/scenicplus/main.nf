@@ -3155,7 +3155,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "a32b952060b668ac78063a87fbb442ecf2a4d07a",
+    "git_commit" : "e7b87a4f8f061be0ebe3b18342d9f6b8df493fcc",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3248,14 +3248,21 @@ def main(par):
     par['motif_annotation'] = os.path.join(par['DB_PATH'], 'motifs-v10-nr.hgnc-m0.00001-o0.0.tbl')
     par['RANKINGS_DB_PATH'] = os.path.join(par['DB_PATH'], 'db.regions_vs_motifs.rankings.feather')
     par['SCORES_DB_PATH']= os.path.join(par['DB_PATH'], 'db.regions_vs_motifs.scores.feather')
-    par['blacklist_path'] = os.path.join(par['temp_dir'], 'hg38-blacklist.v2.bed')
+    par['blacklist_path'] = os.path.join(par['DB_PATH'], 'hg38-blacklist.v2.bed')
+    par['atac_dir'] = os.path.join(par['temp_dir'], 'atac')
+    par['fragments_dict'] = os.path.join(par['temp_dir'], 'fragments_dict.json')
+    par['MALLET_PATH'] = os.path.join(par['temp_dir'], 'Mallet-202108', 'bin', 'mallet')
+    os.makedirs(par['atac_dir'], exist_ok=True)
 
-    print('------- process_peak_cistopic -------')
-    process_peak_cistopic(par)
+    print('------- download_databases -------')
+    # download_databases(par)
+    print('------- process_peak -------')
+    # process_peak(par)
+    print('------- run_cistopic -------')
+    run_cistopic(par)
     print('------- process_topics -------')
     process_topics(par)
-    print('------- download_databases -------')
-    download_databases(par)
+    
     print('------- preprocess_rna -------')
     preprocess_rna(par)
     print('------- snakemake_pipeline -------')

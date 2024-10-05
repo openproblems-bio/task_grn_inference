@@ -461,9 +461,9 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scglue"
-LABEL org.opencontainers.image.created="2024-10-05T13:50:40Z"
+LABEL org.opencontainers.image.created="2024-10-05T13:53:19Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="a32b952060b668ac78063a87fbb442ecf2a4d07a"
+LABEL org.opencontainers.image.revision="e7b87a4f8f061be0ebe3b18342d9f6b8df493fcc"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1207,7 +1207,7 @@ if args.resources_dir:
 sys.path.append(meta["util_dir"])
 sys.path.append(meta["resources_dir"])
 from main import main 
-
+print(par)
 prediction = main(par)
 
 print('Write output to file', flush=True)

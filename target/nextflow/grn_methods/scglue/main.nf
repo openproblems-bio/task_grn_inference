@@ -3173,7 +3173,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scglue",
     "viash_version" : "0.8.6",
-    "git_commit" : "a32b952060b668ac78063a87fbb442ecf2a4d07a",
+    "git_commit" : "e7b87a4f8f061be0ebe3b18342d9f6b8df493fcc",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3265,7 +3265,7 @@ if args.resources_dir:
 sys.path.append(meta["util_dir"])
 sys.path.append(meta["resources_dir"])
 from main import main 
-
+print(par)
 prediction = main(par)
 
 print('Write output to file', flush=True)
