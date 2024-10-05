@@ -27,6 +27,7 @@ dir.create(par$temp_dir, recursive = TRUE, showWarnings = TRUE)
 atac = readRDS(par$multiomics_atac_r)
 rna  = readRDS(par$multiomics_rna_r)
 
+
 colnames(atac) <- gsub("-", "", colnames(atac))
 colnames(rna) <- gsub("-", "", colnames(rna))
 

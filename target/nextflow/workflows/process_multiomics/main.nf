@@ -2788,7 +2788,7 @@ meta = [
         "type" : "file",
         "name" : "--multiome_counts",
         "description" : "multiomics data at baseline",
-        "default" : [
+        "example" : [
           "resources/datasets_raw/multiome_counts.h5ad"
         ],
         "must_exist" : true,
@@ -2802,12 +2802,12 @@ meta = [
       {
         "type" : "file",
         "name" : "--multiomics_rna",
-        "default" : [
+        "example" : [
           "resources/grn-benchmark/multiomics_rna.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "output",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2816,12 +2816,40 @@ meta = [
       {
         "type" : "file",
         "name" : "--multiomics_atac",
-        "default" : [
+        "example" : [
           "resources/grn-benchmark/multiomics_atac.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
+        "direction" : "output",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "file",
+        "name" : "--multiomics_rna_d0_hvg",
+        "example" : [
+          "resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
+        "direction" : "output",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "file",
+        "name" : "--multiomics_atac_d0",
+        "example" : [
+          "resources/grn-benchmark/multiomics_atac_d0.h5ad"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
         "direction" : "output",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2830,12 +2858,12 @@ meta = [
       {
         "type" : "file",
         "name" : "--rna_rds",
-        "default" : [
+        "example" : [
           "resources/grn-benchmark/multiomics_rna.rds"
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
         "direction" : "output",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2844,12 +2872,40 @@ meta = [
       {
         "type" : "file",
         "name" : "--atac_rds",
-        "default" : [
+        "example" : [
           "resources/grn-benchmark/multiomics_atac.rds"
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : true,
+        "required" : false,
+        "direction" : "output",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "file",
+        "name" : "--rna_rds_d0_hvg",
+        "example" : [
+          "resources/grn-benchmark/multiomics_rna_d0_hvg.rds"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
+        "direction" : "output",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "file",
+        "name" : "--atac_rds_d0",
+        "example" : [
+          "resources/grn-benchmark/multiomics_atac_d0.rds"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
         "direction" : "output",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2901,7 +2957,7 @@ meta = [
           "functionalityNamespace" : "multiomics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "885a27d00b987b43d994c8ed66c8638af93e2e5e",
+          "git_commit" : "a32b952060b668ac78063a87fbb442ecf2a4d07a",
           "executable" : "/nextflow/multiomics/format_data/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/format_data"
@@ -2922,7 +2978,7 @@ meta = [
           "functionalityNamespace" : "multiomics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "885a27d00b987b43d994c8ed66c8638af93e2e5e",
+          "git_commit" : "a32b952060b668ac78063a87fbb442ecf2a4d07a",
           "executable" : "/nextflow/multiomics/multiome_matrix/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/multiome_matrix"
@@ -2943,10 +2999,31 @@ meta = [
           "functionalityNamespace" : "multiomics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "885a27d00b987b43d994c8ed66c8638af93e2e5e",
+          "git_commit" : "a32b952060b668ac78063a87fbb442ecf2a4d07a",
           "executable" : "/nextflow/multiomics/format_resources_r/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/format_resources_r"
+      },
+      {
+        "name" : "multiomics/subset_hvg",
+        "repository" : {
+          "type" : "local",
+          "localPath" : ""
+        },
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/multiomics/subset_hvg/config.vsh.yaml",
+        "configInfo" : {
+          "functionalityName" : "subset_hvg",
+          "git_tag" : "",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
+          "viash_version" : "0.8.6",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/multiomics/subset_hvg/config.vsh.yaml",
+          "functionalityNamespace" : "multiomics",
+          "output" : "",
+          "platform" : "",
+          "git_commit" : "a32b952060b668ac78063a87fbb442ecf2a4d07a",
+          "executable" : "/nextflow/multiomics/subset_hvg/main.nf"
+        },
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/subset_hvg"
       }
     ],
     "set_wd_to_resources_dir" : false
@@ -2997,7 +3074,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/process_multiomics",
     "viash_version" : "0.8.6",
-    "git_commit" : "885a27d00b987b43d994c8ed66c8638af93e2e5e",
+    "git_commit" : "a32b952060b668ac78063a87fbb442ecf2a4d07a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3008,6 +3085,7 @@ meta["root_dir"] = getRootDir()
 include { format_data } from "${meta.resources_dir}/../../../nextflow/multiomics/format_data/main.nf"
 include { multiome_matrix } from "${meta.resources_dir}/../../../nextflow/multiomics/multiome_matrix/main.nf"
 include { format_resources_r } from "${meta.resources_dir}/../../../nextflow/multiomics/format_resources_r/main.nf"
+include { subset_hvg } from "${meta.resources_dir}/../../../nextflow/multiomics/subset_hvg/main.nf"
 
 // inner workflow
 // user-provided Nextflow code
@@ -3044,7 +3122,33 @@ workflow run_wf {
                 atac_rds: "atac_rds"]
     )
 
-    | setState(["multiomics_rna", "multiomics_atac", "rna_rds", "atac_rds"])
+    | subset_hvg.run(
+      fromState: [multiomics_rna: "multiomics_rna", multiomics_atac: "multiomics_atac"],
+      toState: [multiomics_rna_d0_hvg: "multiomics_rna_d0_hvg", multiomics_atac_d0: "multiomics_atac_d0"]
+    )
+
+    | multiome_matrix.run(
+      fromState: [multiomics_rna: "multiomics_rna_d0_hvg", multiomics_atac: "multiomics_atac_d0"],
+      toState: [rna_matrix_d0: "rna_matrix",
+                atac_matrix_d0: "atac_matrix",
+                rna_gene_annot_d0: "rna_gene_annot",
+                rna_cell_annot_d0: "rna_cell_annot",
+                atac_peak_annot_d0: "atac_peak_annot",
+                atac_cell_annot_d0: "atac_cell_annot"]
+    )
+    
+    | format_resources_r.run(
+      fromState: [rna_matrix: "rna_matrix_d0",
+                atac_matrix: "atac_matrix_d0",
+                rna_gene_annot: "rna_gene_annot_d0",
+                rna_cell_annot: "rna_cell_annot_d0",
+                atac_peak_annot: "atac_peak_annot_d0",
+                atac_cell_annot: "atac_cell_annot_d0"],
+      toState: [rna_rds_d0_hvg: "rna_rds",
+                atac_rds_d0: "atac_rds"]
+    )
+
+    | setState(["multiomics_rna", "multiomics_atac", "rna_rds", "atac_rds", "multiomics_rna_d0_hvg", "multiomics_atac_d0", "rna_rds_d0_hvg", "atac_rds_d0"])
 
   emit:
   output_ch

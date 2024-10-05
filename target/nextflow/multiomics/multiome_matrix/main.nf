@@ -2787,12 +2787,12 @@ meta = [
       {
         "type" : "file",
         "name" : "--multiomics_rna",
-        "default" : [
+        "example" : [
           "resources/grn-benchmark/multiomics_rna.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : false,
+        "required" : true,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2801,12 +2801,12 @@ meta = [
       {
         "type" : "file",
         "name" : "--multiomics_atac",
-        "default" : [
+        "example" : [
           "resources/grn-benchmark/multiomics_atac.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : false,
+        "required" : true,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -2815,7 +2815,7 @@ meta = [
       {
         "type" : "file",
         "name" : "--rna_matrix",
-        "default" : [
+        "example" : [
           "output/scRNA/X_matrix.mtx"
         ],
         "must_exist" : true,
@@ -2829,7 +2829,7 @@ meta = [
       {
         "type" : "file",
         "name" : "--atac_matrix",
-        "default" : [
+        "example" : [
           "output/scATAC/X_matrix.mtx"
         ],
         "must_exist" : true,
@@ -2843,7 +2843,7 @@ meta = [
       {
         "type" : "file",
         "name" : "--rna_gene_annot",
-        "default" : [
+        "example" : [
           "output/scRNA/annotation_gene.csv"
         ],
         "must_exist" : true,
@@ -2857,7 +2857,7 @@ meta = [
       {
         "type" : "file",
         "name" : "--rna_cell_annot",
-        "default" : [
+        "example" : [
           "output/scRNA/annotation_cell.csv"
         ],
         "must_exist" : true,
@@ -2871,7 +2871,7 @@ meta = [
       {
         "type" : "file",
         "name" : "--atac_peak_annot",
-        "default" : [
+        "example" : [
           "output/scATAC/annotation_gene.csv"
         ],
         "must_exist" : true,
@@ -2885,7 +2885,7 @@ meta = [
       {
         "type" : "file",
         "name" : "--atac_cell_annot",
-        "default" : [
+        "example" : [
           "output/scATAC/annotation_cell.csv"
         ],
         "must_exist" : true,
@@ -2974,7 +2974,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/multiome_matrix",
     "viash_version" : "0.8.6",
-    "git_commit" : "885a27d00b987b43d994c8ed66c8638af93e2e5e",
+    "git_commit" : "a32b952060b668ac78063a87fbb442ecf2a4d07a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

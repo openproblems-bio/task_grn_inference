@@ -174,36 +174,36 @@ function ViashHelp {
   echo ""
   echo "Arguments:"
   echo "    --rna_matrix"
-  echo "        type: file, file must exist"
-  echo "        default: output/scRNA/X_matrix.mtx"
+  echo "        type: file, required parameter, file must exist"
+  echo "        example: output/scRNA/X_matrix.mtx"
   echo ""
   echo "    --atac_matrix"
-  echo "        type: file, file must exist"
-  echo "        default: output/scATAC/X_matrix.mtx"
+  echo "        type: file, required parameter, file must exist"
+  echo "        example: output/scATAC/X_matrix.mtx"
   echo ""
   echo "    --rna_gene_annot"
-  echo "        type: file, file must exist"
-  echo "        default: output/scRNA/annotation_gene.csv"
+  echo "        type: file, required parameter, file must exist"
+  echo "        example: output/scRNA/annotation_gene.csv"
   echo ""
   echo "    --rna_cell_annot"
-  echo "        type: file, file must exist"
-  echo "        default: output/scRNA/annotation_cell.csv"
+  echo "        type: file, required parameter, file must exist"
+  echo "        example: output/scRNA/annotation_cell.csv"
   echo ""
   echo "    --atac_peak_annot"
-  echo "        type: file, file must exist"
-  echo "        default: output/scATAC/annotation_gene.csv"
+  echo "        type: file, required parameter, file must exist"
+  echo "        example: output/scATAC/annotation_gene.csv"
   echo ""
   echo "    --atac_cell_annot"
-  echo "        type: file, file must exist"
-  echo "        default: output/scATAC/annotation_cell.csv"
+  echo "        type: file, required parameter, file must exist"
+  echo "        example: output/scATAC/annotation_cell.csv"
   echo ""
   echo "    --rna_rds"
   echo "        type: file, output, file must exist"
-  echo "        default: resources/grn-benchmark/multiomics_r/rna.rds"
+  echo "        example: resources/grn-benchmark/multiomics_r/rna.rds"
   echo ""
   echo "    --atac_rds"
   echo "        type: file, output, file must exist"
-  echo "        default: resources/grn-benchmark/multiomics_r/atac.rds"
+  echo "        example: resources/grn-benchmark/multiomics_r/atac.rds"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -428,9 +428,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component multiomics format_resources_r"
-LABEL org.opencontainers.image.created="2024-10-04T21:17:17Z"
+LABEL org.opencontainers.image.created="2024-10-05T13:50:37Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="885a27d00b987b43d994c8ed66c8638af93e2e5e"
+LABEL org.opencontainers.image.revision="a32b952060b668ac78063a87fbb442ecf2a4d07a"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -795,6 +795,30 @@ fi
 
 
 # check whether required parameters exist
+if [ -z ${VIASH_PAR_RNA_MATRIX+x} ]; then
+  ViashError '--rna_matrix' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
+if [ -z ${VIASH_PAR_ATAC_MATRIX+x} ]; then
+  ViashError '--atac_matrix' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
+if [ -z ${VIASH_PAR_RNA_GENE_ANNOT+x} ]; then
+  ViashError '--rna_gene_annot' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
+if [ -z ${VIASH_PAR_RNA_CELL_ANNOT+x} ]; then
+  ViashError '--rna_cell_annot' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
+if [ -z ${VIASH_PAR_ATAC_PEAK_ANNOT+x} ]; then
+  ViashError '--atac_peak_annot' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
+if [ -z ${VIASH_PAR_ATAC_CELL_ANNOT+x} ]; then
+  ViashError '--atac_cell_annot' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then
   ViashError 'functionality_name' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
@@ -814,32 +838,6 @@ fi
 if [ -z ${VIASH_META_TEMP_DIR+x} ]; then
   ViashError 'temp_dir' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
-fi
-
-# filling in defaults
-if [ -z ${VIASH_PAR_RNA_MATRIX+x} ]; then
-  VIASH_PAR_RNA_MATRIX="output/scRNA/X_matrix.mtx"
-fi
-if [ -z ${VIASH_PAR_ATAC_MATRIX+x} ]; then
-  VIASH_PAR_ATAC_MATRIX="output/scATAC/X_matrix.mtx"
-fi
-if [ -z ${VIASH_PAR_RNA_GENE_ANNOT+x} ]; then
-  VIASH_PAR_RNA_GENE_ANNOT="output/scRNA/annotation_gene.csv"
-fi
-if [ -z ${VIASH_PAR_RNA_CELL_ANNOT+x} ]; then
-  VIASH_PAR_RNA_CELL_ANNOT="output/scRNA/annotation_cell.csv"
-fi
-if [ -z ${VIASH_PAR_ATAC_PEAK_ANNOT+x} ]; then
-  VIASH_PAR_ATAC_PEAK_ANNOT="output/scATAC/annotation_gene.csv"
-fi
-if [ -z ${VIASH_PAR_ATAC_CELL_ANNOT+x} ]; then
-  VIASH_PAR_ATAC_CELL_ANNOT="output/scATAC/annotation_cell.csv"
-fi
-if [ -z ${VIASH_PAR_RNA_RDS+x} ]; then
-  VIASH_PAR_RNA_RDS="resources/grn-benchmark/multiomics_r/rna.rds"
-fi
-if [ -z ${VIASH_PAR_ATAC_RDS+x} ]; then
-  VIASH_PAR_ATAC_RDS="resources/grn-benchmark/multiomics_r/atac.rds"
 fi
 
 # check whether required files exist
@@ -1072,6 +1070,7 @@ annotation_peak_filtered <- annotation_peak[filter_indices, ]
 
 # Filter the rows in X
 X_filtered <- X[filter_indices, ]
+
 
 # Create the SummarizedExperiment object with the filtered data
 atac <- SummarizedExperiment(assays = list(counts = X_filtered), 

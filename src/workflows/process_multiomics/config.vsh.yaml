@@ -13,30 +13,52 @@ functionality:
       type: file 
       required: true
       direction: input
-      default: resources/datasets_raw/multiome_counts.h5ad
+      example: resources/datasets_raw/multiome_counts.h5ad
       description: multiomics data at baseline
 
     - name: --multiomics_rna
       type: file 
-      required: true
+      required: false
       direction: output
-      default: resources/grn-benchmark/multiomics_rna.h5ad
+      example: resources/grn-benchmark/multiomics_rna.h5ad
     - name: --multiomics_atac
       type: file 
-      required: true
+      required: false
       direction: output
-      default: resources/grn-benchmark/multiomics_atac.h5ad
+      example: resources/grn-benchmark/multiomics_atac.h5ad
+
+    - name: --multiomics_rna_d0_hvg
+      type: file 
+      required: false
+      direction: output
+      example: resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad
+    - name: --multiomics_atac_d0
+      type: file 
+      required: false
+      direction: output
+      example: resources/grn-benchmark/multiomics_atac_d0.h5ad
     
     - name: --rna_rds
       type: file
-      required: true
+      required: false
       direction: output
-      default: resources/grn-benchmark/multiomics_rna.rds
+      example: resources/grn-benchmark/multiomics_rna.rds
     - name: --atac_rds
       type: file
-      required: true
+      required: false
       direction: output
-      default: resources/grn-benchmark/multiomics_atac.rds
+      example: resources/grn-benchmark/multiomics_atac.rds
+    
+    - name: --rna_rds_d0_hvg
+      type: file
+      required: false
+      direction: output
+      example: resources/grn-benchmark/multiomics_rna_d0_hvg.rds
+    - name: --atac_rds_d0
+      type: file
+      required: false
+      direction: output
+      example: resources/grn-benchmark/multiomics_atac_d0.rds
     
   resources:
     - type: nextflow_script
@@ -46,6 +68,7 @@ functionality:
     - name: multiomics/format_data 
     - name: multiomics/multiome_matrix
     - name: multiomics/format_resources_r 
+    - name: multiomics/subset_hvg
 platforms:
   - type: nextflow
     directives:

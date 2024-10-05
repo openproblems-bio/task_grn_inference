@@ -8,51 +8,50 @@ functionality:
   arguments:
     - name: --multiomics_rna
       type: file
-      required: false
+      required: true
       direction: input
-      default: resources/grn-benchmark/multiomics_rna.h5ad
+      example: resources/grn-benchmark/multiomics_rna.h5ad
     
     - name: --multiomics_atac
       type: file
-      required: false
+      required: true
       direction: input
-      default: resources/grn-benchmark/multiomics_atac.h5ad
+      example: resources/grn-benchmark/multiomics_atac.h5ad
 
     - name: --rna_matrix
       type: file
       required: false
       direction: output
-      default: output/scRNA/X_matrix.mtx
-  
+      example: output/scRNA/X_matrix.mtx
     - name: --atac_matrix
       type: file
       required: false
       direction: output
-      default: output/scATAC/X_matrix.mtx 
+      example: output/scATAC/X_matrix.mtx 
 
     - name: --rna_gene_annot
       type: file
       required: false
       direction: output
-      default: output/scRNA/annotation_gene.csv
+      example: output/scRNA/annotation_gene.csv
 
     - name: --rna_cell_annot
       type: file
       required: false
       direction: output
-      default: output/scRNA/annotation_cell.csv 
+      example: output/scRNA/annotation_cell.csv 
    
     - name: --atac_peak_annot
       type: file
       required: false
       direction: output
-      default: output/scATAC/annotation_gene.csv
+      example: output/scATAC/annotation_gene.csv
       
     - name: --atac_cell_annot
       type: file
       required: false
       direction: output
-      default: output/scATAC/annotation_cell.csv
+      example: output/scATAC/annotation_cell.csv
   resources:
     - type: python_script
       path: script.py

@@ -8,26 +8,15 @@ functionality:
   arguments:
     - name: --multiome_counts
       type: file 
-      required: false
+      required: true
       direction: input
       example: resources/datasets_raw/multiome_counts.h5ad
+
     - name: --multiomics_rna
       type: file 
       required: false
       direction: output
       example: resources/grn-benchmark/multiomics_rna.h5ad
-    - name: --multiomics_rna_d0
-      type: file 
-      required: false
-      direction: output
-      example: resources/grn-benchmark/multiomics_rna_d0.h5ad
-    
-    - name: --multiomics_rna_d0_hvg
-      type: file 
-      required: false
-      direction: output
-      example: resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad
-    
     - name: --multiomics_atac
       type: file 
       required: false
