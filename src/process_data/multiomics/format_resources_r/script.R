@@ -32,6 +32,7 @@ annotation_peak_filtered <- annotation_peak[filter_indices, ]
 # Filter the rows in X
 X_filtered <- X[filter_indices, ]
 
+
 # Create the SummarizedExperiment object with the filtered data
 atac <- SummarizedExperiment(assays = list(counts = X_filtered), 
                              rowRanges = GRanges(annotation_peak_filtered$seqname,

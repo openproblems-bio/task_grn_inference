@@ -1,5 +1,6 @@
 import anndata as ad
 import scanpy as sc
+import numpy as np
 ## VIASH START
 par = {
     # 'multiome_counts': 'resources/datasets_raw/multiome_counts.h5ad',
@@ -26,22 +27,14 @@ multiomics.obs['cell_type'] = multiomics.obs['cell_type'].map(cell_type_map)
 multiomics_rna = multiomics[:,multiomics.var.feature_types=='Gene Expression']
 multiomics_rna.var = multiomics_rna.var[['gene_ids', 'interval']]
 
-def high_coverage(adata):
-    threshold = 0.1
-    mask = adata.X!=0
-    mask_obs = (np.sum(mask, axis=1).A.flatten()/mask.shape[1])>threshold
-    mask_var = (np.sum(mask, axis=0).A.flatten()/mask.shape[0])>threshold
-    adata.obs['high_coverage'] = mask_obs
-    adata.var['high_coverage'] = mask_var
-high_coverage(multiomics_rna)
-
-#  hvgs
-var = sc.pp.highly_variable_genes(multiomics_rna, flavor='seurat_v3', n_top_genes=7000, inplace=False)
-multiomics_rna.var['highly_variable'] = var.highly_variable
-
-# subset to donor 0
-multiomics_rna_d0 = multiomics_rna[multiomics_rna.obs.donor_id=='donor_0', :]
-multiomics_rna_d0_hvg = multiomics_rna[multiomics_rna.obs.donor_id=='donor_0', multiomics_rna.var.highly_variable]
+# def high_coverage(adata):
+#     threshold = 0.1
+#     mask = adata.X!=0
+#     mask_obs = (np.sum(mask, axis=1).A.flatten()/mask.shape[1])>threshold
+#     mask_var = (np.sum(mask, axis=0).A.flatten()/mask.shape[0])>threshold
+#     adata.obs['high_coverage'] = mask_obs
+#     adata.var['high_coverage'] = mask_var
+# high_coverage(multiomics_rna)
 #------ ATAC
 multiomics_atac = multiomics[:,multiomics.var.feature_types=='Peaks']
 multiomics_atac.var = multiomics_atac.var[[]]
@@ -62,6 +55,4 @@ multiomics_rna.obs['donor_id'] = multiomics_rna.obs['donor_id'].map(donor_map)
 multiomics_atac.obs['donor_id'] = multiomics_atac.obs['donor_id'].map(donor_map)
 
 multiomics_rna.write(par['multiomics_rna'])
-multiomics_rna_h0.write(par['multiomics_rna_h0'])
-multiomics_rna_h0_hvg.write(par['multiomics_rna_h0_hvg'])
 multiomics_atac.write(par['multiomics_atac'])
