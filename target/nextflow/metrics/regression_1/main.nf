@@ -3107,6 +3107,18 @@ meta = [
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
+      },
+      {
+        "type" : "string",
+        "name" : "--skeleton",
+        "example" : [
+          "resources/prior/skeleton.csv'"
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
       }
     ],
     "resources" : [
@@ -3231,7 +3243,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "e7b87a4f8f061be0ebe3b18342d9f6b8df493fcc",
+    "git_commit" : "652b00edd0f6b175fafc69074162ed61cd0cbda8",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3268,7 +3280,8 @@ par = {
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'verbose': $( if [ ! -z ${VIASH_PAR_VERBOSE+x} ]; then echo "int(r'${VIASH_PAR_VERBOSE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'min_tf': $( if [ ! -z ${VIASH_PAR_MIN_TF+x} ]; then echo "r'${VIASH_PAR_MIN_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'binarize': $( if [ ! -z ${VIASH_PAR_BINARIZE+x} ]; then echo "r'${VIASH_PAR_BINARIZE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
+  'binarize': $( if [ ! -z ${VIASH_PAR_BINARIZE+x} ]; then echo "r'${VIASH_PAR_BINARIZE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'skeleton': $( if [ ! -z ${VIASH_PAR_SKELETON+x} ]; then echo "r'${VIASH_PAR_SKELETON//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),

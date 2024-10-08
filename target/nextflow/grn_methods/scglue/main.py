@@ -11,7 +11,35 @@ import numpy as np
 from ast import literal_eval
 import requests
 import torch
-
+def download_annotation(par):
+    
+    if not os.path.exists(par['annotation_file']):
+        print("Downloading prior started")
+    
+        response = requests.get("https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.annotation.gtf.gz")
+        
+        if response.status_code == 200:
+            with open(par['annotation_file'], 'wb') as file:
+                file.write(response.content)
+            print(f"File downloaded and saved to {par['annotation_file']}")
+        else:
+            print(f"Failed to download the gencode.v45.annotation.gtf.gz. Status code: {response.status_code}")
+        print("Downloading prior ended")
+def download_motifs(par):
+    # get gene annotation
+    
+    if not os.path.exists(par['motif_file']):
+        tag = par['motif_file'].split('/')[-1]
+        print("Downloading motif started")
+        response = requests.get(f"http://download.gao-lab.org/GLUE/cisreg/{tag}")
+        
+        if response.status_code == 200:
+            with open(par['motif_file'], 'wb') as file:
+                file.write(response.content)
+            print(f"File downloaded and saved to {par['motif_file']}")
+        else:
+            print(f"Failed to download the motif file. Status code: {response.status_code}")
+        print("Downloading motif ended")
 def preprocess(par):
     print('Reading input files', flush=True)
     rna = ad.read_h5ad(par['multiomics_rna'])
@@ -119,7 +147,7 @@ def training(par):
     atac.write(f"{par['temp_dir']}/atac-emb.h5ad", compression="gzip")
     nx.write_graphml(guidance, f"{par['temp_dir']}/guidance.graphml.gz")
     
-def run_grn(par):
+def create_prior(par):
     ''' Infers gene2peak connections
     '''
     rna = ad.read_h5ad(f"{par['temp_dir']}/rna-emb.h5ad")
@@ -163,25 +191,6 @@ def run_grn(par):
     rna[:, np.union1d(genes, tfs)].write_loom(f"{par['temp_dir']}/rna.loom")
     np.savetxt(f"{par['temp_dir']}/tfs.txt", tfs, fmt="%s")
 
-    # pyscenic grn
-    if True:
-        command = ['pyscenic', 'grn', f"{par['temp_dir']}/rna.loom", 
-                f"{par['temp_dir']}/tfs.txt", '-o', f"{par['temp_dir']}/draft_grn.csv", 
-                '--seed', '0', '--num_workers', f"{par['num_workers']}", 
-                '--cell_id_attribute', 'obs_id', '--gene_attribute', 'name']
-        print('Run grn')
-        result = subprocess.run(command,  check=True)
-
-        print("Output:")
-        print(result.stdout)
-        print("Error:")
-        print(result.stderr)
-
-        if result.returncode == 0:
-            print("Command executed successfully")
-        else:
-            print("Command failed with return code", result.returncode)
-
     print("Generate TF cis-regulatory ranking bridged by ATAC peaks", flush=True)
     peak_bed = scglue.genomics.Bed(atac.var.loc[peaks])
     peak2tf = scglue.genomics.window_graph(peak_bed, motif_bed, 0, right_sorted=True)
@@ -192,7 +201,7 @@ def run_grn(par):
         region_lens=atac.var.loc[peaks, "chromEnd"] - atac.var.loc[peaks, "chromStart"],
         random_state=0)
 
-    flank_bed = scglue.genomics.Bed(rna.var.loc[genes]).strand_specific_start_site().expand(10000, 10000)
+    flank_bed = scglue.genomics.Bed(rna.var.loc[genes]).strand_specific_start_site().expand(500, 500)
     flank2tf = scglue.genomics.window_graph(flank_bed, motif_bed, 0, right_sorted=True)
 
     gene2flank = nx.Graph([(g, g) for g in genes])
@@ -224,6 +233,23 @@ def run_grn(par):
         orthologous_identity=1.0,
         description="placeholder"
     ).to_csv(f"{par['temp_dir']}/ctx_annotation.tsv", sep="\t", index=False)
+def pyscenic_grn(par):
+    command = ['pyscenic', 'grn', f"{par['temp_dir']}/rna.loom", 
+            f"{par['temp_dir']}/tfs.txt", '-o', f"{par['temp_dir']}/draft_grn.csv", 
+            '--seed', '0', '--num_workers', f"{par['num_workers']}", 
+            '--cell_id_attribute', 'obs_id', '--gene_attribute', 'name']
+    print('Run grn')
+    result = subprocess.run(command,  check=True)
+
+    print("Output:")
+    print(result.stdout)
+    print("Error:")
+    print(result.stderr)
+
+    if result.returncode == 0:
+        print("Command executed successfully")
+    else:
+        print("Command failed with return code", result.returncode)
 def prune_grn(par):
     # Construct the command 
     print(par)
@@ -236,10 +262,10 @@ def prune_grn(par):
         "--annotations_fname", f"{par['temp_dir']}/ctx_annotation.tsv",
         "--expression_mtx_fname", f"{par['temp_dir']}/rna.loom",
         "--output", f"{par['temp_dir']}/pruned_grn.csv",
-        "--top_n_targets", str(par['top_n_targets']),
+        # "--top_n_targets", str(par['top_n_targets']),
         # "--rank_threshold", str(par['rank_threshold']),
-        "--auc_threshold", "0.1",
-        "--nes_threshold", str(par['nes_threshold']), 
+        # "--auc_threshold", "0.1",
+        # "--nes_threshold", str(par['nes_threshold']), 
         "--min_genes", "1",
         "--num_workers", f"{par['num_workers']}",
         "--cell_id_attribute", "obs_id", # be sure that obs_id is in obs and name is in var
@@ -247,7 +273,6 @@ def prune_grn(par):
     ]
 
     result = subprocess.run(command, check=True)
-
     print("Output:")
     print(result.stdout)
     print("Error:")
@@ -257,57 +282,28 @@ def prune_grn(par):
         print("pyscenic ctx executed successfully")
     else:
         print("pyscenic ctx failed with return code", result.returncode)
-def download_annotation(par):
-    # get gene annotation
-    par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
-    if not os.path.exists(par['annotation_file']):
-        print("Downloading prior started")
-    
-        response = requests.get("https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.annotation.gtf.gz")
-        
-        if response.status_code == 200:
-            with open(par['annotation_file'], 'wb') as file:
-                file.write(response.content)
-            print(f"File downloaded and saved to {par['annotation_file']}")
-        else:
-            print(f"Failed to download the gencode.v45.annotation.gtf.gz. Status code: {response.status_code}")
-        print("Downloading prior ended")
-def download_motifs(par):
-    # get gene annotation
-    tag = "JASPAR2022-hg38.bed.gz"
-    par['motif_file'] = f"{par['temp_dir']}/{tag}"
-    if not os.path.exists(par['motif_file']):
-        print("Downloading motif started")
-        response = requests.get(f"http://download.gao-lab.org/GLUE/cisreg/{tag}")
-        
-        if response.status_code == 200:
-            with open(par['motif_file'], 'wb') as file:
-                file.write(response.content)
-            print(f"File downloaded and saved to {par['motif_file']}")
-        else:
-            print(f"Failed to download the motif file. Status code: {response.status_code}")
-        print("Downloading motif ended")
+
 
 def main(par):
     
     print("Is CUDA available:", torch.cuda.is_available())
     print("Number of GPUs:", torch.cuda.device_count())
     
-    
-    
     from util import process_links
     # Load scRNA-seq data
-    os.makedirs(par['temp_dir'], exist_ok=True)
-    print('----- download_annotation ---- ', flush=True)
-    download_annotation(par)
-    print('----- download_motifs ---- ', flush=True)
-    download_motifs(par)
-    print('----- preprocess ---- ', flush=True)
-    preprocess(par)
-    print('----- training ---- ', flush=True)
-    training(par)
-    print('----- run_grn ---- ', flush=True)
-    run_grn(par)
+    # os.makedirs(par['temp_dir'], exist_ok=True)
+    # print('----- download_annotation ---- ', flush=True)
+    # download_annotation(par)
+    # print('----- download_motifs ---- ', flush=True)
+    # download_motifs(par)
+    # print('----- preprocess ---- ', flush=True)
+    # preprocess(par)
+    # print('----- training ---- ', flush=True)
+    # training(par)
+    print('----- create_prior ---- ', flush=True)
+    create_prior(par)
+    print('----- pyscenic_grn ---- ', flush=True)
+    pyscenic_grn(par)
     print('----- prune_grn ---- ', flush=True)
     prune_grn(par)
     print('Curate predictions', flush=True)

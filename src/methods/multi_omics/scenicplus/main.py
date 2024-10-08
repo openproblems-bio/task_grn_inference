@@ -1,5 +1,7 @@
 
 import os
+import gc
+
 import sys
 import yaml
 import pickle
@@ -16,6 +18,9 @@ import gzip
 import tarfile
 from urllib.request import urlretrieve
 import json
+import os
+
+
 
 import flatbuffers
 import numpy as np
@@ -193,10 +198,7 @@ def process_peak(par):
         chain=False
     )
 
-    # Create cistopic objects
-
     # Download Mallet
-    
     if not os.path.exists(par['MALLET_PATH']):
         url = 'https://github.com/mimno/Mallet/releases/download/v202108/Mallet-202108-bin.tar.gz'
         response = requests.get(url)
@@ -204,12 +206,17 @@ def process_peak(par):
             f.write(response.content)
         with tarfile.open(os.path.join(par['temp_dir'], 'Mallet-202108-bin.tar.gz'), 'r:gz') as f:
             f.extractall(path=par['temp_dir'])
+    del consensus_peaks
+    del narrow_peak_dict
+    del adata_atac
+    gc.collect()
 def run_cistopic(par):
     adata_atac = anndata.read_h5ad(par['multiomics_atac'])
     unique_donor_ids = [s.replace(' ', '_') for s in adata_atac.obs.donor_id.cat.categories]
     print(unique_donor_ids)
     unique_cell_types = [s.replace(' ', '_') for s in adata_atac.obs.cell_type.cat.categories]
-    
+    donor_ids = [s.replace(' ', '_') for s in adata_atac.obs.donor_id]
+    index = [barcode.replace('-', '') + '-' + donor_id for donor_id, barcode in zip(donor_ids, adata_atac.obs.index)]
     cell_data = pd.DataFrame({
         'cell_type': [s.replace(' ', '_') for s in adata_atac.obs.cell_type.to_numpy()],
         'donor_id': [s.replace(' ', '_') for s in adata_atac.obs.donor_id.to_numpy()]
@@ -362,7 +369,12 @@ def run_cistopic(par):
     # Save cistopic objects
     with open(par['cistopic_object'], 'wb') as f:
         pickle.dump(cistopic_obj, f)
-
+        
+    del cistopic_obj
+    del model
+    del cistopic_obj_list
+    del adata_atac
+    gc.collect()
 
 def process_topics(par):  
     # Load cistopic objects
@@ -559,7 +571,6 @@ def process_topics(par):
         split_pattern='-'
     )
 
-# Download databases
 def download_databases(par):
     def download(url: str, filepath: str) -> None:
         if os.path.exists(filepath):
@@ -574,7 +585,6 @@ def download_databases(par):
         # with open(par['blacklist_path'], 'w') as f:
         #     f.write(response.text)
         download(url, par['blacklist_path'])
-    
     url = 'https://resources.aertslab.org/cistarget/motif_collections/v10nr_clust_public/snapshots/motifs-v10-nr.hgnc-m0.00001-o0.0.tbl'
     if not os.path.exists(par['motif_annotation']):
         download(url, par['motif_annotation'])
@@ -594,7 +604,6 @@ def download_databases(par):
             if not os.path.exists(os.path.join(par['temp_dir'], 'cistarget-db', 'create_cisTarget_databases')):
                 with contextlib.chdir(os.path.join(par['temp_dir'], 'cistarget-db')):
                     subprocess.run(['git', 'clone', 'https://github.com/aertslab/create_cisTarget_databases'])
-
             # Download cluster-buster
             if not os.path.exists(os.path.join(par['temp_dir'], 'cistarget-db', 'cbust')):
                 urlretrieve('https://resources.aertslab.org/cistarget/programs/cbust', os.path.join(par['temp_dir'], 'cistarget-db', 'cbust'))
@@ -639,7 +648,6 @@ def download_databases(par):
                     '1000',
                     'yes'
                 ])
-
             # Create cistarget databases
             with open(os.path.join(par['temp_dir'], 'cistarget-db', 'motifs.txt'), 'w') as f:
                 for filename in os.listdir(os.path.join(par['temp_dir'], 'cistarget-db', 'v10nr_clust_public', 'singletons')):
@@ -659,14 +667,12 @@ def download_databases(par):
                 '--bgpadding', '1000',
                 '-t', str(par['num_workers'])
             ], capture_output=True, text=True)
-
             # Print the result for debugging
             print(result.stdout)
             print(result.stderr)
     
 def preprocess_rna(par):
     os.makedirs(os.path.join(par['temp_dir'], 'scRNA'), exist_ok=True)
-
     print("Preprocess RNA-seq", flush=True)
     # Load scRNA-seq data
     print("Load scRNA-seq data")
@@ -688,11 +694,9 @@ def preprocess_rna(par):
     adata_rna.raw = adata_rna
     sc.pp.normalize_total(adata_rna, target_sum=1e4)
     sc.pp.log1p(adata_rna)
-
     # Change barcodes to match the barcodes in the scATAC-seq data
     bar_codes = [f'{obs_name.replace("-", "")}-{donor_id}' for obs_name, donor_id in zip(adata_rna.obs_names, adata_rna.obs.donor_id)]
     adata_rna.obs_names = bar_codes
-
     # Save scRNA-seq data
     adata_rna.write_h5ad(os.path.join(par['temp_dir'], 'rna.h5ad'))
 
