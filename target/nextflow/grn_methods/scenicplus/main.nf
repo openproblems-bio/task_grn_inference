@@ -3155,7 +3155,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "652b00edd0f6b175fafc69074162ed61cd0cbda8",
+    "git_commit" : "1180b200f9d532b8562d10697c1f617e9a820ddf",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3264,21 +3264,21 @@ def main(par):
     par['MALLET_PATH'] = os.path.join(par['temp_dir'], 'Mallet-202108', 'bin', 'mallet')
     os.makedirs(par['atac_dir'], exist_ok=True)
 
-    # print('------- download_databases -------')
-    # download_databases(par)
-    # print_memory_usage()
-    # print('------- process_peak -------')
-    # process_peak(par)
-    # print_memory_usage()
-    # print('------- run_cistopic -------')
-    # run_cistopic(par)
-    # print_memory_usage()
-    # print('------- process_topics -------')
-    # process_topics(par)
-    # print_memory_usage()
-    # print('------- preprocess_rna -------')
-    # preprocess_rna(par)
-    # print_memory_usage()
+    print('------- download_databases -------')
+    download_databases(par)
+    print_memory_usage()
+    print('------- process_peak -------')
+    process_peak(par)
+    print_memory_usage()
+    print('------- run_cistopic -------')
+    run_cistopic(par)
+    print_memory_usage()
+    print('------- process_topics -------')
+    process_topics(par)
+    print_memory_usage()
+    print('------- preprocess_rna -------')
+    preprocess_rna(par)
+    print_memory_usage()
     print('------- snakemake_pipeline -------')
     snakemake_pipeline(par)
     print_memory_usage()

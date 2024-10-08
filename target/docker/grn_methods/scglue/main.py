@@ -262,10 +262,10 @@ def prune_grn(par):
         "--annotations_fname", f"{par['temp_dir']}/ctx_annotation.tsv",
         "--expression_mtx_fname", f"{par['temp_dir']}/rna.loom",
         "--output", f"{par['temp_dir']}/pruned_grn.csv",
-        # "--top_n_targets", str(par['top_n_targets']),
-        # "--rank_threshold", str(par['rank_threshold']),
-        # "--auc_threshold", "0.1",
-        # "--nes_threshold", str(par['nes_threshold']), 
+        "--top_n_targets", str(par['top_n_targets']),
+        "--rank_threshold", str(par['rank_threshold']),
+        "--auc_threshold", "0.1",
+        "--nes_threshold", str(par['nes_threshold']), 
         "--min_genes", "1",
         "--num_workers", f"{par['num_workers']}",
         "--cell_id_attribute", "obs_id", # be sure that obs_id is in obs and name is in var
@@ -300,11 +300,11 @@ def main(par):
     # preprocess(par)
     # print('----- training ---- ', flush=True)
     # training(par)
-    print('----- create_prior ---- ', flush=True)
-    create_prior(par)
-    print('----- pyscenic_grn ---- ', flush=True)
-    pyscenic_grn(par)
-    print('----- prune_grn ---- ', flush=True)
+    # print('----- create_prior ---- ', flush=True)
+    # create_prior(par)
+    # print('----- pyscenic_grn ---- ', flush=True)
+    # pyscenic_grn(par)
+    # print('----- prune_grn ---- ', flush=True)
     prune_grn(par)
     print('Curate predictions', flush=True)
     pruned_grn = pd.read_csv(
