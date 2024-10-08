@@ -201,10 +201,20 @@ def main(par):
 
     verbose_print(par['verbose'], 'Reading input files', 3)
     
+    
     perturbation_data = ad.read_h5ad(par['perturbation_data'])
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
     gene_names = perturbation_data.var.index.to_numpy()
     net = pd.read_csv(par['prediction'])
+    
+    if True: #apply skeleton
+        print('Before filtering with skeleton:', net.shape)
+        skeleton = np.savetxt(par['skeleton'], all_links.values, fmt='%s')
+        net['link'] = net['source'].astype(str) + '_' + net['target'].astype(str)
+        net = net[net['link'].isin(skeleton)]
+        print('After filtering with skeleton:', net.shape)
+
+    
     # net['weight'] = net.weight.abs()
     # subset to keep only those links with source as tf
     

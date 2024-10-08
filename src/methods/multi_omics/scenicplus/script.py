@@ -1,5 +1,6 @@
 
 import sys 
+import os
 ## VIASH START
 par = {
   'multiomics_rna': 'resources_test/grn-benchmark/multiomics_rna.h5ad',
@@ -44,6 +45,15 @@ print(par)
 sys.path.append(meta["resources_dir"])
 from main import * 
 
+
+def print_memory_usage():
+    import psutil
+
+    process = psutil.Process(os.getpid())
+    mem_info = process.memory_info().rss / (1024 * 1024)  # Convert to MB
+    print(f"Memory usage: {mem_info:.2f} MB")
+
+
 def main(par):
 
     par['cistopic_object'] = f'{par["temp_dir"]}/cistopic_object.pkl'
@@ -58,19 +68,24 @@ def main(par):
     par['MALLET_PATH'] = os.path.join(par['temp_dir'], 'Mallet-202108', 'bin', 'mallet')
     os.makedirs(par['atac_dir'], exist_ok=True)
 
-    print('------- download_databases -------')
+    # print('------- download_databases -------')
     # download_databases(par)
-    print('------- process_peak -------')
+    # print_memory_usage()
+    # print('------- process_peak -------')
     # process_peak(par)
-    print('------- run_cistopic -------')
-    run_cistopic(par)
-    print('------- process_topics -------')
-    process_topics(par)
-    
-    print('------- preprocess_rna -------')
-    preprocess_rna(par)
+    # print_memory_usage()
+    # print('------- run_cistopic -------')
+    # run_cistopic(par)
+    # print_memory_usage()
+    # print('------- process_topics -------')
+    # process_topics(par)
+    # print_memory_usage()
+    # print('------- preprocess_rna -------')
+    # preprocess_rna(par)
+    # print_memory_usage()
     print('------- snakemake_pipeline -------')
     snakemake_pipeline(par)
+    print_memory_usage()
     print('------- post_process -------')
     post_process(par)
 if __name__ == '__main__':

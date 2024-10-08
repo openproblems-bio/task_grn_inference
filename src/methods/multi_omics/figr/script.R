@@ -8,14 +8,14 @@ library(BSgenome.Hsapiens.UCSC.hg38)
 
 ## VIASH START
 par <- list(
-  multiomics_rna_r = "resources_test/grn-benchmark/multiomics_rna.rds",
-  multiomics_atac_r = "resources_test/grn-benchmark/multiomics_atac.rds",
+  multiomics_rna_r = "resources/grn-benchmark/multiomics_rna.rds",
+  multiomics_atac_r = "resources/grn-benchmark/multiomics_atac.rds",
   temp_dir =  "output/figr/",
-  cell_topic = "resources/prior/cell_topic_d0_hvg.csv",
-  num_workers = 2,
+  cell_topic = "resources/prior/cell_topic.csv",
+  num_workers = 20,
   n_topics = 48,
   peak_gene = "output/figr/peak_gene.csv",
-  prediction= "output/figr/prediction.csv"
+  prediction= "resources/grn_models/figr.csv"
 )
 print(par)
 # meta <- list(
@@ -25,10 +25,9 @@ print(par)
 dir.create(par$temp_dir, recursive = TRUE, showWarnings = TRUE)
 
 atac = readRDS(par$multiomics_atac_r)
-rna  = readRDS(par$multiomics_rna_r)
-
-
 colnames(atac) <- gsub("-", "", colnames(atac))
+
+rna  = readRDS(par$multiomics_rna_r)
 colnames(rna) <- gsub("-", "", colnames(rna))
 
 
@@ -41,8 +40,7 @@ cellknn_func <- function(par) {
   rownames(cellkNN) <- rownames(cell_topic)
   saveRDS(cellkNN, paste0(par$temp_dir, "cellkNN.rds"))
 }
-cellknn_func(par)
-print('1: cellknn_func finished')
+
 ## Step1: Peak-gene association testing
 peak_gene_func <- function(par){
   
@@ -59,9 +57,6 @@ peak_gene_func <- function(par){
   write.csv(cisCorr, paste0(par$temp_dir, "cisCorr.csv"), row.names = TRUE)
 }
 
-peak_gene_func(par)
-
-print('2: peak_gene_func finished')
 ## Step 2: create DORCs and smooth them 
 dorc_genes_func <- function(par){
   cisCorr = read.csv(paste0(par$temp_dir, "cisCorr.csv"))
@@ -83,19 +78,23 @@ dorc_genes_func <- function(par){
   cat('cellKNN dim:', dim(cellkNN), '\n')
   cat('dorcMat dim:', dim(dorcMat), '\n')
   cat('rna dim:', dim(rna), '\n')
-  dorcMat.s <- smoothScoresNN(NNmat = cellkNN[,1:n_topics], mat = dorcMat, nCores = par$num_workers) 
+  dorcMat.s <- smoothScoresNN(NNmat = cellkNN, mat = dorcMat, nCores = par$num_workers) 
   cat('dorcMat.s completed')
   # Smooth RNA using cell KNNs
   # This takes longer since it's all genes
-  RNAmat.s <- smoothScoresNN(NNmat = cellkNN[,1:n_topics], mat = rna, nCores = par$num_workers)
+  matching_indices <- match(colnames(rna), rownames(cellkNN))
+  cellkNN_ordered <- cellkNN[matching_indices, ]
+
+
+  RNAmat.s <- smoothScoresNN(NNmat = cellkNN_ordered, mat = rna, nCores = par$num_workers)
+  # RNAmat.s <- rna
   cat('RNAmat.s completed')
   # get peak gene connection
   write.csv(cisCorr.filt, paste0(par$temp_dir, "cisCorr.filt.csv"))
   saveRDS(RNAmat.s, paste0(par$temp_dir, "RNAmat.s.RDS"))
   saveRDS(dorcMat.s, paste0(par$temp_dir, "dorcMat.s.RDS"))
 }
-dorc_genes_func(par)
-print('3: dorc_genes_func finished')
+
 ## TF-gene associations
 tf_gene_association_func <- function(par){
   cisCorr.filt = read.csv(paste0(par$temp_dir, "cisCorr.filt.csv"))
@@ -111,8 +110,6 @@ tf_gene_association_func <- function(par){
 
   write.csv(figR.d, paste0(par$temp_dir, "figR.d.csv"))
 }
-tf_gene_association_func(par)
-print('3: tf_gene_association_func finished')
 
 extract_peak_gene_func <- function(par) {
   # Read the CSV file
@@ -137,22 +134,20 @@ extract_peak_gene_func <- function(par) {
   # Write the result to a CSV file
   write.csv(peak_gene_figr, file = par$peak_gene, row.names = FALSE)
 }
-extract_peak_gene_func(par)
-print('4: extract_peak_gene_func finished')
-
 
 filter_figr_grn <- function(par) {
   # Read the CSV file
   figr_grn <- read.csv(file.path(par$temp_dir, "figR.d.csv"))
+
+  # Filter those that have a Score of 0
+  figr_grn <- subset(figr_grn, Score != 0)
   
   # Filter based on enrichment
   figr_grn <- subset(figr_grn, Enrichment.P < 0.05)
   
   # Filter based on correlation
-  figr_grn <- subset(figr_grn, Corr.P < 0.05)
+  # figr_grn <- subset(figr_grn, Corr.P < 0.05)
   
-  # Filter those that have a Score of 0
-  figr_grn <- subset(figr_grn, Score != 0)
   
   # Subset columns
   figr_grn <- figr_grn[, c("Motif", "DORC", "Score")]
@@ -168,4 +163,16 @@ filter_figr_grn <- function(par) {
 }
 
 
+
+
+cellknn_func(par)
+print('1: cellknn_func finished')
+peak_gene_func(par)
+print('2: peak_gene_func finished')
+dorc_genes_func(par)
+print('3: dorc_genes_func finished')
+tf_gene_association_func(par)
+print('3: tf_gene_association_func finished')
+extract_peak_gene_func(par)
+print('4: extract_peak_gene_func finished')
 filter_figr_grn(par)

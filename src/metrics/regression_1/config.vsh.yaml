@@ -19,6 +19,10 @@ functionality:
       direction: input 
       description: whether to binarize the weight
       default: true
+    - name: --skeleton 
+      type: string
+      direction: input
+      example: resources/prior/skeleton.csv'
   resources:
     - type: python_script
       path: script.py

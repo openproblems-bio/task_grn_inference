@@ -62,6 +62,14 @@ functionality:
       required: false
       direction: output
       example: resources_test/grn-benchmark/perturbation_data.h5ad 
+    - name: --batch_key
+      type: string
+      default: plate_id
+      direction: input
+    - name: --label_key
+      type: string
+      default: cell_type
+      direction: input
 
   resources:
     - type: python_script
