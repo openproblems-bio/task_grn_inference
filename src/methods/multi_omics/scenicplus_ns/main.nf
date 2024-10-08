@@ -13,10 +13,10 @@ workflow run_wf {
               num_workers: "num_workers"
               
               ],
-      toState: [prediction:"prediction", cell_topic:"cell_topic", scplus_mdata:"scplus_mdata"]
+      toState: [prediction:"prediction", cell_topic:"cell_topic", scplus_mdata:"scplus_mdata", grn_extended:"grn_extended"]
     )
 
-    | setState(["prediction", "cell_topic", "scplus_mdata"])
+    | setState(["prediction", "cell_topic", "scplus_mdata", "grn_extended"])
 
   emit:
   output_ch

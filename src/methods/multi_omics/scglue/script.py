@@ -11,8 +11,8 @@ par = {
   "num_workers": 20,
   "prediction": "output/scglue_d0_hvg.csv",
   "max_n_links": 50000,
-  "nes_threshold": 1.5,
-  "rank_threshold": 1500,
+  "nes_threshold": 1,
+  "rank_threshold": 5000,
   "top_n_targets": 100,
   'normalize': False,
   'extend_range': 150000

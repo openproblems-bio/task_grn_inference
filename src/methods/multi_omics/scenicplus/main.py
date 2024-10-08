@@ -721,8 +721,6 @@ def snakemake_pipeline(par):
     cwd = os.getcwd()
     print(cwd)
     
-    
-
     settings['input_data']['cisTopic_obj_fname'] = f"{cwd}/{par['cistopic_object']}"
     settings['input_data']['GEX_anndata_fname'] = f"{cwd}/{os.path.join(par['temp_dir'], 'rna.h5ad')}"
     settings['input_data']['region_set_folder'] = f"{cwd}/{os.path.join(par['temp_dir'], 'region_sets')}"
