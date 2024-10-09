@@ -3094,6 +3094,7 @@ meta = [
           "lowmem" : "memory = 20.Gb",
           "midmem" : "memory = 50.Gb",
           "highmem" : "memory = 100.Gb",
+          "veryhighmem" : "memory = 250.Gb",
           "lowcpu" : "cpus = 5",
           "midcpu" : "cpus = 15",
           "highcpu" : "cpus = 30",
@@ -3117,7 +3118,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "f2a60669054e8d22bf5b6768ff375eaf3bc9c5e1",
+    "git_commit" : "0b42bb993172c798ab946d2d4849f62ddb2390f7",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

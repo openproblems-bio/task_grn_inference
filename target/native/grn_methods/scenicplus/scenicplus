@@ -739,8 +739,9 @@ if args.tf_all:
 if args.num_workers:
     par['num_workers'] = args.num_workers
 
-meta = {}
+
 if args.resources_dir:
+    meta = {}
     meta['resources_dir'] = args.resources_dir  
 par['num_workers'] = int(par['num_workers'])
 print(par)

@@ -40,4 +40,4 @@ functionality:
 platforms:
   - type: nextflow
     directives:
-      label: [ onedaytime, highmem, highcpu ]
+      label: [ onedaytime, veryhighmem, highcpu ]
