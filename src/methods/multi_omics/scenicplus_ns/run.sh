@@ -23,12 +23,12 @@ publish_dir: "$publish_dir"
 HERE
 
 
-nextflow run . \
-  -main-script  target/nextflow/workflows/grn_inference_scenicplus/main.nf \
-  -profile docker \
-  -with-trace \
-  -c src/common/nextflow_helpers/labels_ci.config \
-  -params-file params/${RUN_ID}.yaml
+# nextflow run . \
+#   -main-script  target/nextflow/workflows/grn_inference_scenicplus/main.nf \
+#   -profile docker \
+#   -with-trace \
+#   -c src/common/nextflow_helpers/labels_ci.config \
+#   -params-file params/${RUN_ID}.yaml
 
 
 # ./tw-windows-x86_64.exe launch `
@@ -40,5 +40,12 @@ nextflow run . \
 #       --compute-env 6TeIFgV5OY4pJCk8I0bfOh `
 #       --params-file ./params/scenicplus.yaml `
 #       --config src/common/nextflow_helpers/labels_tw.config
-
+./tw launch https://github.com/openproblems-bio/task_grn_inference \
+  --revision build/main \
+  --pull-latest \
+  --main-script target/nextflow/workflows/grn_inference_scenicplus/main.nf \
+  --workspace 53907369739130 \
+  --compute-env 6TeIFgV5OY4pJCk8I0bfOh \
+  --params-file ${param_file} \
+  --config src/common/nextflow_helpers/labels_tw.config
 

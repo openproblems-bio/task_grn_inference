@@ -8,7 +8,7 @@ import numpy as np
 par = {
     'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
     'layer': 'scgen_pearson',
-    "prediction": "resources/grn_models/donor_0_celltype/grnboost2.csv",
+    "prediction": "resources/grn_models/full/grnboost2.csv",
     'tf_all': 'resources/prior/tf_all.csv',
     "max_n_links": 50000,
     'consensus': 'resources/prior/consensus-num-regulators.json',
@@ -20,15 +20,24 @@ par = {
     'num_workers': 4,
     'apply_tf': True,
     'clip_scores': True,
-    'method_id': 'grnboost'
+    'method_id': 'grnboost',
+    'apply_skeleton': False,
+    'skeleton': 'resources/prior/skeleton.csv',
+    'verbose': 2
     
 }
 ## VIASH END
-# meta = {
-#   "resources_dir":'src/metrics/regression_1/'
-# }
+
 print(par)
-sys.path.append(meta['resources_dir'])
+try:
+    sys.path.append(meta['resources_dir'])
+except:
+    meta = {
+    "resources_dir": 'src/metrics/',
+    "util": 'src/utils'
+    }
+    sys.path.append(meta["resources_dir"])
+    sys.path.append(meta["util"])
 from main import main
 
 if isinstance(par['reg_type'], list) and (len(par['reg_type']) == 1):

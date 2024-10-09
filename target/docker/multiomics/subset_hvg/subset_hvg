@@ -414,9 +414,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "scikit-misc"
 
 LABEL org.opencontainers.image.description="Companion container for running component multiomics subset_hvg"
-LABEL org.opencontainers.image.created="2024-10-08T18:04:57Z"
+LABEL org.opencontainers.image.created="2024-10-09T16:23:32Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="1180b200f9d532b8562d10697c1f617e9a820ddf"
+LABEL org.opencontainers.image.revision="f2a60669054e8d22bf5b6768ff375eaf3bc9c5e1"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

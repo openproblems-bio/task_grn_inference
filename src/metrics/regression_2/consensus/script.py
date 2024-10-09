@@ -13,7 +13,7 @@ par = {
     'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
     # 'models_dir': 'resources/grn-benchmark/grn_models/d0_hvg',
     # 'models': [pearson_corr, pearson_causal, portia, ppcor, genie3, grnboost2, scenic, scglue, celloracle],
-    'output': 'resources/grn-benchmark/consensus-num-regulators.json'
+    'output': 'resources/prior/consensus-num-regulators.json'
 }
 ## VIASH END
 import argparse
@@ -34,15 +34,20 @@ try:
     gene_names = adata_rna.var.gene.to_numpy()
 except:
     gene_names = adata_rna.var.index.to_numpy()
-
+gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
 print(par['perturbation_data'])
 print(par['models'])
 
 # Load inferred GRNs
 grns = []
-for filename in par['models']:
-    filepath = os.path.join(par['models_dir'], f'{filename}.csv')
-    gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
+for model in par['models']:
+    filepath = os.path.join(par['models_dir'], f'{model}.csv')
+    if not os.path.exists(filepath):
+        print(f"{filepath} didnt exist. Skipped.")
+        continue 
+    if model == 'collectri':
+        print(f"skipping collectri")
+        continue
     A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
     df = pd.read_csv(filepath, sep=',', header='infer', index_col=0)
     for source, target, weight in zip(df['source'], df['target'], df['weight']):

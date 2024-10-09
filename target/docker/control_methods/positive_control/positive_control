@@ -186,7 +186,7 @@ function ViashHelp {
   echo "        example: resources_test/grn_models/collectri.csv"
   echo ""
   echo "    --tf_all"
-  echo "        type: file, required parameter, file must exist"
+  echo "        type: file, file must exist"
   echo "        example: resources_test/prior/tf_all.csv"
   echo ""
   echo "    --max_n_links"
@@ -443,9 +443,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component control_methods positive_control"
-LABEL org.opencontainers.image.created="2024-10-08T18:04:59Z"
+LABEL org.opencontainers.image.created="2024-10-09T16:23:33Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="1180b200f9d532b8562d10697c1f617e9a820ddf"
+LABEL org.opencontainers.image.revision="f2a60669054e8d22bf5b6768ff375eaf3bc9c5e1"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -845,10 +845,6 @@ fi
 # check whether required parameters exist
 if [ -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then
   ViashError '--multiomics_rna' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
-  ViashError '--tf_all' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
 if [ -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then

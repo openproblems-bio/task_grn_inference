@@ -3107,6 +3107,30 @@ meta = [
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
+      },
+      {
+        "type" : "string",
+        "name" : "--skeleton",
+        "example" : [
+          "resources/prior/skeleton.csv'"
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "boolean",
+        "name" : "--apply_skeleton",
+        "default" : [
+          true
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
       }
     ],
     "resources" : [
@@ -3231,7 +3255,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "1180b200f9d532b8562d10697c1f617e9a820ddf",
+    "git_commit" : "f2a60669054e8d22bf5b6768ff375eaf3bc9c5e1",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3269,7 +3293,9 @@ par = {
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'verbose': $( if [ ! -z ${VIASH_PAR_VERBOSE+x} ]; then echo "int(r'${VIASH_PAR_VERBOSE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'consensus': $( if [ ! -z ${VIASH_PAR_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'static_only': $( if [ ! -z ${VIASH_PAR_STATIC_ONLY+x} ]; then echo "r'${VIASH_PAR_STATIC_ONLY//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
+  'static_only': $( if [ ! -z ${VIASH_PAR_STATIC_ONLY+x} ]; then echo "r'${VIASH_PAR_STATIC_ONLY//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'skeleton': $( if [ ! -z ${VIASH_PAR_SKELETON+x} ]; then echo "r'${VIASH_PAR_SKELETON//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3290,11 +3316,17 @@ dep = {
 }
 
 ## VIASH END
-# meta = {
-#   "resources_dir":'src/metrics/regression_1/'
-# }
+
 print(par)
-sys.path.append(meta['resources_dir'])
+try:
+    sys.path.append(meta['resources_dir'])
+except:
+    meta = {
+    "resources_dir": 'src/metrics/',
+    "util": 'src/utils'
+    }
+    sys.path.append(meta["resources_dir"])
+    sys.path.append(meta["util"])
 from main import main
 
 if isinstance(par['reg_type'], list) and (len(par['reg_type']) == 1):

@@ -17,7 +17,8 @@ par = {
   'layer': 'scgen_pearson',
   'subsample': -2,
   'num_workers': 4,
-  'skeleton': 'resources/prior/skeleton.csv'
+  'skeleton': 'resources/prior/skeleton.csv',
+  'apply_skeleton': True
 }
 ## VIASH END
 # meta = {

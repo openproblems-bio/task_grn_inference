@@ -50,8 +50,10 @@ def basic_qc(adata, min_genes_per_cell = 200, max_genes_per_cell = 5000, min_cel
 
 def process_links(net, par):
     net = net[net.source!=net.target]
-    net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
-    net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
+    
+    if par['max_n_links'] != -1:
+        net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
+        net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
     return net
 def efficient_melting(net, gene_names, par):
     '''to replace pandas melting'''
@@ -74,7 +76,7 @@ def efficient_melting(net, gene_names, par):
     return net
     
 
-def corr_net(X, gene_names, par, tf_all):
+def corr_net(X, gene_names, par):
     print('calculate correlation')
     if False:
         X = StandardScaler().fit_transform(X)
@@ -85,6 +87,9 @@ def corr_net(X, gene_names, par, tf_all):
     if 'no_tf_subsetting' in par:
         pass
     else:
+        tf_all = np.loadtxt(par['tf_all'], dtype=str)
+        tf_all = np.intersect1d(tf_all, gene_names)
+    
         # # Convert to a DataFrame with gene names as both row and column indices
         net = pd.DataFrame(net, index=gene_names, columns=gene_names)
         if par['causal']:  
@@ -120,9 +125,7 @@ def create_corr_net(par):
     multiomics_rna = ad.read_h5ad(par["multiomics_rna"])
     process_data(multiomics_rna, par)
     gene_names = multiomics_rna.var_names.to_numpy()
-    tf_all = np.loadtxt(par['tf_all'], dtype=str)
-    tf_all = np.intersect1d(tf_all, gene_names)
-    
+
     if 'layer' in par:
         print(par['layer'])
         X = multiomics_rna.layers[par['layer']]
@@ -134,7 +137,7 @@ def create_corr_net(par):
         i = 0
         for group in tqdm(np.unique(groups), desc="Processing groups"):
             X_sub = X[groups == group, :]
-            net = corr_net(X_sub, gene_names, par, tf_all)
+            net = corr_net(X_sub, gene_names, par)
             net['cell_type'] = group
             if i==0:
                 grn = net
@@ -142,7 +145,7 @@ def create_corr_net(par):
                 grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
             i += 1
     else:
-        grn = corr_net(X, gene_names, par, tf_all)    
+        grn = corr_net(X, gene_names, par)    
     return grn
 def read_gmt(file_path:str) -> dict[str, list[str]]:
     '''Reas gmt file and returns a dict of gene'''

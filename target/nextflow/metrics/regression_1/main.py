@@ -207,9 +207,9 @@ def main(par):
     gene_names = perturbation_data.var.index.to_numpy()
     net = pd.read_csv(par['prediction'])
     
-    if True: #apply skeleton
+    if par['apply_skeleton']: #apply skeleton
         print('Before filtering with skeleton:', net.shape)
-        skeleton = np.savetxt(par['skeleton'], all_links.values, fmt='%s')
+        skeleton = np.loadtxt(par['skeleton'], dtype=str)
         net['link'] = net['source'].astype(str) + '_' + net['target'].astype(str)
         net = net[net['link'].isin(skeleton)]
         print('After filtering with skeleton:', net.shape)
