@@ -264,13 +264,28 @@ def prune_grn(par):
         "--output", f"{par['temp_dir']}/pruned_grn.csv",
         "--top_n_targets", str(par['top_n_targets']),
         "--rank_threshold", str(par['rank_threshold']),
-        "--auc_threshold", "0.1",
-        "--nes_threshold", str(par['nes_threshold']), 
+        "--auc_threshold", "0",
+        "--nes_threshold", "0", 
         "--min_genes", "1",
+        "--thresholds", "0.5", "0.7", 
+        "--top_n_regulators", "10", "50", "100",
+        "--max_similarity_fdr", "0.1",
         "--num_workers", f"{par['num_workers']}",
         "--cell_id_attribute", "obs_id", # be sure that obs_id is in obs and name is in var
         "--gene_attribute", "name"
     ]
+    
+#       --thresholds, The first method to create the TF-modules based on the best targets for each transcription factor (default: 0.75 0.90).
+#   --top_n_targets TOP_N_TARGETS [TOP_N_TARGETS ...]
+#                         The second method is to select the top targets for a given TF. (default: 50)
+# --top_n_regulators TOP_N_REGULATORS [TOP_N_REGULATORS ...]
+#                         The alternative way to create the TF-modules is to select the best regulators for each gene. (default: 5 10 50)
+# --max_similarity_fdr MAX_SIMILARITY_FDR
+#                         Maximum FDR in motif similarity to use when annotating enriched motifs (default: 0.001)
+# --auc_threshold AUC_THRESHOLD
+#                         The threshold used for calculating the AUC of a feature as fraction of ranked genes (default: 0.05).
+# --nes_threshold NES_THRESHOLD
+#                         The Normalized Enrichment Score (NES) threshold for finding enriched features (default: 3.0).
 
     result = subprocess.run(command, check=True)
     print("Output:")

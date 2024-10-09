@@ -41,7 +41,7 @@ jobs:
       id: cache
       with:
         s3_bucket: $s3_bucket
-        dest_path: resources
+        dest_path: resources_test
         cache_key_prefix: resources__
 
     - id: ns_list

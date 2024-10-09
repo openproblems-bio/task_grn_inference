@@ -20,18 +20,24 @@ N_POINTS_TO_ESTIMATE_BACKGROUND = 20
 
 def load_grn(filepath: str, gene_names: np.ndarray, par: Dict[str, Any]) -> np.ndarray:
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
-    df = pd.read_csv(filepath, sep=',', header='infer')
-    if 'cell_type' in df.columns:
+    net = pd.read_csv(filepath, sep=',', header='infer')
+    if 'cell_type' in net.columns:
         verbose_print(par['verbose'], 'Taking mean of cell type specific grns', 3)
-        df.drop(columns=['cell_type'], inplace=True)
-        df = df.groupby(['source', 'target']).mean().reset_index()
+        net.drop(columns=['cell_type'], inplace=True)
+        net = net.groupby(['source', 'target']).mean().reset_index()
+    if par['apply_skeleton']: #apply skeleton
+        print('Before filtering with skeleton:', net.shape)
+        skeleton = np.loadtxt(par['skeleton'], dtype=str)
+        net['link'] = net['source'].astype(str) + '_' + net['target'].astype(str)
+        net = net[net['link'].isin(skeleton)]
+        print('After filtering with skeleton:', net.shape)
     # keep only top n links
-    if df.shape[0] > par['max_n_links']:
+    if net.shape[0] > par['max_n_links']:
         verbose_print(par['verbose'], f"Reducing number of links to {par['max_n_links']}", 3)
-        df = process_links(df, par)
+        net = process_links(net, par)
     # convert to matrix
     A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
-    for source, target, weight in zip(df['source'], df['target'], df['weight']):
+    for source, target, weight in zip(net['source'], net['target'], net['weight']):
         if (source not in gene_dict) or (target not in gene_dict):
             continue
         i = gene_dict[source]
@@ -170,7 +176,6 @@ def cross_validate(
         if n_features[j] > 0:
             res = cross_validate_gene(estimator_t, X, groups, grn, j, n_features=int(n_features[j]),n_jobs=n_jobs)
             results.append(res)
-    
     return {
         'gene_names': list(gene_names),
         'scores': list(results)
@@ -238,19 +243,23 @@ def static_approach(
 
     # Cross-validate each gene using the inferred GRN to define select input features
     res = cross_validate(reg_type, gene_names, tf_names, X, groups, grn, n_features, n_jobs=n_jobs)
-    r2 = []
-
-    for i in range(len(res['scores'])):
-        gene_name = res['gene_names'][i]
-        if n_features[n_features_dict[gene_name]] != 0:
-            score = res['scores'][i]['avg-r2']
-            if clip_scores:
-               score = np.clip(score, 0, 1)
-            r2.append(score)
-    # mean_r2_scores = np.asarray([res['scores'][j]['avg-r2'] for j in range(len(res['scores']))])
-    mean_r2_scores = float(np.mean(r2))
-
-    # return np.mean(mean_r2_scores)
+    
+    # scores
+    if False: # there is a bug here
+        r2 = []
+        for i in range(len(res['scores'])):
+            gene_name = res['gene_names'][i]
+            if n_features[n_features_dict[gene_name]] != 0:
+                score = res['scores'][i]['avg-r2']
+                if clip_scores:
+                score = np.clip(score, 0, 1)
+                r2.append(score)
+        if len(r2)==0:
+            raise ValueError('R2 score is empty')
+        mean_r2_scores = float(np.mean(r2))
+    else:
+        r2_scores = np.asarray([res['scores'][j]['avg-r2'] for j in range(len(res['scores']))])
+        mean_r2_scores = np.mean(r2_scores)
     return mean_r2_scores
 
 
@@ -309,6 +318,8 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     verbose_print(par['verbose'], f'Compute metrics for layer: {layer}', 3)
     # print(f'Dynamic approach:', flush=True)
     verbose_print(par['verbose'], f'Static approach (theta=0):', 3)
+    # print(np.any(n_features_theta_min!=0))
+    # aa
     score_static_min = static_approach(grn, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
     verbose_print(par['verbose'], f'Static approach (theta=0.5):', 3)
     score_static_median = static_approach(grn, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)

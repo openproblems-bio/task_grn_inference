@@ -7,14 +7,16 @@ import os
 ## VIASH START
 par = {
   'reg_type': 'ridge',
-  'models_dir': "resources/grn_models/d0_hvg",
+  'models_dir': "resources/grn_models/",
   'scores_dir': "resources/scores/",
   
-  'methods': [ 'scenicplus', 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle'],
+  'methods': [ 'scenicplus', 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
   'layers': ['scgen_pearson', 'lognorm', 'pearson', 'seurat_lognorm', 'seurat_pearson', 'scgen_lognorm'],
+  # 'layers': ['scgen_pearson'],
 
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
   "tf_all": "resources/prior/tf_all.csv",
+  'skeleton': 'resources/prior/skeleton.csv', 
   "max_n_links": 50000,
   "apply_tf": "true",
   'subsample': -2,
@@ -23,7 +25,8 @@ par = {
   'num_workers': 20,
   'consensus': 'resources/prior/consensus-num-regulators.json',
   'static_only': True,
-  'clip_scores': True
+  'clip_scores': True,
+  'apply_skeleton': False
 }
 # VIASH END
 
@@ -33,6 +36,7 @@ parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics R
 parser.add_argument('--num_workers', type=str, help='Number of cores')
 parser.add_argument('--models_dir', type=str, help='where to read the models')
 parser.add_argument('--scores_dir', type=str, help='where to write the model')
+parser.add_argument('--apply_skeleton', type=str, help='where to apply the skeleton')
 
 args = parser.parse_args()
 
@@ -44,6 +48,8 @@ if args.models_dir:
   par['models_dir'] = args.models_dir
 if args.scores_dir:
   par['scores_dir'] = args.scores_dir
+if args.apply_skeleton:
+  par['apply_skeleton'] = args.apply_skeleton
     
 meta = {
   "resources_dir": 'src/metrics/',
@@ -54,21 +60,29 @@ sys.path.append(meta["util"])
 
 os.makedirs(par['scores_dir'], exist_ok=True)
 
-
-for layer in par['layers']:
-  par['layer'] = layer
-  for i, method in enumerate(par['methods']):
-    par['prediction'] = f"{par['models_dir']}/{method}.csv"
-    from regression_1.main import main 
-    reg1 = main(par)
-    from regression_2.main import main 
-    reg2 = main(par)
-    score = pd.concat([reg1, reg2], axis=1)
-    score.index = [method]
-    if i==0:
-      df_all = score
-    else:
-      df_all = pd.concat([df_all, score])
-    df_all.to_csv(f"{par['scores_dir']}/{layer}-{par['reg_type']}.csv")
-    print(df_all)
+for dataset_type in ['full', 'hvg']:
+  for apply_skeleton in [False, True]:
+    os.makedirs(f"{par['scores_dir']}/{dataset_type}/skeleton_{apply_skeleton}", exist_ok=True)
+    for layer in par['layers']:
+      par['layer'] = layer
+      i = 0
+      for method in par['methods']:
+        print(method)
+        par['prediction'] = f"{par['models_dir']}/{dataset_type}/{method}.csv"
+        if not os.path.exists(par['prediction']):
+          print(f"{par['prediction']} doesnt exist. Skipped.")
+          continue
+        from regression_1.main import main 
+        reg1 = main(par)
+        from regression_2.main import main 
+        reg2 = main(par)
+        score = pd.concat([reg1, reg2], axis=1)
+        score.index = [method]
+        if i==0:
+          df_all = score
+        else:
+          df_all = pd.concat([df_all, score])
+        df_all.to_csv(f"{par['scores_dir']}/{dataset_type}/skeleton_{apply_skeleton}/{layer}-{par['reg_type']}.csv")
+        print(df_all)
+        i+=1
   

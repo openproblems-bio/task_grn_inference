@@ -23,6 +23,14 @@ functionality:
       direction: input
       type: boolean
       default: true
+    - name: --skeleton 
+      type: string
+      direction: input
+      example: resources/prior/skeleton.csv'
+    - name: --apply_skeleton 
+      type: boolean
+      direction: input
+      default: true
 
 platforms:
   - type: docker
