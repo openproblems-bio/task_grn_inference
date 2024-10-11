@@ -703,17 +703,20 @@ def preprocess_rna(par):
 def snakemake_pipeline(par):
     import os
     snakemake_dir = os.path.join(par['temp_dir'], 'scplus_pipeline', 'Snakemake')
-    if os.path.exists(snakemake_dir):
-        import shutil
-        shutil.rmtree(snakemake_dir)  # Replace 'snakemake_dir' with your directory path
+    # if os.path.exists(snakemake_dir):
+    #     import shutil
+    #     shutil.rmtree(snakemake_dir)  
 
     os.makedirs(os.path.join(par['temp_dir'], 'scplus_pipeline'), exist_ok=True)
     os.makedirs(os.path.join(par['temp_dir'], 'scplus_pipeline', 'temp'), exist_ok=True)
-    subprocess.run(['scenicplus', 'init_snakemake', '--out_dir', os.path.join(par['temp_dir'], 'scplus_pipeline')])
-    print('snake make initialized', flush=True)
+    
+    pipeline_dir = os.path.join(par['temp_dir'], 'scplus_pipeline')
+    if not os.path.exists(pipeline_dir):
+        subprocess.run(['scenicplus', 'init_snakemake', '--out_dir', pipeline_dir])
+        print('snake make initialized', flush=True)
 
     # Load pipeline settings
-    with open(os.path.join(par['temp_dir'], 'scplus_pipeline', 'Snakemake', 'config', 'config.yaml'), 'r') as f:
+    with open(os.path.join(snakemake_dir, 'config', 'config.yaml'), 'r') as f:
         settings = yaml.safe_load(f)
     print('output_data:', settings['output_data'], flush=True)
 
@@ -776,13 +779,28 @@ def snakemake_pipeline(par):
 
     # Run pipeline
     print('run snakemake ', flush=True)
-    
+
     with contextlib.chdir(snakemake_dir):
+        # this fails to download atumatically so we do manually
+        if True:
+            url = "https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes"
+            response = requests.get(url)
+            with open('hg38.chrom.sizes', 'wb') as file:
+                file.write(response.content)
+        
         subprocess.run([
             f'snakemake',
-            '--cores', str(par['num_workers']),
-            #'--unlock'
+            'touch'
         ])
+        
+        subprocess.run([
+            f'snakemake',
+            '--unlock'
+        ])
+
+        subprocess.run([
+            f'snakemake',
+            '--cores', str(par['num_workers'])])
 
 def post_process(par):
     scplus_mdata = mudata.read(par['scplus_mdata'])

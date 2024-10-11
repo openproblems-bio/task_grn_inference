@@ -264,12 +264,12 @@ def prune_grn(par):
         "--output", f"{par['temp_dir']}/pruned_grn.csv",
         "--top_n_targets", str(par['top_n_targets']),
         "--rank_threshold", str(par['rank_threshold']),
-        "--auc_threshold", "0",
+        "--auc_threshold", ".5",
         "--nes_threshold", "0", 
         "--min_genes", "1",
         "--thresholds", "0.5", "0.7", 
         "--top_n_regulators", "10", "50", "100",
-        "--max_similarity_fdr", "0.1",
+        "--max_similarity_fdr", "0.2",
         "--num_workers", f"{par['num_workers']}",
         "--cell_id_attribute", "obs_id", # be sure that obs_id is in obs and name is in var
         "--gene_attribute", "name"

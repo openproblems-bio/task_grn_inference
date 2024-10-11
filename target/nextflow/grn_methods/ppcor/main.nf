@@ -3110,7 +3110,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.8.6",
-    "git_commit" : "0b42bb993172c798ab946d2d4849f62ddb2390f7",
+    "git_commit" : "68ff6c4e650dac7467ed9d7524a8548f9cfd80d2",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3171,8 +3171,9 @@ rm(.viash_orig_warn)
 
 ## VIASH END
 print(par)
-print(dim(par))
 # input expression data
+tf_names <- scan(par\\$tf_all, what = "", sep = "\\\\n")
+
 ad <- anndata::read_h5ad(par\\$multiomics_rna)
 
 inputExpr <- ad\\$X
@@ -3194,6 +3195,9 @@ df <- df[order(df\\$weight, decreasing=TRUE),]
 
 # Remove self-interactions
 df_filtered <- df[df\\$source != df\\$target,]
+
+# Filter to keep only connections where the source is a TF
+df_filtered <- df_filtered %>% filter(source %in% tf_names)
 
 # Reset index
 df_filtered\\$index = 1:nrow(df_filtered)

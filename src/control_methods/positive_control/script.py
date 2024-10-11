@@ -24,6 +24,8 @@ from util import create_corr_net
 
 print('Create causal corr net')
 par['causal'] = True
+par['normalize'] = True
+
 par['multiomics_rna'] = par['perturbation_data']
 net = create_corr_net(par)
 
