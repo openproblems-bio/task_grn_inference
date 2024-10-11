@@ -252,7 +252,7 @@ def static_approach(
             if n_features[n_features_dict[gene_name]] != 0:
                 score = res['scores'][i]['avg-r2']
                 if clip_scores:
-                score = np.clip(score, 0, 1)
+                    score = np.clip(score, 0, 1)
                 r2.append(score)
         if len(r2)==0:
             raise ValueError('R2 score is empty')

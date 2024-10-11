@@ -4,14 +4,16 @@ library(dplyr)
 
 ## VIASH START
 par <- list(
-  multiomics_rna = 'resources/grn-benchmark/multiomics_rna.h5ad',
+  multiomics_rna = 'resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad',
   prediction = 'resources/grn_models/ppcor.csv',
+  tf_all = 'resources/prior/tf_all.csv',
   max_n_links = 50000
 )
 ## VIASH END
 print(par)
-print(dim(par))
 # input expression data
+tf_names <- scan(par$tf_all, what = "", sep = "\n")
+
 ad <- anndata::read_h5ad(par$multiomics_rna)
 
 inputExpr <- ad$X
@@ -33,6 +35,9 @@ df <- df[order(df$weight, decreasing=TRUE),]
 
 # Remove self-interactions
 df_filtered <- df[df$source != df$target,]
+
+# Filter to keep only connections where the source is a TF
+df_filtered <- df_filtered %>% filter(source %in% tf_names)
 
 # Reset index
 df_filtered$index = 1:nrow(df_filtered)

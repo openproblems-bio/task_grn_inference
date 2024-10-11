@@ -60,29 +60,33 @@ sys.path.append(meta["util"])
 
 os.makedirs(par['scores_dir'], exist_ok=True)
 
-for dataset_type in ['full', 'hvg']:
-  for apply_skeleton in [False, True]:
-    os.makedirs(f"{par['scores_dir']}/{dataset_type}/skeleton_{apply_skeleton}", exist_ok=True)
-    for layer in par['layers']:
-      par['layer'] = layer
-      i = 0
-      for method in par['methods']:
-        print(method)
-        par['prediction'] = f"{par['models_dir']}/{dataset_type}/{method}.csv"
-        if not os.path.exists(par['prediction']):
-          print(f"{par['prediction']} doesnt exist. Skipped.")
-          continue
-        from regression_1.main import main 
-        reg1 = main(par)
-        from regression_2.main import main 
-        reg2 = main(par)
-        score = pd.concat([reg1, reg2], axis=1)
-        score.index = [method]
-        if i==0:
-          df_all = score
-        else:
-          df_all = pd.concat([df_all, score])
-        df_all.to_csv(f"{par['scores_dir']}/{dataset_type}/skeleton_{apply_skeleton}/{layer}-{par['reg_type']}.csv")
-        print(df_all)
-        i+=1
+for max_n_links in [10000, 50000]:
+  par['max_n_links'] = max_n_links
+  for dataset_type in ['full', 'hvg']:
+    for apply_skeleton in [False, True]:
+      par['apply_skeleton'] = apply_skeleton
+      save_dir = f"{par['scores_dir']}/{dataset_type}/{max_n_links}/skeleton_{apply_skeleton}"
+      os.makedirs(save_dir, exist_ok=True)
+      for layer in par['layers']:
+        par['layer'] = layer
+        i = 0
+        for method in par['methods']:
+          print(method)
+          par['prediction'] = f"{par['models_dir']}/{dataset_type}/{method}.csv"
+          if not os.path.exists(par['prediction']):
+            print(f"{par['prediction']} doesnt exist. Skipped.")
+            continue
+          from regression_1.main import main 
+          reg1 = main(par)
+          from regression_2.main import main 
+          reg2 = main(par)
+          score = pd.concat([reg1, reg2], axis=1)
+          score.index = [method]
+          if i==0:
+            df_all = score
+          else:
+            df_all = pd.concat([df_all, score])
+          df_all.to_csv(f"{save_dir}/{layer}-{par['reg_type']}.csv")
+          print(df_all)
+          i+=1
   

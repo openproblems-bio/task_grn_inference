@@ -59,7 +59,7 @@ def calculate_feature_distance(sample: pd.DataFrame, control: pd.DataFrame, top_
     
     distance_df = pd.DataFrame({'distance_raw':distance_raw, 'distance_rank':distance_rank}, index=entries_common)
     return distance_df 
-def cosine_similarity(nets_dict, col_name='source', weight_col='weight', figsize=(4, 4), title='Cosine Similarity', ax=None):
+def cosine_similarity_net(nets_dict, col_name='source', weight_col='weight', figsize=(4, 4), title='Cosine Similarity', ax=None):
     from itertools import combinations
     from sklearn.metrics.pairwise import cosine_similarity
     import seaborn as sns
@@ -99,14 +99,14 @@ def cosine_similarity(nets_dict, col_name='source', weight_col='weight', figsize
     
     sns.heatmap(cosine_sim_matrix, annot=True, cmap="coolwarm", xticklabels=nets_names, yticklabels=nets_names, ax=ax)
     ax.grid(False)
-    ax.set_title(title)
+    ax.set_title(title, pad=20)
 
     # Rotate x labels for readability
     plt.xticks(rotation=45, ha='right')
     
     return cosine_sim_matrix, fig
 
-def jaccard_similarity(nets_dict, col_name='link', figsize=(4, 4), title='jaccard Similarity', ax=None):
+def jaccard_similarity_net(nets_dict, col_name='link', figsize=(4, 4), title='jaccard Similarity', ax=None):
     from itertools import combinations
     import seaborn as sns
     import matplotlib.pyplot as plt

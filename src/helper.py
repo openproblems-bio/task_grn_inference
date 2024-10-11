@@ -4,7 +4,6 @@ import pandas as pd
 import anndata as ad 
 import numpy as np
 import scanpy as sc 
-from src.exp_analysis.helper import plot_cumulative_density
 import sys 
 import subprocess
 import io
@@ -41,6 +40,15 @@ def check_scores(par):
     df_all_n = (df_scores-df_scores.min(axis=0))/(df_scores.max(axis=0)-df_scores.min(axis=0))
     df_scores['rank'] = df_all_n.mean(axis=1).rank(ascending=False).astype(int)
     return df_scores
+
+def calculate_scores():
+    command = [
+        "sbatch", 
+        "scripts/sbatch/calculate_scores.sh"
+    ] 
+
+    # Print command to verify
+    subprocess.run(command)
     
 
 def run_consensus(par):
@@ -55,7 +63,7 @@ def run_consensus(par):
     # Print command to verify
     subprocess.run(command)
 
-def run_grn_inference_seqera():
+def run_grn_seqera():
     # if False: # submit the job
     # !bash src/methods/multi_omics/celloracle/run.sh
     # if False: # get the results
@@ -74,13 +82,22 @@ def run_grn_inference_seqera():
     raise ValueError('define first')
 
 def run_grn_inference():
+    # par = {
+    #     'methods': ['scglue'],
+    #     'models_dir': 'resources/grn_models/',
+    #     'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad', 
+    #     'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad', 
+    #     'num_workers': 20,
+    #     'mem': "120GB",
+    #     'time': "48:00:00"
+    # }
     par = {
-        'methods': ['scglue'],
+        'methods': ['scenicplus'],
         'models_dir': 'resources/grn_models/',
         'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad', 
         'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad', 
         'num_workers': 20,
-        'mem': "120GB",
+        'mem': "250GB",
         'time': "48:00:00"
     }
 
@@ -126,6 +143,8 @@ def run_grn_inference():
         # Run sbatch command
         try:
             result = subprocess.run(['sbatch'] + full_tag + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
+            # result = subprocess.run(['bash'] + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
+
             print(f"Job {method} submitted successfully.")
             print(result.stdout)  # Print the standard output
         except subprocess.CalledProcessError as e:
@@ -298,3 +317,8 @@ def process_trace_local(job_ids_dict):
     df_local['MaxRSS'] = df_local['MaxRSS'] / (1024 ** 2)  # Convert KB to GB
     df_local['MaxVMSize'] = df_local['MaxVMSize'] / (1024 ** 2)  # Convert KB to GB
     return df_local
+
+
+if __name__ == '__main__':
+    # run_grn_inference()
+    calculate_scores()
