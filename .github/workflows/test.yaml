@@ -88,7 +88,7 @@ jobs:
       uses: actions/cache@v4
       timeout-minutes: 10
       with:
-        path: resources
+        path: resources_test
         key: ${{ needs.list.outputs.cache_key }}
 
     - name: Run test
