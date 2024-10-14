@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ## VIASH START
-par_input='s3://openproblems-bio/public/grn-benchmark/workflow-resources/'
+par_input='s3://openproblems-data/resources_test/grn/'
 par_output='resources_test'
 ## VIASH END
 

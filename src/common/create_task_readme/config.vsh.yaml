@@ -1,4 +1,5 @@
 functionality:
+  status: disabled
   name: create_task_readme
   namespace: common
   description: |
