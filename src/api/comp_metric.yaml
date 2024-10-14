@@ -34,7 +34,7 @@ functionality:
     - name: --subsample
       type: integer
       direction: input
-      default: -2
+      default: -1
       description: number of samples randomly drawn from perturbation data
     - name: --num_workers
       type: integer

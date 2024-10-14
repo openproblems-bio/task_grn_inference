@@ -83,22 +83,22 @@ def run_grn_seqera():
 
 def run_grn_inference():
     # par = {
-    #     'methods': ['scglue'],
+    #     'methods': ['portia'],
     #     'models_dir': 'resources/grn_models/',
     #     'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad', 
     #     'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad', 
     #     'num_workers': 20,
     #     'mem': "120GB",
-    #     'time': "48:00:00"
+    #     'time': "24:00:00"
     # }
     par = {
-        'methods': ['scenicplus'],
+        'methods': ["pearson_corr", "positive_control", "negative_control"],
         'models_dir': 'resources/grn_models/',
         'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad', 
-        'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad', 
+        'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad',
         'num_workers': 20,
-        'mem': "250GB",
-        'time': "48:00:00"
+        'mem': "120GB",
+        'time': "24:00:00"
     }
 
     for method in par['methods']:
@@ -112,8 +112,8 @@ def run_grn_inference():
                        f"--resources_dir src/utils")
 
         # Determine the command based on the method
-        if method == "pearson_corr":
-            command = f"python src/control_methods/pearson/script.py {method_args}"
+        if method in ["pearson_corr", "positive_control", "negative_control"]:
+            command = f"python src/control_methods/{method}/script.py {method_args}"
         elif method == "celloracle":
             command = (f"/home/jnourisa/miniconda3/envs/celloracle/bin/python "
                        f"src/methods/multi_omics/celloracle/script.py {method_args}")
@@ -142,8 +142,8 @@ def run_grn_inference():
         
         # Run sbatch command
         try:
-            result = subprocess.run(['sbatch'] + full_tag + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
-            # result = subprocess.run(['bash'] + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
+            # result = subprocess.run(['sbatch'] + full_tag + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
+            result = subprocess.run(['bash'] + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
 
             print(f"Job {method} submitted successfully.")
             print(result.stdout)  # Print the standard output
@@ -320,5 +320,5 @@ def process_trace_local(job_ids_dict):
 
 
 if __name__ == '__main__':
-    # run_grn_inference()
-    calculate_scores()
+    run_grn_inference()
+    # calculate_scores()

@@ -4,7 +4,7 @@
 import anndata as ad 
 import pandas as pd
 import numpy as np
-import sctk
+# import sctk
 from scipy import sparse
 import scanpy as sc
 

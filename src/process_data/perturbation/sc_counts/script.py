@@ -153,6 +153,7 @@ def filter_func(bulk_adata):
     ### filter
     # samples with less than 10 cells
     bulk_adata_filtered = bulk_adata.copy()
+    bulk_adata_filtered.obs['donor_id'] = bulk_adata_filtered.obs.donor_id.map({'Donor 1': 'donor_0', 'Donor 2': 'donor_1', 'Donor 3': 'donor_2'})
     # toxic ones
     outliers_toxic = ['Alvocidib', 'UNII-BXU45ZH6LI', 'CGP 60474', 'BMS-387032']
     bulk_adata_filtered = bulk_adata_filtered[~bulk_adata_filtered.obs.sm_name.isin(outliers_toxic),:]
@@ -177,9 +178,9 @@ def filter_func(bulk_adata):
     bulk_adata_filtered = bulk_adata_filtered[~bulk_adata_filtered.obs.sm_name.isin(outliers_misbalance_all),:]
     # remove big class misbalance in 1 donor
     outliers_misbalance_donor_2 = ['Vorinostat']
-    bulk_adata_filtered = bulk_adata_filtered[~ (bulk_adata_filtered.obs.sm_name.isin(outliers_misbalance_donor_2) & (bulk_adata_filtered.obs.donor_id=='Donor 2')),:]
+    bulk_adata_filtered = bulk_adata_filtered[~ (bulk_adata_filtered.obs.sm_name.isin(outliers_misbalance_donor_2) & (bulk_adata_filtered.obs.donor_id=='donor_1')),:]
     outliers_misbalance_donor_3 = ['AT13387', 'Ganetespib (STA-9090)']
-    bulk_adata_filtered = bulk_adata_filtered[~ (bulk_adata_filtered.obs.sm_name.isin(outliers_misbalance_donor_3) & (bulk_adata_filtered.obs.donor_id=='Donor 3')),:]
+    bulk_adata_filtered = bulk_adata_filtered[~ (bulk_adata_filtered.obs.sm_name.isin(outliers_misbalance_donor_3) & (bulk_adata_filtered.obs.donor_id=='donor_2')),:]
     print(f"number of initial samples: {len(bulk_adata)}, number of samples after filtering: {len(bulk_adata_filtered)}")
     # low gene coverage
     mask_to_go_genes = ((bulk_adata_filtered.X == 0).sum(axis=0)/bulk_adata_filtered.shape[0])>0.7

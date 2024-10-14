@@ -6,17 +6,17 @@ import pandas as pd
 import scipy.sparse
 import portia as pt
 from tqdm import tqdm
+import anndata as ad
 
 
 ## VIASH START
 par = {
-  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad',
+  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
   'tf_all': 'resources/prior/tf_all.csv',
-  'prediction': 'output/portia_donor_0_hvgs.csv',
+  'prediction': 'output/portia.csv',
   'max_n_links': 50000,
-  'cell_type_specific': False,
-  'normalize': False,
-  'only_hvgs': True
+  'donor_specific': False,
+  'temp_dir': 'output/portia'
 }
 ## VIASH END
 
@@ -28,6 +28,7 @@ meta= {
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
 parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--multiomics_atac', type=str, help='Path to the multiomics atac file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
@@ -48,21 +49,21 @@ if args.resources_dir:
     
 sys.path.append(meta["resources_dir"])
 from util import process_links
-# Load scRNA-seq data
-print('Reading data')
-adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-
-gene_names = adata_rna.var_names
-X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X
-
-# Load list of putative TFs
-tfs = np.loadtxt(par['tf_all'], dtype=str)
-tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
-tf_idx = np.asarray([i for i, gene_name in enumerate(gene_names) if gene_name in tf_names], dtype=int)
 
 
-# GRN inference
-def infer_grn(X, gene_names):
+def main(par):
+  print('Reading data')
+  adata_rna = anndata.read_h5ad(par['multiomics_rna'])
+
+  gene_names = adata_rna.var_names
+  X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X
+
+  # Load list of putative TFs
+  tfs = np.loadtxt(par['tf_all'], dtype=str)
+  tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
+  tf_idx = np.asarray([i for i, gene_name in enumerate(gene_names) if gene_name in tf_names], dtype=int)
+
+
   print('Inferring grn')
   dataset = pt.GeneExpressionDataset()
   
@@ -78,10 +79,30 @@ def infer_grn(X, gene_names):
   grn = grn[grn.source.isin(tf_names)]
 
   grn = process_links(grn, par)
+
   return grn
-# par['cell_type_specific'] = False
-grn = infer_grn(X, gene_names)
 
-grn.to_csv(par['prediction'])
 
-print('Finished.')
+if __name__ == '__main__':
+  os.makedirs(par['temp_dir'], exist_ok=True)
+  adata = ad.read_h5ad(par['multiomics_rna'])
+  if ('donor_id' in adata.obs) & (par['donor_specific']):
+      # - new dir for donor specific adata
+      par['multiomics_rna'] = f"{par['temp_dir']}/multiomics_rna.h5ad"
+      donor_ids = adata.obs.donor_id.unique()
+      for i, donor_id in enumerate(donor_ids): # run for each donor and concat
+          print('GRN inference for ', donor_id)
+          adata_sub = adata[adata.obs.donor_id.eq(donor_id), :]
+          adata_sub.write(par['multiomics_rna'])
+          net_sub = main(par)
+          net_sub['donor_id'] = donor_id
+          if i == 0:
+              net = net_sub
+          else:
+              net = pd.concat([net, net_sub])
+  else:
+      net = main(par)
+
+  net.to_csv(par['prediction'])
+
+  print('Finished.')
