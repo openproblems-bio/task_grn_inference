@@ -2956,6 +2956,18 @@ meta = [
         "dest" : "par"
       },
       {
+        "type" : "boolean",
+        "name" : "--donor_specific",
+        "default" : [
+          true
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
         "type" : "file",
         "name" : "--perturbation_data",
         "example" : [
@@ -2975,6 +2987,11 @@ meta = [
         "type" : "python_script",
         "path" : "script.py",
         "is_executable" : true,
+        "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/control_methods/negative_control/"
+      },
+      {
+        "type" : "file",
+        "path" : "main.py",
         "parent" : "file:/home/runner/work/task_grn_inference/task_grn_inference/src/control_methods/negative_control/"
       }
     ],
@@ -3084,7 +3101,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/negative_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "dc2cb033bb58d032778f5caabfc8c5f1c7f83cc4",
+    "git_commit" : "8f10928167ac24cf513744bec62d7659aac5b0c0",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3116,6 +3133,7 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
+  'donor_specific': $( if [ ! -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_DONOR_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {

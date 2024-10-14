@@ -363,9 +363,12 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         df_results_store.append(df_results)
     
     df_results_concat = pd.concat(df_results_store, axis=0)
-    print(df_results_concat)
-    df_results_mean = df_results_concat.groupby(df_results_concat.index).mean()
+    df_results_concat.index.name = 'donor_id'
+    print(df_results_concat.reset_index())
+    df_results_mean = df_results_concat.reset_index().groupby('donor_id').mean()
     print(df_results_mean)
-    # Update df_results with the calculated mean
-    df_results = pd.DataFrame(df_results_mean, index=df_results_mean.index, columns=df_results.columns)
-    return df_results
+
+    
+
+
+    return df_results_mean

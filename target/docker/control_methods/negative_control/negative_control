@@ -205,6 +205,10 @@ function ViashHelp {
   echo "        type: integer"
   echo "        default: 32"
   echo ""
+  echo "    --donor_specific"
+  echo "        type: boolean"
+  echo "        default: true"
+  echo ""
   echo "    --perturbation_data"
   echo "        type: file, required parameter, file must exist"
   echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
@@ -433,9 +437,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component control_methods negative_control"
-LABEL org.opencontainers.image.created="2024-10-14T13:32:37Z"
+LABEL org.opencontainers.image.created="2024-10-14T14:14:51Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="dc2cb033bb58d032778f5caabfc8c5f1c7f83cc4"
+LABEL org.opencontainers.image.revision="8f10928167ac24cf513744bec62d7659aac5b0c0"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -682,6 +686,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_SEED=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --donor_specific)
+            [ -n "$VIASH_PAR_DONOR_SPECIFIC" ] && ViashError Bad arguments for option \'--donor_specific\': \'$VIASH_PAR_DONOR_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_DONOR_SPECIFIC="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --donor_specific. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --donor_specific=*)
+            [ -n "$VIASH_PAR_DONOR_SPECIFIC" ] && ViashError Bad arguments for option \'--donor_specific=*\': \'$VIASH_PAR_DONOR_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_DONOR_SPECIFIC=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --perturbation_data)
             [ -n "$VIASH_PAR_PERTURBATION_DATA" ] && ViashError Bad arguments for option \'--perturbation_data\': \'$VIASH_PAR_PERTURBATION_DATA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_PERTURBATION_DATA="$2"
@@ -853,6 +868,9 @@ fi
 if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
+if [ -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then
+  VIASH_PAR_DONOR_SPECIFIC="true"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
@@ -888,6 +906,12 @@ fi
 if [[ -n "$VIASH_PAR_SEED" ]]; then
   if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_DONOR_SPECIFIC" ]]; then
+  if ! [[ "$VIASH_PAR_DONOR_SPECIFIC" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--donor_specific' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1036,6 +1060,7 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'donor_specific': $( if [ ! -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_DONOR_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {

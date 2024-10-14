@@ -57,10 +57,11 @@ from util import process_links, basic_qc
 # Load scRNA-seq data
 print('Reading data')
 adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-if par['qc']:
-    print('Shape before QC: ', adata_rna.shape)
-    adata_rna = basic_qc(adata_rna)
-    print('Shape after QC: ', adata_rna.shape)
+if 'qc' in par:
+    if par['qc']:
+        print('Shape before QC: ', adata_rna.shape)
+        adata_rna = basic_qc(adata_rna)
+        print('Shape after QC: ', adata_rna.shape)
 
 gene_names = adata_rna.var_names
 X = adata_rna.X
