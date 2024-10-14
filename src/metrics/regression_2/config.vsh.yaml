@@ -23,8 +23,7 @@ functionality:
       direction: input
       type: boolean
       default: true
-
-
+      
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4
