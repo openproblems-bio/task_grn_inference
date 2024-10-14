@@ -66,6 +66,15 @@ functionality:
       type: integer
       default: 2
       direction: input
+    - name: --skeleton 
+      type: file
+      direction: input
+      example: resources/prior/skeleton.csv'
+    - name: --apply_skeleton 
+      type: boolean
+      direction: input
+      default: true
+
 
 
       

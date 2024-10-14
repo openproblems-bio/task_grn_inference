@@ -21,9 +21,6 @@ par = {
     'donor_specific': False,
     'cell_type_specific': False}
 ## VIASH END
-meta = {
-    'resources_dir': 'src/utils'
-    }
 import sys
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")

@@ -16,9 +16,7 @@ par = {
     'temp_dir': 'output/pearson_corr',
     'causal': True}
 ## VIASH END
-meta = {
-    'resources_dir': 'src/utils'
-    }
+
 
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
@@ -46,7 +44,14 @@ if args.resources_dir:
 
 os.makedirs(par['temp_dir'], exist_ok=True)
 import sys
-sys.path.append(meta["resources_dir"])
+
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta = {
+    'resources_dir': 'src/utils'
+    }
+    sys.path.append(meta["resources_dir"])
 from util import corr_net
 
 

@@ -19,14 +19,7 @@ functionality:
       direction: input 
       description: whether to binarize the weight
       default: true
-    - name: --skeleton 
-      type: string
-      direction: input
-      example: resources/prior/skeleton.csv'
-    - name: --apply_skeleton 
-      type: boolean
-      direction: input
-      default: true
+
   resources:
     - type: python_script
       path: script.py

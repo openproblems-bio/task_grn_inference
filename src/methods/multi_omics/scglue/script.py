@@ -20,11 +20,6 @@ par = {
 ## VIASH END
 
 import sys
-meta= {
-  "util_dir": 'src/utils/',
-  "resources_dir": 'src/methods/multi_omics/scglue'
-}
-
 
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
@@ -56,8 +51,15 @@ par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
 # par['motif_file'] = f"{par['temp_dir']}/ENCODE-TF-ChIP-hg38.bed.gz"
 par['motif_file'] = f"output/db/jaspar_encode.bed.gz"
 
-sys.path.append(meta["util_dir"])
-sys.path.append(meta["resources_dir"])
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta= {
+        "util_dir": 'src/utils/',
+        "resources_dir": 'src/methods/multi_omics/scglue'
+    }
+    sys.path.append(meta["util_dir"])
+    sys.path.append(meta["resources_dir"])
 from main import main 
 print(par)
 prediction = main(par)
