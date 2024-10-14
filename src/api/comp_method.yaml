@@ -43,6 +43,11 @@ functionality:
       type: integer
       direction: input
       default: 32
+    - name: --donor_specific
+      type: boolean
+      direction: input
+      default: True
+
 
   test_resources:
     - type: python_script

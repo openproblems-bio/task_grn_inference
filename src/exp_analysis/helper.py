@@ -146,7 +146,7 @@ def jaccard_similarity_net(nets_dict, col_name='link', figsize=(4, 4), title='ja
 
     return jaccard_matrix, fig
 
-def plot_cumulative_density(data, title='', ax=None, s=1, x_label='Weight', **kwdgs):
+def plot_cumulative_density(data, label='', ax=None, title=None, label=None, s=1, x_label='Weight', **kwdgs):
     # Sort the data
     sorted_data = np.sort(data)
     # Compute the cumulative density values
@@ -155,7 +155,7 @@ def plot_cumulative_density(data, title='', ax=None, s=1, x_label='Weight', **kw
     	fig, ax = plt.subplots(1, 1, figsize=(4, 4))
     else:
     	fig = None
-    ax.step(sorted_data, cdf, where='post', label=title, **kwdgs)
+    ax.step(sorted_data, cdf, where='post', label=label, **kwdgs)
     ax.set_xlabel(x_label)
     ax.set_ylabel('Cumulative Density')
     ax.set_title(title)
