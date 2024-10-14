@@ -2989,7 +2989,7 @@ meta = [
         "name" : "--subsample",
         "description" : "number of samples randomly drawn from perturbation data",
         "default" : [
-          -2
+          -1
         ],
         "required" : false,
         "direction" : "input",
@@ -3083,6 +3083,32 @@ meta = [
         "dest" : "par"
       },
       {
+        "type" : "file",
+        "name" : "--skeleton",
+        "example" : [
+          "resources/prior/skeleton.csv'"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "boolean",
+        "name" : "--apply_skeleton",
+        "default" : [
+          true
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
         "type" : "boolean",
         "name" : "--min_tf",
         "description" : "calculate the scores for the given min tfs in addition to the default",
@@ -3099,30 +3125,6 @@ meta = [
         "type" : "boolean",
         "name" : "--binarize",
         "description" : "whether to binarize the weight",
-        "default" : [
-          true
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "string",
-        "name" : "--skeleton",
-        "example" : [
-          "resources/prior/skeleton.csv'"
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "boolean",
-        "name" : "--apply_skeleton",
         "default" : [
           true
         ],
@@ -3262,7 +3264,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "240092fabda4c3cc894d8ca0c5019e3e044ea346",
+    "git_commit" : "dc2cb033bb58d032778f5caabfc8c5f1c7f83cc4",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3298,10 +3300,10 @@ par = {
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'verbose': $( if [ ! -z ${VIASH_PAR_VERBOSE+x} ]; then echo "int(r'${VIASH_PAR_VERBOSE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'min_tf': $( if [ ! -z ${VIASH_PAR_MIN_TF+x} ]; then echo "r'${VIASH_PAR_MIN_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'binarize': $( if [ ! -z ${VIASH_PAR_BINARIZE+x} ]; then echo "r'${VIASH_PAR_BINARIZE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'skeleton': $( if [ ! -z ${VIASH_PAR_SKELETON+x} ]; then echo "r'${VIASH_PAR_SKELETON//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
+  'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'min_tf': $( if [ ! -z ${VIASH_PAR_MIN_TF+x} ]; then echo "r'${VIASH_PAR_MIN_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'binarize': $( if [ ! -z ${VIASH_PAR_BINARIZE+x} ]; then echo "r'${VIASH_PAR_BINARIZE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3322,10 +3324,17 @@ dep = {
 }
 
 ## VIASH END
-# meta = {
-#   "resources_dir":'src/metrics/regression_1/'
-# }
-sys.path.append(meta["resources_dir"])
+
+try:
+  sys.path.append(meta["resources_dir"])
+except:
+  meta = {
+    "resources_dir":'src/metrics/regression_1/',
+    "util_dir":'src/utils'
+  }
+  sys.path.append(meta["resources_dir"])
+  sys.path.append(meta["util_dir"])
+
 from main import main 
 
 output = main(par) 

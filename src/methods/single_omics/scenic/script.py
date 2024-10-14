@@ -50,8 +50,14 @@ if args.num_workers:
     
 if args.resources_dir:
     meta = {'resources_dir': args.resources_dir} 
-    
-sys.path.append(meta["resources_dir"])
+
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta= {
+    "resources_dir": 'src/utils/'
+    }
+    sys.path.append(meta["resources_dir"])
 from util import process_links
 
 def download_prior(par):

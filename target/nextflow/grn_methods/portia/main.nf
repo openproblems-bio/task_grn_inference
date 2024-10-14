@@ -2954,31 +2954,6 @@ meta = [
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
-      },
-      {
-        "type" : "boolean",
-        "name" : "--cell_type_specific",
-        "default" : [
-          false
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "boolean",
-        "name" : "--normalize",
-        "description" : "normalize rna seq data before inference. currently, it's only applicable to baseline models",
-        "default" : [
-          false
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
       }
     ],
     "resources" : [
@@ -3113,7 +3088,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia",
     "viash_version" : "0.8.6",
-    "git_commit" : "240092fabda4c3cc894d8ca0c5019e3e044ea346",
+    "git_commit" : "dc2cb033bb58d032778f5caabfc8c5f1c7f83cc4",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3136,6 +3111,7 @@ import pandas as pd
 import scipy.sparse
 import portia as pt
 from tqdm import tqdm
+import anndata as ad
 
 
 ## VIASH START
@@ -3148,9 +3124,7 @@ par = {
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
+  'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3173,13 +3147,12 @@ dep = {
 ## VIASH END
 
 import sys
-meta= {
-  "resources_dir": 'src/utils/'
-}
+
 
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
 parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--multiomics_atac', type=str, help='Path to the multiomics atac file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
@@ -3197,24 +3170,30 @@ if args.num_workers:
     
 if args.resources_dir:
     meta['resources_dir'] = args.resources_dir   
-    
-sys.path.append(meta["resources_dir"])
+
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta= {
+    "resources_dir": 'src/utils/'
+    }
+    sys.path.append(meta["resources_dir"])
 from util import process_links
-# Load scRNA-seq data
-print('Reading data')
-adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-
-gene_names = adata_rna.var_names
-X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X
-
-# Load list of putative TFs
-tfs = np.loadtxt(par['tf_all'], dtype=str)
-tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
-tf_idx = np.asarray([i for i, gene_name in enumerate(gene_names) if gene_name in tf_names], dtype=int)
 
 
-# GRN inference
-def infer_grn(X, gene_names):
+def main(par):
+  print('Reading data')
+  adata_rna = anndata.read_h5ad(par['multiomics_rna'])
+
+  gene_names = adata_rna.var_names
+  X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X
+
+  # Load list of putative TFs
+  tfs = np.loadtxt(par['tf_all'], dtype=str)
+  tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
+  tf_idx = np.asarray([i for i, gene_name in enumerate(gene_names) if gene_name in tf_names], dtype=int)
+
+
   print('Inferring grn')
   dataset = pt.GeneExpressionDataset()
   
@@ -3230,13 +3209,33 @@ def infer_grn(X, gene_names):
   grn = grn[grn.source.isin(tf_names)]
 
   grn = process_links(grn, par)
+
   return grn
-# par['cell_type_specific'] = False
-grn = infer_grn(X, gene_names)
 
-grn.to_csv(par['prediction'])
 
-print('Finished.')
+if __name__ == '__main__':
+  os.makedirs(par['temp_dir'], exist_ok=True)
+  adata = ad.read_h5ad(par['multiomics_rna'])
+  if ('donor_id' in adata.obs) & (par['donor_specific']):
+      # - new dir for donor specific adata
+      par['multiomics_rna'] = f"{par['temp_dir']}/multiomics_rna.h5ad"
+      donor_ids = adata.obs.donor_id.unique()
+      for i, donor_id in enumerate(donor_ids): # run for each donor and concat
+          print('GRN inference for ', donor_id)
+          adata_sub = adata[adata.obs.donor_id.eq(donor_id), :]
+          adata_sub.write(par['multiomics_rna'])
+          net_sub = main(par)
+          net_sub['donor_id'] = donor_id
+          if i == 0:
+              net = net_sub
+          else:
+              net = pd.concat([net, net_sub])
+  else:
+      net = main(par)
+
+  net.to_csv(par['prediction'])
+
+  print('Finished.')
 VIASHMAIN
 python -B "$tempscript"
 '''

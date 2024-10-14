@@ -204,16 +204,6 @@ function ViashHelp {
   echo "    --seed"
   echo "        type: integer"
   echo "        default: 32"
-  echo ""
-  echo "    --cell_type_specific"
-  echo "        type: boolean"
-  echo "        default: false"
-  echo ""
-  echo "    --normalize"
-  echo "        type: boolean"
-  echo "        default: false"
-  echo "        normalize rna seq data before inference. currently, it's only applicable"
-  echo "        to baseline models"
 }
 
 # initialise array
@@ -328,28 +318,6 @@ while [[ $# -gt 0 ]]; do
         --seed=*)
             [ -n "$VIASH_PAR_SEED" ] && ViashError Bad arguments for option \'--seed=*\': \'$VIASH_PAR_SEED\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_SEED=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --cell_type_specific)
-            [ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ] && ViashError Bad arguments for option \'--cell_type_specific\': \'$VIASH_PAR_CELL_TYPE_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CELL_TYPE_SPECIFIC="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --cell_type_specific. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --cell_type_specific=*)
-            [ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ] && ViashError Bad arguments for option \'--cell_type_specific=*\': \'$VIASH_PAR_CELL_TYPE_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CELL_TYPE_SPECIFIC=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --normalize)
-            [ -n "$VIASH_PAR_NORMALIZE" ] && ViashError Bad arguments for option \'--normalize\': \'$VIASH_PAR_NORMALIZE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_NORMALIZE="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --normalize. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --normalize=*)
-            [ -n "$VIASH_PAR_NORMALIZE" ] && ViashError Bad arguments for option \'--normalize=*\': \'$VIASH_PAR_NORMALIZE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_NORMALIZE=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---cpus)
@@ -468,12 +436,6 @@ fi
 if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
-if [ -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then
-  VIASH_PAR_CELL_TYPE_SPECIFIC="false"
-fi
-if [ -z ${VIASH_PAR_NORMALIZE+x} ]; then
-  VIASH_PAR_NORMALIZE="false"
-fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
@@ -505,18 +467,6 @@ fi
 if [[ -n "$VIASH_PAR_SEED" ]]; then
   if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ]]; then
-  if ! [[ "$VIASH_PAR_CELL_TYPE_SPECIFIC" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--cell_type_specific' has to be a boolean. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_NORMALIZE" ]]; then
-  if ! [[ "$VIASH_PAR_NORMALIZE" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--normalize' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -603,9 +553,7 @@ par <- list(
   "max_n_links" = $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_MAX_N_LINKS" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi ),
   "num_workers" = $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_NUM_WORKERS" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi ),
   "temp_dir" = $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TEMP_DIR" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi ),
-  "cell_type_specific" = $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" | sed "s#['\\]#\\\\&#g"; echo "'))"; else echo NULL; fi ),
-  "normalize" = $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_NORMALIZE" | sed "s#['\\]#\\\\&#g"; echo "'))"; else echo NULL; fi )
+  "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi )
 )
 meta <- list(
   "functionality_name" = $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo -n "'"; echo -n "$VIASH_META_FUNCTIONALITY_NAME" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),

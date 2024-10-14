@@ -2956,31 +2956,6 @@ meta = [
         "dest" : "par"
       },
       {
-        "type" : "boolean",
-        "name" : "--cell_type_specific",
-        "default" : [
-          false
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "boolean",
-        "name" : "--normalize",
-        "description" : "normalize rna seq data before inference. currently, it's only applicable to baseline models",
-        "default" : [
-          false
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
         "type" : "file",
         "name" : "--base_grn",
         "default" : [
@@ -3058,7 +3033,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "240092fabda4c3cc894d8ca0c5019e3e044ea346",
+          "git_commit" : "dc2cb033bb58d032778f5caabfc8c5f1c7f83cc4",
           "executable" : "/nextflow/grn_methods/celloracle/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/celloracle"
@@ -3113,7 +3088,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/grn_inference_celloracle",
     "viash_version" : "0.8.6",
-    "git_commit" : "240092fabda4c3cc894d8ca0c5019e3e044ea346",
+    "git_commit" : "dc2cb033bb58d032778f5caabfc8c5f1c7f83cc4",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

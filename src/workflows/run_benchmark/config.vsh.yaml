@@ -57,10 +57,7 @@ functionality:
         - name: --normalize
           type: boolean
           required: false
-          direction: input
-
-          
-        
+          direction: input        
     - name: Outputs
       arguments:
         - name: "--scores"
@@ -102,7 +99,7 @@ functionality:
     - name: grn_methods/genie3
 
     - name: grn_methods/ppcor #needs docker image
-    - name: grn_methods/scgpt 
+    # - name: grn_methods/scgpt 
     
     # ---- multiomics 
     - name: grn_methods/celloracle

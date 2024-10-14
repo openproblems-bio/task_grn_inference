@@ -20,13 +20,6 @@ par = {
   'qc': False
 }
 ## VIASH END
-
-meta= {
-  "resources_dir": 'src/utils/'
-}
-
-# Handle command-line arguments
-
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
 parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
@@ -53,7 +46,13 @@ if args.resources_dir:
 
 print(par)
 
-sys.path.append(meta["resources_dir"])
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta= {
+    "resources_dir": 'src/utils/'
+    }
+    sys.path.append(meta["resources_dir"])
 from util import process_links, basic_qc
 # Load scRNA-seq data
 print('Reading data')

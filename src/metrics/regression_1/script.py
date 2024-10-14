@@ -7,24 +7,34 @@ import numpy as np
 par = {
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
   "tf_all": "resources/prior/tf_all.csv",
-  "prediction": "resources/grn_models/donor_0_default/pearson_causal.csv",
+  # "prediction": "output/pearson_net.csv",
+  "prediction": "resources/grn_models/full/portia.csv",
   "method_id": "scenic",
   "min_tf": False,
   "max_n_links": 50000,
   "apply_tf": "true",
   'score': 'output/score.h5ad',
   'reg_type': 'ridge',
-  'layer': 'scgen_pearson',
-  'subsample': -2,
+  'layer': 'pearson',
+  'subsample': -1,
   'num_workers': 4,
   'skeleton': 'resources/prior/skeleton.csv',
-  'apply_skeleton': True
+  'apply_skeleton': False,
+  'verbose': 0,
+  'binarize': True
 }
 ## VIASH END
-# meta = {
-#   "resources_dir":'src/metrics/regression_1/'
-# }
-sys.path.append(meta["resources_dir"])
+
+try:
+  sys.path.append(meta["resources_dir"])
+except:
+  meta = {
+    "resources_dir":'src/metrics/regression_1/',
+    "util_dir":'src/utils'
+  }
+  sys.path.append(meta["resources_dir"])
+  sys.path.append(meta["util_dir"])
+
 from main import main 
 
 output = main(par) 

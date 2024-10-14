@@ -7,16 +7,15 @@ import numpy as np
 ## VIASH START
 par = {
     'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
-    'layer': 'scgen_pearson',
-    "prediction": "resources/grn_models/full/grnboost2.csv",
+    'layer': 'lognorm',
+    "prediction": "resources/grn_models/celloracle.csv",
     'tf_all': 'resources/prior/tf_all.csv',
     "max_n_links": 50000,
     'consensus': 'resources/prior/consensus-num-regulators.json',
-    'score': 'output/score_regression2.csv',
+    'score': 'output/score_regression2.h5ad',
     'reg_type': 'ridge',
     'static_only': True,
-    'layer': 'scgen_pearson',
-    'subsample': -2,
+    'subsample': -1,
     'num_workers': 4,
     'apply_tf': True,
     'clip_scores': True,
@@ -38,11 +37,8 @@ except:
     }
     sys.path.append(meta["resources_dir"])
     sys.path.append(meta["util"])
-from main import main
 
-if isinstance(par['reg_type'], list) and (len(par['reg_type']) == 1):
-    par['reg_type'] = par['reg_type'][0]
-assert isinstance(par['reg_type'], str)
+from main import main
 
 print('Reading input data')
 

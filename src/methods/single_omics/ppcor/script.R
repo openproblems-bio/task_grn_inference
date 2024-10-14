@@ -4,7 +4,7 @@ library(dplyr)
 
 ## VIASH START
 par <- list(
-  multiomics_rna = 'resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad',
+  multiomics_rna = 'resources/grn-benchmark/multiomics_rna.h5ad',
   prediction = 'resources/grn_models/ppcor.csv',
   tf_all = 'resources/prior/tf_all.csv',
   max_n_links = 50000

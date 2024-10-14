@@ -205,16 +205,6 @@ function ViashHelp {
   echo "        type: integer"
   echo "        default: 32"
   echo ""
-  echo "    --cell_type_specific"
-  echo "        type: boolean"
-  echo "        default: false"
-  echo ""
-  echo "    --normalize"
-  echo "        type: boolean"
-  echo "        default: false"
-  echo "        normalize rna seq data before inference. currently, it's only applicable"
-  echo "        to baseline models"
-  echo ""
   echo "    --rank_threshold"
   echo "        type: integer"
   echo "        default: 5000"
@@ -452,9 +442,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenic"
-LABEL org.opencontainers.image.created="2024-10-14T07:39:39Z"
+LABEL org.opencontainers.image.created="2024-10-14T13:32:37Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="240092fabda4c3cc894d8ca0c5019e3e044ea346"
+LABEL org.opencontainers.image.revision="dc2cb033bb58d032778f5caabfc8c5f1c7f83cc4"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -701,28 +691,6 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_SEED=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --cell_type_specific)
-            [ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ] && ViashError Bad arguments for option \'--cell_type_specific\': \'$VIASH_PAR_CELL_TYPE_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CELL_TYPE_SPECIFIC="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --cell_type_specific. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --cell_type_specific=*)
-            [ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ] && ViashError Bad arguments for option \'--cell_type_specific=*\': \'$VIASH_PAR_CELL_TYPE_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CELL_TYPE_SPECIFIC=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --normalize)
-            [ -n "$VIASH_PAR_NORMALIZE" ] && ViashError Bad arguments for option \'--normalize\': \'$VIASH_PAR_NORMALIZE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_NORMALIZE="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --normalize. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --normalize=*)
-            [ -n "$VIASH_PAR_NORMALIZE" ] && ViashError Bad arguments for option \'--normalize=*\': \'$VIASH_PAR_NORMALIZE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_NORMALIZE=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
         --rank_threshold)
             [ -n "$VIASH_PAR_RANK_THRESHOLD" ] && ViashError Bad arguments for option \'--rank_threshold\': \'$VIASH_PAR_RANK_THRESHOLD\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_RANK_THRESHOLD="$2"
@@ -912,12 +880,6 @@ fi
 if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
-if [ -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then
-  VIASH_PAR_CELL_TYPE_SPECIFIC="false"
-fi
-if [ -z ${VIASH_PAR_NORMALIZE+x} ]; then
-  VIASH_PAR_NORMALIZE="false"
-fi
 if [ -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then
   VIASH_PAR_RANK_THRESHOLD="5000"
 fi
@@ -958,18 +920,6 @@ fi
 if [[ -n "$VIASH_PAR_SEED" ]]; then
   if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ]]; then
-  if ! [[ "$VIASH_PAR_CELL_TYPE_SPECIFIC" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--cell_type_specific' has to be a boolean. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_NORMALIZE" ]]; then
-  if ! [[ "$VIASH_PAR_NORMALIZE" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--normalize' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1143,8 +1093,6 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
-  'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
-  'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'rank_threshold': $( if [ ! -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then echo "int(r'${VIASH_PAR_RANK_THRESHOLD//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'auc_threshold': $( if [ ! -z ${VIASH_PAR_AUC_THRESHOLD+x} ]; then echo "float(r'${VIASH_PAR_AUC_THRESHOLD//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "float(r'${VIASH_PAR_NES_THRESHOLD//\'/\'\"\'\"r\'}')"; else echo None; fi )
@@ -1188,8 +1136,14 @@ if args.num_workers:
     
 if args.resources_dir:
     meta = {'resources_dir': args.resources_dir} 
-    
-sys.path.append(meta["resources_dir"])
+
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta= {
+    "resources_dir": 'src/utils/'
+    }
+    sys.path.append(meta["resources_dir"])
 from util import process_links
 
 def download_prior(par):

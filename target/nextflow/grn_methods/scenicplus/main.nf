@@ -2956,31 +2956,6 @@ meta = [
         "dest" : "par"
       },
       {
-        "type" : "boolean",
-        "name" : "--cell_type_specific",
-        "default" : [
-          false
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "boolean",
-        "name" : "--normalize",
-        "description" : "normalize rna seq data before inference. currently, it's only applicable to baseline models",
-        "default" : [
-          false
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
         "type" : "file",
         "name" : "--scplus_mdata",
         "description" : "Main output object.",
@@ -3156,7 +3131,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "240092fabda4c3cc894d8ca0c5019e3e044ea346",
+    "git_commit" : "dc2cb033bb58d032778f5caabfc8c5f1c7f83cc4",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3185,8 +3160,6 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'scplus_mdata': $( if [ ! -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then echo "r'${VIASH_PAR_SCPLUS_MDATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'qc': $( if [ ! -z ${VIASH_PAR_QC+x} ]; then echo "r'${VIASH_PAR_QC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3266,22 +3239,22 @@ def main(par):
     par['MALLET_PATH'] = os.path.join(par['temp_dir'], 'Mallet-202108', 'bin', 'mallet')
     os.makedirs(par['atac_dir'], exist_ok=True)
 
-    # print('------- download_databases -------')
-    # download_databases(par)
-    # print_memory_usage()
-    # print('------- process_peak -------')
-    # process_peak(par)
-    # print_memory_usage()
-    # print('------- run_cistopic -------')
-    # run_cistopic(par)
-    # print_memory_usage()
-    # print('------- process_topics -------')
-    # process_topics(par)
-    # print_memory_usage()
-    # print('------- preprocess_rna -------')
-    # preprocess_rna(par)
-    # print_memory_usage()
-    # print('------- snakemake_pipeline -------')
+    print('------- download_databases -------')
+    download_databases(par)
+    print_memory_usage()
+    print('------- process_peak -------')
+    process_peak(par)
+    print_memory_usage()
+    print('------- run_cistopic -------')
+    run_cistopic(par)
+    print_memory_usage()
+    print('------- process_topics -------')
+    process_topics(par)
+    print_memory_usage()
+    print('------- preprocess_rna -------')
+    preprocess_rna(par)
+    print_memory_usage()
+    print('------- snakemake_pipeline -------')
     snakemake_pipeline(par)
     print_memory_usage()
     print('------- post_process -------')

@@ -23,15 +23,7 @@ functionality:
       direction: input
       type: boolean
       default: true
-    - name: --skeleton 
-      type: string
-      direction: input
-      example: resources/prior/skeleton.csv'
-    - name: --apply_skeleton 
-      type: boolean
-      direction: input
-      default: true
-
+      
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4

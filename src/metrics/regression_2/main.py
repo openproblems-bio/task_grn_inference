@@ -18,13 +18,13 @@ SEED = 0xCAFE
 N_POINTS_TO_ESTIMATE_BACKGROUND = 20
 
 
-def load_grn(filepath: str, gene_names: np.ndarray, par: Dict[str, Any]) -> np.ndarray:
+def net_to_matrix(net, gene_names: np.ndarray, par: Dict[str, Any]) -> np.ndarray:
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
-    net = pd.read_csv(filepath, sep=',', header='infer')
     if 'cell_type' in net.columns:
-        verbose_print(par['verbose'], 'Taking mean of cell type specific grns', 3)
-        net.drop(columns=['cell_type'], inplace=True)
-        net = net.groupby(['source', 'target']).mean().reset_index()
+        # verbose_print(par['verbose'], 'Taking mean of cell type specific grns', 3)
+        # net.drop(columns=['cell_type'], inplace=True)
+        # net = net.groupby(['source', 'target']).mean().reset_index()
+        raise ValueError('Fix this')
     if par['apply_skeleton']: #apply skeleton
         print('Before filtering with skeleton:', net.shape)
         skeleton = np.loadtxt(par['skeleton'], dtype=str)
@@ -114,41 +114,41 @@ def cross_validate_gene(
     return results
 
 
-def learn_background_distribution(
-        estimator_t: str,
-        X: np.ndarray,
-        groups: np.ndarray,
-        max_n_regulators: int,
+# def learn_background_distribution(
+#         estimator_t: str,
+#         X: np.ndarray,
+#         groups: np.ndarray,
+#         max_n_regulators: int,
 
-) -> Dict[int, Tuple[float, float]]:
+# ) -> Dict[int, Tuple[float, float]]:
 
-    rng = np.random.default_rng(seed=SEED)
+#     rng = np.random.default_rng(seed=SEED)
 
-    n_genes = X.shape[1]
-    random_grn = rng.random(size=(n_genes, n_genes))
+#     n_genes = X.shape[1]
+#     random_grn = rng.random(size=(n_genes, n_genes))
 
-    background = {}
-    for n_features in tqdm.tqdm(range(1, max_n_regulators + 1), desc='Estimating background dist'):
-        scores = []
-        for _ in range(N_POINTS_TO_ESTIMATE_BACKGROUND):
-            j = rng.integers(low=0, high=n_genes)
-            random_grn[:, j] = rng.random(size=n_genes)
+#     background = {}
+#     for n_features in tqdm.tqdm(range(1, max_n_regulators + 1), desc='Estimating background dist'):
+#         scores = []
+#         for _ in range(N_POINTS_TO_ESTIMATE_BACKGROUND):
+#             j = rng.integers(low=0, high=n_genes)
+#             random_grn[:, j] = rng.random(size=n_genes)
 
-            if n_features > 0:
-                res = cross_validate_gene(
-                    estimator_t,
-                    X,
-                    groups,
-                    random_grn,
-                    j,
-                    n_features=n_features,
-                    random_state=SEED,
-                    n_jobs=n_jobs
-                )
-                scores.append(res['avg-r2'])
-        background[n_features] = (np.mean(scores), max(0.001, np.std(scores)))
-    background['max'] = background[max_n_regulators]
-    return background
+#             if n_features > 0:
+#                 res = cross_validate_gene(
+#                     estimator_t,
+#                     X,
+#                     groups,
+#                     random_grn,
+#                     j,
+#                     n_features=n_features,
+#                     random_state=SEED,
+#                     n_jobs=n_jobs
+#                 )
+#                 scores.append(res['avg-r2'])
+#         background[n_features] = (np.mean(scores), max(0.001, np.std(scores)))
+#     background['max'] = background[max_n_regulators]
+#     return background
 
 
 def cross_validate(
@@ -182,50 +182,50 @@ def cross_validate(
     }
 
 
-def dynamic_approach(
-        grn: np.ndarray,
-        X: np.ndarray,
-        groups: np.ndarray,
-        gene_names: List[str],
-        tf_names: Set[str],
-        reg_type: str
-) -> float:
+# def dynamic_approach(
+#         grn: np.ndarray,
+#         X: np.ndarray,
+#         groups: np.ndarray,
+#         gene_names: List[str],
+#         tf_names: Set[str],
+#         reg_type: str
+# ) -> float:
 
-    # Determine maximum number of input features
-    n_genes = X.shape[1]
-    max_n_regulators = min(100, int(0.5 * n_genes))
+#     # Determine maximum number of input features
+#     n_genes = X.shape[1]
+#     max_n_regulators = min(100, int(0.5 * n_genes))
 
-    # Learn background distribution for each value of `n_features`:
-    # r2 scores using random genes as features.
-    background = learn_background_distribution(reg_type, X, groups, max_n_regulators)
+#     # Learn background distribution for each value of `n_features`:
+#     # r2 scores using random genes as features.
+#     background = learn_background_distribution(reg_type, X, groups, max_n_regulators)
 
-    # Cross-validate each gene using the inferred GRN to define select input features
-    res = cross_validate(
-        reg_type,
-        gene_names,
-        tf_names,
-        X,
-        groups,
-        grn,
-        np.clip(np.sum(grn != 0, axis=0), 0, max_n_regulators)
-    )
+#     # Cross-validate each gene using the inferred GRN to define select input features
+#     res = cross_validate(
+#         reg_type,
+#         gene_names,
+#         tf_names,
+#         X,
+#         groups,
+#         grn,
+#         np.clip(np.sum(grn != 0, axis=0), 0, max_n_regulators)
+#     )
 
-    # Compute z-scores from r2 scores to take into account the fact
-    # that random network can still perform well when the number of features is large
-    scores = []
-    for j in range(n_genes):
-        if np.isnan(res['scores'][j]['avg-r2']):
-            continue
-        n_features = int(np.sum(grn[:, j] != 0))
-        if n_features in background:
-            mu, sigma = background[n_features]
-        else:
-            mu, sigma = background['max']
-        z_score = (res['scores'][j]['avg-r2'] - mu) / sigma
-        z_score = max(0, z_score)
-        scores.append(z_score)
+#     # Compute z-scores from r2 scores to take into account the fact
+#     # that random network can still perform well when the number of features is large
+#     scores = []
+#     for j in range(n_genes):
+#         if np.isnan(res['scores'][j]['avg-r2']):
+#             continue
+#         n_features = int(np.sum(grn[:, j] != 0))
+#         if n_features in background:
+#             mu, sigma = background[n_features]
+#         else:
+#             mu, sigma = background['max']
+#         z_score = (res['scores'][j]['avg-r2'] - mu) / sigma
+#         z_score = max(0, z_score)
+#         scores.append(z_score)
 
-    return np.mean(scores)
+#     return np.mean(scores)
 
 
 def static_approach(
@@ -273,74 +273,99 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     verbose_print(par['verbose'], "Reading input files", 3)
     
     # Load perturbation data
-    perturbation_data = ad.read_h5ad(par['perturbation_data'])
+    prturb_adata = ad.read_h5ad(par['perturbation_data'])
     subsample = par['subsample']
     if subsample == -1:
         pass
-    elif subsample == -2: # one combination of cell_type, sm_name
-        sampled_obs = perturbation_data.obs.groupby(['sm_name', 'cell_type'], observed=False).apply(lambda x: x.sample(1)).reset_index(drop=True)
-        obs = perturbation_data.obs
-        mask = []
-        for _, row in obs.iterrows():
-            mask.append((sampled_obs==row).all(axis=1).any())  
-        perturbation_data = perturbation_data[mask,:]
+    # elif subsample == -2: # one combination of cell_type, sm_name
+    #     sampled_obs = perturbation_data.obs.groupby(['sm_name', 'cell_type'], observed=False).apply(lambda x: x.sample(1)).reset_index(drop=True)
+    #     obs = perturbation_data.obs
+    #     mask = []
+    #     for _, row in obs.iterrows():
+    #         mask.append((sampled_obs==row).all(axis=1).any())  
+    #     perturbation_data = perturbation_data[mask,:]
+    # else:
+    #     perturbation_data = perturbation_data[np.random.choice(perturbation_data.n_obs, subsample, replace=False), :]
     else:
-        perturbation_data = perturbation_data[np.random.choice(perturbation_data.n_obs, subsample, replace=False), :]
+        raise ValueError('fix this')
 
-    gene_names = perturbation_data.var.index.to_numpy()
+    gene_names = prturb_adata.var.index.to_numpy()
     n_genes = len(gene_names)
-    groups = LabelEncoder().fit_transform(perturbation_data.obs.plate_name)
+    net = pd.read_csv(par['prediction'], sep=',', header='infer')
 
-    grn = load_grn(par['prediction'], gene_names, par)
+    donor_ids = prturb_adata.obs.donor_id.unique()
+    df_results_store = []
+    for donor_id in donor_ids:
+        prturb_adata_sub = prturb_adata[prturb_adata.obs.donor_id==donor_id,:]
+        if 'donor_id' in net.columns:
+            if donor_id not in net.donor_id.unique():
+                raise ValueError(f'{donor_id} is not present in grn.')
+            net_sub = net[net.donor_id==donor_id]
+        else:
+            net_sub = net
+        net_matrix = net_to_matrix(net, gene_names, par)
 
-    # Load and standardize perturbation data
-    layer = par['layer']
-    X = perturbation_data.layers[layer]
-    X = RobustScaler().fit_transform(X)
+        # groups = LabelEncoder().fit_transform(perturbation_data.obs.plate_name)
+        # groups = LabelEncoder().fit_transform(prturb_adata_sub.obs.cell_type)
+        n_cells = prturb_adata_sub.shape[0]
+        random_groups = np.random.choice(range(1, 5+1), size=n_cells, replace=True) # random sampling
+        groups = LabelEncoder().fit_transform(random_groups)
 
-    # Load consensus numbers of putative regulators
-    with open(par['consensus'], 'r') as f:
-        data = json.load(f)
-    gene_names_ = np.asarray(list(data.keys()), dtype=object)
-    n_features_dict = {gene_name: i for i, gene_name in enumerate(gene_names_)}
 
-    n_features_theta_min = np.asarray([data[gene_name]['0'] for gene_name in gene_names], dtype=int)
-    n_features_theta_median = np.asarray([data[gene_name]['0.5'] for gene_name in gene_names], dtype=int)
-    n_features_theta_max = np.asarray([data[gene_name]['1'] for gene_name in gene_names], dtype=int)
+        # Load and standardize perturbation data
+        layer = par['layer']
+        X = prturb_adata_sub.layers[layer]
+        X = RobustScaler().fit_transform(X)
 
-    # Load list of putative TFs
-    tf_names = np.loadtxt(par['tf_all'], dtype=str)
-    if par['apply_tf']==False:
-        tf_names = gene_names
-    clip_scores = par['clip_scores']
+        # Load consensus numbers of putative regulators
+        with open(par['consensus'], 'r') as f:
+            data = json.load(f)
+        gene_names_ = np.asarray(list(data.keys()), dtype=object)
+        n_features_dict = {gene_name: i for i, gene_name in enumerate(gene_names_)}
 
-    # Evaluate GRN
-    verbose_print(par['verbose'], f'Compute metrics for layer: {layer}', 3)
-    # print(f'Dynamic approach:', flush=True)
-    verbose_print(par['verbose'], f'Static approach (theta=0):', 3)
-    # print(np.any(n_features_theta_min!=0))
-    # aa
-    score_static_min = static_approach(grn, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
-    verbose_print(par['verbose'], f'Static approach (theta=0.5):', 3)
-    score_static_median = static_approach(grn, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
-    # print(f'Static approach (theta=1):', flush=True)
-    # score_static_max = static_approach(grn, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
-    # TODO: find a mathematically sound way to combine Z-scores and r2 scores
+        n_features_theta_min = np.asarray([data[gene_name]['0'] for gene_name in gene_names], dtype=int)
+        n_features_theta_median = np.asarray([data[gene_name]['0.5'] for gene_name in gene_names], dtype=int)
+        n_features_theta_max = np.asarray([data[gene_name]['1'] for gene_name in gene_names], dtype=int)
 
-    results = {
-        'static-theta-0.0': [float(score_static_min)],
-        'static-theta-0.5': [float(score_static_median)]
-        # 'static-theta-1.0': [float(score_static_max)],
-    }
+        # Load list of putative TFs
+        tf_names = np.loadtxt(par['tf_all'], dtype=str)
+        if par['apply_tf']==False:
+            tf_names = gene_names
+        clip_scores = par['clip_scores']
 
-    # Add dynamic score
-    if not par['static_only']:
-        score_dynamic = dynamic_approach(grn, X, groups, gene_names, tf_names, par['reg_type'])
-        score_overall = score_dynamic + score_static_min + score_static_median + score_static_max
-        results['dynamic'] = [float(score_dynamic)]
-        results['Overall'] = [float(score_overall)]
+        # Evaluate GRN
+        verbose_print(par['verbose'], f'Compute metrics for layer: {layer}', 3)
+        # print(f'Dynamic approach:', flush=True)
+        verbose_print(par['verbose'], f'Static approach (theta=0):', 3)
+        score_static_min = static_approach(net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
+        verbose_print(par['verbose'], f'Static approach (theta=0.5):', 3)
+        score_static_median = static_approach(net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
+        # print(f'Static approach (theta=1):', flush=True)
+        # score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
 
-    # Convert results to DataFrame
-    df_results = pd.DataFrame(results)
+        results = {
+            'static-theta-0.0': [float(score_static_min)],
+            'static-theta-0.5': [float(score_static_median)]
+            # 'static-theta-1.0': [float(score_static_max)],
+        }
+
+        # # Add dynamic score
+        # if not par['static_only']:
+        #     score_dynamic = dynamic_approach(grn, X, groups, gene_names, tf_names, par['reg_type'])
+        #     score_overall = score_dynamic + score_static_min + score_static_median + score_static_max
+        #     results['dynamic'] = [float(score_dynamic)]
+        #     results['Overall'] = [float(score_overall)]
+
+        # Convert results to DataFrame
+        df_results = pd.DataFrame(results)
+        df_results.index=[donor_id]
+
+        df_results_store.append(df_results)
     
+    df_results_concat = pd.concat(df_results_store, axis=0)
+    print(df_results_concat)
+    df_results_mean = df_results_concat.groupby(df_results_concat.index).mean()
+    print(df_results_mean)
+    # Update df_results with the calculated mean
+    df_results = pd.DataFrame(df_results_mean, index=df_results_mean.index, columns=df_results.columns)
     return df_results

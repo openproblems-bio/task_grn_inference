@@ -2956,31 +2956,6 @@ meta = [
         "dest" : "par"
       },
       {
-        "type" : "boolean",
-        "name" : "--cell_type_specific",
-        "default" : [
-          false
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "boolean",
-        "name" : "--normalize",
-        "description" : "normalize rna seq data before inference. currently, it's only applicable to baseline models",
-        "default" : [
-          false
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
         "type" : "file",
         "name" : "--perturbation_data",
         "example" : [
@@ -3109,7 +3084,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/negative_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "240092fabda4c3cc894d8ca0c5019e3e044ea346",
+    "git_commit" : "dc2cb033bb58d032778f5caabfc8c5f1c7f83cc4",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3141,8 +3116,6 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
@@ -3164,11 +3137,38 @@ dep = {
 }
 
 ## VIASH END
+
+import argparse
+parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
+parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--multiomics_atac', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--prediction', type=str, help='Path to the prediction file')
+parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
+parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
+parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
+args = parser.parse_args()
+if args.multiomics_rna:
+    par['multiomics_rna'] = args.multiomics_rna
+if args.prediction:
+    par['prediction'] = args.prediction
+if args.tf_all:
+    par['tf_all'] = args.tf_all
+if args.num_workers:
+    par['num_workers'] = args.num_workers
+if args.max_n_links:
+    par['max_n_links'] = int(args.max_n_links)
+if args.resources_dir:
+    meta['resources_dir'] = args.resources_dir  
 print(par)
-meta = {
-  'resources_dir':'src/control_methods/negative_control'
-}
-sys.path.append(meta['resources_dir'])
+
+try:
+    sys.path.append(meta['resources_dir'])
+except:
+    meta = {
+    'resources_dir':'src/control_methods/negative_control'
+    }
+    sys.path.append(meta['resources_dir'])
 from main import main
 prediction = main(par)
 prediction.to_csv(par["prediction"])

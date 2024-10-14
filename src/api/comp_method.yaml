@@ -43,15 +43,6 @@ functionality:
       type: integer
       direction: input
       default: 32
-    - name: --cell_type_specific
-      type: boolean
-      direction: input
-      default: false
-    - name: --normalize
-      type: boolean
-      direction: input
-      default: false
-      description: normalize rna seq data before inference. currently, it's only applicable to baseline models
 
   test_resources:
     - type: python_script

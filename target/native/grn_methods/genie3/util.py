@@ -65,10 +65,8 @@ def efficient_melting(net, gene_names, par):
 
     # Extract the corresponding correlation values
     weights = net[upper_triangle_indices]
-    # apply mask 
-    mask = np.abs(weights)>par['corr_t']
     # Create a structured array
-    data = np.column_stack((targets[mask], sources[mask], weights[mask]))
+    data = np.column_stack((targets, sources, weights))
 
     # Convert to DataFrame
     print('conver to df')
@@ -78,75 +76,29 @@ def efficient_melting(net, gene_names, par):
 
 def corr_net(X, gene_names, par):
     print('calculate correlation')
-    if False:
-        X = StandardScaler().fit_transform(X)
-        net = np.dot(X.T, X) / X.shape[0]
+    if hasattr(X, 'todense'):
+        net = np.corrcoef(X.todense().T)
     else:
         net = np.corrcoef(X.T)
     print('process corr results')
-    if 'no_tf_subsetting' in par:
-        pass
-    else:
-        tf_all = np.loadtxt(par['tf_all'], dtype=str)
-        tf_all = np.intersect1d(tf_all, gene_names)
     
-        # # Convert to a DataFrame with gene names as both row and column indices
-        net = pd.DataFrame(net, index=gene_names, columns=gene_names)
-        if par['causal']:  
-            print('TF subsetting')
-            net = net[tf_all]
-        else:
-            print('Random subsetting')
-            net = net.sample(len(tf_all), axis=1, random_state=par['seed'])
-        net = net.values()
+    tf_all = np.loadtxt(par['tf_all'], dtype=str)
+    tf_all = np.intersect1d(tf_all, gene_names)
+
+    # # Convert to a DataFrame with gene names as both row and column indices
+    net = pd.DataFrame(net, index=gene_names, columns=gene_names)
+    
+    net = net.values
 
     net = efficient_melting(net, gene_names, par)
+    if par['causal']:  
+        print('TF subsetting')
+        net = net[net.source.isin(tf_all)]
     net = process_links(net, par)
     print('Corr results are ready')
     return net
 
-def process_data(adata, par):
-    if par['normalize']:
-        import scanpy as sc
-        print('Noramlize data')
-        sc.pp.normalize_total(adata)
-        sc.pp.log1p(adata)
-        sc.pp.scale(adata)
-    if sp.issparse(adata.X):
-        # Convert to dense if it's sparse
-        adata.X = adata.X.toarray()  # You can also use .todense(), but .toarray() gives a NumPy array directly
-    else:
-        print("adata.X is already dense.")
-        
-def create_corr_net(par):
-    print(par)
 
-    print('Read data')
-    multiomics_rna = ad.read_h5ad(par["multiomics_rna"])
-    process_data(multiomics_rna, par)
-    gene_names = multiomics_rna.var_names.to_numpy()
-
-    if 'layer' in par:
-        print(par['layer'])
-        X = multiomics_rna.layers[par['layer']]
-    else:
-        X = multiomics_rna.X
-    if par['cell_type_specific']:
-        groups = multiomics_rna.obs.cell_type
-        print('cell_type_specific')
-        i = 0
-        for group in tqdm(np.unique(groups), desc="Processing groups"):
-            X_sub = X[groups == group, :]
-            net = corr_net(X_sub, gene_names, par)
-            net['cell_type'] = group
-            if i==0:
-                grn = net
-            else:
-                grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
-            i += 1
-    else:
-        grn = corr_net(X, gene_names, par)    
-    return grn
 def read_gmt(file_path:str) -> dict[str, list[str]]:
     '''Reas gmt file and returns a dict of gene'''
     gene_sets = {}

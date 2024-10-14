@@ -2957,7 +2957,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/normalization",
     "viash_version" : "0.8.6",
-    "git_commit" : "240092fabda4c3cc894d8ca0c5019e3e044ea346",
+    "git_commit" : "dc2cb033bb58d032778f5caabfc8c5f1c7f83cc4",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -2978,7 +2978,7 @@ cat > "$tempscript" << VIASHMAIN
 import anndata as ad 
 import pandas as pd
 import numpy as np
-import sctk
+# import sctk
 from scipy import sparse
 import scanpy as sc
 

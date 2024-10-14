@@ -204,16 +204,6 @@ function ViashHelp {
   echo "    --seed"
   echo "        type: integer"
   echo "        default: 32"
-  echo ""
-  echo "    --cell_type_specific"
-  echo "        type: boolean"
-  echo "        default: false"
-  echo ""
-  echo "    --normalize"
-  echo "        type: boolean"
-  echo "        default: false"
-  echo "        normalize rna seq data before inference. currently, it's only applicable"
-  echo "        to baseline models"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -440,9 +430,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata" "numpy" "scipy" "scikit-learn" "portia-grn"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods portia"
-LABEL org.opencontainers.image.created="2024-10-14T07:39:40Z"
+LABEL org.opencontainers.image.created="2024-10-14T13:32:38Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="240092fabda4c3cc894d8ca0c5019e3e044ea346"
+LABEL org.opencontainers.image.revision="dc2cb033bb58d032778f5caabfc8c5f1c7f83cc4"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -689,28 +679,6 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_SEED=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --cell_type_specific)
-            [ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ] && ViashError Bad arguments for option \'--cell_type_specific\': \'$VIASH_PAR_CELL_TYPE_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CELL_TYPE_SPECIFIC="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --cell_type_specific. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --cell_type_specific=*)
-            [ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ] && ViashError Bad arguments for option \'--cell_type_specific=*\': \'$VIASH_PAR_CELL_TYPE_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CELL_TYPE_SPECIFIC=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --normalize)
-            [ -n "$VIASH_PAR_NORMALIZE" ] && ViashError Bad arguments for option \'--normalize\': \'$VIASH_PAR_NORMALIZE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_NORMALIZE="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --normalize. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --normalize=*)
-            [ -n "$VIASH_PAR_NORMALIZE" ] && ViashError Bad arguments for option \'--normalize=*\': \'$VIASH_PAR_NORMALIZE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_NORMALIZE=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
         ---setup)
             VIASH_MODE='docker_setup'
             VIASH_DOCKER_SETUP_STRATEGY="$2"
@@ -867,12 +835,6 @@ fi
 if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
-if [ -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then
-  VIASH_PAR_CELL_TYPE_SPECIFIC="false"
-fi
-if [ -z ${VIASH_PAR_NORMALIZE+x} ]; then
-  VIASH_PAR_NORMALIZE="false"
-fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
@@ -904,18 +866,6 @@ fi
 if [[ -n "$VIASH_PAR_SEED" ]]; then
   if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_CELL_TYPE_SPECIFIC" ]]; then
-  if ! [[ "$VIASH_PAR_CELL_TYPE_SPECIFIC" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--cell_type_specific' has to be a boolean. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_NORMALIZE" ]]; then
-  if ! [[ "$VIASH_PAR_NORMALIZE" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--normalize' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1051,6 +1001,7 @@ import pandas as pd
 import scipy.sparse
 import portia as pt
 from tqdm import tqdm
+import anndata as ad
 
 
 ## VIASH START
@@ -1063,9 +1014,7 @@ par = {
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
-  'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
-  'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
+  'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1088,13 +1037,12 @@ dep = {
 ## VIASH END
 
 import sys
-meta= {
-  "resources_dir": 'src/utils/'
-}
+
 
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
 parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--multiomics_atac', type=str, help='Path to the multiomics atac file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
@@ -1112,24 +1060,30 @@ if args.num_workers:
     
 if args.resources_dir:
     meta['resources_dir'] = args.resources_dir   
-    
-sys.path.append(meta["resources_dir"])
+
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta= {
+    "resources_dir": 'src/utils/'
+    }
+    sys.path.append(meta["resources_dir"])
 from util import process_links
-# Load scRNA-seq data
-print('Reading data')
-adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-
-gene_names = adata_rna.var_names
-X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X
-
-# Load list of putative TFs
-tfs = np.loadtxt(par['tf_all'], dtype=str)
-tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
-tf_idx = np.asarray([i for i, gene_name in enumerate(gene_names) if gene_name in tf_names], dtype=int)
 
 
-# GRN inference
-def infer_grn(X, gene_names):
+def main(par):
+  print('Reading data')
+  adata_rna = anndata.read_h5ad(par['multiomics_rna'])
+
+  gene_names = adata_rna.var_names
+  X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X
+
+  # Load list of putative TFs
+  tfs = np.loadtxt(par['tf_all'], dtype=str)
+  tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
+  tf_idx = np.asarray([i for i, gene_name in enumerate(gene_names) if gene_name in tf_names], dtype=int)
+
+
   print('Inferring grn')
   dataset = pt.GeneExpressionDataset()
   
@@ -1145,13 +1099,33 @@ def infer_grn(X, gene_names):
   grn = grn[grn.source.isin(tf_names)]
 
   grn = process_links(grn, par)
+
   return grn
-# par['cell_type_specific'] = False
-grn = infer_grn(X, gene_names)
 
-grn.to_csv(par['prediction'])
 
-print('Finished.')
+if __name__ == '__main__':
+  os.makedirs(par['temp_dir'], exist_ok=True)
+  adata = ad.read_h5ad(par['multiomics_rna'])
+  if ('donor_id' in adata.obs) & (par['donor_specific']):
+      # - new dir for donor specific adata
+      par['multiomics_rna'] = f"{par['temp_dir']}/multiomics_rna.h5ad"
+      donor_ids = adata.obs.donor_id.unique()
+      for i, donor_id in enumerate(donor_ids): # run for each donor and concat
+          print('GRN inference for ', donor_id)
+          adata_sub = adata[adata.obs.donor_id.eq(donor_id), :]
+          adata_sub.write(par['multiomics_rna'])
+          net_sub = main(par)
+          net_sub['donor_id'] = donor_id
+          if i == 0:
+              net = net_sub
+          else:
+              net = pd.concat([net, net_sub])
+  else:
+      net = main(par)
+
+  net.to_csv(par['prediction'])
+
+  print('Finished.')
 VIASHMAIN
 python -B "\$tempscript" &
 wait "\$!"

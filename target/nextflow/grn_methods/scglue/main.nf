@@ -2956,31 +2956,6 @@ meta = [
         "dest" : "par"
       },
       {
-        "type" : "boolean",
-        "name" : "--cell_type_specific",
-        "default" : [
-          false
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "boolean",
-        "name" : "--normalize",
-        "description" : "normalize rna seq data before inference. currently, it's only applicable to baseline models",
-        "default" : [
-          false
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
         "type" : "string",
         "name" : "--top_n_targets",
         "default" : [
@@ -3174,7 +3149,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scglue",
     "viash_version" : "0.8.6",
-    "git_commit" : "240092fabda4c3cc894d8ca0c5019e3e044ea346",
+    "git_commit" : "dc2cb033bb58d032778f5caabfc8c5f1c7f83cc4",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3205,8 +3180,6 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'cell_type_specific': $( if [ ! -z ${VIASH_PAR_CELL_TYPE_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_CELL_TYPE_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'top_n_targets': $( if [ ! -z ${VIASH_PAR_TOP_N_TARGETS+x} ]; then echo "r'${VIASH_PAR_TOP_N_TARGETS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'rank_threshold': $( if [ ! -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_RANK_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_NES_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3233,11 +3206,6 @@ dep = {
 ## VIASH END
 
 import sys
-meta= {
-  "util_dir": 'src/utils/',
-  "resources_dir": 'src/methods/multi_omics/scglue'
-}
-
 
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
@@ -3269,8 +3237,15 @@ par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
 # par['motif_file'] = f"{par['temp_dir']}/ENCODE-TF-ChIP-hg38.bed.gz"
 par['motif_file'] = f"output/db/jaspar_encode.bed.gz"
 
-sys.path.append(meta["util_dir"])
-sys.path.append(meta["resources_dir"])
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta= {
+        "util_dir": 'src/utils/',
+        "resources_dir": 'src/methods/multi_omics/scglue'
+    }
+    sys.path.append(meta["util_dir"])
+    sys.path.append(meta["resources_dir"])
 from main import main 
 print(par)
 prediction = main(par)

@@ -67,7 +67,7 @@ def cross_validation(net, prturb_adata, par:dict):
         included_genes = gene_names_grn
     else:
         included_genes = gene_names
-    
+
     X_df = pd.DataFrame(np.zeros((len(included_genes), n_tfs)), index=included_genes)
     train_df = pd.DataFrame(prturb_adata.X, columns=gene_names).T
     Y_df = train_df.loc[included_genes,:]
@@ -130,15 +130,15 @@ def regression_1(
     """
        
     gene_names = prturb_adata.var_names
-    cell_types = prturb_adata.obs.cell_type.unique()
+    donor_ids = prturb_adata.obs.donor_id.unique()
     score_list = []
-    for cell_type in cell_types:
-        verbose_print(par['verbose'], f'----cross validate for {cell_type}----', 2)
-        # check if net is cell type specific 
-        if 'cell_type' in net.columns:
-            if cell_type not in net.cell_type.unique():
-                raise ValueError(f'{cell_type} is not present in grn.')
-            net_sub = net[net.cell_type==cell_type]
+    for donor_id in donor_ids:
+        verbose_print(par['verbose'], f'----cross validate for {donor_id}----', 2)
+        # check if net is donor specific 
+        if 'donor_id' in net.columns:
+            if donor_id not in net.donor_id.unique():
+                raise ValueError(f'{donor_id} is not present in grn.')
+            net_sub = net[net.donor_id==donor_id]
         else:
             net_sub = net
         if (len(net_sub)>par['max_n_links']) and (par['max_n_links']!=-1):
@@ -146,7 +146,7 @@ def regression_1(
             verbose_print(par['verbose'], f"Number of links reduced to {par['max_n_links']}", 2)
         if par['binarize']:
             net['weight'] = net['weight'].apply(binarize_weight)        
-        prturb_adata_sub = prturb_adata[prturb_adata.obs.cell_type==cell_type,:]
+        prturb_adata_sub = prturb_adata[prturb_adata.obs.donor_id==donor_id,:]
         y_true_sub, y_pred_sub = cross_validation(net_sub, prturb_adata_sub, par)
 
         score = r2_score(y_true_sub, y_pred_sub, multioutput='variance_weighted')
@@ -220,10 +220,12 @@ def main(par):
     
     if par['apply_tf']:
         net = net[net.source.isin(tf_all)]
-    # if 'cell_type' in net.columns:
-    #     print('Taking mean of cell type specific grns')
-    #     net.drop(columns=['cell_type'], inplace=True)
-    #     net = net.groupby(['source', 'target']).mean().reset_index()
+
+    if 'cell_type' in net.columns:
+        # print('Taking mean of cell type specific grns')
+        # net.drop(columns=['cell_type'], inplace=True)
+        # net = net.groupby(['source', 'target']).mean().reset_index()
+        raise ValueError('define this')
 
     subsample = par['subsample']
     max_workers = par['num_workers']
