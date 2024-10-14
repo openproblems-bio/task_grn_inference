@@ -3170,6 +3170,12 @@ meta = [
         "path" : "resources_test/prior",
         "dest" : "resources_test/prior",
         "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
+      },
+      {
+        "type" : "file",
+        "path" : "resources_test/grn_models",
+        "dest" : "resources_test/grn_models",
+        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
     "info" : {
@@ -3256,7 +3262,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "68ff6c4e650dac7467ed9d7524a8548f9cfd80d2",
+    "git_commit" : "240092fabda4c3cc894d8ca0c5019e3e044ea346",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

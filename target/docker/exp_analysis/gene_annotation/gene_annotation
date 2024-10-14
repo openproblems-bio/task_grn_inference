@@ -400,9 +400,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component exp_analysis gene_annotation"
-LABEL org.opencontainers.image.created="2024-10-11T19:11:35Z"
+LABEL org.opencontainers.image.created="2024-10-14T07:39:40Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="68ff6c4e650dac7467ed9d7524a8548f9cfd80d2"
+LABEL org.opencontainers.image.revision="240092fabda4c3cc894d8ca0c5019e3e044ea346"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
