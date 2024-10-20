@@ -23,6 +23,7 @@ parser.add_argument('--prediction', type=str, help='Path to the prediction file'
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--max_n_links', type=int)
 args = parser.parse_args()
 
 if args.multiomics_rna:
@@ -33,6 +34,8 @@ if args.prediction:
     par['prediction'] = args.prediction
 if args.tf_all:
     par['tf_all'] = args.tf_all
+if args.max_n_links:
+    par['max_n_links'] = args.max_n_links
 if args.num_workers:
     par['num_workers'] = args.num_workers
 
@@ -42,8 +45,10 @@ if args.resources_dir:
     meta['resources_dir'] = args.resources_dir  
 par['num_workers'] = int(par['num_workers'])
 print(par)
-
-sys.path.append(meta["resources_dir"])
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    pass
 from main import * 
 
 
@@ -69,22 +74,22 @@ def main(par):
     par['MALLET_PATH'] = os.path.join(par['temp_dir'], 'Mallet-202108', 'bin', 'mallet')
     os.makedirs(par['atac_dir'], exist_ok=True)
 
-    print('------- download_databases -------')
-    download_databases(par)
-    print_memory_usage()
-    print('------- process_peak -------')
-    process_peak(par)
-    print_memory_usage()
-    print('------- run_cistopic -------')
-    run_cistopic(par)
-    print_memory_usage()
-    print('------- process_topics -------')
-    process_topics(par)
-    print_memory_usage()
-    print('------- preprocess_rna -------')
-    preprocess_rna(par)
-    print_memory_usage()
-    print('------- snakemake_pipeline -------')
+    # print('------- download_databases -------')
+    # download_databases(par)
+    # print_memory_usage()
+    # print('------- process_peak -------')
+    # process_peak(par)
+    # print_memory_usage()
+    # print('------- run_cistopic -------')
+    # run_cistopic(par)
+    # print_memory_usage()
+    # print('------- process_topics -------')
+    # process_topics(par)
+    # print_memory_usage()
+    # print('------- preprocess_rna -------')
+    # preprocess_rna(par)
+    # print_memory_usage()
+    # print('------- snakemake_pipeline -------')
     snakemake_pipeline(par)
     print_memory_usage()
     print('------- post_process -------')

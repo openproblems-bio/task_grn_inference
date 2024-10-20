@@ -47,6 +47,10 @@ functionality:
       type: boolean
       direction: input
       default: True
+    - name: --causal
+      type: boolean
+      direction: input
+      default: True
 
 
   test_resources:

@@ -9,23 +9,26 @@ par = {
   'reg_type': 'ridge',
   'read_dir': "resources/grn_models/",
   'write_dir': "resources/results/robustness_analysis",
-  'degrees': [0, 10, 20, 50, 100],
+  # 'degrees': [0, 10, 20, 50, 100],
+  'degrees': [50],
   'noise_types': ["net", "sign"],
-  'methods': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle'],
-
+  # 'noise_types': ['weight'],
+  'methods': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
 
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
   "tf_all": "resources/prior/tf_all.csv",
   "max_n_links": 50000,
-  "apply_tf": "true",
-  'subsample': -2,
-  'verbose': 3,
-  'binarize': True,
+  "apply_tf": True,
+  'binarize': False, 
+  'subsample': -1,
+  'verbose': 0,
   'num_workers': 20,
   'consensus': 'resources/prior/consensus-num-regulators.json',
   'static_only': True,
   'clip_scores': True,
-  'layer': 'scgen_pearson',
+  'layer': 'pearson',
+  'apply_skeleton': True,
+  'skeleton': 'resources/prior/skeleton.csv'
 }
 
 meta = {
@@ -37,7 +40,6 @@ sys.path.append(meta["util"])
 
 os.makedirs(par['write_dir'], exist_ok=True)
 os.makedirs(f"{par['write_dir']}/tmp/", exist_ok=True)
-
 
 def run_reg(par):
   from metrics.regression_1.main import main 

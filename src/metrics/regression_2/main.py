@@ -341,11 +341,11 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         verbose_print(par['verbose'], f'Static approach (theta=0.5):', 3)
         score_static_median = static_approach(net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
         # print(f'Static approach (theta=1):', flush=True)
-        # score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
+        # score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
 
         results = {
             'static-theta-0.0': [float(score_static_min)],
-            'static-theta-0.5': [float(score_static_median)]
+            'static-theta-0.5': [float(score_static_median)],
             # 'static-theta-1.0': [float(score_static_max)],
         }
 
@@ -363,12 +363,5 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         df_results_store.append(df_results)
     
     df_results_concat = pd.concat(df_results_store, axis=0)
-    df_results_concat.index.name = 'donor_id'
-    print(df_results_concat.reset_index())
-    df_results_mean = df_results_concat.reset_index().groupby('donor_id').mean()
-    print(df_results_mean)
-
-    
-
-
+    df_results_mean = df_results_concat.mean(axis=0).to_frame().T
     return df_results_mean

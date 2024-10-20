@@ -84,18 +84,19 @@ def infer_grn(X, par):
   return network
 
 # par['cell_type_specific'] = False
-if par['cell_type_specific']:
-    groups = adata_rna.obs.cell_type
-    i = 0
-    for group in tqdm(np.unique(groups), desc="Processing groups"):
-        X_sub = X[groups == group, :]
-        net = infer_grn(X_sub, par)
-        net['cell_type'] = group
-        if i==0:
-            grn = net
-        else:
-            grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
-        i += 1
+if 'cell_type_specific' in par:
+    if par['cell_type_specific']:
+        groups = adata_rna.obs.cell_type
+        i = 0
+        for group in tqdm(np.unique(groups), desc="Processing groups"):
+            X_sub = X[groups == group, :]
+            net = infer_grn(X_sub, par)
+            net['cell_type'] = group
+            if i==0:
+                grn = net
+            else:
+                grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
+            i += 1
 else:
     grn = infer_grn(X, par)       
 

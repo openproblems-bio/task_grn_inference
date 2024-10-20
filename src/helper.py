@@ -46,7 +46,6 @@ def calculate_scores():
         "sbatch", 
         "scripts/sbatch/calculate_scores.sh"
     ] 
-
     # Print command to verify
     subprocess.run(command)
     
@@ -84,46 +83,56 @@ def run_grn_seqera():
 def run_grn_inference():
     # par = {
     #     'methods': ['portia'],
-    #     'models_dir': 'resources/grn_models/',
-    #     'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad', 
-    #     'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad', 
+    #     'models_dir': 'resources/grn_models/mccalla/han',
+    #     'multiomics_rna': 'resources/grn-benchmark/mccalla/inference/han.h5ad', 
     #     'num_workers': 20,
-    #     'mem': "120GB",
-    #     'time': "24:00:00"
-    # }
+    #     'mem': "250GB",
+    #     'time': "48:00:00",
+    #     'max_n_links': 100000,
+    #     'causal': False, 
+    #     'normalize': False
+    #     }
     par = {
-        'methods': ["pearson_corr", "positive_control", "negative_control"],
+        'methods': ['scenicplus'],
         'models_dir': 'resources/grn_models/',
         'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad', 
-        'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad',
+        'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad', 
         'num_workers': 20,
-        'mem': "120GB",
-        'time': "24:00:00"
+        'mem': "400GB",
+        'time': "48:00:00",
+        'causal': False,
+        'normalize': True,
+        'max_n_links': 100000,
     }
 
     for method in par['methods']:
+        print(method)
         par['prediction'] = f"{par['models_dir']}/{method}.csv"
         
         # Method arguments
         method_args = (f"--multiomics_rna {par['multiomics_rna']} "
-                       f"--multiomics_atac {par['multiomics_atac']} "
                        f"--prediction {par['prediction']} "
                        f"--num_workers {par['num_workers']} "
-                       f"--resources_dir src/utils")
+                       f"--max_n_links {par['max_n_links']} ")
+        if par['causal']:
+            method_args += f"--causal "
 
         # Determine the command based on the method
         if method in ["pearson_corr", "positive_control", "negative_control"]:
+            if par['normalize']:
+                method_args += f"--normalize "
             command = f"python src/control_methods/{method}/script.py {method_args}"
         elif method == "celloracle":
+            method_args += f"--multiomics_atac {par['multiomics_atac']} "
             command = (f"/home/jnourisa/miniconda3/envs/celloracle/bin/python "
                        f"src/methods/multi_omics/celloracle/script.py {method_args}")
         elif method in ["grnboost2", "scenic", "genie3"]:
             command = f"singularity exec ../../images/scenic python src/methods/single_omics/{method}/script.py {method_args}"
         elif method == 'scglue':
+            method_args += f"--multiomics_atac {par['multiomics_atac']} "
             command = f"singularity exec ../../images/scglue python src/methods/multi_omics/{method}/script.py {method_args}"
-        elif method == 'ppcor':
-            command = f"singularity exec ../../images/ppcor Rscript src/methods/single_omics/{method}/script.R {method_args}"
         elif method == 'scenicplus':
+            method_args += f"--multiomics_atac {par['multiomics_atac']} "
             command = f"singularity exec ../../images/scenicplus python src/methods/multi_omics/{method}/script.py {method_args}"
         else:
             command = f"singularity exec ../../images/{method} python src/methods/single_omics/{method}/script.py {method_args}"
@@ -139,11 +148,12 @@ def run_grn_inference():
         # Add GPU partition if method is 'scglue'
         if method == 'scglue':
             full_tag += ["--partition=gpu", "--gres=gpu:1"]
-        
+        if True:
+            full_tag += ["--partition=gpu", "--gres=gpu:1"]
         # Run sbatch command
         try:
-            # result = subprocess.run(['sbatch'] + full_tag + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
-            result = subprocess.run(['bash'] + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
+            result = subprocess.run(['sbatch'] + full_tag + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
+            # result = subprocess.run(['bash'] + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
 
             print(f"Job {method} submitted successfully.")
             print(result.stdout)  # Print the standard output
@@ -201,6 +211,31 @@ def marco_data():
     #         print(f"{cell_type}-{GT}. adata shape: {adata.shape}, GT size: {GT_df.shape}, Gene overlap: {gene_overlap}")
     #         command = f"viash run src/metrics/regression_1/config.vsh.yaml -- --perturbation_data resources_local/mccalla_extended/{cell_type}.h5ad --prediction resources_local/mccalla_extended/{cell_type}_{GT}.csv --layer norm --subsample {subsample} --apply_tf false --tf_all resources/prior/tf_all.csv --max_n_links -1 --verbose 1 --score output/{cell_type}_{GT}.h5ad"
     #         subprocess.run(command, shell=True, check=True)
+
+
+    all_gene_names = pd.read_csv('resources/prior/genome_annotation.tsv', sep='\t').Gene.unique().astype(str)
+
+    # adata_names = ['han', 'jackson', 'zhao', 'shalek']
+    # post_fixes = ['chipunion','KDunion', 'chipunion_KDUnion_intersect']
+    # for name in adata_names:
+    #     print('------- ', name)
+    #     adata = ad.read_h5ad(f'resources/grn-benchmark/mccalla/inference/{name}.h5ad')
+    #     adata.var_names = adata.var_names.str.upper().astype(str)
+
+    #     genes = adata.var_names
+    #     print(len(genes),genes.isin(all_gene_names).sum())
+    #     print(np.setdiff1d(genes, all_gene_names)[0:5])
+    #     adata.write_h5ad(f'resources/grn-benchmark/mccalla/inference/{name}.h5ad')
+
+    #     for post_fix in post_fixes:
+    #         GT = pd.read_csv(f'resources/grn-benchmark/mccalla/evaluation/{name}_{post_fix}.csv')
+    #         GT.source = GT.source.str.upper()
+    #         GT.target = GT.target.str.upper()
+    #         GT.to_csv(f'resources/grn-benchmark/mccalla/evaluation/{name}_{post_fix}.csv')
+    #         tf_genes =set(GT.source) | set(GT.target)
+    #         tf_genes = [name.upper() for name in tf_genes]
+    #         # print(tf_genes)
+    #         print('-- ', post_fix, len(tf_genes), np.intersect1d(list(tf_genes), genes).shape)
     pass
 
 def extract_data(data, reg='reg1', dataset_id='scgen_pearson'):
@@ -300,22 +335,39 @@ def process_trace_local(job_ids_dict):
             time = time[0]
         h, m, s = map(int, time.split(':'))
         return day*24 + h + m / 60 + s / 3600
+    def reformat_data(df_local):
+        # Remove 'K' and convert to integers
+        df_local['MaxRSS'] = df_local['MaxRSS'].str.replace('K', '').astype(int)
+        df_local['MaxVMSize'] = df_local['MaxVMSize'].str.replace('K', '').astype(int)
+        df_local['Elapsed'] = df_local['Elapsed'].apply(lambda x: (elapsed_to_hours(x)))
+
+        # Convert MaxRSS and MaxVMSize from KB to GB
+        df_local['MaxRSS'] = df_local['MaxRSS'] / (1024 ** 2)  # Convert KB to GB
+        df_local['MaxVMSize'] = df_local['MaxVMSize'] / (1024 ** 2)  # Convert KB to GB
+        return df_local
     for i, (name, job_id) in enumerate(job_ids_dict.items()):
-        df = get_sacct_data(job_id)
+        if type(job_id)==list:
+            
+            for i_sub, job_id_ in enumerate(job_id):
+                df_ = get_sacct_data(job_id_)
+                df_ = reformat_data(df_)
+                if i_sub == 0:
+                    df = df_
+                else:
+                    concat_df = pd.concat([df, df_], axis=0)
+                    df['MaxVMSize'] = concat_df['MaxVMSize'].max()
+                    df['MaxRSS'] = concat_df['MaxRSS'].max()
+                    df['Elapsed'] = concat_df['Elapsed'].sum()
+        else: 
+            df = get_sacct_data(job_id)
+            df = reformat_data(df)
         df.index = [name]
         if i==0:
             df_local = df
         else:
             df_local = pd.concat([df_local, df], axis=0)
         
-    # Remove 'K' and convert to integers
-    df_local['MaxRSS'] = df_local['MaxRSS'].str.replace('K', '').astype(int)
-    df_local['MaxVMSize'] = df_local['MaxVMSize'].str.replace('K', '').astype(int)
-    df_local['Elapsed'] = df_local['Elapsed'].apply(lambda x: (elapsed_to_hours(x)))
-
-    # Convert MaxRSS and MaxVMSize from KB to GB
-    df_local['MaxRSS'] = df_local['MaxRSS'] / (1024 ** 2)  # Convert KB to GB
-    df_local['MaxVMSize'] = df_local['MaxVMSize'] / (1024 ** 2)  # Convert KB to GB
+    
     return df_local
 
 
