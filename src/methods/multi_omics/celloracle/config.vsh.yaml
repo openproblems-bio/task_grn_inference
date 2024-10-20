@@ -14,6 +14,7 @@ functionality:
       type: file
       direction: output
       default: output/celloracle/base_grn.csv
+
     # - name: --links
     #   type: file
     #   direction: output

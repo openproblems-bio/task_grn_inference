@@ -209,6 +209,10 @@ function ViashHelp {
   echo "        type: boolean"
   echo "        default: true"
   echo ""
+  echo "    --causal"
+  echo "        type: boolean"
+  echo "        default: true"
+  echo ""
   echo "    --base_grn"
   echo "        type: file, output, file must exist"
   echo "        default: output/celloracle/base_grn.csv"
@@ -337,6 +341,17 @@ while [[ $# -gt 0 ]]; do
         --donor_specific=*)
             [ -n "$VIASH_PAR_DONOR_SPECIFIC" ] && ViashError Bad arguments for option \'--donor_specific=*\': \'$VIASH_PAR_DONOR_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_DONOR_SPECIFIC=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --causal)
+            [ -n "$VIASH_PAR_CAUSAL" ] && ViashError Bad arguments for option \'--causal\': \'$VIASH_PAR_CAUSAL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CAUSAL="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --causal. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --causal=*)
+            [ -n "$VIASH_PAR_CAUSAL" ] && ViashError Bad arguments for option \'--causal=*\': \'$VIASH_PAR_CAUSAL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CAUSAL=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --base_grn)
@@ -469,6 +484,9 @@ fi
 if [ -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then
   VIASH_PAR_DONOR_SPECIFIC="true"
 fi
+if [ -z ${VIASH_PAR_CAUSAL+x} ]; then
+  VIASH_PAR_CAUSAL="true"
+fi
 if [ -z ${VIASH_PAR_BASE_GRN+x} ]; then
   VIASH_PAR_BASE_GRN="output/celloracle/base_grn.csv"
 fi
@@ -509,6 +527,12 @@ fi
 if [[ -n "$VIASH_PAR_DONOR_SPECIFIC" ]]; then
   if ! [[ "$VIASH_PAR_DONOR_SPECIFIC" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--donor_specific' has to be a boolean. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_CAUSAL" ]]; then
+  if ! [[ "$VIASH_PAR_CAUSAL" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--causal' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -599,6 +623,7 @@ par = {
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'donor_specific': $( if [ ! -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_DONOR_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
+  'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'base_grn': $( if [ ! -z ${VIASH_PAR_BASE_GRN+x} ]; then echo "r'${VIASH_PAR_BASE_GRN//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
@@ -627,7 +652,8 @@ parser.add_argument('--multiomics_atac', type=str, help='Path to the multiomics 
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--num_workers', type=int, help='Number of cores')
+parser.add_argument('--max_n_links', type=int)
 args = parser.parse_args()
 
 if args.multiomics_rna:
@@ -640,38 +666,25 @@ if args.tf_all:
     par['tf_all'] = args.tf_all
 if args.num_workers:
     par['num_workers'] = args.num_workers
+if args.max_n_links:
+    par['max_n_links'] = args.max_n_links
     
 if args.resources_dir:
+    meta = {}
     meta['resources_dir'] = args.resources_dir   
-
-
-par['links'] = f"{par['temp_dir']}/links.celloracle.links" 
-
-
-import argparse
-parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
-parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-parser.add_argument('--num_workers', type=str, help='Number of cores')
-args = parser.parse_args()
-
-if args.multiomics_rna:
-    par['multiomics_rna'] = args.multiomics_rna
-if args.prediction:
-    par['prediction'] = args.prediction
-if args.tf_all:
-    par['tf_all'] = args.tf_all
-if args.num_workers:
-    par['num_workers'] = args.num_workers
-    
-if args.resources_dir:
-    meta['resources_dir'] = args.resources_dir   
-
-sys.path.append(meta["resources_dir"])
+try:
+    meta['resources_dir'] = args.resources_dir 
+except:
+    pass
 from main import main 
 os.makedirs(par['temp_dir'], exist_ok=True)
+
+ 
+if 'base_grn' not in par:
+    par['base_grn'] = f"{par['temp_dir']}/base_grn.csv" 
+if 'links' not in par:
+    par['links'] = f"{par['temp_dir']}/links.celloracle.links"
+
 prediction = main(par)
 
 print('Write output to file', flush=True)

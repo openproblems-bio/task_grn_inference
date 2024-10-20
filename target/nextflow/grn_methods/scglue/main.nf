@@ -2968,6 +2968,18 @@ meta = [
         "dest" : "par"
       },
       {
+        "type" : "boolean",
+        "name" : "--causal",
+        "default" : [
+          true
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
         "type" : "string",
         "name" : "--top_n_targets",
         "default" : [
@@ -3167,7 +3179,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scglue",
     "viash_version" : "0.8.6",
-    "git_commit" : "8f10928167ac24cf513744bec62d7659aac5b0c0",
+    "git_commit" : "73179958d17024790a15c980c6fe366af80ec0c0",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3199,6 +3211,7 @@ par = {
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'donor_specific': $( if [ ! -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_DONOR_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'top_n_targets': $( if [ ! -z ${VIASH_PAR_TOP_N_TARGETS+x} ]; then echo "r'${VIASH_PAR_TOP_N_TARGETS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'rank_threshold': $( if [ ! -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_RANK_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_NES_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3247,8 +3260,8 @@ if args.tf_all:
 if args.num_workers:
     par['num_workers'] = args.num_workers
     
-if args.resources_dir:
-    meta['resources_dir'] = args.resources_dir  
+# if args.resources_dir:
+#     meta['resources_dir'] = args.resources_dir  
 
 # get gene annotation
 par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"

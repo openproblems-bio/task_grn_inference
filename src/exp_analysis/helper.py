@@ -106,7 +106,7 @@ def cosine_similarity_net(nets_dict, col_name='source', weight_col='weight', fig
     
     return cosine_sim_matrix, fig
 
-def jaccard_similarity_net(nets_dict, col_name='link', figsize=(4, 4), title='jaccard Similarity', ax=None):
+def jaccard_similarity_net(nets_dict, col_name='link', figsize=(4, 4), title='jaccard Similarity', ax=None, fmt='.02f'):
     from itertools import combinations
     import seaborn as sns
     import matplotlib.pyplot as plt
@@ -138,7 +138,7 @@ def jaccard_similarity_net(nets_dict, col_name='link', figsize=(4, 4), title='ja
         fig, ax = plt.subplots(1, 1, figsize=figsize)
     else:
         fig = None
-    sns.heatmap(jaccard_matrix, annot=True, cmap="coolwarm", xticklabels=nets_names, yticklabels=nets_names, ax=ax)
+    sns.heatmap(jaccard_matrix, annot=True, cmap="viridis", xticklabels=nets_names, yticklabels=nets_names, ax=ax, fmt=fmt, cbar=None)
     ax.grid(False)
     ax.set_title(title)
     # Rotate x labels for readability
@@ -146,7 +146,7 @@ def jaccard_similarity_net(nets_dict, col_name='link', figsize=(4, 4), title='ja
 
     return jaccard_matrix, fig
 
-def plot_cumulative_density(data, label='', ax=None, title=None, label=None, s=1, x_label='Weight', **kwdgs):
+def plot_cumulative_density(data, ax=None, title=None, label=None, s=3, x_label='Weight', **kwdgs):
     # Sort the data
     sorted_data = np.sort(data)
     # Compute the cumulative density values
@@ -159,7 +159,9 @@ def plot_cumulative_density(data, label='', ax=None, title=None, label=None, s=1
     ax.set_xlabel(x_label)
     ax.set_ylabel('Cumulative Density')
     ax.set_title(title)
-    ax.grid(True)
+    ax.grid(True, linewidth=0.2, linestyle='--', color='gray')
+    for side in ['right', 'top']:
+        ax.spines[side].set_visible(False)
     return fig, ax
 
 class Connectivity:
@@ -224,6 +226,37 @@ class VSA_analysis:
         # df_distance['critical_change_ps'] = df_distance['ps_distance'] > df_distance['ps_distance'].quantile(critical_change_q_t)
         # df_distance['critical_change_overall'] = df_distance['overall_distance'] > df_distance['overall_distance'].quantile(critical_change_q_t)
         return df_distance
+def find_peak_intersection(peaks, peaks_ref):
+    '''Find those peaks_ref intersect with peaks'''
+    # Convert arrays to structured data (chr, start, end)
+    def split_peaks(peak_array):
+        split_data = []
+        for p in peak_array:
+            try:
+                chr_, range_ = p.split(':')
+                start, end = map(int, range_.split('-'))
+                split_data.append((chr_, start, end))
+            except ValueError:
+                continue  # Skip malformed peaks
+        return np.array(split_data, dtype=object)
+
+    peaks_struct = split_peaks(peaks)
+    peaks_ref_struct = split_peaks(peaks_ref)
+
+    # Optimize with NumPy broadcasting for faster intersection check
+    intersecting_peaks_ref = []
+    
+    chr_peaks = peaks_struct[:, 0]
+    start_peaks = peaks_struct[:, 1].astype(int)
+    end_peaks = peaks_struct[:, 2].astype(int)
+
+    for chr_ref, start_ref, end_ref in peaks_ref_struct:
+        # Vectorized filtering for chromosome and overlap conditions
+        mask = (chr_peaks == chr_ref) & (start_peaks <= end_ref) & (end_peaks >= start_ref)
+        if np.any(mask):
+            intersecting_peaks_ref.append(f"{chr_ref}:{start_ref}-{end_ref}")
+    
+    return intersecting_peaks_ref
 class Exp_analysis:
     '''
     This class provides functions for explanatory analysis of GRNs
@@ -232,8 +265,10 @@ class Exp_analysis:
         self.net = net 
         # self.net.weight = minmax_scale(self.net.weight)
         self.net['link'] = self.net['source'].astype(str) + '_' + self.net['target'].astype(str)
-
         self.peak_gene_net = peak_gene_net
+        if self.peak_gene_net is not None:
+            if 'peak' in peak_gene_net.columns:
+                peak_gene_net.rename(columns={'peak': 'source'}, inplace=True)
         self.tfs = net.source.unique()
         self.targets = net.target.unique()
         # check duplicates
@@ -251,7 +286,7 @@ class Exp_analysis:
     def plot_centrality_barh(df, title='',ax=None, xlabel='Degree', ylabel='Gene', colors=None):
         if ax==None:
             fig, ax = plt.subplots(figsize=(10, 6))
-        df['degree'].plot(kind='barh', color='skyblue', ax=ax)  # Pass ax to the plot method
+        df.plot(kind='barh', color='skyblue', ax=ax)  # Pass ax to the plot method
         ax.set_title(title)
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
@@ -293,15 +328,33 @@ class Exp_analysis:
         else:
             df = df.sort_values(by=col_name, ascending=ascending, key=abs)[:top_n]
         return df
+        
+
     def annotate_peaks(self, annotation_df) -> dict[str, float]:
         '''Annotate peaks with associated regions on genome.
         '''
         if self.peak_gene_net is None:
             print('Peak gene net is not given. Peak annoation is skipped.')
             return
-        peaks = self.peak_gene_net.peak.unique()
+        # print(self.peak_gene_net)
+        peaks = self.peak_gene_net.source.unique()
         peaks = self.format_peak(peaks)
-        annotation_df = annotation_df[annotation_df.peak.isin(peaks)]
+
+        annotation_peaks = annotation_df.peak.unique()
+
+        flag = False
+        for peak in peaks:
+            if peak not in annotation_peaks:
+                flag = True
+
+
+        if flag:
+            print('Not all peaks in the net is among the annotated ones. Finding the overlap')
+            peaks = find_peak_intersection(peaks, annotation_df.peak.unique())
+            annotation_df = annotation_df[annotation_df.peak.isin(peaks)]
+        else:
+            annotation_df = annotation_df[annotation_df.peak.isin(peaks)]
+
         value_counts = annotation_df.annotation.value_counts()
         sum_values = value_counts.sum()
         value_ratio = ((value_counts/sum_values)*100).round(1)
@@ -343,7 +396,7 @@ class Exp_analysis:
         return df
     
 
-def plot_interactions(interaction_df: pd.DataFrame, min_subset_size=None, min_degree=None, color_map=None) -> plt.Figure: 
+def plot_interactions(interaction_df: pd.DataFrame, min_subset_size=None, min_degree=None, color_map=None, sort_by='degree') -> plt.Figure: 
     """Upset plot of interactions
 
     Args:
@@ -359,7 +412,7 @@ def plot_interactions(interaction_df: pd.DataFrame, min_subset_size=None, min_de
     out_dict = upsetplot.plot(upsetplot.from_indicators(indicators=lambda a: a==True, data=interaction_df), fig=fig, 
             show_counts=True, 
             show_percentages = '{:.0%}',
-            # sort_by='cardinality', 
+            sort_by=sort_by,  #'cardinality'
             # min_subset_size =".1%", # min interaction to show
             min_subset_size = min_subset_size, # min interaction to show
             min_degree=min_degree,

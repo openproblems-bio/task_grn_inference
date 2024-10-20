@@ -14,22 +14,35 @@ par = {
     'normalize': False,
     'donor_specific': False,
     'temp_dir': 'output/pearson_corr',
-    'causal': True}
+    'causal': True,
+    'normalize': True}
 ## VIASH END
 
 
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
 parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--multiomics_atac', type=str, help='Path to the multiomics RNA file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
 parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
+parser.add_argument('--causal', action='store_true', help='Enable causal mode')
+parser.add_argument('--normalize', action='store_true')
+
 args = parser.parse_args()
+
 if args.multiomics_rna:
     par['multiomics_rna'] = args.multiomics_rna
+if args.causal:
+    par['causal'] = True
+else:
+    par['causal'] = False
+
+if args.causal:
+    par['normalize'] = True
+else:
+    par['normalize'] = False
+
 if args.prediction:
     par['prediction'] = args.prediction
 if args.tf_all:
@@ -38,9 +51,6 @@ if args.num_workers:
     par['num_workers'] = args.num_workers
 if args.max_n_links:
     par['max_n_links'] = int(args.max_n_links)
-if args.resources_dir:
-    meta['resources_dir'] = args.resources_dir  
-
 
 os.makedirs(par['temp_dir'], exist_ok=True)
 import sys
@@ -59,9 +69,11 @@ def create_corr_net(par):
     print(par)
     print('Read data')
     adata = ad.read_h5ad(par["multiomics_rna"])
-    # - lognorm 
-    sc.pp.normalize_total(adata)
-    sc.pp.log1p(adata)
+    if 'normalize' in par:
+        if par['normalize']:
+            # - lognorm 
+            sc.pp.normalize_total(adata)
+            sc.pp.log1p(adata)
     # - corr
     gene_names = adata.var_names.to_numpy()
     grn = corr_net(adata.X, gene_names, par)    

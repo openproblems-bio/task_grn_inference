@@ -208,6 +208,10 @@ function ViashHelp {
   echo "    --donor_specific"
   echo "        type: boolean"
   echo "        default: true"
+  echo ""
+  echo "    --causal"
+  echo "        type: boolean"
+  echo "        default: true"
 }
 
 # initialise array
@@ -335,6 +339,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_DONOR_SPECIFIC=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --causal)
+            [ -n "$VIASH_PAR_CAUSAL" ] && ViashError Bad arguments for option \'--causal\': \'$VIASH_PAR_CAUSAL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CAUSAL="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --causal. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --causal=*)
+            [ -n "$VIASH_PAR_CAUSAL" ] && ViashError Bad arguments for option \'--causal=*\': \'$VIASH_PAR_CAUSAL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CAUSAL=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         ---cpus)
             [ -n "$VIASH_META_CPUS" ] && ViashError Bad arguments for option \'---cpus\': \'$VIASH_META_CPUS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_META_CPUS="$2"
@@ -454,6 +469,9 @@ fi
 if [ -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then
   VIASH_PAR_DONOR_SPECIFIC="true"
 fi
+if [ -z ${VIASH_PAR_CAUSAL+x} ]; then
+  VIASH_PAR_CAUSAL="true"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
@@ -491,6 +509,12 @@ fi
 if [[ -n "$VIASH_PAR_DONOR_SPECIFIC" ]]; then
   if ! [[ "$VIASH_PAR_DONOR_SPECIFIC" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--donor_specific' has to be a boolean. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_CAUSAL" ]]; then
+  if ! [[ "$VIASH_PAR_CAUSAL" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--causal' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -582,7 +606,8 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
-  'donor_specific': $( if [ ! -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_DONOR_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
+  'donor_specific': $( if [ ! -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_DONOR_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
+  'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -610,30 +635,44 @@ import sys
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
 parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--multiomics_atac', type=str, help='Path to the multiomics atac file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
+parser.add_argument('--causal', action='store_true', help='Enable causal mode')
+parser.add_argument('--normalize', action='store_true')
+
 args = parser.parse_args()
 
 if args.multiomics_rna:
     par['multiomics_rna'] = args.multiomics_rna
+if args.causal:
+    par['causal'] = True
+else:
+    par['causal'] = False
+
+if args.causal:
+    par['normalize'] = True
+else:
+    par['normalize'] = False
+
 if args.prediction:
     par['prediction'] = args.prediction
 if args.tf_all:
     par['tf_all'] = args.tf_all
 if args.num_workers:
     par['num_workers'] = args.num_workers
-    
-if args.resources_dir:
-    meta['resources_dir'] = args.resources_dir   
+if args.max_n_links:
+    par['max_n_links'] = int(args.max_n_links)
+
+os.makedirs(par['temp_dir'], exist_ok=True)
+import sys
 
 try:
     sys.path.append(meta["resources_dir"])
 except:
-    meta= {
-    "resources_dir": 'src/utils/'
+    meta = {
+    'resources_dir': 'src/utils'
     }
     sys.path.append(meta["resources_dir"])
 from util import process_links

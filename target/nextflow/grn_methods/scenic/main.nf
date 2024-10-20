@@ -2968,6 +2968,18 @@ meta = [
         "dest" : "par"
       },
       {
+        "type" : "boolean",
+        "name" : "--causal",
+        "default" : [
+          true
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
         "type" : "integer",
         "name" : "--rank_threshold",
         "default" : [
@@ -3130,7 +3142,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenic",
     "viash_version" : "0.8.6",
-    "git_commit" : "8f10928167ac24cf513744bec62d7659aac5b0c0",
+    "git_commit" : "73179958d17024790a15c980c6fe366af80ec0c0",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3174,6 +3186,7 @@ par = {
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'donor_specific': $( if [ ! -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_DONOR_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'rank_threshold': $( if [ ! -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then echo "int(r'${VIASH_PAR_RANK_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'auc_threshold': $( if [ ! -z ${VIASH_PAR_AUC_THRESHOLD+x} ]; then echo "float(r'${VIASH_PAR_AUC_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "float(r'${VIASH_PAR_NES_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi )

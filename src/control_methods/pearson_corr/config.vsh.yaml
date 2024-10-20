@@ -6,6 +6,11 @@ functionality:
   info:
     label: pearson_corr
     summary: "Baseline based on correlation"
+  arguments:
+    - name: --normalize
+      type: boolean 
+      default: True 
+      direction: input
 
   resources:
     - type: python_script

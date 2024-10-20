@@ -2968,6 +2968,18 @@ meta = [
         "dest" : "par"
       },
       {
+        "type" : "boolean",
+        "name" : "--causal",
+        "default" : [
+          true
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
         "type" : "file",
         "name" : "--base_grn",
         "default" : [
@@ -3099,7 +3111,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/celloracle",
     "viash_version" : "0.8.6",
-    "git_commit" : "8f10928167ac24cf513744bec62d7659aac5b0c0",
+    "git_commit" : "73179958d17024790a15c980c6fe366af80ec0c0",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3132,6 +3144,7 @@ par = {
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'donor_specific': $( if [ ! -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_DONOR_SPECIFIC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'base_grn': $( if [ ! -z ${VIASH_PAR_BASE_GRN+x} ]; then echo "r'${VIASH_PAR_BASE_GRN//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
@@ -3160,7 +3173,8 @@ parser.add_argument('--multiomics_atac', type=str, help='Path to the multiomics 
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--num_workers', type=int, help='Number of cores')
+parser.add_argument('--max_n_links', type=int)
 args = parser.parse_args()
 
 if args.multiomics_rna:
@@ -3173,38 +3187,25 @@ if args.tf_all:
     par['tf_all'] = args.tf_all
 if args.num_workers:
     par['num_workers'] = args.num_workers
+if args.max_n_links:
+    par['max_n_links'] = args.max_n_links
     
 if args.resources_dir:
+    meta = {}
     meta['resources_dir'] = args.resources_dir   
-
-
-par['links'] = f"{par['temp_dir']}/links.celloracle.links" 
-
-
-import argparse
-parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
-parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-parser.add_argument('--num_workers', type=str, help='Number of cores')
-args = parser.parse_args()
-
-if args.multiomics_rna:
-    par['multiomics_rna'] = args.multiomics_rna
-if args.prediction:
-    par['prediction'] = args.prediction
-if args.tf_all:
-    par['tf_all'] = args.tf_all
-if args.num_workers:
-    par['num_workers'] = args.num_workers
-    
-if args.resources_dir:
-    meta['resources_dir'] = args.resources_dir   
-
-sys.path.append(meta["resources_dir"])
+try:
+    meta['resources_dir'] = args.resources_dir 
+except:
+    pass
 from main import main 
 os.makedirs(par['temp_dir'], exist_ok=True)
+
+ 
+if 'base_grn' not in par:
+    par['base_grn'] = f"{par['temp_dir']}/base_grn.csv" 
+if 'links' not in par:
+    par['links'] = f"{par['temp_dir']}/links.celloracle.links"
+
 prediction = main(par)
 
 print('Write output to file', flush=True)

@@ -333,8 +333,8 @@ def run_cistopic(par):
     
     # LDA-based topic modeling
     print('Run LDA models', flush=True)
-    # n_topics = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
-    n_topics = [40] #TODO: fix this
+    n_topics = [2, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50]
+    # n_topics = [40] #TODO: fix this
     if os.path.exists(par['MALLET_PATH']):
         models = run_cgs_models_mallet(
             cistopic_obj,
@@ -703,17 +703,17 @@ def preprocess_rna(par):
 def snakemake_pipeline(par):
     import os
     snakemake_dir = os.path.join(par['temp_dir'], 'scplus_pipeline', 'Snakemake')
-    # if os.path.exists(snakemake_dir):
-    #     import shutil
-    #     shutil.rmtree(snakemake_dir)  
+    if os.path.exists(snakemake_dir):
+        import shutil
+        shutil.rmtree(snakemake_dir)  
 
     os.makedirs(os.path.join(par['temp_dir'], 'scplus_pipeline'), exist_ok=True)
     os.makedirs(os.path.join(par['temp_dir'], 'scplus_pipeline', 'temp'), exist_ok=True)
     
     pipeline_dir = os.path.join(par['temp_dir'], 'scplus_pipeline')
-    if not os.path.exists(pipeline_dir):
-        subprocess.run(['scenicplus', 'init_snakemake', '--out_dir', pipeline_dir])
-        print('snake make initialized', flush=True)
+    # if not os.path.exists(pipeline_dir):
+    subprocess.run(['scenicplus', 'init_snakemake', '--out_dir', pipeline_dir])
+    print('snake make initialized', flush=True)
 
     # Load pipeline settings
     with open(os.path.join(snakemake_dir, 'config', 'config.yaml'), 'r') as f:

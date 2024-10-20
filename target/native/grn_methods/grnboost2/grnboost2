@@ -208,6 +208,10 @@ function ViashHelp {
   echo "    --donor_specific"
   echo "        type: boolean"
   echo "        default: true"
+  echo ""
+  echo "    --causal"
+  echo "        type: boolean"
+  echo "        default: true"
 }
 
 # initialise array
@@ -335,6 +339,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_DONOR_SPECIFIC=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --causal)
+            [ -n "$VIASH_PAR_CAUSAL" ] && ViashError Bad arguments for option \'--causal\': \'$VIASH_PAR_CAUSAL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CAUSAL="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --causal. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --causal=*)
+            [ -n "$VIASH_PAR_CAUSAL" ] && ViashError Bad arguments for option \'--causal=*\': \'$VIASH_PAR_CAUSAL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CAUSAL=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         ---cpus)
             [ -n "$VIASH_META_CPUS" ] && ViashError Bad arguments for option \'---cpus\': \'$VIASH_META_CPUS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_META_CPUS="$2"
@@ -454,6 +469,9 @@ fi
 if [ -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then
   VIASH_PAR_DONOR_SPECIFIC="true"
 fi
+if [ -z ${VIASH_PAR_CAUSAL+x} ]; then
+  VIASH_PAR_CAUSAL="true"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
@@ -491,6 +509,12 @@ fi
 if [[ -n "$VIASH_PAR_DONOR_SPECIFIC" ]]; then
   if ! [[ "$VIASH_PAR_DONOR_SPECIFIC" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--donor_specific' has to be a boolean. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_CAUSAL" ]]; then
+  if ! [[ "$VIASH_PAR_CAUSAL" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--causal' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -582,7 +606,8 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
-  'donor_specific': $( if [ ! -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_DONOR_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
+  'donor_specific': $( if [ ! -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_DONOR_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
+  'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -667,18 +692,19 @@ def infer_grn(X, par):
   return network
 
 # par['cell_type_specific'] = False
-if par['cell_type_specific']:
-    groups = adata_rna.obs.cell_type
-    i = 0
-    for group in tqdm(np.unique(groups), desc="Processing groups"):
-        X_sub = X[groups == group, :]
-        net = infer_grn(X_sub, par)
-        net['cell_type'] = group
-        if i==0:
-            grn = net
-        else:
-            grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
-        i += 1
+if 'cell_type_specific' in par:
+    if par['cell_type_specific']:
+        groups = adata_rna.obs.cell_type
+        i = 0
+        for group in tqdm(np.unique(groups), desc="Processing groups"):
+            X_sub = X[groups == group, :]
+            net = infer_grn(X_sub, par)
+            net['cell_type'] = group
+            if i==0:
+                grn = net
+            else:
+                grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
+            i += 1
 else:
     grn = infer_grn(X, par)       
 

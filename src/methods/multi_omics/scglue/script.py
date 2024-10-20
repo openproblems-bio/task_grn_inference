@@ -42,8 +42,8 @@ if args.tf_all:
 if args.num_workers:
     par['num_workers'] = args.num_workers
     
-if args.resources_dir:
-    meta['resources_dir'] = args.resources_dir  
+# if args.resources_dir:
+#     meta['resources_dir'] = args.resources_dir  
 
 # get gene annotation
 par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
