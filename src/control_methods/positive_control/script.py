@@ -11,9 +11,8 @@ import scanpy as sc
 
 ## VIASH START
 par = {
-    'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
+    'rna': 'resources/grn-benchmark/rna.h5ad',
     'tf_all': 'resources/prior/tf_all.csv',
-    'causal': True,
     'max_n_links': 50000,
     'prediction': 'resources/grn_models/positive_control.csv',
     "seed": 32,
@@ -24,27 +23,32 @@ par = {
 import sys
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--multiomics_atac', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
 parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
+parser.add_argument('--normalize', action='store_true')
 args = parser.parse_args()
-if args.multiomics_rna:
-    par['multiomics_rna'] = args.multiomics_rna
+if args.rna:
+    par['rna'] = args.rna
 if args.prediction:
     par['prediction'] = args.prediction
 if args.tf_all:
     par['tf_all'] = args.tf_all
 if args.num_workers:
     par['num_workers'] = args.num_workers
+
 if args.max_n_links:
     par['max_n_links'] = int(args.max_n_links)
 if args.resources_dir:
     meta['resources_dir'] = args.resources_dir  
 
+if args.normalize:
+    par['normalize'] = True
+else:
+    par['normalize'] = False
 try:
     sys.path.append(meta["resources_dir"])
 except:
@@ -54,41 +58,21 @@ except:
     sys.path.append(meta["resources_dir"])
 from util import corr_net
 
-print('Create causal corr net')
-par['causal'] = True
-
 def create_corr_net(par):
     print(par)
     print('Read data')
-    adata = ad.read_h5ad(par["multiomics_rna"])
-    # - lognorm 
-    sc.pp.normalize_total(adata)
-    sc.pp.log1p(adata)
+    adata = ad.read_h5ad(par["rna"])
+    if 'normalize' in par:
+        if par['normalize']:
+            print('normalizing')
+            # - lognorm 
+            sc.pp.normalize_total(adata)
+            sc.pp.log1p(adata)
     # - corr
     gene_names = adata.var_names.to_numpy()
     grn = corr_net(adata.X, gene_names, par)    
     return grn
 
-
-par['multiomics_rna'] = par['perturbation_data']
-
-if par['donor_specific']:
-    os.makedirs(par['temp_dir'], exist_ok=True)
-    adata = ad.read_h5ad(par['multiomics_rna'])
-    # - new dir for donor specific adata
-    par['multiomics_rna'] = f"{par['temp_dir']}/multiomics_rna.h5ad"
-    donor_ids = adata.obs.donor_id.unique()
-    for i, donor_id in enumerate(donor_ids): # run for each donor and concat
-        print('GRN inference for ', donor_id)
-        adata_sub = adata[adata.obs.donor_id.eq(donor_id), :]
-        adata_sub.write(par['multiomics_rna'])
-        net_sub = create_corr_net(par)
-        net_sub['donor_id'] = donor_id
-        if i == 0:
-            net = net_sub
-        else:
-            net = pd.concat([net, net_sub])
-else:
-    net = create_corr_net(par)
+net = create_corr_net(par)
 
 net.to_csv(par['prediction'])

@@ -12,11 +12,11 @@ import scanpy as sc
 
 def base_grn(par) -> None:
     print("Reading atac data")
-    multiomics_atac = ad.read_h5ad(par["multiomics_atac"])
+    atac = ad.read_h5ad(par["atac"])
 
    
     print("Format peak data")
-    peaks = multiomics_atac.var_names.to_numpy()
+    peaks = atac.var_names.to_numpy()
     peaks = [peak.replace(':','_').replace("-",'_') for peak in peaks]
     tss_annotated = ma.get_tss_info(peak_str_list=peaks, ref_genome="hg38")
     tss_annotated['peak_id'] = tss_annotated['chr'].astype(str)+"_"+tss_annotated['start'].astype(str)+"_"+tss_annotated['end'].astype(str)
@@ -57,7 +57,7 @@ def base_grn(par) -> None:
 
 def preprocess_rna(par) -> None:
     print("Processing rna data")
-    adata = ad.read_h5ad(par['multiomics_rna'])
+    adata = ad.read_h5ad(par['rna'])
     if True: #only one cluster
         adata.obs['cell_type'] = 'one_cell_type'
     adata.layers["counts"] = adata.X.copy()

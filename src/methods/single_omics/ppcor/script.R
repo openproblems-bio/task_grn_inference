@@ -4,7 +4,7 @@ library(dplyr)
 
 ## VIASH START
 par <- list(
-  multiomics_rna = 'resources/grn-benchmark/multiomics_rna.h5ad',
+  rna = 'resources/grn-benchmark/rna.h5ad',
   prediction = 'resources/grn_models/ppcor.csv',
   tf_all = 'resources/prior/tf_all.csv',
   max_n_links = 50000
@@ -14,7 +14,7 @@ print(par)
 # input expression data
 tf_names <- scan(par$tf_all, what = "", sep = "\n")
 
-ad <- anndata::read_h5ad(par$multiomics_rna)
+ad <- anndata::read_h5ad(par$rna)
 
 inputExpr <- ad$X
 geneNames <- colnames(inputExpr)

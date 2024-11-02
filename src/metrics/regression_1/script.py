@@ -10,9 +10,8 @@ par = {
   # "prediction": "output/pearson_net.csv",
   "prediction": "resources/grn_models/full/portia.csv",
   "method_id": "scenic",
-  "min_tf": False,
   "max_n_links": 50000,
-  "apply_tf": "true",
+  "apply_tf": False,
   'score': 'output/score.h5ad',
   'reg_type': 'ridge',
   'layer': 'pearson',
@@ -20,10 +19,38 @@ par = {
   'num_workers': 4,
   'skeleton': 'resources/prior/skeleton.csv',
   'apply_skeleton': False,
-  'verbose': 0,
+  'verbose': 4,
   'binarize': True
 }
 ## VIASH END
+
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--perturbation_data', type=str, help='Path to the perturbation_data file')
+parser.add_argument('--prediction', type=str, help='Path to the prediction file')
+parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
+parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--layer', type=str, help='Layer to use')
+parser.add_argument('--causal', action='store_true', help='Enable causal mode')
+parser.add_argument('--normalize', action='store_true')
+
+args = parser.parse_args()
+
+if args.perturbation_data:
+    par['perturbation_data'] = args.perturbation_data
+if args.layer:
+  par['layer'] = args.layer
+if args.causal:
+    par['causal'] = True
+else:
+    par['causal'] = False
+
+if args.prediction:
+    par['prediction'] = args.prediction
+if args.tf_all:
+    par['tf_all'] = args.tf_all
+if args.num_workers:
+    par['num_workers'] = args.num_workers
 
 try:
   sys.path.append(meta["resources_dir"])
@@ -36,7 +63,7 @@ except:
   sys.path.append(meta["util_dir"])
 
 from main import main 
-
+print(par)
 output = main(par) 
 print(output)
 

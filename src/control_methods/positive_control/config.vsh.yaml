@@ -6,12 +6,7 @@ functionality:
   info:
     label: positive_control
     summary: "Baseline based on correlation"
-  arguments:
-    - name: --perturbation_data
-      type: file
-      required: true
-      direction: input
-      example: resources_test/grn-benchmark/perturbation_data.h5ad
+
   resources:
     - type: python_script
       path: script.py

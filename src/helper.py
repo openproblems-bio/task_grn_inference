@@ -92,30 +92,43 @@ def run_grn_inference():
     #     'causal': False, 
     #     'normalize': False
     #     }
+    # par = {
+    #     'methods': ['scenicplus'],
+    #     'models_dir': 'resources/grn_models/',
+    #     'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad', 
+    #     'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad', 
+    #     'num_workers': 20,
+    #     'mem': "400GB",
+    #     'time': "48:00:00",
+    #     'causal': False,
+    #     'normalize': True,
+    #     'max_n_links': 100000,
+    # }
+
+    # - single omics 
     par = {
-        'methods': ['scenicplus'],
-        'models_dir': 'resources/grn_models/',
-        'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad', 
-        'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad', 
+        # 'methods': ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2"],
+        'methods': ["grnboost2"],
+
+        'models_dir': 'output/',
+        'rna': 'resources/inference_datasets/replogle2.h5ad', 
         'num_workers': 20,
-        'mem': "400GB",
-        'time': "48:00:00",
-        'causal': False,
-        'normalize': True,
-        'max_n_links': 100000,
+        'mem': "64GB",
+        'time': "2:00:00",
+        'normalize': False,
+        'max_n_links': 10000,
     }
+    
 
     for method in par['methods']:
         print(method)
         par['prediction'] = f"{par['models_dir']}/{method}.csv"
         
         # Method arguments
-        method_args = (f"--multiomics_rna {par['multiomics_rna']} "
+        method_args = (f"--rna {par['rna']} "
                        f"--prediction {par['prediction']} "
                        f"--num_workers {par['num_workers']} "
                        f"--max_n_links {par['max_n_links']} ")
-        if par['causal']:
-            method_args += f"--causal "
 
         # Determine the command based on the method
         if method in ["pearson_corr", "positive_control", "negative_control"]:
@@ -123,16 +136,16 @@ def run_grn_inference():
                 method_args += f"--normalize "
             command = f"python src/control_methods/{method}/script.py {method_args}"
         elif method == "celloracle":
-            method_args += f"--multiomics_atac {par['multiomics_atac']} "
+            method_args += f"--atac {par['atac']} "
             command = (f"/home/jnourisa/miniconda3/envs/celloracle/bin/python "
                        f"src/methods/multi_omics/celloracle/script.py {method_args}")
         elif method in ["grnboost2", "scenic", "genie3"]:
             command = f"singularity exec ../../images/scenic python src/methods/single_omics/{method}/script.py {method_args}"
         elif method == 'scglue':
-            method_args += f"--multiomics_atac {par['multiomics_atac']} "
+            method_args += f"--atac {par['atac']} "
             command = f"singularity exec ../../images/scglue python src/methods/multi_omics/{method}/script.py {method_args}"
         elif method == 'scenicplus':
-            method_args += f"--multiomics_atac {par['multiomics_atac']} "
+            method_args += f"--atac {par['atac']} "
             command = f"singularity exec ../../images/scenicplus python src/methods/multi_omics/{method}/script.py {method_args}"
         else:
             command = f"singularity exec ../../images/{method} python src/methods/single_omics/{method}/script.py {method_args}"

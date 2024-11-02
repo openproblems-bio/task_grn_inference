@@ -8,26 +8,26 @@ functionality:
       description: |
         A method for inferring GRN from expression data.
   arguments:
-    - name: --multiomics_rna
-      __merge__: file_multiomics_rna_h5ad.yaml
+    - name: --rna
+      __merge__: file_rna_h5ad.yaml
       required: true
       direction: input
-      example: resources_test/grn-benchmark/multiomics_rna.h5ad
-    - name: --multiomics_atac
-      __merge__: file_multiomics_atac_h5ad.yaml
+      example: resources/evaluation_datasets/op_rna.h5ad
+    - name: --atac
+      __merge__: file_atac_h5ad.yaml
       required: false
       direction: input
-      example: resources_test/grn-benchmark/multiomics_atac.h5ad
+      example: resources/evaluation_datasets/op_atac.h5ad
     - name: --prediction
       __merge__: file_prediction.yaml
       required: false
       direction: output
-      example: resources_test/grn_models/collectri.csv
+      example: resources/grn_models/collectri.csv
     - name: --tf_all
       type: file
       required: false
       direction: input
-      example: resources_test/prior/tf_all.csv
+      example: resources/prior/tf_all.csv
     - name: --max_n_links
       type: integer
       default: 50000
@@ -43,10 +43,6 @@ functionality:
       type: integer
       direction: input
       default: 32
-    - name: --donor_specific
-      type: boolean
-      direction: input
-      default: True
     - name: --causal
       type: boolean
       direction: input
@@ -56,9 +52,5 @@ functionality:
   test_resources:
     - type: python_script
       path: /src/common/component_tests/run_and_check_output.py
-    - path: /resources_test/grn-benchmark
-      dest: resources_test/grn-benchmark
-    - path: /resources_test/prior
-      dest: resources_test/prior
-    - path: /resources_test/supplementary
-      dest: resources_test/supplementary
+    - path: /resources_test/
+      dest: resources_test/

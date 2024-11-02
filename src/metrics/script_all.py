@@ -6,7 +6,7 @@ import os
 
 ## VIASH START
 par = {
-  'reg_type': 'ridge',
+  'reg_type': 'RF',
   'models_dir': "resources/grn_models/",
   'scores_dir': "resources/scores/",
   
@@ -59,11 +59,11 @@ sys.path.append(meta["util"])
 
 os.makedirs(par['scores_dir'], exist_ok=True)
 
-for binarize in [False, True]:
+for binarize in [True]:
   par['binarize'] = binarize
-  for max_n_links in [50000, 10000]:
+  for max_n_links in [50000]:
     par['max_n_links'] = max_n_links
-    for apply_skeleton in [True, False]:
+    for apply_skeleton in [True]:
       par['apply_skeleton'] = apply_skeleton
       for layer in par['layers']:
         par['layer'] = layer

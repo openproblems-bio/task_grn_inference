@@ -8,8 +8,8 @@ functionality:
       description: |
         A metric to evaluate the performance of the inferred GRN
   arguments: 
-    - name: --perturbation_data
-      __merge__: file_perturbation_h5ad.yaml
+    - name: --evaluation_data
+      __merge__: file_evaluation_h5ad.yaml
       required: false
       direction: input
     - name: --prediction
@@ -81,9 +81,5 @@ functionality:
   test_resources:
     - type: python_script
       path: /src/common/component_tests/run_and_check_output.py
-    - path: /resources_test/grn-benchmark
-      dest: resources_test/grn-benchmark
-    - path: /resources_test/prior
-      dest: resources_test/prior
-    - path: /resources_test/grn_models
-      dest: resources_test/grn_models
+    - path: /resources_test/
+      dest: resources_test/

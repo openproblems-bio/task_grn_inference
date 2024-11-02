@@ -17,7 +17,7 @@ import sys
 
 ## VIASH START
 par = {
-  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna_0.h5ad',
+  'rna': 'resources/grn-benchmark/rna_0.h5ad',
   "tf_all": 'resources/prior/tf_all.csv',
   'prediction': 'output/scenic_0_hvgs.csv',
   'temp_dir': 'output/scenic',
@@ -32,15 +32,15 @@ par = {
 ## VIASH END
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
 args = parser.parse_args()
 
-if args.multiomics_rna:
-    par['multiomics_rna'] = args.multiomics_rna
+if args.rna:
+    par['rna'] = args.rna
 if args.prediction:
     par['prediction'] = args.prediction
 if args.tf_all:
@@ -79,7 +79,7 @@ def download_prior(par):
 
 def format_data(par):
   print('Read data')
-  adata_rna = anndata.read_h5ad(par['multiomics_rna'])  
+  adata_rna = anndata.read_h5ad(par['rna'])  
   gene_names = adata_rna.var_names
   if sp.issparse(adata_rna.X):
     adata_rna.X = adata_rna.X.toarray()
