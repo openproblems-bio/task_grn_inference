@@ -2859,7 +2859,7 @@ meta = [
           }
         },
         "example" : [
-          "resources_test/evaluation_datasets/op_perturbation.h5ad"
+          "resources/evaluation_datasets/op_perturbation.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2947,7 +2947,7 @@ meta = [
           }
         },
         "example" : [
-          "resources_test/scores/score.h5ad"
+          "resources/scores/score.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -3252,7 +3252,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "972d714cd2d3657ad409e8cc613cf51bdec4f495",
+    "git_commit" : "dab5ba0d168072f09e2a63cb1893fa0abacfdb8a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

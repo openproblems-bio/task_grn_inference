@@ -175,7 +175,7 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --evaluation_data"
   echo "        type: file, file must exist"
-  echo "        example: resources_test/evaluation_datasets/op_perturbation.h5ad"
+  echo "        example: resources/evaluation_datasets/op_perturbation.h5ad"
   echo ""
   echo "    --prediction"
   echo "        type: file, required parameter, file must exist"
@@ -183,7 +183,7 @@ function ViashHelp {
   echo ""
   echo "    --score"
   echo "        type: file, output, file must exist"
-  echo "        example: resources_test/scores/score.h5ad"
+  echo "        example: resources/scores/score.h5ad"
   echo ""
   echo "    --tf_all"
   echo "        type: file, required parameter, file must exist"
@@ -466,9 +466,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2024-11-04T20:23:33Z"
+LABEL org.opencontainers.image.created="2024-11-04T20:36:50Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="972d714cd2d3657ad409e8cc613cf51bdec4f495"
+LABEL org.opencontainers.image.revision="dab5ba0d168072f09e2a63cb1893fa0abacfdb8a"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
