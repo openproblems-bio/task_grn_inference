@@ -1,4 +1,3 @@
-
 __merge__: ../../api/unit_test.yaml
 
 functionality:
@@ -17,7 +16,7 @@ functionality:
       description: single cell perturbation data 
 
     - name: --perturbation_data_bc
-      __merge__: ../../api/file_perturbation_h5ad.yaml
+      __merge__: ../../api/file_evaluation_h5ad.yaml
       required: false
       direction: output
     
