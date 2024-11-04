@@ -69,15 +69,12 @@ functionality:
     - name: --skeleton 
       type: file
       direction: input
-      example: resources/prior/skeleton.csv'
+      example: resources/prior/skeleton.csv
     - name: --apply_skeleton 
       type: boolean
       direction: input
       default: true
 
-
-
-      
   test_resources:
     - type: python_script
       path: /src/common/component_tests/run_and_check_output.py
