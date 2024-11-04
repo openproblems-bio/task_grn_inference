@@ -6,7 +6,7 @@ import numpy as np
 
 ## VIASH START
 par = {
-    'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
+    'evaluation_data': 'resources/grn-benchmark/evaluation_data.h5ad',
     'layer': 'lognorm',
     "prediction": "resources/grn_models/celloracle.csv",
     'tf_all': 'resources/prior/tf_all.csv',

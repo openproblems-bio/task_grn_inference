@@ -5,7 +5,7 @@ import numpy as np
 
 ## VIASH START
 par = {
-  "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
+  "evaluation_data": "resources/grn-benchmark/evaluation_data.h5ad",
   "tf_all": "resources/prior/tf_all.csv",
   # "prediction": "output/pearson_net.csv",
   "prediction": "resources/grn_models/full/portia.csv",
@@ -26,7 +26,7 @@ par = {
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--perturbation_data', type=str, help='Path to the perturbation_data file')
+parser.add_argument('--evaluation_data', type=str, help='Path to the evaluation_data file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
@@ -36,8 +36,8 @@ parser.add_argument('--normalize', action='store_true')
 
 args = parser.parse_args()
 
-if args.perturbation_data:
-    par['perturbation_data'] = args.perturbation_data
+if args.evaluation_data:
+    par['evaluation_data'] = args.evaluation_data
 if args.layer:
   par['layer'] = args.layer
 if args.causal:
