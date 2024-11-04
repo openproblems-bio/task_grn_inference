@@ -2786,7 +2786,7 @@ meta = [
     "arguments" : [
       {
         "type" : "file",
-        "name" : "--multiomics_rna",
+        "name" : "--rna",
         "info" : {
           "label" : "multiomics rna",
           "summary" : "RNA expression for multiomics data.",
@@ -2809,7 +2809,7 @@ meta = [
           }
         },
         "example" : [
-          "resources_test/grn-benchmark/multiomics_rna.h5ad"
+          "resources/evaluation_datasets/op_rna.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2821,7 +2821,7 @@ meta = [
       },
       {
         "type" : "file",
-        "name" : "--multiomics_atac",
+        "name" : "--atac",
         "info" : {
           "label" : "multiomics atac",
           "summary" : "Peak data for multiomics data.",
@@ -2844,7 +2844,7 @@ meta = [
           }
         },
         "example" : [
-          "resources_test/grn-benchmark/multiomics_atac.h5ad"
+          "resources/evaluation_datasets/op_atac.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2883,7 +2883,7 @@ meta = [
           ]
         },
         "example" : [
-          "resources_test/grn_models/collectri.csv"
+          "resources/grn_models/collectri.csv"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2897,7 +2897,7 @@ meta = [
         "type" : "file",
         "name" : "--tf_all",
         "example" : [
-          "resources_test/prior/tf_all.csv"
+          "resources/prior/tf_all.csv"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2957,18 +2957,6 @@ meta = [
       },
       {
         "type" : "boolean",
-        "name" : "--donor_specific",
-        "default" : [
-          true
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "boolean",
         "name" : "--causal",
         "default" : [
           true
@@ -3003,20 +2991,8 @@ meta = [
       },
       {
         "type" : "file",
-        "path" : "resources_test/grn-benchmark",
-        "dest" : "resources_test/grn-benchmark",
-        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
-      },
-      {
-        "type" : "file",
-        "path" : "resources_test/prior",
-        "dest" : "resources_test/prior",
-        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
-      },
-      {
-        "type" : "file",
-        "path" : "resources_test/supplementary",
-        "dest" : "resources_test/supplementary",
+        "path" : "resources_test/",
+        "dest" : "resources_test/",
         "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
@@ -3109,7 +3085,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.8.6",
-    "git_commit" : "73179958d17024790a15c980c6fe366af80ec0c0",
+    "git_commit" : "9eaba5b565fde088613c09da01bc27853e9df950",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3134,15 +3110,14 @@ library(dplyr)
 .viash_orig_warn <- options(warn = 2)
 
 par <- list(
-  "multiomics_rna" = $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_MULTIOMICS_RNA" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "multiomics_atac" = $( if [ ! -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_MULTIOMICS_ATAC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
+  "rna" = $( if [ ! -z ${VIASH_PAR_RNA+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_RNA" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
+  "atac" = $( if [ ! -z ${VIASH_PAR_ATAC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_ATAC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "prediction" = $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PREDICTION" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "tf_all" = $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TF_ALL" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "max_n_links" = $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_MAX_N_LINKS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "num_workers" = $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_NUM_WORKERS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "temp_dir" = $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TEMP_DIR" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
-  "donor_specific" = $( if [ ! -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_DONOR_SPECIFIC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi ),
   "causal" = $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_CAUSAL" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi )
 )
 meta <- list(
@@ -3173,7 +3148,7 @@ print(par)
 # input expression data
 tf_names <- scan(par\\$tf_all, what = "", sep = "\\\\n")
 
-ad <- anndata::read_h5ad(par\\$multiomics_rna)
+ad <- anndata::read_h5ad(par\\$rna)
 
 inputExpr <- ad\\$X
 geneNames <- colnames(inputExpr)

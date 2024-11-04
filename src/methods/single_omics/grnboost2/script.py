@@ -11,7 +11,7 @@ import sys
 
 ## VIASH START
 par = {
-  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad',
+  'rna': 'resources/grn-benchmark/rna_d0_hvg.h5ad',
   "tf_all": 'resources/prior/tf_all.csv',
   'prediction': 'output/grnboost2_donor_0_hvg.csv',
   'max_n_links': 50000,
@@ -22,16 +22,20 @@ par = {
 ## VIASH END
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
 parser.add_argument('--qc', action='store_true', help='Whether to do QC or not')
+parser.add_argument('--max_n_links', type=str, help='Number of links')
+
 args = parser.parse_args()
 
-if args.multiomics_rna:
-    par['multiomics_rna'] = args.multiomics_rna
+if args.max_n_links:
+    par['max_n_links'] = int(args.max_n_links)
+if args.rna:
+    par['rna'] = args.rna
 if args.prediction:
     par['prediction'] = args.prediction
 if args.tf_all:
@@ -56,7 +60,7 @@ except:
 from util import process_links, basic_qc
 # Load scRNA-seq data
 print('Reading data')
-adata_rna = anndata.read_h5ad(par['multiomics_rna'])
+adata_rna = anndata.read_h5ad(par['rna'])
 if 'qc' in par:
     if par['qc']:
         print('Shape before QC: ', adata_rna.shape)
@@ -83,22 +87,7 @@ def infer_grn(X, par):
   
   return network
 
-# par['cell_type_specific'] = False
-if 'cell_type_specific' in par:
-    if par['cell_type_specific']:
-        groups = adata_rna.obs.cell_type
-        i = 0
-        for group in tqdm(np.unique(groups), desc="Processing groups"):
-            X_sub = X[groups == group, :]
-            net = infer_grn(X_sub, par)
-            net['cell_type'] = group
-            if i==0:
-                grn = net
-            else:
-                grn = pd.concat([grn, net], axis=0).reset_index(drop=True)
-            i += 1
-else:
-    grn = infer_grn(X, par)       
+grn = infer_grn(X, par)       
 
 # Save inferred GRN
 grn.to_csv(par['prediction'], sep=',')

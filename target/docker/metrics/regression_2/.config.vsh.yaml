@@ -4,7 +4,7 @@ functionality:
   version: "build-main"
   arguments:
   - type: "file"
-    name: "--perturbation_data"
+    name: "--evaluation_data"
     info:
       label: "perturbation"
       summary: "Perturbation dataset for benchmarking."
@@ -55,7 +55,7 @@ functionality:
           description: "Normalized values using shifted logarithm "
           required: false
     example:
-    - "resources_test/grn-benchmark/perturbation_data.h5ad"
+    - "resources_test/evaluation_datasets/op_perturbation.h5ad"
     must_exist: true
     create_parent: true
     required: false
@@ -83,7 +83,7 @@ functionality:
         type: "float"
         required: true
     example:
-    - "resources_test/grn_models/collectri.csv"
+    - "resources/grn_models/op/collectri.csv"
     must_exist: true
     create_parent: true
     required: true
@@ -236,7 +236,7 @@ functionality:
     name: "--skeleton"
     info: null
     example:
-    - "resources/prior/skeleton.csv'"
+    - "resources/prior/skeleton.csv"
     must_exist: true
     create_parent: true
     required: false
@@ -290,14 +290,8 @@ functionality:
     path: "src/common/component_tests/run_and_check_output.py"
     is_executable: true
   - type: "file"
-    path: "resources_test/grn-benchmark"
-    dest: "resources_test/grn-benchmark"
-  - type: "file"
-    path: "resources_test/prior"
-    dest: "resources_test/prior"
-  - type: "file"
-    path: "resources_test/grn_models"
-    dest: "resources_test/grn_models"
+    path: "resources_test/"
+    dest: "resources_test/"
   info:
     label: "regression_2"
     summary: "Calculates R2 score for regression 2"
@@ -367,5 +361,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/metrics/regression_2"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/metrics/regression_2/regression_2"
   viash_version: "0.8.6"
-  git_commit: "73179958d17024790a15c980c6fe366af80ec0c0"
+  git_commit: "9eaba5b565fde088613c09da01bc27853e9df950"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

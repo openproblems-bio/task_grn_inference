@@ -11,7 +11,7 @@ import anndata as ad
 
 ## VIASH START
 par = {
-  'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
+  'rna': 'resources/grn-benchmark/rna.h5ad',
   'tf_all': 'resources/prior/tf_all.csv',
   'prediction': 'output/portia.csv',
   'max_n_links': 50000,
@@ -25,27 +25,16 @@ import sys
 
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
 parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
-parser.add_argument('--causal', action='store_true', help='Enable causal mode')
-parser.add_argument('--normalize', action='store_true')
 
 args = parser.parse_args()
 
-if args.multiomics_rna:
-    par['multiomics_rna'] = args.multiomics_rna
-if args.causal:
-    par['causal'] = True
-else:
-    par['causal'] = False
-
-if args.causal:
-    par['normalize'] = True
-else:
-    par['normalize'] = False
+if args.rna:
+    par['rna'] = args.rna
 
 if args.prediction:
     par['prediction'] = args.prediction
@@ -71,7 +60,7 @@ from util import process_links
 
 def main(par):
   print('Reading data')
-  adata_rna = anndata.read_h5ad(par['multiomics_rna'])
+  adata_rna = anndata.read_h5ad(par['rna'])
 
   gene_names = adata_rna.var_names
   X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X
@@ -103,15 +92,15 @@ def main(par):
 
 if __name__ == '__main__':
   os.makedirs(par['temp_dir'], exist_ok=True)
-  adata = ad.read_h5ad(par['multiomics_rna'])
+  adata = ad.read_h5ad(par['rna'])
   if ('donor_id' in adata.obs) & (par['donor_specific']):
       # - new dir for donor specific adata
-      par['multiomics_rna'] = f"{par['temp_dir']}/multiomics_rna.h5ad"
+      par['rna'] = f"{par['temp_dir']}/rna.h5ad"
       donor_ids = adata.obs.donor_id.unique()
       for i, donor_id in enumerate(donor_ids): # run for each donor and concat
           print('GRN inference for ', donor_id)
           adata_sub = adata[adata.obs.donor_id.eq(donor_id), :]
-          adata_sub.write(par['multiomics_rna'])
+          adata_sub.write(par['rna'])
           net_sub = main(par)
           net_sub['donor_id'] = donor_id
           if i == 0:

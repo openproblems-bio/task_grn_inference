@@ -50,7 +50,6 @@ def preprocess(par):
         "blockSizes",
         "blockStarts",
         "artif_dupl",
-        "highly_variable_rank"
     ]
     rna.var[column_names] = rna.var[column_names].astype(str)
 
@@ -79,12 +78,13 @@ def get_flank_bed(par):
     )
     rna = rna[:, ~rna.var.chrom.isna()]
 
-    flank_bed = scglue.genomics.Bed(rna.var).strand_specific_start_site().expand(par['flank_length']/2, par['flank_length']/2)
-    flank_bed.to_csv(par['flank2gene'])
+    flank_bed = scglue.genomics.Bed(rna.var).strand_specific_start_site().expand(par['flank_length'], par['flank_length'])
+    print(flank_bed.head(5))
+    return flank_bed
 
 def skeleton_promotor(par):
     '''Creates promotor based skeleton using TF motif data and TSS flank'''
-    flank_bed = pd.read_csv(par['flank2gene'])
+    flank_bed = get_flank_bed(par)
     
     motif_bed = scglue.genomics.read_bed(par['motif_file']) 
     
@@ -99,7 +99,7 @@ def skeleton_promotor(par):
 
 def skeleton_peak(par):
     '''Creates peak based skeleton using TF motif data'''
-    atac = ad.read_h5ad(f"{par['temp_dir']}/atac-emb.h5ad")
+    atac = ad.read_h5ad(f"{par['temp_dir']}/atac.h5ad")
     
     print('this is the motif file: ', par['motif_file'])
     motif_bed = scglue.genomics.read_bed(par['motif_file']) 
@@ -135,6 +135,7 @@ if __name__ == '__main__':
         # 'motif_file':   'output/db/ENCODE-TF-ChIP-hg38.bed.gz',
         'temp_dir': 'output/skeleton',
         'extend_range': 150000,
+        'flank_length': 1000,
         'skeleton': 'output/skeleton/skeleton.csv'
     }
     print(par)
@@ -147,15 +148,15 @@ if __name__ == '__main__':
 
 
     # ----- connect rna to atac -> peak2gene connections 
-    if False:
+    if True:
         print('------- preprocess ---------')
         preprocess(par)
-        print('------- get flank ---------')
-        get_flank_bed(par)
+
+
     print('------- promotor based skeleton for different motif files ---------')
     names = ['encode','jaspar']
     motif_files = ['output/db/ENCODE-TF-ChIP-hg38.bed.gz', 'output/db/JASPAR2022-hg38.bed.gz']
-    if True:
+    if False:
         for i, motif_file in enumerate(motif_files):
             par['skeleton_promotor_file'] = f"{par['temp_dir']}/skeleton_{names[i]}_promotor.csv"
             par['motif_file'] = motif_file
@@ -170,7 +171,7 @@ if __name__ == '__main__':
                 skeleton = pd.concat([df, skeleton], axis=0).drop_duplicates()
             print(skeleton.shape)
         skeleton.to_csv(f"{par['temp_dir']}/skeleton_promotor.csv")
-    print('------- peak based skeleton for different motif files ---------')
+    # print('------- peak based skeleton for different motif files ---------')
     if False:
         for i, motif_file in enumerate(motif_files):
             par['skeleton_peak_file'] = f"{par['temp_dir']}/skeleton_peak_{names[i]}.csv"
@@ -188,17 +189,18 @@ if __name__ == '__main__':
                 skeleton_peak = pd.concat([df, skeleton_peak], axis=0).drop_duplicates()
         skeleton_peak.to_csv(f"{par['temp_dir']}/skeleton_peak.csv")
 
-    print('------- mege peak based skeleton with promotor base skeleton ---------')
-    # - read peak based and promotor based skeletons
-    skeleton_peak = pd.read_csv(f"{par['temp_dir']}/skeleton_peak.csv")[['source', 'target']].drop_duplicates()
-    print(len(skeleton_peak), skeleton_peak.source.nunique(), skeleton_peak.target.nunique())
-    skeleton_promotor = pd.read_csv(f"{par['temp_dir']}/skeleton_promotor.csv")[['source', 'target']].drop_duplicates()
-    print(len(skeleton_promotor), skeleton_promotor.source.nunique(), skeleton_promotor.target.nunique())
+    if False:
+        print('------- mege peak based skeleton with promotor base skeleton ---------')
+        # - read peak based and promotor based skeletons
+        skeleton_peak = pd.read_csv(f"{par['temp_dir']}/skeleton_peak.csv")[['source', 'target']].drop_duplicates()
+        print(len(skeleton_peak), skeleton_peak.source.nunique(), skeleton_peak.target.nunique())
+        skeleton_promotor = pd.read_csv(f"{par['temp_dir']}/skeleton_promotor.csv")[['source', 'target']].drop_duplicates()
+        print(len(skeleton_promotor), skeleton_promotor.source.nunique(), skeleton_promotor.target.nunique())
 
-    # - merge and save 
-    skeleton = pd.concat([skeleton_promotor, skeleton_peak], axis=0).drop_duplicates()
-    print(len(skeleton), skeleton.source.nunique(), skeleton.target.nunique())
-    skeleton.to_csv(f"{par['temp_dir']}/skeleton.csv")
+        # - merge and save 
+        skeleton = pd.concat([skeleton_promotor, skeleton_peak], axis=0).drop_duplicates()
+        print(len(skeleton), skeleton.source.nunique(), skeleton.target.nunique())
+        skeleton.to_csv(f"{par['temp_dir']}/skeleton.csv")
     
 
 

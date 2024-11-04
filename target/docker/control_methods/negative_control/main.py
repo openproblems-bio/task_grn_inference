@@ -10,8 +10,8 @@ def process_links(net, par):
     return net
 def main(par):
   print('Reading input data')
-  perturbation_data = ad.read_h5ad(par["perturbation_data"])
-  gene_names = perturbation_data.var_names.to_numpy()
+  rna = ad.read_h5ad(par["rna"])
+  gene_names = rna.var_names.to_numpy()
   tf_all = np.loadtxt(par['tf_all'], dtype=str)
 
   n_tf = 500

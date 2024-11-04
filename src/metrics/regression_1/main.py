@@ -10,6 +10,7 @@ import pandas as pd
 import anndata as ad
 from tqdm import tqdm
 from util import verbose_print, process_links, verbose_tqdm
+from sklearn.multioutput import MultiOutputRegressor
 import os
 import warnings
 
@@ -47,6 +48,7 @@ class lightgbm_wrapper:
 
 def cv_5(genes_n):
     '''5 fold standard'''
+    np.random.seed(32)
     num_groups = 5
     group_size = genes_n // num_groups
     groups = np.repeat(np.arange(num_groups), group_size)
@@ -81,8 +83,8 @@ def cross_validation(net, prturb_adata, par:dict):
     # run cv 
     groups = cv_5(len(included_genes))
     # initialize y_pred with the mean of gene expressed across all samples
-    means = Y_df.mean(axis=0)
     y_pred = Y_df.copy()
+    means = Y_df.mean(axis=0)
     y_pred[:] = means
     y_pred = y_pred.values
 
@@ -91,7 +93,8 @@ def cross_validation(net, prturb_adata, par:dict):
     y_true = Y.copy()
 
     unique_groups = np.unique(groups)
-    
+
+
     # determine regressor 
     reg_type = par['reg_type']
     if reg_type=='ridge':
@@ -108,12 +111,14 @@ def cross_validation(net, prturb_adata, par:dict):
         regr = lightgbm_wrapper(params, max_workers=par['num_workers'])
     else:
         raise ValueError(f"{reg_type} is not defined.")  
-
+    
     for group in verbose_tqdm(unique_groups, "Processing groups", 2, par['verbose']):
         mask_va = groups == group
         mask_tr = ~mask_va
         X_tr = X[mask_tr & mask_shared_genes, :]
         Y_tr = Y[mask_tr & mask_shared_genes, :]
+        if X_tr.shape[0]<2:
+            continue 
         regr.fit(X_tr, Y_tr)
         y_pred[mask_va & mask_shared_genes, :] = regr.predict(X[mask_va & mask_shared_genes, :])
     return y_true, y_pred
@@ -130,7 +135,10 @@ def regression_1(
     """
        
     gene_names = prturb_adata.var_names
-    donor_ids = prturb_adata.obs.donor_id.unique()
+    if 'donor_id' in prturb_adata.obs.columns:
+        donor_ids = prturb_adata.obs.donor_id.unique()
+    else:
+        donor_ids = ['default']
     score_list = []
     for donor_id in donor_ids:
         verbose_print(par['verbose'], f'----cross validate for {donor_id}----', 2)
@@ -146,7 +154,10 @@ def regression_1(
             verbose_print(par['verbose'], f"Number of links reduced to {par['max_n_links']}", 2)
         if par['binarize']:
             net['weight'] = net['weight'].apply(binarize_weight)        
-        prturb_adata_sub = prturb_adata[prturb_adata.obs.donor_id==donor_id,:]
+        if 'donor_id' in prturb_adata.obs.columns:
+            prturb_adata_sub = prturb_adata[prturb_adata.obs.donor_id==donor_id,:]
+        else:
+            prturb_adata_sub = prturb_adata
         y_true_sub, y_pred_sub = cross_validation(net_sub, prturb_adata_sub, par)
 
         score = r2_score(y_true_sub, y_pred_sub, multioutput='variance_weighted')
@@ -165,14 +176,6 @@ def pivot_grn(net):
     ''' make net to have gene*tf format'''
     df_tmp = net.pivot(index='target', columns='source', values='weight')
     return df_tmp.fillna(0)
-
-def degree_centrality(net, source='source', target='target', normalize=False):
-    '''calculates centrality score of source'''
-    counts = net.groupby(source)[target].nunique().values
-    if normalize:
-        total_targets = net[target].nunique()
-        counts = counts / total_targets
-    return counts
 
 
 def process_net(net, gene_names):
@@ -198,11 +201,14 @@ def main(par):
     par['theta'] = 1 # no subsetting based on theta
     manipulate = None 
     ## read and process input data
-
     verbose_print(par['verbose'], 'Reading input files', 3)
     
-    
     perturbation_data = ad.read_h5ad(par['perturbation_data'])
+
+    if 'is_test' in perturbation_data.obs.columns:
+        perturbation_data = perturbation_data[perturbation_data.obs['is_test']]
+        print(perturbation_data.shape)
+
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
     gene_names = perturbation_data.var.index.to_numpy()
     net = pd.read_csv(par['prediction'])
@@ -247,10 +253,12 @@ def main(par):
         perturbation_data = perturbation_data[mask,:]
     else:
         perturbation_data = perturbation_data[np.random.choice(perturbation_data.n_obs, subsample, replace=False), :]
-    verbose_print(par['verbose'], perturbation_data.shape,4)    
-    perturbation_data.X = perturbation_data.layers[layer]
+    verbose_print(par['verbose'], perturbation_data.shape,4)   
 
-    
+    if layer=='X':
+        pass 
+    else:
+        perturbation_data.X = perturbation_data.layers[layer]
 
     verbose_print(par['verbose'], f'Compute metrics for layer: {layer}',  3)    
 

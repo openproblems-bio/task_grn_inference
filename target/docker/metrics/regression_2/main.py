@@ -292,7 +292,8 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     gene_names = prturb_adata.var.index.to_numpy()
     n_genes = len(gene_names)
     net = pd.read_csv(par['prediction'], sep=',', header='infer')
-
+    if 'donor_id' not in prturb_adata.obs.columns:
+        prturb_adata.obs['donor_id']= 'onebatch'
     donor_ids = prturb_adata.obs.donor_id.unique()
     df_results_store = []
     for donor_id in donor_ids:
@@ -311,10 +312,12 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         random_groups = np.random.choice(range(1, 5+1), size=n_cells, replace=True) # random sampling
         groups = LabelEncoder().fit_transform(random_groups)
 
-
         # Load and standardize perturbation data
-        layer = par['layer']
-        X = prturb_adata_sub.layers[layer]
+        if  par['layer']=='X':
+            X = prturb_adata_sub.X
+        else:
+            layer = par['layer']
+            X = prturb_adata_sub.layers[layer]
         X = RobustScaler().fit_transform(X)
 
         # Load consensus numbers of putative regulators

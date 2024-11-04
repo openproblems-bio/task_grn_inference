@@ -2786,7 +2786,7 @@ meta = [
     "arguments" : [
       {
         "type" : "file",
-        "name" : "--multiomics_rna",
+        "name" : "--rna",
         "info" : {
           "label" : "multiomics rna",
           "summary" : "RNA expression for multiomics data.",
@@ -2809,7 +2809,7 @@ meta = [
           }
         },
         "example" : [
-          "resources_test/grn-benchmark/multiomics_rna.h5ad"
+          "resources/evaluation_datasets/op_rna.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2821,7 +2821,7 @@ meta = [
       },
       {
         "type" : "file",
-        "name" : "--multiomics_atac",
+        "name" : "--atac",
         "info" : {
           "label" : "multiomics atac",
           "summary" : "Peak data for multiomics data.",
@@ -2844,7 +2844,7 @@ meta = [
           }
         },
         "example" : [
-          "resources_test/grn-benchmark/multiomics_atac.h5ad"
+          "resources/evaluation_datasets/op_atac.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2883,7 +2883,7 @@ meta = [
           ]
         },
         "example" : [
-          "resources_test/grn_models/collectri.csv"
+          "resources/grn_models/collectri.csv"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2897,7 +2897,7 @@ meta = [
         "type" : "file",
         "name" : "--tf_all",
         "example" : [
-          "resources_test/prior/tf_all.csv"
+          "resources/prior/tf_all.csv"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2957,18 +2957,6 @@ meta = [
       },
       {
         "type" : "boolean",
-        "name" : "--donor_specific",
-        "default" : [
-          true
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "boolean",
         "name" : "--causal",
         "default" : [
           true
@@ -3012,20 +3000,8 @@ meta = [
       },
       {
         "type" : "file",
-        "path" : "resources_test/grn-benchmark",
-        "dest" : "resources_test/grn-benchmark",
-        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
-      },
-      {
-        "type" : "file",
-        "path" : "resources_test/prior",
-        "dest" : "resources_test/prior",
-        "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
-      },
-      {
-        "type" : "file",
-        "path" : "resources_test/supplementary",
-        "dest" : "resources_test/supplementary",
+        "path" : "resources_test/",
+        "dest" : "resources_test/",
         "parent" : "file:///home/runner/work/task_grn_inference/task_grn_inference/"
       }
     ],
@@ -3057,7 +3033,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "73179958d17024790a15c980c6fe366af80ec0c0",
+          "git_commit" : "9eaba5b565fde088613c09da01bc27853e9df950",
           "executable" : "/nextflow/grn_methods/celloracle/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/celloracle"
@@ -3112,7 +3088,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/grn_inference_celloracle",
     "viash_version" : "0.8.6",
-    "git_commit" : "73179958d17024790a15c980c6fe366af80ec0c0",
+    "git_commit" : "9eaba5b565fde088613c09da01bc27853e9df950",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3132,8 +3108,8 @@ workflow run_wf {
   output_ch = input_ch
 
     | celloracle.run(
-      fromState: [multiomics_rna: "multiomics_rna",
-              multiomics_atac: "multiomics_atac",
+      fromState: [rna: "rna",
+              atac: "atac",
               tf_all: "tf_all",
               temp_dir: "temp_dir",
               num_workers: "num_workers",

@@ -173,21 +173,21 @@ function ViashHelp {
   echo "celloracle build-main"
   echo ""
   echo "Arguments:"
-  echo "    --multiomics_rna"
+  echo "    --rna"
   echo "        type: file, required parameter, file must exist"
-  echo "        example: resources_test/grn-benchmark/multiomics_rna.h5ad"
+  echo "        example: resources/evaluation_datasets/op_rna.h5ad"
   echo ""
-  echo "    --multiomics_atac"
+  echo "    --atac"
   echo "        type: file, file must exist"
-  echo "        example: resources_test/grn-benchmark/multiomics_atac.h5ad"
+  echo "        example: resources/evaluation_datasets/op_atac.h5ad"
   echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"
-  echo "        example: resources_test/grn_models/collectri.csv"
+  echo "        example: resources/grn_models/collectri.csv"
   echo ""
   echo "    --tf_all"
   echo "        type: file, file must exist"
-  echo "        example: resources_test/prior/tf_all.csv"
+  echo "        example: resources/prior/tf_all.csv"
   echo ""
   echo "    --max_n_links"
   echo "        type: integer"
@@ -204,10 +204,6 @@ function ViashHelp {
   echo "    --seed"
   echo "        type: integer"
   echo "        default: 32"
-  echo ""
-  echo "    --donor_specific"
-  echo "        type: boolean"
-  echo "        default: true"
   echo ""
   echo "    --causal"
   echo "        type: boolean"
@@ -244,26 +240,26 @@ while [[ $# -gt 0 ]]; do
             echo "celloracle build-main"
             exit
             ;;
-        --multiomics_rna)
-            [ -n "$VIASH_PAR_MULTIOMICS_RNA" ] && ViashError Bad arguments for option \'--multiomics_rna\': \'$VIASH_PAR_MULTIOMICS_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_MULTIOMICS_RNA="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --multiomics_rna. Use "--help" to get more information on the parameters. && exit 1
+        --rna)
+            [ -n "$VIASH_PAR_RNA" ] && ViashError Bad arguments for option \'--rna\': \'$VIASH_PAR_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_RNA="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --rna. Use "--help" to get more information on the parameters. && exit 1
             shift 2
             ;;
-        --multiomics_rna=*)
-            [ -n "$VIASH_PAR_MULTIOMICS_RNA" ] && ViashError Bad arguments for option \'--multiomics_rna=*\': \'$VIASH_PAR_MULTIOMICS_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_MULTIOMICS_RNA=$(ViashRemoveFlags "$1")
+        --rna=*)
+            [ -n "$VIASH_PAR_RNA" ] && ViashError Bad arguments for option \'--rna=*\': \'$VIASH_PAR_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_RNA=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --multiomics_atac)
-            [ -n "$VIASH_PAR_MULTIOMICS_ATAC" ] && ViashError Bad arguments for option \'--multiomics_atac\': \'$VIASH_PAR_MULTIOMICS_ATAC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_MULTIOMICS_ATAC="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --multiomics_atac. Use "--help" to get more information on the parameters. && exit 1
+        --atac)
+            [ -n "$VIASH_PAR_ATAC" ] && ViashError Bad arguments for option \'--atac\': \'$VIASH_PAR_ATAC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_ATAC="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --atac. Use "--help" to get more information on the parameters. && exit 1
             shift 2
             ;;
-        --multiomics_atac=*)
-            [ -n "$VIASH_PAR_MULTIOMICS_ATAC" ] && ViashError Bad arguments for option \'--multiomics_atac=*\': \'$VIASH_PAR_MULTIOMICS_ATAC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_MULTIOMICS_ATAC=$(ViashRemoveFlags "$1")
+        --atac=*)
+            [ -n "$VIASH_PAR_ATAC" ] && ViashError Bad arguments for option \'--atac=*\': \'$VIASH_PAR_ATAC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_ATAC=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --prediction)
@@ -330,17 +326,6 @@ while [[ $# -gt 0 ]]; do
         --seed=*)
             [ -n "$VIASH_PAR_SEED" ] && ViashError Bad arguments for option \'--seed=*\': \'$VIASH_PAR_SEED\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_SEED=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --donor_specific)
-            [ -n "$VIASH_PAR_DONOR_SPECIFIC" ] && ViashError Bad arguments for option \'--donor_specific\': \'$VIASH_PAR_DONOR_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_DONOR_SPECIFIC="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --donor_specific. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --donor_specific=*)
-            [ -n "$VIASH_PAR_DONOR_SPECIFIC" ] && ViashError Bad arguments for option \'--donor_specific=*\': \'$VIASH_PAR_DONOR_SPECIFIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_DONOR_SPECIFIC=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --causal)
@@ -443,8 +428,8 @@ fi
 
 
 # check whether required parameters exist
-if [ -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then
-  ViashError '--multiomics_rna' is a required argument. Use "--help" to get more information on the parameters.
+if [ -z ${VIASH_PAR_RNA+x} ]; then
+  ViashError '--rna' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then
@@ -481,9 +466,6 @@ fi
 if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
-if [ -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then
-  VIASH_PAR_DONOR_SPECIFIC="true"
-fi
 if [ -z ${VIASH_PAR_CAUSAL+x} ]; then
   VIASH_PAR_CAUSAL="true"
 fi
@@ -492,12 +474,12 @@ if [ -z ${VIASH_PAR_BASE_GRN+x} ]; then
 fi
 
 # check whether required files exist
-if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
-  ViashError "Input file '$VIASH_PAR_MULTIOMICS_RNA' does not exist."
+if [ ! -z "$VIASH_PAR_RNA" ] && [ ! -e "$VIASH_PAR_RNA" ]; then
+  ViashError "Input file '$VIASH_PAR_RNA' does not exist."
   exit 1
 fi
-if [ ! -z "$VIASH_PAR_MULTIOMICS_ATAC" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_ATAC" ]; then
-  ViashError "Input file '$VIASH_PAR_MULTIOMICS_ATAC' does not exist."
+if [ ! -z "$VIASH_PAR_ATAC" ] && [ ! -e "$VIASH_PAR_ATAC" ]; then
+  ViashError "Input file '$VIASH_PAR_ATAC' does not exist."
   exit 1
 fi
 if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
@@ -521,12 +503,6 @@ fi
 if [[ -n "$VIASH_PAR_SEED" ]]; then
   if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_DONOR_SPECIFIC" ]]; then
-  if ! [[ "$VIASH_PAR_DONOR_SPECIFIC" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--donor_specific' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -614,15 +590,14 @@ import argparse
 ## VIASH START
 # The following code has been auto-generated by Viash.
 par = {
-  'multiomics_rna': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_RNA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'multiomics_atac': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_ATAC//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'rna': $( if [ ! -z ${VIASH_PAR_RNA+x} ]; then echo "r'${VIASH_PAR_RNA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'atac': $( if [ ! -z ${VIASH_PAR_ATAC+x} ]; then echo "r'${VIASH_PAR_ATAC//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
-  'donor_specific': $( if [ ! -z ${VIASH_PAR_DONOR_SPECIFIC+x} ]; then echo "r'${VIASH_PAR_DONOR_SPECIFIC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'base_grn': $( if [ ! -z ${VIASH_PAR_BASE_GRN+x} ]; then echo "r'${VIASH_PAR_BASE_GRN//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
@@ -647,8 +622,8 @@ dep = {
 ## VIASH END
 
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--multiomics_atac', type=str, help='Path to the multiomics atac file')
+parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--atac', type=str, help='Path to the multiomics atac file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
@@ -656,10 +631,10 @@ parser.add_argument('--num_workers', type=int, help='Number of cores')
 parser.add_argument('--max_n_links', type=int)
 args = parser.parse_args()
 
-if args.multiomics_rna:
-    par['multiomics_rna'] = args.multiomics_rna
-if args.multiomics_atac:
-    par['multiomics_atac'] = args.multiomics_atac
+if args.rna:
+    par['rna'] = args.rna
+if args.atac:
+    par['atac'] = args.atac
 if args.prediction:
     par['prediction'] = args.prediction
 if args.tf_all:

@@ -6,7 +6,7 @@ import sys
 
 ## VIASH START
 par = {
-  "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
+  "rna": "resources/grn-benchmark/rna.h5ad",
   "prediction": "resources/grn_models/default/negative_control.csv",
   "tf_all": "resources/prior/tf_all.csv",
   "max_n_links": 50000
@@ -15,16 +15,16 @@ par = {
 
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--multiomics_atac', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
 parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
+parser.add_argument('--normalize', action='store_true')
 args = parser.parse_args()
-if args.multiomics_rna:
-    par['multiomics_rna'] = args.multiomics_rna
+if args.rna:
+    par['rna'] = args.rna
 if args.prediction:
     par['prediction'] = args.prediction
 if args.tf_all:

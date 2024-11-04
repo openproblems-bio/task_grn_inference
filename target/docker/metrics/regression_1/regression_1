@@ -173,13 +173,13 @@ function ViashHelp {
   echo "regression_1 build-main"
   echo ""
   echo "Arguments:"
-  echo "    --perturbation_data"
+  echo "    --evaluation_data"
   echo "        type: file, file must exist"
-  echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
+  echo "        example: resources_test/evaluation_datasets/op_perturbation.h5ad"
   echo ""
   echo "    --prediction"
   echo "        type: file, required parameter, file must exist"
-  echo "        example: resources_test/grn_models/collectri.csv"
+  echo "        example: resources/grn_models/op/collectri.csv"
   echo ""
   echo "    --score"
   echo "        type: file, output, file must exist"
@@ -230,16 +230,11 @@ function ViashHelp {
   echo ""
   echo "    --skeleton"
   echo "        type: file, file must exist"
-  echo "        example: resources/prior/skeleton.csv'"
+  echo "        example: resources/prior/skeleton.csv"
   echo ""
   echo "    --apply_skeleton"
   echo "        type: boolean"
   echo "        default: true"
-  echo ""
-  echo "    --min_tf"
-  echo "        type: boolean"
-  echo "        default: false"
-  echo "        calculate the scores for the given min tfs in addition to the default"
   echo ""
   echo "    --binarize"
   echo "        type: boolean"
@@ -471,9 +466,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2024-10-20T20:54:47Z"
+LABEL org.opencontainers.image.created="2024-11-04T20:14:32Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="73179958d17024790a15c980c6fe366af80ec0c0"
+LABEL org.opencontainers.image.revision="9eaba5b565fde088613c09da01bc27853e9df950"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -632,15 +627,15 @@ while [[ $# -gt 0 ]]; do
             echo "regression_1 build-main"
             exit
             ;;
-        --perturbation_data)
-            [ -n "$VIASH_PAR_PERTURBATION_DATA" ] && ViashError Bad arguments for option \'--perturbation_data\': \'$VIASH_PAR_PERTURBATION_DATA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_PERTURBATION_DATA="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --perturbation_data. Use "--help" to get more information on the parameters. && exit 1
+        --evaluation_data)
+            [ -n "$VIASH_PAR_EVALUATION_DATA" ] && ViashError Bad arguments for option \'--evaluation_data\': \'$VIASH_PAR_EVALUATION_DATA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_EVALUATION_DATA="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --evaluation_data. Use "--help" to get more information on the parameters. && exit 1
             shift 2
             ;;
-        --perturbation_data=*)
-            [ -n "$VIASH_PAR_PERTURBATION_DATA" ] && ViashError Bad arguments for option \'--perturbation_data=*\': \'$VIASH_PAR_PERTURBATION_DATA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_PERTURBATION_DATA=$(ViashRemoveFlags "$1")
+        --evaluation_data=*)
+            [ -n "$VIASH_PAR_EVALUATION_DATA" ] && ViashError Bad arguments for option \'--evaluation_data=*\': \'$VIASH_PAR_EVALUATION_DATA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_EVALUATION_DATA=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --prediction)
@@ -795,17 +790,6 @@ while [[ $# -gt 0 ]]; do
         --apply_skeleton=*)
             [ -n "$VIASH_PAR_APPLY_SKELETON" ] && ViashError Bad arguments for option \'--apply_skeleton=*\': \'$VIASH_PAR_APPLY_SKELETON\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_APPLY_SKELETON=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --min_tf)
-            [ -n "$VIASH_PAR_MIN_TF" ] && ViashError Bad arguments for option \'--min_tf\': \'$VIASH_PAR_MIN_TF\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_MIN_TF="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --min_tf. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --min_tf=*)
-            [ -n "$VIASH_PAR_MIN_TF" ] && ViashError Bad arguments for option \'--min_tf=*\': \'$VIASH_PAR_MIN_TF\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_MIN_TF=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --binarize)
@@ -994,16 +978,13 @@ fi
 if [ -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then
   VIASH_PAR_APPLY_SKELETON="true"
 fi
-if [ -z ${VIASH_PAR_MIN_TF+x} ]; then
-  VIASH_PAR_MIN_TF="false"
-fi
 if [ -z ${VIASH_PAR_BINARIZE+x} ]; then
   VIASH_PAR_BINARIZE="true"
 fi
 
 # check whether required files exist
-if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ] && [ ! -e "$VIASH_PAR_PERTURBATION_DATA" ]; then
-  ViashError "Input file '$VIASH_PAR_PERTURBATION_DATA' does not exist."
+if [ ! -z "$VIASH_PAR_EVALUATION_DATA" ] && [ ! -e "$VIASH_PAR_EVALUATION_DATA" ]; then
+  ViashError "Input file '$VIASH_PAR_EVALUATION_DATA' does not exist."
   exit 1
 fi
 if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -e "$VIASH_PAR_PREDICTION" ]; then
@@ -1059,12 +1040,6 @@ fi
 if [[ -n "$VIASH_PAR_APPLY_SKELETON" ]]; then
   if ! [[ "$VIASH_PAR_APPLY_SKELETON" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--apply_skeleton' has to be a boolean. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_MIN_TF" ]]; then
-  if ! [[ "$VIASH_PAR_MIN_TF" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--min_tf' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1124,9 +1099,9 @@ fi
 
 # detect volumes from file arguments
 VIASH_CHOWN_VARS=()
-if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ]; then
-  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PERTURBATION_DATA")" )
-  VIASH_PAR_PERTURBATION_DATA=$(ViashAutodetectMount "$VIASH_PAR_PERTURBATION_DATA")
+if [ ! -z "$VIASH_PAR_EVALUATION_DATA" ]; then
+  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_EVALUATION_DATA")" )
+  VIASH_PAR_EVALUATION_DATA=$(ViashAutodetectMount "$VIASH_PAR_EVALUATION_DATA")
 fi
 if [ ! -z "$VIASH_PAR_PREDICTION" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PREDICTION")" )
@@ -1210,7 +1185,7 @@ import numpy as np
 ## VIASH START
 # The following code has been auto-generated by Viash.
 par = {
-  'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'evaluation_data': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'score': $( if [ ! -z ${VIASH_PAR_SCORE+x} ]; then echo "r'${VIASH_PAR_SCORE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1225,7 +1200,6 @@ par = {
   'verbose': $( if [ ! -z ${VIASH_PAR_VERBOSE+x} ]; then echo "int(r'${VIASH_PAR_VERBOSE//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'skeleton': $( if [ ! -z ${VIASH_PAR_SKELETON+x} ]; then echo "r'${VIASH_PAR_SKELETON//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
-  'min_tf': $( if [ ! -z ${VIASH_PAR_MIN_TF+x} ]; then echo "r'${VIASH_PAR_MIN_TF//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'binarize': $( if [ ! -z ${VIASH_PAR_BINARIZE+x} ]; then echo "r'${VIASH_PAR_BINARIZE//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
@@ -1248,6 +1222,34 @@ dep = {
 
 ## VIASH END
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--perturbation_data', type=str, help='Path to the perturbation_data file')
+parser.add_argument('--prediction', type=str, help='Path to the prediction file')
+parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
+parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--layer', type=str, help='Layer to use')
+parser.add_argument('--causal', action='store_true', help='Enable causal mode')
+parser.add_argument('--normalize', action='store_true')
+
+args = parser.parse_args()
+
+if args.perturbation_data:
+    par['perturbation_data'] = args.perturbation_data
+if args.layer:
+  par['layer'] = args.layer
+if args.causal:
+    par['causal'] = True
+else:
+    par['causal'] = False
+
+if args.prediction:
+    par['prediction'] = args.prediction
+if args.tf_all:
+    par['tf_all'] = args.tf_all
+if args.num_workers:
+    par['num_workers'] = args.num_workers
+
 try:
   sys.path.append(meta["resources_dir"])
 except:
@@ -1259,7 +1261,7 @@ except:
   sys.path.append(meta["util_dir"])
 
 from main import main 
-
+print(par)
 output = main(par) 
 print(output)
 
@@ -1286,8 +1288,8 @@ VIASHEOF
 
 
 # strip viash automount from file paths
-if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ]; then
-  VIASH_PAR_PERTURBATION_DATA=$(ViashStripAutomount "$VIASH_PAR_PERTURBATION_DATA")
+if [ ! -z "$VIASH_PAR_EVALUATION_DATA" ]; then
+  VIASH_PAR_EVALUATION_DATA=$(ViashStripAutomount "$VIASH_PAR_EVALUATION_DATA")
 fi
 if [ ! -z "$VIASH_PAR_PREDICTION" ]; then
   VIASH_PAR_PREDICTION=$(ViashStripAutomount "$VIASH_PAR_PREDICTION")

@@ -91,9 +91,10 @@ def corr_net(X, gene_names, par):
     net = net.values
 
     net = efficient_melting(net, gene_names, par)
-    if par['causal']:  
-        print('TF subsetting')
-        net = net[net.source.isin(tf_all)]
+
+    print('TF subsetting')
+    net = net[net.source.isin(tf_all)]
+    
     net = process_links(net, par)
     print('Corr results are ready')
     return net
