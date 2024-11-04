@@ -71,7 +71,10 @@ def cross_validation(net, prturb_adata, par:dict):
         included_genes = gene_names
 
     X_df = pd.DataFrame(np.zeros((len(included_genes), n_tfs)), index=included_genes)
-    train_df = pd.DataFrame(prturb_adata.X, columns=gene_names).T
+    try:
+        train_df = pd.DataFrame(prturb_adata.X, columns=gene_names).T
+    except:
+        train_df = pd.DataFrame(prturb_adata.X.todense().A, columns=gene_names).T
     Y_df = train_df.loc[included_genes,:]
 
     mask_shared_genes = X_df.index.isin(net.index)
@@ -203,14 +206,14 @@ def main(par):
     ## read and process input data
     verbose_print(par['verbose'], 'Reading input files', 3)
     
-    perturbation_data = ad.read_h5ad(par['perturbation_data'])
+    evaluation_data = ad.read_h5ad(par['evaluation_data'])
 
-    if 'is_test' in perturbation_data.obs.columns:
-        perturbation_data = perturbation_data[perturbation_data.obs['is_test']]
-        print(perturbation_data.shape)
+    if 'is_test' in evaluation_data.obs.columns:
+        evaluation_data = evaluation_data[evaluation_data.obs['is_test']]
+        print(evaluation_data.shape)
 
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
-    gene_names = perturbation_data.var.index.to_numpy()
+    gene_names = evaluation_data.var.index.to_numpy()
     net = pd.read_csv(par['prediction'])
     
     if par['apply_skeleton']: #apply skeleton
@@ -239,34 +242,34 @@ def main(par):
     if subsample == -1:
         pass
     elif subsample == -2: # one combination of cell_type, sm_name
-        sampled_obs = perturbation_data.obs.groupby(['sm_name', 'cell_type'], observed=False).apply(lambda x: x.sample(1)).reset_index(drop=True)
-        obs = perturbation_data.obs
+        sampled_obs = evaluation_data.obs.groupby(['sm_name', 'cell_type'], observed=False).apply(lambda x: x.sample(1)).reset_index(drop=True)
+        obs = evaluation_data.obs
         mask = []
         for _, row in obs.iterrows():
             mask.append((sampled_obs==row).all(axis=1).any())  
-        perturbation_data = perturbation_data[mask,:]
+        evaluation_data = evaluation_data[mask,:]
     elif subsample == -3: #negative control
-        mask = perturbation_data.obs.sm_name == 'Dimethyl Sulfoxide'
-        perturbation_data = perturbation_data[mask,:]
+        mask = evaluation_data.obs.sm_name == 'Dimethyl Sulfoxide'
+        evaluation_data = evaluation_data[mask,:]
     elif subsample == -4: #positive control
-        mask = perturbation_data.obs.sm_name.isin(['Dabrafenib', 'Belinostat'])
-        perturbation_data = perturbation_data[mask,:]
+        mask = evaluation_data.obs.sm_name.isin(['Dabrafenib', 'Belinostat'])
+        evaluation_data = evaluation_data[mask,:]
     else:
-        perturbation_data = perturbation_data[np.random.choice(perturbation_data.n_obs, subsample, replace=False), :]
-    verbose_print(par['verbose'], perturbation_data.shape,4)   
+        evaluation_data = evaluation_data[np.random.choice(evaluation_data.n_obs, subsample, replace=False), :]
+    verbose_print(par['verbose'], evaluation_data.shape,4)   
 
     if layer=='X':
         pass 
     else:
-        perturbation_data.X = perturbation_data.layers[layer]
+        evaluation_data.X = evaluation_data.layers[layer]
 
     verbose_print(par['verbose'], f'Compute metrics for layer: {layer}',  3)    
 
     results = {}    
     par['exclude_missing_genes'] = False
-    results['S1'] = [regression_1(net, perturbation_data, par=par, max_workers=max_workers)['mean_score_r2']]
+    results['S1'] = [regression_1(net, evaluation_data, par=par, max_workers=max_workers)['mean_score_r2']]
     par['exclude_missing_genes'] = True
-    results['S2'] = [regression_1(net, perturbation_data, par=par, max_workers=max_workers)['mean_score_r2']]
+    results['S2'] = [regression_1(net, evaluation_data, par=par, max_workers=max_workers)['mean_score_r2']]
 
     df_results = pd.DataFrame(results)
     return df_results

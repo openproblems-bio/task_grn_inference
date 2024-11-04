@@ -3239,7 +3239,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "9eaba5b565fde088613c09da01bc27853e9df950",
+    "git_commit" : "972d714cd2d3657ad409e8cc613cf51bdec4f495",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3301,7 +3301,7 @@ dep = {
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('--perturbation_data', type=str, help='Path to the perturbation_data file')
+parser.add_argument('--evaluation_data', type=str, help='Path to the evaluation_data file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
@@ -3311,8 +3311,8 @@ parser.add_argument('--normalize', action='store_true')
 
 args = parser.parse_args()
 
-if args.perturbation_data:
-    par['perturbation_data'] = args.perturbation_data
+if args.evaluation_data:
+    par['evaluation_data'] = args.evaluation_data
 if args.layer:
   par['layer'] = args.layer
 if args.causal:

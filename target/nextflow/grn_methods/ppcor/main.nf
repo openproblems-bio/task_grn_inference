@@ -3085,7 +3085,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.8.6",
-    "git_commit" : "9eaba5b565fde088613c09da01bc27853e9df950",
+    "git_commit" : "972d714cd2d3657ad409e8cc613cf51bdec4f495",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3144,7 +3144,33 @@ options(.viash_orig_warn)
 rm(.viash_orig_warn)
 
 ## VIASH END
-print(par)
+args <- commandArgs(trailingOnly = TRUE)
+
+# print(length(args))
+# aa
+i <- 1
+while (i <= length(args)) {
+  if (args[i] == "--rna") {
+    par\\$rna <- args[i + 1]
+    i <- i + 2
+  } else if (args[i] == "--prediction") {
+    par\\$prediction <- args[i + 1]
+    i <- i + 2
+  } else if (args[i] == "--tf_all" ) {
+    par\\$tf_all <- args[i + 1]
+    i <- i + 2
+  } else if (args[i] == "--max_n_links") {
+    par\\$max_n_links <- as.numeric(args[i + 1])
+    i <- i + 2
+  } else if (args[i] == "--num_workers") {
+    par\\$num_workers <- as.numeric(args[i + 1])
+    i <- i + 2
+  } else {
+    message("Unknown argument or missing value: ", args[i])
+    
+  }
+}
+
 # input expression data
 tf_names <- scan(par\\$tf_all, what = "", sep = "\\\\n")
 

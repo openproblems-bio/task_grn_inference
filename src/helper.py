@@ -81,43 +81,40 @@ def run_grn_seqera():
     raise ValueError('define first')
 
 def run_grn_inference():
-    # par = {
-    #     'methods': ['portia'],
-    #     'models_dir': 'resources/grn_models/mccalla/han',
-    #     'multiomics_rna': 'resources/grn-benchmark/mccalla/inference/han.h5ad', 
-    #     'num_workers': 20,
-    #     'mem': "250GB",
-    #     'time': "48:00:00",
-    #     'max_n_links': 100000,
-    #     'causal': False, 
-    #     'normalize': False
-    #     }
-    # par = {
-    #     'methods': ['scenicplus'],
-    #     'models_dir': 'resources/grn_models/',
-    #     'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad', 
-    #     'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad', 
-    #     'num_workers': 20,
-    #     'mem': "400GB",
-    #     'time': "48:00:00",
-    #     'causal': False,
-    #     'normalize': True,
-    #     'max_n_links': 100000,
-    # }
 
-    # - single omics 
-    par = {
-        # 'methods': ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2"],
-        'methods': ["grnboost2"],
 
-        'models_dir': 'output/',
-        'rna': 'resources/inference_datasets/replogle2.h5ad', 
-        'num_workers': 20,
-        'mem': "64GB",
-        'time': "2:00:00",
-        'normalize': False,
-        'max_n_links': 10000,
-    }
+
+    # - replogle2
+    if False:
+        par = {
+            # 'methods': ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2", "ppcor", "scenic"],
+            'methods': ["scenic"],
+
+            'models_dir': 'resources/grn_models/replogle/',
+            'rna': 'resources/inference_datasets/replogle2.h5ad', 
+            'rna_positive_control': 'resources/datasets_raw/replogle2.h5ad', 
+            'num_workers': 20,
+            'mem': "64GB",
+            'time': "48:00:00",
+            'normalize': False,
+            # 'max_n_links': 10000,
+        }
+    # - frangieh_IFNg_v2
+    if True:
+        par = {
+            'methods': ["grnboost2", 'scenic'],
+            # 'methods': ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2", "ppcor"],
+            # 'methods': ["scenic"],
+
+            'models_dir': 'output',
+            'rna': 'resources/inference_datasets/frangieh_IFNg_v2.h5ad', 
+            'rna_positive_control': 'resources/datasets_raw/frangieh_IFNg_v2.h5ad', 
+            'num_workers': 20,
+            'mem': "120GB",
+            'time': "48:30:00",
+            'normalize': False,
+            # 'max_n_links': 10000,
+        }
     
 
     for method in par['methods']:
@@ -125,13 +122,22 @@ def run_grn_inference():
         par['prediction'] = f"{par['models_dir']}/{method}.csv"
         
         # Method arguments
-        method_args = (f"--rna {par['rna']} "
-                       f"--prediction {par['prediction']} "
-                       f"--num_workers {par['num_workers']} "
-                       f"--max_n_links {par['max_n_links']} ")
+        if method == 'positive_control':
+            method_args = (f"--rna {par['rna_positive_control']} ")
+        else:
+            method_args = (f"--rna {par['rna']} ")
 
+        method_args += (
+                        f"--prediction {par['prediction']} "
+                        f"--num_workers {par['num_workers']} "
+                        #    f"--max_n_links {par['max_n_links']} "
+                        )
+        
+        method_args_r = ( f" {par['prediction']} "
+                        
+        )
         # Determine the command based on the method
-        if method in ["pearson_corr", "positive_control", "negative_control"]:
+        if method in ["positive_control", "pearson_corr", "negative_control"]:
             if par['normalize']:
                 method_args += f"--normalize "
             command = f"python src/control_methods/{method}/script.py {method_args}"
@@ -147,13 +153,15 @@ def run_grn_inference():
         elif method == 'scenicplus':
             method_args += f"--atac {par['atac']} "
             command = f"singularity exec ../../images/scenicplus python src/methods/multi_omics/{method}/script.py {method_args}"
+        elif method=='ppcor':
+            command = f"singularity exec ../../images/ppcor Rscript src/methods/single_omics/{method}/script.R {method_args}"
         else:
             command = f"singularity exec ../../images/{method} python src/methods/single_omics/{method}/script.py {method_args}"
 
         # Prepare sbatch command
         tag = f"--job-name={method}"  # No spaces around '='
         resources = (f"--cpus-per-task={par['num_workers']} "
-                     f"--mem={par['mem']} --time={par['time']}")
+                     f"--mem={par['mem']} --time={par['time']} --partition=gpu")
         
         # Combine tags and resources
         full_tag = [tag] + resources.split()
@@ -161,9 +169,7 @@ def run_grn_inference():
         # Add GPU partition if method is 'scglue'
         if method == 'scglue':
             full_tag += ["--partition=gpu", "--gres=gpu:1"]
-        if True:
-            full_tag += ["--partition=gpu", "--gres=gpu:1"]
-        # Run sbatch command
+
         try:
             result = subprocess.run(['sbatch'] + full_tag + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
             # result = subprocess.run(['bash'] + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)

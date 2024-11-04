@@ -6,50 +6,31 @@ import os
 
 ## VIASH START
 par = {
-  'reg_type': 'RF',
-  'models_dir': "resources/grn_models/",
-  'scores_dir': "resources/scores/",
+  'reg_type': 'ridge',
+  'models_dir': "resources/grn_models/replogle2",
+  'scores_dir': "output/",
   
-  'methods': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
-  # 'layers': ['scgen_pearson', 'lognorm', 'pearson', 'seurat_lognorm', 'seurat_pearson', 'scgen_lognorm'],
-  'layers': ['lognorm', 'pearson'],
+  # 'models': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
+  'models': [ 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'grnboost2', 'ppcor', 'scenic'],
+  # 'models': [ 'negative_control', 'positive_control', 'pearson_corr', 'portia'],
 
-  "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
+  "evaluation_data": "resources/evaluation_datasets/replogle2.h5ad",
+  'consensus': 'resources/prior/replogle2_consensus-num-regulators.json',
+  # "evaluation_data": "resources/evaluation_datasets/frangieh_IFNg_v2.h5ad",
+  # 'consensus': 'resources/prior/frangieh_IFNg_v2_consensus-num-regulators.json',
+
+  'layers': ['X'],
+  
   "tf_all": "resources/prior/tf_all.csv",
   'skeleton': 'resources/prior/skeleton.csv', 
-  "max_n_links": 50000,
-  "apply_tf": "true",
+  "apply_tf": True,
   'subsample': -1,
-  'verbose': 1,
-  'binarize': True,
+  'verbose': 4,
   'num_workers': 20,
-  'consensus': 'resources/prior/consensus-num-regulators.json',
-  'static_only': True,
   'clip_scores': True
 }
 # VIASH END
 
-import argparse
-parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--num_workers', type=str, help='Number of cores')
-parser.add_argument('--models_dir', type=str, help='where to read the models')
-parser.add_argument('--scores_dir', type=str, help='where to write the model')
-parser.add_argument('--apply_skeleton', type=str, help='where to apply the skeleton')
-
-args = parser.parse_args()
-
-if args.multiomics_rna:
-  par['multiomics_rna'] = args.multiomics_rna
-if args.num_workers:
-  par['num_workers'] = args.num_workers
-if args.models_dir:
-  par['models_dir'] = args.models_dir
-if args.scores_dir:
-  par['scores_dir'] = args.scores_dir
-if args.apply_skeleton:
-  par['apply_skeleton'] = args.apply_skeleton
-    
 meta = {
   "resources_dir": 'src/metrics/',
   "util": 'src/utils'
@@ -59,18 +40,23 @@ sys.path.append(meta["util"])
 
 os.makedirs(par['scores_dir'], exist_ok=True)
 
-for binarize in [True]:
+# - run consensus 
+from consensus.script import main 
+main(par)
+
+# - run metrics 
+for binarize in [False]:
   par['binarize'] = binarize
   for max_n_links in [50000]:
     par['max_n_links'] = max_n_links
-    for apply_skeleton in [True]:
+    for apply_skeleton in [False]:
       par['apply_skeleton'] = apply_skeleton
       for layer in par['layers']:
         par['layer'] = layer
         i = 0
-        for method in par['methods']:
-          print(method)
-          par['prediction'] = f"{par['models_dir']}/{method}.csv"
+        for model in par['models']:
+          print(model)
+          par['prediction'] = f"{par['models_dir']}/{model}.csv"
           if not os.path.exists(par['prediction']):
             print(f"{par['prediction']} doesnt exist. Skipped.")
             continue
@@ -79,7 +65,7 @@ for binarize in [True]:
           from regression_2.main import main 
           reg2 = main(par)
           score = pd.concat([reg1, reg2], axis=1)
-          score.index = [method]
+          score.index = [model]
           if i==0:
             df_all = score
           else:

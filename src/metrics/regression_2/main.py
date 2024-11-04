@@ -56,7 +56,7 @@ def fill_zeros_in_grn(A: np.ndarray, eps: float = 1e-10) -> np.ndarray:
 
 
 def cross_validate_gene(
-        estimator_t: str,
+        reg_type: str,
         X: np.ndarray,
         groups: np.ndarray,
         grn: np.ndarray,
@@ -87,12 +87,14 @@ def cross_validate_gene(
     y_pred, y_target, r2s = [], [], []
     for t, (train_index, test_index) in enumerate(LeaveOneGroupOut().split(X_, y_, groups)):
 
-        if estimator_t == 'ridge':
+        if reg_type == 'ridge':
             model = Ridge(random_state=random_state)
-        elif estimator_t == 'GB':
+        elif reg_type == 'GB':
             model = lightgbm.LGBMRegressor(verbosity=-1, n_estimators=100, n_jobs=n_jobs, random_state=random_state)
+        elif reg_type == 'RF':
+            model = lightgbm.LGBMRegressor(boosting_type='rf', feature_fraction=0.05, verbosity=-1, n_estimators=100, n_jobs=n_jobs, random_state=random_state)
         else:
-            raise NotImplementedError(f'Unknown model "{estimator_t}"')
+            raise NotImplementedError(f'Unknown model "{reg_type}"')
 
         X_train = X_[train_index, :]
         X_test = X_[test_index, :]
@@ -115,7 +117,7 @@ def cross_validate_gene(
 
 
 # def learn_background_distribution(
-#         estimator_t: str,
+#         reg_type: str,
 #         X: np.ndarray,
 #         groups: np.ndarray,
 #         max_n_regulators: int,
@@ -136,7 +138,7 @@ def cross_validate_gene(
 
 #             if n_features > 0:
 #                 res = cross_validate_gene(
-#                     estimator_t,
+#                     reg_type,
 #                     X,
 #                     groups,
 #                     random_grn,
@@ -152,7 +154,7 @@ def cross_validate_gene(
 
 
 def cross_validate(
-        estimator_t: str,
+        reg_type: str,
         gene_names: np.ndarray,
         tf_names: Set[str],
         X: np.ndarray,
@@ -172,9 +174,9 @@ def cross_validate(
     
     # Perform cross-validation for each gene
     results = []
-    for j in tqdm.tqdm(range(n_genes), desc=f'{estimator_t} CV'):
+    for j in tqdm.tqdm(range(n_genes), desc=f'{reg_type} CV'):
         if n_features[j] > 0:
-            res = cross_validate_gene(estimator_t, X, groups, grn, j, n_features=int(n_features[j]),n_jobs=n_jobs)
+            res = cross_validate_gene(reg_type, X, groups, grn, j, n_features=int(n_features[j]),n_jobs=n_jobs)
             results.append(res)
     return {
         'gene_names': list(gene_names),
@@ -273,19 +275,19 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     verbose_print(par['verbose'], "Reading input files", 3)
     
     # Load perturbation data
-    prturb_adata = ad.read_h5ad(par['perturbation_data'])
+    prturb_adata = ad.read_h5ad(par['evaluation_data'])
     subsample = par['subsample']
     if subsample == -1:
         pass
     # elif subsample == -2: # one combination of cell_type, sm_name
-    #     sampled_obs = perturbation_data.obs.groupby(['sm_name', 'cell_type'], observed=False).apply(lambda x: x.sample(1)).reset_index(drop=True)
-    #     obs = perturbation_data.obs
+    #     sampled_obs = evaluation_data.obs.groupby(['sm_name', 'cell_type'], observed=False).apply(lambda x: x.sample(1)).reset_index(drop=True)
+    #     obs = evaluation_data.obs
     #     mask = []
     #     for _, row in obs.iterrows():
     #         mask.append((sampled_obs==row).all(axis=1).any())  
-    #     perturbation_data = perturbation_data[mask,:]
+    #     evaluation_data = evaluation_data[mask,:]
     # else:
-    #     perturbation_data = perturbation_data[np.random.choice(perturbation_data.n_obs, subsample, replace=False), :]
+    #     evaluation_data = evaluation_data[np.random.choice(evaluation_data.n_obs, subsample, replace=False), :]
     else:
         raise ValueError('fix this')
 
@@ -306,18 +308,24 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
             net_sub = net
         net_matrix = net_to_matrix(net, gene_names, par)
 
-        # groups = LabelEncoder().fit_transform(perturbation_data.obs.plate_name)
+        # groups = LabelEncoder().fit_transform(evaluation_data.obs.plate_name)
         # groups = LabelEncoder().fit_transform(prturb_adata_sub.obs.cell_type)
         n_cells = prturb_adata_sub.shape[0]
         random_groups = np.random.choice(range(1, 5+1), size=n_cells, replace=True) # random sampling
         groups = LabelEncoder().fit_transform(random_groups)
 
         # Load and standardize perturbation data
-        if  par['layer']=='X':
+        layer = par['layer']
+        if  layer=='X':
             X = prturb_adata_sub.X
         else:
-            layer = par['layer']
             X = prturb_adata_sub.layers[layer]
+        
+        try:
+            X = X.todense().A
+        except:
+            pass
+
         X = RobustScaler().fit_transform(X)
 
         # Load consensus numbers of putative regulators

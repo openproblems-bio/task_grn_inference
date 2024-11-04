@@ -434,9 +434,9 @@ RUN Rscript -e 'if (!requireNamespace("remotes", quietly = TRUE)) install.packag
   Rscript -e 'remotes::install_cran(c("ppcor", "anndata", "dplyr"), repos = "https://cran.rstudio.com")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods ppcor"
-LABEL org.opencontainers.image.created="2024-11-04T20:14:33Z"
+LABEL org.opencontainers.image.created="2024-11-04T20:23:33Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="9eaba5b565fde088613c09da01bc27853e9df950"
+LABEL org.opencontainers.image.revision="972d714cd2d3657ad409e8cc613cf51bdec4f495"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -1061,7 +1061,33 @@ options(.viash_orig_warn)
 rm(.viash_orig_warn)
 
 ## VIASH END
-print(par)
+args <- commandArgs(trailingOnly = TRUE)
+
+# print(length(args))
+# aa
+i <- 1
+while (i <= length(args)) {
+  if (args[i] == "--rna") {
+    par\$rna <- args[i + 1]
+    i <- i + 2
+  } else if (args[i] == "--prediction") {
+    par\$prediction <- args[i + 1]
+    i <- i + 2
+  } else if (args[i] == "--tf_all" ) {
+    par\$tf_all <- args[i + 1]
+    i <- i + 2
+  } else if (args[i] == "--max_n_links") {
+    par\$max_n_links <- as.numeric(args[i + 1])
+    i <- i + 2
+  } else if (args[i] == "--num_workers") {
+    par\$num_workers <- as.numeric(args[i + 1])
+    i <- i + 2
+  } else {
+    message("Unknown argument or missing value: ", args[i])
+    
+  }
+}
+
 # input expression data
 tf_names <- scan(par\$tf_all, what = "", sep = "\\n")
 
