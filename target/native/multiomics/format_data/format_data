@@ -175,15 +175,13 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --multiome_counts"
   echo "        type: file, required parameter, file must exist"
-  echo "        example: resources/datasets_raw/multiome_counts.h5ad"
+  echo "        example: resources/datasets_raw/op_multiome_counts.h5ad"
   echo ""
   echo "    --multiomics_rna"
   echo "        type: file, output, file must exist"
-  echo "        example: resources/grn-benchmark/multiomics_rna.h5ad"
   echo ""
   echo "    --multiomics_atac"
   echo "        type: file, output, file must exist"
-  echo "        example: resources/grn-benchmark/multiomics_atac.h5ad"
 }
 
 # initialise array

@@ -10,18 +10,16 @@ functionality:
       type: file 
       required: true
       direction: input
-      example: resources/datasets_raw/multiome_counts.h5ad
+      example: resources/datasets_raw/op_multiome_counts.h5ad
 
     - name: --multiomics_rna
       type: file 
       required: false
       direction: output
-      example: resources/grn-benchmark/multiomics_rna.h5ad
     - name: --multiomics_atac
       type: file 
       required: false
       direction: output
-      example: resources/grn-benchmark/multiomics_atac.h5ad
   resources:
     - type: python_script
       path: script.py

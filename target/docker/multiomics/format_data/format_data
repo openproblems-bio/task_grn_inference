@@ -175,15 +175,13 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --multiome_counts"
   echo "        type: file, required parameter, file must exist"
-  echo "        example: resources/datasets_raw/multiome_counts.h5ad"
+  echo "        example: resources/datasets_raw/op_multiome_counts.h5ad"
   echo ""
   echo "    --multiomics_rna"
   echo "        type: file, output, file must exist"
-  echo "        example: resources/grn-benchmark/multiomics_rna.h5ad"
   echo ""
   echo "    --multiomics_atac"
   echo "        type: file, output, file must exist"
-  echo "        example: resources/grn-benchmark/multiomics_atac.h5ad"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -408,9 +406,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component multiomics format_data"
-LABEL org.opencontainers.image.created="2024-11-04T20:36:52Z"
+LABEL org.opencontainers.image.created="2024-11-07T08:58:02Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="dab5ba0d168072f09e2a63cb1893fa0abacfdb8a"
+LABEL org.opencontainers.image.revision="90a70ab6147d26c3c8a2d4c40f60db9c41dfe5f0"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

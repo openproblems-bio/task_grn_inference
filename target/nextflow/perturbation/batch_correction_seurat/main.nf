@@ -2815,7 +2815,7 @@ meta = [
           }
         },
         "example" : [
-          "resources_test/grn-benchmark/perturbation_data.h5ad"
+          "resources_test/evaluation_datasets/op_perturbation.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -3013,7 +3013,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/batch_correction_seurat",
     "viash_version" : "0.8.6",
-    "git_commit" : "dab5ba0d168072f09e2a63cb1893fa0abacfdb8a",
+    "git_commit" : "90a70ab6147d26c3c8a2d4c40f60db9c41dfe5f0",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

@@ -71,6 +71,7 @@ def cross_validation(net, prturb_adata, par:dict):
         included_genes = gene_names
 
     X_df = pd.DataFrame(np.zeros((len(included_genes), n_tfs)), index=included_genes)
+    
     try:
         train_df = pd.DataFrame(prturb_adata.X, columns=gene_names).T
     except:

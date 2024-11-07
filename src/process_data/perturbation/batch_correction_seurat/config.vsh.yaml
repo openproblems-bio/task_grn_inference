@@ -30,7 +30,7 @@ functionality:
               required: true
       required: true
       direction: input
-      example: resources_test/grn-benchmark/perturbation_data.h5ad 
+      example: resources_test/evaluation_datasets/op_perturbation.h5ad 
     - name: --perturbation_data_bc
       __merge__: ../../../api/file_evaluation_h5ad.yaml
       required: false

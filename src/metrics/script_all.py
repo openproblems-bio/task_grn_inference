@@ -6,13 +6,13 @@ import os
 
 ## VIASH START
 par = {
-  'reg_type': 'ridge',
+  'reg_type': 'GB',
   'models_dir': "resources/grn_models/replogle2",
   'scores_dir': "output/",
   
   # 'models': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
   'models': [ 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'grnboost2', 'ppcor', 'scenic'],
-  # 'models': [ 'negative_control', 'positive_control', 'pearson_corr', 'portia'],
+  # 'models': ['negative_control', 'positive_control', 'pearson_corr'],
 
   "evaluation_data": "resources/evaluation_datasets/replogle2.h5ad",
   'consensus': 'resources/prior/replogle2_consensus-num-regulators.json',

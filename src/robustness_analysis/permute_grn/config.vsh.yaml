@@ -8,12 +8,11 @@ functionality:
     - name: --prediction
       type: file
       direction: input
-      example: resources/grn_models/collectri.csv
+      example: resources_test/grn_models/op/collectri.csv
 
     - name: --prediction_n
       type: file
       direction: output 
-      example: resources/grn_models/collectri.csv
 
     - name: --degree
       type: integer

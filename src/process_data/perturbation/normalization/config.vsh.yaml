@@ -24,7 +24,7 @@ functionality:
 
       required: true
       direction: input
-      example: resources_test/grn-benchmark/perturbation_data.h5ad 
+      example: resources_test/evaluation_datasets/op_perturbation.h5ad 
 
     - name: --perturbation_data_n
       type: file
@@ -48,7 +48,7 @@ functionality:
               required: true
       required: false
       direction: output
-      example: resources_test/grn-benchmark/perturbation_data.h5ad 
+      example: resources_test/evaluation_datasets/op_perturbation.h5ad 
       
 
   resources:

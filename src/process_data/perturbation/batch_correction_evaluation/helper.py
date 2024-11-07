@@ -6,6 +6,7 @@ from sklearn.model_selection import cross_validate
 from sklearn.linear_model import RidgeClassifier
 from sklearn.metrics import r2_score, make_scorer, accuracy_score
 
+
 def run_scib(bulk_adata, layer='lognorm', layer_baseline='n_counts', batch_key='plate_name', label_key='cell_type'):
     bulk_adata.X = bulk_adata.layers[layer_baseline].copy()
 

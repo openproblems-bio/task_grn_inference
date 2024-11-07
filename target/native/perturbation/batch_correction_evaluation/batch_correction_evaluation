@@ -179,7 +179,6 @@ function ViashHelp {
   echo ""
   echo "    --output"
   echo "        type: file, output, file must exist"
-  echo "        example: resources_test/results/batch_correction_metrics.csv"
 }
 
 # initialise array

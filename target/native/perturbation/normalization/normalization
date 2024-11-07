@@ -175,11 +175,11 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --pseudobulked_data_f"
   echo "        type: file, required parameter, file must exist"
-  echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
+  echo "        example: resources_test/evaluation_datasets/op_perturbation.h5ad"
   echo ""
   echo "    --perturbation_data_n"
   echo "        type: file, output, file must exist"
-  echo "        example: resources_test/grn-benchmark/perturbation_data.h5ad"
+  echo "        example: resources_test/evaluation_datasets/op_perturbation.h5ad"
 }
 
 # initialise array
