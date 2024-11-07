@@ -12,12 +12,12 @@ functionality:
       type: file
       required: false
       direction: input
-      example: resources/evaluation_datasets/op_rna.rds
+      example: resources_test/evaluation_datasets/op_rna.rds
     - name: --atac_r
       type: file
       required: false
       direction: input
-      example: resources/evaluation_datasets/op_atac.rds
+      example: resources_test/evaluation_datasets/op_atac.rds
     - name: --prediction
       __merge__: file_prediction.yaml
       required: false

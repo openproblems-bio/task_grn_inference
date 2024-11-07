@@ -14,7 +14,6 @@ functionality:
       type: file
       required: false 
       direction: output
-      example: resources_test/results/batch_correction_metrics.csv
 
   resources:
     - type: python_script

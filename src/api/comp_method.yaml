@@ -12,22 +12,22 @@ functionality:
       __merge__: file_rna_h5ad.yaml
       required: true
       direction: input
-      example: resources/evaluation_datasets/op_rna.h5ad
+      example: resources_test/evaluation_datasets/op_rna.h5ad
     - name: --atac
       __merge__: file_atac_h5ad.yaml
       required: false
       direction: input
-      example: resources/evaluation_datasets/op_atac.h5ad
+      example: resources_test/evaluation_datasets/op_atac.h5ad
     - name: --prediction
       __merge__: file_prediction.yaml
       required: false
       direction: output
-      example: resources/grn_models/collectri.csv
+      example: resources_test/grn_models/collectri.csv
     - name: --tf_all
       type: file
       required: false
       direction: input
-      example: resources/prior/tf_all.csv
+      example: resources_test/prior/tf_all.csv
     - name: --max_n_links
       type: integer
       default: 50000

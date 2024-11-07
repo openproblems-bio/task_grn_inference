@@ -69,7 +69,7 @@ functionality:
     - name: --skeleton 
       type: file
       direction: input
-      example: resources/prior/skeleton.csv
+      example: resources_test/prior/skeleton.csv
     - name: --apply_skeleton 
       type: boolean
       direction: input

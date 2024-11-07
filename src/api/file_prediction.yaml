@@ -1,5 +1,5 @@
 type: file
-example: resources/grn_models/op/collectri.csv
+example: resources_test/grn_models/op/collectri.csv
 info:
   label: GRN
   summary: "GRN prediction"

@@ -82,15 +82,13 @@ def run_grn_seqera():
 
 def run_grn_inference():
 
-
-
     # - replogle2
-    if False:
+    if True:
         par = {
             # 'methods': ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2", "ppcor", "scenic"],
-            'methods': ["scenic"],
+            'methods': ["positive_control", "negative_control", "pearson_corr"],
 
-            'models_dir': 'resources/grn_models/replogle/',
+            'models_dir': 'resources/grn_models/replogle2/',
             'rna': 'resources/inference_datasets/replogle2.h5ad', 
             'rna_positive_control': 'resources/datasets_raw/replogle2.h5ad', 
             'num_workers': 20,
@@ -100,7 +98,7 @@ def run_grn_inference():
             # 'max_n_links': 10000,
         }
     # - frangieh_IFNg_v2
-    if True:
+    if False:
         par = {
             'methods': ["grnboost2", 'scenic'],
             # 'methods': ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2", "ppcor"],
@@ -116,7 +114,6 @@ def run_grn_inference():
             # 'max_n_links': 10000,
         }
     
-
     for method in par['methods']:
         print(method)
         par['prediction'] = f"{par['models_dir']}/{method}.csv"
@@ -171,8 +168,8 @@ def run_grn_inference():
             full_tag += ["--partition=gpu", "--gres=gpu:1"]
 
         try:
-            result = subprocess.run(['sbatch'] + full_tag + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
-            # result = subprocess.run(['bash'] + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
+            # result = subprocess.run(['sbatch'] + full_tag + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
+            result = subprocess.run(['bash'] + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
 
             print(f"Job {method} submitted successfully.")
             print(result.stdout)  # Print the standard output
