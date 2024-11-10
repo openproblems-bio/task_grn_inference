@@ -86,14 +86,14 @@ def run_grn_inference():
     if True:
         par = {
             # 'methods': ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2", "ppcor", "scenic"],
-            'methods': ["positive_control", "negative_control", "pearson_corr"],
+            'methods': ["portia", "grnboost2"],
 
             'models_dir': 'resources/grn_models/replogle2/',
             'rna': 'resources/inference_datasets/replogle2.h5ad', 
             'rna_positive_control': 'resources/datasets_raw/replogle2.h5ad', 
             'num_workers': 20,
             'mem': "64GB",
-            'time': "48:00:00",
+            'time': "12:00:00",
             'normalize': False,
             # 'max_n_links': 10000,
         }
@@ -168,8 +168,8 @@ def run_grn_inference():
             full_tag += ["--partition=gpu", "--gres=gpu:1"]
 
         try:
-            # result = subprocess.run(['sbatch'] + full_tag + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
-            result = subprocess.run(['bash'] + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
+            result = subprocess.run(['sbatch'] + full_tag + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
+            # result = subprocess.run(['bash'] + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
 
             print(f"Job {method} submitted successfully.")
             print(result.stdout)  # Print the standard output

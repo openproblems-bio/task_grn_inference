@@ -5,19 +5,16 @@ import numpy as np
 import os 
 
 ## VIASH START
-par = {
-  'reg_type': 'GB',
-  'models_dir': "resources/grn_models/replogle2",
-  'scores_dir': "output/",
+if True: #op 
+  par = {
+  'reg_type': 'ridge',
+  'models_dir': "resources/grn_models/op",
+  'scores_dir': "output/temp",
   
-  # 'models': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
-  'models': [ 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'grnboost2', 'ppcor', 'scenic'],
-  # 'models': ['negative_control', 'positive_control', 'pearson_corr'],
+  'models': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
 
-  "evaluation_data": "resources/evaluation_datasets/replogle2.h5ad",
-  'consensus': 'resources/prior/replogle2_consensus-num-regulators.json',
-  # "evaluation_data": "resources/evaluation_datasets/frangieh_IFNg_v2.h5ad",
-  # 'consensus': 'resources/prior/frangieh_IFNg_v2_consensus-num-regulators.json',
+  "evaluation_data": "resources/evaluation_datasets/op_perturbation.h5ad",
+  'consensus': 'resources/prior/op_consensus-num-regulators.json',
 
   'layers': ['X'],
   
@@ -29,6 +26,29 @@ par = {
   'num_workers': 20,
   'clip_scores': True
 }
+
+if False: # replogle2
+  par = {
+    'reg_type': 'GB',
+    'models_dir': "resources/grn_models/replogle2",
+    'scores_dir': "output/",
+    
+    'models': [ 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'grnboost2', 'ppcor', 'scenic'],
+
+
+    "evaluation_data": "resources/evaluation_datasets/replogle2.h5ad",
+    'consensus': 'resources/prior/replogle2_consensus-num-regulators.json',
+
+    'layers': ['X'],
+    
+    "tf_all": "resources/prior/tf_all.csv",
+    'skeleton': 'resources/prior/skeleton.csv', 
+    "apply_tf": True,
+    'subsample': -1,
+    'verbose': 4,
+    'num_workers': 20,
+    'clip_scores': True
+  }
 # VIASH END
 
 meta = {
@@ -39,7 +59,6 @@ sys.path.append(meta["resources_dir"])
 sys.path.append(meta["util"])
 
 os.makedirs(par['scores_dir'], exist_ok=True)
-
 # - run consensus 
 from consensus.script import main 
 main(par)
