@@ -175,7 +175,7 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --perturbation_data"
   echo "        type: file, required parameter, file must exist"
-  echo "        example: resources/evaluation_datasets/op_perturbation.h5ad"
+  echo "        example: resources_test/evaluation_datasets/op_perturbation.h5ad"
   echo ""
   echo "    --output"
   echo "        type: file, output, file must exist"

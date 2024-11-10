@@ -175,7 +175,7 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --perturbation_data"
   echo "        type: file, required parameter, file must exist"
-  echo "        example: resources/evaluation_datasets/op_perturbation.h5ad"
+  echo "        example: resources_test/evaluation_datasets/op_perturbation.h5ad"
   echo ""
   echo "    --output"
   echo "        type: file, output, file must exist"
@@ -405,9 +405,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.5.0" "scib==1.1.5" "louvain==0.8.2" "rpy2"
 
 LABEL org.opencontainers.image.description="Companion container for running component perturbation batch_correction_evaluation"
-LABEL org.opencontainers.image.created="2024-11-07T08:58:01Z"
+LABEL org.opencontainers.image.created="2024-11-10T20:21:04Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="90a70ab6147d26c3c8a2d4c40f60db9c41dfe5f0"
+LABEL org.opencontainers.image.revision="fd2bfa9db6dfa9d0d4c5ddef6ae3feac7cdeb3a0"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

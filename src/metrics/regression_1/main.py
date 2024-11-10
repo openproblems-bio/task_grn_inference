@@ -115,7 +115,7 @@ def cross_validation(net, prturb_adata, par:dict):
         regr = lightgbm_wrapper(params, max_workers=par['num_workers'])
     else:
         raise ValueError(f"{reg_type} is not defined.")  
-    
+    reg_models = []
     for group in verbose_tqdm(unique_groups, "Processing groups", 2, par['verbose']):
         mask_va = groups == group
         mask_tr = ~mask_va
@@ -125,7 +125,9 @@ def cross_validation(net, prturb_adata, par:dict):
             continue 
         regr.fit(X_tr, Y_tr)
         y_pred[mask_va & mask_shared_genes, :] = regr.predict(X[mask_va & mask_shared_genes, :])
-    return y_true, y_pred
+
+        reg_models.append(regr)
+    return y_true, y_pred, reg_models
 
 def regression_1(
             net: pd.DataFrame, 
@@ -162,9 +164,10 @@ def regression_1(
             prturb_adata_sub = prturb_adata[prturb_adata.obs.donor_id==donor_id,:]
         else:
             prturb_adata_sub = prturb_adata
-        y_true_sub, y_pred_sub = cross_validation(net_sub, prturb_adata_sub, par)
+        y_true_sub, y_pred_sub, _ = cross_validation(net_sub, prturb_adata_sub, par)
 
         score = r2_score(y_true_sub, y_pred_sub, multioutput='variance_weighted')
+        
         score_list.append(score)
     mean_score_r2 = np.mean(score_list)
     output = dict(mean_score_r2=mean_score_r2)
