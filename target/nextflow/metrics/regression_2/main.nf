@@ -3050,7 +3050,7 @@ meta = [
         "type" : "string",
         "name" : "--layer",
         "default" : [
-          "scgen_pearson"
+          "pearson"
         ],
         "required" : false,
         "direction" : "input",
@@ -3100,7 +3100,7 @@ meta = [
         "type" : "boolean",
         "name" : "--apply_skeleton",
         "default" : [
-          true
+          false
         ],
         "required" : false,
         "direction" : "input",
@@ -3112,7 +3112,7 @@ meta = [
         "type" : "file",
         "name" : "--consensus",
         "example" : [
-          "resources_test/prior/consensus-num-regulators.json"
+          "resources_test/prior/op_consensus-num-regulators.json"
         ],
         "must_exist" : false,
         "create_parent" : true,
@@ -3252,7 +3252,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "fd2bfa9db6dfa9d0d4c5ddef6ae3feac7cdeb3a0",
+    "git_commit" : "c5cde01c6bd09dd70b022bd6654fa18d3532da06",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

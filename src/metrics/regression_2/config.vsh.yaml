@@ -18,7 +18,7 @@ functionality:
       direction: input
       must_exist: false
       required: true
-      example: 'resources_test/prior/consensus-num-regulators.json'
+      example: resources_test/prior/op_consensus-num-regulators.json
     - name: --static_only
       direction: input
       type: boolean

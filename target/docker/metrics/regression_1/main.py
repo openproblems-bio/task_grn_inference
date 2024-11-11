@@ -44,6 +44,16 @@ class lightgbm_wrapper:
             y_pred_list = list(executor.map(predict_sample, range(self.n_sample)))
         
         return np.stack(y_pred_list, axis=1)
+    def get_feature_importance(self):
+        # Ensure models have been fitted
+        if not all(self.regr_samples):
+            raise ValueError("Models are not yet trained. Call `fit` first.")
+
+        # Collect feature importances from each regressor
+        importances = np.array([regr.feature_importances_ for regr in self.regr_samples])
+        
+        # Optionally, return the importance for each sample as well
+        return importances
 
 
 def cv_5(genes_n):

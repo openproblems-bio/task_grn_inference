@@ -2809,7 +2809,7 @@ meta = [
           }
         },
         "example" : [
-          "resources_test/evaluation_datasets/op_rna.h5ad"
+          "resources_test/inference_datasets/op_rna.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2844,7 +2844,7 @@ meta = [
           }
         },
         "example" : [
-          "resources_test/evaluation_datasets/op_atac.h5ad"
+          "resources_test/inference_datasets/op_atac.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2883,7 +2883,7 @@ meta = [
           ]
         },
         "example" : [
-          "resources_test/grn_models/collectri.csv"
+          "resources_test/grn_models/op/collectri.csv"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -3033,7 +3033,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "fd2bfa9db6dfa9d0d4c5ddef6ae3feac7cdeb3a0",
+          "git_commit" : "c5cde01c6bd09dd70b022bd6654fa18d3532da06",
           "executable" : "/nextflow/grn_methods/celloracle/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/celloracle"
@@ -3088,7 +3088,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/grn_inference_celloracle",
     "viash_version" : "0.8.6",
-    "git_commit" : "fd2bfa9db6dfa9d0d4c5ddef6ae3feac7cdeb3a0",
+    "git_commit" : "c5cde01c6bd09dd70b022bd6654fa18d3532da06",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

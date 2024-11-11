@@ -218,7 +218,7 @@ function ViashHelp {
   echo ""
   echo "    --layer"
   echo "        type: string"
-  echo "        default: scgen_pearson"
+  echo "        default: pearson"
   echo ""
   echo "    --max_n_links"
   echo "        type: integer"
@@ -234,11 +234,11 @@ function ViashHelp {
   echo ""
   echo "    --apply_skeleton"
   echo "        type: boolean"
-  echo "        default: true"
+  echo "        default: false"
   echo ""
   echo "    --consensus"
   echo "        type: file, required parameter"
-  echo "        example: resources_test/prior/consensus-num-regulators.json"
+  echo "        example: resources_test/prior/op_consensus-num-regulators.json"
   echo ""
   echo "    --static_only"
   echo "        type: boolean"
@@ -469,9 +469,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_2"
-LABEL org.opencontainers.image.created="2024-11-10T20:21:03Z"
+LABEL org.opencontainers.image.created="2024-11-11T20:55:10Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="fd2bfa9db6dfa9d0d4c5ddef6ae3feac7cdeb3a0"
+LABEL org.opencontainers.image.revision="c5cde01c6bd09dd70b022bd6654fa18d3532da06"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -985,7 +985,7 @@ if [ -z ${VIASH_PAR_CLIP_SCORES+x} ]; then
   VIASH_PAR_CLIP_SCORES="true"
 fi
 if [ -z ${VIASH_PAR_LAYER+x} ]; then
-  VIASH_PAR_LAYER="scgen_pearson"
+  VIASH_PAR_LAYER="pearson"
 fi
 if [ -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then
   VIASH_PAR_MAX_N_LINKS="50000"
@@ -994,7 +994,7 @@ if [ -z ${VIASH_PAR_VERBOSE+x} ]; then
   VIASH_PAR_VERBOSE="2"
 fi
 if [ -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then
-  VIASH_PAR_APPLY_SKELETON="true"
+  VIASH_PAR_APPLY_SKELETON="false"
 fi
 if [ -z ${VIASH_PAR_STATIC_ONLY+x} ]; then
   VIASH_PAR_STATIC_ONLY="true"

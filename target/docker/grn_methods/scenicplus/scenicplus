@@ -175,15 +175,15 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --rna"
   echo "        type: file, required parameter, file must exist"
-  echo "        example: resources_test/evaluation_datasets/op_rna.h5ad"
+  echo "        example: resources_test/inference_datasets/op_rna.h5ad"
   echo ""
   echo "    --atac"
   echo "        type: file, file must exist"
-  echo "        example: resources_test/evaluation_datasets/op_atac.h5ad"
+  echo "        example: resources_test/inference_datasets/op_atac.h5ad"
   echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"
-  echo "        example: resources_test/grn_models/collectri.csv"
+  echo "        example: resources_test/grn_models/op/collectri.csv"
   echo ""
   echo "    --tf_all"
   echo "        type: file, file must exist"
@@ -452,9 +452,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenicplus"
-LABEL org.opencontainers.image.created="2024-11-10T20:21:05Z"
+LABEL org.opencontainers.image.created="2024-11-11T20:55:12Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="fd2bfa9db6dfa9d0d4c5ddef6ae3feac7cdeb3a0"
+LABEL org.opencontainers.image.revision="c5cde01c6bd09dd70b022bd6654fa18d3532da06"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
