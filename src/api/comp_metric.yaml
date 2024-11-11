@@ -58,7 +58,7 @@ functionality:
       type: string
       direction: input
       required: false
-      default: scgen_pearson
+      default: pearson
     - name: --max_n_links
       type: integer
       default: 50000
@@ -73,7 +73,7 @@ functionality:
     - name: --apply_skeleton 
       type: boolean
       direction: input
-      default: true
+      default: false
 
   test_resources:
     - type: python_script
