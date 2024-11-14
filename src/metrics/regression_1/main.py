@@ -88,10 +88,10 @@ def cross_validation(net, prturb_adata, par:dict):
         train_df = pd.DataFrame(prturb_adata.X.todense().A, columns=gene_names).T
     Y_df = train_df.loc[included_genes,:]
 
-    mask_shared_genes = X_df.index.isin(net.index)
+    mask_gene_net = X_df.index.isin(net.index)
     
     # fill the actual regulatory links
-    X_df.loc[mask_shared_genes, :] = net.values
+    X_df.loc[mask_gene_net, :] = net.values
     X = X_df.values.copy()
 
     # run cv 
@@ -106,8 +106,9 @@ def cross_validation(net, prturb_adata, par:dict):
     Y = Y_df.values
     y_true = Y.copy()
 
-    unique_groups = np.unique(groups)
+    # print(r2_score(y_true, y_pred, multioutput='variance_weighted'))
 
+    unique_groups = np.unique(groups)
 
     # determine regressor 
     reg_type = par['reg_type']
@@ -126,18 +127,34 @@ def cross_validation(net, prturb_adata, par:dict):
     else:
         raise ValueError(f"{reg_type} is not defined.")  
     reg_models = []
+
+    
     for group in verbose_tqdm(unique_groups, "Processing groups", 2, par['verbose']):
         mask_va = groups == group
         mask_tr = ~mask_va
-        X_tr = X[mask_tr & mask_shared_genes, :]
-        Y_tr = Y[mask_tr & mask_shared_genes, :]
+        X_tr = X[mask_tr & mask_gene_net, :]
+        Y_tr = Y[mask_tr & mask_gene_net, :]
+
+        print(X.shape, Y.shape, X_tr.shape, Y_tr.shape, X[mask_va & mask_gene_net, :].shape)
+
         if X_tr.shape[0]<2:
             continue 
         regr.fit(X_tr, Y_tr)
-        y_pred[mask_va & mask_shared_genes, :] = regr.predict(X[mask_va & mask_shared_genes, :])
+        y_pred[mask_va & mask_gene_net, :] = regr.predict(X[mask_va & mask_gene_net, :])
 
         reg_models.append(regr)
-    return y_true, y_pred, reg_models
+
+    r2score = r2_score(y_true, y_pred, multioutput='variance_weighted')
+    r2score_samples = []
+    for i_sample in range(y_true.shape[1]):
+        score_sample = r2_score(y_true[:, i_sample], y_pred[:, i_sample], multioutput='variance_weighted')
+        r2score_samples.append(score_sample)
+    results = {
+        'r2score-aver': r2score,
+        'r2scores': r2score_samples,
+        'reg_models' : reg_models
+    }
+    return results
 
 def regression_1(
             net: pd.DataFrame, 
@@ -174,11 +191,11 @@ def regression_1(
             prturb_adata_sub = prturb_adata[prturb_adata.obs.donor_id==donor_id,:]
         else:
             prturb_adata_sub = prturb_adata
-        y_true_sub, y_pred_sub, _ = cross_validation(net_sub, prturb_adata_sub, par)
+        results = cross_validation(net_sub, prturb_adata_sub, par)
 
-        score = r2_score(y_true_sub, y_pred_sub, multioutput='variance_weighted')
         
-        score_list.append(score)
+        
+        score_list.append(results['r2score-aver'])
     mean_score_r2 = np.mean(score_list)
     output = dict(mean_score_r2=mean_score_r2)
     return output

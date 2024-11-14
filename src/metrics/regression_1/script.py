@@ -5,16 +5,16 @@ import numpy as np
 
 ## VIASH START
 par = {
-  "evaluation_data": "resources/grn-benchmark/evaluation_data.h5ad",
+  "evaluation_data": "resources/evaluation_datasets/nakatake_perturbation.h5ad",
   "tf_all": "resources/prior/tf_all.csv",
   # "prediction": "output/pearson_net.csv",
-  "prediction": "resources/grn_models/full/portia.csv",
+  "prediction": "resources/grn_models/nakatake/portia.csv",
   "method_id": "scenic",
   "max_n_links": 50000,
-  "apply_tf": False,
+  "apply_tf": True,
   'score': 'output/score.h5ad',
   'reg_type': 'ridge',
-  'layer': 'pearson',
+  'layer': 'X',
   'subsample': -1,
   'num_workers': 4,
   'skeleton': 'resources/prior/skeleton.csv',

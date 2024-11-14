@@ -82,38 +82,32 @@ def run_grn_seqera():
 
 def run_grn_inference():
 
-    # - replogle2
-    if True:
-        par = {
-            # 'methods': ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2", "ppcor", "scenic"],
-            'methods': ["portia", "grnboost2"],
+    # - 
+    dataset = 'nakatake' # 'replogle2' 'op'
+    sbatch = True
+    partition='cpu'
 
-            'models_dir': 'resources/grn_models/replogle2/',
-            'rna': 'resources/inference_datasets/replogle2.h5ad', 
-            'rna_positive_control': 'resources/datasets_raw/replogle2.h5ad', 
-            'num_workers': 20,
-            'mem': "64GB",
-            'time': "12:00:00",
-            'normalize': False,
-            # 'max_n_links': 10000,
-        }
-    # - frangieh_IFNg_v2
-    if False:
-        par = {
-            'methods': ["grnboost2", 'scenic'],
-            # 'methods': ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2", "ppcor"],
-            # 'methods': ["scenic"],
-
-            'models_dir': 'output',
-            'rna': 'resources/inference_datasets/frangieh_IFNg_v2.h5ad', 
-            'rna_positive_control': 'resources/datasets_raw/frangieh_IFNg_v2.h5ad', 
-            'num_workers': 20,
-            'mem': "120GB",
-            'time': "48:30:00",
-            'normalize': False,
-            # 'max_n_links': 10000,
-        }
+    if dataset == 'op':
+        normalize = True
+    else:
+        normalize = False
     
+    
+    par = {
+        # 'methods': ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2", "ppcor", "scenic"],
+        'methods': ["portia", "grnboost2", "ppcor", "scenic"],
+
+        'models_dir': f'resources/grn_models/{dataset}/',
+        'rna': f'resources/inference_datasets/{dataset}_rna.h5ad', 
+        'rna_positive_control': f'resources/datasets_raw/{dataset}.h5ad', 
+        'num_workers': 10,
+        'mem': "64GB",
+        'time': "12:00:00",
+        'normalize': normalize,
+        # 'max_n_links': 10000,
+    }
+   
+    os.makedirs(par['models_dir'], exist_ok=True)
     for method in par['methods']:
         print(method)
         par['prediction'] = f"{par['models_dir']}/{method}.csv"
@@ -158,7 +152,7 @@ def run_grn_inference():
         # Prepare sbatch command
         tag = f"--job-name={method}"  # No spaces around '='
         resources = (f"--cpus-per-task={par['num_workers']} "
-                     f"--mem={par['mem']} --time={par['time']} --partition=gpu")
+                     f"--mem={par['mem']} --time={par['time']} --partition={partition}")
         
         # Combine tags and resources
         full_tag = [tag] + resources.split()
@@ -168,8 +162,10 @@ def run_grn_inference():
             full_tag += ["--partition=gpu", "--gres=gpu:1"]
 
         try:
-            result = subprocess.run(['sbatch'] + full_tag + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
-            # result = subprocess.run(['bash'] + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
+            if sbatch:
+                result = subprocess.run(['sbatch'] + full_tag + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
+            else:
+                result = subprocess.run(['bash'] + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
 
             print(f"Job {method} submitted successfully.")
             print(result.stdout)  # Print the standard output

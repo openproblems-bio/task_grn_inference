@@ -5,51 +5,37 @@ import numpy as np
 import os 
 
 ## VIASH START
+
+dataset = 'nakatake' #replogle2, op, nakatake
+
+if dataset == 'op':
+  layer = 'pearson'
+elif dataset in ['replogle2', 'nakatake']:
+  layer = 'X'
+else:
+  raise ValueError('define first')
+
 if True: #op 
   par = {
   'reg_type': 'ridge',
-  'models_dir': "resources/grn_models/op",
-  'scores_dir': "output/temp",
+  'models_dir': f"resources/grn_models/{dataset}",
+  'scores_dir': f"output/temp/{dataset}",
   
   'models': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
 
-  "evaluation_data": "resources/evaluation_datasets/op_perturbation.h5ad",
-  'consensus': 'resources/prior/op_consensus-num-regulators.json',
+  "evaluation_data": f"resources/evaluation_datasets/{dataset}_perturbation.h5ad",
+  'consensus': f'resources/prior/{dataset}_consensus-num-regulators.json',
 
-  'layers': ['X'],
+  'layers': [layer],
   
   "tf_all": "resources/prior/tf_all.csv",
   'skeleton': 'resources/prior/skeleton.csv', 
   "apply_tf": True,
   'subsample': -1,
   'verbose': 4,
-  'num_workers': 20,
-  'clip_scores': True
+  'num_workers': 20
 }
 
-if False: # replogle2
-  par = {
-    'reg_type': 'GB',
-    'models_dir': "resources/grn_models/replogle2",
-    'scores_dir': "output/",
-    
-    'models': [ 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'grnboost2', 'ppcor', 'scenic'],
-
-
-    "evaluation_data": "resources/evaluation_datasets/replogle2.h5ad",
-    'consensus': 'resources/prior/replogle2_consensus-num-regulators.json',
-
-    'layers': ['X'],
-    
-    "tf_all": "resources/prior/tf_all.csv",
-    'skeleton': 'resources/prior/skeleton.csv', 
-    "apply_tf": True,
-    'subsample': -1,
-    'verbose': 4,
-    'num_workers': 20,
-    'clip_scores': True
-  }
-# VIASH END
 
 meta = {
   "resources_dir": 'src/metrics/',
@@ -64,9 +50,9 @@ from consensus.script import main
 main(par)
 
 # - run metrics 
-for binarize in [False]:
+for binarize in [False, True]:
   par['binarize'] = binarize
-  for max_n_links in [50000]:
+  for max_n_links in [50000, 10000]:
     par['max_n_links'] = max_n_links
     for apply_skeleton in [False]:
       par['apply_skeleton'] = apply_skeleton

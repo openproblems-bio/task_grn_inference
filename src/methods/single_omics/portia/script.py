@@ -93,22 +93,8 @@ def main(par):
 if __name__ == '__main__':
   os.makedirs(par['temp_dir'], exist_ok=True)
   adata = ad.read_h5ad(par['rna'])
-  if ('donor_id' in adata.obs) & (par['donor_specific']):
-      # - new dir for donor specific adata
-      par['rna'] = f"{par['temp_dir']}/rna.h5ad"
-      donor_ids = adata.obs.donor_id.unique()
-      for i, donor_id in enumerate(donor_ids): # run for each donor and concat
-          print('GRN inference for ', donor_id)
-          adata_sub = adata[adata.obs.donor_id.eq(donor_id), :]
-          adata_sub.write(par['rna'])
-          net_sub = main(par)
-          net_sub['donor_id'] = donor_id
-          if i == 0:
-              net = net_sub
-          else:
-              net = pd.concat([net, net_sub])
-  else:
-      net = main(par)
+  
+  net = main(par)
 
   net.to_csv(par['prediction'])
 
