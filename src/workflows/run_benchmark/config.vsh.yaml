@@ -96,7 +96,7 @@ functionality:
     - name: grn_methods/portia
     - name: grn_methods/grnboost2
     - name: grn_methods/scenic
-    - name: grn_methods/genie3
+    # - name: grn_methods/genie3
 
     - name: grn_methods/ppcor #needs docker image
     # - name: grn_methods/scgpt 

@@ -81,13 +81,12 @@ def run_grn_seqera():
     raise ValueError('define first')
 
 def run_grn_inference():
-
     # - 
-    dataset = 'nakatake' # 'replogle2' 'op'
-    sbatch = True
+    dataset = 'norman' # 'replogle2' 'op' norman
+    sbatch = False
     partition='cpu'
 
-    if dataset == 'op':
+    if dataset in ['op', 'norman']:
         normalize = True
     else:
         normalize = False
@@ -95,14 +94,14 @@ def run_grn_inference():
     
     par = {
         # 'methods': ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2", "ppcor", "scenic"],
-        'methods': ["portia", "grnboost2", "ppcor", "scenic"],
+        'methods': ["negative_control"],
 
         'models_dir': f'resources/grn_models/{dataset}/',
         'rna': f'resources/inference_datasets/{dataset}_rna.h5ad', 
         'rna_positive_control': f'resources/datasets_raw/{dataset}.h5ad', 
         'num_workers': 10,
-        'mem': "64GB",
-        'time': "12:00:00",
+        'mem': "120GB",
+        'time': "24:00:00",
         'normalize': normalize,
         # 'max_n_links': 10000,
     }

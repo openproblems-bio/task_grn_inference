@@ -3,18 +3,21 @@ import anndata as ad
 import sys
 import numpy as np
 
+
+file_name = 'op' #nakatake
+
 ## VIASH START
 par = {
-  "evaluation_data": "resources/evaluation_datasets/nakatake_perturbation.h5ad",
+  "evaluation_data": f"resources/evaluation_datasets/{file_name}_perturbation.h5ad",
   "tf_all": "resources/prior/tf_all.csv",
   # "prediction": "output/pearson_net.csv",
-  "prediction": "resources/grn_models/nakatake/portia.csv",
+  "prediction": f"resources/grn_models/{file_name}/grnboost2.csv",
   "method_id": "scenic",
   "max_n_links": 50000,
   "apply_tf": True,
   'score': 'output/score.h5ad',
   'reg_type': 'ridge',
-  'layer': 'X',
+  'layer': 'pearson',
   'subsample': -1,
   'num_workers': 4,
   'skeleton': 'resources/prior/skeleton.csv',
