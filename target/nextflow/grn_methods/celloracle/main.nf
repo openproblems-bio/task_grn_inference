@@ -3087,7 +3087,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/celloracle",
     "viash_version" : "0.8.6",
-    "git_commit" : "c5cde01c6bd09dd70b022bd6654fa18d3532da06",
+    "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3168,10 +3168,12 @@ if args.max_n_links:
 if args.resources_dir:
     meta = {}
     meta['resources_dir'] = args.resources_dir   
+
 try:
-    meta['resources_dir'] = args.resources_dir 
+    meta['resources_dir'] =par['resources_dir ']
 except:
     pass
+
 from main import main 
 os.makedirs(par['temp_dir'], exist_ok=True)
 

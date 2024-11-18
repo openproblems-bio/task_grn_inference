@@ -3131,7 +3131,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "c5cde01c6bd09dd70b022bd6654fa18d3532da06",
+    "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3246,21 +3246,21 @@ def main(par):
     os.makedirs(par['atac_dir'], exist_ok=True)
 
     # print('------- download_databases -------')
-    # download_databases(par)
-    # print_memory_usage()
-    # print('------- process_peak -------')
-    # process_peak(par)
-    # print_memory_usage()
-    # print('------- run_cistopic -------')
-    # run_cistopic(par)
-    # print_memory_usage()
-    # print('------- process_topics -------')
-    # process_topics(par)
-    # print_memory_usage()
-    # print('------- preprocess_rna -------')
-    # preprocess_rna(par)
-    # print_memory_usage()
-    # print('------- snakemake_pipeline -------')
+    download_databases(par)
+    print_memory_usage()
+    print('------- process_peak -------')
+    process_peak(par)
+    print_memory_usage()
+    print('------- run_cistopic -------')
+    run_cistopic(par)
+    print_memory_usage()
+    print('------- process_topics -------')
+    process_topics(par)
+    print_memory_usage()
+    print('------- preprocess_rna -------')
+    preprocess_rna(par)
+    print_memory_usage()
+    print('------- snakemake_pipeline -------')
     snakemake_pipeline(par)
     print_memory_usage()
     print('------- post_process -------')

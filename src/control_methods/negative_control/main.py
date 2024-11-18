@@ -6,7 +6,10 @@ import numpy as np
 
 def process_links(net, par):
     net = net[net.source!=net.target]
-    net = net.sample(par['max_n_links'])
+    try:
+        net = net.sample(par['max_n_links'])
+    except:
+        net = net.sample(par['max_n_links'], replace=True)
     return net
 def main(par):
   print('Reading input data')
@@ -29,7 +32,9 @@ def main(par):
   pivoted_net = net.reset_index().melt(id_vars='index', var_name='source', value_name='weight')
 
   pivoted_net = pivoted_net.rename(columns={'index': 'target'})
+  
   pivoted_net = pivoted_net[pivoted_net['weight'] != 0]
+  
 
   pivoted_net = process_links(pivoted_net, par)
   return pivoted_net

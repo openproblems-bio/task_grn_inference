@@ -3118,7 +3118,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenic",
     "viash_version" : "0.8.6",
-    "git_commit" : "c5cde01c6bd09dd70b022bd6654fa18d3532da06",
+    "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

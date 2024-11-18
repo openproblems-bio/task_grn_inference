@@ -3088,7 +3088,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia",
     "viash_version" : "0.8.6",
-    "git_commit" : "c5cde01c6bd09dd70b022bd6654fa18d3532da06",
+    "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3220,22 +3220,8 @@ def main(par):
 if __name__ == '__main__':
   os.makedirs(par['temp_dir'], exist_ok=True)
   adata = ad.read_h5ad(par['rna'])
-  if ('donor_id' in adata.obs) & (par['donor_specific']):
-      # - new dir for donor specific adata
-      par['rna'] = f"{par['temp_dir']}/rna.h5ad"
-      donor_ids = adata.obs.donor_id.unique()
-      for i, donor_id in enumerate(donor_ids): # run for each donor and concat
-          print('GRN inference for ', donor_id)
-          adata_sub = adata[adata.obs.donor_id.eq(donor_id), :]
-          adata_sub.write(par['rna'])
-          net_sub = main(par)
-          net_sub['donor_id'] = donor_id
-          if i == 0:
-              net = net_sub
-          else:
-              net = pd.concat([net, net_sub])
-  else:
-      net = main(par)
+  
+  net = main(par)
 
   net.to_csv(par['prediction'])
 

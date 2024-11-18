@@ -68,34 +68,33 @@ def cv_5(genes_n):
     return groups
 
 def cross_validation(net, prturb_adata, par:dict):
+    np.random.seed(32)
+    
     gene_names = prturb_adata.var_names
+    
     net = process_net(net.copy(), gene_names)
 
     gene_names_grn = net.index.to_numpy()   
     
     n_tfs = net.shape[1]
     # construct feature and target space
-    if par['exclude_missing_genes']:
-        included_genes = gene_names_grn
-    else:
-        included_genes = gene_names
-
-    X_df = pd.DataFrame(np.zeros((len(included_genes), n_tfs)), index=included_genes)
+    X_df = pd.DataFrame(np.zeros((len(gene_names), n_tfs)), index=gene_names)
     
     try:
         train_df = pd.DataFrame(prturb_adata.X, columns=gene_names).T
     except:
         train_df = pd.DataFrame(prturb_adata.X.todense().A, columns=gene_names).T
-    Y_df = train_df.loc[included_genes,:]
+    Y_df = train_df.loc[gene_names,:]
 
-    mask_shared_genes = X_df.index.isin(net.index)
+    mask_gene_net = X_df.index.isin(net.index)
     
     # fill the actual regulatory links
-    X_df.loc[mask_shared_genes, :] = net.values
+    X_df.loc[mask_gene_net, :] = net.values
     X = X_df.values.copy()
+    
 
     # run cv 
-    groups = cv_5(len(included_genes))
+    groups = cv_5(len(gene_names))
     # initialize y_pred with the mean of gene expressed across all samples
     y_pred = Y_df.copy()
     means = Y_df.mean(axis=0)
@@ -106,8 +105,9 @@ def cross_validation(net, prturb_adata, par:dict):
     Y = Y_df.values
     y_true = Y.copy()
 
-    unique_groups = np.unique(groups)
+    # print(r2_score(y_true, y_pred, multioutput='variance_weighted'))
 
+    unique_groups = np.unique(groups)
 
     # determine regressor 
     reg_type = par['reg_type']
@@ -126,18 +126,64 @@ def cross_validation(net, prturb_adata, par:dict):
     else:
         raise ValueError(f"{reg_type} is not defined.")  
     reg_models = []
+
+    n_baselines = 100
+    y_pred_baselines = [y_pred.copy() for i in range(n_baselines)]
     for group in verbose_tqdm(unique_groups, "Processing groups", 2, par['verbose']):
         mask_va = groups == group
         mask_tr = ~mask_va
-        X_tr = X[mask_tr & mask_shared_genes, :]
-        Y_tr = Y[mask_tr & mask_shared_genes, :]
+        X_tr = X[mask_tr & mask_gene_net, :]
+        Y_tr = Y[mask_tr & mask_gene_net, :]
+
+        X_va = X[mask_va & mask_gene_net, :]
+
         if X_tr.shape[0]<2:
             continue 
         regr.fit(X_tr, Y_tr)
-        y_pred[mask_va & mask_shared_genes, :] = regr.predict(X[mask_va & mask_shared_genes, :])
+        Y_pr = regr.predict(X_va)
 
+        y_pred[mask_va & mask_gene_net, :] = Y_pr.copy()
+        
+        # Shuffle each column independently and keep the same shape
+        for i in range(n_baselines):
+            for col in range(Y_pr.shape[1]):
+                np.random.shuffle(Y_pr[:, col])
+            y_pred_baselines[i][mask_va & mask_gene_net, :] = Y_pr
         reg_models.append(regr)
-    return y_true, y_pred, reg_models
+    
+    # - normalized r2 score
+    r2score = r2_score(y_true, y_pred, multioutput='variance_weighted')
+    r2score_baselines = []
+    for y_pred_baseline in y_pred_baselines:
+        r2score_baselines.append(r2_score(y_true, y_pred_baseline, multioutput='variance_weighted'))
+    r2score_n = r2score - np.mean(r2score_baselines)
+
+    # - normalized r2 score - S2
+    r2score = r2_score(y_true[mask_gene_net, :], y_pred[mask_gene_net, :], multioutput='variance_weighted')
+    r2score_baselines = []
+    for y_pred_baseline in y_pred_baselines:
+        r2score_baselines.append(r2_score(y_true[mask_gene_net, :], y_pred_baseline[mask_gene_net, :], multioutput='variance_weighted'))
+    r2score_n_s2 = r2score - np.mean(r2score_baselines)
+    
+    # - normalized r2 scores per sample
+    r2score_samples = []
+    for i_sample in range(y_true.shape[1]):
+        score_sample = r2_score(y_true[:, i_sample], y_pred[:, i_sample])
+        r2score_baselines = []
+        for y_pred_baseline in y_pred_baselines:
+            r2score_baselines.append(r2_score(y_true[:, i_sample], y_pred_baseline[:, i_sample]))
+        r2score_samples.append(score_sample - np.mean(r2score_baselines))
+    
+
+    results = {
+        'r2score-aver': r2score_n,
+        'r2score-aver-s2': r2score_n_s2,
+        'r2scores': r2score_samples,
+        'reg_models' : reg_models
+    }
+    
+    
+    return results
 
 def regression_1(
             net: pd.DataFrame, 
@@ -156,6 +202,7 @@ def regression_1(
     else:
         donor_ids = ['default']
     score_list = []
+    score_s2_list = []
     for donor_id in donor_ids:
         verbose_print(par['verbose'], f'----cross validate for {donor_id}----', 2)
         # check if net is donor specific 
@@ -174,13 +221,16 @@ def regression_1(
             prturb_adata_sub = prturb_adata[prturb_adata.obs.donor_id==donor_id,:]
         else:
             prturb_adata_sub = prturb_adata
-        y_true_sub, y_pred_sub, _ = cross_validation(net_sub, prturb_adata_sub, par)
+        results = cross_validation(net_sub, prturb_adata_sub, par)
 
-        score = r2_score(y_true_sub, y_pred_sub, multioutput='variance_weighted')
         
-        score_list.append(score)
-    mean_score_r2 = np.mean(score_list)
-    output = dict(mean_score_r2=mean_score_r2)
+        
+        score_list.append(results['r2score-aver'])
+        score_s2_list.append(results['r2score-aver-s2'])
+    s1 = [np.mean(score_list)]
+    s2 = [np.mean(score_s2_list)]
+    
+    output = dict(S1=s1, S2=s2)
     return output
 
 def set_global_seed(seed):
@@ -279,11 +329,9 @@ def main(par):
 
     verbose_print(par['verbose'], f'Compute metrics for layer: {layer}',  3)    
 
-    results = {}    
-    par['exclude_missing_genes'] = False
-    results['S1'] = [regression_1(net, evaluation_data, par=par, max_workers=max_workers)['mean_score_r2']]
-    par['exclude_missing_genes'] = True
-    results['S2'] = [regression_1(net, evaluation_data, par=par, max_workers=max_workers)['mean_score_r2']]
+
+    results = regression_1(net, evaluation_data, par=par, max_workers=max_workers)
+
 
     df_results = pd.DataFrame(results)
     return df_results

@@ -35,7 +35,8 @@ def main(par):
             print(f"skipping collectri")
             continue
         A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
-        df = pd.read_csv(filepath, sep=',', header='infer', index_col=0)
+        df = pd.read_csv(filepath)
+
         for source, target, weight in zip(df['source'], df['target'], df['weight']):
             if (source not in gene_dict) or (target not in gene_dict):
                 continue

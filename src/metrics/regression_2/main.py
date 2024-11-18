@@ -84,7 +84,7 @@ def cross_validate_gene(
     # Define labels
     y_ = X[:, j]
 
-    y_pred, y_target, r2s = [], [], []
+    y_pred, y_target, r2s, models = [], [], [], []
     for t, (train_index, test_index) in enumerate(LeaveOneGroupOut().split(X_, y_, groups)):
 
         if reg_type == 'ridge':
@@ -106,12 +106,14 @@ def cross_validate_gene(
         y_pred.append(model.predict(X_test))
         y_target.append(y_test)
         r2s.append(r2_score(y_target[-1], y_pred[-1]))
+        models.append(model)
 
     y_pred = np.concatenate(y_pred, axis=0)
     y_target = np.concatenate(y_target, axis=0)
     
     results['r2'] = float(np.clip(r2_score(y_target, y_pred), 0, 1))
     results['avg-r2'] = float(np.clip(np.mean(r2s), 0, 1))
+    results['models'] = models
     
     return results
 
@@ -174,13 +176,15 @@ def cross_validate(
     
     # Perform cross-validation for each gene
     results = []
+    included_gene_names = []
     for j in tqdm.tqdm(range(n_genes), desc=f'{reg_type} CV'):
         if n_features[j] > 0:
+            included_gene_names.append(gene_names[j])
             res = cross_validate_gene(reg_type, X, groups, grn, j, n_features=int(n_features[j]),n_jobs=n_jobs)
             results.append(res)
     return {
-        'gene_names': list(gene_names),
-        'scores': list(results)
+        'gene_names': list(included_gene_names),
+        'results': list(results)
     }
 
 
@@ -239,29 +243,15 @@ def static_approach(
         tf_names: Set[str],
         reg_type: str,
         n_jobs:int,
-        n_features_dict:dict,
-        clip_scores:bool
+        n_features_dict:dict
 ) -> float:
 
     # Cross-validate each gene using the inferred GRN to define select input features
     res = cross_validate(reg_type, gene_names, tf_names, X, groups, grn, n_features, n_jobs=n_jobs)
     
-    # scores
-    if False: # there is a bug here
-        r2 = []
-        for i in range(len(res['scores'])):
-            gene_name = res['gene_names'][i]
-            if n_features[n_features_dict[gene_name]] != 0:
-                score = res['scores'][i]['avg-r2']
-                if clip_scores:
-                    score = np.clip(score, 0, 1)
-                r2.append(score)
-        if len(r2)==0:
-            raise ValueError('R2 score is empty')
-        mean_r2_scores = float(np.mean(r2))
-    else:
-        r2_scores = np.asarray([res['scores'][j]['avg-r2'] for j in range(len(res['scores']))])
-        mean_r2_scores = np.mean(r2_scores)
+    r2_scores = np.asarray([res['results'][j]['avg-r2'] for j in range(len(res['results']))])
+    mean_r2_scores = np.mean(r2_scores)
+
     return mean_r2_scores
 
 
@@ -309,7 +299,7 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         net_matrix = net_to_matrix(net, gene_names, par)
 
         # groups = LabelEncoder().fit_transform(evaluation_data.obs.plate_name)
-        # groups = LabelEncoder().fit_transform(prturb_adata_sub.obs.cell_type)
+        # groups = LabelEncoder().fit_transforcross_validatem(prturb_adata_sub.obs.cell_type)
         n_cells = prturb_adata_sub.shape[0]
         random_groups = np.random.choice(range(1, 5+1), size=n_cells, replace=True) # random sampling
         groups = LabelEncoder().fit_transform(random_groups)
@@ -342,17 +332,16 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         tf_names = np.loadtxt(par['tf_all'], dtype=str)
         if par['apply_tf']==False:
             tf_names = gene_names
-        clip_scores = par['clip_scores']
 
         # Evaluate GRN
         verbose_print(par['verbose'], f'Compute metrics for layer: {layer}', 3)
         # print(f'Dynamic approach:', flush=True)
         verbose_print(par['verbose'], f'Static approach (theta=0):', 3)
-        score_static_min = static_approach(net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
+        score_static_min = static_approach(net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict)
         verbose_print(par['verbose'], f'Static approach (theta=0.5):', 3)
-        score_static_median = static_approach(net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
+        score_static_median = static_approach(net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict)
         # print(f'Static approach (theta=1):', flush=True)
-        # score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict, clip_scores=clip_scores)
+        # score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict)
 
         results = {
             'static-theta-0.0': [float(score_static_min)],

@@ -2957,7 +2957,7 @@ meta = [
           "functionalityNamespace" : "multiomics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "c5cde01c6bd09dd70b022bd6654fa18d3532da06",
+          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
           "executable" : "/nextflow/multiomics/format_data/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/format_data"
@@ -2978,7 +2978,7 @@ meta = [
           "functionalityNamespace" : "multiomics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "c5cde01c6bd09dd70b022bd6654fa18d3532da06",
+          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
           "executable" : "/nextflow/multiomics/multiome_matrix/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/multiome_matrix"
@@ -2999,7 +2999,7 @@ meta = [
           "functionalityNamespace" : "multiomics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "c5cde01c6bd09dd70b022bd6654fa18d3532da06",
+          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
           "executable" : "/nextflow/multiomics/format_resources_r/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/format_resources_r"
@@ -3020,7 +3020,7 @@ meta = [
           "functionalityNamespace" : "multiomics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "c5cde01c6bd09dd70b022bd6654fa18d3532da06",
+          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
           "executable" : "/nextflow/multiomics/subset_hvg/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/subset_hvg"
@@ -3075,7 +3075,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/process_multiomics",
     "viash_version" : "0.8.6",
-    "git_commit" : "c5cde01c6bd09dd70b022bd6654fa18d3532da06",
+    "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
