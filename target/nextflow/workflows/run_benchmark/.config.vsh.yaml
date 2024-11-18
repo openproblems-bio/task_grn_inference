@@ -6,7 +6,7 @@ functionality:
   - name: "Inputs"
     arguments:
     - type: "file"
-      name: "--multiomics_rna"
+      name: "--rna"
       info: null
       must_exist: true
       create_parent: true
@@ -16,7 +16,7 @@ functionality:
       multiple_sep: ":"
       dest: "par"
     - type: "file"
-      name: "--multiomics_atac"
+      name: "--atac"
       info: null
       must_exist: true
       create_parent: true
@@ -26,7 +26,7 @@ functionality:
       multiple_sep: ":"
       dest: "par"
     - type: "file"
-      name: "--perturbation_data"
+      name: "--evaluation_data"
       info: null
       must_exist: true
       create_parent: true
@@ -49,7 +49,7 @@ functionality:
       name: "--subsample"
       info: null
       default:
-      - 2
+      - -1
       required: false
       direction: "input"
       multiple: false
@@ -102,24 +102,6 @@ functionality:
       info: null
       default:
       - "pearson"
-      required: false
-      direction: "input"
-      multiple: false
-      multiple_sep: ":"
-      dest: "par"
-    - type: "boolean"
-      name: "--cell_type_specific"
-      info: null
-      default:
-      - true
-      required: false
-      direction: "input"
-      multiple: false
-      multiple_sep: ":"
-      dest: "par"
-    - type: "boolean"
-      name: "--normalize"
-      info: null
       required: false
       direction: "input"
       multiple: false
@@ -179,8 +161,8 @@ functionality:
       name: ""
       repo: "openproblems-bio/openproblems"
       tag: "v2.0.0"
-      localPath: "/tmp/viash_hub_repo12428767417171788331"
-    foundConfigPath: "/tmp/viash_hub_repo12428767417171788331/target/nextflow/common/extract_metadata/.config.vsh.yaml"
+      localPath: "/tmp/viash_hub_repo7720961391316820599"
+    foundConfigPath: "/tmp/viash_hub_repo7720961391316820599/target/nextflow/common/extract_metadata/.config.vsh.yaml"
     configInfo:
       functionalityName: "extract_metadata"
       git_tag: "v1.0.0-1413-gb782e93f"
@@ -207,7 +189,7 @@ functionality:
       functionalityNamespace: "metrics"
       output: ""
       platform: ""
-      git_commit: "662b8821303a11b1ade2ef2e7ced2218f397c3c4"
+      git_commit: "403533f115b61fa4f404ba17cbc5a821640ff572"
       executable: "/nextflow/metrics/regression_2/main.nf"
     writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
   - name: "metrics/regression_1"
@@ -224,7 +206,7 @@ functionality:
       functionalityNamespace: "metrics"
       output: ""
       platform: ""
-      git_commit: "662b8821303a11b1ade2ef2e7ced2218f397c3c4"
+      git_commit: "403533f115b61fa4f404ba17cbc5a821640ff572"
       executable: "/nextflow/metrics/regression_1/main.nf"
     writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
   - name: "grn_methods/portia"
@@ -241,7 +223,7 @@ functionality:
       functionalityNamespace: "grn_methods"
       output: ""
       platform: ""
-      git_commit: "662b8821303a11b1ade2ef2e7ced2218f397c3c4"
+      git_commit: "403533f115b61fa4f404ba17cbc5a821640ff572"
       executable: "/nextflow/grn_methods/portia/main.nf"
     writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia"
   - name: "grn_methods/grnboost2"
@@ -258,7 +240,7 @@ functionality:
       functionalityNamespace: "grn_methods"
       output: ""
       platform: ""
-      git_commit: "662b8821303a11b1ade2ef2e7ced2218f397c3c4"
+      git_commit: "403533f115b61fa4f404ba17cbc5a821640ff572"
       executable: "/nextflow/grn_methods/grnboost2/main.nf"
     writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/grnboost2"
   - name: "grn_methods/scenic"
@@ -275,7 +257,7 @@ functionality:
       functionalityNamespace: "grn_methods"
       output: ""
       platform: ""
-      git_commit: "662b8821303a11b1ade2ef2e7ced2218f397c3c4"
+      git_commit: "403533f115b61fa4f404ba17cbc5a821640ff572"
       executable: "/nextflow/grn_methods/scenic/main.nf"
     writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenic"
   - name: "grn_methods/ppcor"
@@ -292,9 +274,26 @@ functionality:
       functionalityNamespace: "grn_methods"
       output: ""
       platform: ""
-      git_commit: "662b8821303a11b1ade2ef2e7ced2218f397c3c4"
+      git_commit: "403533f115b61fa4f404ba17cbc5a821640ff572"
       executable: "/nextflow/grn_methods/ppcor/main.nf"
     writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ppcor"
+  - name: "grn_methods/scgpt"
+    repository:
+      type: "local"
+      localPath: ""
+    foundConfigPath: "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/scgpt/config.vsh.yaml"
+    configInfo:
+      functionalityName: "scgpt"
+      git_tag: ""
+      git_remote: "https://github.com/openproblems-bio/task_grn_inference"
+      viash_version: "0.8.6"
+      config: "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/scgpt/config.vsh.yaml"
+      functionalityNamespace: "grn_methods"
+      output: ""
+      platform: ""
+      git_commit: "403533f115b61fa4f404ba17cbc5a821640ff572"
+      executable: "/nextflow/grn_methods/scgpt/main.nf"
+    writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scgpt"
   - name: "grn_methods/celloracle"
     repository:
       type: "local"
@@ -309,7 +308,7 @@ functionality:
       functionalityNamespace: "grn_methods"
       output: ""
       platform: ""
-      git_commit: "662b8821303a11b1ade2ef2e7ced2218f397c3c4"
+      git_commit: "403533f115b61fa4f404ba17cbc5a821640ff572"
       executable: "/nextflow/grn_methods/celloracle/main.nf"
     writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/celloracle"
   - name: "grn_methods/scglue"
@@ -326,7 +325,7 @@ functionality:
       functionalityNamespace: "grn_methods"
       output: ""
       platform: ""
-      git_commit: "662b8821303a11b1ade2ef2e7ced2218f397c3c4"
+      git_commit: "403533f115b61fa4f404ba17cbc5a821640ff572"
       executable: "/nextflow/grn_methods/scglue/main.nf"
     writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scglue"
   - name: "control_methods/pearson_corr"
@@ -343,7 +342,7 @@ functionality:
       functionalityNamespace: "control_methods"
       output: ""
       platform: ""
-      git_commit: "662b8821303a11b1ade2ef2e7ced2218f397c3c4"
+      git_commit: "403533f115b61fa4f404ba17cbc5a821640ff572"
       executable: "/nextflow/control_methods/pearson_corr/main.nf"
     writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/pearson_corr"
   - name: "control_methods/negative_control"
@@ -360,7 +359,7 @@ functionality:
       functionalityNamespace: "control_methods"
       output: ""
       platform: ""
-      git_commit: "662b8821303a11b1ade2ef2e7ced2218f397c3c4"
+      git_commit: "403533f115b61fa4f404ba17cbc5a821640ff572"
       executable: "/nextflow/control_methods/negative_control/main.nf"
     writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/negative_control"
   - name: "control_methods/positive_control"
@@ -377,7 +376,7 @@ functionality:
       functionalityNamespace: "control_methods"
       output: ""
       platform: ""
-      git_commit: "662b8821303a11b1ade2ef2e7ced2218f397c3c4"
+      git_commit: "403533f115b61fa4f404ba17cbc5a821640ff572"
       executable: "/nextflow/control_methods/positive_control/main.nf"
     writtenPath: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control"
   repositories:
@@ -427,5 +426,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_benchmark"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_benchmark/main.nf"
   viash_version: "0.8.6"
-  git_commit: "662b8821303a11b1ade2ef2e7ced2218f397c3c4"
+  git_commit: "403533f115b61fa4f404ba17cbc5a821640ff572"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

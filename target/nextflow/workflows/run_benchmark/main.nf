@@ -2789,7 +2789,7 @@ meta = [
         "arguments" : [
           {
             "type" : "file",
-            "name" : "--multiomics_rna",
+            "name" : "--rna",
             "must_exist" : true,
             "create_parent" : true,
             "required" : false,
@@ -2800,7 +2800,7 @@ meta = [
           },
           {
             "type" : "file",
-            "name" : "--multiomics_atac",
+            "name" : "--atac",
             "must_exist" : true,
             "create_parent" : true,
             "required" : false,
@@ -2811,7 +2811,7 @@ meta = [
           },
           {
             "type" : "file",
-            "name" : "--perturbation_data",
+            "name" : "--evaluation_data",
             "must_exist" : true,
             "create_parent" : true,
             "required" : false,
@@ -2835,7 +2835,7 @@ meta = [
             "type" : "integer",
             "name" : "--subsample",
             "default" : [
-              2
+              -1
             ],
             "required" : false,
             "direction" : "input",
@@ -2898,27 +2898,6 @@ meta = [
             "default" : [
               "pearson"
             ],
-            "required" : false,
-            "direction" : "input",
-            "multiple" : false,
-            "multiple_sep" : ":",
-            "dest" : "par"
-          },
-          {
-            "type" : "boolean",
-            "name" : "--cell_type_specific",
-            "default" : [
-              true
-            ],
-            "required" : false,
-            "direction" : "input",
-            "multiple" : false,
-            "multiple_sep" : ":",
-            "dest" : "par"
-          },
-          {
-            "type" : "boolean",
-            "name" : "--normalize",
             "required" : false,
             "direction" : "input",
             "multiple" : false,
@@ -2999,9 +2978,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems",
           "tag" : "v2.0.0",
-          "localPath" : "/tmp/viash_hub_repo12428767417171788331"
+          "localPath" : "/tmp/viash_hub_repo7720961391316820599"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo12428767417171788331/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo7720961391316820599/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_tag" : "v1.0.0-1413-gb782e93f",
@@ -3032,7 +3011,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+          "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
@@ -3053,7 +3032,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+          "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
@@ -3074,7 +3053,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+          "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
           "executable" : "/nextflow/grn_methods/portia/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/portia"
@@ -3095,7 +3074,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+          "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
           "executable" : "/nextflow/grn_methods/grnboost2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/grnboost2"
@@ -3116,7 +3095,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+          "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
           "executable" : "/nextflow/grn_methods/scenic/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenic"
@@ -3137,10 +3116,31 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+          "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
           "executable" : "/nextflow/grn_methods/ppcor/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ppcor"
+      },
+      {
+        "name" : "grn_methods/scgpt",
+        "repository" : {
+          "type" : "local",
+          "localPath" : ""
+        },
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/scgpt/config.vsh.yaml",
+        "configInfo" : {
+          "functionalityName" : "scgpt",
+          "git_tag" : "",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
+          "viash_version" : "0.8.6",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/scgpt/config.vsh.yaml",
+          "functionalityNamespace" : "grn_methods",
+          "output" : "",
+          "platform" : "",
+          "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
+          "executable" : "/nextflow/grn_methods/scgpt/main.nf"
+        },
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scgpt"
       },
       {
         "name" : "grn_methods/celloracle",
@@ -3158,7 +3158,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+          "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
           "executable" : "/nextflow/grn_methods/celloracle/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/celloracle"
@@ -3179,7 +3179,7 @@ meta = [
           "functionalityNamespace" : "grn_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+          "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
           "executable" : "/nextflow/grn_methods/scglue/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scglue"
@@ -3200,7 +3200,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+          "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
           "executable" : "/nextflow/control_methods/pearson_corr/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/pearson_corr"
@@ -3221,7 +3221,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+          "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
           "executable" : "/nextflow/control_methods/negative_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/negative_control"
@@ -3242,7 +3242,7 @@ meta = [
           "functionalityNamespace" : "control_methods",
           "output" : "",
           "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+          "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
           "executable" : "/nextflow/control_methods/positive_control/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control"
@@ -3307,7 +3307,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_benchmark",
     "viash_version" : "0.8.6",
-    "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+    "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3322,6 +3322,7 @@ include { portia } from "${meta.resources_dir}/../../../nextflow/grn_methods/por
 include { grnboost2 } from "${meta.resources_dir}/../../../nextflow/grn_methods/grnboost2/main.nf"
 include { scenic } from "${meta.resources_dir}/../../../nextflow/grn_methods/scenic/main.nf"
 include { ppcor } from "${meta.resources_dir}/../../../nextflow/grn_methods/ppcor/main.nf"
+include { scgpt } from "${meta.resources_dir}/../../../nextflow/grn_methods/scgpt/main.nf"
 include { celloracle } from "${meta.resources_dir}/../../../nextflow/grn_methods/celloracle/main.nf"
 include { scglue } from "${meta.resources_dir}/../../../nextflow/grn_methods/scglue/main.nf"
 include { pearson_corr } from "${meta.resources_dir}/../../../nextflow/control_methods/pearson_corr/main.nf"
@@ -3350,6 +3351,7 @@ workflow run_wf {
     grnboost2,
     ppcor,
     scenic,
+    scglue,
 
     pearson_corr,
     negative_control,
@@ -3409,12 +3411,9 @@ workflow run_wf {
       },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
-        multiomics_rna: "multiomics_rna",
-        multiomics_atac: "multiomics_atac",
+        rna: "rna",
+        atac: "atac",
         tf_all: "tf_all",
-        perturbation_data:"perturbation_data",
-        cell_type_specific:"cell_type_specific",
-        normalize:"normalize",
         num_workers:"num_workers"
 
       ],
@@ -3439,7 +3438,7 @@ workflow run_wf {
       },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
-        perturbation_data: "perturbation_data",
+        evaluation_data: "evaluation_data",
         prediction: "prediction",
         method_id: "method_id", 
         subsample: "subsample",
@@ -3448,7 +3447,6 @@ workflow run_wf {
         consensus: "consensus",
         tf_all: "tf_all",
         layer:"layer",
-        cell_type_specific:"cell_type_specific"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->

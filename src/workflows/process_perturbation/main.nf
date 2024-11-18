@@ -14,18 +14,9 @@ workflow run_wf {
       fromState: [pseudobulked_data_f: "pseudobulked_data_f"],
       toState: [perturbation_data_n: "perturbation_data_n"]
     )
-    
-    | batch_correction_scgen.run(
-      fromState: [perturbation_data_n: "perturbation_data_n"],
-      toState: [perturbation_data_bc: "perturbation_data_bc"]
-    )
 
-    | batch_correction_seurat.run(
-      fromState: [perturbation_data_n: "perturbation_data_bc"],
-      toState: [perturbation_data_bc: "perturbation_data_bc"]
-    )
     
-    | setState(["perturbation_data_bc"])
+    | setState(["perturbation_data_n"])
 
   emit:
   output_ch

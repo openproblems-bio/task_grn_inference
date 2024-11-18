@@ -2788,8 +2788,8 @@ meta = [
         "type" : "file",
         "name" : "--perturbation_counts",
         "description" : "single cell perturbation data",
-        "default" : [
-          "resources/datasets_raw/perturbation_counts.h5ad"
+        "example" : [
+          "resources_test/datasets_raw/op_perturbation_counts.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2801,7 +2801,7 @@ meta = [
       },
       {
         "type" : "file",
-        "name" : "--perturbation_data_bc",
+        "name" : "--perturbation_data_n",
         "info" : {
           "label" : "perturbation",
           "summary" : "Perturbation dataset for benchmarking.",
@@ -2930,7 +2930,7 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+          "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
           "executable" : "/nextflow/perturbation/sc_counts/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/sc_counts"
@@ -2951,52 +2951,10 @@ meta = [
           "functionalityNamespace" : "perturbation",
           "output" : "",
           "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+          "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
           "executable" : "/nextflow/perturbation/normalization/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/normalization"
-      },
-      {
-        "name" : "perturbation/batch_correction_scgen",
-        "repository" : {
-          "type" : "local",
-          "localPath" : ""
-        },
-        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/batch_correction_scgen/config.vsh.yaml",
-        "configInfo" : {
-          "functionalityName" : "batch_correction_scgen",
-          "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
-          "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/batch_correction_scgen/config.vsh.yaml",
-          "functionalityNamespace" : "perturbation",
-          "output" : "",
-          "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
-          "executable" : "/nextflow/perturbation/batch_correction_scgen/main.nf"
-        },
-        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/batch_correction_scgen"
-      },
-      {
-        "name" : "perturbation/batch_correction_seurat",
-        "repository" : {
-          "type" : "local",
-          "localPath" : ""
-        },
-        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/batch_correction_seurat/config.vsh.yaml",
-        "configInfo" : {
-          "functionalityName" : "batch_correction_seurat",
-          "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
-          "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/batch_correction_seurat/config.vsh.yaml",
-          "functionalityNamespace" : "perturbation",
-          "output" : "",
-          "platform" : "",
-          "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
-          "executable" : "/nextflow/perturbation/batch_correction_seurat/main.nf"
-        },
-        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/batch_correction_seurat"
       }
     ],
     "set_wd_to_resources_dir" : false
@@ -3048,7 +3006,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/process_perturbation",
     "viash_version" : "0.8.6",
-    "git_commit" : "662b8821303a11b1ade2ef2e7ced2218f397c3c4",
+    "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3058,8 +3016,6 @@ meta = [
 meta["root_dir"] = getRootDir()
 include { sc_counts } from "${meta.resources_dir}/../../../nextflow/perturbation/sc_counts/main.nf"
 include { normalization } from "${meta.resources_dir}/../../../nextflow/perturbation/normalization/main.nf"
-include { batch_correction_scgen } from "${meta.resources_dir}/../../../nextflow/perturbation/batch_correction_scgen/main.nf"
-include { batch_correction_seurat } from "${meta.resources_dir}/../../../nextflow/perturbation/batch_correction_seurat/main.nf"
 
 // inner workflow
 // user-provided Nextflow code
@@ -3079,18 +3035,9 @@ workflow run_wf {
       fromState: [pseudobulked_data_f: "pseudobulked_data_f"],
       toState: [perturbation_data_n: "perturbation_data_n"]
     )
-    
-    | batch_correction_scgen.run(
-      fromState: [perturbation_data_n: "perturbation_data_n"],
-      toState: [perturbation_data_bc: "perturbation_data_bc"]
-    )
 
-    | batch_correction_seurat.run(
-      fromState: [perturbation_data_n: "perturbation_data_bc"],
-      toState: [perturbation_data_bc: "perturbation_data_bc"]
-    )
     
-    | setState(["perturbation_data_bc"])
+    | setState(["perturbation_data_n"])
 
   emit:
   output_ch

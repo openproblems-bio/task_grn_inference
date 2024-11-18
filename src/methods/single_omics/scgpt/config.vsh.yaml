@@ -10,21 +10,6 @@ functionality:
       GRN inference using scGPT.
     documentation_url: https://github.com/bowang-lab/scGPT/blob/main/tutorials/Tutorial_Attention_GRN.ipynb 
   arguments:
-    - name: --model_file
-      type: file
-      direction: input
-      example: resources_test/supplementary/finetuned_scGPT_adamson/best_model.pt
-      default: resources_test/supplementary/finetuned_scGPT_adamson/best_model.pt
-    - name: --model_config_file
-      type: file
-      direction: input
-      example: resources_test/supplementary/finetuned_scGPT_adamson/args.json
-      default: resources_test/supplementary/finetuned_scGPT_adamson/args.json
-    - name: --vocab_file
-      type: file
-      direction: input
-      example: resources_test/supplementary/finetuned_scGPT_adamson/vocab.json
-      default: resources_test/supplementary/finetuned_scGPT_adamson/vocab.json
     - name: --n_bins
       type: integer
       direction: input

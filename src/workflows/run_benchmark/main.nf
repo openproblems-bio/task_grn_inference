@@ -18,6 +18,7 @@ workflow run_wf {
     grnboost2,
     ppcor,
     scenic,
+    scglue,
 
     pearson_corr,
     negative_control,
@@ -77,12 +78,9 @@ workflow run_wf {
       },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
-        multiomics_rna: "multiomics_rna",
-        multiomics_atac: "multiomics_atac",
+        rna: "rna",
+        atac: "atac",
         tf_all: "tf_all",
-        perturbation_data:"perturbation_data",
-        cell_type_specific:"cell_type_specific",
-        normalize:"normalize",
         num_workers:"num_workers"
 
       ],
@@ -107,7 +105,7 @@ workflow run_wf {
       },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
-        perturbation_data: "perturbation_data",
+        evaluation_data: "evaluation_data",
         prediction: "prediction",
         method_id: "method_id", 
         subsample: "subsample",
@@ -116,7 +114,6 @@ workflow run_wf {
         consensus: "consensus",
         tf_all: "tf_all",
         layer:"layer",
-        cell_type_specific:"cell_type_specific"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->
