@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import sys
 import warnings
+import subprocess
 
 import torch
 from anndata import AnnData
@@ -56,6 +57,22 @@ par = {
   'condition': 'cell_type'
 }
 ## VIASH END
+
+# Download datasets 
+par['model_file'] = f"{par['temp_dir']}/best_model.pt"
+par['model_config_file'] = f"{par['temp_dir']}/args.json"
+par['vocab_file'] = f"{par['temp_dir']}/vocab.json"
+
+
+command = f"wget --no-check-certificate 'https://drive.google.com/uc?export=download&id=1CPVtpWUJ2nkI9jGignlHLcefBe6Gk-F9' -O {par['model_file']}"
+subprocess.run(command, shell=True, check=True)
+
+command = f"wget --no-check-certificate 'https://drive.google.com/file/d/1Qzb6Y9UB342a2QxmY-BCubSvcmYZ5jw3/view?usp=drive_link' -O {par['vocab_file']}"
+subprocess.run(command, shell=True, check=True)
+
+command = f"wget --no-check-certificate 'https://drive.google.com/file/d/1VwPGHuSorVAXyTreMFI1yzMougtUDeUt/view?usp=drive_link' -O {par['model_config_file']}"
+subprocess.run(command, shell=True, check=True)
+
 
 # os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:50"
 initial_memory = torch.cuda.memory_allocated()

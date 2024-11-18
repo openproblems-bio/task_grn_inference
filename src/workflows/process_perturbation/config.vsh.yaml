@@ -12,10 +12,10 @@ functionality:
       type: file 
       required: true
       direction: input
-      default: resources/datasets_raw/perturbation_counts.h5ad
+      example: resources_test/datasets_raw/op_perturbation_counts.h5ad
       description: single cell perturbation data 
 
-    - name: --perturbation_data_bc
+    - name: --perturbation_data_n
       __merge__: ../../api/file_evaluation_h5ad.yaml
       required: false
       direction: output
@@ -28,8 +28,8 @@ functionality:
   dependencies:
     - name: perturbation/sc_counts 
     - name: perturbation/normalization
-    - name: perturbation/batch_correction_scgen
-    - name: perturbation/batch_correction_seurat 
+    # - name: perturbation/batch_correction_scgen
+    # - name: perturbation/batch_correction_seurat 
 
 platforms:
   - type: nextflow

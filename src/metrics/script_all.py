@@ -16,7 +16,7 @@ def define_par(dataset):
     raise ValueError('define first')
 
   par = {
-      'reg_type': 'ridge',
+      'reg_type': 'GB',
       'models_dir': f"resources/grn_models/{dataset}",
       'scores_dir': f"output/temp/{dataset}",
       
@@ -77,7 +77,7 @@ from consensus.script import main as main_consensus
 global_models = False
 
 # - run metrics 
-for dataset in ['norman', 'adamson']: #'replogle2', 'nakatake', norman
+for dataset in ['op','replogle2', 'nakatake', 'norman', 'adamson']: #'replogle2', 'nakatake', norman
   print('------ ', dataset, '------')
   par = define_par(dataset)
   os.makedirs(par['scores_dir'], exist_ok=True)

@@ -9,13 +9,13 @@ functionality:
   argument_groups:
     - name: Inputs
       arguments:
-        - name: --multiomics_rna
+        - name: --rna
           type: file
           direction: input
-        - name: --multiomics_atac
+        - name: --atac
           type: file
           direction: input
-        - name: --perturbation_data
+        - name: --evaluation_data
           type: file
           direction: input
         - name: --prediction
@@ -25,7 +25,7 @@ functionality:
         - name: --subsample
           type: integer
           direction: input
-          default: 2
+          default: -1
         - name: --reg_type
           type: string
           direction: input
@@ -49,15 +49,7 @@ functionality:
           required: false
           direction: input
           default: pearson
-        - name: --cell_type_specific
-          type: boolean
-          required: false
-          direction: input
-          default: true
-        - name: --normalize
-          type: boolean
-          required: false
-          direction: input        
+       
     - name: Outputs
       arguments:
         - name: "--scores"
@@ -96,10 +88,11 @@ functionality:
     - name: grn_methods/portia
     - name: grn_methods/grnboost2
     - name: grn_methods/scenic
+
     # - name: grn_methods/genie3
 
     - name: grn_methods/ppcor #needs docker image
-    # - name: grn_methods/scgpt 
+    - name: grn_methods/scgpt 
     
     # ---- multiomics 
     - name: grn_methods/celloracle
