@@ -179,7 +179,6 @@ function ViashHelp {
   echo ""
   echo "    --perturbation_data_n"
   echo "        type: file, output, file must exist"
-  echo "        example: resources_test/evaluation_datasets/op_perturbation.h5ad"
 }
 
 # initialise array

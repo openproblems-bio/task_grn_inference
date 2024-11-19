@@ -16,7 +16,7 @@ def define_par(dataset):
     raise ValueError('define first')
 
   par = {
-      'reg_type': 'GB',
+      'reg_type': 'ridge',
       'models_dir': f"resources/grn_models/{dataset}",
       'scores_dir': f"output/temp/{dataset}",
       

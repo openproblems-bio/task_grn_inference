@@ -3112,7 +3112,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scgpt",
     "viash_version" : "0.8.6",
-    "git_commit" : "403533f115b61fa4f404ba17cbc5a821640ff572",
+    "git_commit" : "8b0ecf6751141e770ff1a010a26155f3d66f8073",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3214,14 +3214,20 @@ par['model_config_file'] = f"{par['temp_dir']}/args.json"
 par['vocab_file'] = f"{par['temp_dir']}/vocab.json"
 
 
-command = f"wget --no-check-certificate 'https://drive.google.com/uc?export=download&id=1CPVtpWUJ2nkI9jGignlHLcefBe6Gk-F9' -O {par['model_file']}"
-subprocess.run(command, shell=True, check=True)
-
-command = f"wget --no-check-certificate 'https://drive.google.com/file/d/1Qzb6Y9UB342a2QxmY-BCubSvcmYZ5jw3/view?usp=drive_link' -O {par['vocab_file']}"
-subprocess.run(command, shell=True, check=True)
-
-command = f"wget --no-check-certificate 'https://drive.google.com/file/d/1VwPGHuSorVAXyTreMFI1yzMougtUDeUt/view?usp=drive_link' -O {par['model_config_file']}"
-subprocess.run(command, shell=True, check=True)
+import requests
+def download_file(output_file, url):
+    response = requests.get(url, stream=True)
+    if response.status_code == 200:
+        with open(output_file, "wb") as f:
+            for chunk in response.iter_content(chunk_size=1024):
+                if chunk:
+                    f.write(chunk)
+        print(f"File downloaded successfully and saved to {output_file}")
+    else:
+        print(f"Failed to download file. HTTP status code: {response.status_code}")
+download_file(par['model_file'], 'https://drive.google.com/uc?export=download&id=1CPVtpWUJ2nkI9jGignlHLcefBe6Gk-F9')
+download_file(par['vocab_file'], 'https://drive.google.com/file/d/1Qzb6Y9UB342a2QxmY-BCubSvcmYZ5jw3/view?usp=drive_link')
+download_file(par['model_config_file'], 'https://drive.google.com/file/d/1VwPGHuSorVAXyTreMFI1yzMougtUDeUt/view?usp=drive_link')
 
 
 # os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:50"

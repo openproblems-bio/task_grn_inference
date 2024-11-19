@@ -27,16 +27,6 @@ functionality:
       direction: output
       example: resources/grn-benchmark/multiomics_atac.h5ad
 
-    - name: --multiomics_rna_d0_hvg
-      type: file 
-      required: false
-      direction: output
-      example: resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad
-    - name: --multiomics_atac_d0
-      type: file 
-      required: false
-      direction: output
-      example: resources/grn-benchmark/multiomics_atac_d0.h5ad
     
     - name: --rna_rds
       type: file
@@ -49,17 +39,6 @@ functionality:
       direction: output
       example: resources/grn-benchmark/multiomics_atac.rds
     
-    - name: --rna_rds_d0_hvg
-      type: file
-      required: false
-      direction: output
-      example: resources/grn-benchmark/multiomics_rna_d0_hvg.rds
-    - name: --atac_rds_d0
-      type: file
-      required: false
-      direction: output
-      example: resources/grn-benchmark/multiomics_atac_d0.rds
-    
   resources:
     - type: nextflow_script
       path: main.nf
@@ -68,7 +47,6 @@ functionality:
     - name: multiomics/format_data 
     - name: multiomics/multiome_matrix
     - name: multiomics/format_resources_r 
-    - name: multiomics/subset_hvg
 platforms:
   - type: nextflow
     directives:

@@ -649,7 +649,7 @@ if args.resources_dir:
     meta['resources_dir'] = args.resources_dir   
 
 try:
-    meta['resources_dir'] =par['resources_dir ']
+    meta['resources_dir'] = par['resources_dir']
 except:
     pass
 

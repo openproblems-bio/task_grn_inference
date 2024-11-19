@@ -72,10 +72,10 @@ def cross_validate_gene(
         return results
     
     # Feature selection
-    scores = np.abs(grn[:, j])
-    scores[j] = -1
-    selected_features = np.argsort(scores)[-n_features:]
-    selected_features = selected_features[scores[selected_features] > 0]
+    regulatory_importance = np.abs(grn[:, j])
+    regulatory_importance[j] = -1
+    selected_features = np.argsort(regulatory_importance)[-n_features:]
+    selected_features = selected_features[regulatory_importance[selected_features] > 0]
     if len(selected_features) == 0:
         return results
     assert j not in selected_features
@@ -242,8 +242,7 @@ def static_approach(
         gene_names: List[str],
         tf_names: Set[str],
         reg_type: str,
-        n_jobs:int,
-        n_features_dict:dict
+        n_jobs:int
 ) -> float:
 
     # Cross-validate each gene using the inferred GRN to define select input features
@@ -322,7 +321,6 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         with open(par['consensus'], 'r') as f:
             data = json.load(f)
         gene_names_ = np.asarray(list(data.keys()), dtype=object)
-        n_features_dict = {gene_name: i for i, gene_name in enumerate(gene_names_)}
 
         n_features_theta_min = np.asarray([data[gene_name]['0'] for gene_name in gene_names], dtype=int)
         n_features_theta_median = np.asarray([data[gene_name]['0.5'] for gene_name in gene_names], dtype=int)
@@ -335,18 +333,17 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
 
         # Evaluate GRN
         verbose_print(par['verbose'], f'Compute metrics for layer: {layer}', 3)
-        # print(f'Dynamic approach:', flush=True)
         verbose_print(par['verbose'], f'Static approach (theta=0):', 3)
-        score_static_min = static_approach(net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict)
+        score_static_min = static_approach(net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
         verbose_print(par['verbose'], f'Static approach (theta=0.5):', 3)
-        score_static_median = static_approach(net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict)
-        # print(f'Static approach (theta=1):', flush=True)
-        # score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'], n_features_dict=n_features_dict)
+        score_static_median = static_approach(net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
+        print(f'Static approach (theta=1):', flush=True)
+        score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
 
         results = {
             'static-theta-0.0': [float(score_static_min)],
             'static-theta-0.5': [float(score_static_median)],
-            # 'static-theta-1.0': [float(score_static_max)],
+            'static-theta-1.0': [float(score_static_max)],
         }
 
         # # Add dynamic score
