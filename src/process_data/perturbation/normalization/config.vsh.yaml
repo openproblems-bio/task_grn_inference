@@ -48,7 +48,6 @@ functionality:
               required: true
       required: false
       direction: output
-      example: resources_test/evaluation_datasets/op_perturbation.h5ad 
       
 
   resources:
