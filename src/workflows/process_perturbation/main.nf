@@ -5,18 +5,12 @@ workflow run_wf {
   main:
   output_ch = input_ch
 
-    | sc_counts.run(
+    | opsca.run(
       fromState: [perturbation_counts: "perturbation_counts"],
-      toState: [pseudobulked_data:"pseudobulked_data", pseudobulked_data_f: "pseudobulked_data_f"]
+      toState: [pseudobulked_data:"pseudobulked_data"]
     )
-
-    | normalization.run(
-      fromState: [pseudobulked_data_f: "pseudobulked_data_f"],
-      toState: [perturbation_data_n: "perturbation_data_n"]
-    )
-
     
-    | setState(["perturbation_data_n"])
+    | setState(["pseudobulked_data"])
 
   emit:
   output_ch

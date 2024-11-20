@@ -24,10 +24,3 @@ info:
         description: "The metric values obtained for the given prediction. Must be of same length as 'metric_ids'."
         multiple: true
         required: true
-
-  # file_type: csv
-  # columns:
-  #   - name: S1
-  #     description: "S1 metric" 
-  #     type: string
-  #     required: false

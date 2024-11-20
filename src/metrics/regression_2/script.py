@@ -7,7 +7,7 @@ import numpy as np
 ## VIASH START
 par = {
     'evaluation_data': 'resources/grn-benchmark/evaluation_data.h5ad',
-    'layer': 'lognorm',
+    'layer': 'X_norm',
     "prediction": "resources/grn_models/celloracle.csv",
     'tf_all': 'resources/prior/tf_all.csv',
     "max_n_links": 50000,

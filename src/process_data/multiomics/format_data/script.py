@@ -15,6 +15,10 @@ par = {
 multiomics = ad.read_h5ad(par['multiome_counts'])
 multiomics.X = multiomics.layers['counts']
 del multiomics.layers
+multiomics.layers['counts'] = multiomics.X.copy()
+X_norm = sc.pp.normalize_total(multiomics, inplace=False)['X']
+multiomics.layers['X_norm'] = sc.pp.log1p(X_norm, copy=True)
+
 multiomics.var.index.name='location'
 multiomics.obs.index.name='obs_id'
 
