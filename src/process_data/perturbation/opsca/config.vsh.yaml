@@ -22,7 +22,11 @@ functionality:
       type: file
       required: false
       direction: output
-      example: resources_test/evaluation_datasets/op_perturbation.h5ad    
+
+    - name: --evaluation_data
+      type: file
+      required: false
+      direction: output
 
   resources:
     - type: python_script

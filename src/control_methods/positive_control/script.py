@@ -62,15 +62,10 @@ def create_corr_net(par):
     print(par)
     print('Read data')
     adata = ad.read_h5ad(par["rna"])
-    if 'normalize' in par:
-        if par['normalize']:
-            print('normalizing')
-            # - lognorm 
-            sc.pp.normalize_total(adata)
-            sc.pp.log1p(adata)
+    X = adata.layers['X_norm']
     # - corr
     gene_names = adata.var_names.to_numpy()
-    grn = corr_net(adata.X, gene_names, par)    
+    grn = corr_net(X, gene_names, par)    
     return grn
 
 net = create_corr_net(par)

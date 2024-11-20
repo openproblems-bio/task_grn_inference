@@ -3093,7 +3093,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/positive_control",
     "viash_version" : "0.8.6",
-    "git_commit" : "b09204f81010c43a32476a288bd1205cbc01ccd2",
+    "git_commit" : "e868c54f31780e7b1a0d94473111c787ab87137c",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3193,15 +3193,10 @@ def create_corr_net(par):
     print(par)
     print('Read data')
     adata = ad.read_h5ad(par["rna"])
-    if 'normalize' in par:
-        if par['normalize']:
-            print('normalizing')
-            # - lognorm 
-            sc.pp.normalize_total(adata)
-            sc.pp.log1p(adata)
+    X = adata.layers['X_norm']
     # - corr
     gene_names = adata.var_names.to_numpy()
-    grn = corr_net(adata.X, gene_names, par)    
+    grn = corr_net(X, gene_names, par)    
     return grn
 
 net = create_corr_net(par)

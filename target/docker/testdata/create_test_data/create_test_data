@@ -174,28 +174,39 @@ function ViashHelp {
   echo ""
   echo "Arguments:"
   echo "    --multiomics_rna"
-  echo "        type: file, file must exist"
-  echo "        default: resources/grn-benchmark/multiomics_rna.h5ad"
+  echo "        type: file, required parameter, file must exist"
+  echo "        example: resources_test/inference_datasets/op_rna.h5ad"
   echo ""
   echo "    --multiomics_rna_test"
   echo "        type: file, output, file must exist"
-  echo "        default: resources_test/grn-benchmark/multiomics_rna.h5ad"
   echo ""
   echo "    --multiomics_atac"
   echo "        type: file, file must exist"
-  echo "        default: resources/grn-benchmark/multiomics_atac.h5ad"
+  echo "        example: resources/inference_datasets/op_atac.h5ad"
   echo ""
   echo "    --multiomics_atac_test"
   echo "        type: file, file must exist"
-  echo "        default: resources_test/grn-benchmark/multiomics_atac.h5ad"
   echo ""
   echo "    --perturbation_data"
   echo "        type: file, file must exist"
-  echo "        default: resources/grn-benchmark/perturbation_data.h5ad"
+  echo "        example: resources/evaluation_datasets/op_perturbation.h5ad"
   echo ""
   echo "    --perturbation_data_test"
   echo "        type: file, output, file must exist"
-  echo "        default: resources_test/grn-benchmark/perturbation_data.h5ad"
+  echo ""
+  echo "    --multiomics_counts"
+  echo "        type: file, file must exist"
+  echo "        example: resources_test/datasets_raw/op_multiome_counts.h5ad"
+  echo ""
+  echo "    --multiomics_counts_test"
+  echo "        type: file, output, file must exist"
+  echo ""
+  echo "    --perturbation_counts"
+  echo "        type: file, file must exist"
+  echo "        example: resources_test/datasets_raw/op_perturbation_counts.h5ad"
+  echo ""
+  echo "    --perturbation_counts_test"
+  echo "        type: file, output, file must exist"
 }
 
 ######## Helper functions for setting up Docker images for viash ########
@@ -420,9 +431,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component testdata create_test_data"
-LABEL org.opencontainers.image.created="2024-11-20T13:56:37Z"
+LABEL org.opencontainers.image.created="2024-11-20T14:26:01Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="b09204f81010c43a32476a288bd1205cbc01ccd2"
+LABEL org.opencontainers.image.revision="e868c54f31780e7b1a0d94473111c787ab87137c"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -647,6 +658,50 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_PERTURBATION_DATA_TEST=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --multiomics_counts)
+            [ -n "$VIASH_PAR_MULTIOMICS_COUNTS" ] && ViashError Bad arguments for option \'--multiomics_counts\': \'$VIASH_PAR_MULTIOMICS_COUNTS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MULTIOMICS_COUNTS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --multiomics_counts. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --multiomics_counts=*)
+            [ -n "$VIASH_PAR_MULTIOMICS_COUNTS" ] && ViashError Bad arguments for option \'--multiomics_counts=*\': \'$VIASH_PAR_MULTIOMICS_COUNTS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MULTIOMICS_COUNTS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --multiomics_counts_test)
+            [ -n "$VIASH_PAR_MULTIOMICS_COUNTS_TEST" ] && ViashError Bad arguments for option \'--multiomics_counts_test\': \'$VIASH_PAR_MULTIOMICS_COUNTS_TEST\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MULTIOMICS_COUNTS_TEST="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --multiomics_counts_test. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --multiomics_counts_test=*)
+            [ -n "$VIASH_PAR_MULTIOMICS_COUNTS_TEST" ] && ViashError Bad arguments for option \'--multiomics_counts_test=*\': \'$VIASH_PAR_MULTIOMICS_COUNTS_TEST\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MULTIOMICS_COUNTS_TEST=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --perturbation_counts)
+            [ -n "$VIASH_PAR_PERTURBATION_COUNTS" ] && ViashError Bad arguments for option \'--perturbation_counts\': \'$VIASH_PAR_PERTURBATION_COUNTS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_PERTURBATION_COUNTS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --perturbation_counts. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --perturbation_counts=*)
+            [ -n "$VIASH_PAR_PERTURBATION_COUNTS" ] && ViashError Bad arguments for option \'--perturbation_counts=*\': \'$VIASH_PAR_PERTURBATION_COUNTS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_PERTURBATION_COUNTS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --perturbation_counts_test)
+            [ -n "$VIASH_PAR_PERTURBATION_COUNTS_TEST" ] && ViashError Bad arguments for option \'--perturbation_counts_test\': \'$VIASH_PAR_PERTURBATION_COUNTS_TEST\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_PERTURBATION_COUNTS_TEST="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --perturbation_counts_test. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --perturbation_counts_test=*)
+            [ -n "$VIASH_PAR_PERTURBATION_COUNTS_TEST" ] && ViashError Bad arguments for option \'--perturbation_counts_test=*\': \'$VIASH_PAR_PERTURBATION_COUNTS_TEST\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_PERTURBATION_COUNTS_TEST=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         ---setup)
             VIASH_MODE='docker_setup'
             VIASH_DOCKER_SETUP_STRATEGY="$2"
@@ -765,6 +820,10 @@ fi
 
 
 # check whether required parameters exist
+if [ -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then
+  ViashError '--multiomics_rna' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then
   ViashError 'functionality_name' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
@@ -786,26 +845,6 @@ if [ -z ${VIASH_META_TEMP_DIR+x} ]; then
   exit 1
 fi
 
-# filling in defaults
-if [ -z ${VIASH_PAR_MULTIOMICS_RNA+x} ]; then
-  VIASH_PAR_MULTIOMICS_RNA="resources/grn-benchmark/multiomics_rna.h5ad"
-fi
-if [ -z ${VIASH_PAR_MULTIOMICS_RNA_TEST+x} ]; then
-  VIASH_PAR_MULTIOMICS_RNA_TEST="resources_test/grn-benchmark/multiomics_rna.h5ad"
-fi
-if [ -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then
-  VIASH_PAR_MULTIOMICS_ATAC="resources/grn-benchmark/multiomics_atac.h5ad"
-fi
-if [ -z ${VIASH_PAR_MULTIOMICS_ATAC_TEST+x} ]; then
-  VIASH_PAR_MULTIOMICS_ATAC_TEST="resources_test/grn-benchmark/multiomics_atac.h5ad"
-fi
-if [ -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then
-  VIASH_PAR_PERTURBATION_DATA="resources/grn-benchmark/perturbation_data.h5ad"
-fi
-if [ -z ${VIASH_PAR_PERTURBATION_DATA_TEST+x} ]; then
-  VIASH_PAR_PERTURBATION_DATA_TEST="resources_test/grn-benchmark/perturbation_data.h5ad"
-fi
-
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RNA" ]; then
   ViashError "Input file '$VIASH_PAR_MULTIOMICS_RNA' does not exist."
@@ -821,6 +860,14 @@ if [ ! -z "$VIASH_PAR_MULTIOMICS_ATAC_TEST" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_A
 fi
 if [ ! -z "$VIASH_PAR_PERTURBATION_DATA" ] && [ ! -e "$VIASH_PAR_PERTURBATION_DATA" ]; then
   ViashError "Input file '$VIASH_PAR_PERTURBATION_DATA' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_MULTIOMICS_COUNTS" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_COUNTS" ]; then
+  ViashError "Input file '$VIASH_PAR_MULTIOMICS_COUNTS' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_PERTURBATION_COUNTS" ] && [ ! -e "$VIASH_PAR_PERTURBATION_COUNTS" ]; then
+  ViashError "Input file '$VIASH_PAR_PERTURBATION_COUNTS' does not exist."
   exit 1
 fi
 
@@ -875,6 +922,12 @@ fi
 if [ ! -z "$VIASH_PAR_PERTURBATION_DATA_TEST" ] && [ ! -d "$(dirname "$VIASH_PAR_PERTURBATION_DATA_TEST")" ]; then
   mkdir -p "$(dirname "$VIASH_PAR_PERTURBATION_DATA_TEST")"
 fi
+if [ ! -z "$VIASH_PAR_MULTIOMICS_COUNTS_TEST" ] && [ ! -d "$(dirname "$VIASH_PAR_MULTIOMICS_COUNTS_TEST")" ]; then
+  mkdir -p "$(dirname "$VIASH_PAR_MULTIOMICS_COUNTS_TEST")"
+fi
+if [ ! -z "$VIASH_PAR_PERTURBATION_COUNTS_TEST" ] && [ ! -d "$(dirname "$VIASH_PAR_PERTURBATION_COUNTS_TEST")" ]; then
+  mkdir -p "$(dirname "$VIASH_PAR_PERTURBATION_COUNTS_TEST")"
+fi
 
 # detect volumes from file arguments
 VIASH_CHOWN_VARS=()
@@ -903,6 +956,24 @@ if [ ! -z "$VIASH_PAR_PERTURBATION_DATA_TEST" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PERTURBATION_DATA_TEST")" )
   VIASH_PAR_PERTURBATION_DATA_TEST=$(ViashAutodetectMount "$VIASH_PAR_PERTURBATION_DATA_TEST")
   VIASH_CHOWN_VARS+=( "$VIASH_PAR_PERTURBATION_DATA_TEST" )
+fi
+if [ ! -z "$VIASH_PAR_MULTIOMICS_COUNTS" ]; then
+  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_MULTIOMICS_COUNTS")" )
+  VIASH_PAR_MULTIOMICS_COUNTS=$(ViashAutodetectMount "$VIASH_PAR_MULTIOMICS_COUNTS")
+fi
+if [ ! -z "$VIASH_PAR_MULTIOMICS_COUNTS_TEST" ]; then
+  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_MULTIOMICS_COUNTS_TEST")" )
+  VIASH_PAR_MULTIOMICS_COUNTS_TEST=$(ViashAutodetectMount "$VIASH_PAR_MULTIOMICS_COUNTS_TEST")
+  VIASH_CHOWN_VARS+=( "$VIASH_PAR_MULTIOMICS_COUNTS_TEST" )
+fi
+if [ ! -z "$VIASH_PAR_PERTURBATION_COUNTS" ]; then
+  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PERTURBATION_COUNTS")" )
+  VIASH_PAR_PERTURBATION_COUNTS=$(ViashAutodetectMount "$VIASH_PAR_PERTURBATION_COUNTS")
+fi
+if [ ! -z "$VIASH_PAR_PERTURBATION_COUNTS_TEST" ]; then
+  VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_PAR_PERTURBATION_COUNTS_TEST")" )
+  VIASH_PAR_PERTURBATION_COUNTS_TEST=$(ViashAutodetectMount "$VIASH_PAR_PERTURBATION_COUNTS_TEST")
+  VIASH_CHOWN_VARS+=( "$VIASH_PAR_PERTURBATION_COUNTS_TEST" )
 fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_EXTRA_MOUNTS+=( "$(ViashAutodetectMountArg "$VIASH_META_RESOURCES_DIR")" )
@@ -970,6 +1041,7 @@ import numpy as np
 from scipy import sparse
 import scanpy as sc
 import requests
+import os
 
 ## VIASH START
 # The following code has been auto-generated by Viash.
@@ -979,7 +1051,11 @@ par = {
   'multiomics_atac': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_ATAC+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_ATAC//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'multiomics_atac_test': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_ATAC_TEST+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_ATAC_TEST//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'perturbation_data': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'perturbation_data_test': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA_TEST+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA_TEST//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'perturbation_data_test': $( if [ ! -z ${VIASH_PAR_PERTURBATION_DATA_TEST+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_DATA_TEST//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'multiomics_counts': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_COUNTS+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_COUNTS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'multiomics_counts_test': $( if [ ! -z ${VIASH_PAR_MULTIOMICS_COUNTS_TEST+x} ]; then echo "r'${VIASH_PAR_MULTIOMICS_COUNTS_TEST//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'perturbation_counts': $( if [ ! -z ${VIASH_PAR_PERTURBATION_COUNTS+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_COUNTS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'perturbation_counts_test': $( if [ ! -z ${VIASH_PAR_PERTURBATION_COUNTS_TEST+x} ]; then echo "r'${VIASH_PAR_PERTURBATION_COUNTS_TEST//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
   'functionality_name': $( if [ ! -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then echo "r'${VIASH_META_FUNCTIONALITY_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1048,6 +1124,28 @@ adata_atac_s.write(par['multiomics_atac_test'])
 # shorten perturbation
 adata_bulk = ad.read_h5ad(par['perturbation_data'])
 adata_bulk[:600, adata_bulk.var_names.isin(adata_rna_s.var_names)].write(par['perturbation_data_test'])
+
+
+
+
+# - test datasets for raw counts
+
+os.makedirs('resources_test/datasets_raw/', exist_ok=True)
+multiomics_counts = ad.read_h5ad(par['multiomics_counts'])
+# shorten multiomics_counts 
+mask = multiomics_counts.obs.donor_id=='CCL-240'
+multiomics_counts_s = multiomics_counts[mask]
+# only one chr and n_cells 
+if 'interval' not in multiomics_counts_s.var:
+    raise ValueError('location is not given in rna')
+chr_mask = multiomics_counts_s.var.interval.str.split(':').str[0] == 'chr1'
+multiomics_counts_s = multiomics_counts_s[multiomics_counts_s.obs.sample(2000).index, multiomics_counts_s.var.sample(2000).index]
+multiomics_counts_s.write(par['multiomics_counts_test'])
+# shorten perturbation
+perturbation_counts = ad.read_h5ad(par['perturbation_counts'])
+perturbation_counts_s = perturbation_counts[perturbation_counts.obs.donor_id=='Donor 1']
+perturbation_counts_s = perturbation_counts_s[perturbation_counts_s.obs.sample(1000).index,perturbation_counts_s.var.sample(1000).index]
+perturbation_counts_s.write(par['perturbation_counts_test'])
 VIASHMAIN
 python -B "\$tempscript" &
 wait "\$!"
@@ -1074,6 +1172,18 @@ fi
 if [ ! -z "$VIASH_PAR_PERTURBATION_DATA_TEST" ]; then
   VIASH_PAR_PERTURBATION_DATA_TEST=$(ViashStripAutomount "$VIASH_PAR_PERTURBATION_DATA_TEST")
 fi
+if [ ! -z "$VIASH_PAR_MULTIOMICS_COUNTS" ]; then
+  VIASH_PAR_MULTIOMICS_COUNTS=$(ViashStripAutomount "$VIASH_PAR_MULTIOMICS_COUNTS")
+fi
+if [ ! -z "$VIASH_PAR_MULTIOMICS_COUNTS_TEST" ]; then
+  VIASH_PAR_MULTIOMICS_COUNTS_TEST=$(ViashStripAutomount "$VIASH_PAR_MULTIOMICS_COUNTS_TEST")
+fi
+if [ ! -z "$VIASH_PAR_PERTURBATION_COUNTS" ]; then
+  VIASH_PAR_PERTURBATION_COUNTS=$(ViashStripAutomount "$VIASH_PAR_PERTURBATION_COUNTS")
+fi
+if [ ! -z "$VIASH_PAR_PERTURBATION_COUNTS_TEST" ]; then
+  VIASH_PAR_PERTURBATION_COUNTS_TEST=$(ViashStripAutomount "$VIASH_PAR_PERTURBATION_COUNTS_TEST")
+fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_META_RESOURCES_DIR=$(ViashStripAutomount "$VIASH_META_RESOURCES_DIR")
 fi
@@ -1095,6 +1205,14 @@ if [ ! -z "$VIASH_PAR_MULTIOMICS_RNA_TEST" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_RN
 fi
 if [ ! -z "$VIASH_PAR_PERTURBATION_DATA_TEST" ] && [ ! -e "$VIASH_PAR_PERTURBATION_DATA_TEST" ]; then
   ViashError "Output file '$VIASH_PAR_PERTURBATION_DATA_TEST' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_MULTIOMICS_COUNTS_TEST" ] && [ ! -e "$VIASH_PAR_MULTIOMICS_COUNTS_TEST" ]; then
+  ViashError "Output file '$VIASH_PAR_MULTIOMICS_COUNTS_TEST' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_PERTURBATION_COUNTS_TEST" ] && [ ! -e "$VIASH_PAR_PERTURBATION_COUNTS_TEST" ]; then
+  ViashError "Output file '$VIASH_PAR_PERTURBATION_COUNTS_TEST' does not exist."
   exit 1
 fi
 

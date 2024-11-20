@@ -86,12 +86,6 @@ def run_grn_inference():
     sbatch = False
     partition='cpu'
 
-    if dataset in ['op', 'norman']:
-        normalize = True
-    else:
-        normalize = False
-    
-    
     par = {
         # 'methods': ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2", "ppcor", "scenic"],
         'methods': ["negative_control"],
@@ -102,7 +96,6 @@ def run_grn_inference():
         'num_workers': 10,
         'mem': "120GB",
         'time': "24:00:00",
-        'normalize': normalize,
         # 'max_n_links': 10000,
     }
    
@@ -128,8 +121,6 @@ def run_grn_inference():
         )
         # Determine the command based on the method
         if method in ["positive_control", "pearson_corr", "negative_control"]:
-            if par['normalize']:
-                method_args += f"--normalize "
             command = f"python src/control_methods/{method}/script.py {method_args}"
         elif method == "celloracle":
             method_args += f"--atac {par['atac']} "
@@ -205,94 +196,7 @@ def merge_tf_motifs():
         df_concat = df_concat[cols].drop_duplicates() #(143124468, 5)
         df_concat.to_csv('output/db/jaspar_encode.bed.gz', sep='\t', header=False, index=False, compression='gzip')
 
-def marco_data():
-    # import subprocess
-    # import anndata as ad 
-    # import pandas as pd
-    # import numpy as np
-    # for cell_type in ['zhao', 'shalek', 'han', 'jackson']:
-    #     adata = ad.read_h5ad(f'resources_local/mccalla_extended/{cell_type}.h5ad')
-    #     adata.layers['norm'] = adata.X
-    #     adata.obs['cell_type'] = 'onecelltype'
-    #     adata.write(f'resources_local/mccalla_extended/{cell_type}.h5ad')
-    #     subsample = min([10000, len(adata)])
-    #     for GT in ['KDunion', 'chipunion', 'chipunion_KDUnion_intersect']:
-    #         GT_df = pd.read_csv(f'resources_local/mccalla_extended/{cell_type}_{GT}.csv')
-    #         gene_overlap = np.intersect1d(adata.var_names, GT_df.target.unique()).shape
-    #         print(f"{cell_type}-{GT}. adata shape: {adata.shape}, GT size: {GT_df.shape}, Gene overlap: {gene_overlap}")
-    #         command = f"viash run src/metrics/regression_1/config.vsh.yaml -- --perturbation_data resources_local/mccalla_extended/{cell_type}.h5ad --prediction resources_local/mccalla_extended/{cell_type}_{GT}.csv --layer norm --subsample {subsample} --apply_tf false --tf_all resources/prior/tf_all.csv --max_n_links -1 --verbose 1 --score output/{cell_type}_{GT}.h5ad"
-    #         subprocess.run(command, shell=True, check=True)
 
-
-    all_gene_names = pd.read_csv('resources/prior/genome_annotation.tsv', sep='\t').Gene.unique().astype(str)
-
-    # adata_names = ['han', 'jackson', 'zhao', 'shalek']
-    # post_fixes = ['chipunion','KDunion', 'chipunion_KDUnion_intersect']
-    # for name in adata_names:
-    #     print('------- ', name)
-    #     adata = ad.read_h5ad(f'resources/grn-benchmark/mccalla/inference/{name}.h5ad')
-    #     adata.var_names = adata.var_names.str.upper().astype(str)
-
-    #     genes = adata.var_names
-    #     print(len(genes),genes.isin(all_gene_names).sum())
-    #     print(np.setdiff1d(genes, all_gene_names)[0:5])
-    #     adata.write_h5ad(f'resources/grn-benchmark/mccalla/inference/{name}.h5ad')
-
-    #     for post_fix in post_fixes:
-    #         GT = pd.read_csv(f'resources/grn-benchmark/mccalla/evaluation/{name}_{post_fix}.csv')
-    #         GT.source = GT.source.str.upper()
-    #         GT.target = GT.target.str.upper()
-    #         GT.to_csv(f'resources/grn-benchmark/mccalla/evaluation/{name}_{post_fix}.csv')
-    #         tf_genes =set(GT.source) | set(GT.target)
-    #         tf_genes = [name.upper() for name in tf_genes]
-    #         # print(tf_genes)
-    #         print('-- ', post_fix, len(tf_genes), np.intersect1d(list(tf_genes), genes).shape)
-    pass
-
-def extract_data(data, reg='reg1', dataset_id='scgen_pearson'):
-    i = 0
-    for entry in data:
-        if entry['dataset_id']!=dataset_id:
-            continue
-        try:
-            rg, method_id = entry['method_id'].split('-')
-        except:
-            rg, method_id, _ = entry['method_id'].split('-')
-        if rg != reg:
-            continue
-        dataset_id = entry['dataset_id']
-        metric_ids = entry['metric_ids']
-        metric_values = entry['metric_values']
-        
-        df = pd.DataFrame([metric_values], index=[method_id], columns=metric_ids)
-        if i==0:
-            df_reg = df
-        else:
-            df_reg = pd.concat([df_reg, df], axis=0)
-        i+=1
-    return df_reg
-def process_data(RUN_ID, models_all=None):
-    raise ValueError('fix this')
-    # !aws s3 sync s3://openproblems-data/resources/grn/results/{RUN_ID} resources/results/{RUN_ID} 
-    base_folder = f'resources/results/{RUN_ID}'
-    result_file = f'{base_folder}/scores.yaml'
-        
-
-    with open(result_file, 'r') as file:
-        data = yaml.safe_load(file)
-    
-    
-    if models_all is None:
-        df_reg1 = extract_data(data, reg='reg1')
-        df_reg2 = extract_data(data, reg='reg2')
-    else:
-        df_reg1 = extract_data(data, reg='reg1').reindex(models_all)
-        df_reg2 = extract_data(data, reg='reg2').reindex(models_all)
-    # df_all = pd.concat([df_reg1, df_reg2], axis=1).fillna(0)
-    # df_all_n = (df_all-df_all.min(axis=0))/(df_all.max(axis=0)-df_all.min(axis=0))
-    # df_all['Rank'] = df_all_n.mean(axis=1).rank(ascending=False).astype(int)
-    df_all = pd.concat([df_reg1, df_reg2], axis=1)
-    return df_all
 def process_trace_seqera(trace):
     trace['model'] = pd.DataFrame(trace.name.str.split(':').to_list())[3] #TODO: number 3 might be different  
     trace = trace.groupby('model').apply(lambda df: df.sort_values(by='duration', ascending=False).iloc[0])[['%cpu', 'peak_rss', 'peak_vmem', 'rchar', 'wchar', 'duration']]

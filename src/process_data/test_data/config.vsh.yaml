@@ -9,35 +9,56 @@ functionality:
   arguments:
     - name: --multiomics_rna
       type: file 
-      required: false
+      required: true
       direction: input
-      default: resources/grn-benchmark/multiomics_rna.h5ad
+      example: resources_test/inference_datasets/op_rna.h5ad
     - name: --multiomics_rna_test
       type: file 
       required: false
       direction: output
-      default: resources_test/grn-benchmark/multiomics_rna.h5ad
 
     - name: --multiomics_atac
       type: file 
       required: false
       direction: input
-      default: resources/grn-benchmark/multiomics_atac.h5ad
+      example: resources/inference_datasets/op_atac.h5ad
     - name: --multiomics_atac_test
       type: file 
       required: false
       direction: input
-      default: resources_test/grn-benchmark/multiomics_atac.h5ad
+
     - name: --perturbation_data
       type: file 
       required: false
       direction: input
-      default: resources/grn-benchmark/perturbation_data.h5ad
+      example: resources/evaluation_datasets/op_perturbation.h5ad
     - name: --perturbation_data_test
       type: file 
       required: false
       direction: output
-      default: resources_test/grn-benchmark/perturbation_data.h5ad
+    
+
+    - name: --multiomics_counts
+      type: file 
+      required: no
+      direction: input
+      example: resources_test/datasets_raw/op_multiome_counts.h5ad
+    - name: --multiomics_counts_test
+      type: file 
+      required: no
+      direction: output
+
+    - name: --perturbation_counts
+      type: file 
+      required: no
+      direction: input
+      example: resources_test/datasets_raw/op_perturbation_counts.h5ad
+    - name: --perturbation_counts_test
+      type: file 
+      required: no
+      direction: output
+      
+      
   resources:
     - type: python_script
       path: script.py
