@@ -26,7 +26,7 @@ functionality:
       path: main.nf
       entrypoint: run_wf
   dependencies:
-    - name: perturbation/opsca
+    - name: preprocessing/process_opsca
 
 platforms:
   - type: nextflow
