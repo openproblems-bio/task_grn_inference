@@ -12,7 +12,8 @@ from scipy.sparse import csr_matrix
 ## VIASH START
 par = {
     'perturbation_counts': 'resources/datasets_raw/op_perturbation_counts.h5ad',
-    'pseudobulked_data': 'resources/evaluation_datasets/op_perturbation.h5ad'
+    'pseudobulked_data': 'resources/datasets_raw/op_perturbation.h5ad',
+    'evaluation_data': 'resources/evaluation_datasets/op.h5ad',
 }
 ## VIASH END
 
@@ -220,6 +221,6 @@ del bulk_adata.layers['n_counts']
 
 bulk_adata.X = csr_matrix(bulk_adata.X)
 bulk_adata.layers['counts'] = csr_matrix(bulk_adata.layers['counts'])
-bulk_adata.layers['X_norm'] = csr_matrix(bulk_adata.layers['X_norm'])
 
 bulk_adata.write(par['pseudobulked_data'])
+bulk_adata.write(par['evaluation_data'])

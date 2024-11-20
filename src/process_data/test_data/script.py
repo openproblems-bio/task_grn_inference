@@ -7,18 +7,25 @@ import numpy as np
 from scipy import sparse
 import scanpy as sc
 import requests
+import os
 
 ## VIASH START
 
 par = {
-    'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
-    'multiomics_rna_test': 'resources_test/grn-benchmark/multiomics_rna.h5ad',
+    'multiomics_rna': 'resources/inference_datasets/op_rna.h5ad',
+    'multiomics_rna_test': 'resources_test/inference_datasets/op_rna.h5ad',
 
-    'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad',
-    'multiomics_atac_test': 'resources_test/grn-benchmark/multiomics_atac.h5ad',
+    'multiomics_atac': 'resources/inference_datasets/op_atac.h5ad',
+    'multiomics_atac_test': 'resources_test/inference_datasets/op_atac.h5ad',
 
-    'perturbation_data': 'resources/grn-benchmark/perturbation_data.h5ad',
-    'perturbation_data_test': 'resources_test/grn-benchmark/perturbation_data.h5ad',
+    'perturbation_data': 'resources/evaluation_datasets/op_perturbation.h5ad',
+    'perturbation_data_test': 'resources_test/evaluation_datasets/op_perturbation.h5ad',
+
+    'multiomics_counts': 'resources/datasets_raw/op_multiome_counts.h5ad',
+    'multiomics_counts_test': 'resources_test/datasets_raw/op_multiome_counts.h5ad',
+
+    'perturbation_counts': 'resources/datasets_raw/op_perturbation_counts.h5ad',
+    'perturbation_counts_test': 'resources_test/datasets_raw/op_perturbation_counts.h5ad',
 }
 ## VIASH END
 
@@ -69,3 +76,25 @@ adata_atac_s.write(par['multiomics_atac_test'])
 # shorten perturbation
 adata_bulk = ad.read_h5ad(par['perturbation_data'])
 adata_bulk[:600, adata_bulk.var_names.isin(adata_rna_s.var_names)].write(par['perturbation_data_test'])
+
+
+
+
+# - test datasets for raw counts
+
+os.makedirs('resources_test/datasets_raw/', exist_ok=True)
+multiomics_counts = ad.read_h5ad(par['multiomics_counts'])
+# shorten multiomics_counts 
+mask = multiomics_counts.obs.donor_id=='CCL-240'
+multiomics_counts_s = multiomics_counts[mask]
+# only one chr and n_cells 
+if 'interval' not in multiomics_counts_s.var:
+    raise ValueError('location is not given in rna')
+chr_mask = multiomics_counts_s.var.interval.str.split(':').str[0] == 'chr1'
+multiomics_counts_s = multiomics_counts_s[multiomics_counts_s.obs.sample(2000).index, multiomics_counts_s.var.sample(2000).index]
+multiomics_counts_s.write(par['multiomics_counts_test'])
+# shorten perturbation
+perturbation_counts = ad.read_h5ad(par['perturbation_counts'])
+perturbation_counts_s = perturbation_counts[perturbation_counts.obs.donor_id=='Donor 1']
+perturbation_counts_s = perturbation_counts_s[perturbation_counts_s.obs.sample(1000).index,perturbation_counts_s.var.sample(1000).index]
+perturbation_counts_s.write(par['perturbation_counts_test'])
