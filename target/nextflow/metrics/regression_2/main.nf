@@ -2800,9 +2800,9 @@ meta = [
                 "required" : true
               },
               {
-                "name" : "sm_name",
+                "name" : "perturbation",
                 "type" : "string",
-                "description" : "The primary name for the (parent) compound (in a standardized representation)\nas chosen by LINCS. This is provided to map the data in this experiment to \nthe LINCS Connectivity Map data.\n",
+                "description" : "Name of the column containing perturbation names",
                 "required" : true
               },
               {
@@ -2812,48 +2812,18 @@ meta = [
                 "required" : true
               },
               {
-                "name" : "plate_name",
+                "name" : "perturbation_type",
                 "type" : "string",
-                "description" : "Plate name 6 levels",
-                "required" : true
-              },
-              {
-                "name" : "row",
-                "type" : "string",
-                "description" : "Row name on the plate",
-                "required" : true
-              },
-              {
-                "name" : "well",
-                "type" : "string",
-                "description" : "Well name on the plate",
-                "required" : true
-              },
-              {
-                "name" : "cell_count",
-                "type" : "string",
-                "description" : "Number of single cells pseudobulked",
+                "description" : "Name of the column indicating perturbation type",
                 "required" : true
               }
             ],
             "layers" : [
               {
-                "name" : "n_counts",
+                "name" : "X_norm",
                 "type" : "double",
-                "description" : "Pseudobulked values using mean approach",
+                "description" : "Normalized values",
                 "required" : true
-              },
-              {
-                "name" : "pearson",
-                "type" : "double",
-                "description" : "Normalized values using pearson residuals",
-                "required" : false
-              },
-              {
-                "name" : "lognorm",
-                "type" : "double",
-                "description" : "Normalized values using shifted logarithm ",
-                "required" : false
               }
             ]
           }
@@ -3050,7 +3020,7 @@ meta = [
         "type" : "string",
         "name" : "--layer",
         "default" : [
-          "pearson"
+          "X_norm"
         ],
         "required" : false,
         "direction" : "input",
@@ -3252,7 +3222,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "8b0ecf6751141e770ff1a010a26155f3d66f8073",
+    "git_commit" : "b09204f81010c43a32476a288bd1205cbc01ccd2",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

@@ -15,7 +15,7 @@ functionality:
       example: resources_test/datasets_raw/op_perturbation_counts.h5ad
       description: single cell perturbation data 
 
-    - name: --perturbation_data_n
+    - name: --pseudobulked_data
       __merge__: ../../api/file_evaluation_h5ad.yaml
       required: false
       direction: output
@@ -26,10 +26,7 @@ functionality:
       path: main.nf
       entrypoint: run_wf
   dependencies:
-    - name: perturbation/sc_counts 
-    - name: perturbation/normalization
-    # - name: perturbation/batch_correction_scgen
-    # - name: perturbation/batch_correction_seurat 
+    - name: preprocessing/process_opsca
 
 platforms:
   - type: nextflow

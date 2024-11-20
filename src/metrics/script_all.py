@@ -6,14 +6,6 @@ import os
 
 
 def define_par(dataset):
-  if dataset == 'op':
-    layer = 'pearson'
-  elif dataset in ['norman']:
-    layer = 'pearson'
-  elif dataset in ['replogle2', 'nakatake', 'adamson']:
-    layer = 'X'
-  else:
-    raise ValueError('define first')
 
   par = {
       'reg_type': 'ridge',
@@ -47,7 +39,7 @@ def define_par(dataset):
       "evaluation_data": f"resources/evaluation_datasets/{dataset}_perturbation.h5ad",
       'consensus': f'resources/prior/{dataset}_consensus-num-regulators.json',
 
-      'layer': layer,
+      'layer': 'X_norm',
       
       "tf_all": "resources/prior/tf_all.csv",
       'skeleton': 'resources/prior/skeleton.csv', 
@@ -73,11 +65,11 @@ from util import process_links
 # - run consensus 
 from consensus.script import main as main_consensus
 
-# - include general models?
+# - run general models
 global_models = False
 
 # - run metrics 
-for dataset in ['op','replogle2', 'nakatake', 'norman', 'adamson']: #'replogle2', 'nakatake', norman
+for dataset in ['op']: #'op', 'replogle2', 'nakatake', 'norman', 'adamson'
   print('------ ', dataset, '------')
   par = define_par(dataset)
   os.makedirs(par['scores_dir'], exist_ok=True)
@@ -86,7 +78,7 @@ for dataset in ['op','replogle2', 'nakatake', 'norman', 'adamson']: #'replogle2'
     par['binarize'] = binarize
     for max_n_links in [50000]:
       par['max_n_links'] = max_n_links
-      for apply_skeleton in [False]:
+      for apply_skeleton in [True]:
         par['apply_skeleton'] = apply_skeleton
         # - determines models to run 
         grn_files_dict = {}
@@ -104,15 +96,16 @@ for dataset in ['op','replogle2', 'nakatake', 'norman', 'adamson']: #'replogle2'
             grn_file = f'{temp_dir}/{model}.csv'
             net.to_csv(grn_file)
             grn_files_dict[model] = grn_file
-        # - add actual models
-        for model in par['models']:
-          print(model)
-          grn_file = f"{par['models_dir']}/{model}.csv"
-          if not os.path.exists(grn_file):
-            print(f"{grn_file} doesnt exist. Skipped.")
-            continue
-          grn_files_dict[model] = grn_file
-        
+        else:
+          # - add actual models
+          for model in par['models']:
+            print(model)
+            grn_file = f"{par['models_dir']}/{model}.csv"
+            if not os.path.exists(grn_file):
+              print(f"{grn_file} doesnt exist. Skipped.")
+              continue
+            grn_files_dict[model] = grn_file
+          
         # - actual runs 
         i = 0
         for model, grn_file in grn_files_dict.items():
@@ -125,7 +118,7 @@ for dataset in ['op','replogle2', 'nakatake', 'norman', 'adamson']: #'replogle2'
             df_all = score
           else:
             df_all = pd.concat([df_all, score])
-          df_all.to_csv(f"{par['scores_dir']}/{max_n_links}-skeleton_{apply_skeleton}-binarize_{binarize}-{par['reg_type']}.csv")
+          df_all.to_csv(f"{par['scores_dir']}/{max_n_links}-skeleton_{apply_skeleton}-binarize_{binarize}-{par['reg_type']}-global-{global_models}.csv")
           print(df_all)
           i+=1
   

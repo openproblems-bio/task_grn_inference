@@ -268,15 +268,6 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     subsample = par['subsample']
     if subsample == -1:
         pass
-    # elif subsample == -2: # one combination of cell_type, sm_name
-    #     sampled_obs = evaluation_data.obs.groupby(['sm_name', 'cell_type'], observed=False).apply(lambda x: x.sample(1)).reset_index(drop=True)
-    #     obs = evaluation_data.obs
-    #     mask = []
-    #     for _, row in obs.iterrows():
-    #         mask.append((sampled_obs==row).all(axis=1).any())  
-    #     evaluation_data = evaluation_data[mask,:]
-    # else:
-    #     evaluation_data = evaluation_data[np.random.choice(evaluation_data.n_obs, subsample, replace=False), :]
     else:
         raise ValueError('fix this')
 

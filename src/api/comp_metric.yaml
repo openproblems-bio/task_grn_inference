@@ -58,7 +58,7 @@ functionality:
       type: string
       direction: input
       required: false
-      default: pearson
+      default: X_norm
     - name: --max_n_links
       type: integer
       default: 50000

@@ -2797,12 +2797,26 @@ meta = [
                 "name" : "cell_type",
                 "type" : "string",
                 "description" : "The annotated cell type of each cell based on RNA expression.",
-                "required" : true
+                "required" : false
               },
               {
                 "name" : "donor_id",
                 "type" : "string",
                 "description" : "Donor id",
+                "required" : false
+              }
+            ],
+            "layers" : [
+              {
+                "name" : "counts",
+                "type" : "double",
+                "description" : "Counts matrix",
+                "required" : false
+              },
+              {
+                "name" : "X_norm",
+                "type" : "double",
+                "description" : "Normalized values",
                 "required" : true
               }
             ]
@@ -2832,13 +2846,13 @@ meta = [
                 "name" : "cell_type",
                 "type" : "string",
                 "description" : "The annotated cell type of each cell based on RNA expression.",
-                "required" : true
+                "required" : false
               },
               {
                 "name" : "donor_id",
                 "type" : "string",
                 "description" : "Donor id",
-                "required" : true
+                "required" : false
               }
             ]
           }
@@ -3091,7 +3105,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/control_methods/pearson_corr",
     "viash_version" : "0.8.6",
-    "git_commit" : "8b0ecf6751141e770ff1a010a26155f3d66f8073",
+    "git_commit" : "b09204f81010c43a32476a288bd1205cbc01ccd2",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

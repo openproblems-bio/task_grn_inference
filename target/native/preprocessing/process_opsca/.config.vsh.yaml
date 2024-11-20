@@ -1,22 +1,13 @@
 functionality:
-  name: "normalization"
-  namespace: "perturbation"
+  name: "process_opsca"
+  namespace: "preprocessing"
   version: "build-main"
   arguments:
   - type: "file"
-    name: "--pseudobulked_data_f"
-    info:
-      label: "perturbation"
-      summary: "Perturbation dataset for benchmarking."
-      file_type: "h5ad"
-      slots:
-        layers:
-        - name: "n_counts"
-          type: "double"
-          description: "Pseudobulked values using mean approach"
-          required: true
+    name: "--perturbation_counts"
+    info: null
     example:
-    - "resources_test/evaluation_datasets/op_perturbation.h5ad"
+    - "resources_test/datasets_raw/op_perturbation_counts.h5ad"
     must_exist: true
     create_parent: true
     required: true
@@ -25,25 +16,10 @@ functionality:
     multiple_sep: ":"
     dest: "par"
   - type: "file"
-    name: "--perturbation_data_n"
-    info:
-      label: "perturbation"
-      summary: "Perturbation dataset for benchmarking."
-      file_type: "h5ad"
-      slots:
-        layers:
-        - name: "n_counts"
-          type: "double"
-          description: "Pseudobulked values using mean approach"
-          required: true
-        - name: "pearson"
-          type: "double"
-          description: "Normalized values using pearson residuals"
-          required: true
-        - name: "lognorm"
-          type: "double"
-          description: "Normalized values using shifted logarithm "
-          required: true
+    name: "--pseudobulked_data"
+    info: null
+    example:
+    - "resources_test/evaluation_datasets/op_perturbation.h5ad"
     must_exist: true
     create_parent: true
     required: false
@@ -63,8 +39,13 @@ functionality:
     path: "resources_test/grn-benchmark"
     dest: "resources_test/grn-benchmark"
   info:
-    label: "normalization"
-    summary: "Normalize pseudobulked data"
+    label: "process_opsca"
+    summary: "Porcesses sc counts of perturbation data to generate pseudobulked normalized\
+      \ data"
+    description: "It conducts QC on sc level to remove low quality cell and genes.\
+      \ \nThen, sc counts are pseudobulked and filtered for outliers compounds, samples\
+      \ with low quality cells, and genes with low coverage. \nFinally, it normalized\
+      \ the counts data. \n"
   status: "enabled"
   set_wd_to_resources_dir: false
 platforms:
@@ -121,10 +102,10 @@ platforms:
   debug: false
   container: "docker"
 info:
-  config: "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/normalization/config.vsh.yaml"
+  config: "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/opsca/config.vsh.yaml"
   platform: "native"
-  output: "/home/runner/work/task_grn_inference/task_grn_inference/target/native/perturbation/normalization"
-  executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/native/perturbation/normalization/normalization"
+  output: "/home/runner/work/task_grn_inference/task_grn_inference/target/native/preprocessing/process_opsca"
+  executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/native/preprocessing/process_opsca/process_opsca"
   viash_version: "0.8.6"
-  git_commit: "8b0ecf6751141e770ff1a010a26155f3d66f8073"
+  git_commit: "b09204f81010c43a32476a288bd1205cbc01ccd2"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

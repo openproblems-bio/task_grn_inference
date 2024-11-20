@@ -9,8 +9,8 @@ info:
       - name: cell_type
         type: string
         description: "The annotated cell type of each cell based on RNA expression."
-        required: true
+        required: false
       - name: donor_id
         type: string
         description: "Donor id"
-        required: true
+        required: false

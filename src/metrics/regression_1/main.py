@@ -247,6 +247,7 @@ def pivot_grn(net):
 
 def process_net(net, gene_names):
     # Remove self-regulations
+    net = net.drop_duplicates()
     net = net[net['source'] != net['target']]
     # pivot
     net = pivot_grn(net)
@@ -305,18 +306,18 @@ def main(par):
     layer = par["layer"]
     if subsample == -1:
         pass
-    elif subsample == -2: # one combination of cell_type, sm_name
-        sampled_obs = evaluation_data.obs.groupby(['sm_name', 'cell_type'], observed=False).apply(lambda x: x.sample(1)).reset_index(drop=True)
+    elif subsample == -2: # one combination of cell_type, perturbation
+        sampled_obs = evaluation_data.obs.groupby(['perturbation', 'cell_type'], observed=False).apply(lambda x: x.sample(1)).reset_index(drop=True)
         obs = evaluation_data.obs
         mask = []
         for _, row in obs.iterrows():
             mask.append((sampled_obs==row).all(axis=1).any())  
         evaluation_data = evaluation_data[mask,:]
     elif subsample == -3: #negative control
-        mask = evaluation_data.obs.sm_name == 'Dimethyl Sulfoxide'
+        mask = evaluation_data.obs.perturbation == 'Dimethyl Sulfoxide'
         evaluation_data = evaluation_data[mask,:]
     elif subsample == -4: #positive control
-        mask = evaluation_data.obs.sm_name.isin(['Dabrafenib', 'Belinostat'])
+        mask = evaluation_data.obs.perturbation.isin(['Dabrafenib', 'Belinostat'])
         evaluation_data = evaluation_data[mask,:]
     else:
         evaluation_data = evaluation_data[np.random.choice(evaluation_data.n_obs, subsample, replace=False), :]

@@ -406,9 +406,9 @@ ENTRYPOINT []
  
 RUN :
 LABEL org.opencontainers.image.description="Companion container for running component multiomics format_data"
-LABEL org.opencontainers.image.created="2024-11-19T12:27:31Z"
+LABEL org.opencontainers.image.created="2024-11-20T13:56:36Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="8b0ecf6751141e770ff1a010a26155f3d66f8073"
+LABEL org.opencontainers.image.revision="b09204f81010c43a32476a288bd1205cbc01ccd2"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -910,6 +910,10 @@ dep = {
 multiomics = ad.read_h5ad(par['multiome_counts'])
 multiomics.X = multiomics.layers['counts']
 del multiomics.layers
+multiomics.layers['counts'] = multiomics.X.copy()
+X_norm = sc.pp.normalize_total(multiomics, inplace=False)['X']
+multiomics.layers['X_norm'] = sc.pp.log1p(X_norm, copy=True)
+
 multiomics.var.index.name='location'
 multiomics.obs.index.name='obs_id'
 

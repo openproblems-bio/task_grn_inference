@@ -2801,7 +2801,7 @@ meta = [
       },
       {
         "type" : "file",
-        "name" : "--perturbation_data_n",
+        "name" : "--pseudobulked_data",
         "info" : {
           "label" : "perturbation",
           "summary" : "Perturbation dataset for benchmarking.",
@@ -2815,9 +2815,9 @@ meta = [
                 "required" : true
               },
               {
-                "name" : "sm_name",
+                "name" : "perturbation",
                 "type" : "string",
-                "description" : "The primary name for the (parent) compound (in a standardized representation)\nas chosen by LINCS. This is provided to map the data in this experiment to \nthe LINCS Connectivity Map data.\n",
+                "description" : "Name of the column containing perturbation names",
                 "required" : true
               },
               {
@@ -2827,48 +2827,18 @@ meta = [
                 "required" : true
               },
               {
-                "name" : "plate_name",
+                "name" : "perturbation_type",
                 "type" : "string",
-                "description" : "Plate name 6 levels",
-                "required" : true
-              },
-              {
-                "name" : "row",
-                "type" : "string",
-                "description" : "Row name on the plate",
-                "required" : true
-              },
-              {
-                "name" : "well",
-                "type" : "string",
-                "description" : "Well name on the plate",
-                "required" : true
-              },
-              {
-                "name" : "cell_count",
-                "type" : "string",
-                "description" : "Number of single cells pseudobulked",
+                "description" : "Name of the column indicating perturbation type",
                 "required" : true
               }
             ],
             "layers" : [
               {
-                "name" : "n_counts",
+                "name" : "X_norm",
                 "type" : "double",
-                "description" : "Pseudobulked values using mean approach",
+                "description" : "Normalized values",
                 "required" : true
-              },
-              {
-                "name" : "pearson",
-                "type" : "double",
-                "description" : "Normalized values using pearson residuals",
-                "required" : false
-              },
-              {
-                "name" : "lognorm",
-                "type" : "double",
-                "description" : "Normalized values using shifted logarithm ",
-                "required" : false
               }
             ]
           }
@@ -2915,46 +2885,25 @@ meta = [
     "status" : "enabled",
     "dependencies" : [
       {
-        "name" : "perturbation/sc_counts",
+        "name" : "preprocessing/process_opsca",
         "repository" : {
           "type" : "local",
           "localPath" : ""
         },
-        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/sc_counts/config.vsh.yaml",
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/opsca/config.vsh.yaml",
         "configInfo" : {
-          "functionalityName" : "sc_counts",
+          "functionalityName" : "process_opsca",
           "git_tag" : "",
           "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
           "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/sc_counts/config.vsh.yaml",
-          "functionalityNamespace" : "perturbation",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/opsca/config.vsh.yaml",
+          "functionalityNamespace" : "preprocessing",
           "output" : "",
           "platform" : "",
-          "git_commit" : "8b0ecf6751141e770ff1a010a26155f3d66f8073",
-          "executable" : "/nextflow/perturbation/sc_counts/main.nf"
+          "git_commit" : "b09204f81010c43a32476a288bd1205cbc01ccd2",
+          "executable" : "/nextflow/preprocessing/process_opsca/main.nf"
         },
-        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/sc_counts"
-      },
-      {
-        "name" : "perturbation/normalization",
-        "repository" : {
-          "type" : "local",
-          "localPath" : ""
-        },
-        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/normalization/config.vsh.yaml",
-        "configInfo" : {
-          "functionalityName" : "normalization",
-          "git_tag" : "",
-          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
-          "viash_version" : "0.8.6",
-          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/perturbation/normalization/config.vsh.yaml",
-          "functionalityNamespace" : "perturbation",
-          "output" : "",
-          "platform" : "",
-          "git_commit" : "8b0ecf6751141e770ff1a010a26155f3d66f8073",
-          "executable" : "/nextflow/perturbation/normalization/main.nf"
-        },
-        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/perturbation/normalization"
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/preprocessing/process_opsca"
       }
     ],
     "set_wd_to_resources_dir" : false
@@ -3006,7 +2955,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/process_perturbation",
     "viash_version" : "0.8.6",
-    "git_commit" : "8b0ecf6751141e770ff1a010a26155f3d66f8073",
+    "git_commit" : "b09204f81010c43a32476a288bd1205cbc01ccd2",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3014,8 +2963,7 @@ meta = [
 
 // resolve dependencies dependencies (if any)
 meta["root_dir"] = getRootDir()
-include { sc_counts } from "${meta.resources_dir}/../../../nextflow/perturbation/sc_counts/main.nf"
-include { normalization } from "${meta.resources_dir}/../../../nextflow/perturbation/normalization/main.nf"
+include { process_opsca } from "${meta.resources_dir}/../../../nextflow/preprocessing/process_opsca/main.nf"
 
 // inner workflow
 // user-provided Nextflow code
@@ -3026,18 +2974,12 @@ workflow run_wf {
   main:
   output_ch = input_ch
 
-    | sc_counts.run(
+    | opsca.run(
       fromState: [perturbation_counts: "perturbation_counts"],
-      toState: [pseudobulked_data:"pseudobulked_data", pseudobulked_data_f: "pseudobulked_data_f"]
+      toState: [pseudobulked_data:"pseudobulked_data"]
     )
-
-    | normalization.run(
-      fromState: [pseudobulked_data_f: "pseudobulked_data_f"],
-      toState: [perturbation_data_n: "perturbation_data_n"]
-    )
-
     
-    | setState(["perturbation_data_n"])
+    | setState(["pseudobulked_data"])
 
   emit:
   output_ch

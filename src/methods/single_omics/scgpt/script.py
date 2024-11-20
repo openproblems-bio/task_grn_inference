@@ -57,7 +57,7 @@ par = {
   'condition': 'cell_type'
 }
 ## VIASH END
-
+os.makedirs(par['temp_dir'], exist_ok=True)
 # Download datasets 
 par['model_file'] = f"{par['temp_dir']}/best_model.pt"
 par['model_config_file'] = f"{par['temp_dir']}/args.json"

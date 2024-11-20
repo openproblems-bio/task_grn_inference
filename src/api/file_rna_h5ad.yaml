@@ -9,8 +9,17 @@ info:
       - name: cell_type
         type: string
         description: "The annotated cell type of each cell based on RNA expression."
-        required: true
+        required: false
       - name: donor_id
         type: string
         description: "Donor id"
+        required: false
+    layers:
+      - name: counts
+        type: double
+        description: "Counts matrix"
+        required: false
+      - name: X_norm
+        type: double
+        description: "Normalized values"
         required: true

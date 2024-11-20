@@ -1,11 +1,11 @@
 __merge__: ../../../api/unit_test.yaml
 
 functionality:
-  name: sc_counts
-  namespace: "perturbation"
+  name: process_opsca
+  namespace: "preprocessing"
   info:
-    label: sc_counts
-    summary: "Porcesses sc counts of perturbation data to generate pseudobulked"
+    label: process_opsca
+    summary: "Porcesses sc counts of perturbation data to generate pseudobulked normalized data"
     description: |
       It conducts QC on sc level to remove low quality cell and genes. 
       Then, sc counts are pseudobulked and filtered for outliers compounds, samples with low quality cells, and genes with low coverage. 
@@ -20,30 +20,9 @@ functionality:
       
     - name: --pseudobulked_data
       type: file
-      info:
-        label: pseudobulked_data
-        summary: "Pseudobulked perturbation dataset for benchmarking."
-        file_type: h5ad
       required: false
       direction: output
-      example: resources_test/evaluation_datasets/op_perturbation.h5ad 
-
-    - name: --pseudobulked_data_f
-      type: file
-      info:
-        label: perturbation
-        summary: "Perturbation dataset for benchmarking."
-        file_type: h5ad
-        slots:
-          layers:
-            - name: n_counts
-              type: double
-              description: "Pseudobulked values using mean approach"
-              required: true
-      required: false
-      direction: output
-      example: resources_test/grn-benchmark/perturbation_data.h5ad
-      
+      example: resources_test/evaluation_datasets/op_perturbation.h5ad    
 
   resources:
     - type: python_script

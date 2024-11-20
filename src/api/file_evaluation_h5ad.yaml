@@ -10,45 +10,23 @@ info:
         type: string
         description: "The annotated cell type of each cell based on RNA expression."
         required: true
-      - name: sm_name
+      - name: perturbation
         type: string
-        description: |
-          The primary name for the (parent) compound (in a standardized representation)
-          as chosen by LINCS. This is provided to map the data in this experiment to 
-          the LINCS Connectivity Map data.
+        description: "Name of the column containing perturbation names"
         required: true
       - name: donor_id
         type: string
         description: "Donor id"
         required: true
-      - name: plate_name
+      - name: perturbation_type
         type: string
-        description: "Plate name 6 levels"
-        required: true
-      - name: row
-        type: string
-        description: "Row name on the plate"
-        required: true
-      - name: well
-        type: string
-        description: "Well name on the plate"
-        required: true
-      - name: cell_count
-        type: string
-        description: "Number of single cells pseudobulked"
+        description: "Name of the column indicating perturbation type"
         required: true
 
     layers:
-      - name: n_counts
+      - name: X_norm
         type: double
-        description: "Pseudobulked values using mean approach"
+        description: "Normalized values"
         required: true
-      - name: pearson
-        type: double
-        description: "Normalized values using pearson residuals"
-        required: false
-      - name: lognorm
-        type: double
-        description: "Normalized values using shifted logarithm "
-        required: false
+      
       

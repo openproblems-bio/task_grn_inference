@@ -7,12 +7,12 @@ import numpy as np
 import sctk
 from scipy import sparse
 import scanpy as sc
+from scipy.sparse import csr_matrix
 
 ## VIASH START
 par = {
-    'perturbation_counts': 'resources_test/datasets_raw/perturbation_counts.h5ad',
-    'pseudobulked_data': 'resources_local/pseudobulked_data.h5ad',
-    'pseudobulked_data_f': 'resources_local/pseudobulked_data_f.h5ad',
+    'perturbation_counts': 'resources/datasets_raw/op_perturbation_counts.h5ad',
+    'pseudobulked_data': 'resources/evaluation_datasets/op_perturbation.h5ad'
 }
 ## VIASH END
 
@@ -191,6 +191,13 @@ def filter_func(bulk_adata):
     for key in ['cell_type','plate_name']:
         bulk_adata_filtered.obs[key] = bulk_adata_filtered.obs[key].astype(str)
     return bulk_adata_filtered
+def normalize_func(bulk_adata):
+    # sc.pp.normalize_total(bulk_adata_c)
+    # sc.pp.log1p(bulk_adata_c)
+
+    bulk_adata.layers['X_norm'] = sc.experimental.pp.normalize_pearson_residuals(bulk_adata, inplace=False)['X']
+    
+    return bulk_adata
 
 test_flag = False
 if 'test' in par['perturbation_counts'].split('/')[0]:
@@ -205,6 +212,14 @@ else:
 sc_counts_f = preprocess_sc(par)
 bulk_adata = pseudobulk_sum_func(sc_counts_f)
 bulk_adata = pseudobulk_mean_func(bulk_adata)
+bulk_adata.obs = bulk_adata.obs.rename(columns={'sm_name':'perturbation'})
+
+bulk_adata = normalize_func(bulk_adata)
+
+del bulk_adata.layers['n_counts']
+
+bulk_adata.X = csr_matrix(bulk_adata.X)
+bulk_adata.layers['counts'] = csr_matrix(bulk_adata.layers['counts'])
+bulk_adata.layers['X_norm'] = csr_matrix(bulk_adata.layers['X_norm'])
+
 bulk_adata.write(par['pseudobulked_data'])
-bulk_adata_filtered = filter_func(bulk_adata)
-bulk_adata_filtered.write(par['pseudobulked_data_f'])

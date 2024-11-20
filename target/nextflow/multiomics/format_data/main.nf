@@ -2899,7 +2899,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/format_data",
     "viash_version" : "0.8.6",
-    "git_commit" : "8b0ecf6751141e770ff1a010a26155f3d66f8073",
+    "git_commit" : "b09204f81010c43a32476a288bd1205cbc01ccd2",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -2950,6 +2950,10 @@ dep = {
 multiomics = ad.read_h5ad(par['multiome_counts'])
 multiomics.X = multiomics.layers['counts']
 del multiomics.layers
+multiomics.layers['counts'] = multiomics.X.copy()
+X_norm = sc.pp.normalize_total(multiomics, inplace=False)['X']
+multiomics.layers['X_norm'] = sc.pp.log1p(X_norm, copy=True)
+
 multiomics.var.index.name='location'
 multiomics.obs.index.name='obs_id'
 
