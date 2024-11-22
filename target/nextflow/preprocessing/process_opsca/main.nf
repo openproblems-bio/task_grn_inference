@@ -2788,7 +2788,7 @@ meta = [
         "type" : "file",
         "name" : "--perturbation_counts",
         "example" : [
-          "resources_test/datasets_raw/op_perturbation_counts.h5ad"
+          "resources_test/datasets_raw/op_perturbation_sc_counts.h5ad"
         ],
         "must_exist" : true,
         "create_parent" : true,
@@ -2924,7 +2924,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/preprocessing/process_opsca",
     "viash_version" : "0.8.6",
-    "git_commit" : "e868c54f31780e7b1a0d94473111c787ab87137c",
+    "git_commit" : "e8c1f4315eee9c64bbba17f5ad8b4d14b21fbfd7",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3107,7 +3107,7 @@ def pseudobulk_mean_func(bulk_adata):
     bulk_adata.layers['n_counts'] = np.asarray(rows_adj)
 
     return bulk_adata
-def filter_func(bulk_adata):
+def filter_func(bulk_adata, cell_counts_t):
     \'\'\'Filters pseudobulked data by removing outliers compound, 
     samples with low cell counts, and genes with low coverage
     \'\'\'
@@ -3152,38 +3152,41 @@ def filter_func(bulk_adata):
     for key in ['cell_type','plate_name']:
         bulk_adata_filtered.obs[key] = bulk_adata_filtered.obs[key].astype(str)
     return bulk_adata_filtered
-def normalize_func(bulk_adata):
+def normalize_func(adata):
     # sc.pp.normalize_total(bulk_adata_c)
     # sc.pp.log1p(bulk_adata_c)
 
-    bulk_adata.layers['X_norm'] = sc.experimental.pp.normalize_pearson_residuals(bulk_adata, inplace=False)['X']
+    adata.layers['X_norm'] = sc.experimental.pp.normalize_pearson_residuals(adata, layer='counts', inplace=False)['X']
+    X_norm = sc.pp.normalize_total(adata, layer='counts',inplace=False)['X']
+    X_norm = sc.pp.log1p(X_norm, copy=False)
+    adata.layers['lognorm'] = X_norm
     
-    return bulk_adata
+    return adata
 
-test_flag = False
-if 'test' in par['perturbation_counts'].split('/')[0]:
-    print('Test')
-    test_flag = True
-    cell_counts_t = 1
-    cell_type_t = 1
-else:
+if __name__ == '__main__':
+    
     cell_counts_t = 10
-    cell_type_t = 2
-    
-sc_counts_f = preprocess_sc(par)
-bulk_adata = pseudobulk_sum_func(sc_counts_f)
-bulk_adata = pseudobulk_mean_func(bulk_adata)
-bulk_adata.obs = bulk_adata.obs.rename(columns={'sm_name':'perturbation'})
+        
+    sc_counts_f = preprocess_sc(par)
+    bulk_adata = pseudobulk_sum_func(sc_counts_f)
+    bulk_adata = pseudobulk_mean_func(bulk_adata)
+    bulk_adata = filter_func(bulk_adata, cell_counts_t)
 
-bulk_adata = normalize_func(bulk_adata)
 
-del bulk_adata.layers['n_counts']
+    bulk_adata.obs = bulk_adata.obs.rename(columns={'sm_name':'perturbation'})
 
-bulk_adata.X = csr_matrix(bulk_adata.X)
-bulk_adata.layers['counts'] = csr_matrix(bulk_adata.layers['counts'])
+    bulk_adata = normalize_func(bulk_adata)
 
-bulk_adata.write(par['pseudobulked_data'])
-bulk_adata.write(par['evaluation_data'])
+    del bulk_adata.layers['n_counts']
+
+    bulk_adata.X = csr_matrix(bulk_adata.X)
+    bulk_adata.layers['counts'] = csr_matrix(bulk_adata.layers['counts'])
+
+    bulk_adata.obs['is_control'] = bulk_adata.obs['perturbation'].isin(['Dimethyl Sulfoxide'])
+    bulk_adata.obs['is_positive_control'] = bulk_adata.obs['perturbation'].isin(['Dabrafenib', 'Belinostat'])
+
+    bulk_adata.write(par['pseudobulked_data'])
+    bulk_adata.write(par['evaluation_data'])
 VIASHMAIN
 python -B "$tempscript"
 '''
