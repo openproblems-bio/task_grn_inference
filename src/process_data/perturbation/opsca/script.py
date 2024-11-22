@@ -11,9 +11,9 @@ from scipy.sparse import csr_matrix
 
 ## VIASH START
 par = {
-    'perturbation_counts': 'resources/datasets_raw/op_perturbation_counts.h5ad',
-    'pseudobulked_data': 'resources/datasets_raw/op_perturbation.h5ad',
-    'evaluation_data': 'resources/evaluation_datasets/op.h5ad',
+    'perturbation_counts': 'resources/datasets_raw/op_perturbation_sc_counts.h5ad',
+    'pseudobulked_data': 'resources/datasets_raw/op_bulked.h5ad',
+    'evaluation_data': 'resources/evaluation_datasets/op_perturbation.h5ad',
 }
 ## VIASH END
 
@@ -147,7 +147,7 @@ def pseudobulk_mean_func(bulk_adata):
     bulk_adata.layers['n_counts'] = np.asarray(rows_adj)
 
     return bulk_adata
-def filter_func(bulk_adata):
+def filter_func(bulk_adata, cell_counts_t):
     '''Filters pseudobulked data by removing outliers compound, 
     samples with low cell counts, and genes with low coverage
     '''
@@ -192,35 +192,38 @@ def filter_func(bulk_adata):
     for key in ['cell_type','plate_name']:
         bulk_adata_filtered.obs[key] = bulk_adata_filtered.obs[key].astype(str)
     return bulk_adata_filtered
-def normalize_func(bulk_adata):
+def normalize_func(adata):
     # sc.pp.normalize_total(bulk_adata_c)
     # sc.pp.log1p(bulk_adata_c)
 
-    bulk_adata.layers['X_norm'] = sc.experimental.pp.normalize_pearson_residuals(bulk_adata, inplace=False)['X']
+    adata.layers['X_norm'] = sc.experimental.pp.normalize_pearson_residuals(adata, layer='counts', inplace=False)['X']
+    X_norm = sc.pp.normalize_total(adata, layer='counts',inplace=False)['X']
+    X_norm = sc.pp.log1p(X_norm, copy=False)
+    adata.layers['lognorm'] = X_norm
     
-    return bulk_adata
+    return adata
 
-test_flag = False
-if 'test' in par['perturbation_counts'].split('/')[0]:
-    print('Test')
-    test_flag = True
-    cell_counts_t = 1
-    cell_type_t = 1
-else:
+if __name__ == '__main__':
+    
     cell_counts_t = 10
-    cell_type_t = 2
-    
-sc_counts_f = preprocess_sc(par)
-bulk_adata = pseudobulk_sum_func(sc_counts_f)
-bulk_adata = pseudobulk_mean_func(bulk_adata)
-bulk_adata.obs = bulk_adata.obs.rename(columns={'sm_name':'perturbation'})
+        
+    sc_counts_f = preprocess_sc(par)
+    bulk_adata = pseudobulk_sum_func(sc_counts_f)
+    bulk_adata = pseudobulk_mean_func(bulk_adata)
+    bulk_adata = filter_func(bulk_adata, cell_counts_t)
 
-bulk_adata = normalize_func(bulk_adata)
 
-del bulk_adata.layers['n_counts']
+    bulk_adata.obs = bulk_adata.obs.rename(columns={'sm_name':'perturbation'})
 
-bulk_adata.X = csr_matrix(bulk_adata.X)
-bulk_adata.layers['counts'] = csr_matrix(bulk_adata.layers['counts'])
+    bulk_adata = normalize_func(bulk_adata)
 
-bulk_adata.write(par['pseudobulked_data'])
-bulk_adata.write(par['evaluation_data'])
+    del bulk_adata.layers['n_counts']
+
+    bulk_adata.X = csr_matrix(bulk_adata.X)
+    bulk_adata.layers['counts'] = csr_matrix(bulk_adata.layers['counts'])
+
+    bulk_adata.obs['is_control'] = bulk_adata.obs['perturbation'].isin(['Dimethyl Sulfoxide'])
+    bulk_adata.obs['is_positive_control'] = bulk_adata.obs['perturbation'].isin(['Dabrafenib', 'Belinostat'])
+
+    bulk_adata.write(par['pseudobulked_data'])
+    bulk_adata.write(par['evaluation_data'])

@@ -3,9 +3,9 @@ import scanpy as sc
 import numpy as np
 ## VIASH START
 par = {
-    # 'multiome_counts': 'resources/datasets_raw/multiome_counts.h5ad',
-    # 'multiomics_rna': 'resources/grn-benchmark/multiomics_rna.h5ad',
-    # 'multiomics_atac': 'resources/grn-benchmark/multiomics_atac.h5ad'
+    'multiome_counts': 'resources/datasets_raw/op_multiome_sc_counts.h5ad',
+    'multiomics_rna': 'resources/inference_datasets/op_rna.h5ad',
+    'multiomics_atac': 'resources/inference_datasets/op_atac.h5ad'
 }
 ## VIASH END
 

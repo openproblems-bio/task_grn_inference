@@ -16,7 +16,7 @@ functionality:
       type: file 
       required: true
       direction: input
-      example: resources_test/datasets_raw/op_perturbation_counts.h5ad 
+      example: resources_test/datasets_raw/op_perturbation_sc_counts.h5ad 
       
     - name: --pseudobulked_data
       type: file
