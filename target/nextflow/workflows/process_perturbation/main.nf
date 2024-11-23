@@ -2824,13 +2824,13 @@ meta = [
                 "name" : "donor_id",
                 "type" : "string",
                 "description" : "Donor id",
-                "required" : true
+                "required" : false
               },
               {
                 "name" : "perturbation_type",
                 "type" : "string",
                 "description" : "Name of the column indicating perturbation type",
-                "required" : true
+                "required" : false
               }
             ],
             "layers" : [
@@ -2900,7 +2900,7 @@ meta = [
           "functionalityNamespace" : "preprocessing",
           "output" : "",
           "platform" : "",
-          "git_commit" : "e8c1f4315eee9c64bbba17f5ad8b4d14b21fbfd7",
+          "git_commit" : "94c79b7c8eaeaa13bd9a9b797307fb0362b3b7d2",
           "executable" : "/nextflow/preprocessing/process_opsca/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/preprocessing/process_opsca"
@@ -2955,7 +2955,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/process_perturbation",
     "viash_version" : "0.8.6",
-    "git_commit" : "e8c1f4315eee9c64bbba17f5ad8b4d14b21fbfd7",
+    "git_commit" : "94c79b7c8eaeaa13bd9a9b797307fb0362b3b7d2",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
