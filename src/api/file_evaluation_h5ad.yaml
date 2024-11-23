@@ -17,11 +17,11 @@ info:
       - name: donor_id
         type: string
         description: "Donor id"
-        required: true
+        required: false
       - name: perturbation_type
         type: string
         description: "Name of the column indicating perturbation type"
-        required: true
+        required: false
 
     layers:
       - name: X_norm
