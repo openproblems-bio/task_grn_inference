@@ -40,12 +40,10 @@ if args.max_n_links:
 if args.resources_dir:
     meta = {}
     meta['resources_dir'] = args.resources_dir   
-
 try:
-    meta['resources_dir'] = par['resources_dir']
+    sys.path.append(meta["resources_dir"])
 except:
     pass
-
 from main import main 
 os.makedirs(par['temp_dir'], exist_ok=True)
 
