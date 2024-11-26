@@ -16,8 +16,10 @@ import networkx as nx
 import pandas as pd
 import tqdm
 import os
-# import gseapy as gp
-# from gears import PertData, GEARS
+
+import requests
+import gdown
+
 
 from scipy.sparse import issparse
 import scipy as sp
@@ -54,7 +56,8 @@ par = {
   'vocab_file': 'resources_test/supplementary/finetuned_scGPT_adamson/vocab.json',
   'n_bins': 51,
   'batch_size': 16,
-  'condition': 'cell_type'
+  'condition': 'cell_type',
+  'temp_dir': 'output'
 }
 ## VIASH END
 os.makedirs(par['temp_dir'], exist_ok=True)
@@ -63,8 +66,6 @@ par['model_file'] = f"{par['temp_dir']}/best_model.pt"
 par['model_config_file'] = f"{par['temp_dir']}/args.json"
 par['vocab_file'] = f"{par['temp_dir']}/vocab.json"
 
-
-import requests
 def download_file(output_file, url):
     response = requests.get(url, stream=True)
     if response.status_code == 200:
@@ -75,11 +76,11 @@ def download_file(output_file, url):
         print(f"File downloaded successfully and saved to {output_file}")
     else:
         print(f"Failed to download file. HTTP status code: {response.status_code}")
-download_file(par['model_file'], 'https://drive.google.com/uc?export=download&id=1CPVtpWUJ2nkI9jGignlHLcefBe6Gk-F9')
 download_file(par['vocab_file'], 'https://docs.google.com/uc?export=download&id=1Qzb6Y9UB342a2QxmY-BCubSvcmYZ5jw3')
 download_file(par['model_config_file'], 'https://docs.google.com/uc?export=download&id=1VwPGHuSorVAXyTreMFI1yzMougtUDeUt')
 
 
+gdown.download("https://drive.google.com/uc?id=1CPVtpWUJ2nkI9jGignlHLcefBe6Gk-F9", par['model_file'], quiet=False)
 
 # os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:50"
 initial_memory = torch.cuda.memory_allocated()

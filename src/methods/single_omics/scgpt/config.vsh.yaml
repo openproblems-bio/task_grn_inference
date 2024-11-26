@@ -32,7 +32,7 @@ platforms:
     image: xueerchen/scgpt:0.1.7
     setup:
       - type: python
-        packages: [  ]
+        packages: [ gdown ]
   - type: native
   - type: nextflow
     directives:
