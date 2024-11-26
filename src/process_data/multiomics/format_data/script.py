@@ -16,8 +16,6 @@ multiomics = ad.read_h5ad(par['multiome_counts'])
 multiomics.X = multiomics.layers['counts']
 del multiomics.layers
 multiomics.layers['counts'] = multiomics.X.copy()
-X_norm = sc.pp.normalize_total(multiomics, inplace=False)['X']
-multiomics.layers['X_norm'] = sc.pp.log1p(X_norm, copy=True)
 
 multiomics.var.index.name='location'
 multiomics.obs.index.name='obs_id'
@@ -57,6 +55,10 @@ unique_donors = multiomics_rna.obs.donor_id.unique()
 donor_map = {donor_id: f'donor_{i}' for i, donor_id in enumerate(unique_donors)}
 multiomics_rna.obs['donor_id'] = multiomics_rna.obs['donor_id'].map(donor_map)
 multiomics_atac.obs['donor_id'] = multiomics_atac.obs['donor_id'].map(donor_map)
+
+# normalize rna 
+X_norm = sc.pp.normalize_total(multiomics_rna, inplace=False)['X']
+multiomics_rna.layers['X_norm'] = sc.pp.log1p(X_norm, copy=True)
 
 multiomics_rna.write(par['multiomics_rna'])
 multiomics_atac.write(par['multiomics_atac'])

@@ -3099,7 +3099,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.8.6",
-    "git_commit" : "94c79b7c8eaeaa13bd9a9b797307fb0362b3b7d2",
+    "git_commit" : "b1a4b0ccb84163b660564230e68fdc28f092b8c8",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
