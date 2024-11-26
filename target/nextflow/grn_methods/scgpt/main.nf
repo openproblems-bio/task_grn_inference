@@ -3126,7 +3126,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scgpt",
     "viash_version" : "0.8.6",
-    "git_commit" : "b1a4b0ccb84163b660564230e68fdc28f092b8c8",
+    "git_commit" : "cea93626aad49dfd68defaa7d4ae6fc0f8b87a8a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3240,8 +3240,9 @@ def download_file(output_file, url):
     else:
         print(f"Failed to download file. HTTP status code: {response.status_code}")
 download_file(par['model_file'], 'https://drive.google.com/uc?export=download&id=1CPVtpWUJ2nkI9jGignlHLcefBe6Gk-F9')
-download_file(par['vocab_file'], 'https://drive.google.com/file/d/1Qzb6Y9UB342a2QxmY-BCubSvcmYZ5jw3/view?usp=drive_link')
-download_file(par['model_config_file'], 'https://drive.google.com/file/d/1VwPGHuSorVAXyTreMFI1yzMougtUDeUt/view?usp=drive_link')
+download_file(par['vocab_file'], 'https://docs.google.com/uc?export=download&id=1Qzb6Y9UB342a2QxmY-BCubSvcmYZ5jw3')
+download_file(par['model_config_file'], 'https://docs.google.com/uc?export=download&id=1VwPGHuSorVAXyTreMFI1yzMougtUDeUt')
+
 
 
 # os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:50"
