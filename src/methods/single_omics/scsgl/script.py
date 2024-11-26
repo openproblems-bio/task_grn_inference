@@ -13,7 +13,7 @@ import pandas as pd
 
 ## VIASH START
 par = {
-  'multiomics_rna': 'resources/resources_test/grn-benchmark/multiomics_rna.h5ad',
+  'rna': 'resources/resources_test/grn-benchmark/multiomics_rna.h5ad',
   'prediction': 'output/scsgl/prediction.csv',
   'temp_dir': 'output/scsgl',
   'max_n_links': 50000
@@ -21,8 +21,8 @@ par = {
 ## VIASH END
 
 # Load scRNA-seq data
-adata_rna = anndata.read_h5ad(par['multiomics_rna'])
-gene_names = adata_rna.var.gene_ids.index.to_numpy()
+adata_rna = anndata.read_h5ad(par['rna'])
+gene_names = adata_rna.var_names
 X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X
 
 # Import pysrc locally

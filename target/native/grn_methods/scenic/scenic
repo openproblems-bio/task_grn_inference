@@ -797,6 +797,7 @@ def main(par):
   par['expression_data'] = os.path.join(par['temp_dir'], "expression_data.tsv")
   par['regulons'] = f"{par['temp_dir']}/regulons.csv"
   
+  download_prior(par)
   format_data(par)
   run_grn(par)
   prune_grn(par)

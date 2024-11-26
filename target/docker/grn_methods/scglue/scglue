@@ -442,22 +442,16 @@ function ViashDockerCheckCommands {
 #   ViashDockerFile
 function ViashDockerfile {
   cat << 'VIASHDOCKER'
-FROM nvcr.io/nvidia/pytorch:24.06-py3
+FROM janursa/scglue:19-08-2024
 
 ENTRYPOINT []
 
  
-RUN pip install --upgrade pip && \
-  pip install --upgrade --no-cache-dir "scglue==0.3.2" "pyscenic==0.12.1" "numpy==1.23.4" "scanpy" "networkx" "pyarrow" "cytoolz" "scikit-misc" "cuda-python" "faiss-gpu"
-
-RUN apt-get update && \
-  DEBIAN_FRONTEND=noninteractive apt-get install -y bedtools && \
-  rm -rf /var/lib/apt/lists/*
-
+RUN :
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scglue"
-LABEL org.opencontainers.image.created="2024-11-26T21:18:22Z"
+LABEL org.opencontainers.image.created="2024-11-26T21:31:06Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="608673abe3d07f03d5dee881c0276ccc1e84f4fb"
+LABEL org.opencontainers.image.revision="88936d503bdd96066687c78a63b05d4515722601"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER

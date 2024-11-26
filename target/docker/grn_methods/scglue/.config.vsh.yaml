@@ -224,7 +224,7 @@ functionality:
 platforms:
 - type: "docker"
   id: "docker"
-  image: "nvcr.io/nvidia/pytorch:24.06-py3"
+  image: "janursa/scglue:19-08-2024"
   target_organization: "openproblems-bio/task_grn_inference"
   target_registry: "ghcr.io"
   namespace_separator: "/"
@@ -232,25 +232,6 @@ platforms:
   chown: true
   setup_strategy: "ifneedbepullelsecachedbuild"
   target_image_source: "https://github.com/openproblems-bio/task_grn_inference"
-  setup:
-  - type: "python"
-    user: false
-    packages:
-    - "scglue==0.3.2"
-    - "pyscenic==0.12.1"
-    - "numpy==1.23.4"
-    - "scanpy"
-    - "networkx"
-    - "pyarrow"
-    - "cytoolz"
-    - "scikit-misc"
-    - "cuda-python"
-    - "faiss-gpu"
-    upgrade: true
-  - type: "apt"
-    packages:
-    - "bedtools"
-    interactive: false
   entrypoint: []
   cmd: null
 - type: "native"
@@ -294,5 +275,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/grn_methods/scglue"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/grn_methods/scglue/scglue"
   viash_version: "0.8.6"
-  git_commit: "608673abe3d07f03d5dee881c0276ccc1e84f4fb"
+  git_commit: "88936d503bdd96066687c78a63b05d4515722601"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

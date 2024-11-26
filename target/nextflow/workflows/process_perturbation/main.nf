@@ -2900,7 +2900,7 @@ meta = [
           "functionalityNamespace" : "preprocessing",
           "output" : "",
           "platform" : "",
-          "git_commit" : "608673abe3d07f03d5dee881c0276ccc1e84f4fb",
+          "git_commit" : "88936d503bdd96066687c78a63b05d4515722601",
           "executable" : "/nextflow/preprocessing/process_opsca/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/preprocessing/process_opsca"
@@ -2955,7 +2955,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/process_perturbation",
     "viash_version" : "0.8.6",
-    "git_commit" : "608673abe3d07f03d5dee881c0276ccc1e84f4fb",
+    "git_commit" : "88936d503bdd96066687c78a63b05d4515722601",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
