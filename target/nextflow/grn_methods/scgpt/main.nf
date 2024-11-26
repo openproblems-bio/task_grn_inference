@@ -3071,6 +3071,9 @@ meta = [
         {
           "type" : "python",
           "user" : false,
+          "packages" : [
+            "gdown"
+          ],
           "upgrade" : true
         }
       ]
@@ -3126,7 +3129,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scgpt",
     "viash_version" : "0.8.6",
-    "git_commit" : "cea93626aad49dfd68defaa7d4ae6fc0f8b87a8a",
+    "git_commit" : "608673abe3d07f03d5dee881c0276ccc1e84f4fb",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3159,8 +3162,10 @@ import networkx as nx
 import pandas as pd
 import tqdm
 import os
-# import gseapy as gp
-# from gears import PertData, GEARS
+
+import requests
+import gdown
+
 
 from scipy.sparse import issparse
 import scipy as sp
@@ -3227,8 +3232,6 @@ par['model_file'] = f"{par['temp_dir']}/best_model.pt"
 par['model_config_file'] = f"{par['temp_dir']}/args.json"
 par['vocab_file'] = f"{par['temp_dir']}/vocab.json"
 
-
-import requests
 def download_file(output_file, url):
     response = requests.get(url, stream=True)
     if response.status_code == 200:
@@ -3239,11 +3242,11 @@ def download_file(output_file, url):
         print(f"File downloaded successfully and saved to {output_file}")
     else:
         print(f"Failed to download file. HTTP status code: {response.status_code}")
-download_file(par['model_file'], 'https://drive.google.com/uc?export=download&id=1CPVtpWUJ2nkI9jGignlHLcefBe6Gk-F9')
 download_file(par['vocab_file'], 'https://docs.google.com/uc?export=download&id=1Qzb6Y9UB342a2QxmY-BCubSvcmYZ5jw3')
 download_file(par['model_config_file'], 'https://docs.google.com/uc?export=download&id=1VwPGHuSorVAXyTreMFI1yzMougtUDeUt')
 
 
+gdown.download("https://drive.google.com/uc?id=1CPVtpWUJ2nkI9jGignlHLcefBe6Gk-F9", par['model_file'], quiet=False)
 
 # os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:50"
 initial_memory = torch.cuda.memory_allocated()
