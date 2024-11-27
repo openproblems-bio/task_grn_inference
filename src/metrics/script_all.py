@@ -69,16 +69,16 @@ from consensus.script import main as main_consensus
 global_models = False
 
 # - run metrics 
-for dataset in ['op']: #'op', 'replogle2', 'nakatake', 'norman', 'adamson'
+for dataset in ['op', 'replogle2', 'nakatake', 'norman', 'adamson']: #'op', 'replogle2', 'nakatake', 'norman', 'adamson'
   print('------ ', dataset, '------')
   par = define_par(dataset)
   os.makedirs(par['scores_dir'], exist_ok=True)
   main_consensus(par)
   for binarize in [True]:
     par['binarize'] = binarize
-    for max_n_links in [50000]:
+    for max_n_links in [10000]:
       par['max_n_links'] = max_n_links
-      for apply_skeleton in [True]:
+      for apply_skeleton in [False]:
         par['apply_skeleton'] = apply_skeleton
         # - determines models to run 
         grn_files_dict = {}
