@@ -19,6 +19,7 @@ workflow run_wf {
     ppcor,
     scenic,
     scglue,
+    scgpt,
 
     pearson_corr,
     negative_control,

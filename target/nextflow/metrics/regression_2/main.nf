@@ -3004,19 +3004,6 @@ meta = [
         "dest" : "par"
       },
       {
-        "type" : "boolean",
-        "name" : "--clip_scores",
-        "description" : "clips the r2 scores for each gene to make them within [0, 1]",
-        "default" : [
-          true
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
         "type" : "string",
         "name" : "--layer",
         "default" : [
@@ -3222,7 +3209,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2",
     "viash_version" : "0.8.6",
-    "git_commit" : "88936d503bdd96066687c78a63b05d4515722601",
+    "git_commit" : "4cd5eacfec88f9a444b96a9b9a8d384d2f3e0717",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3255,7 +3242,6 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'clip_scores': $( if [ ! -z ${VIASH_PAR_CLIP_SCORES+x} ]; then echo "r'${VIASH_PAR_CLIP_SCORES//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'verbose': $( if [ ! -z ${VIASH_PAR_VERBOSE+x} ]; then echo "int(r'${VIASH_PAR_VERBOSE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),

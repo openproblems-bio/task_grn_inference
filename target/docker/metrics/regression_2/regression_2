@@ -211,11 +211,6 @@ function ViashHelp {
   echo "        type: boolean"
   echo "        default: true"
   echo ""
-  echo "    --clip_scores"
-  echo "        type: boolean"
-  echo "        default: true"
-  echo "        clips the r2 scores for each gene to make them within [0, 1]"
-  echo ""
   echo "    --layer"
   echo "        type: string"
   echo "        default: X_norm"
@@ -469,9 +464,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_2"
-LABEL org.opencontainers.image.created="2024-11-26T21:31:06Z"
+LABEL org.opencontainers.image.created="2024-11-27T19:19:19Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="88936d503bdd96066687c78a63b05d4515722601"
+LABEL org.opencontainers.image.revision="4cd5eacfec88f9a444b96a9b9a8d384d2f3e0717"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -729,17 +724,6 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_APPLY_TF=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --clip_scores)
-            [ -n "$VIASH_PAR_CLIP_SCORES" ] && ViashError Bad arguments for option \'--clip_scores\': \'$VIASH_PAR_CLIP_SCORES\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CLIP_SCORES="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --clip_scores. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --clip_scores=*)
-            [ -n "$VIASH_PAR_CLIP_SCORES" ] && ViashError Bad arguments for option \'--clip_scores=*\': \'$VIASH_PAR_CLIP_SCORES\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CLIP_SCORES=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
         --layer)
             [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_LAYER="$2"
@@ -981,9 +965,6 @@ fi
 if [ -z ${VIASH_PAR_APPLY_TF+x} ]; then
   VIASH_PAR_APPLY_TF="true"
 fi
-if [ -z ${VIASH_PAR_CLIP_SCORES+x} ]; then
-  VIASH_PAR_CLIP_SCORES="true"
-fi
 if [ -z ${VIASH_PAR_LAYER+x} ]; then
   VIASH_PAR_LAYER="X_norm"
 fi
@@ -1034,12 +1015,6 @@ fi
 if [[ -n "$VIASH_PAR_APPLY_TF" ]]; then
   if ! [[ "$VIASH_PAR_APPLY_TF" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--apply_tf' has to be a boolean. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_CLIP_SCORES" ]]; then
-  if ! [[ "$VIASH_PAR_CLIP_SCORES" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--clip_scores' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1217,7 +1192,6 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
-  'clip_scores': $( if [ ! -z ${VIASH_PAR_CLIP_SCORES+x} ]; then echo "r'${VIASH_PAR_CLIP_SCORES//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'verbose': $( if [ ! -z ${VIASH_PAR_VERBOSE+x} ]; then echo "int(r'${VIASH_PAR_VERBOSE//\'/\'\"\'\"r\'}')"; else echo None; fi ),

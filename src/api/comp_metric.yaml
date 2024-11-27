@@ -49,11 +49,7 @@ functionality:
       type: boolean 
       required: false
       default: true
-    - name: --clip_scores
-      type: boolean 
-      required: false
-      default: true
-      description: clips the r2 scores for each gene to make them within [0, 1]
+
     - name: --layer
       type: string
       direction: input
