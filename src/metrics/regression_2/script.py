@@ -6,12 +6,12 @@ import numpy as np
 
 ## VIASH START
 par = {
-    'evaluation_data': 'resources/grn-benchmark/evaluation_data.h5ad',
+    'evaluation_data': 'resources/evaluation_datasets/op_perturbation.h5ad',
     'layer': 'X_norm',
-    "prediction": "resources/grn_models/celloracle.csv",
+    "prediction": "output/models/collectri.csv",
     'tf_all': 'resources/prior/tf_all.csv',
     "max_n_links": 50000,
-    'consensus': 'resources/prior/consensus-num-regulators.json',
+    'consensus': 'output/models/op_consensus-num-regulators.json',
     'score': 'output/score_regression2.h5ad',
     'reg_type': 'ridge',
     'static_only': True,

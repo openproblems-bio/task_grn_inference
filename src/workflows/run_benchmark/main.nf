@@ -17,7 +17,6 @@ workflow run_wf {
     grnboost2,
     ppcor,
     scenic,
-    scglue,
     scgpt,
 
     pearson_corr,

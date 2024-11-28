@@ -114,24 +114,3 @@ def read_gmt(file_path:str) -> dict[str, list[str]]:
                 'genes': genes
             }
     return gene_sets
-def quantile_transformation(values, one_sided=False, log1p_scale=True):
-    from sklearn.preprocessing import QuantileTransformer
-    if log1p_scale:
-        log_data = np.log1p(values)  # log(x + 1) to avoid log(0)
-    if one_sided:
-        output_distribution = 'uniform'
-    else:
-        output_distribution = 'normal'
-    quantile_transformer = QuantileTransformer(output_distribution=output_distribution)
-    transformed_data = quantile_transformer.fit_transform(log_data.reshape(-1, 1)).reshape(len(log_data))
-    return transformed_data
-def zscore_transformation(values, one_sided=False, log1p_scale=True):
-    if log1p_scale:
-        log_data = np.log1p(values)  # log(x + 1) to avoid log(0)
-    if one_sided:
-        mean = 0
-    else:
-        mean = np.mean(values)
-    std = np.std(values)
-    transformed_data = (log_data-mean)/std
-    return transformed_data

@@ -325,7 +325,10 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         # Evaluate GRN
         verbose_print(par['verbose'], f'Compute metrics for layer: {layer}', 3)
         verbose_print(par['verbose'], f'Static approach (theta=0):', 3)
-        score_static_min = static_approach(net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
+        if (n_features_theta_min!=0).any()==False:
+            score_static_min = np.nan
+        else:
+            score_static_min = static_approach(net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
         verbose_print(par['verbose'], f'Static approach (theta=0.5):', 3)
         score_static_median = static_approach(net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
         print(f'Static approach (theta=1):', flush=True)
