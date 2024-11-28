@@ -97,5 +97,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/format_data"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/multiomics/format_data/format_data"
   viash_version: "0.8.6"
-  git_commit: "4cd5eacfec88f9a444b96a9b9a8d384d2f3e0717"
+  git_commit: "b76d6c0f4ad90013a49079995a11de3c60379761"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

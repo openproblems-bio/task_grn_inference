@@ -446,9 +446,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "gdown"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scgpt"
-LABEL org.opencontainers.image.created="2024-11-27T19:19:19Z"
+LABEL org.opencontainers.image.created="2024-11-28T09:41:55Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="4cd5eacfec88f9a444b96a9b9a8d384d2f3e0717"
+LABEL org.opencontainers.image.revision="b76d6c0f4ad90013a49079995a11de3c60379761"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
