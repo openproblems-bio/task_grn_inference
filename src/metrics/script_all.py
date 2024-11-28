@@ -5,39 +5,36 @@ import numpy as np
 import os 
 
 
-def define_par(dataset):
+def define_par(dataset, global_models=False):
 
   par = {
       'reg_type': 'ridge',
       'models_dir': f"resources/grn_models/{dataset}",
       'scores_dir': f"output/temp/{dataset}",
       
-      'models': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
+      'models': [ 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
 
-      # 'models': [ 'positive_control', 'pearson_corr'],
       'global_models': [
-                        'ANANSE_tissue/networks/lung.parquet',
-                        'ANANSE_tissue/networks/stomach.parquet', 
-                        'ANANSE_tissue/networks/heart.parquet',
-                        'ANANSE_tissue/networks/bone_marrow.parquet',
-                        
-                        'gtex_rna/networks/Whole_Blood.parquet',
-                        'gtex_rna/networks/Brain_Amygdala.parquet', 
-                        'gtex_rna/networks/Breast_Mammary_Tissue.parquet', 
-                        'gtex_rna/networks/Lung.parquet',
-                        'gtex_rna/networks/Stomach.parquet',
-
-
-                        'cellnet_human_Hg1332/networks/bcell.parquet',
-                        'cellnet_human_Hg1332/networks/tcell.parquet',
-                        'cellnet_human_Hg1332/networks/skin.parquet',
-                        'cellnet_human_Hg1332/networks/neuron.parquet',
-                        'cellnet_human_Hg1332/networks/heart.parquet',
+                        'collectri',
+                        'Ananse:Lung',
+                        'Ananse:Stomach',
+                        'Ananse:Heart',
+                        'Ananse:Bone marrow',
+                        'Gtex:Whole blood',
+                        'Gtex:Brain amygdala',
+                        'Gtex:Breast mammary tissue',
+                        'Gtex:Lung',
+                        'Gtex:Stomach',
+                        'Cellnet:Bcell',
+                        'Cellnet:Tcell',
+                        'Cellnet:Skin',
+                        'Cellnet:Neuron',
+                        'Cellnet:Heart'
                         ],
-      'global_models_dir': '../eric/network_collection/networks/',
+      'global_models_dir': 'resources/grn_models/global/',
 
       "evaluation_data": f"resources/evaluation_datasets/{dataset}_perturbation.h5ad",
-      'consensus': f'resources/prior/{dataset}_consensus-num-regulators.json',
+      'consensus':  f'resources/prior/{dataset}_consensus-num-regulators.json',
 
       'layer': 'X_norm',
       
@@ -48,6 +45,32 @@ def define_par(dataset):
       'verbose': 4,
       'num_workers': 20
   }
+  if global_models:
+    import shutil
+
+    temp_grn_dir = 'output/models/'
+    os.makedirs(temp_grn_dir, exist_ok=True)
+
+    grn_file_list = []
+    for model in par['global_models']:
+        grn_file = f"{par['global_models_dir']}/{model}.csv"
+        grn_file_list.append(grn_file)
+      
+    for model in par['models']:
+        grn_file = f"{par['models_dir']}/{model}.csv"
+        grn_file_list.append(grn_file)
+    
+    par['models'] = par['models'] + par['global_models']
+    par['models_dir'] = temp_grn_dir
+    par['consensus'] = f'{temp_grn_dir}/{dataset}_consensus-num-regulators.json'
+    for grn_file in grn_file_list:
+      try:
+          shutil.copy(grn_file, temp_grn_dir)
+          print(f"Copied {grn_file} to {temp_grn_dir}")
+      except FileNotFoundError:
+          print(f"File not found: {grn_file}")
+      except Exception as e:
+          print(f"Error copying {grn_file}: {e}")
   return par
 
 
@@ -66,45 +89,31 @@ from util import process_links
 from consensus.script import main as main_consensus
 
 # - run general models
-global_models = False
+global_models = True
 
 # - run metrics 
-for dataset in ['op', 'replogle2', 'nakatake', 'norman', 'adamson']: #'op', 'replogle2', 'nakatake', 'norman', 'adamson'
+for dataset in ['op']: #'op', 'replogle2', 'nakatake', 'norman', 'adamson'
   print('------ ', dataset, '------')
   par = define_par(dataset)
   os.makedirs(par['scores_dir'], exist_ok=True)
+  par = define_par(dataset, global_models=global_models)
   main_consensus(par)
   for binarize in [True]:
     par['binarize'] = binarize
-    for max_n_links in [10000]:
+    for max_n_links in [50000]:
       par['max_n_links'] = max_n_links
       for apply_skeleton in [False]:
         par['apply_skeleton'] = apply_skeleton
         # - determines models to run 
         grn_files_dict = {}
-        # - add global models
-        if global_models:
-          for model in par['global_models']:
-            temp_dir = f"{par['scores_dir']}/nets/"
-            os.makedirs(temp_dir, exist_ok=True)
-            net = pd.read_parquet(f"{par['global_models_dir']}/{model}")
-            net.columns = ['source','target','weight']
-            net = process_links(net, par)
-            if par['binarize']:
-                net['weight'] = net['weight'].apply(binarize_weight) 
-            model = model.replace('/','_')
-            grn_file = f'{temp_dir}/{model}.csv'
-            net.to_csv(grn_file)
-            grn_files_dict[model] = grn_file
-        else:
-          # - add actual models
-          for model in par['models']:
-            print(model)
-            grn_file = f"{par['models_dir']}/{model}.csv"
-            if not os.path.exists(grn_file):
-              print(f"{grn_file} doesnt exist. Skipped.")
-              continue
-            grn_files_dict[model] = grn_file
+        # - add models
+        for model in par['models']:
+          print(model)
+          grn_file = f"{par['models_dir']}/{model}.csv"
+          if not os.path.exists(grn_file):
+            print(f"{grn_file} doesnt exist. Skipped.")
+            continue
+          grn_files_dict[model] = grn_file
           
         # - actual runs 
         i = 0

@@ -1,18 +1,17 @@
 #!/bin/bash
 
-RUN_ID="d0_hvgs_baseline"
+dataset="op"
+RUN_ID=${dataset}
 # resources_dir="./resources/"
 resources_dir="s3://openproblems-data/resources/grn"
 publish_dir="${resources_dir}/results/${RUN_ID}"
 
 reg_type=ridge
-subsample=-2
+subsample=-1
 num_workers=10
-layer='scgen_pearson'
+layer='X_norm'
 metric_ids="[regression_1, regression_2]"
-cell_type_specific=false #for controls
-normalize=false
-method_ids="[pearson_corr, positive_control]"
+method_ids="[negative_control, pearson_corr, positive_control, portia, scgpt]"
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -22,17 +21,15 @@ param_list:
   - id: ${reg_type}
     metric_ids: $metric_ids
     method_ids: $method_ids
-    perturbation_data: ${resources_dir}/grn-benchmark/perturbation_data.h5ad
-    multiomics_rna: ${resources_dir}/grn-benchmark/multiomics_rna_d0_hvg.h5ad
-    multiomics_atac: ${resources_dir}/grn-benchmark/multiomics_atac_d0.h5ad
+    evaluation_data: ${resources_dir}/evaluation_datasets/${dataset}_perturbation.h5ad
+    rna: ${resources_dir}/inference_datasets/${dataset}_rna.h5ad
+    atac: ${resources_dir}/inference_datasets/${dataset}_atac.h5ad
     reg_type: $reg_type
     subsample: $subsample
     num_workers: $num_workers
     layer: $layer
-    consensus: ${resources_dir}/prior/consensus-num-regulators.json
+    consensus: ${resources_dir}/prior/${dataset}_consensus-num-regulators.json
     tf_all: ${resources_dir}/prior/tf_all.csv
-    cell_type_specific: ${cell_type_specific}
-    normalize: ${normalize}
 
 output_state: "state.yaml"
 publish_dir: "$publish_dir"
@@ -60,6 +57,6 @@ HERE
   --pull-latest \
   --main-script target/nextflow/workflows/run_benchmark/main.nf \
   --workspace 53907369739130 \
-  --compute-env 6TeIFgV5OY4pJCk8I0bfOh \
+  --compute-env 5DwwhQoBi0knMSGcwThnlF \
   --params-file ${param_file} \
   --config src/common/nextflow_helpers/labels_tw.config

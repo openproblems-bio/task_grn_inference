@@ -14,7 +14,6 @@ workflow run_wf {
   // construct list of methods
   methods = [
     portia,
-    genie3,
     grnboost2,
     ppcor,
     scenic,
@@ -26,7 +25,10 @@ workflow run_wf {
     positive_control,
 
     celloracle,
-    scglue
+    scglue,
+    granie,
+    figr,
+    scenicplus
   ]
 
 
