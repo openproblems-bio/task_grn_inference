@@ -69,7 +69,7 @@ def efficient_melting(net, gene_names, par):
     data = np.column_stack((targets, sources, weights))
 
     # Convert to DataFrame
-    print('conver to df')
+    print('convert to long dataframe')
     net = pd.DataFrame(data, columns=['target', 'source', 'weight'])
     return net
     

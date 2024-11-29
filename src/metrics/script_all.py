@@ -5,12 +5,12 @@ import numpy as np
 import os 
 
 
-def define_par(dataset, global_models=False):
+def define_par(dataset):
 
   par = {
       'reg_type': 'ridge',
       'models_dir': f"resources/grn_models/{dataset}",
-      'scores_dir': f"output/temp/{dataset}",
+      'scores_dir': f"resources/scores/{dataset}",
       
       'models': [ 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
 
@@ -45,32 +45,7 @@ def define_par(dataset, global_models=False):
       'verbose': 4,
       'num_workers': 20
   }
-  if global_models:
-    import shutil
 
-    temp_grn_dir = 'output/models/'
-    os.makedirs(temp_grn_dir, exist_ok=True)
-
-    grn_file_list = []
-    for model in par['global_models']:
-        grn_file = f"{par['global_models_dir']}/{model}.csv"
-        grn_file_list.append(grn_file)
-      
-    for model in par['models']:
-        grn_file = f"{par['models_dir']}/{model}.csv"
-        grn_file_list.append(grn_file)
-    
-    par['models'] = par['models'] + par['global_models']
-    par['models_dir'] = temp_grn_dir
-    par['consensus'] = f'{temp_grn_dir}/{dataset}_consensus-num-regulators.json'
-    for grn_file in grn_file_list:
-      try:
-          shutil.copy(grn_file, temp_grn_dir)
-          print(f"Copied {grn_file} to {temp_grn_dir}")
-      except FileNotFoundError:
-          print(f"File not found: {grn_file}")
-      except Exception as e:
-          print(f"Error copying {grn_file}: {e}")
   return par
 
 
@@ -89,16 +64,18 @@ from util import process_links
 from consensus.script import main as main_consensus
 
 # - run general models
-global_models = True
+global_models = False
 
 # - run metrics 
 for dataset in ['op']: #'op', 'replogle2', 'nakatake', 'norman', 'adamson'
   print('------ ', dataset, '------')
   par = define_par(dataset)
   os.makedirs(par['scores_dir'], exist_ok=True)
-  par = define_par(dataset, global_models=global_models)
   main_consensus(par)
-  for binarize in [True]:
+  if global_models:
+    par['models'] = par['global_models']
+    par['models_dir'] = par['global_models_dir']
+  for binarize in [False]:
     par['binarize'] = binarize
     for max_n_links in [50000]:
       par['max_n_links'] = max_n_links
