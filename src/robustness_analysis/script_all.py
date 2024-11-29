@@ -7,15 +7,15 @@ import random
 
 par = {
   'reg_type': 'ridge',
-  'read_dir': "resources/grn_models/",
+  'read_dir': "resources/grn_models/op/",
   'write_dir': "resources/results/robustness_analysis",
-  # 'degrees': [0, 10, 20, 50, 100],
-  'degrees': [50],
+  'degrees': [0, 10, 20, 50, 100],
+  # 'degrees': [50],
   'noise_types': ["net", "sign"],
   # 'noise_types': ['weight'],
-  'methods': [ 'collectri', 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
+  'methods': ['negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
 
-  "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
+  "evaluation_data": "resources/evaluation_datasets/op_perturbation.h5ad",
   "tf_all": "resources/prior/tf_all.csv",
   "max_n_links": 50000,
   "apply_tf": True,
@@ -23,11 +23,10 @@ par = {
   'subsample': -1,
   'verbose': 0,
   'num_workers': 20,
-  'consensus': 'resources/prior/consensus-num-regulators.json',
+  'consensus': 'resources/prior/op_consensus-num-regulators.json',
   'static_only': True,
-  'clip_scores': True,
-  'layer': 'pearson',
-  'apply_skeleton': True,
+  'layer': 'X_norm',
+  'apply_skeleton': False,
   'skeleton': 'resources/prior/skeleton.csv'
 }
 

@@ -47,7 +47,7 @@ warnings.filterwarnings('ignore')
 
 ## VIASH START
 par = {
-  'multiomics_rna': 'resources_test/grn-benchmark/multiomics_rna.h5ad',
+  'rna': 'resources_test/grn-benchmark/multiomics_rna.h5ad',
   'tf_all': 'resources_test/prior/tf_all.csv',
   'prediction': 'output/prediction_scgpt.csv',
   'max_n_links': 50000,
@@ -168,7 +168,7 @@ monitor_memory()
 
 print('Process rna-seq file')
 import scanpy as sc 
-adata = sc.read(par['multiomics_rna'])
+adata = sc.read(par['rna'])
 adata.X = adata.X.todense()
 adata.obs["celltype"] = adata.obs["cell_type"].astype("category")
 adata.obs["str_batch"] = adata.obs["donor_id"].astype(str)
