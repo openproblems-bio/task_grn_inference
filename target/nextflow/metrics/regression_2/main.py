@@ -27,7 +27,10 @@ def net_to_matrix(net, gene_names: np.ndarray, par: Dict[str, Any]) -> np.ndarra
         raise ValueError('Fix this')
     if par['apply_skeleton']: #apply skeleton
         print('Before filtering with skeleton:', net.shape)
-        skeleton = np.loadtxt(par['skeleton'], dtype=str)
+        skeleton = pd.read_csv(par['skeleton'])
+        skeleton['link'] = skeleton['source'].astype(str) + '_' + skeleton['target'].astype(str)
+        skeleton = skeleton['link'].values.flatten()
+        
         net['link'] = net['source'].astype(str) + '_' + net['target'].astype(str)
         net = net[net['link'].isin(skeleton)]
         print('After filtering with skeleton:', net.shape)

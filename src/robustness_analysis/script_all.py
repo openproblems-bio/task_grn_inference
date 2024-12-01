@@ -11,8 +11,8 @@ par = {
   'write_dir': "resources/results/robustness_analysis",
   'degrees': [0, 10, 20, 50, 100],
   # 'degrees': [50],
-  'noise_types': ["net", "sign"],
-  # 'noise_types': ['weight'],
+  # 'noise_types': ["net", "sign", 'weight'],
+  'noise_types': ['weight'],
   'methods': ['negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
 
   "evaluation_data": "resources/evaluation_datasets/op_perturbation.h5ad",
