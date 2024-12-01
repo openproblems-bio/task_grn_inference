@@ -117,7 +117,86 @@ def analyse_meta_cells(task_grn_inference_dir):
             scores_all = pd.concat([scores_all, scores], axis=0)
         print(scores_all)
         scores_all.to_csv(f"{par['temp_dir']}/scores_all.csv")
-        
+
+def analyse_imputation(task_grn_inference_dir):
+    dataset = 'op' #'nakatake' #op', norman
+
+
+    par = {
+        'rna': f'{task_grn_inference_dir}/resources/inference_datasets/{dataset}_rna.h5ad',
+        "evaluation_data": f"{task_grn_inference_dir}/resources/evaluation_datasets/{dataset}_perturbation.h5ad",
+
+        'layer': 'X_norm',
+        'consensus':  f'{task_grn_inference_dir}/resources/prior/{dataset}_consensus-num-regulators.json',
+        'tf_all': f'{task_grn_inference_dir}/resources/prior/tf_all.csv',
+        'apply_tf': True,
+        'apply_skeleton': False,
+        'verbose': 2,
+        'max_n_links': 50_000,
+        'temp_dir': 'output/imputation/',
+        'subsample': -1,
+        'num_workers': 4,
+        'binarize': True,
+        'reg_type': 'ridge'
+    }
+
+    os.makedirs(par['temp_dir'], exist_ok=True)
+    # - imports 
+    sys.path.append(f'{task_grn_inference_dir}/')
+    sys.path.append(f'{task_grn_inference_dir}/src/utils')
+
+    from src.metrics.regression_1.main import main as main_reg1
+    from src.metrics.regression_2.main import main as main_reg2
+
+    from util import corr_net
+
+    # - read inputs and cluster with differen resolutions
+    rna = ad.read_h5ad(par['rna'])
+    rna.X = rna.layers[par['layer']]
+
+    sc.pp.pca(rna)
+    sc.pp.neighbors(rna)
+
+    X_original = rna.X.todense().A
+    # - pseudobulkd and run per res
+    gene_names = rna.var_names
+    for i_run, method in enumerate(['knn', 'softimpute', -1]): 
+        if method == -1:
+            X = X_original
+        elif method == 'knn':
+            from sklearn.impute import KNNImputer
+            knn_imputer = KNNImputer(n_neighbors=10) 
+            X = knn_imputer.fit_transform(X_original)
+        elif method == 'softimpute':
+            from fancyimpute import SoftImpute
+            X = SoftImpute().fit_transform(X_original)
+        elif method == 'magic':
+            import scprep
+            import magic
+
+            magic_operator = magic.MAGIC()
+            X = magic_operator.fit_transform(X_original)
+        else:
+            raise ValueError('define first')
+        # - run corr 
+        net = corr_net(X, gene_names, par)
+        par['prediction'] = f"{par['temp_dir']}/net_{method}.csv"
+        net.to_csv(par['prediction'])
+
+        # - regression 1 and 2
+        scores_reg1 = main_reg1(par)
+
+        scores_reg2 = main_reg2(par)
+
+        scores = pd.concat([scores_reg1, scores_reg2], axis=1)
+        scores.index = [method]
+
+        if i_run == 0:
+            scores_all = scores
+        else:
+            scores_all = pd.concat([scores_all, scores], axis=0)
+        print(scores_all)
+        scores_all.to_csv(f"{par['temp_dir']}/scores_all.csv")
 def check_scores(par):
     df_scores = pd.read_csv(f"resources/scores/scgen_pearson-ridge.csv", index_col=0)
     df_all_n = (df_scores-df_scores.min(axis=0))/(df_scores.max(axis=0)-df_scores.min(axis=0))
@@ -372,4 +451,6 @@ def process_trace_local(job_ids_dict):
 if __name__ == '__main__':
     # run_grn_inference()
     # calculate_scores()
-    analyse_meta_cells(task_grn_inference_dir='./')
+    # analyse_meta_cells(task_grn_inference_dir='./')
+    analyse_imputation(task_grn_inference_dir='./')
+

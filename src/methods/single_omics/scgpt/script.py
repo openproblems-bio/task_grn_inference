@@ -172,26 +172,26 @@ adata = sc.read(par['rna'])
 adata.X = adata.X.todense()
 adata.obs["celltype"] = adata.obs["cell_type"].astype("category")
 adata.obs["str_batch"] = adata.obs["donor_id"].astype(str)
-data_is_raw = False
+data_is_raw = True
 
 adata.var["id_in_vocab"] = [1 if gene in vocab else -1 for gene in adata.var.index]
 gene_ids_in_vocab = np.array(adata.var["id_in_vocab"])
 adata = adata[:, adata.var["id_in_vocab"] >= 0]
 
-preprocessor = Preprocessor(
-    use_key="X",  # the key in adata.layers to use as raw data
-    filter_gene_by_counts=3,  # step 1
-    filter_cell_by_counts=False,  # step 2
-    normalize_total=1e4,  # 3. whether to normalize the raw data and to what sum
-    result_normed_key="X_normed",  # the key in adata.layers to store the normalized data
-    log1p=data_is_raw,  # 4. whether to log1p the normalized data
-    result_log1p_key="X_log1p",
-    subset_hvg= False,  # 5. whether to subset the raw data to highly variable genes
-    hvg_flavor="seurat_v3" if data_is_raw else "cell_ranger",
-    binning=n_input_bins,  # 6. whether to bin the raw data and to what number of bins
-    result_binned_key="X_binned",  # the key in adata.layers to store the binned data
-)
-preprocessor(adata, batch_key="str_batch")
+# preprocessor = Preprocessor(
+#     use_key="counts",  # the key in adata.layers to use as raw data
+#     filter_gene_by_counts=3,  # step 1
+#     filter_cell_by_counts=False,  # step 2
+#     normalize_total=1e4,  # 3. whether to normalize the raw data and to what sum
+#     result_normed_key="X_normed",  # the key in adata.layers to store the normalized data
+#     log1p=data_is_raw,  # 4. whether to log1p the normalized data
+#     result_log1p_key="X_log1p",
+#     subset_hvg= False,  # 5. whether to subset the raw data to highly variable genes
+#     hvg_flavor="seurat_v3" if data_is_raw else "cell_ranger",
+#     binning=n_input_bins,  # 6. whether to bin the raw data and to what number of bins
+#     result_binned_key="X_binned",  # the key in adata.layers to store the binned data
+# )
+# preprocessor(adata, batch_key="str_batch")
 
 # print('Subsetting to HVGs')
 # sc.pp.highly_variable_genes(
@@ -205,7 +205,8 @@ preprocessor(adata, batch_key="str_batch")
 # adata = adata[:, adata.var["highly_variable"]].copy()
 
 
-input_layer_key = "X_binned"
+
+input_layer_key = "X_norm"
 all_counts = (
     adata.layers[input_layer_key].A
     if issparse(adata.layers[input_layer_key])
