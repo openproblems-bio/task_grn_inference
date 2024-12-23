@@ -3101,7 +3101,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/celloracle",
     "viash_version" : "0.8.6",
-    "git_commit" : "af362dc7db8a8695691ea93bc8f731058e2e0cbd",
+    "git_commit" : "d2539c6daf49e238123d0673ab6757cff6260cbc",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

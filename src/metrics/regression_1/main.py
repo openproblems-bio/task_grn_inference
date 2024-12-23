@@ -241,6 +241,7 @@ def set_global_seed(seed):
 
 def pivot_grn(net):
     ''' make net to have gene*tf format'''
+    net = net.drop_duplicates(subset=['target', 'source'])
     df_tmp = net.pivot(index='target', columns='source', values='weight')
     return df_tmp.fillna(0)
 

@@ -11,8 +11,8 @@ library(tibble)
 
 ## VIASH START
 par <- list(
-  multiomics_atac = "resources/grn-benchmark/multiomics_atac.h5ad",
-  annot_peak_database = "resources/grn-benchmark/supp/annot_peak_database.csv"
+  multiomics_atac = "resources/inference_datasets/op_atac.h5ad",
+  annot_peak_database = "resources/prior/peak_annotation.csv"
 )
 ## VIASH END
 

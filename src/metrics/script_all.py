@@ -8,11 +8,29 @@ import os
 def define_par(dataset):
 
   par = {
+    # - run general models
+      'run_global_models': False,
       'reg_type': 'ridge',
-      'models_dir': f"resources/grn_models/{dataset}",
-      'scores_dir': f"resources/scores/{dataset}",
-      
-      'models': [ 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
+      # 'models_dir': f"resources/grn_models/{dataset}",
+      # 'scores_dir': f"resources/scores/{dataset}",
+      # 'models': [ 'negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
+
+
+      'models_dir': f"../ciim/output/grns/",
+      'scores_dir': f"../ciim/output/scores/",
+      'models': [
+            'pearson_corr', 
+            'grnboost2', 'celloracle', 'scenicplus',
+            'net_all_celltypes_young_all_batches',
+            'net_all_celltypes_young_batch_1',
+            'net_all_celltypes_old_all_batches',
+            'net_all_celltypes_old_batch_1', 
+            'net_B cells_all_ages_all_batches', 
+            'net_T cells_all_ages_all_batches', 
+            'net_Myeloid cells_all_ages_all_batches', 
+            'net_NK cells_all_ages_all_batches',
+
+            ],
 
       'global_models': [
                         'collectri',
@@ -63,16 +81,16 @@ from util import process_links
 # - run consensus 
 from consensus.script import main as main_consensus
 
-# - run general models
-global_models = False
+
 
 # - run metrics 
-for dataset in ['op']: #'op', 'replogle2', 'nakatake', 'norman', 'adamson'
+# for dataset in ['op', 'replogle2', 'nakatake', 'norman', 'adamson']: #'op', 'replogle2', 'nakatake', 'norman', 'adamson'
+for dataset in ['op']:
   print('------ ', dataset, '------')
   par = define_par(dataset)
   os.makedirs(par['scores_dir'], exist_ok=True)
   main_consensus(par)
-  if global_models:
+  if par['run_global_models']:
     par['models'] = par['global_models']
     par['models_dir'] = par['global_models_dir']
   for binarize in [False]:
@@ -104,7 +122,7 @@ for dataset in ['op']: #'op', 'replogle2', 'nakatake', 'norman', 'adamson'
             df_all = score
           else:
             df_all = pd.concat([df_all, score])
-          df_all.to_csv(f"{par['scores_dir']}/{par['layer']}-{max_n_links}-skeleton_{apply_skeleton}-binarize_{binarize}-{par['reg_type']}-global-{global_models}.csv")
+          df_all.to_csv(f"{par['scores_dir']}/{par['layer']}-{max_n_links}-skeleton_{apply_skeleton}-binarize_{binarize}-{par['reg_type']}-global-{par['run_global_models']}.csv")
           print(df_all)
           i+=1
   

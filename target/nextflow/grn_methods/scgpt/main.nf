@@ -3059,7 +3059,7 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "xueerchen/scgpt:0.1.7",
+      "image" : "openproblems/base_pytorch_nvidia:1.0.0",
       "target_organization" : "openproblems-bio/task_grn_inference",
       "target_registry" : "ghcr.io",
       "namespace_separator" : "/",
@@ -3071,10 +3071,17 @@ meta = [
         {
           "type" : "python",
           "user" : false,
-          "packages" : [
-            "gdown"
+          "pypi" : [
+            "gdown",
+            "scgpt"
           ],
           "upgrade" : true
+        },
+        {
+          "type" : "docker",
+          "run" : [
+            "pip install --upgrade --no-deps --force-reinstall git+https://github.com/bowang-lab/scGPT.git"
+          ]
         }
       ]
     },
@@ -3129,7 +3136,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scgpt",
     "viash_version" : "0.8.6",
-    "git_commit" : "af362dc7db8a8695691ea93bc8f731058e2e0cbd",
+    "git_commit" : "d2539c6daf49e238123d0673ab6757cff6260cbc",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

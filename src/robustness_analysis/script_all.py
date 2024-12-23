@@ -10,15 +10,17 @@ par = {
   'read_dir': "resources/grn_models/op/",
   'write_dir': "resources/results/robustness_analysis",
   'degrees': [0, 10, 20, 50, 100],
+  # 'degrees': [20, 50, 100],
   # 'degrees': [50],
-  # 'noise_types': ["net", "sign", 'weight'],
-  'noise_types': ['weight'],
+  # 'analysis_types': ["net", "sign", 'weight'],
+  'analysis_types': ['direction'],
   'methods': ['negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
+  # 'methods': ['pearson_corr'],
 
   "evaluation_data": "resources/evaluation_datasets/op_perturbation.h5ad",
   "tf_all": "resources/prior/tf_all.csv",
   "max_n_links": 50000,
-  "apply_tf": True,
+  "apply_tf": False,
   'binarize': False, 
   'subsample': -1,
   'verbose': 0,
@@ -50,7 +52,7 @@ def run_reg(par):
   
 #------ noise types and degrees ------#
 if True:
-  for noise_type in par['noise_types']: # run for each noise type (net, sign, weight)
+  for noise_type in par['analysis_types']: # run for each noise type (net, sign, weight)
     for degree in par['degrees']: # run for each degree
       for i, method in enumerate(par['methods']): # run for each method
         par['prediction'] = f"{par['read_dir']}/{method}.csv"
@@ -71,60 +73,5 @@ if True:
           df_all = score
         else:
           df_all = pd.concat([df_all, score])
+        print(noise_type, degree, df_all)
         df_all.to_csv(f"{par['write_dir']}/{noise_type}-{degree}-scores.csv")
-        print(df_all)
-
-#------ causal vs corr ------#
-if False:
-  from util import create_corr_net
-  par = {
-    'reg_type': 'ridge',
-    'write_dir': "resources/results/robustness_analysis",
-    ## base corr
-    "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
-    'cell_type_specific': False,
-    'normalize': False,
-    ## metric 
-    'multiomics_rna': 'resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad',
-    "tf_all": "resources/prior/tf_all.csv",
-    "max_n_links": 50000,
-    "apply_tf": False, #this has to be false
-    'subsample': -2,
-    'verbose': 2,
-    'binarize': True,
-    'num_workers': 20,
-    'consensus': 'resources/prior/consensus-num-regulators.json',
-    'static_only': True,
-    'clip_scores': True,
-    'layer': 'scgen_pearson',
-    'seed': 32
-  }
-
-  # run for corr 
-  os.makedirs(f"{par['write_dir']}/corr/", exist_ok=True)
-  par['causal'] = False
-  for i in range(100):
-    par['causal']
-    par['prediction'] = f"{par['write_dir']}/corr/corr.csv"
-    par['seed'] = i
-    random.seed(par['seed'])
-    print('seed :', par['seed'])
-    
-    net = create_corr_net(par)
-    net.to_csv(par['prediction'])
-    score = run_reg(par)
-    if i == 0:
-      scores_corr = score 
-    else:
-      scores_corr = pd.concat([score, scores_corr], axis=0)
-    print(scores_corr)
-    scores_corr.to_csv(f"{par['write_dir']}/corr/scores_corr.csv")
-    
-  # run for causal corr
-  par['prediction'] = f"{par['write_dir']}/corr/corr_causal.csv"
-  par['causal'] = True
-  net = create_corr_net(par)
-
-  net.to_csv(par['prediction'])
-  score = run_reg(par)
-  score.to_csv(f"{par['write_dir']}/corr/scores_causal.csv")
