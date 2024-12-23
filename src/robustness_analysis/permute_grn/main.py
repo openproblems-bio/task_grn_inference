@@ -60,6 +60,19 @@ def main(par):
     random_indices = np.random.choice(prediction.index, size=num_to_modify, replace=False)
     # 3. Change the sign of the selected rows
     prediction.loc[random_indices, 'weight'] *= -1
+  elif type == 'direction': # change the regulatory sign
+    # Calculate the number of rows to permute
+    prediction = prediction.reset_index(drop=True)
+    n_rows_to_permute = int(len(prediction) * (degree))
+    # print(n_rows_to_permute)
+    
+    # Randomly select indices to permute
+    indices_to_permute = np.random.choice(prediction.index, size=n_rows_to_permute, replace=False)
+
+    print(indices_to_permute)
+    # Swap source and target for the selected rows
+    prediction.loc[indices_to_permute, ['source', 'target']] = prediction.loc[indices_to_permute, ['target', 'source']].values
+    
   elif type == 'binary': # change the regulatory sign
     prediction['weight'] = np.where(prediction['weight'] > 0, 1, -1)
   else:

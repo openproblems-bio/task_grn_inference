@@ -158,12 +158,15 @@ def analyse_imputation(task_grn_inference_dir):
     sc.pp.neighbors(rna)
 
     X_original = rna.X.todense().A
+    
+
     # - pseudobulkd and run per res
     gene_names = rna.var_names
-    for i_run, method in enumerate(['knn', 'softimpute', -1]): 
+    for i_run, method in enumerate(['magic', 'knn',  -1]): 
         if method == -1:
-            X = X_original
+            X = rna.X.todense().A
         elif method == 'knn':
+            X_original[X_original == 0] = np.nan
             from sklearn.impute import KNNImputer
             knn_imputer = KNNImputer(n_neighbors=10) 
             X = knn_imputer.fit_transform(X_original)
@@ -197,6 +200,95 @@ def analyse_imputation(task_grn_inference_dir):
             scores_all = pd.concat([scores_all, scores], axis=0)
         print(scores_all)
         scores_all.to_csv(f"{par['temp_dir']}/scores_all.csv")
+
+def analyse_corr_vs_tfmasked_corr(task_grn_inference_dir):
+    for i_run, dataset in enumerate(['op', 'replogle2', 'nakatake', 'norman', 'adamson']):
+        par = {
+            'rna': f'{task_grn_inference_dir}/resources/inference_datasets/{dataset}_rna.h5ad',
+            "evaluation_data": f"{task_grn_inference_dir}/resources/evaluation_datasets/{dataset}_perturbation.h5ad",
+
+            'layer': 'X_norm',
+            'consensus':  f'{task_grn_inference_dir}/resources/prior/{dataset}_consensus-num-regulators.json',
+            'tf_all': f'{task_grn_inference_dir}/resources/prior/tf_all.csv',
+            'apply_skeleton': False,
+            'verbose': 2,
+            'max_n_links': 50_000,
+            'temp_dir': 'output/causal_vs_corr/',
+            'subsample': -1,
+            'num_workers': 4,
+            'binarize': True,
+            'reg_type': 'ridge'
+        }
+
+        os.makedirs(par['temp_dir'], exist_ok=True)
+        # - imports 
+        sys.path.append(f'{task_grn_inference_dir}/')
+        sys.path.append(f'{task_grn_inference_dir}/src/utils')
+
+        from src.metrics.regression_1.main import main as main_reg1
+        from src.metrics.regression_2.main import main as main_reg2
+
+        from util import efficient_melting, process_links
+
+        # - read inputs and cluster with differen resolutions
+        rna = ad.read_h5ad(par['rna'])
+        gene_names = rna.var_names.to_numpy()
+        try:
+            rna.X = rna.layers[par['layer']]
+        except:
+            raise ValueError(f'{dataset} doesnt have X_norm')
+        X = rna.X
+        import scipy.sparse
+        # Assert that rna.X is not a sparse matrix
+        if scipy.sparse.issparse(X):
+            X = X.todense().A
+
+        def calculate_corr(X, par):
+            net = np.corrcoef(X.T)
+            
+            # # Convert to a DataFrame with gene names as both row and column indices
+            net = pd.DataFrame(net, index=gene_names, columns=gene_names)
+            
+            net = net.values
+
+            net = efficient_melting(net, gene_names, par)
+            if par['apply_tf']:
+                tf_all = np.loadtxt(par['tf_all'], dtype=str)
+                tf_all = np.intersect1d(tf_all, gene_names)
+                print('TF subsetting')
+                net = net[net.source.isin(tf_all)]
+            
+            net = process_links(net, par)
+            return net
+        def calculate_scores(par):
+            scores_reg1 = main_reg1(par)
+            scores_reg2 = main_reg2(par)
+            scores = pd.concat([scores_reg1, scores_reg2], axis=1)
+            return scores
+        # - causal net 
+        par['apply_tf'] = True
+        net = calculate_corr(X, par)
+        par['prediction'] = f"{par['temp_dir']}/net_causal.csv"
+        net.to_csv(par['prediction'])
+        scores_causal = calculate_scores(par)
+        scores_causal['type'] = ['causal']
+        # - corr net 
+        par['apply_tf'] = False
+        net = calculate_corr(X, par)
+        par['prediction'] = f"{par['temp_dir']}/net_corr.csv"
+        net.to_csv(par['prediction'])
+        scores_corr = calculate_scores(par)
+        scores_corr['type']= ['corr']
+
+        scores_all = pd.concat([scores_causal, scores_corr], axis=0)
+        
+        scores_all['dataset'] = dataset
+        if i_run == 0:
+            scores_all_datasets = scores_all
+        else:
+            scores_all_datasets = pd.concat([scores_all, scores_all_datasets], axis=0)
+        print(scores_all)
+        scores_all_datasets.to_csv(f"{par['temp_dir']}/scores_all.csv")
 def check_scores(par):
     df_scores = pd.read_csv(f"resources/scores/scgen_pearson-ridge.csv", index_col=0)
     df_all_n = (df_scores-df_scores.min(axis=0))/(df_scores.max(axis=0)-df_scores.min(axis=0))
@@ -393,59 +485,7 @@ def process_trace_seqera(trace):
         else:
             trace[col] = trace[col].apply(format_ram)
     return trace 
-def process_trace_local(job_ids_dict):
-    def get_sacct_data(job_id):
-        command = f'sacct -j {job_id} --format=JobID,JobName,AllocCPUS,Elapsed,State,MaxRSS,MaxVMSize'
-        output = subprocess.check_output(command, shell=True).decode()
-        
-        # Load the output into a DataFrame
-        df = pd.read_csv(io.StringIO(output), delim_whitespace=True)
-        df = df.iloc[[2]]
-        return df
-    def elapsed_to_hours(elapsed_str):
-        time = elapsed_str.split('-')
-        if len(time) > 1:
-            day = int(time[0])
-            time = time[1]
-        else:
-            day = 0
-            time = time[0]
-        h, m, s = map(int, time.split(':'))
-        return day*24 + h + m / 60 + s / 3600
-    def reformat_data(df_local):
-        # Remove 'K' and convert to integers
-        df_local['MaxRSS'] = df_local['MaxRSS'].str.replace('K', '').astype(int)
-        df_local['MaxVMSize'] = df_local['MaxVMSize'].str.replace('K', '').astype(int)
-        df_local['Elapsed'] = df_local['Elapsed'].apply(lambda x: (elapsed_to_hours(x)))
 
-        # Convert MaxRSS and MaxVMSize from KB to GB
-        df_local['MaxRSS'] = df_local['MaxRSS'] / (1024 ** 2)  # Convert KB to GB
-        df_local['MaxVMSize'] = df_local['MaxVMSize'] / (1024 ** 2)  # Convert KB to GB
-        return df_local
-    for i, (name, job_id) in enumerate(job_ids_dict.items()):
-        if type(job_id)==list:
-            
-            for i_sub, job_id_ in enumerate(job_id):
-                df_ = get_sacct_data(job_id_)
-                df_ = reformat_data(df_)
-                if i_sub == 0:
-                    df = df_
-                else:
-                    concat_df = pd.concat([df, df_], axis=0)
-                    df['MaxVMSize'] = concat_df['MaxVMSize'].max()
-                    df['MaxRSS'] = concat_df['MaxRSS'].max()
-                    df['Elapsed'] = concat_df['Elapsed'].sum()
-        else: 
-            df = get_sacct_data(job_id)
-            df = reformat_data(df)
-        df.index = [name]
-        if i==0:
-            df_local = df
-        else:
-            df_local = pd.concat([df_local, df], axis=0)
-        
-    
-    return df_local
 
 
 if __name__ == '__main__':
@@ -453,4 +493,5 @@ if __name__ == '__main__':
     # calculate_scores()
     # analyse_meta_cells(task_grn_inference_dir='./')
     analyse_imputation(task_grn_inference_dir='./')
+    # analyse_corr_vs_tfmasked_corr(task_grn_inference_dir='./')
 
