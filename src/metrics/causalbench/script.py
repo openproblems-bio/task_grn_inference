@@ -15,8 +15,9 @@ par = {
     'evaluation_data': 'resources/grn-benchmark/evaluation_data.h5ad',
      'models_dir': 'resources/grn-benchmark/grn_models/d0_hvg',
      'models': [pearson_corr, pearson_causal, portia, ppcor, genie3, grnboost2, scenic, scglue, celloracle],
-     'negative_sampling': 0,
-     'file': 'resources/prior/wassersteindistances.json'
+     'negative_samples': 100,
+     'p_value_threshold': 0.01,
+     'file': 'resources/prior/causalbench_evaluation.json'
 }
 ## VIASH END
 def main(par):
@@ -78,19 +79,7 @@ def main(par):
         grns[model] = network_as_dict
     
     # Compute wasserstein distances
-    def wasserstein_distances(network_as_dict, neg_samples = 0, seed = 0):            
-        if(neg_samples > 0):
-            edges = set()
-            random.seed(seed)
-            while len(edges) < neg_samples:
-                edge = random.sample(range(len(gene_names)), 2)
-                if edge[0] in network_as_dict and edge[1] in network_as_dict[edge[0]]:
-                    continue
-                edges.add(edge)
-            network_as_dict = {}
-            for a, b in edges:
-                network_as_dict.setdefault(a, set()).add(b)
-                
+    def wasserstein_distances(network_as_dict):                   
         wasserstein_distances = []
         for parent in network_as_dict.keys():
             children = network_as_dict[parent]
@@ -102,12 +91,50 @@ def main(par):
                 )
                 wasserstein_distances.append(wasserstein_distance)
         return wasserstein_distances
+    
+    def false_omission_rate(network_as_dict):                  
+        true_positive = 0
+        tests = 0
+        for parent in network_as_dict.keys():
+            children = network_as_dict[parent]
+            for child in children:
+                observational_samples = get_observational(child)
+                interventional_samples = get_interventional(child, parent)
+                ranksum_result = scipy.stats.mannwhitneyu(
+                    observational_samples, interventional_samples
+                )
+                tests +=1
+                p_value = ranksum_result[1]
+                if p_value < par['p_value_threshold']:
+                 true_positive += 1
+        return true_positive / tests
+    
+    def negative_sampling(network_as_dict, negative_samples = 100, seed = 0):
+        edges = set()
+        random.seed(seed)
+        while len(edges) < negative_samples:
+            edge = random.sample(range(len(gene_names)), 2)
+            if edge[0] in network_as_dict and edge[1] in network_as_dict[edge[0]]:
+                continue
+            edges.add(edge)
+        negative_dict = {}
+        for a, b in edges:
+            negative_dict.setdefault(a, set()).add(b)
+            
+        return negative_dict
 
     results = {}
     for model in grns.keys():
-        dists = wasserstein_distances(grns[model], neg_samples = par['negative_sampling'])
-        results[model] = {'mean': np.mean(dists),
-                          'detail': dists}
+        dists = wasserstein_distances(grns[model])
+        negative_dict = negative_sampling(grns[model], par['negative_samples'])
+        neg_dists = wasserstein_distances(negative_dict)
+        fo_rate = false_omission_rate(negative_dict)
+        
+        results[model] = {'mean_wasserstein': np.mean(dists),
+                          'mean_negative_wasserstein': np.mean(neg_dists),
+                          'fo_rate': fo_rate,
+                          'wasserstein_dist': dists,
+                          'negative_wasserstein_dist': neg_dists}
 
     # Store results
     with open(par['file'], 'w') as f:
