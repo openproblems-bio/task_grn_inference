@@ -105,7 +105,9 @@ def main(par):
 
     results = {}
     for model in grns.keys():
-        results[model] = np.mean(wasserstein_distances(grns[model], neg_samples = par['negative_sampling']))
+        dists = wasserstein_distances(grns[model], neg_samples = par['negative_sampling'])
+        results[model] = {'mean': np.mean(dists),
+                          'detail': dists}
 
     # Store results
     with open(par['file'], 'w') as f:
