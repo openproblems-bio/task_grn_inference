@@ -15,7 +15,8 @@ par = {
     'evaluation_data': 'resources/grn-benchmark/evaluation_data.h5ad',
      'models_dir': 'resources/grn-benchmark/grn_models/d0_hvg',
      'models': [pearson_corr, pearson_causal, portia, ppcor, genie3, grnboost2, scenic, scglue, celloracle],
-     'negative_sampling': 0
+     'negative_sampling': 0,
+     'file': 'resources/prior/wassersteindistances.json'
 }
 ## VIASH END
 def main(par):
@@ -52,7 +53,7 @@ def main(par):
         return tbd
 
     # Load inferred GRNs
-    grns = []
+    grns = {}
     for model in par['models']:
         filepath = os.path.join(par['models_dir'], f'{model}.csv')
         if not os.path.exists(filepath):
@@ -74,7 +75,7 @@ def main(par):
             if weight != 0:
                 network_as_dict.setdefault(i, set()).add(j)
         print(f'Sparsity of {filepath}: {np.mean(A == 0)}')
-        grns.append(network_as_dict)
+        grns[model] = network_as_dict
     
     # Compute wasserstein distances
     def wasserstein_distances(network_as_dict, neg_samples = 0, seed = 0):            
@@ -103,11 +104,11 @@ def main(par):
         return wasserstein_distances
 
     results = {}
-    for grn in grns: 
-        results[grn] = np.mean(wasserstein_distances(network_as_dict, neg_samples = par['negative_sampling']))
+    for model in grns.keys():
+        results[model] = np.mean(wasserstein_distances(grns[model], neg_samples = par['negative_sampling']))
 
     # Store results
-    with open(par['consensus'], 'w') as f:
+    with open(par['file'], 'w') as f:
         json.dump(results, f)
 
 
