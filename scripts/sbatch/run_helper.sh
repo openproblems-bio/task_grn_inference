@@ -8,4 +8,5 @@
 #SBATCH --mem=64G 
 #SBATCH --cpus-per-task=20  
 
-python src/helper.py 
+# python src/helper.py 
+python src/metrics/wasserstein/background_score.py 

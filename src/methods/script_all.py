@@ -115,6 +115,9 @@ def run_grn_inference(dataset='op', subsample=None):
         elif method in ["scenicplus"]:
             mem = "250GB"
             time = "12:00:00"
+        elif method in ["scenic"]:
+            mem = "250GB"
+            time = "24:00:00"
 
         # Prepare sbatch command
         tag = f"--job-name={method}"  # No spaces around '='
@@ -143,23 +146,24 @@ def run_grn_inference(dataset='op', subsample=None):
             print(f"Command error output: {e.stderr}")
 
 if __name__ == '__main__':
-    force = False
+    force = True
     sbatch = True
     # methods = ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2", "ppcor", "scenic"],
     # methods = ["portia", "grnboost2"]
-    methods = ["scenicplus"]
+    methods = ["scenic"]
+    datasets = ['adamson']
 
     
     partition='cpu'
 
-    mem = "120GB"
-    time = "12:00:00"
+    # mem = "120GB"
+    # time = "24:00:00"
 
-    if False: # normal run 
-        for dataset in ['op','replogle2', 'norman', 'adamson', 'nakatake']:
+    if True: # normal run 
+        for dataset in datasets:
             run_grn_inference(dataset, subsample=None)
 
-    if True: # subsample
+    if False: # subsample
         # for dataset in ['replogle2', 'norman', 'adamson', 'nakatake']: # 'replogle2' 'op' norman
         for dataset in ['op']:
             if dataset == 'op':

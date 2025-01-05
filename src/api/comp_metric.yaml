@@ -70,6 +70,12 @@ functionality:
       type: boolean
       direction: input
       default: false
+    - name: --dataset_id
+      type: string
+      direction: input
+      required: true
+      default: op
+
 
   test_resources:
     - type: python_script

@@ -10,10 +10,10 @@ import numpy as np
 
 ## VIASH START
 par = {
-    'evaluation_data': 'resources/grn-benchmark/evaluation_data.h5ad',
-    # 'models_dir': 'resources/grn-benchmark/grn_models/d0_hvg',
-    # 'models': [pearson_corr, pearson_causal, portia, ppcor, genie3, grnboost2, scenic, scglue, celloracle],
-    'consensus': 'resources/prior/consensus-num-regulators.json'
+    'evaluation_data': 'resources/evaluation_datasets/op_perturbation.h5ad',
+    'models_dir': 'resources/grn_models/op/',
+    'models': ['pearson_corr', 'pearson_causal', 'portia', 'ppcor', 'genie3', 'grnboost2', 'scenic', 'scglue', 'celloracle'],
+    'regulators_consensus': 'resources/prior/regulators_consensus_op.json'
 }
 ## VIASH END
 def main(par):
@@ -57,8 +57,10 @@ def main(par):
     results = {}
     for i, gene_name in enumerate(gene_names):
         results[gene_name] = {theta: int(n_tfs[theta][i]) for theta in thetas}
-    with open(par['consensus'], 'w') as f:
+    with open(par['regulators_consensus'], 'w') as f:
         json.dump(results, f)
+        
+    return results
 
 
 if __name__ == '__main__':

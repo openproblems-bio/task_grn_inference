@@ -312,7 +312,7 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         X = RobustScaler().fit_transform(X)
 
         # Load consensus numbers of putative regulators
-        with open(par['consensus'], 'r') as f:
+        with open(par['regulators_consensus'], 'r') as f:
             data = json.load(f)
         gene_names_ = np.asarray(list(data.keys()), dtype=object)
 
@@ -338,9 +338,9 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
 
         results = {
-            'static-theta-0.0': [float(score_static_min)],
-            'static-theta-0.5': [float(score_static_median)],
-            'static-theta-1.0': [float(score_static_max)],
+            'reg2-theta-0.0': [float(score_static_min)],
+            'reg2-theta-0.5': [float(score_static_median)],
+            'reg2-theta-1.0': [float(score_static_max)],
         }
 
         # # Add dynamic score
