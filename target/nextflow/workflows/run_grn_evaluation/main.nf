@@ -2969,9 +2969,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems",
           "tag" : "v2.0.0",
-          "localPath" : "/tmp/viash_hub_repo14922772211648842767"
+          "localPath" : "/tmp/viash_hub_repo14000870190343905152"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo14922772211648842767/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo14000870190343905152/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_tag" : "v1.0.0-1413-gb782e93f",
@@ -3002,7 +3002,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "d2539c6daf49e238123d0673ab6757cff6260cbc",
+          "git_commit" : "5f374ff0c4b5b4ea190a85b2a9a97395a3dd452e",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
@@ -3023,7 +3023,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "d2539c6daf49e238123d0673ab6757cff6260cbc",
+          "git_commit" : "5f374ff0c4b5b4ea190a85b2a9a97395a3dd452e",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
@@ -3087,7 +3087,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.8.6",
-    "git_commit" : "d2539c6daf49e238123d0673ab6757cff6260cbc",
+    "git_commit" : "5f374ff0c4b5b4ea190a85b2a9a97395a3dd452e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))

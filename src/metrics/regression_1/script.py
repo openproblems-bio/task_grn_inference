@@ -77,7 +77,7 @@ print(metric_ids.shape, metric_values.shape)
 output = ad.AnnData(
     X=np.empty((0, 0)),
     uns={
-        "dataset_id": par["layer"],
+        "dataset_id": par["dataset_id"],
         "method_id": f"reg1-{par['method_id']}",
         "metric_ids": metric_ids,
         "metric_values": metric_values

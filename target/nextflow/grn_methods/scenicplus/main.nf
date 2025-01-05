@@ -3145,7 +3145,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.8.6",
-    "git_commit" : "d2539c6daf49e238123d0673ab6757cff6260cbc",
+    "git_commit" : "5f374ff0c4b5b4ea190a85b2a9a97395a3dd452e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3202,8 +3202,8 @@ dep = {
 
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--multiomics_atac', type=str, help='Path to the multiomics atac file')
+parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--atac', type=str, help='Path to the multiomics atac file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
@@ -3211,10 +3211,10 @@ parser.add_argument('--num_workers', type=str, help='Number of cores')
 parser.add_argument('--max_n_links', type=int)
 args = parser.parse_args()
 
-if args.multiomics_rna:
-    par['multiomics_rna'] = args.multiomics_rna
-if args.multiomics_atac:
-    par['multiomics_atac'] = args.multiomics_atac
+if args.rna:
+    par['rna'] = args.rna
+if args.atac:
+    par['atac'] = args.atac
 if args.prediction:
     par['prediction'] = args.prediction
 if args.tf_all:

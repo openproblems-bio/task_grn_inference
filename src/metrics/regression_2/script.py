@@ -52,7 +52,7 @@ metric_values = output.values[0]
 output = ad.AnnData(
     X=np.empty((0, 0)),
     uns={
-        "dataset_id": str(par["layer"]),
+        "dataset_id": str(par["dataset_id"]),
         "method_id": f"reg2-{par['method_id']}",
         "metric_ids": metric_ids,
         "metric_values": metric_values

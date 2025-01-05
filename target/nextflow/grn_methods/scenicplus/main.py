@@ -59,7 +59,7 @@ except NameError:
 def process_peak(par):
     # Get list of samples (e.g., donors)
     print('Collect list of samples')
-    adata_atac = anndata.read_h5ad(par['multiomics_atac'])
+    adata_atac = anndata.read_h5ad(par['atac'])
     unique_donor_ids = [s.replace(' ', '_') for s in adata_atac.obs.donor_id.cat.categories]
     print(unique_donor_ids)
     unique_cell_types = [s.replace(' ', '_') for s in adata_atac.obs.cell_type.cat.categories]
@@ -211,7 +211,7 @@ def process_peak(par):
     del adata_atac
     gc.collect()
 def run_cistopic(par):
-    adata_atac = anndata.read_h5ad(par['multiomics_atac'])
+    adata_atac = anndata.read_h5ad(par['atac'])
     unique_donor_ids = [s.replace(' ', '_') for s in adata_atac.obs.donor_id.cat.categories]
     print(unique_donor_ids)
     unique_cell_types = [s.replace(' ', '_') for s in adata_atac.obs.cell_type.cat.categories]
@@ -676,7 +676,7 @@ def preprocess_rna(par):
     print("Preprocess RNA-seq", flush=True)
     # Load scRNA-seq data
     print("Load scRNA-seq data")
-    adata_rna = anndata.read_h5ad(par['multiomics_rna'])
+    adata_rna = anndata.read_h5ad(par['rna'])
     # Only keep cells with at least 200 expressed genes, and genes with at least 3 cells expressing them
     sc.pp.filter_cells(adata_rna, min_genes=200)
     sc.pp.filter_genes(adata_rna, min_cells=3)

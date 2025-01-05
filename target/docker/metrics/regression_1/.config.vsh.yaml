@@ -221,6 +221,16 @@ functionality:
     multiple: false
     multiple_sep: ":"
     dest: "par"
+  - type: "string"
+    name: "--dataset_id"
+    info: null
+    default:
+    - "op"
+    required: true
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
   - type: "boolean"
     name: "--binarize"
     description: "whether to binarize the weight"
@@ -317,5 +327,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/metrics/regression_1"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/metrics/regression_1/regression_1"
   viash_version: "0.8.6"
-  git_commit: "d2539c6daf49e238123d0673ab6757cff6260cbc"
+  git_commit: "5f374ff0c4b5b4ea190a85b2a9a97395a3dd452e"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

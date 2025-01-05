@@ -231,6 +231,10 @@ function ViashHelp {
   echo "        type: boolean"
   echo "        default: false"
   echo ""
+  echo "    --dataset_id"
+  echo "        type: string, required parameter"
+  echo "        default: op"
+  echo ""
   echo "    --binarize"
   echo "        type: boolean"
   echo "        default: true"
@@ -461,9 +465,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2024-12-23T19:51:56Z"
+LABEL org.opencontainers.image.created="2025-01-05T19:18:43Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="d2539c6daf49e238123d0673ab6757cff6260cbc"
+LABEL org.opencontainers.image.revision="5f374ff0c4b5b4ea190a85b2a9a97395a3dd452e"
 LABEL org.opencontainers.image.version="build-main"
 
 VIASHDOCKER
@@ -776,6 +780,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_APPLY_SKELETON=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --dataset_id)
+            [ -n "$VIASH_PAR_DATASET_ID" ] && ViashError Bad arguments for option \'--dataset_id\': \'$VIASH_PAR_DATASET_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_DATASET_ID="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --dataset_id. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --dataset_id=*)
+            [ -n "$VIASH_PAR_DATASET_ID" ] && ViashError Bad arguments for option \'--dataset_id=*\': \'$VIASH_PAR_DATASET_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_DATASET_ID=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --binarize)
             [ -n "$VIASH_PAR_BINARIZE" ] && ViashError Bad arguments for option \'--binarize\': \'$VIASH_PAR_BINARIZE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_BINARIZE="$2"
@@ -911,6 +926,10 @@ if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
 fi
 if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
   ViashError '--tf_all' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
+if [ -z ${VIASH_PAR_DATASET_ID+x} ]; then
+  ViashError '--dataset_id' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
 if [ -z ${VIASH_META_FUNCTIONALITY_NAME+x} ]; then
@@ -1177,6 +1196,7 @@ par = {
   'verbose': $( if [ ! -z ${VIASH_PAR_VERBOSE+x} ]; then echo "int(r'${VIASH_PAR_VERBOSE//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'skeleton': $( if [ ! -z ${VIASH_PAR_SKELETON+x} ]; then echo "r'${VIASH_PAR_SKELETON//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
+  'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'binarize': $( if [ ! -z ${VIASH_PAR_BINARIZE+x} ]; then echo "r'${VIASH_PAR_BINARIZE//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
@@ -1249,7 +1269,7 @@ print(metric_ids.shape, metric_values.shape)
 output = ad.AnnData(
     X=np.empty((0, 0)),
     uns={
-        "dataset_id": par["layer"],
+        "dataset_id": par["dataset_id"],
         "method_id": f"reg1-{par['method_id']}",
         "metric_ids": metric_ids,
         "metric_values": metric_values
