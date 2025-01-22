@@ -2789,10 +2789,10 @@ meta = [
         "arguments" : [
           {
             "type" : "file",
-            "name" : "--perturbation_data",
+            "name" : "--evaluation_data",
             "must_exist" : true,
             "create_parent" : true,
-            "required" : false,
+            "required" : true,
             "direction" : "input",
             "multiple" : false,
             "multiple_sep" : ":",
@@ -2800,8 +2800,8 @@ meta = [
           },
           {
             "type" : "string",
-            "name" : "--layer",
-            "required" : false,
+            "name" : "--method_id",
+            "required" : true,
             "direction" : "input",
             "multiple" : false,
             "multiple_sep" : ":",
@@ -2809,22 +2809,13 @@ meta = [
           },
           {
             "type" : "file",
-            "name" : "--prediction",
+            "name" : "--tf_all",
+            "example" : [
+              "resources_test/prior/tf_all.csv"
+            ],
             "must_exist" : true,
             "create_parent" : true,
-            "required" : false,
-            "direction" : "input",
-            "multiple" : false,
-            "multiple_sep" : ":",
-            "dest" : "par"
-          },
-          {
-            "type" : "integer",
-            "name" : "--subsample",
-            "default" : [
-              2
-            ],
-            "required" : false,
+            "required" : true,
             "direction" : "input",
             "multiple" : false,
             "multiple_sep" : ":",
@@ -2833,6 +2824,7 @@ meta = [
           {
             "type" : "string",
             "name" : "--reg_type",
+            "description" : "name of regretion to use",
             "default" : [
               "ridge"
             ],
@@ -2843,12 +2835,13 @@ meta = [
             "dest" : "par"
           },
           {
-            "type" : "string",
-            "name" : "--method_id",
-            "example" : [
-              "collectri"
+            "type" : "integer",
+            "name" : "--subsample",
+            "description" : "number of samples randomly drawn from perturbation data",
+            "default" : [
+              -1
             ],
-            "required" : true,
+            "required" : false,
             "direction" : "input",
             "multiple" : false,
             "multiple_sep" : ":",
@@ -2857,6 +2850,86 @@ meta = [
           {
             "type" : "integer",
             "name" : "--num_workers",
+            "default" : [
+              4
+            ],
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "boolean",
+            "name" : "--apply_tf",
+            "default" : [
+              true
+            ],
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "boolean",
+            "name" : "--apply_skeleton",
+            "default" : [
+              false
+            ],
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "file",
+            "name" : "--regulators_consensus",
+            "example" : [
+              "resources_test/prior/regulators_consensus_norman.json"
+            ],
+            "must_exist" : false,
+            "create_parent" : true,
+            "required" : true,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "boolean",
+            "name" : "--static_only",
+            "default" : [
+              true
+            ],
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "boolean",
+            "name" : "--binarize",
+            "description" : "whether to binarize the weight",
+            "default" : [
+              true
+            ],
+            "required" : false,
+            "direction" : "input",
+            "multiple" : false,
+            "multiple_sep" : ":",
+            "dest" : "par"
+          },
+          {
+            "type" : "file",
+            "name" : "--ws_consensus",
+            "example" : [
+              "resources_test/prior/ws_consensus_norman.csv"
+            ],
+            "must_exist" : false,
+            "create_parent" : true,
             "required" : true,
             "direction" : "input",
             "multiple" : false,
@@ -2865,13 +2938,13 @@ meta = [
           },
           {
             "type" : "file",
-            "name" : "--tf_all",
-            "default" : [
-              "resources/prior/tf_all.csv"
+            "name" : "--ws_distance_background",
+            "example" : [
+              "resources_test/prior/ws_distance_background_norman.csv"
             ],
-            "must_exist" : true,
+            "must_exist" : false,
             "create_parent" : true,
-            "required" : false,
+            "required" : true,
             "direction" : "input",
             "multiple" : false,
             "multiple_sep" : ":",
@@ -2879,13 +2952,13 @@ meta = [
           },
           {
             "type" : "file",
-            "name" : "--consensus",
-            "default" : [
-              "resources/prior/consensus.json"
+            "name" : "--evaluation_data_sc",
+            "example" : [
+              "resources_test/datasets_raw/adamson_sc_counts.h5ad"
             ],
             "must_exist" : true,
             "create_parent" : true,
-            "required" : false,
+            "required" : true,
             "direction" : "input",
             "multiple" : false,
             "multiple_sep" : ":",
@@ -2969,9 +3042,9 @@ meta = [
           "name" : "",
           "repo" : "openproblems-bio/openproblems",
           "tag" : "v2.0.0",
-          "localPath" : "/tmp/viash_hub_repo15011612095363648325"
+          "localPath" : "/tmp/viash_hub_repo1639627449167176708"
         },
-        "foundConfigPath" : "/tmp/viash_hub_repo15011612095363648325/target/nextflow/common/extract_metadata/.config.vsh.yaml",
+        "foundConfigPath" : "/tmp/viash_hub_repo1639627449167176708/target/nextflow/common/extract_metadata/.config.vsh.yaml",
         "configInfo" : {
           "functionalityName" : "extract_metadata",
           "git_tag" : "v1.0.0-1413-gb782e93f",
@@ -3002,7 +3075,7 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "50c65b33a24565fe023ba83bbb2903c23bed60f9",
+          "git_commit" : "5e2bfea7de33dab9b6363d819f156a442fb43e5d",
           "executable" : "/nextflow/metrics/regression_2/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_2"
@@ -3023,10 +3096,31 @@ meta = [
           "functionalityNamespace" : "metrics",
           "output" : "",
           "platform" : "",
-          "git_commit" : "50c65b33a24565fe023ba83bbb2903c23bed60f9",
+          "git_commit" : "5e2bfea7de33dab9b6363d819f156a442fb43e5d",
           "executable" : "/nextflow/metrics/regression_1/main.nf"
         },
         "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1"
+      },
+      {
+        "name" : "metrics/ws_distance",
+        "repository" : {
+          "type" : "local",
+          "localPath" : ""
+        },
+        "foundConfigPath" : "/home/runner/work/task_grn_inference/task_grn_inference/src/metrics/wasserstein/config.vsh.yaml",
+        "configInfo" : {
+          "functionalityName" : "ws_distance",
+          "git_tag" : "",
+          "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
+          "viash_version" : "0.8.6",
+          "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/metrics/wasserstein/config.vsh.yaml",
+          "functionalityNamespace" : "metrics",
+          "output" : "",
+          "platform" : "",
+          "git_commit" : "5e2bfea7de33dab9b6363d819f156a442fb43e5d",
+          "executable" : "/nextflow/metrics/ws_distance/main.nf"
+        },
+        "writtenPath" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/ws_distance"
       }
     ],
     "repositories" : [
@@ -3087,7 +3181,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.8.6",
-    "git_commit" : "50c65b33a24565fe023ba83bbb2903c23bed60f9",
+    "git_commit" : "5e2bfea7de33dab9b6363d819f156a442fb43e5d",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3098,6 +3192,7 @@ meta["root_dir"] = getRootDir()
 include { extract_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems/v2.0.0/nextflow/common/extract_metadata/main.nf"
 include { regression_2 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_2/main.nf"
 include { regression_1 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_1/main.nf"
+include { ws_distance } from "${meta.resources_dir}/../../../nextflow/metrics/ws_distance/main.nf"
 
 // inner workflow
 // user-provided Nextflow code
@@ -3116,7 +3211,7 @@ workflow run_wf {
   main:
 
   // construct list of metrics
-  metrics = [
+  metrics_regression = [
     regression_1,
     regression_2
   ]
@@ -3157,13 +3252,13 @@ workflow run_wf {
       },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
-        perturbation_data: "perturbation_data",
+        evaluation_data: "evaluation_data",
         prediction: "prediction",
         subsample: "subsample",
         reg_type: "reg_type",
         method_id: "method_id",
         num_workers: "num_workers",
-        consensus: "consensus",
+        regulators_consensus: "regulators_consensus",
         layer: "layer",
         tf_all: "tf_all"
       ],

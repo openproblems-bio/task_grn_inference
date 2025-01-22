@@ -4,44 +4,6 @@ functionality:
   version: "build-main"
   arguments:
   - type: "file"
-    name: "--evaluation_data"
-    info:
-      label: "perturbation"
-      summary: "Perturbation dataset for benchmarking."
-      file_type: "h5ad"
-      slots:
-        obs:
-        - name: "cell_type"
-          type: "string"
-          description: "The annotated cell type of each cell based on RNA expression."
-          required: true
-        - name: "perturbation"
-          type: "string"
-          description: "Name of the column containing perturbation names"
-          required: true
-        - name: "donor_id"
-          type: "string"
-          description: "Donor id"
-          required: false
-        - name: "perturbation_type"
-          type: "string"
-          description: "Name of the column indicating perturbation type"
-          required: false
-        layers:
-        - name: "X_norm"
-          type: "double"
-          description: "Normalized values"
-          required: true
-    example:
-    - "resources_test/evaluation_datasets/op_perturbation.h5ad"
-    must_exist: true
-    create_parent: true
-    required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
-  - type: "file"
     name: "--prediction"
     info:
       label: "GRN"
@@ -100,8 +62,96 @@ functionality:
     - "resources_test/scores/score.h5ad"
     must_exist: true
     create_parent: true
-    required: false
+    required: true
     direction: "output"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--method_id"
+    info: null
+    example:
+    - "grnboost2"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--layer"
+    info: null
+    default:
+    - "X_norm"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "integer"
+    name: "--max_n_links"
+    info: null
+    default:
+    - 50000
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "integer"
+    name: "--verbose"
+    info: null
+    default:
+    - 2
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "string"
+    name: "--dataset_id"
+    info: null
+    default:
+    - "op"
+    required: true
+    direction: "input"
+    multiple: false
+    multiple_sep: ":"
+    dest: "par"
+  - type: "file"
+    name: "--evaluation_data"
+    info:
+      label: "perturbation"
+      summary: "Perturbation dataset for benchmarking."
+      file_type: "h5ad"
+      slots:
+        obs:
+        - name: "cell_type"
+          type: "string"
+          description: "The annotated cell type of each cell based on RNA expression."
+          required: true
+        - name: "perturbation"
+          type: "string"
+          description: "Name of the column containing perturbation names"
+          required: true
+        - name: "donor_id"
+          type: "string"
+          description: "Donor id"
+          required: false
+        - name: "perturbation_type"
+          type: "string"
+          description: "Name of the column indicating perturbation type"
+          required: false
+        layers:
+        - name: "X_norm"
+          type: "double"
+          description: "Normalized values"
+          required: true
+    example:
+    - "resources_test/evaluation_datasets/op_perturbation.h5ad"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
     multiple: false
     multiple_sep: ":"
     dest: "par"
@@ -149,63 +199,11 @@ functionality:
     multiple: false
     multiple_sep: ":"
     dest: "par"
-  - type: "string"
-    name: "--method_id"
-    info: null
-    example:
-    - "collectri"
-    required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
   - type: "boolean"
     name: "--apply_tf"
     info: null
     default:
     - true
-    required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
-  - type: "string"
-    name: "--layer"
-    info: null
-    default:
-    - "X_norm"
-    required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
-  - type: "integer"
-    name: "--max_n_links"
-    info: null
-    default:
-    - 50000
-    required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
-  - type: "integer"
-    name: "--verbose"
-    info: null
-    default:
-    - 2
-    required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
-  - type: "file"
-    name: "--skeleton"
-    info: null
-    example:
-    - "resources_test/prior/skeleton.csv"
-    must_exist: true
-    create_parent: true
     required: false
     direction: "input"
     multiple: false
@@ -221,21 +219,11 @@ functionality:
     multiple: false
     multiple_sep: ":"
     dest: "par"
-  - type: "string"
-    name: "--dataset_id"
-    info: null
-    default:
-    - "op"
-    required: true
-    direction: "input"
-    multiple: false
-    multiple_sep: ":"
-    dest: "par"
   - type: "file"
-    name: "--consensus"
+    name: "--regulators_consensus"
     info: null
     example:
-    - "resources_test/prior/op_consensus-num-regulators.json"
+    - "resources_test/prior/regulators_consensus_norman.json"
     must_exist: false
     create_parent: true
     required: true
@@ -271,8 +259,7 @@ functionality:
     dest: "resources_test/"
   info:
     label: "regression_2"
-    summary: "Calculates R2 score for regression 2"
-    description: "Calculates R2 score using regression approach 2.\n"
+    summary: "Calculates regression scores 2"
     type: "metrics"
     type_info:
       label: "Label"
@@ -338,5 +325,5 @@ info:
   output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/metrics/regression_2"
   executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/metrics/regression_2/regression_2"
   viash_version: "0.8.6"
-  git_commit: "50c65b33a24565fe023ba83bbb2903c23bed60f9"
+  git_commit: "5e2bfea7de33dab9b6363d819f156a442fb43e5d"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

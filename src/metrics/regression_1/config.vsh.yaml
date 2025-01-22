@@ -1,15 +1,13 @@
-__merge__: ../../api/comp_metric.yaml
+__merge__: ../../api/comp_metric_regression.yaml
 
 functionality:
   name: regression_1
   namespace: "metrics"
   info:
-    label: Regression 1
-    summary: Calculates R2 score for regression 1
-    description: |
-      Calculates R2 score using regression approach 1.
-
-  arguments:
+    label: regression_1
+    summary: Calculates regression scores 1
+      
+  arguments: 
     - name: --binarize
       type: boolean 
       direction: input 
@@ -22,6 +20,7 @@ functionality:
     - path: main.py
     - path: /src/utils/util.py
       dest: util.py
+      
 platforms:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4

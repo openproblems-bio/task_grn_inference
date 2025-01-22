@@ -13,7 +13,7 @@ workflow run_wf {
   main:
 
   // construct list of metrics
-  metrics = [
+  metrics_regression = [
     regression_1,
     regression_2
   ]
@@ -54,13 +54,13 @@ workflow run_wf {
       },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
-        perturbation_data: "perturbation_data",
+        evaluation_data: "evaluation_data",
         prediction: "prediction",
         subsample: "subsample",
         reg_type: "reg_type",
         method_id: "method_id",
         num_workers: "num_workers",
-        consensus: "consensus",
+        regulators_consensus: "regulators_consensus",
         layer: "layer",
         tf_all: "tf_all"
       ],

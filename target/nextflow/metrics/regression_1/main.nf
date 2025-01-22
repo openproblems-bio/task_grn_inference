@@ -2786,61 +2786,6 @@ meta = [
     "arguments" : [
       {
         "type" : "file",
-        "name" : "--evaluation_data",
-        "info" : {
-          "label" : "perturbation",
-          "summary" : "Perturbation dataset for benchmarking.",
-          "file_type" : "h5ad",
-          "slots" : {
-            "obs" : [
-              {
-                "name" : "cell_type",
-                "type" : "string",
-                "description" : "The annotated cell type of each cell based on RNA expression.",
-                "required" : true
-              },
-              {
-                "name" : "perturbation",
-                "type" : "string",
-                "description" : "Name of the column containing perturbation names",
-                "required" : true
-              },
-              {
-                "name" : "donor_id",
-                "type" : "string",
-                "description" : "Donor id",
-                "required" : false
-              },
-              {
-                "name" : "perturbation_type",
-                "type" : "string",
-                "description" : "Name of the column indicating perturbation type",
-                "required" : false
-              }
-            ],
-            "layers" : [
-              {
-                "name" : "X_norm",
-                "type" : "double",
-                "description" : "Normalized values",
-                "required" : true
-              }
-            ]
-          }
-        },
-        "example" : [
-          "resources_test/evaluation_datasets/op_perturbation.h5ad"
-        ],
-        "must_exist" : true,
-        "create_parent" : true,
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "file",
         "name" : "--prediction",
         "info" : {
           "label" : "GRN",
@@ -2921,8 +2866,123 @@ meta = [
         ],
         "must_exist" : true,
         "create_parent" : true,
-        "required" : false,
+        "required" : true,
         "direction" : "output",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "string",
+        "name" : "--method_id",
+        "example" : [
+          "grnboost2"
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "string",
+        "name" : "--layer",
+        "default" : [
+          "X_norm"
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "integer",
+        "name" : "--max_n_links",
+        "default" : [
+          50000
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "integer",
+        "name" : "--verbose",
+        "default" : [
+          2
+        ],
+        "required" : false,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "string",
+        "name" : "--dataset_id",
+        "default" : [
+          "op"
+        ],
+        "required" : true,
+        "direction" : "input",
+        "multiple" : false,
+        "multiple_sep" : ":",
+        "dest" : "par"
+      },
+      {
+        "type" : "file",
+        "name" : "--evaluation_data",
+        "info" : {
+          "label" : "perturbation",
+          "summary" : "Perturbation dataset for benchmarking.",
+          "file_type" : "h5ad",
+          "slots" : {
+            "obs" : [
+              {
+                "name" : "cell_type",
+                "type" : "string",
+                "description" : "The annotated cell type of each cell based on RNA expression.",
+                "required" : true
+              },
+              {
+                "name" : "perturbation",
+                "type" : "string",
+                "description" : "Name of the column containing perturbation names",
+                "required" : true
+              },
+              {
+                "name" : "donor_id",
+                "type" : "string",
+                "description" : "Donor id",
+                "required" : false
+              },
+              {
+                "name" : "perturbation_type",
+                "type" : "string",
+                "description" : "Name of the column indicating perturbation type",
+                "required" : false
+              }
+            ],
+            "layers" : [
+              {
+                "name" : "X_norm",
+                "type" : "double",
+                "description" : "Normalized values",
+                "required" : true
+              }
+            ]
+          }
+        },
+        "example" : [
+          "resources_test/evaluation_datasets/op_perturbation.h5ad"
+        ],
+        "must_exist" : true,
+        "create_parent" : true,
+        "required" : false,
+        "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
         "dest" : "par"
@@ -2980,73 +3040,11 @@ meta = [
         "dest" : "par"
       },
       {
-        "type" : "string",
-        "name" : "--method_id",
-        "example" : [
-          "collectri"
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
         "type" : "boolean",
         "name" : "--apply_tf",
         "default" : [
           true
         ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "string",
-        "name" : "--layer",
-        "default" : [
-          "X_norm"
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "integer",
-        "name" : "--max_n_links",
-        "default" : [
-          50000
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "integer",
-        "name" : "--verbose",
-        "default" : [
-          2
-        ],
-        "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "file",
-        "name" : "--skeleton",
-        "example" : [
-          "resources_test/prior/skeleton.csv"
-        ],
-        "must_exist" : true,
-        "create_parent" : true,
         "required" : false,
         "direction" : "input",
         "multiple" : false,
@@ -3060,18 +3058,6 @@ meta = [
           false
         ],
         "required" : false,
-        "direction" : "input",
-        "multiple" : false,
-        "multiple_sep" : ":",
-        "dest" : "par"
-      },
-      {
-        "type" : "string",
-        "name" : "--dataset_id",
-        "default" : [
-          "op"
-        ],
-        "required" : true,
         "direction" : "input",
         "multiple" : false,
         "multiple_sep" : ":",
@@ -3125,9 +3111,8 @@ meta = [
       }
     ],
     "info" : {
-      "label" : "Regression 1",
-      "summary" : "Calculates R2 score for regression 1",
-      "description" : "Calculates R2 score using regression approach 1.\n",
+      "label" : "regression_1",
+      "summary" : "Calculates regression scores 1",
       "type" : "metrics",
       "type_info" : {
         "label" : "Label",
@@ -3208,7 +3193,7 @@ meta = [
     "platform" : "nextflow",
     "output" : "/home/runner/work/task_grn_inference/task_grn_inference/target/nextflow/metrics/regression_1",
     "viash_version" : "0.8.6",
-    "git_commit" : "50c65b33a24565fe023ba83bbb2903c23bed60f9",
+    "git_commit" : "5e2bfea7de33dab9b6363d819f156a442fb43e5d",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   }
 }'''))
@@ -3234,21 +3219,20 @@ file_name = 'op' #nakatake
 ## VIASH START
 # The following code has been auto-generated by Viash.
 par = {
-  'evaluation_data': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'score': $( if [ ! -z ${VIASH_PAR_SCORE+x} ]; then echo "r'${VIASH_PAR_SCORE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
+  'verbose': $( if [ ! -z ${VIASH_PAR_VERBOSE+x} ]; then echo "int(r'${VIASH_PAR_VERBOSE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
+  'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'evaluation_data': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'subsample': $( if [ ! -z ${VIASH_PAR_SUBSAMPLE+x} ]; then echo "int(r'${VIASH_PAR_SUBSAMPLE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'verbose': $( if [ ! -z ${VIASH_PAR_VERBOSE+x} ]; then echo "int(r'${VIASH_PAR_VERBOSE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'skeleton': $( if [ ! -z ${VIASH_PAR_SKELETON+x} ]; then echo "r'${VIASH_PAR_SKELETON//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'binarize': $( if [ ! -z ${VIASH_PAR_BINARIZE+x} ]; then echo "r'${VIASH_PAR_BINARIZE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {

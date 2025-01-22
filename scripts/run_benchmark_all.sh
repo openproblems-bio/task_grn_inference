@@ -11,7 +11,7 @@ subsample=-1
 num_workers=10
 layer='X_norm'
 metric_ids="[regression_1, regression_2]"
-method_ids="[negative_control, pearson_corr, positive_control, portia, scgpt]"
+method_ids="[scgpt]"
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -57,6 +57,6 @@ HERE
   --pull-latest \
   --main-script target/nextflow/workflows/run_benchmark/main.nf \
   --workspace 53907369739130 \
-  --compute-env 5DwwhQoBi0knMSGcwThnlF \
+  --compute-env 7gRyww9YNGb0c6BUBtLhDP \
   --params-file ${param_file} \
-  --config src/common/nextflow_helpers/labels_tw.config
+  --config common/nextflow_helpers/labels_tw.config

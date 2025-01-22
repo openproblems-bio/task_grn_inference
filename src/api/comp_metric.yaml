@@ -8,48 +8,19 @@ functionality:
       description: |
         A metric to evaluate the performance of the inferred GRN
   arguments: 
-    - name: --evaluation_data
-      __merge__: file_evaluation_h5ad.yaml
-      required: false
-      direction: input
     - name: --prediction
       __merge__: file_prediction.yaml
       required: true
       direction: input
     - name: --score
       __merge__: file_score.yaml
-      required: false
-      direction: output
-    - name: --tf_all
-      type: file
-      direction: input
       required: true
-      example: resources_test/prior/tf_all.csv
-    - name: --reg_type
-      type: string
-      direction: input
-      default: ridge
-      description: name of regretion to use
-      multiple: false
-    - name: --subsample
-      type: integer
-      direction: input
-      default: -1
-      description: number of samples randomly drawn from perturbation data
-    - name: --num_workers
-      type: integer
-      direction: input
-      default: 4
+      direction: output
     - name: --method_id 
       type: string 
       direction: input 
       required: false
-      example: collectri
-    - name: --apply_tf
-      type: boolean 
-      required: false
-      default: true
-
+      example: grnboost2
     - name: --layer
       type: string
       direction: input
@@ -62,14 +33,6 @@ functionality:
       type: integer
       default: 2
       direction: input
-    - name: --skeleton 
-      type: file
-      direction: input
-      example: resources_test/prior/skeleton.csv
-    - name: --apply_skeleton 
-      type: boolean
-      direction: input
-      default: false
     - name: --dataset_id
       type: string
       direction: input
