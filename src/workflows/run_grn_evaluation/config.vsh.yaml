@@ -9,43 +9,70 @@ functionality:
   argument_groups:
     - name: Inputs
       arguments:
-        - name: --perturbation_data
+        - name: --evaluation_data
+          type: file
+          required: true
+          direction: input
+        - name: --tf_all
           type: file
           direction: input
-        - name: --layer
-          type: string
-          direction: input
-        - name: --prediction
-          type: file
-          direction: input
-          required: false
-        - name: --subsample
-          type: integer
-          direction: input
-          default: 2
+          required: true
+          example: resources_test/prior/tf_all.csv
         - name: --reg_type
           type: string
           direction: input
           default: ridge
-        - name: --method_id 
-          type: string 
-          direction: input 
-          required: True
-          example: collectri
+          description: name of regretion to use
+          multiple: false
+        - name: --subsample
+          type: integer
+          direction: input
+          default: -1
+          description: number of samples randomly drawn from perturbation data
         - name: --num_workers
           type: integer
           direction: input
-          required: True
-        - name: --tf_all
-          type: file
+          default: 4
+        - name: --apply_tf
+          type: boolean 
           required: false
-          direction: input
-          default: resources/prior/tf_all.csv
-        - name: --consensus
-          type: file
+          default: true
+        - name: --apply_skeleton
+          type: boolean 
           required: false
+          default: false
+        - name: --regulators_consensus
+          type: file
           direction: input
-          default: resources/prior/consensus.json
+          must_exist: false
+          required: true
+          example: resources_test/prior/regulators_consensus_norman.json
+        - name: --static_only
+          direction: input
+          type: boolean
+          default: true
+        - name: --binarize
+          type: boolean 
+          direction: input 
+          description: whether to binarize the weight
+          default: true
+        - name: --ws_consensus
+          type: file
+          direction: input
+          must_exist: false
+          required: true
+          example: resources_test/prior/ws_consensus_norman.csv 
+        - name: --ws_distance_background
+          type: file
+          direction: input
+          must_exist: false
+          required: true
+          example: resources_test/prior/ws_distance_background_norman.csv
+        - name: --evaluation_data_sc
+          type: file
+          required: true
+          direction: input
+          example: 'resources_test/datasets_raw/adamson_sc_counts.h5ad'
         
     - name: Outputs
       arguments:
@@ -54,8 +81,6 @@ functionality:
           required: true
           direction: output
           default: "scores.yaml"
-          # description: A csv file containing the scores with each row corrosponding to a layer.
-          # default: scores.csv
         - name: "--metric_configs"
           type: file
           required: true
@@ -81,6 +106,7 @@ functionality:
       repository: openproblems
     - name: metrics/regression_2 
     - name: metrics/regression_1
+    - name: metrics/ws_distance
   repositories:
     - name: openproblems
       type: github
