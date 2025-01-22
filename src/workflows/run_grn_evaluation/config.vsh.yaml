@@ -13,6 +13,10 @@ functionality:
           type: file
           required: true
           direction: input
+        - name: --method_id
+          type: string
+          required: true
+          direction: input
         - name: --tf_all
           type: file
           direction: input

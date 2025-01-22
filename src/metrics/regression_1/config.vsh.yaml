@@ -1,10 +1,10 @@
 __merge__: ../../api/comp_metric_regression.yaml
 
 functionality:
-  name: metrics_regression_1
+  name: regression_1
   namespace: "metrics"
   info:
-    label: metrics_regression_1
+    label: regression_1
     summary: Calculates regression scores 1
       
   arguments: 

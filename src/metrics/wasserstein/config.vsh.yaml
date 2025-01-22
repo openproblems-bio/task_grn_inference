@@ -1,4 +1,5 @@
-__merge__: comp_metric.yaml
+__merge__: ../../api/comp_metric.yaml
+
 functionality:
   name: ws_distance
   namespace: "metrics"
