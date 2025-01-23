@@ -52,7 +52,7 @@ HERE
 #     --params-file ./params/benchmark_donor_0_default.yaml `
 #     --config src/common/nextflow_helpers/labels_tw.config
 
-./tw launch https://github.com/openproblems-bio/task_grn_inference \
+tw launch https://github.com/openproblems-bio/task_grn_inference \
   --revision build/main \
   --pull-latest \
   --main-script target/nextflow/workflows/run_benchmark/main.nf \

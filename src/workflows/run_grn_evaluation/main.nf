@@ -13,7 +13,7 @@ workflow run_wf {
   main:
 
   // construct list of metrics
-  metrics_regression = [
+  metrics = [
     regression_1,
     regression_2
   ]
@@ -61,6 +61,7 @@ workflow run_wf {
         method_id: "method_id",
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
+        ws_consensus: "ws_consensus",
         layer: "layer",
         tf_all: "tf_all"
       ],

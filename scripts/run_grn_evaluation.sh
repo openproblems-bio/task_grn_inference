@@ -64,7 +64,10 @@ append_entry() {
     num_workers: $num_workers
     tf_all: ${resources_dir}/prior/tf_all.csv
     regulators_consensus: ${resources_dir}/prior/regulators_consensus_${dataset}.json
+    ws_consensus: ${resources_dir}/prior/ws_consensus_${dataset}.json
+    ws_distance_background: ${resources_dir}/prior/ws_distance_background_${dataset}.json
     prediction: ${grn_models_folder}/${dataset}/$1.csv
+    layer: "X_norm"
 HERE
 }
 
