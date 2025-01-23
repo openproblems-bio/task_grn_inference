@@ -13,6 +13,14 @@ functionality:
           type: file
           required: true
           direction: input
+        - name: --prediction
+          type: file
+          required: true
+          direction: input
+        - name: --layer
+          type: string
+          required: true
+          direction: input
         - name: --method_id
           type: string
           required: true
