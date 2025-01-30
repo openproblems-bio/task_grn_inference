@@ -1,10 +1,10 @@
 type: file
 example: resources_test/inference_datasets/op_rna.h5ad
+label: multiomics rna
+summary: "RNA expression for multiomics data."
 info:
-  label: multiomics rna
-  summary: "RNA expression for multiomics data."
-  file_type: h5ad
-  slots:
+  format:
+    type: h5ad
     obs:
       - name: cell_type
         type: string
