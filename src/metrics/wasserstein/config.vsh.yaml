@@ -1,42 +1,44 @@
 __merge__: ../../api/comp_metric.yaml
 
-functionality:
-  name: ws_distance
-  namespace: "metrics"
-  info:
-    label: ws_distance
-    summary: Calculates Wasserstein distance for a given GRN and dataset
-  arguments:
-    - name: --ws_consensus
-      type: file
-      direction: input
-      must_exist: false
-      required: true
-      example: resources_test/prior/ws_consensus_norman.csv 
-    - name: --ws_distance_background
-      type: file
-      direction: input
-      must_exist: false
-      required: true
-      example: resources_test/prior/ws_distance_background_norman.csv
-    - name: --evaluation_data_sc
-      type: file
-      required: true
-      direction: input
-      example: 'resources_test/datasets_raw/adamson_sc_counts.h5ad'
-  resources:
-    - type: python_script
-      path: script.py
-    - path: /src/utils/util.py
-      dest: util.py
-    - path: main.py
+name: ws_distance
+namespace: "metrics"
+info:
+  label: ws_distance
+  summary: Calculates Wasserstein distance for a given GRN and dataset
+arguments:
+  - name: --ws_consensus
+    type: file
+    direction: input
+    must_exist: false
+    required: true
+    example: resources_test/prior/ws_consensus_adamson.csv 
+  - name: --ws_distance_background
+    type: file
+    direction: input
+    must_exist: false
+    required: true
+    example: resources_test/prior/ws_distance_background_adamson.csv
+  - name: --evaluation_data_sc
+    type: file
+    required: true
+    direction: input
+    example: 'resources_test/datasets_raw/adamson_sc_counts.h5ad'
+resources:
+  - type: python_script
+    path: script.py
+  - path: /src/utils/util.py
+    dest: util.py
+  - path: main.py
   
-platforms:
+engines:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4
+    __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
         packages: [numpy==1.26.4 ]
+runners:
+  - type: executable
   - type: nextflow
     directives:
       label: [ midtime, midmem, midcpu ]

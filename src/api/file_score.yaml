@@ -1,7 +1,7 @@
 type: file
 example: resources_test/scores/score.h5ad
 info:
-  label: Score
+  label: score
   summary: "File indicating the score of a metric."
   file_type: h5ad
   slots:

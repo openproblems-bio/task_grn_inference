@@ -1,38 +1,38 @@
 __merge__: ../../../api/comp_method.yaml
 
-functionality:
-  name: scenic
-  namespace: "grn_methods"
-  info:
-    label: scenic
-    summary: "GRN inference using scenic"
 
-  arguments:
-    - name: --rank_threshold
-      type: integer
-      direction: input 
-      required: false
-      default: 5000 
-    - name: --auc_threshold
-      type: double
-      direction: input 
-      required: false
-      default: 0.05 
-    - name: --nes_threshold
-      type: double
-      direction: input 
-      required: false
-      default: 3.0
-      
-  resources:
-    - type: python_script
-      path: script.py
-    # - path: main.py
-    - path: /src/utils/util.py
-      dest: util.py
+name: scenic
+namespace: "grn_methods"
+info:
+  label: scenic
+  summary: "GRN inference using scenic"
+
+arguments:
+  - name: --rank_threshold
+    type: integer
+    direction: input 
+    required: false
+    default: 5000 
+  - name: --auc_threshold
+    type: double
+    direction: input 
+    required: false
+    default: 0.05 
+  - name: --nes_threshold
+    type: double
+    direction: input 
+    required: false
+    default: 3.0
+    
+resources:
+  - type: python_script
+    path: script.py
+  # - path: main.py
+  - path: /src/utils/util.py
+    dest: util.py
     
 
-platforms:
+engines:
   - type: docker
     image: aertslab/pyscenic:0.12.1
     setup:
@@ -42,6 +42,9 @@ platforms:
       - type: python
         packages: [ anndata ]
   - type: native
+  __merge__: /src/api/base_requirements.yaml
+runners:
+  - type: executable
   - type: nextflow
     directives:
       label: [onedaytime, midmem, midcpu]

@@ -1,26 +1,30 @@
 __merge__: comp_metric.yaml
-functionality:
-  name: ws_distance
-  namespace: "metrics"
-  info:
+
+namespace: "metrics"
+info:
+  type: ws_distance
+  
+  type_info:
     label: ws_distance
     summary: Calculates Wasserstein distance for a given GRN and dataset
-  arguments:
-    - name: --ws_consensus
-      type: file
-      direction: input
-      must_exist: false
-      required: true
-      example: resources_test/prior/ws_consensus_norman.csv 
-    - name: --ws_distance_background
-      type: file
-      direction: input
-      must_exist: false
-      required: true
-      example: resources_test/prior/ws_distance_background_norman.csv
-    - name: --evaluation_data_sc
-      type: file
-      required: true
-      direction: input
-      example: 'resources_test/datasets_raw/adamson_sc_counts.h5ad'
+
+
+arguments:
+  - name: --ws_consensus
+    type: file
+    direction: input
+    must_exist: false
+    required: true
+    example: resources_test/prior/ws_consensus_norman.csv 
+  - name: --ws_distance_background
+    type: file
+    direction: input
+    must_exist: false
+    required: true
+    example: resources_test/prior/ws_distance_background_norman.csv
+  - name: --evaluation_data_sc
+    type: file
+    required: true
+    direction: input
+    example: 'resources_test/datasets_raw/adamson_sc_counts.h5ad'
       

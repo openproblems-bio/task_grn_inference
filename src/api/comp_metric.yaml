@@ -1,47 +1,46 @@
-functionality:
-  namespace: "metrics"
-  info:
-    type: metrics
-    type_info:
-      label: Label
-      summary: A metric to evaluate the performance of the inferred GRN
-      description: |
-        A metric to evaluate the performance of the inferred GRN
-  arguments: 
-    - name: --prediction
-      __merge__: file_prediction.yaml
-      required: true
-      direction: input
-    - name: --score
-      __merge__: file_score.yaml
-      required: true
-      direction: output
-    - name: --method_id 
-      type: string 
-      direction: input 
-      required: false
-      example: grnboost2
-    - name: --layer
-      type: string
-      direction: input
-      required: false
-      default: X_norm
-    - name: --max_n_links
-      type: integer
-      default: 50000
-    - name: --verbose
-      type: integer
-      default: 2
-      direction: input
-    - name: --dataset_id
-      type: string
-      direction: input
-      required: true
-      default: op
+namespace: "metrics"
+info:
+  type: metrics
+  type_info:
+    label: metrics
+    summary: A metric to evaluate the performance of the inferred GRN
+    description: |
+      A metric to evaluate the performance of the inferred GRN
+arguments: 
+  - name: --prediction
+    __merge__: file_prediction.yaml
+    required: true
+    direction: input
+  - name: --score
+    __merge__: file_score.yaml
+    required: true
+    direction: output
+  - name: --method_id 
+    type: string 
+    direction: input 
+    required: false
+    example: grnboost2
+  - name: --layer
+    type: string
+    direction: input
+    required: false
+    default: X_norm
+  - name: --max_n_links
+    type: integer
+    default: 50000
+  - name: --verbose
+    type: integer
+    default: 2
+    direction: input
+  - name: --dataset_id
+    type: string
+    direction: input
+    required: false
+    default: op
 
 
-  test_resources:
-    - type: python_script
-      path: /src/common/component_tests/run_and_check_output.py
-    - path: /resources_test/
-      dest: resources_test/
+test_resources:
+  - type: python_script
+    path: /common/component_tests/run_and_check_output.py
+  - path: /resources_test/
+    dest: resources_test/

@@ -2,7 +2,7 @@ namespace: "methods"
 info:
   type: method
   type_info:
-    label: Method
+    label: method
     summary: A GRN inference method
     description: |
       A method for inferring GRN from expression data.
