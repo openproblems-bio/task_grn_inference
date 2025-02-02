@@ -1,24 +1,25 @@
 __merge__: ../../../api/comp_method.yaml
 
-functionality:
-  name: grnboost2
-  namespace: "grn_methods"
-  info:
-    label: grnboost2
-    summary: "GRN inference using GRNBoost2"
-    description: |
-      GRN inference using GRNBoost2.
-    documentation_url: https://arboreto.readthedocs.io/en/latest/algorithms.html#grnboost2
- 
-  resources:
-    - type: python_script
-      path: script.py
-    - path: /src/utils/util.py
-      dest: util.py
 
-platforms:
+name: grnboost2
+namespace: "grn_methods"
+info:
+  label: grnboost2
+  summary: "GRN inference using GRNBoost2"
+  description: |
+    GRN inference using GRNBoost2.
+  documentation_url: https://arboreto.readthedocs.io/en/latest/algorithms.html#grnboost2
+
+resources:
+  - type: python_script
+    path: script.py
+  - path: /src/utils/util.py
+    dest: util.py
+
+engines:
   - type: docker
     image: continuumio/anaconda3:2024.02-1
+    __merge__: /src/api/base_requirements.yaml
     setup:
       - type: docker
         run: |
@@ -26,6 +27,8 @@ platforms:
       - type: python
         packages: [ anndata ]
   - type: native
+runners:
+  - type: executable
   - type: nextflow
     directives:
       label: [onedaytime, midmem, midcpu]

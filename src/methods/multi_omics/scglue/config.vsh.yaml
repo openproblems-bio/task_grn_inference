@@ -1,47 +1,46 @@
 __merge__: ../../../api/comp_method.yaml
 
+name: scglue
+namespace: "grn_methods"
+info:
+  label: scglue
+  summary: "GRN inference using scglue"
+  description: |
+    GRN inference using scglue. 
+  documentation_url: https://scglue.readthedocs.io/
+arguments:
+  - name: --top_n_targets
+    type: string
+    required: false
+    direction: input
+    default: 100
+  - name: --rank_threshold
+    type: string
+    required: false
+    direction: input
+    default: 1500
+  - name: --nes_threshold
+    type: string
+    required: false
+    direction: input
+    default: 1.5
+  - name: --extend_range
+    type: integer
+    required: false
+    direction: input
+    default: 0
+    description: extending range of promotors to connect to peak
+resources:
+  - type: python_script
+    path: script.py
+  - path: main.py
+  - path: /src/utils/util.py
+    dest: util.py
 
-functionality:
-  name: scglue
-  namespace: "grn_methods"
-  info:
-    label: scglue
-    summary: "GRN inference using scglue"
-    description: |
-      GRN inference using scglue. 
-    documentation_url: https://scglue.readthedocs.io/
-  arguments:
-    - name: --top_n_targets
-      type: string
-      required: false
-      direction: input
-      default: 100
-    - name: --rank_threshold
-      type: string
-      required: false
-      direction: input
-      default: 1500
-    - name: --nes_threshold
-      type: string
-      required: false
-      direction: input
-      default: 1.5
-    - name: --extend_range
-      type: integer
-      required: false
-      direction: input
-      default: 0
-      description: extending range of promotors to connect to peak
-  resources:
-    - type: python_script
-      path: script.py
-    - path: main.py
-    - path: /src/utils/util.py
-      dest: util.py
-
-platforms:
+engines:
   - type: docker
     image: janursa/scglue:19-08-2024
+    __merge__: /src/api/base_requirements.yaml
     # image: nvcr.io/nvidia/pytorch:24.06-py3
     # setup:
     #   - type: python
@@ -50,6 +49,8 @@ platforms:
     #     packages: [bedtools]
 
   - type: native
+runners:
+  - type: executable
   - type: nextflow
     directives:
       label: [oneweektime, midmem, highcpu, gpu]

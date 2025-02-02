@@ -87,9 +87,10 @@ def infer_grn(X, par):
   
   return network
 
-grn = infer_grn(X, par)       
+net = infer_grn(X, par)       
 
 # Save inferred GRN
-grn.to_csv(par['prediction'], sep=',')
-
-print('Finished.')
+print('Output GRN')
+net['weight'] = net['weight'].astype(str)
+output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+output.write(par['prediction'])

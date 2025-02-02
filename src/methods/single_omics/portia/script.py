@@ -91,11 +91,12 @@ def main(par):
 
 
 if __name__ == '__main__':
-  os.makedirs(par['temp_dir'], exist_ok=True)
-  adata = ad.read_h5ad(par['rna'])
-  
-  net = main(par)
+    os.makedirs(par['temp_dir'], exist_ok=True)
+    adata = ad.read_h5ad(par['rna'])
 
-  net.to_csv(par['prediction'])
+    net = main(par)
 
-  print('Finished.')
+    print('Output GRN')
+    net['weight'] = net['weight'].astype(str)
+    output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+    output.write(par['prediction'])

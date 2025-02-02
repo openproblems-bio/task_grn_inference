@@ -271,7 +271,9 @@ def main(par):
     manipulate = None 
     ## read and process input data
     verbose_print(par['verbose'], 'Reading input files', 3)
-    
+    net = ad.read_h5ad(par['prediction'])
+    net = pd.DataFrame(net.uns['prediction'])
+
     evaluation_data = ad.read_h5ad(par['evaluation_data'])
 
     if 'is_test' in evaluation_data.obs.columns:
@@ -280,7 +282,7 @@ def main(par):
 
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
     gene_names = evaluation_data.var.index.to_numpy()
-    net = pd.read_csv(par['prediction'])
+    
     
     if par['apply_skeleton']: #apply skeleton
         print('Before filtering with skeleton:', net.shape)

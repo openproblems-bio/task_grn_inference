@@ -815,7 +815,10 @@ def post_process(par):
 
     grn_extended = grn_extended[['source', 'target', 'weight', 'peak']].drop_duplicates(ignore_index=True)
 
-    prediction = grn_extended.groupby(['source', 'target'], as_index=False)['weight'].sum()
+    net = grn_extended.groupby(['source', 'target'], as_index=False)['weight'].sum()
 
     grn_extended.to_csv(par['grn_extended'])
-    prediction.to_csv(par['prediction'])
+
+    net['weight'] = net['weight'].astype(str)
+    output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+    output.write(par['prediction'])

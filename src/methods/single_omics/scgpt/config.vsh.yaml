@@ -1,33 +1,33 @@
 __merge__: ../../../api/comp_method.yaml
 
-functionality:
-  name: scgpt
-  namespace: "grn_methods"
-  info:
-    label: scgpt
-    summary: "GRN inference using scGPT"
-    description: |
-      GRN inference using scGPT.
-    documentation_url: https://github.com/bowang-lab/scGPT/blob/main/tutorials/Tutorial_Attention_GRN.ipynb 
-  arguments:
-    - name: --n_bins
-      type: integer
-      direction: input
-      default: 51
-    - name: --batch_size
-      type: integer
-      direction: input
-      default: 10
-    - name: --condition
-      type: string
-      direction: input
-      default: cell_type
 
-  resources:
-    - type: python_script
-      path: script.py
+name: scgpt
+namespace: "grn_methods"
+info:
+  label: scgpt
+  summary: "GRN inference using scGPT"
+  description: |
+    GRN inference using scGPT.
+  documentation_url: https://github.com/bowang-lab/scGPT/blob/main/tutorials/Tutorial_Attention_GRN.ipynb 
+arguments:
+  - name: --n_bins
+    type: integer
+    direction: input
+    default: 51
+  - name: --batch_size
+    type: integer
+    direction: input
+    default: 10
+  - name: --condition
+    type: string
+    direction: input
+    default: cell_type
 
-platforms:
+resources:
+  - type: python_script
+    path: script.py
+
+engines:
   # - type: docker
   #   image: xueerchen/scgpt:0.1.7
   #   setup:
@@ -35,6 +35,7 @@ platforms:
   #       packages: [ gdown ]
   - type: docker
     image: openproblems/base_pytorch_nvidia:1.0.0
+    __merge__: /src/api/base_requirements.yaml
     # TODO: Try to find working installation of flash attention (flash-attn<1.0.5)
     setup:
       - type: python
@@ -46,6 +47,8 @@ platforms:
         run: pip install --upgrade --no-deps --force-reinstall git+https://github.com/bowang-lab/scGPT.git
 
   - type: native
+runners:
+  - type: executable
   - type: nextflow
     directives:
       label: [midtime, midmem, midcpu, biggpu]

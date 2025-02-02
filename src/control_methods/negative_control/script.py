@@ -45,6 +45,10 @@ except:
     }
     sys.path.append(meta['resources_dir'])
 from main import main
-prediction = main(par)
-prediction.to_csv(par["prediction"])
+net = main(par)
+
+print('Output GRN')
+net['weight'] = net['weight'].astype(str)
+output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+output.write(par['prediction'])
 

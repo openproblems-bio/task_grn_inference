@@ -1,0 +1,10 @@
+{
+  "yaml.schemas": {
+    "common/schemas/api_component_spec.yaml": "**/api/comp_*.yaml",
+    "common/schemas/api_file_format.yaml": "**/api/file_*.yaml",
+    "common/schemas/task_config.yaml": "_viash.yaml",
+    "common/schemas/task_method.yaml": "**/methods/**/config.vsh.yaml",
+    "common/schemas/task_control_method.yaml": "**/control_methods/**/config.vsh.yaml",
+    "common/schemas/task_metric.yaml": "**/metrics/**/config.vsh.yaml"
+  }
+}

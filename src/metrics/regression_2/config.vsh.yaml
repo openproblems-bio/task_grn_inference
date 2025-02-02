@@ -1,36 +1,38 @@
 __merge__: ../../api/comp_metric_regression.yaml
 
-functionality:
-  name: regression_2
-  namespace: "metrics"
-  info:
-    label: regression_2
-    summary: Calculates regression scores 2
-      
-  arguments: 
-    - name: --regulators_consensus
-      type: file
-      direction: input
-      must_exist: false
-      required: true
-      example: resources_test/prior/regulators_consensus_norman.json
-    - name: --static_only
-      direction: input
-      type: boolean
-      default: true
-  resources:
-    - type: python_script
-      path: script.py
-    - path: main.py
-    - path: /src/utils/util.py
-      dest: util.py
+name: regression_2
+namespace: "metrics"
+info:
+  label: regression_2
+  summary: Calculates regression scores 2
+    
+arguments: 
+  - name: --regulators_consensus
+    type: file
+    direction: input
+    must_exist: false
+    required: true
+    example: resources_test/prior/regulators_consensus_op.json
+  - name: --static_only
+    direction: input
+    type: boolean
+    default: true
+resources:
+  - type: python_script
+    path: script.py
+  - path: main.py
+  - path: /src/utils/util.py
+    dest: util.py
 
-platforms:
+engines:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4
+    __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
         packages: [ lightgbm==4.3.0, numpy==1.26.4 ]
+runners:
+  - type: executable
   - type: nextflow
     directives:
       label: [ midtime, highmem, highcpu ]

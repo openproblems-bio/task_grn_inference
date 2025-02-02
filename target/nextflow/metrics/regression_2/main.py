@@ -276,7 +276,9 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
 
     gene_names = prturb_adata.var.index.to_numpy()
     n_genes = len(gene_names)
-    net = pd.read_csv(par['prediction'], sep=',', header='infer')
+    
+    net = ad.read_h5ad(par['prediction'])
+    net = pd.DataFrame(net.uns['prediction'])
     if 'donor_id' not in prturb_adata.obs.columns:
         prturb_adata.obs['donor_id']= 'onebatch'
     donor_ids = prturb_adata.obs.donor_id.unique()

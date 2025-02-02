@@ -1,53 +1,61 @@
-functionality:
-  namespace: "methods"
-  info:
-    type: methods
-    type_info:
-      label: Method
-      summary: A GRN inference method
-      description: |
-        A method for inferring GRN from expression data.
-  arguments:
-    - name: --rna
-      __merge__: file_rna_h5ad.yaml
-      required: true
-      direction: input
-    - name: --atac
-      __merge__: file_atac_h5ad.yaml
-      required: false
-      direction: input
-    - name: --prediction
-      __merge__: file_prediction.yaml
-      required: false
-      direction: output
-    - name: --tf_all
-      type: file
-      required: false
-      direction: input
-      example: resources_test/prior/tf_all.csv
-    - name: --max_n_links
-      type: integer
-      default: 50000
-    - name: --num_workers
-      type: integer
-      direction: input
-      default: 4
-    - name: --temp_dir
-      type: string
-      direction: input
-      default: output/temdir
-    - name: --seed
-      type: integer
-      direction: input
-      default: 32
-    - name: --causal
-      type: boolean
-      direction: input
-      default: True
+namespace: "methods"
+info:
+  type: method
+  type_info:
+    label: method
+    summary: A GRN inference method
+    description: |
+      A method for inferring GRN from expression data.
+arguments:
+  - name: --rna
+    __merge__: file_rna_h5ad.yaml
+    required: true
+    direction: input
+  - name: --atac
+    __merge__: file_atac_h5ad.yaml
+    required: false
+    direction: input
+  - name: --prediction
+    __merge__: file_prediction_h5ad.yaml
+    required: false
+    direction: output
+  - name: --tf_all
+    type: file
+    required: false
+    direction: input
+    example: resources_test/prior/tf_all.csv
+  - name: --max_n_links
+    type: integer
+    default: 50000
+  - name: --num_workers
+    type: integer
+    direction: input
+    default: 4
+  - name: --temp_dir
+    type: string
+    direction: input
+    default: output/temdir
+  - name: --seed
+    type: integer
+    direction: input
+    default: 32
+  - name: --causal
+    type: boolean
+    direction: input
+    default: True
+  - name: --dataset_id
+    type: string
+    direction: input
+    required: false
+    default: op
+  - name: --method_id
+    type: string
+    direction: input
+    required: false
+    default: grnboost2
 
-
-  test_resources:
-    - type: python_script
-      path: /src/common/component_tests/run_and_check_output.py
-    - path: /resources_test/
-      dest: resources_test/
+test_resources:
+  - type: python_script
+    path: /common/component_tests/run_and_check_output.py
+  - path: /resources_test/
+    dest: resources_test/

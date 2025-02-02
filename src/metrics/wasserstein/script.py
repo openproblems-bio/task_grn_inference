@@ -31,7 +31,7 @@ except:
 
 if __name__ == '__main__':
     _, mean_scores = main(par)
-    
+    print(mean_scores)
     output = ad.AnnData(
         X=np.empty((0, 0)),
         uns={

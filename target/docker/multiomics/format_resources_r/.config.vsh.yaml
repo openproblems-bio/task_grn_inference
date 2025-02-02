@@ -1,7 +1,8 @@
-functionality:
-  name: "format_resources_r"
-  namespace: "multiomics"
-  version: "build-main"
+name: "format_resources_r"
+namespace: "multiomics"
+version: "build_main"
+argument_groups:
+- name: "Arguments"
   arguments:
   - type: "file"
     name: "--rna_matrix"
@@ -13,8 +14,7 @@ functionality:
     required: true
     direction: "input"
     multiple: false
-    multiple_sep: ":"
-    dest: "par"
+    multiple_sep: ";"
   - type: "file"
     name: "--atac_matrix"
     info: null
@@ -25,8 +25,7 @@ functionality:
     required: true
     direction: "input"
     multiple: false
-    multiple_sep: ":"
-    dest: "par"
+    multiple_sep: ";"
   - type: "file"
     name: "--rna_gene_annot"
     info: null
@@ -37,8 +36,7 @@ functionality:
     required: true
     direction: "input"
     multiple: false
-    multiple_sep: ":"
-    dest: "par"
+    multiple_sep: ";"
   - type: "file"
     name: "--rna_cell_annot"
     info: null
@@ -49,8 +47,7 @@ functionality:
     required: true
     direction: "input"
     multiple: false
-    multiple_sep: ":"
-    dest: "par"
+    multiple_sep: ";"
   - type: "file"
     name: "--atac_peak_annot"
     info: null
@@ -61,8 +58,7 @@ functionality:
     required: true
     direction: "input"
     multiple: false
-    multiple_sep: ":"
-    dest: "par"
+    multiple_sep: ";"
   - type: "file"
     name: "--atac_cell_annot"
     info: null
@@ -73,8 +69,7 @@ functionality:
     required: true
     direction: "input"
     multiple: false
-    multiple_sep: ":"
-    dest: "par"
+    multiple_sep: ";"
   - type: "file"
     name: "--rna_rds"
     info: null
@@ -85,8 +80,7 @@ functionality:
     required: false
     direction: "output"
     multiple: false
-    multiple_sep: ":"
-    dest: "par"
+    multiple_sep: ";"
   - type: "file"
     name: "--atac_rds"
     info: null
@@ -97,32 +91,34 @@ functionality:
     required: false
     direction: "output"
     multiple: false
-    multiple_sep: ":"
-    dest: "par"
-  resources:
-  - type: "r_script"
-    path: "script.R"
-    is_executable: true
-  info:
-    label: "format_resources_r"
-    summary: "Converts data to format needed for R methods."
-  status: "enabled"
-  set_wd_to_resources_dir: false
-platforms:
-- type: "docker"
+    multiple_sep: ";"
+resources:
+- type: "r_script"
+  path: "script.R"
+  is_executable: true
+info:
+  label: "format_resources_r"
+  summary: "Converts data to format needed for R methods."
+status: "enabled"
+scope:
+  image: "public"
+  target: "public"
+repositories:
+- type: "github"
+  name: "openproblems"
+  repo: "openproblems-bio/openproblems"
+  tag: "build/main"
+license: "MIT"
+links:
+  repository: "https://github.com/openproblems-bio/task_grn_inference"
+  docker_registry: "ghcr.io"
+runners:
+- type: "executable"
   id: "docker"
-  image: "janursa/figr:19-08-2024"
-  target_organization: "openproblems-bio/task_grn_inference"
-  target_registry: "ghcr.io"
-  namespace_separator: "/"
-  resolve_volume: "Automatic"
-  chown: true
-  setup_strategy: "ifneedbepullelsecachedbuild"
-  target_image_source: "https://github.com/openproblems-bio/task_grn_inference"
-  entrypoint: []
-  cmd: null
-- type: "native"
+  docker_setup_strategy: "ifneedbepullelsecachedbuild"
+- type: "executable"
   id: "native"
+  docker_setup_strategy: "ifneedbepullelsecachedbuild"
 - type: "nextflow"
   id: "nextflow"
   directives:
@@ -141,25 +137,156 @@ platforms:
       lowmem: "memory = 20.Gb"
       midmem: "memory = 50.Gb"
       highmem: "memory = 100.Gb"
-      veryhighmem: "memory = 250.Gb"
       lowcpu: "cpus = 5"
       midcpu: "cpus = 15"
       highcpu: "cpus = 30"
       lowtime: "time = 1.h"
       midtime: "time = 4.h"
       hightime: "time = 8.h"
-      onedaytime: "time = 24.h"
-      threedaystime: "time = 72.h"
-      oneweektime: "time = 168.h"
-    script:
-    - "process.errorStrategy = 'ignore'"
+      veryhightime: "time = 24.h"
   debug: false
   container: "docker"
-info:
-  config: "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/multiomics/format_resources_r/config.vsh.yaml"
-  platform: "docker"
-  output: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/multiomics/format_resources_r"
-  executable: "/home/runner/work/task_grn_inference/task_grn_inference/target/docker/multiomics/format_resources_r/format_resources_r"
-  viash_version: "0.8.6"
-  git_commit: "3147fb2ecab978334332ef0e2569809471f0233f"
+engines:
+- type: "docker"
+  id: "docker"
+  image: "janursa/figr:19-08-2024"
+  namespace_separator: "/"
+  entrypoint: null
+  cmd: null
+- type: "native"
+  id: "native"
+build_info:
+  config: "src/process_data/multiomics/format_resources_r/config.vsh.yaml"
+  runner: "docker"
+  engine: "docker|native"
+  output: "target/docker/multiomics/format_resources_r"
+  executable: "target/docker/multiomics/format_resources_r/format_resources_r"
+  viash_version: "0.9.1"
+  git_commit: "b101f87b2f36b26e891054817fb50b2210a8e7df"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
+package_config:
+  name: "task_grn_inference"
+  version: "build_main"
+  label: "GRN Inference"
+  summary: "Benchmarking GRN inference methods\nThe full documentation is hosted on\
+    \ [ReadTheDocs](https://grn-inference-benchmarking.readthedocs.io/en/latest/index.html).\
+    \ \n"
+  description: "GRNs are essential for understanding cellular identity and behavior.\
+    \ They are simplified models of gene expression regulated by complex processes\
+    \ involving multiple layers of control, from transcription to post-transcriptional\
+    \ modifications, incorporating various regulatory elements and non-coding RNAs.\
+    \ Gene transcription is controlled by a regulatory complex that includes transcription\
+    \ factors (TFs), cis-regulatory elements (CREs) like promoters and enhancers,\
+    \ and essential co-factors. High-throughput datasets, covering thousands of genes,\
+    \ facilitate the use of machine learning approaches to decipher GRNs. The advent\
+    \ of single-cell sequencing technologies, such as scRNA-seq, has made it possible\
+    \ to infer GRNs from a single experiment due to the abundance of samples. This\
+    \ allows researchers to infer condition-specific GRNs, such as for different cell\
+    \ types or diseases, and study potential regulatory factors associated with these\
+    \ conditions. Combining chromatin accessibility data with gene expression measurements\
+    \ has led to the development of enhancer-driven GRN (eGRN) inference pipelines,\
+    \ which offer significantly improved accuracy over single-modality methods.\n\n\
+    Here, we present geneRNIB as a living benchmark platform for GRN inference. This\
+    \ platform provides curated datasets for GRN inference and evaluation, standardized\
+    \ evaluation protocols and metrics, computational infrastructure, and a dynamically\
+    \ updated leaderboard to track state-of-the-art methods. It runs novel GRNs in\
+    \ the cloud, offers competition scores, and stores them for future comparisons,\
+    \ reflecting new developments over time.\n\nThe platform supports the integration\
+    \ of new datasets and protocols. When a new feature is added, previously evaluated\
+    \ GRNs are re-assessed, and the leaderboard is updated accordingly. The aim is\
+    \ to evaluate both the accuracy and completeness of inferred GRNs. It is designed\
+    \ for both single-modality and multi-omics GRN inference. Ultimately, it is a\
+    \ community-driven platform. \n\nSo far, ten GRN inference methods have been integrated:\
+    \ five single-omics methods of GRNBoost2, GENIE3, Portia, PPCOR, and Scenic; and\
+    \ five eGRN inference methods of Scenic+, CellOracle, FigR, scGLUE, and GRaNIE.\n\
+    \nDue to its flexible nature, the platform can incorporate various benchmark datasets\
+    \ and evaluation methods, using either prior knowledge or feature-based approaches.\
+    \ \nIn the current version, due to the absence of standardized prior knowledge,\
+    \ we use indirect approaches to benchmark GRNs. Employing interventional data\
+    \ as evaluation datasets, we have developed 8 metrics using feature-based approach\
+    \ and Wasserstein distance, accounting for both accuracy and comprehensiveness.\n\
+    \nFive datasets have been integrated so far, namely OPSCA, Nakatake, Norman, Adamson,\
+    \ and Replogle. For each dataset, standardized inference datasets are provided\
+    \ to be used for GRN inference and evaluation datasets are employed to benchmark.\n\
+    See our publication for the details of methods. \n"
+  info:
+    image: "thumbnail.svg"
+    test_resources:
+    - type: "s3"
+      path: "s3://openproblems-data/resources_test/grn/inference_datasets/"
+      dest: "resources_test/inference_datasets/"
+    - type: "s3"
+      path: "s3://openproblems-data/resources_test/grn/evaluation_datasets/"
+      dest: "resources_test/evaluation_datasets/"
+    - type: "s3"
+      path: "s3://openproblems-data/resources_test/grn/prior/"
+      dest: "resources_test/prior/"
+    - type: "s3"
+      path: "s3://openproblems-data/resources_test/grn/grn_models/"
+      dest: "resources_test/grn_models/"
+    readme: "## Installation\n\nYou need to have Docker, Java, and Viash installed.\
+      \ Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\n\
+      to install the required dependencies. \n\n## Download resources\n```bash\ngit\
+      \ clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n\
+      \n# download resources\nscripts/download_resources.sh\n```\nThe datasets for\
+      \ GRN inference are located in `resources/inference_datasets`. \n## Infer a\
+      \ GRN \nOne GRN should be inferred for each inference dataset (op, norman, replogle2,\
+      \ adamson, and nakatake). The inferred GRN should have three columns of `source,\
+      \ target, weight`. See `resources/grn_models/op/grnboost2.csv` as an example.\n\
+      \n## Evaluate a GRN\nOnce a GRN is inferred (e.g. located in `output/your_GRN.csv`)\
+      \ for a given dataset (e.g. `norman`), use the following code to obtain evaluation\
+      \ scores. \n```bash\nscripts/calculate_score.sh output/your_GRN.csv norman\n\
+      ```\nThis will calculate and print the scores as well as output the scores into\
+      \ `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository,\
+      \ follow the instructions in the `scripts/add_a_method.sh` script.\n"
+  repositories:
+  - type: "github"
+    name: "openproblems"
+    repo: "openproblems-bio/openproblems"
+    tag: "build/main"
+  viash_version: "0.9.1"
+  source: "src"
+  target: "target"
+  config_mods:
+  - ".runners[.type == \"nextflow\"].config.labels := { lowmem : \"memory = 20.Gb\"\
+    , midmem : \"memory = 50.Gb\", highmem : \"memory = 100.Gb\", lowcpu : \"cpus\
+    \ = 5\", midcpu : \"cpus = 15\", highcpu : \"cpus = 30\", lowtime : \"time = 1.h\"\
+    , midtime : \"time = 4.h\", hightime : \"time = 8.h\", veryhightime : \"time =\
+    \ 24.h\" }\n"
+  authors:
+  - name: "Jalil Nourisa"
+    roles:
+    - "author"
+    info:
+      github: "janursa"
+      orcid: "0000-0002-7539-4396"
+  - name: "Robrecht Cannoodt"
+    roles:
+    - "author"
+    info:
+      github: "rcannood"
+      orcid: "0000-0003-3641-729X"
+  - name: "Antoine Passimier"
+    roles:
+    - "contributor"
+    info:
+      github: "AntoinePassemiers"
+  - name: "Marco Stock"
+    roles:
+    - "contributor"
+    info:
+      github: "stkmrc"
+  - name: "Christian Arnold"
+    roles:
+    - "contributor"
+    info:
+      github: "chrarnold"
+  keywords:
+  - "gene regulatory network"
+  - "network inference"
+  license: "MIT"
+  organization: "openproblems-bio"
+  links:
+    repository: "https://github.com/openproblems-bio/task_grn_inference"
+    docker_registry: "ghcr.io"
+    issue_tracker: "https://github.com/openproblems-bio/task_grn_inference/issues"

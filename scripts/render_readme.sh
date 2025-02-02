@@ -2,8 +2,4 @@
 
 set -e
 
-viash run src/common/create_task_readme/config.vsh.yaml -- \
-  --task "grn_inference" \
-  --task_dir "src" \
-  --github_url "https://github.com/openproblems-bio/task_grn_inference/tree/main/" \
-  --output "README.md"
+common/scripts/create_task_readme --input src/api

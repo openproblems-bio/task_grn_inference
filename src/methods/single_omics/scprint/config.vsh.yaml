@@ -1,0 +1,49 @@
+__merge__: ../../../api/comp_method.yaml
+
+name: scprint
+namespace: "grn_methods"
+info:
+  label: scprint
+  summary: "GRN inference using scPRINT"
+  description: |
+    GRN inference using scPRINT.
+  documentation_url: https://github.com/cantinilab/scPRINT/ 
+arguments:
+  - name: --filtration
+    type: string
+    direction: input
+    default: "top-k"
+  - name: --num_genes
+    type: integer
+    direction: input
+    default: 5000
+  - name: --max_cells
+    type: integer
+    direction: input
+    default: 1000
+resources:
+  - type: python_script
+    path: script.py
+
+engines:
+  - type: docker
+    image: openproblems/base_pytorch_nvidia:1.0.0
+    __merge__: /src/api/base_requirements.yaml
+    setup:
+      - type: docker
+        run: |
+          apt install git && \
+          git clone https://github.com/cantinilab/scPRINT && \
+          git clone https://github.com/jkobject/scDataLoader && \
+          git clone https://github.com/cantinilab/GRnnData && \
+          git clone https://github.com/jkobject/benGRN && \
+          pip install -e scPRINT[dev] && \
+          pip install -e scDataLoader[dev] && \
+          pip install -e GRnnData[dev] && \
+          pip install -e benGRN[dev] && \
+  - type: native
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [midtime, midmem, midcpu, biggpu]

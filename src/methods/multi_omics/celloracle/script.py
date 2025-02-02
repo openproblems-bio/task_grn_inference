@@ -53,10 +53,12 @@ if 'base_grn' not in par:
 if 'links' not in par:
     par['links'] = f"{par['temp_dir']}/links.celloracle.links"
 
-prediction = main(par)
+net = main(par)
 
 print('Write output to file', flush=True)
-prediction.to_csv(par["prediction"])
+net['weight'] = net['weight'].astype(str)
+output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+output.write(par['prediction'])
 
 
 

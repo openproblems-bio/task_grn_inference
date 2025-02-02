@@ -311,4 +311,7 @@ net_melted = net.reset_index()  # Move index to a column for melting
 net_melted = pd.melt(net_melted, id_vars=net_melted.columns[0], var_name='target', value_name='weight')
 net_melted.rename(columns={net_melted.columns[0]: 'source'}, inplace=True)
 
-net_melted.to_csv(par['prediction'])
+net = net_melted
+net['weight'] = net['weight'].astype(str)
+output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+output.write(par['prediction'])
