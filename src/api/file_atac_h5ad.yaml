@@ -1,6 +1,6 @@
 type: file
 example: resources_test/inference_datasets/op_atac.h5ad
-label: atac
+label:  chromatin accessibility data
 summary: "Chromatin accessibility data"
 info:
   format:

@@ -40,10 +40,6 @@ arguments:
     type: integer
     direction: input
     default: 32
-  - name: --causal
-    type: boolean
-    direction: input
-    default: True
   - name: --dataset_id
     type: string
     direction: input

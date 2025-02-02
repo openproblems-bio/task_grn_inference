@@ -22,19 +22,23 @@ import pandas as pd
 import torch
 torch.set_float32_matmul_precision('medium')
 import sys 
-sys.path.append("./")
-from src.helper_infer_grns import efficient_melting 
+
 ## VIASH START
 par = {
-    'rna': '../task_grn_inference/resources/inference_datasets/op_rna.h5ad',
-    'tf_all': '../task_grn_inference/resources/prior/tf_all.csv',
+    'rna': 'resources/inference_datasets/op_rna.h5ad',
+    'tf_all': 'resources/prior/tf_all.csv',
     'prediction': 'output/grn.h5ad',
     'filtration': 'top-k',
-    'max_num_links': 50_000,
+    'max_n_links': 50_000,
     'num_genes': 5000,
     'max_cells': 1000
 }
 ## VIASH END
+
+sys.path.append(meta["resources_dir"])
+
+from util import efficient_melting 
+
 def run_scprint_sub(adata, model, par):
     grn_inferer = GNInfer(
                         how="most var within",
@@ -47,7 +51,7 @@ def run_scprint_sub(adata, model, par):
                         max_cells=par['max_cells'],
                         doplot=False,
                         batch_size=16,
-                        k=par['max_num_links'],
+                        k=par['max_n_links'],
                         )
 
     grn = grn_inferer(model, adata)

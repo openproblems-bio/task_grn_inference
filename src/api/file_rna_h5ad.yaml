@@ -1,6 +1,6 @@
 type: file
 example: resources_test/inference_datasets/op_rna.h5ad
-label: rna
+label: gene expression data
 summary: "RNA expression data."
 info:
   format:

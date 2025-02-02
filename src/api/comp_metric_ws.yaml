@@ -3,9 +3,8 @@ __merge__: comp_metric.yaml
 namespace: "metrics"
 info:
   type: ws_distance
-  
   type_info:
-    label: ws_distance
+    label: Wasserstein distance metric
     summary: Calculates Wasserstein distance for a given GRN and dataset
 
 
@@ -23,7 +22,7 @@ arguments:
     required: true
     example: resources_test/prior/ws_distance_background_norman.csv
   - name: --evaluation_data_sc
-    type: file
+    type: file_evaluation_h5ad.yaml
     required: true
     direction: input
     example: 'resources_test/datasets_raw/adamson_sc_counts.h5ad'
