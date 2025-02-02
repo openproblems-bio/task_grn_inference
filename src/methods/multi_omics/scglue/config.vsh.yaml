@@ -40,6 +40,9 @@ resources:
 engines:
   - type: docker
     image: janursa/scglue:19-08-2024
+    - type: python
+        github:
+          - openproblems-bio/core#subdirectory=packages/python/openproblems
     # image: nvcr.io/nvidia/pytorch:24.06-py3
     # setup:
     #   - type: python

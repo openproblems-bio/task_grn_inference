@@ -92,6 +92,7 @@ net = infer_grn(X, par)
 
 # Save inferred GRN
 print('Output GRN')
+
 net['weight'] = net['weight'].astype(str)
 output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
 output.write(par['prediction'])
