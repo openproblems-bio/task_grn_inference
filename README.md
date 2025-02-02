@@ -46,15 +46,15 @@ See our publication for the details of methods.
 
 ``` mermaid
 flowchart TB
-  file_atac_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-atac'>atac</a>")
+  file_atac_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-chromatin-accessibility-data'>chromatin accessibility data</a>")
   comp_method[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-method'>method</a>"/]
-  file_prediction_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-prediction'>prediction</a>")
-  comp_metric_regression[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-metric-regression'>metric_regression</a>"/]
-  comp_metric_ws[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-ws-distance'>ws_distance</a>"/]
+  file_prediction_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-grn-prediction'>GRN prediction</a>")
+  comp_metric_regression[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-feature-based-metrics'>Feature-based metrics</a>"/]
+  comp_metric_ws[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-wasserstein-distance-metric'>Wasserstein distance metric</a>"/]
   comp_metric[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-metrics'>metrics</a>"/]
   file_score_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-score'>score</a>")
-  file_evaluation_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-perturbation'>perturbation</a>")
-  file_rna_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-rna'>rna</a>")
+  file_evaluation_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-perturbation-data'>perturbation data</a>")
+  file_rna_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-gene-expression-data'>gene expression data</a>")
   file_atac_h5ad-.-comp_method
   comp_method-.->file_prediction_h5ad
   file_prediction_h5ad---comp_metric_regression
@@ -67,7 +67,7 @@ flowchart TB
   file_rna_h5ad---comp_method
 ```
 
-## File format: atac
+## File format: chromatin accessibility data
 
 Chromatin accessibility data
 
@@ -111,13 +111,12 @@ Arguments:
 | `--num_workers` | `integer` | (*Optional*) NA. Default: `4`. |
 | `--temp_dir` | `string` | (*Optional*) NA. Default: `output/temdir`. |
 | `--seed` | `integer` | (*Optional*) NA. Default: `32`. |
-| `--causal` | `boolean` | (*Optional*) NA. Default: `TRUE`. |
 | `--dataset_id` | `string` | (*Optional*) NA. Default: `op`. |
 | `--method_id` | `string` | (*Optional*) NA. Default: `grnboost2`. |
 
 </div>
 
-## File format: prediction
+## File format: GRN prediction
 
 File indicating the inferred GRN.
 
@@ -144,7 +143,7 @@ Data structure:
 
 </div>
 
-## Component type: metric_regression
+## Component type: Feature-based metrics
 
 Calculates regression scores
 
@@ -171,7 +170,7 @@ Arguments:
 
 </div>
 
-## Component type: ws_distance
+## Component type: Wasserstein distance metric
 
 Calculates Wasserstein distance for a given GRN and dataset
 
@@ -190,7 +189,7 @@ Arguments:
 | `--dataset_id` | `string` | (*Optional*) NA. Default: `op`. |
 | `--ws_consensus` | `file` | NA. |
 | `--ws_distance_background` | `file` | NA. |
-| `--evaluation_data_sc` | `file` | NA. |
+| `--evaluation_data_sc` | `file_evaluation_h5ad.yaml` | NA. |
 
 </div>
 
@@ -242,7 +241,7 @@ Data structure:
 
 </div>
 
-## File format: perturbation
+## File format: perturbation data
 
 Perturbation dataset for benchmarking.
 
@@ -272,7 +271,7 @@ Data structure:
 
 </div>
 
-## File format: rna
+## File format: gene expression data
 
 RNA expression data.
 

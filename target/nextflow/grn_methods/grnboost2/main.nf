@@ -3382,7 +3382,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/grnboost2",
     "viash_version" : "0.9.1",
-    "git_commit" : "09c28006fee3c89826e9555fde5cd07e28e2a306",
+    "git_commit" : "7d787a078704fb4da3671c87442169b05901add9",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3415,7 +3415,7 @@ meta = [
           "dest" : "resources_test/grn_models/"
         }
       ],
-      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n\n# download resources \nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n```bash\nscripts/download_resources.sh\n```\n\n## Infer a GRN \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n          --rna resources/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad\n```\n\n```bash\n## Evaluate a GRN\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\nThis will calculate and print the scores as well as output the scores into `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
+      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\n\n# download resources \nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Infer a GRN \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n          --rna resources/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad\n```\n\n## Evaluate a GRN\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\n\nThis will calculate and print the scores as well as output the scores into `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
     },
     "repositories" : [
       {
@@ -3585,7 +3585,8 @@ def main(par: dict) -> pd.DataFrame:
     network = grnboost2(X, client_or_address=client, gene_names=gene_names, tf_names=tf_names)
     network.rename(columns={'TF': 'source', 'target': 'target', 'importance': 'weight'}, inplace=True)
     network.reset_index(drop=True, inplace=True)
-    network = process_links(network, par)    
+    network = process_links(network, par)  
+    return network  
 
 if __name__ == '__main__':
     net = main(par)   

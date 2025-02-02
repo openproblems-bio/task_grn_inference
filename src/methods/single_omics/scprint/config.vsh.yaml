@@ -21,6 +21,7 @@ arguments:
     type: integer
     direction: input
     default: 1000
+    
 resources:
   - type: python_script
     path: script.py
