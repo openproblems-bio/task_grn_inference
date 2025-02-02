@@ -161,7 +161,6 @@ resources:
 engines:
   - type: docker
     image: chrarnold84/granieverse:v1.3
-    __merge__: /src/api/base_requirements.yaml
 
   - type: native
 runners:

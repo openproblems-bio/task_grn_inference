@@ -41,7 +41,6 @@ resources:
 engines:
   - type: docker
     image: apassemi/scenicplus:1.0.4
-    __merge__: /src/api/base_requirements.yaml
     # image: vanallenlab/scenicplus_x86_64:initial
     #image: aertslab/pyscenic:0.12.1
   - type: native

@@ -40,7 +40,6 @@ resources:
 engines:
   - type: docker
     image: janursa/scglue:19-08-2024
-    __merge__: /src/api/base_requirements.yaml
     # image: nvcr.io/nvidia/pytorch:24.06-py3
     # setup:
     #   - type: python
