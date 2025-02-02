@@ -24,6 +24,7 @@ arguments:
     required: false
     direction: input
     example: resources_test/prior/tf_all.csv
+    default: resources_test/prior/tf_all.csv
   - name: --max_n_links
     type: integer
     default: 50000

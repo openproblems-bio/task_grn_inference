@@ -1,5 +1,8 @@
-import lamindb as ln
-ln.setup.init(storage='./output')
+import lamindb_setup as ln_setup
+
+ln_setup.init(storage="./testdb", name="test", modules="bionty")
+from scdataloader.utils import populate_my_ontology
+
 
 from scprint import scPrint
 from scdataloader import Preprocessor, utils
@@ -15,7 +18,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 import anndata as ad
 import pandas as pd
-from scdataloader.utils import populate_my_ontology
 
 import torch
 torch.set_float32_matmul_precision('medium')
@@ -105,6 +107,7 @@ if __name__ == '__main__':
     populate_my_ontology( 
         organisms= ["NCBITaxon:9606"]
     )
+    
     
     net = run_scprint(par)
 

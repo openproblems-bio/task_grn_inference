@@ -445,13 +445,20 @@ function ViashDockerfile {
     cat << 'VIASHDOCKER'
 FROM openproblems/base_pytorch_nvidia:1.0.0
 ENTRYPOINT []
-RUN pip install --upgrade pip && \
-  pip install --upgrade --no-cache-dir "scprint~=2.1.0"
+RUN apt install git && \
+git clone https://github.com/cantinilab/scPRINT   && \
+git clone https://github.com/jkobject/scDataLoader   && \
+git clone https://github.com/cantinilab/GRnnData   && \
+git clone https://github.com/jkobject/benGRN    && \
+pip install -e scPRINT[dev]   && \
+pip install -e scDataLoader[dev]   && \
+pip install -e GRnnData[dev]   && \
+pip install -e benGRN[dev]  
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-02-02T13:15:20Z"
+LABEL org.opencontainers.image.created="2025-02-02T19:55:07Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="0fc738e7f4216339087094cb08bb80d5a95052d3"
+LABEL org.opencontainers.image.revision="a011d90080721ca3afeb7d7e2a748eb6a26513c7"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -586,6 +593,7 @@ function ViashHelp {
   echo ""
   echo "    --tf_all"
   echo "        type: file, file must exist"
+  echo "        default: resources_test/prior/tf_all.csv"
   echo "        example: resources_test/prior/tf_all.csv"
   echo ""
   echo "    --max_n_links"
@@ -1034,6 +1042,9 @@ if [ -z ${VIASH_META_TEMP_DIR+x} ]; then
 fi
 
 # filling in defaults
+if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
+  VIASH_PAR_TF_ALL="resources_test/prior/tf_all.csv"
+fi
 if [ -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then
   VIASH_PAR_MAX_N_LINKS="50000"
 fi
@@ -1290,8 +1301,11 @@ function interrupt {
 trap clean_up EXIT
 trap interrupt INT SIGINT
 cat > "\$tempscript" << 'VIASHMAIN'
-import lamindb as ln
-ln.setup.init(storage='./output')
+import lamindb_setup as ln_setup
+
+ln_setup.init(storage="./testdb", name="test", modules="bionty")
+from scdataloader.utils import populate_my_ontology
+
 
 from scprint import scPrint
 from scdataloader import Preprocessor, utils
@@ -1307,7 +1321,6 @@ from matplotlib import pyplot as plt
 import numpy as np
 import anndata as ad
 import pandas as pd
-from scdataloader.utils import populate_my_ontology
 
 import torch
 torch.set_float32_matmul_precision('medium')
@@ -1429,6 +1442,7 @@ if __name__ == '__main__':
     populate_my_ontology( 
         organisms= ["NCBITaxon:9606"]
     )
+    
     
     net = run_scprint(par)
 

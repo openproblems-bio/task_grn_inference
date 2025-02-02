@@ -1,7 +1,7 @@
 type: file
 example: resources_test/inference_datasets/op_rna.h5ad
-label: multiomics rna
-summary: "RNA expression for multiomics data."
+label: rna
+summary: "RNA expression data."
 info:
   format:
     type: h5ad

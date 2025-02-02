@@ -19,13 +19,15 @@ resources:
 engines:
   - type: docker
     image: continuumio/anaconda3:2024.02-1
-    __merge__: /src/api/base_requirements.yaml
     setup:
       - type: docker
         run: |
           conda install -y -c bioconda arboreto pandas
       - type: python
         packages: [ anndata ]
+        github:
+          - openproblems-bio/core#subdirectory=packages/python/openproblems
+  
   - type: native
 runners:
   - type: executable

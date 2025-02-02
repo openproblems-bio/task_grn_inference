@@ -26,6 +26,7 @@ resources:
 engines:
   - type: docker
     image: kenjikamimoto126/celloracle_ubuntu:0.18.0
+    __merge__: /src/api/base_requirements.yaml
 
 runners:
   - type: executable

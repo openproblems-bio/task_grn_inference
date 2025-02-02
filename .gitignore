@@ -1,6 +1,7 @@
 # mac os x
 .DS_Store
 
+
 # related to files
 .pybiomart.sqlite
 logs/
@@ -29,3 +30,4 @@ work
 
 # IDE related
 .idea
+.vscode

@@ -3046,8 +3046,8 @@ meta = [
         {
           "type" : "file",
           "name" : "--rna",
-          "label" : "multiomics rna",
-          "summary" : "RNA expression for multiomics data.",
+          "label" : "rna",
+          "summary" : "RNA expression data.",
           "info" : {
             "format" : {
               "type" : "h5ad",
@@ -3094,11 +3094,11 @@ meta = [
         {
           "type" : "file",
           "name" : "--atac",
+          "label" : "atac",
+          "summary" : "Chromatin accessibility data",
           "info" : {
-            "label" : "multiomics atac",
-            "summary" : "Peak data for multiomics data.",
-            "file_type" : "h5ad",
-            "slots" : {
+            "format" : {
+              "type" : "h5ad",
               "obs" : [
                 {
                   "name" : "cell_type",
@@ -3128,11 +3128,11 @@ meta = [
         {
           "type" : "file",
           "name" : "--prediction",
+          "label" : "prediction",
+          "summary" : "File indicating the inferred GRN.",
           "info" : {
-            "label" : "prediction",
-            "summary" : "File indicating the inferred GRN.",
-            "file_type" : "h5ad",
-            "slots" : {
+            "format" : {
+              "type" : "h5ad",
               "uns" : [
                 {
                   "type" : "string",
@@ -3169,6 +3169,9 @@ meta = [
           "type" : "file",
           "name" : "--tf_all",
           "example" : [
+            "resources_test/prior/tf_all.csv"
+          ],
+          "default" : [
             "resources_test/prior/tf_all.csv"
           ],
           "must_exist" : true,
@@ -3410,15 +3413,15 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/control_methods/pearson_corr",
     "viash_version" : "0.9.1",
-    "git_commit" : "0fc738e7f4216339087094cb08bb80d5a95052d3",
+    "git_commit" : "a011d90080721ca3afeb7d7e2a748eb6a26513c7",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
     "name" : "task_grn_inference",
     "version" : "build_main",
     "label" : "GRN Inference",
-    "summary" : "Benchmarking GRN inference methods\nThe full documentation is hosted on [ReadTheDocs](https://grn-inference-benchmarking.readthedocs.io/en/latest/index.html). \n",
-    "description" : "GRNs are essential for understanding cellular identity and behavior. They are simplified models of gene expression regulated by complex processes involving multiple layers of control, from transcription to post-transcriptional modifications, incorporating various regulatory elements and non-coding RNAs. Gene transcription is controlled by a regulatory complex that includes transcription factors (TFs), cis-regulatory elements (CREs) like promoters and enhancers, and essential co-factors. High-throughput datasets, covering thousands of genes, facilitate the use of machine learning approaches to decipher GRNs. The advent of single-cell sequencing technologies, such as scRNA-seq, has made it possible to infer GRNs from a single experiment due to the abundance of samples. This allows researchers to infer condition-specific GRNs, such as for different cell types or diseases, and study potential regulatory factors associated with these conditions. Combining chromatin accessibility data with gene expression measurements has led to the development of enhancer-driven GRN (eGRN) inference pipelines, which offer significantly improved accuracy over single-modality methods.\n\nHere, we present geneRNIB as a living benchmark platform for GRN inference. This platform provides curated datasets for GRN inference and evaluation, standardized evaluation protocols and metrics, computational infrastructure, and a dynamically updated leaderboard to track state-of-the-art methods. It runs novel GRNs in the cloud, offers competition scores, and stores them for future comparisons, reflecting new developments over time.\n\nThe platform supports the integration of new datasets and protocols. When a new feature is added, previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly. The aim is to evaluate both the accuracy and completeness of inferred GRNs. It is designed for both single-modality and multi-omics GRN inference. Ultimately, it is a community-driven platform. \n\nSo far, ten GRN inference methods have been integrated: five single-omics methods of GRNBoost2, GENIE3, Portia, PPCOR, and Scenic; and five eGRN inference methods of Scenic+, CellOracle, FigR, scGLUE, and GRaNIE.\n\nDue to its flexible nature, the platform can incorporate various benchmark datasets and evaluation methods, using either prior knowledge or feature-based approaches. \nIn the current version, due to the absence of standardized prior knowledge, we use indirect approaches to benchmark GRNs. Employing interventional data as evaluation datasets, we have developed 8 metrics using feature-based approach and Wasserstein distance, accounting for both accuracy and comprehensiveness.\n\nFive datasets have been integrated so far, namely OPSCA, Nakatake, Norman, Adamson, and Replogle. For each dataset, standardized inference datasets are provided to be used for GRN inference and evaluation datasets are employed to benchmark.\nSee our publication for the details of methods. \n",
+    "summary" : "Benchmarking GRN inference methods\n",
+    "description" : "\ngeneRNIB is a living benchmark platform for GRN inference. This platform provides curated datasets for GRN inference and evaluation, standardized evaluation protocols and metrics, computational infrastructure, and a dynamically updated leaderboard to track state-of-the-art methods. It runs novel GRNs in the cloud, offers competition scores, and stores them for future comparisons, reflecting new developments over time.\n\nThe platform supports the integration of new inference methods, datasets and protocols. When a new feature is added, previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly. The aim is to evaluate both the accuracy and completeness of inferred GRNs. It is designed for both single-modality and multi-omics GRN inference. \n\nIn the current version, geneRNIB contains 11 inference methods including both single and multi-omics, 8 evalation metrics, and five datasets (OPSCA, Nakatake, Norman, Adamson, and Replogle). \n\nSee our publication for the details of methods. \n",
     "info" : {
       "image" : "thumbnail.svg",
       "test_resources" : [
@@ -3443,7 +3446,7 @@ meta = [
           "dest" : "resources_test/grn_models/"
         }
       ],
-      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n\n# download resources\nscripts/download_resources.sh\n```\nThe datasets for GRN inference are located in `resources/inference_datasets`. \n## Infer a GRN \nOne GRN should be inferred for each inference dataset (op, norman, replogle2, adamson, and nakatake). The inferred GRN should have three columns of `source, target, weight`. See `resources/grn_models/op/grnboost2.csv` as an example.\n\n## Evaluate a GRN\nOnce a GRN is inferred (e.g. located in `output/your_GRN.csv`) for a given dataset (e.g. `norman`), use the following code to obtain evaluation scores. \n```bash\nscripts/calculate_score.sh output/your_GRN.csv norman\n```\nThis will calculate and print the scores as well as output the scores into `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
+      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n\n# download resources \nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n```bash\nscripts/download_resources.sh\n```\n\n## Infer a GRN \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n          --rna resources/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad\n```\n\n```bash\n## Evaluate a GRN\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\nThis will calculate and print the scores as well as output the scores into `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
     },
     "repositories" : [
       {
@@ -3537,6 +3540,11 @@ import anndata as ad
 import pandas as pd
 import os
 import scanpy as sc 
+import sys
+import numpy as np
+
+# - whatever is between viash start and end will be replaced by Viash with the parameters from the config. file
+
 ## VIASH START
 # The following code has been auto-generated by Viash.
 par = {
@@ -3579,61 +3587,42 @@ dep = {
 
 ## VIASH END
 
-
-import argparse
-parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-parser.add_argument('--num_workers', type=str, help='Number of cores')
-parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
-
-args = parser.parse_args()
-
-if args.max_n_links:
-    par['max_n_links'] = int(args.max_n_links)
-    
-if args.rna:
-    par['rna'] = args.rna
-
-if args.prediction:
-    par['prediction'] = args.prediction
-if args.tf_all:
-    par['tf_all'] = args.tf_all
-if args.num_workers:
-    par['num_workers'] = args.num_workers
-
-os.makedirs(par['temp_dir'], exist_ok=True)
-import sys
-
-try:
-    sys.path.append(meta["resources_dir"])
-except:
-    meta = {
-    'resources_dir': 'src/utils'
-    }
-    sys.path.append(meta["resources_dir"])
+sys.path.append(meta["resources_dir"])
 from util import corr_net
 
 
-def create_corr_net(par):
+def infer_net(par: dict) -> pd.DataFrame:
     print(par)
     print('Read data')
     adata = ad.read_h5ad(par["rna"])
+    try:
+        X = adata.layers['X_norm'].todense().A
+    except:
+        X = adata.X
 
-    X = adata.layers['X_norm']
-
-    # - corr
-    gene_names = adata.var_names.to_numpy()
+    # - remove genes with 0 standard deviation
+    gene_std = np.std(X, axis=0)
+    nonzero_std_genes = gene_std > 0
+    X = X[:, nonzero_std_genes]
+    # - get the net
+    gene_names = adata[:, nonzero_std_genes].var_names.to_numpy()
     grn = corr_net(X, gene_names, par)    
     return grn
 
-net = create_corr_net(par)
+if __name__ == '__main__':
+    net = infer_net(par)
+    # - format of et
+    \'\'\'
+        the net is a pandas dataframe with the following columns:
+            - source: the source gene of the interaction
+            - target: the target gene of the interaction
+            - weight: the weight of the interaction
+    \'\'\'
 
-print('Output GRN')
-net['weight'] = net['weight'].astype(str)
-output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
-output.write(par['prediction'])
+    print('Output GRN')
+    net['weight'] = net['weight'].astype(str)
+    output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+    output.write(par['prediction'])
 VIASHMAIN
 python -B "$tempscript"
 '''

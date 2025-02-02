@@ -43,6 +43,10 @@ engines:
     image: apassemi/scenicplus:1.0.4
     # image: vanallenlab/scenicplus_x86_64:initial
     #image: aertslab/pyscenic:0.12.1
+    setup:
+      - type: python
+        github:
+          - openproblems-bio/core#subdirectory=packages/python/openproblems
   - type: native
 runners:
   - type: executable

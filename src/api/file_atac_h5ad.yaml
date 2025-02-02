@@ -1,10 +1,10 @@
 type: file
 example: resources_test/inference_datasets/op_atac.h5ad
+label: atac
+summary: "Chromatin accessibility data"
 info:
-  label: multiomics atac
-  summary: "Peak data for multiomics data."
-  file_type: h5ad
-  slots:
+  format:
+    type: h5ad
     obs:
       - name: cell_type
         type: string

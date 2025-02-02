@@ -6,8 +6,8 @@ argument_groups:
   arguments:
   - type: "file"
     name: "--rna"
-    label: "multiomics rna"
-    summary: "RNA expression for multiomics data."
+    label: "rna"
+    summary: "RNA expression data."
     info:
       format:
         type: "h5ad"
@@ -39,11 +39,11 @@ argument_groups:
     multiple_sep: ";"
   - type: "file"
     name: "--atac"
+    label: "atac"
+    summary: "Chromatin accessibility data"
     info:
-      label: "multiomics atac"
-      summary: "Peak data for multiomics data."
-      file_type: "h5ad"
-      slots:
+      format:
+        type: "h5ad"
         obs:
         - name: "cell_type"
           type: "string"
@@ -63,11 +63,11 @@ argument_groups:
     multiple_sep: ";"
   - type: "file"
     name: "--prediction"
+    label: "prediction"
+    summary: "File indicating the inferred GRN."
     info:
-      label: "prediction"
-      summary: "File indicating the inferred GRN."
-      file_type: "h5ad"
-      slots:
+      format:
+        type: "h5ad"
         uns:
         - type: "string"
           name: "dataset_id"
@@ -93,6 +93,8 @@ argument_groups:
     name: "--tf_all"
     info: null
     example:
+    - "resources_test/prior/tf_all.csv"
+    default:
     - "resources_test/prior/tf_all.csv"
     must_exist: true
     create_parent: true
@@ -262,11 +264,14 @@ engines:
   image: "openproblems/base_pytorch_nvidia:1.0.0"
   namespace_separator: "/"
   setup:
-  - type: "python"
-    user: false
-    packages:
-    - "scprint~=2.1.0"
-    upgrade: true
+  - type: "docker"
+    run:
+    - "apt install git && \\\ngit clone https://github.com/cantinilab/scPRINT   &&\
+      \ \\\ngit clone https://github.com/jkobject/scDataLoader   && \\\ngit clone\
+      \ https://github.com/cantinilab/GRnnData   && \\\ngit clone https://github.com/jkobject/benGRN\
+      \    && \\\npip install -e scPRINT[dev]   && \\\npip install -e scDataLoader[dev]\
+      \   && \\\npip install -e GRnnData[dev]   && \\\npip install -e benGRN[dev]\
+      \  \n"
   entrypoint: []
   cmd: null
 - type: "native"
@@ -278,53 +283,27 @@ build_info:
   output: "target/executable/grn_methods/scprint"
   executable: "target/executable/grn_methods/scprint/scprint"
   viash_version: "0.9.1"
-  git_commit: "0fc738e7f4216339087094cb08bb80d5a95052d3"
+  git_commit: "a011d90080721ca3afeb7d7e2a748eb6a26513c7"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
 package_config:
   name: "task_grn_inference"
   version: "build_main"
   label: "GRN Inference"
-  summary: "Benchmarking GRN inference methods\nThe full documentation is hosted on\
-    \ [ReadTheDocs](https://grn-inference-benchmarking.readthedocs.io/en/latest/index.html).\
-    \ \n"
-  description: "GRNs are essential for understanding cellular identity and behavior.\
-    \ They are simplified models of gene expression regulated by complex processes\
-    \ involving multiple layers of control, from transcription to post-transcriptional\
-    \ modifications, incorporating various regulatory elements and non-coding RNAs.\
-    \ Gene transcription is controlled by a regulatory complex that includes transcription\
-    \ factors (TFs), cis-regulatory elements (CREs) like promoters and enhancers,\
-    \ and essential co-factors. High-throughput datasets, covering thousands of genes,\
-    \ facilitate the use of machine learning approaches to decipher GRNs. The advent\
-    \ of single-cell sequencing technologies, such as scRNA-seq, has made it possible\
-    \ to infer GRNs from a single experiment due to the abundance of samples. This\
-    \ allows researchers to infer condition-specific GRNs, such as for different cell\
-    \ types or diseases, and study potential regulatory factors associated with these\
-    \ conditions. Combining chromatin accessibility data with gene expression measurements\
-    \ has led to the development of enhancer-driven GRN (eGRN) inference pipelines,\
-    \ which offer significantly improved accuracy over single-modality methods.\n\n\
-    Here, we present geneRNIB as a living benchmark platform for GRN inference. This\
+  summary: "Benchmarking GRN inference methods\n"
+  description: "\ngeneRNIB is a living benchmark platform for GRN inference. This\
     \ platform provides curated datasets for GRN inference and evaluation, standardized\
     \ evaluation protocols and metrics, computational infrastructure, and a dynamically\
     \ updated leaderboard to track state-of-the-art methods. It runs novel GRNs in\
     \ the cloud, offers competition scores, and stores them for future comparisons,\
     \ reflecting new developments over time.\n\nThe platform supports the integration\
-    \ of new datasets and protocols. When a new feature is added, previously evaluated\
-    \ GRNs are re-assessed, and the leaderboard is updated accordingly. The aim is\
-    \ to evaluate both the accuracy and completeness of inferred GRNs. It is designed\
-    \ for both single-modality and multi-omics GRN inference. Ultimately, it is a\
-    \ community-driven platform. \n\nSo far, ten GRN inference methods have been integrated:\
-    \ five single-omics methods of GRNBoost2, GENIE3, Portia, PPCOR, and Scenic; and\
-    \ five eGRN inference methods of Scenic+, CellOracle, FigR, scGLUE, and GRaNIE.\n\
-    \nDue to its flexible nature, the platform can incorporate various benchmark datasets\
-    \ and evaluation methods, using either prior knowledge or feature-based approaches.\
-    \ \nIn the current version, due to the absence of standardized prior knowledge,\
-    \ we use indirect approaches to benchmark GRNs. Employing interventional data\
-    \ as evaluation datasets, we have developed 8 metrics using feature-based approach\
-    \ and Wasserstein distance, accounting for both accuracy and comprehensiveness.\n\
-    \nFive datasets have been integrated so far, namely OPSCA, Nakatake, Norman, Adamson,\
-    \ and Replogle. For each dataset, standardized inference datasets are provided\
-    \ to be used for GRN inference and evaluation datasets are employed to benchmark.\n\
-    See our publication for the details of methods. \n"
+    \ of new inference methods, datasets and protocols. When a new feature is added,\
+    \ previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly.\
+    \ The aim is to evaluate both the accuracy and completeness of inferred GRNs.\
+    \ It is designed for both single-modality and multi-omics GRN inference. \n\n\
+    In the current version, geneRNIB contains 11 inference methods including both\
+    \ single and multi-omics, 8 evalation metrics, and five datasets (OPSCA, Nakatake,\
+    \ Norman, Adamson, and Replogle). \n\nSee our publication for the details of methods.\
+    \ \n"
   info:
     image: "thumbnail.svg"
     test_resources:
@@ -344,17 +323,18 @@ package_config:
       \ Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\n\
       to install the required dependencies. \n\n## Download resources\n```bash\ngit\
       \ clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n\
-      \n# download resources\nscripts/download_resources.sh\n```\nThe datasets for\
-      \ GRN inference are located in `resources/inference_datasets`. \n## Infer a\
-      \ GRN \nOne GRN should be inferred for each inference dataset (op, norman, replogle2,\
-      \ adamson, and nakatake). The inferred GRN should have three columns of `source,\
-      \ target, weight`. See `resources/grn_models/op/grnboost2.csv` as an example.\n\
-      \n## Evaluate a GRN\nOnce a GRN is inferred (e.g. located in `output/your_GRN.csv`)\
-      \ for a given dataset (e.g. `norman`), use the following code to obtain evaluation\
-      \ scores. \n```bash\nscripts/calculate_score.sh output/your_GRN.csv norman\n\
-      ```\nThis will calculate and print the scores as well as output the scores into\
-      \ `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository,\
-      \ follow the instructions in the `scripts/add_a_method.sh` script.\n"
+      \n# download resources \nTo interact with the framework, you should download\
+      \ the resources containing necessary inferene and evaluation datasets to get\
+      \ started.\n```bash\nscripts/download_resources.sh\n```\n\n## Infer a GRN \n\
+      \nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\
+      ```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\n\
+      \          --rna resources/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad\n\
+      ```\n\n```bash\n## Evaluate a GRN\nOnce got the prediction for a given dataset,\
+      \ use the following code to obtain evaluation scores. \n```bash\nscripts/single_grn_evaluation.sh\
+      \ output/net.h5ad norman\n```\nThis will calculate and print the scores as well\
+      \ as output the scores into `output/score.h5ad`\n\n## Add a method\n\nTo add\
+      \ a method to the repository, follow the instructions in the `scripts/add_a_method.sh`\
+      \ script.\n"
   repositories:
   - type: "github"
     name: "openproblems"
