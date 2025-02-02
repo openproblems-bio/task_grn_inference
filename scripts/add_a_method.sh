@@ -11,9 +11,8 @@ echo "Please run the script step-by-step."
 method_id="dummy"
 method_lang="python" # change this to "r" if need be
 
-viash run src/common/create_component/config.vsh.yaml -- \
-  --language "$method_lang" \
-  --name "$method_id"
+
+bash common/scripts/create_component --type method --language ${method_lang} --name ${method_id}
 
 # TODO: fill in required fields in src/methods/foo/config.vsh.yaml
 # TODO: edit src/methods/foo/script.py/R
@@ -26,17 +25,13 @@ viash test src/methods/$method_id/config.vsh.yaml
 viash run src/methods/$method_id/config.vsh.yaml -- \
   ---setup cachedbuild ---verbose
 
-# run the method (using h5ad as input)
+# run the inference using the method for op dataset using only RNA data. Add more aurguments if needed.
 viash run src/methods/$method_id/config.vsh.yaml -- \
-  --multiomics_rna "resources/grn-benchmark/multiomics_rna.h5ad" \
-  --multiomics_atac "resources/grn-benchmark/multiomics_atac.h5ad" \
-  --output "output/prediction.csv"
+  --rna "resources/inference_datasets/op_rna.h5ad" \
+  --prediction "output/prediction.h5ad"
 
-# run evaluation metric
-viash run src/metrics/regression_1/config.vsh.yaml -- \
-  --perturbation_file "resources/grn-benchmark/perturbation_file.h5ad" \
-  --prediction "output/prediction.csv" \
-  --output "output/score.csv"
+# run evaluation metrics
+bash scripts/calculate_score.sh output/prediction.h5ad op
 
-# print score on kaggle test dataset
-python -c 'import pandas as pd; print(pd.read_csv("output/score.csv"))'
+# print the score
+python -c 'import pandas as ad; print(ad.read_h5ad("output/score.h5ad"))'

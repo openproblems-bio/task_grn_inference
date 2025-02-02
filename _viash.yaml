@@ -15,7 +15,7 @@ links:
 label: GRN Inference
 summary: |
   Benchmarking GRN inference methods
-  The full documentation is hosted on [ReadTheDocs](https://grn-inference-benchmarking.readthedocs.io/en/latest/index.html). 
+
 description: |
   GRNs are essential for understanding cellular identity and behavior. They are simplified models of gene expression regulated by complex processes involving multiple layers of control, from transcription to post-transcriptional modifications, incorporating various regulatory elements and non-coding RNAs. Gene transcription is controlled by a regulatory complex that includes transcription factors (TFs), cis-regulatory elements (CREs) like promoters and enhancers, and essential co-factors. High-throughput datasets, covering thousands of genes, facilitate the use of machine learning approaches to decipher GRNs. The advent of single-cell sequencing technologies, such as scRNA-seq, has made it possible to infer GRNs from a single experiment due to the abundance of samples. This allows researchers to infer condition-specific GRNs, such as for different cell types or diseases, and study potential regulatory factors associated with these conditions. Combining chromatin accessibility data with gene expression measurements has led to the development of enhancer-driven GRN (eGRN) inference pipelines, which offer significantly improved accuracy over single-modality methods.
 
@@ -26,11 +26,12 @@ description: |
   So far, ten GRN inference methods have been integrated: five single-omics methods of GRNBoost2, GENIE3, Portia, PPCOR, and Scenic; and five eGRN inference methods of Scenic+, CellOracle, FigR, scGLUE, and GRaNIE.
 
   Due to its flexible nature, the platform can incorporate various benchmark datasets and evaluation methods, using either prior knowledge or feature-based approaches. 
-  In the current version, due to the absence of standardized prior knowledge, we use indirect approaches to benchmark GRNs. Employing interventional data as evaluation datasets, we have developed 8 metrics using feature-based approach and Wasserstein distance, accounting for both accuracy and comprehensiveness.
+  In the current version, due to the absence of standardized prior knowledge, we use indirect approaches to benchmark GRNs. Employing interventional data as evaluation datasets, 
+  we have developed 8 metrics using feature-based approach and Wasserstein distance, accounting for both accuracy and comprehensiveness.
 
   Five datasets have been integrated so far, namely OPSCA, Nakatake, Norman, Adamson, and Replogle. For each dataset, standardized inference datasets are provided to be used for GRN inference and evaluation datasets are employed to benchmark.
-  See our publication for the details of methods. 
 
+  See our publication for the details of methods. 
 info:
   image: thumbnail.svg # todo: create a thumbnail
   test_resources:
@@ -59,17 +60,25 @@ info:
 
     cd task_grn_inference
     
-    # download resources
+    # download resources 
+    To interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.
+    ```bash
     scripts/download_resources.sh
     ```
-    The datasets for GRN inference are located in `resources/inference_datasets`. 
+
     ## Infer a GRN 
-    One GRN should be inferred for each inference dataset (op, norman, replogle2, adamson, and nakatake). The inferred GRN should have three columns of `source, target, weight`. See `resources/grn_models/op/grnboost2.csv` as an example.
     
-    ## Evaluate a GRN
-    Once a GRN is inferred (e.g. located in `output/your_GRN.csv`) for a given dataset (e.g. `norman`), use the following code to obtain evaluation scores. 
+    To infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:
     ```bash
-    scripts/calculate_score.sh output/your_GRN.csv norman
+    viash run src/control_methods/pearson_corr/config.vsh.yaml -- \
+              --rna resources/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad
+    ```
+
+    ```bash
+    ## Evaluate a GRN
+    Once got the prediction for a given dataset, use the following code to obtain evaluation scores. 
+    ```bash
+    scripts/single_grn_evaluation.sh output/net.h5ad norman
     ```
     This will calculate and print the scores as well as output the scores into `output/score.h5ad`
   

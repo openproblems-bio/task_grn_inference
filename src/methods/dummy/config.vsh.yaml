@@ -1,0 +1,76 @@
+# The API specifies which type of component this is.
+# It contains specifications for:
+#   - The input/output files
+#   - Common parameters
+#   - A unit test
+__merge__: ../../api/comp_method.yaml
+
+# A unique identifier for your component (required).
+# Can contain only lowercase letters or underscores.
+name: dummy
+# A relatively short label, used when rendering visualisations (required)
+label: Dummy
+# A one sentence summary of how this method works (required). Used when 
+# rendering summary tables.
+summary: "FILL IN: A one sentence summary of this method."
+# A multi-line description of how this component works (required). Used
+# when rendering reference documentation.
+description: |
+  FILL IN: A (multi-line) description of how this method works.
+# references:
+#   doi: 
+#     - 10.1000/xx.123456.789
+#   bibtex:
+#     - |
+#       @article{foo,
+#         title={Foo},
+#         author={Bar},
+#         journal={Baz},
+#         year={2024}
+#       }
+links:
+  # URL to the documentation for this method (required).
+  documentation: https://url.to/the/documentation
+  # URL to the code repository for this method (required).
+  repository: https://github.com/organisation/repository
+
+
+
+# Metadata for your component
+info:
+  # Which normalisation method this component prefers to use (required).
+  preferred_normalization: log_cp10k
+
+# Component-specific parameters (optional)
+# arguments:
+#   - name: "--n_neighbors"
+#     type: "integer"
+#     default: 5
+#     description: Number of neighbors to use.
+
+# Resources required to run the component
+resources:
+  # The script of your component (required)
+  - type: python_script
+    path: script.py
+  # Additional resources your script needs (optional)
+  # - type: file
+  #   path: weights.pt
+
+engines:
+  # Specifications for the Docker image for this component.
+  - type: docker
+    image: openproblems/base_python:1.0.0
+    # Add custom dependencies here (optional). For more information, see
+    # https://viash.io/reference/config/engines/docker/#setup .
+    # setup:
+    #   - type: python
+    #     packages: numpy<2
+
+runners:
+  # This platform allows running the component natively
+  - type: executable
+  # Allows turning the component into a Nextflow module / pipeline.
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]
