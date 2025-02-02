@@ -13,57 +13,22 @@ Repository:
 
 ## Description
 
-GRNs are essential for understanding cellular identity and behavior.
-They are simplified models of gene expression regulated by complex
-processes involving multiple layers of control, from transcription to
-post-transcriptional modifications, incorporating various regulatory
-elements and non-coding RNAs. Gene transcription is controlled by a
-regulatory complex that includes transcription factors (TFs),
-cis-regulatory elements (CREs) like promoters and enhancers, and
-essential co-factors. High-throughput datasets, covering thousands of
-genes, facilitate the use of machine learning approaches to decipher
-GRNs. The advent of single-cell sequencing technologies, such as
-scRNA-seq, has made it possible to infer GRNs from a single experiment
-due to the abundance of samples. This allows researchers to infer
-condition-specific GRNs, such as for different cell types or diseases,
-and study potential regulatory factors associated with these conditions.
-Combining chromatin accessibility data with gene expression measurements
-has led to the development of enhancer-driven GRN (eGRN) inference
-pipelines, which offer significantly improved accuracy over
-single-modality methods.
+geneRNIB is a living benchmark platform for GRN inference. This platform
+provides curated datasets for GRN inference and evaluation, standardized
+evaluation protocols and metrics, computational infrastructure, and a
+dynamically updated leaderboard to track state-of-the-art methods. It
+runs novel GRNs in the cloud, offers competition scores, and stores them
+for future comparisons, reflecting new developments over time.
 
-Here, we present geneRNIB as a living benchmark platform for GRN
-inference. This platform provides curated datasets for GRN inference and
-evaluation, standardized evaluation protocols and metrics, computational
-infrastructure, and a dynamically updated leaderboard to track
-state-of-the-art methods. It runs novel GRNs in the cloud, offers
-competition scores, and stores them for future comparisons, reflecting
-new developments over time.
+The platform supports the integration of new inference methods, datasets
+and protocols. When a new feature is added, previously evaluated GRNs
+are re-assessed, and the leaderboard is updated accordingly. The aim is
+to evaluate both the accuracy and completeness of inferred GRNs. It is
+designed for both single-modality and multi-omics GRN inference.
 
-The platform supports the integration of new datasets and protocols.
-When a new feature is added, previously evaluated GRNs are re-assessed,
-and the leaderboard is updated accordingly. The aim is to evaluate both
-the accuracy and completeness of inferred GRNs. It is designed for both
-single-modality and multi-omics GRN inference. Ultimately, it is a
-community-driven platform.
-
-So far, ten GRN inference methods have been integrated: five
-single-omics methods of GRNBoost2, GENIE3, Portia, PPCOR, and Scenic;
-and five eGRN inference methods of Scenic+, CellOracle, FigR, scGLUE,
-and GRaNIE.
-
-Due to its flexible nature, the platform can incorporate various
-benchmark datasets and evaluation methods, using either prior knowledge
-or feature-based approaches. In the current version, due to the absence
-of standardized prior knowledge, we use indirect approaches to benchmark
-GRNs. Employing interventional data as evaluation datasets, we have
-developed 8 metrics using feature-based approach and Wasserstein
-distance, accounting for both accuracy and comprehensiveness.
-
-Five datasets have been integrated so far, namely OPSCA, Nakatake,
-Norman, Adamson, and Replogle. For each dataset, standardized inference
-datasets are provided to be used for GRN inference and evaluation
-datasets are employed to benchmark.
+In the current version, geneRNIB contains 11 inference methods including
+both single and multi-omics, 8 evalation metrics, and five datasets
+(OPSCA, Nakatake, Norman, Adamson, and Replogle).
 
 See our publication for the details of methods.
 
@@ -81,15 +46,15 @@ See our publication for the details of methods.
 
 ``` mermaid
 flowchart TB
-  file_atac_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-NA'>NA</a>")
+  file_atac_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-atac'>atac</a>")
   comp_method[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-method'>method</a>"/]
-  file_prediction_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-NA'>NA</a>")
+  file_prediction_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-prediction'>prediction</a>")
   comp_metric_regression[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-metric-regression'>metric_regression</a>"/]
   comp_metric_ws[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-ws-distance'>ws_distance</a>"/]
   comp_metric[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-metrics'>metrics</a>"/]
-  file_score_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-NA'>NA</a>")
-  file_evaluation_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-NA'>NA</a>")
-  file_rna_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-multiomics-rna'>multiomics rna</a>")
+  file_score_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-score'>score</a>")
+  file_evaluation_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-perturbation'>perturbation</a>")
+  file_rna_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-rna'>rna</a>")
   file_atac_h5ad-.-comp_method
   comp_method-.->file_prediction_h5ad
   file_prediction_h5ad---comp_metric_regression
@@ -102,11 +67,31 @@ flowchart TB
   file_rna_h5ad---comp_method
 ```
 
-## File format: op_atac.h5ad
+## File format: atac
 
-NA
+Chromatin accessibility data
 
 Example file: `resources_test/inference_datasets/op_atac.h5ad`
+
+Format:
+
+<div class="small">
+
+    AnnData object
+     obs: 'cell_type', 'donor_id'
+
+</div>
+
+Data structure:
+
+<div class="small">
+
+| Slot | Type | Description |
+|:---|:---|:---|
+| `obs["cell_type"]` | `string` | (*Optional*) The annotated cell type of each cell based on RNA expression. |
+| `obs["donor_id"]` | `string` | (*Optional*) Donor id. |
+
+</div>
 
 ## Component type: method
 
@@ -118,8 +103,8 @@ Arguments:
 
 | Name | Type | Description |
 |:---|:---|:---|
-| `--rna` | `file` | RNA expression for multiomics data. |
-| `--atac` | `file` | (*Optional*) Peak data for multiomics data. |
+| `--rna` | `file` | RNA expression data. |
+| `--atac` | `file` | (*Optional*) Chromatin accessibility data. |
 | `--prediction` | `file` | (*Optional, Output*) File indicating the inferred GRN. |
 | `--tf_all` | `file` | (*Optional*) NA. Default: `resources_test/prior/tf_all.csv`. |
 | `--max_n_links` | `integer` | (*Optional*) NA. Default: `50000`. |
@@ -132,11 +117,32 @@ Arguments:
 
 </div>
 
-## File format: collectri.h5ad
+## File format: prediction
 
-NA
+File indicating the inferred GRN.
 
 Example file: `resources/grn_models/op/collectri.h5ad`
+
+Format:
+
+<div class="small">
+
+    AnnData object
+     uns: 'dataset_id', 'method_id', 'prediction'
+
+</div>
+
+Data structure:
+
+<div class="small">
+
+| Slot | Type | Description |
+|:---|:---|:---|
+| `uns["dataset_id"]` | `string` | A unique identifier for the dataset. |
+| `uns["method_id"]` | `string` | A unique identifier for the inference method. |
+| `uns["prediction"]` | `DataFrame` | Inferred GRNs in the format of source, target, weight. |
+
+</div>
 
 ## Component type: metric_regression
 
@@ -208,21 +214,67 @@ Arguments:
 
 </div>
 
-## File format: score.h5ad
+## File format: score
 
-NA
+File indicating the score of a metric.
 
 Example file: `resources_test/scores/score.h5ad`
 
-## File format: op_perturbation.h5ad
+Format:
 
-NA
+<div class="small">
+
+    AnnData object
+     uns: 'dataset_id', 'method_id', 'metric_ids', 'metric_values'
+
+</div>
+
+Data structure:
+
+<div class="small">
+
+| Slot | Type | Description |
+|:---|:---|:---|
+| `uns["dataset_id"]` | `string` | A unique identifier for the dataset. |
+| `uns["method_id"]` | `string` | A unique identifier for the method. |
+| `uns["metric_ids"]` | `string` | One or more unique metric identifiers. |
+| `uns["metric_values"]` | `double` | The metric values obtained for the given prediction. Must be of same length as ‘metric_ids’. |
+
+</div>
+
+## File format: perturbation
+
+Perturbation dataset for benchmarking.
 
 Example file: `resources_test/evaluation_datasets/op_perturbation.h5ad`
 
-## File format: multiomics rna
+Format:
 
-RNA expression for multiomics data.
+<div class="small">
+
+    AnnData object
+     obs: 'cell_type', 'perturbation', 'donor_id', 'perturbation_type'
+     layers: 'X_norm'
+
+</div>
+
+Data structure:
+
+<div class="small">
+
+| Slot | Type | Description |
+|:---|:---|:---|
+| `obs["cell_type"]` | `string` | The annotated cell type of each cell based on RNA expression. |
+| `obs["perturbation"]` | `string` | Name of the column containing perturbation names. |
+| `obs["donor_id"]` | `string` | (*Optional*) Donor id. |
+| `obs["perturbation_type"]` | `string` | (*Optional*) Name of the column indicating perturbation type. |
+| `layers["X_norm"]` | `double` | Normalized values. |
+
+</div>
+
+## File format: rna
+
+RNA expression data.
 
 Example file: `resources_test/inference_datasets/op_rna.h5ad`
 
