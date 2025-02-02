@@ -3370,32 +3370,7 @@ meta = [
       "type" : "docker",
       "id" : "docker",
       "image" : "kenjikamimoto126/celloracle_ubuntu:0.18.0",
-      "namespace_separator" : "/",
-      "setup" : [
-        {
-          "type" : "apt",
-          "packages" : [
-            "procps",
-            "git"
-          ],
-          "interactive" : false
-        },
-        {
-          "type" : "python",
-          "user" : false,
-          "packages" : [
-            "anndata~=0.10.0",
-            "scanpy~=1.10.0",
-            "pyyaml",
-            "requests",
-            "jsonschema"
-          ],
-          "github" : [
-            "openproblems-bio/core#subdirectory=packages/python/openproblems"
-          ],
-          "upgrade" : true
-        }
-      ]
+      "namespace_separator" : "/"
     }
   ],
   "build_info" : {
@@ -3404,7 +3379,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/celloracle",
     "viash_version" : "0.9.1",
-    "git_commit" : "b101f87b2f36b26e891054817fb50b2210a8e7df",
+    "git_commit" : "7cd9b077ed46f9ad700301b6f14614f91475bd02",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

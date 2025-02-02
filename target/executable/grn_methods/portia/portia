@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata" "numpy" "scipy" "scikit-learn" "portia-grn"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods portia"
-LABEL org.opencontainers.image.created="2025-02-02T12:33:26Z"
+LABEL org.opencontainers.image.created="2025-02-02T12:51:16Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="b101f87b2f36b26e891054817fb50b2210a8e7df"
+LABEL org.opencontainers.image.revision="7cd9b077ed46f9ad700301b6f14614f91475bd02"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

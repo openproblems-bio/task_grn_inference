@@ -25,7 +25,6 @@ resources:
 runners:
   - type: docker
     image: janursa/figr:19-08-2024
-    __merge__: /src/api/base_requirements.yaml
   - type: native
 runners:
   - type: executable
