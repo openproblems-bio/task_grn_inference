@@ -52,9 +52,11 @@ info:
     git clone git@github.com:openproblems-bio/task_grn_inference.git
 
     cd task_grn_inference
+    ```
     
     # download resources 
     To interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.
+    
     ```bash
     scripts/download_resources.sh
     ```
@@ -62,17 +64,19 @@ info:
     ## Infer a GRN 
     
     To infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:
+
     ```bash
     viash run src/control_methods/pearson_corr/config.vsh.yaml -- \
               --rna resources/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad
     ```
 
-    ```bash
     ## Evaluate a GRN
     Once got the prediction for a given dataset, use the following code to obtain evaluation scores. 
+
     ```bash
     scripts/single_grn_evaluation.sh output/net.h5ad norman
     ```
+    
     This will calculate and print the scores as well as output the scores into `output/score.h5ad`
   
     ## Add a method

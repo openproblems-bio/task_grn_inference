@@ -51,7 +51,8 @@ def main(par: dict) -> pd.DataFrame:
     network = grnboost2(X, client_or_address=client, gene_names=gene_names, tf_names=tf_names)
     network.rename(columns={'TF': 'source', 'target': 'target', 'importance': 'weight'}, inplace=True)
     network.reset_index(drop=True, inplace=True)
-    network = process_links(network, par)    
+    network = process_links(network, par)  
+    return network  
 
 if __name__ == '__main__':
     net = main(par)   
