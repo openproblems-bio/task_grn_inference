@@ -449,9 +449,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "scprint~=2.1.0"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-02-02T12:51:15Z"
+LABEL org.opencontainers.image.created="2025-02-02T13:15:20Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="7cd9b077ed46f9ad700301b6f14614f91475bd02"
+LABEL org.opencontainers.image.revision="0fc738e7f4216339087094cb08bb80d5a95052d3"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

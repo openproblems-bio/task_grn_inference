@@ -8,6 +8,7 @@ from distributed import Client, LocalCluster
 from tqdm import tqdm
 import subprocess 
 import sys
+import anndata as ad
 
 ## VIASH START
 par = {
