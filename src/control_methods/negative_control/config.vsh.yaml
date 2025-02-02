@@ -1,23 +1,26 @@
 __merge__: ../../api/comp_method.yaml
-functionality:
-  name: negative_control
-  namespace: control_methods
-  info:
-    label: Negative control
-    summary: Source-target links based on random assignment
-    description: |
-      Randomly assigns regulatory links to tf-target links with a given tf and target list. This is to perform near random.
 
-  resources:
-    - type: python_script
-      path: script.py
-    - path: main.py
-platforms:
+name: negative_control
+namespace: control_methods
+info:
+  label: Negative control
+  summary: Source-target links based on random assignment
+  description: |
+    Randomly assigns regulatory links to tf-target links with a given tf and target list. This is to perform near random.
+
+resources:
+  - type: python_script
+    path: script.py
+  - path: main.py
+engines:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4
+    __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
         packages: [  ]
+runners:
+  - type: executable
   - type: nextflow
     directives:
       label: [ midtime, highmem, highcpu ]

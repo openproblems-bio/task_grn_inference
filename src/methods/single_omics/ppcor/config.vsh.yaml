@@ -19,11 +19,11 @@ resources:
 engines:
   - type: docker
     image: janursa/figr:19-08-2024
+    __merge__: /src/api/base_requirements.yaml
     setup:
       - type: r
         packages: [ ppcor, anndata, dplyr ]
   - type: native
-  __merge__: /src/api/base_requirements.yaml
 runners:
   - type: executable
   - type: nextflow

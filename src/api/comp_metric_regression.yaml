@@ -12,7 +12,7 @@ info:
 arguments: 
   - name: --evaluation_data
     __merge__: file_evaluation_h5ad.yaml
-    required: false
+    required: true
     direction: input
   - name: --tf_all
     type: file

@@ -11,7 +11,7 @@ grn_models_folder="${resources_dir}/grn_models/" #TODO: change this
 
 reg_type="ridge"
 num_workers=10
-metric_ids="[regression_1, regression_2]"
+metric_ids="[regression_1, regression_2, ws_distance]"
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -66,7 +66,7 @@ append_entry() {
     regulators_consensus: ${resources_dir}/prior/regulators_consensus_${dataset}.json
     ws_consensus: ${resources_dir}/prior/ws_consensus_${dataset}.json
     ws_distance_background: ${resources_dir}/prior/ws_distance_background_${dataset}.json
-    prediction: ${grn_models_folder}/${dataset}/$1.csv
+    prediction: ${grn_models_folder}/${dataset}/$1.h5ad
     layer: "X_norm"
 HERE
 }

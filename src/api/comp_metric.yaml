@@ -8,11 +8,11 @@ info:
       A metric to evaluate the performance of the inferred GRN
 arguments: 
   - name: --prediction
-    __merge__: file_prediction.yaml
+    __merge__: file_prediction_h5ad.yaml
     required: true
     direction: input
   - name: --score
-    __merge__: file_score.yaml
+    __merge__: file_score_h5ad.yaml
     required: true
     direction: output
   - name: --method_id 

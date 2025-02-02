@@ -69,9 +69,22 @@ df_filtered <- df_filtered %>% filter(source %in% tf_names)
 df_filtered$index = 1:nrow(df_filtered)
 
 # Keep top links
-df_final <- head(df_filtered, par$max_n_links)
+net <- head(df_filtered, par$max_n_links)
 
 # Save results
-write.table(df_final, par$prediction, sep = ",", quote = FALSE, row.names = FALSE)
+
+cat("Output GRN\n")
+net$weight <- as.character(net$weight)
+output <- AnnData(
+  X = matrix(nrow = 0, ncol = 0),
+  uns = list(
+    method_id = par$method_id,
+    dataset_id = par$dataset_id,
+    prediction = net[, c("source", "target", "weight")]
+  )
+)
+output$write(par$prediction)
+
+# write.table(df_final, par$prediction, sep = ",", quote = FALSE, row.names = FALSE)
 
 print("Finished.")

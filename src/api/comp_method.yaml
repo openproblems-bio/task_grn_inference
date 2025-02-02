@@ -16,7 +16,7 @@ arguments:
     required: false
     direction: input
   - name: --prediction
-    __merge__: file_prediction.yaml
+    __merge__: file_prediction_h5ad.yaml
     required: false
     direction: output
   - name: --tf_all
@@ -43,6 +43,16 @@ arguments:
     type: boolean
     direction: input
     default: True
+  - name: --dataset_id
+    type: string
+    direction: input
+    required: false
+    default: op
+  - name: --method_id
+    type: string
+    direction: input
+    required: false
+    default: grnboost2
 
 test_resources:
   - type: python_script

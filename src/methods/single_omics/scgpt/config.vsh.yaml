@@ -35,6 +35,7 @@ engines:
   #       packages: [ gdown ]
   - type: docker
     image: openproblems/base_pytorch_nvidia:1.0.0
+    __merge__: /src/api/base_requirements.yaml
     # TODO: Try to find working installation of flash attention (flash-attn<1.0.5)
     setup:
       - type: python
@@ -46,7 +47,6 @@ engines:
         run: pip install --upgrade --no-deps --force-reinstall git+https://github.com/bowang-lab/scGPT.git
 
   - type: native
-  __merge__: /src/api/base_requirements.yaml
 runners:
   - type: executable
   - type: nextflow

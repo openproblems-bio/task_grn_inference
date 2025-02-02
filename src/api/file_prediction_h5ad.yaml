@@ -1,0 +1,22 @@
+
+type: file
+example: 'resources/grn_models/op/collectri.h5ad'
+info:
+  label: prediction
+  summary: "File indicating the inferred GRN."
+  file_type: h5ad
+  slots:
+    uns:
+      - type: string
+        name: dataset_id
+        description: "A unique identifier for the dataset"
+        required: true
+      - type: string
+        name: method_id
+        description: "A unique identifier for the inference method"
+        required: true
+      - type: DataFrame
+        name: prediction
+        description: "Inferred GRNs in the format of source, target, weight"
+        required: true
+

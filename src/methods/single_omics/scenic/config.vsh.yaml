@@ -35,6 +35,7 @@ resources:
 engines:
   - type: docker
     image: aertslab/pyscenic:0.12.1
+    __merge__: /src/api/base_requirements.yaml
     setup:
     #   - type: docker
     #     run: |
@@ -42,7 +43,8 @@ engines:
       - type: python
         packages: [ anndata ]
   - type: native
-  __merge__: /src/api/base_requirements.yaml
+ 
+
 runners:
   - type: executable
   - type: nextflow

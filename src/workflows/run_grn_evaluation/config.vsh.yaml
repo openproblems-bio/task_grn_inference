@@ -1,130 +1,132 @@
 
-functionality:
-  name: run_grn_evaluation
-  namespace: "workflows"
-  info:
-    label: run_grn_evaluation
-    summary: "Evaluates GRNs and provides scores using regression analysis."
 
-  argument_groups:
-    - name: Inputs
-      arguments:
-        - name: --evaluation_data
-          type: file
-          required: true
-          direction: input
-        - name: --prediction
-          type: file
-          required: true
-          direction: input
-        - name: --layer
-          type: string
-          required: true
-          direction: input
-        - name: --method_id
-          type: string
-          required: true
-          direction: input
-        - name: --tf_all
-          type: file
-          direction: input
-          required: true
-          example: resources_test/prior/tf_all.csv
-        - name: --reg_type
-          type: string
-          direction: input
-          default: ridge
-          description: name of regretion to use
-          multiple: false
-        - name: --subsample
-          type: integer
-          direction: input
-          default: -1
-          description: number of samples randomly drawn from perturbation data
-        - name: --num_workers
-          type: integer
-          direction: input
-          default: 4
-        - name: --apply_tf
-          type: boolean 
-          required: false
-          default: true
-        - name: --apply_skeleton
-          type: boolean 
-          required: false
-          default: false
-        - name: --regulators_consensus
-          type: file
-          direction: input
-          must_exist: false
-          required: true
-          example: resources_test/prior/regulators_consensus_norman.json
-        - name: --static_only
-          direction: input
-          type: boolean
-          default: true
-        - name: --binarize
-          type: boolean 
-          direction: input 
-          description: whether to binarize the weight
-          default: true
-        - name: --ws_consensus
-          type: file
-          direction: input
-          must_exist: false
-          required: true
-          example: resources_test/prior/ws_consensus_norman.csv 
-        - name: --ws_distance_background
-          type: file
-          direction: input
-          must_exist: false
-          required: true
-          example: resources_test/prior/ws_distance_background_norman.csv
-        - name: --evaluation_data_sc
-          type: file
-          required: true
-          direction: input
-          example: 'resources_test/datasets_raw/adamson_sc_counts.h5ad'
-        
-    - name: Outputs
-      arguments:
-        - name: "--scores"
-          type: file
-          required: true
-          direction: output
-          default: "scores.yaml"
-        - name: "--metric_configs"
-          type: file
-          required: true
-          direction: output
-          default: metric_configs.yaml
+name: run_grn_evaluation
+namespace: "workflows"
+info:
+  label: run_grn_evaluation
+  summary: "Evaluates GRNs and provides scores using regression analysis."
 
-    - name: Arguments
-      arguments: 
-        - name: "--metric_ids"
-          type: string
-          multiple: true
-          description: A list of metric ids to run. If not specified, all metric will be run.
-    
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --evaluation_data
+        type: file
+        required: true
+        direction: input
+      - name: --prediction
+        type: file
+        required: true
+        direction: input
+      - name: --layer
+        type: string
+        required: true
+        direction: input
+      - name: --method_id
+        type: string
+        required: true
+        direction: input
+      - name: --tf_all
+        type: file
+        direction: input
+        required: true
+        example: resources_test/prior/tf_all.csv
+      - name: --reg_type
+        type: string
+        direction: input
+        default: ridge
+        description: name of regretion to use
+        multiple: false
+      - name: --subsample
+        type: integer
+        direction: input
+        default: -1
+        description: number of samples randomly drawn from perturbation data
+      - name: --num_workers
+        type: integer
+        direction: input
+        default: 4
+      - name: --apply_tf
+        type: boolean 
+        required: false
+        default: true
+      - name: --apply_skeleton
+        type: boolean 
+        required: false
+        default: false
+      - name: --regulators_consensus
+        type: file
+        direction: input
+        must_exist: false
+        required: true
+        example: resources_test/prior/regulators_consensus_norman.json
+      - name: --static_only
+        direction: input
+        type: boolean
+        default: true
+      - name: --binarize
+        type: boolean 
+        direction: input 
+        description: whether to binarize the weight
+        default: true
+      - name: --ws_consensus
+        type: file
+        direction: input
+        must_exist: false
+        required: true
+        example: resources_test/prior/ws_consensus_norman.csv 
+      - name: --ws_distance_background
+        type: file
+        direction: input
+        must_exist: false
+        required: true
+        example: resources_test/prior/ws_distance_background_norman.csv
+      - name: --evaluation_data_sc
+        type: file
+        required: true
+        direction: input
+        example: 'resources_test/datasets_raw/adamson_sc_counts.h5ad'
+      
+  - name: Outputs
+    arguments:
+      - name: "--scores"
+        type: file
+        required: true
+        direction: output
+        default: "scores.yaml"
+      - name: "--metric_configs"
+        type: file
+        required: true
+        direction: output
+        default: metric_configs.yaml
 
-  resources:
-    - type: nextflow_script
-      path: main.nf
-      entrypoint: run_wf
-    - type: file
-      path: ../../api/task_info.yaml
-  dependencies:
-    - name: common/extract_metadata
-      repository: openproblems
-    - name: metrics/regression_2 
-    - name: metrics/regression_1
-    - name: metrics/ws_distance
-  repositories:
-    - name: openproblems
-      type: github
-      repo: openproblems-bio/openproblems
-      tag: v2.0.0
-platforms:
+  - name: Arguments
+    arguments: 
+      - name: "--metric_ids"
+        type: string
+        multiple: true
+        description: A list of metric ids to run. If not specified, all metric will be run.
+  
+
+resources:
+  - type: nextflow_script
+    path: main.nf
+    entrypoint: run_wf
+  - type: file
+    path: ../../api/task_info.yaml
+dependencies:
+  - name: common/extract_metadata
+    repository: openproblems
+  - name: metrics/regression_2 
+  - name: metrics/regression_1
+  - name: metrics/ws_distance
+repositories:
+  - name: openproblems
+    type: github
+    repo: openproblems-bio/openproblems
+    tag: v2.0.0
+
+runners:
+  - type: executable
   - type: nextflow
     directives:
       label: [ midtime, midmem, lowcpu ]

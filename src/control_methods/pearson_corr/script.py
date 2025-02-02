@@ -70,4 +70,6 @@ def create_corr_net(par):
 net = create_corr_net(par)
 
 print('Output GRN')
-net.to_csv(par['prediction'])
+net['weight'] = net['weight'].astype(str)
+output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+output.write(par['prediction'])

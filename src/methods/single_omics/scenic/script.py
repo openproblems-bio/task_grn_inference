@@ -151,11 +151,12 @@ def main(par):
   return network
   
 if __name__=='__main__':
-  network = main(par)
+  net = main(par)
   os.makedirs(par['temp_dir'], exist_ok=True)
 
-  network.to_csv(par['prediction'], sep=',')
-  print('Finished.')
+  net['weight'] = net['weight'].astype(str)
+  output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+  output.write(par['prediction'])
 
 
 

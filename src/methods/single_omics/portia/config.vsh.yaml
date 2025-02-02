@@ -20,10 +20,10 @@ resources:
 engines:
   - type: docker
     image: continuumio/anaconda3:2024.02-1
+    __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
         packages: [ anndata, numpy, scipy, scikit-learn, portia-grn ]
-    __merge__: ../../../api/engines/engines.yaml
   - type: native
 runners:
   - type: executable
