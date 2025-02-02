@@ -1,10 +1,11 @@
 type: file
 example: resources_test/evaluation_datasets/op_perturbation.h5ad
+label: perturbation
+summary: "Perturbation dataset for benchmarking."
+
 info:
-  label: perturbation
-  summary: "Perturbation dataset for benchmarking."
-  file_type: h5ad
-  slots:
+  format:
+    type: h5ad
     obs:
       - name: cell_type
         type: string

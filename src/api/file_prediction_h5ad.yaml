@@ -1,11 +1,11 @@
 
 type: file
 example: 'resources/grn_models/op/collectri.h5ad'
+label: prediction
+summary: "File indicating the inferred GRN."
 info:
-  label: prediction
-  summary: "File indicating the inferred GRN."
-  file_type: h5ad
-  slots:
+  format:
+    type: h5ad
     uns:
       - type: string
         name: dataset_id

@@ -1,10 +1,10 @@
 type: file
 example: resources_test/scores/score.h5ad
+label: score
+summary: "File indicating the score of a metric."
 info:
-  label: score
-  summary: "File indicating the score of a metric."
-  file_type: h5ad
-  slots:
+  format:
+    type: h5ad
     uns:
       - type: string
         name: dataset_id
