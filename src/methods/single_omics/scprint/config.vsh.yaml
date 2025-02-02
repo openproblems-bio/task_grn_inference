@@ -30,9 +30,17 @@ engines:
     image: openproblems/base_pytorch_nvidia:1.0.0
     __merge__: /src/api/base_requirements.yaml
     setup:
-      - type: python
-        pypi:
-          - scprint 
+      - type: docker
+        run: |
+          apt install git && \
+          git clone https://github.com/cantinilab/scPRINT && \
+          git clone https://github.com/jkobject/scDataLoader && \
+          git clone https://github.com/cantinilab/GRnnData && \
+          git clone https://github.com/jkobject/benGRN && \
+          pip install -e scPRINT[dev] && \
+          pip install -e scDataLoader[dev] && \
+          pip install -e GRnnData[dev] && \
+          pip install -e benGRN[dev] && \
   - type: native
 runners:
   - type: executable

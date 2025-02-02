@@ -1,3 +1,6 @@
+import lamindb as ln
+ln.setup.init(storage='./output')
+
 from scprint import scPrint
 from scdataloader import Preprocessor, utils
 from scprint.tasks import GNInfer, Embedder, Denoiser, withknn
@@ -12,6 +15,8 @@ from matplotlib import pyplot as plt
 import numpy as np
 import anndata as ad
 import pandas as pd
+from scdataloader.utils import populate_my_ontology
+
 import torch
 torch.set_float32_matmul_precision('medium')
 import sys 
@@ -19,7 +24,7 @@ sys.path.append("./")
 from src.helper_infer_grns import efficient_melting 
 ## VIASH START
 par = {
-    'inference_dataset': '../task_grn_inference/resources/inference_datasets/op_rna.h5ad',
+    'rna': '../task_grn_inference/resources/inference_datasets/op_rna.h5ad',
     'tf_all': '../task_grn_inference/resources/prior/tf_all.csv',
     'prediction': 'output/grn.h5ad',
     'filtration': 'top-k',
@@ -56,26 +61,26 @@ def run_scprint_sub(adata, model, par):
     net = net[net['source'].isin(tf_names)]
     return net
 def run_scprint(par):
-    adata = ad.read_h5ad(par['inference_dataset'])
+    adata = ad.read_h5ad(par['rna'])
     adata.var["gene_name"] = adata.var.index
 
     adata.obs['organism_ontology_term_id'] = 'NCBITaxon:9606'
-    adata.obs['self_reported_ethnicity_ontology_term_id'] = "HANCESTRO:0005"
-    adata.obs['sex_ontology_term_id'] = "PATO:0000384"
-    adata.obs['disease_ontology_term_id'] = "MONDO:0000001"
-    adata.obs['development_stage_ontology_term_id'] = "HsapDv:0000087"
-    adata.obs['tissue_ontology_term_id'] = "UBERON:0000178"
-    adata.obs['assay_ontology_term_id'] = "unknown"
+    # adata.obs['self_reported_ethnicity_ontology_term_id'] = "HANCESTRO:0005"
+    # adata.obs['sex_ontology_term_id'] = "PATO:0000384"
+    # adata.obs['disease_ontology_term_id'] = "MONDO:0000001"
+    # adata.obs['development_stage_ontology_term_id'] = "HsapDv:0000087"
+    # adata.obs['tissue_ontology_term_id'] = "UBERON:0000178"
+    # adata.obs['assay_ontology_term_id'] = "unknown"
 
 
-    cell_type_to_ontology = {
-        "T cells": "CL:0000084",
-        "B cells": "CL:0000236",
-        "Myeloid cells": "CL:0000763",
-        "NK cells": "CL:0000623",
-    }
+    # cell_type_to_ontology = {
+    #     "T cells": "CL:0000084",
+    #     "B cells": "CL:0000236",
+    #     "Myeloid cells": "CL:0000763",
+    #     "NK cells": "CL:0000623",
+    # }
 
-    adata.obs["cell_type_ontology_term_id"] = adata.obs["cell_type"].apply(lambda name: cell_type_to_ontology.get(name, name))
+    # adata.obs["cell_type_ontology_term_id"] = adata.obs["cell_type"].apply(lambda name: cell_type_to_ontology.get(name, name))
 
     preprocessor = Preprocessor(do_postp=False, is_symbol=True)
     adata = preprocessor(adata)
@@ -97,6 +102,10 @@ def run_scprint(par):
 
     
 if __name__ == '__main__':
+    populate_my_ontology( 
+        organisms= ["NCBITaxon:9606"]
+    )
+    
     net = run_scprint(par)
 
     net['weight'] = net['weight'].astype(str)

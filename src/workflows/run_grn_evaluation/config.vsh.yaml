@@ -112,21 +112,15 @@ resources:
     path: main.nf
     entrypoint: run_wf
   - type: file
-    path: ../../api/task_info.yaml
+    path: /_viash.yaml
+
+
 dependencies:
-  - name: common/extract_metadata
-    repository: openproblems
   - name: metrics/regression_2 
   - name: metrics/regression_1
   - name: metrics/ws_distance
-repositories:
-  - name: openproblems
-    type: github
-    repo: openproblems-bio/openproblems
-    tag: v2.0.0
+
 
 runners:
   - type: executable
   - type: nextflow
-    directives:
-      label: [ midtime, midmem, lowcpu ]

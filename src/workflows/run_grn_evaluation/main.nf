@@ -15,7 +15,8 @@ workflow run_wf {
   // construct list of metrics
   metrics = [
     regression_1,
-    regression_2
+    regression_2,
+    ws_distance
   ]
     
   /***************************
@@ -95,7 +96,7 @@ workflow run_wf {
       def metric_configs_file = tempFile("metric_configs.yaml")
       metric_configs_file.write(metric_configs_yaml_blob)
 
-      def task_info_file = meta.resources_dir.resolve("task_info.yaml")
+      // def task_info_file = meta.resources_dir.resolve("task_info.yaml")
 
       // store the scores in a file
       def score_uns = states.collect{it.score_uns}
