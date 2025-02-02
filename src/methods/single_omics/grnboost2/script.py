@@ -29,7 +29,7 @@ def main(par: dict) -> pd.DataFrame:
         Main function to infer GRN
     '''
     print('Reading data')
-    adata_rna = anndata.read_h5ad(par['rna'])
+    adata_rna = ad.read_h5ad(par['rna'])
     if 'qc' in par:
         if par['qc']:
             print('Shape before QC: ', adata_rna.shape)

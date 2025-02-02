@@ -23,7 +23,24 @@ def verbose_tqdm(iterable, desc, level, verbose_level):
         return tqdm(iterable, desc=desc)
     else:
         return iterable  # Return the iterable without a progress bar
+def efficient_melting(net, gene_names):
+    '''to replace pandas melting'''
+    upper_triangle_indices = np.triu_indices_from(net, k=1)
 
+    # Extract the source and target gene names based on the indices
+    sources = np.array(gene_names)[upper_triangle_indices[0]]
+    targets = np.array(gene_names)[upper_triangle_indices[1]]
+
+    # Extract the corresponding correlation values
+    weights = net[upper_triangle_indices]
+
+    # Create a structured array
+    data = np.column_stack((targets, sources, weights))
+
+    # Convert to DataFrame
+    # print('convert to df')
+    net = pd.DataFrame(data, columns=['source', 'target', 'weight'])
+    return net
 def basic_qc(adata, min_genes_per_cell = 200, max_genes_per_cell = 5000, min_cells_per_gene = 10):
     mt = adata.var_names.str.startswith('MT-')
     print('shape before ', adata.shape)

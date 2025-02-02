@@ -5,7 +5,7 @@ info:
   type: metric_regression
   
   type_info:
-    label: metric_regression
+    label: Feature-based metrics
     summary: Calculates regression scores
 
 
@@ -29,7 +29,7 @@ arguments:
     type: integer
     direction: input
     default: -1
-    description: number of samples randomly drawn from perturbation data
+    description: Subsampling of perturbation data
   - name: --num_workers
     type: integer
     direction: input

@@ -3046,7 +3046,7 @@ meta = [
         {
           "type" : "file",
           "name" : "--prediction",
-          "label" : "prediction",
+          "label" : "GRN prediction",
           "summary" : "File indicating the inferred GRN.",
           "info" : {
             "format" : {
@@ -3500,7 +3500,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/metrics_all",
     "viash_version" : "0.9.1",
-    "git_commit" : "5a1527f7978a8506934301d7860457793b54b96d",
+    "git_commit" : "09c28006fee3c89826e9555fde5cd07e28e2a306",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

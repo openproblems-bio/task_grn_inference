@@ -213,10 +213,6 @@ function ViashHelp {
   echo "        type: integer"
   echo "        default: 32"
   echo ""
-  echo "    --causal"
-  echo "        type: boolean"
-  echo "        default: true"
-  echo ""
   echo "    --dataset_id"
   echo "        type: string"
   echo "        default: op"
@@ -366,17 +362,6 @@ while [[ $# -gt 0 ]]; do
         --seed=*)
             [ -n "$VIASH_PAR_SEED" ] && ViashError Bad arguments for option \'--seed=*\': \'$VIASH_PAR_SEED\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_SEED=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --causal)
-            [ -n "$VIASH_PAR_CAUSAL" ] && ViashError Bad arguments for option \'--causal\': \'$VIASH_PAR_CAUSAL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CAUSAL="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --causal. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --causal=*)
-            [ -n "$VIASH_PAR_CAUSAL" ] && ViashError Bad arguments for option \'--causal=*\': \'$VIASH_PAR_CAUSAL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CAUSAL=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --dataset_id)
@@ -593,9 +578,6 @@ fi
 if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
-if [ -z ${VIASH_PAR_CAUSAL+x} ]; then
-  VIASH_PAR_CAUSAL="true"
-fi
 if [ -z ${VIASH_PAR_DATASET_ID+x} ]; then
   VIASH_PAR_DATASET_ID="op"
 fi
@@ -639,12 +621,6 @@ fi
 if [[ -n "$VIASH_PAR_SEED" ]]; then
   if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_CAUSAL" ]]; then
-  if ! [[ "$VIASH_PAR_CAUSAL" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--causal' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi

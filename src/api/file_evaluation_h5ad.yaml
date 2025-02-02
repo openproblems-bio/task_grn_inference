@@ -1,6 +1,6 @@
 type: file
 example: resources_test/evaluation_datasets/op_perturbation.h5ad
-label: perturbation
+label: perturbation data
 summary: "Perturbation dataset for benchmarking."
 
 info:

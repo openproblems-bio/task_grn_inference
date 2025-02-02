@@ -3046,7 +3046,7 @@ meta = [
         {
           "type" : "file",
           "name" : "--rna",
-          "label" : "rna",
+          "label" : "gene expression data",
           "summary" : "RNA expression data.",
           "info" : {
             "format" : {
@@ -3094,7 +3094,7 @@ meta = [
         {
           "type" : "file",
           "name" : "--atac",
-          "label" : "atac",
+          "label" : "chromatin accessibility data",
           "summary" : "Chromatin accessibility data",
           "info" : {
             "format" : {
@@ -3128,7 +3128,7 @@ meta = [
         {
           "type" : "file",
           "name" : "--prediction",
-          "label" : "prediction",
+          "label" : "GRN prediction",
           "summary" : "File indicating the inferred GRN.",
           "info" : {
             "format" : {
@@ -3219,17 +3219,6 @@ meta = [
           "name" : "--seed",
           "default" : [
             32
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "boolean",
-          "name" : "--causal",
-          "default" : [
-            true
           ],
           "required" : false,
           "direction" : "input",
@@ -3409,7 +3398,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.9.1",
-    "git_commit" : "5a1527f7978a8506934301d7860457793b54b96d",
+    "git_commit" : "09c28006fee3c89826e9555fde5cd07e28e2a306",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3549,7 +3538,6 @@ par <- list(
   "num_workers" = $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_NUM_WORKERS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "temp_dir" = $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TEMP_DIR" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
-  "causal" = $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_CAUSAL" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi ),
   "dataset_id" = $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_DATASET_ID" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "method_id" = $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_METHOD_ID" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi )
 )

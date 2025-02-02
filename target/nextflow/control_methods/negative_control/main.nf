@@ -3046,7 +3046,7 @@ meta = [
         {
           "type" : "file",
           "name" : "--rna",
-          "label" : "rna",
+          "label" : "gene expression data",
           "summary" : "RNA expression data.",
           "info" : {
             "format" : {
@@ -3094,7 +3094,7 @@ meta = [
         {
           "type" : "file",
           "name" : "--atac",
-          "label" : "atac",
+          "label" : "chromatin accessibility data",
           "summary" : "Chromatin accessibility data",
           "info" : {
             "format" : {
@@ -3128,7 +3128,7 @@ meta = [
         {
           "type" : "file",
           "name" : "--prediction",
-          "label" : "prediction",
+          "label" : "GRN prediction",
           "summary" : "File indicating the inferred GRN.",
           "info" : {
             "format" : {
@@ -3219,17 +3219,6 @@ meta = [
           "name" : "--seed",
           "default" : [
             32
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "boolean",
-          "name" : "--causal",
-          "default" : [
-            true
           ],
           "required" : false,
           "direction" : "input",
@@ -3398,7 +3387,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/control_methods/negative_control",
     "viash_version" : "0.9.1",
-    "git_commit" : "5a1527f7978a8506934301d7860457793b54b96d",
+    "git_commit" : "09c28006fee3c89826e9555fde5cd07e28e2a306",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3537,7 +3526,6 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'causal': $( if [ ! -z ${VIASH_PAR_CAUSAL+x} ]; then echo "r'${VIASH_PAR_CAUSAL//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
