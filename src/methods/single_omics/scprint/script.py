@@ -31,7 +31,8 @@ par = {
     'filtration': 'top-k',
     'max_n_links': 50_000,
     'num_genes': 5000,
-    'max_cells': 1000
+    'max_cells': 1000,
+    'num_workers': 8,
 }
 ## VIASH END
 
@@ -47,7 +48,7 @@ def run_scprint_sub(adata, model, par):
                         forward_mode="none",
                         filtration=par['filtration'],
                         num_genes=par['num_genes'],
-                        num_workers=8, 
+                        num_workers=par['num_workers'], 
                         max_cells=par['max_cells'],
                         doplot=False,
                         batch_size=16,
@@ -71,22 +72,22 @@ def run_scprint(par):
     adata.var["gene_name"] = adata.var.index
 
     adata.obs['organism_ontology_term_id'] = 'NCBITaxon:9606'
-    # adata.obs['self_reported_ethnicity_ontology_term_id'] = "HANCESTRO:0005"
-    # adata.obs['sex_ontology_term_id'] = "PATO:0000384"
-    # adata.obs['disease_ontology_term_id'] = "MONDO:0000001"
-    # adata.obs['development_stage_ontology_term_id'] = "HsapDv:0000087"
-    # adata.obs['tissue_ontology_term_id'] = "UBERON:0000178"
-    # adata.obs['assay_ontology_term_id'] = "unknown"
+    adata.obs['self_reported_ethnicity_ontology_term_id'] = "HANCESTRO:0005"
+    adata.obs['sex_ontology_term_id'] = "PATO:0000384"
+    adata.obs['disease_ontology_term_id'] = "MONDO:0000001"
+    adata.obs['development_stage_ontology_term_id'] = "HsapDv:0000087"
+    adata.obs['tissue_ontology_term_id'] = "UBERON:0000178"
+    adata.obs['assay_ontology_term_id'] = "unknown"
 
 
-    # cell_type_to_ontology = {
-    #     "T cells": "CL:0000084",
-    #     "B cells": "CL:0000236",
-    #     "Myeloid cells": "CL:0000763",
-    #     "NK cells": "CL:0000623",
-    # }
+    cell_type_to_ontology = {
+        "T cells": "CL:0000084",
+        "B cells": "CL:0000236",
+        "Myeloid cells": "CL:0000763",
+        "NK cells": "CL:0000623",
+    }
 
-    # adata.obs["cell_type_ontology_term_id"] = adata.obs["cell_type"].apply(lambda name: cell_type_to_ontology.get(name, name))
+    adata.obs["cell_type_ontology_term_id"] = adata.obs["cell_type"].apply(lambda name: cell_type_to_ontology.get(name, name))
 
     preprocessor = Preprocessor(do_postp=False, is_symbol=True)
     adata = preprocessor(adata)
