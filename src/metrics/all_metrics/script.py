@@ -51,7 +51,7 @@ from ws_main import main as main_ws
 
 def main(par):
     """
-        Calculate all scores for a given model and daatset.
+        Calculate all scores for a given model and dataset.
     """
     assert par['dataset_id']
     dataset = par['dataset_id']

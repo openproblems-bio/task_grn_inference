@@ -57,9 +57,9 @@ def run_grn_inference(dataset='op', subsample=None):
     for method in methods:
         print(method)
         if subsample is None:
-            par['prediction'] = f"{par['models_dir']}/{method}.csv"
+            par['prediction'] = f"{par['models_dir']}/{method}.h5ad"
         else:
-            par['prediction'] = f"{par['models_dir']}/{method}_{subsample}.csv"
+            par['prediction'] = f"{par['models_dir']}/{method}_{subsample}.h5ad"
         
         if (force == False) & (os.path.exists(par['prediction'])):
             continue
@@ -96,6 +96,8 @@ def run_grn_inference(dataset='op', subsample=None):
             command = f"singularity exec ../../images/scenicplus python src/methods/multi_omics/{method}/script.py {method_args}"
         elif method=='ppcor':
             command = f"singularity exec ../../images/ppcor Rscript src/methods/single_omics/{method}/script.R {method_args}"
+        elif method=='scprint':
+            command = f"python src/methods/single_omics/{method}/script.py {method_args}"
         else:
             command = f"singularity exec ../../images/{method} python src/methods/single_omics/{method}/script.py {method_args}"
         
@@ -118,7 +120,9 @@ def run_grn_inference(dataset='op', subsample=None):
         elif method in ["scenic"]:
             mem = "250GB"
             time = "24:00:00"
-
+        elif method in ["scprint"]:
+            mem = "250GB"
+            time = "24:00:00"
         # Prepare sbatch command
         tag = f"--job-name={method}"  # No spaces around '='
         resources = (f"--cpus-per-task={par['num_workers']} "
@@ -137,7 +141,10 @@ def run_grn_inference(dataset='op', subsample=None):
             else:
                 result = subprocess.run(['bash'] + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
 
-            print(f"Job {method} submitted successfully.")
+            if result.returncode != 0:
+                print("STDOUT:", result.stdout)
+                print("STDERR:", result.stderr)
+                raise RuntimeError(f"Error: command process dataset failed with exit code {result.returncode}")
             print(result.stdout)  # Print the standard output
         except subprocess.CalledProcessError as e:
             print(f"Error occurred while submitting job for {method}: {e}")
@@ -147,17 +154,14 @@ def run_grn_inference(dataset='op', subsample=None):
 
 if __name__ == '__main__':
     force = True
-    sbatch = True
+    sbatch = False
     # methods = ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2", "ppcor", "scenic"],
     # methods = ["portia", "grnboost2"]
-    methods = ["scenic"]
-    datasets = ['adamson']
+    methods = ["scprint"]
+    datasets = ['norman'] # 'replogle2', 'norman', 'adamson', 'nakatake', 'op'
 
-    
     partition='cpu'
 
-    # mem = "120GB"
-    # time = "24:00:00"
 
     if True: # normal run 
         for dataset in datasets:

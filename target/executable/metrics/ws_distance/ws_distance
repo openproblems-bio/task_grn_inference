@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics ws_distance"
-LABEL org.opencontainers.image.created="2025-02-04T10:12:21Z"
+LABEL org.opencontainers.image.created="2025-02-05T08:32:57Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="74697c129e7a11dd3bc494194d804186e48cabde"
+LABEL org.opencontainers.image.revision="ccb9e8f8a5e6c929dde065cf4fe0f0b90e07bcfc"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

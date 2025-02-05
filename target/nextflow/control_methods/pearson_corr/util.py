@@ -41,6 +41,7 @@ def efficient_melting(net, gene_names):
     # print('convert to df')
     net = pd.DataFrame(data, columns=['source', 'target', 'weight'])
     return net
+
 def basic_qc(adata, min_genes_per_cell = 200, max_genes_per_cell = 5000, min_cells_per_gene = 10):
     mt = adata.var_names.str.startswith('MT-')
     print('shape before ', adata.shape)
@@ -72,23 +73,7 @@ def process_links(net, par):
         net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
         net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
     return net
-def efficient_melting(net, gene_names, par):
-    '''to replace pandas melting'''
-    upper_triangle_indices = np.triu_indices_from(net, k=1)
 
-    # Extract the source and target gene names based on the indices
-    sources = np.array(gene_names)[upper_triangle_indices[0]]
-    targets = np.array(gene_names)[upper_triangle_indices[1]]
-
-    # Extract the corresponding correlation values
-    weights = net[upper_triangle_indices]
-    # Create a structured array
-    data = np.column_stack((targets, sources, weights))
-
-    # Convert to DataFrame
-    print('convert to long dataframe')
-    net = pd.DataFrame(data, columns=['target', 'source', 'weight'])
-    return net
     
 
 def corr_net(X, gene_names, par):
@@ -107,7 +92,7 @@ def corr_net(X, gene_names, par):
     
     net = net.values
 
-    net = efficient_melting(net, gene_names, par)
+    net = efficient_melting(net, gene_names)
 
     print('TF subsetting')
     net = net[net.source.isin(tf_all)]

@@ -1,4 +1,10 @@
-viash run src/methods/single_omics/scprint/config.vsh.yaml -- \
-    --rna resources_test/inference_datasets/op_rna.h5ad \
+# viash run src/methods/single_omics/scprint/config.vsh.yaml -- \
+#     --rna resources_test/inference_datasets/op_rna.h5ad \
+#     --tf_all resources/prior/tf_all.csv \
+#     --prediction output/prediction.h5ad
+
+
+python src/methods/single_omics/scprint/script.py  \
+    --rna resources/inference_datasets/op_rna.h5ad \
     --tf_all resources/prior/tf_all.csv \
     --prediction output/prediction.h5ad

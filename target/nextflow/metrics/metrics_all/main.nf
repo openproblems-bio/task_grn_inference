@@ -3500,7 +3500,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/metrics_all",
     "viash_version" : "0.9.1",
-    "git_commit" : "74697c129e7a11dd3bc494194d804186e48cabde",
+    "git_commit" : "ccb9e8f8a5e6c929dde065cf4fe0f0b90e07bcfc",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3704,7 +3704,7 @@ from ws_main import main as main_ws
 
 def main(par):
     """
-        Calculate all scores for a given model and daatset.
+        Calculate all scores for a given model and dataset.
     """
     assert par['dataset_id']
     dataset = par['dataset_id']

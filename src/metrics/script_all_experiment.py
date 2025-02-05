@@ -102,9 +102,9 @@ def run_evaluation(dataset, models, models_dir, scores_dir, save_file_name, bina
 if __name__ == '__main__':
   # - define settings
   # models = ['negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus']
-  models = ['pearson_corr', 'portia', 'grnboost2']
+  models = ['scprint']
 
-  if True: # subsample
+  if False: # subsample
     # for dataset in ['op', 'replogle2', 'nakatake', 'norman', 'adamson']: #'op', 'replogle2', 'nakatake', 'norman', 'adamson'
     for dataset in ['op']:
       if dataset == 'op':
@@ -119,14 +119,15 @@ if __name__ == '__main__':
       run_evaluation(dataset, models_subsampled, models_dir, scores_dir, save_file_name)
   
 
-  if False: # default run 
-    models = ['negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus']
+  if True: # default run 
+    # models = ['negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus']
 
     for dataset in ['op', 'replogle2', 'nakatake', 'norman', 'adamson']: 
       models_dir = f"resources/grn_models/{dataset}" 
       scores_dir = f"resources/scores/{dataset}"
       run_consensus(dataset)
-      save_file_name = f"{scores_dir}/X_norm-50000-skeleton_False-binarize_False-ridge-global-False.csv" 
+      # save_file_name = f"{scores_dir}/X_norm-50000-skeleton_False-binarize_False-ridge-global-False.csv" 
+      save_file_name = f"{scores_dir}/scprint.csv" 
 
       run_evaluation(dataset, models, models_dir, scores_dir, run_global_models, save_file_name)
   
