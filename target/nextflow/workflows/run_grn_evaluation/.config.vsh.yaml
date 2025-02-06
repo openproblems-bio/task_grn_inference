@@ -197,8 +197,6 @@ resources:
   path: "main.nf"
   is_executable: true
   entrypoint: "run_wf"
-- type: "file"
-  path: "_viash.yaml"
 info:
   label: "run_grn_evaluation"
   summary: "Evaluates GRNs and provides scores using regression analysis."
@@ -216,6 +214,11 @@ dependencies:
 - name: "metrics/ws_distance"
   repository:
     type: "local"
+- name: "utils/extract_uns_metadata"
+  repository:
+    type: "github"
+    repo: "openproblems-bio/openproblems"
+    tag: "build/main"
 repositories:
 - type: "github"
   name: "openproblems"
@@ -259,12 +262,13 @@ build_info:
   output: "target/nextflow/workflows/run_grn_evaluation"
   executable: "target/nextflow/workflows/run_grn_evaluation/main.nf"
   viash_version: "0.9.1"
-  git_commit: "84283447848a2b224c88165c9ef7beac588328f4"
+  git_commit: "3ff38ca7c76292007a51aad0fa765a77b6d5cafc"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
   dependencies:
   - "target/nextflow/metrics/regression_2"
   - "target/nextflow/metrics/regression_1"
   - "target/nextflow/metrics/ws_distance"
+  - "target/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata"
 package_config:
   name: "task_grn_inference"
   version: "build_main"

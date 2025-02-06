@@ -3396,7 +3396,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/celloracle",
     "viash_version" : "0.9.1",
-    "git_commit" : "84283447848a2b224c88165c9ef7beac588328f4",
+    "git_commit" : "3ff38ca7c76292007a51aad0fa765a77b6d5cafc",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

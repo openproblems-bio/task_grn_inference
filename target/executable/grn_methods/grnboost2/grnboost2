@@ -452,9 +452,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods grnboost2"
-LABEL org.opencontainers.image.created="2025-02-06T19:14:32Z"
+LABEL org.opencontainers.image.created="2025-02-06T22:29:49Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="84283447848a2b224c88165c9ef7beac588328f4"
+LABEL org.opencontainers.image.revision="3ff38ca7c76292007a51aad0fa765a77b6d5cafc"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

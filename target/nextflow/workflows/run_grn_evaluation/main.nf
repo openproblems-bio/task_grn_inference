@@ -3278,10 +3278,6 @@ meta = [
       "path" : "main.nf",
       "is_executable" : true,
       "entrypoint" : "run_wf"
-    },
-    {
-      "type" : "file",
-      "path" : "/_viash.yaml"
     }
   ],
   "info" : {
@@ -3310,6 +3306,14 @@ meta = [
       "name" : "metrics/ws_distance",
       "repository" : {
         "type" : "local"
+      }
+    },
+    {
+      "name" : "utils/extract_uns_metadata",
+      "repository" : {
+        "type" : "github",
+        "repo" : "openproblems-bio/openproblems",
+        "tag" : "build/main"
       }
     }
   ],
@@ -3374,7 +3378,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.1",
-    "git_commit" : "84283447848a2b224c88165c9ef7beac588328f4",
+    "git_commit" : "3ff38ca7c76292007a51aad0fa765a77b6d5cafc",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3477,6 +3481,7 @@ meta["root_dir"] = getRootDir()
 include { regression_2 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_2/main.nf"
 include { regression_1 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_1/main.nf"
 include { ws_distance } from "${meta.resources_dir}/../../../nextflow/metrics/ws_distance/main.nf"
+include { extract_uns_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
 
 // inner workflow
 // user-provided Nextflow code
@@ -3504,41 +3509,25 @@ workflow run_wf {
   /***************************
    * RUN METRICS *
    ***************************/
-  score_ch = input_ch
+  output_ch = input_ch
     | map{ id, state ->
         [id, state + ["_meta": [join_id: id]]]
       }
-
-    // | positive_control.run(
-    //   runIf: { id, state ->
-    //     state.method_id == 'positive_control'
-    //   },
-    //   fromState: [
-    //     perturbation_data: "perturbation_data",
-    //     multiomics_rna: "multiomics_rna",
-    //     layer: "layer",
-    //     tf_all: "tf_all"
-    //   ],
-    //   toState: {id, output, state ->
-    //     state + [
-    //       prediction: output.prediction
-    //     ]
-    //   }
-    // )
 
     // run all metrics
     | runEach(
       components: metrics,
       filter: { id, state, comp ->
-        !state.metric_ids || state.metric_ids.contains(comp.config.functionality.name)
+        !state.metric_ids || state.metric_ids.contains(comp.config.name)
       },
       id: { id, state, comp ->
-        id + "." + comp.config.functionality.name
+        id + "." + comp.config.name
       },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
         evaluation_data: "evaluation_data",
         prediction: "prediction",
+        ws_distance_background: "ws_distance_background",
         subsample: "subsample",
         reg_type: "reg_type",
         method_id: "method_id",
@@ -3551,16 +3540,14 @@ workflow run_wf {
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->
         state + [
-          metric_id: comp.config.functionality.name,
+          metric_id: comp.config.name,
           metric_output: output.score
         ]
       }
     )
 
-  output_ch = score_ch
-
     // extract the scores
-    | extract_metadata.run(
+    | extract_uns_metadata.run(
       key: "extract_scores",
       fromState: [input: "metric_output"],
       toState: { id, output, state ->
@@ -3578,8 +3565,6 @@ workflow run_wf {
       def metric_configs_file = tempFile("metric_configs.yaml")
       metric_configs_file.write(metric_configs_yaml_blob)
 
-      // def task_info_file = meta.resources_dir.resolve("task_info.yaml")
-
       // store the scores in a file
       def score_uns = states.collect{it.score_uns}
       def score_uns_yaml_blob = toYamlBlob(score_uns)
@@ -3593,12 +3578,6 @@ workflow run_wf {
       ]
 
       ["output", new_state]
-    }
-
-    // merge all of the output data 
-    | joinStates{ ids, states ->
-      def mergedStates = states.inject([:]) { acc, m -> acc + m }
-      [ids[0], mergedStates]
     }
 
   emit:
