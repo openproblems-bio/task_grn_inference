@@ -111,16 +111,14 @@ resources:
   - type: nextflow_script
     path: main.nf
     entrypoint: run_wf
-  - type: file
-    path: /_viash.yaml
 
 
 dependencies:
   - name: metrics/regression_2 
   - name: metrics/regression_1
   - name: metrics/ws_distance
-  
-
+  - name: utils/extract_uns_metadata
+    repository: openproblems
 
 runners:
   - type: executable
