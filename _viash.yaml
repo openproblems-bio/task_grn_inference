@@ -29,17 +29,9 @@ info:
   image: thumbnail.svg # todo: create a thumbnail
   test_resources:
     - type: s3
-      path: s3://openproblems-data/resources_test/grn/inference_datasets/
-      dest: resources_test/grn_benchmark/inference_datasets//
-    - type: s3
-      path: s3://openproblems-data/resources_test/grn/evaluation_data/
-      dest: resources_test/grn_benchmark/evaluation_data//
-    - type: s3
-      path: s3://openproblems-data/resources_test/grn/prior/
-      dest: resources_test/grn_benchmark/prior/
-    - type: s3
-      path: s3://openproblems-data/resources_test/grn/grn_models/
-      dest: resources_test/grn_models/
+      path: s3://openproblems-data/resources_test/grn/
+      dest: resources_test/
+
   readme: |
     ## Installation
 
