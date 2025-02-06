@@ -86,7 +86,7 @@ nextflow run . \
   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
   -profile docker \
   -with-trace \
-  -c src/common/nextflow_helpers/labels_ci.config \
+  -c common/nextflow_helpers/labels_ci.config \
   -params-file ${param_file}
 
 

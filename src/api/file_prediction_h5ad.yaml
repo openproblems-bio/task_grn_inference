@@ -1,6 +1,6 @@
 
 type: file
-example: 'resources/grn_models/op/collectri.h5ad'
+example: 'resources_test/grn_models/op/collectri.h5ad'
 label: GRN prediction
 summary: "File indicating the inferred GRN."
 info:

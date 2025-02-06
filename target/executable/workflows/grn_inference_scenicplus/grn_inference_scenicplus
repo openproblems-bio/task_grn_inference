@@ -190,7 +190,7 @@ function ViashHelp {
   echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"
-  echo "        example: resources/grn_models/op/collectri.h5ad"
+  echo "        example: resources_test/grn_models/op/collectri.h5ad"
   echo ""
   echo "    --tf_all"
   echo "        type: file, file must exist"

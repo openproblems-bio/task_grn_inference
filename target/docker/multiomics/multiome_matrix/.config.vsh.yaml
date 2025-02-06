@@ -162,7 +162,7 @@ build_info:
   output: "target/docker/multiomics/multiome_matrix"
   executable: "target/docker/multiomics/multiome_matrix/multiome_matrix"
   viash_version: "0.9.1"
-  git_commit: "cb0cafc792311922e3d17bf11f078864c0fec9b5"
+  git_commit: "84283447848a2b224c88165c9ef7beac588328f4"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
 package_config:
   name: "task_grn_inference"
@@ -187,17 +187,8 @@ package_config:
     image: "thumbnail.svg"
     test_resources:
     - type: "s3"
-      path: "s3://openproblems-data/resources_test/grn/inference_datasets/"
-      dest: "resources_test/grn_benchmark/inference_datasets//"
-    - type: "s3"
-      path: "s3://openproblems-data/resources_test/grn/evaluation_data/"
-      dest: "resources_test/grn_benchmark/evaluation_data//"
-    - type: "s3"
-      path: "s3://openproblems-data/resources_test/grn/prior/"
-      dest: "resources_test/grn_benchmark/prior/"
-    - type: "s3"
-      path: "s3://openproblems-data/resources_test/grn/grn_models/"
-      dest: "resources_test/grn_models/"
+      path: "s3://openproblems-data/resources_test/grn/"
+      dest: "resources_test/"
     readme: "## Installation\n\nYou need to have Docker, Java, and Viash installed.\
       \ Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\n\
       to install the required dependencies. \n\n## Download resources\n```bash\ngit\
