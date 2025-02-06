@@ -17,19 +17,19 @@ par = {
   'methods': ['negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
   # 'methods': ['pearson_corr'],
 
-  "evaluation_data": "resources/evaluation_datasets/op_perturbation.h5ad",
-  "tf_all": "resources/prior/tf_all.csv",
+  "evaluation_data": "resources/grn_benchmark/evaluation_datasets//op_perturbation.h5ad",
+  "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
   "max_n_links": 50000,
   "apply_tf": False,
   'binarize': False, 
   'subsample': -1,
   'verbose': 0,
   'num_workers': 20,
-  'consensus': 'resources/prior/op_consensus-num-regulators.json',
+  'consensus': 'resources/grn_benchmark/prior/op_consensus-num-regulators.json',
   'static_only': True,
   'layer': 'X_norm',
   'apply_skeleton': False,
-  'skeleton': 'resources/prior/skeleton.csv'
+  'skeleton': 'resources/grn_benchmark/prior/skeleton.csv'
 }
 
 meta = {

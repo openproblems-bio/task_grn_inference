@@ -28,8 +28,8 @@ torch.set_float32_matmul_precision('medium')
 
 ## VIASH START
 par = {
-    'rna': 'resources/inference_datasets/op_rna.h5ad',
-    'tf_all': 'resources/prior/tf_all.csv',
+    'rna': 'resources/grn_benchmark/inference_datasets/op_rna.h5ad',
+    'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
     'prediction': 'output/grn.h5ad',
     'filtration': 'top-k',
     'max_n_links': 50_000,
@@ -148,12 +148,12 @@ def main(par):
 
     
 if __name__ == '__main__':
-    if True: #TODO:remove this
+    if False: #TODO:remove this
         populate_my_ontology( 
             organisms= ["NCBITaxon:9606"]
         )
     par['checkpoint'] = par['temp_dir'] + '/scprint.ckpt'
-    if True: 
+    if False: 
 
         os.makedirs(par['temp_dir'], exist_ok=True)
         print(f"Downloading checkpoint")

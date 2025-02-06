@@ -15,14 +15,14 @@ par = {
   'layers': ['scgen_pearson'],
 
   "perturbation_data": "resources/grn-benchmark/perturbation_data.h5ad",
-  "tf_all": "resources/prior/tf_all.csv",
+  "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
   "max_n_links": 50000,
   "apply_tf": "true",
   'subsample': -2,
   'verbose': 1,
   'binarize': True,
   'num_workers': 20,
-  'consensus': 'resources/prior/consensus-num-regulators.json',
+  'consensus': 'resources/grn_benchmark/prior/consensus-num-regulators.json',
   'static_only': True,
   'clip_scores': True
 }

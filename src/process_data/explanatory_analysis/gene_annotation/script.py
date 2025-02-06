@@ -7,7 +7,7 @@ import biomart
 
 ## VIASH START
 par = {
-    'gene_annotations': 'resources/prior/gene_annotations.txt'
+    'gene_annotations': 'resources/grn_benchmark/prior/gene_annotations.txt'
 }
 ## VIASH END
 

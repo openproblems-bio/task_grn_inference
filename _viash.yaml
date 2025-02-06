@@ -30,10 +30,10 @@ info:
   test_resources:
     - type: s3
       path: s3://openproblems-data/resources_test/grn/inference_datasets/
-      dest: resources_test/inference_datasets/
+      dest: resources_test/grn_benchmark/inference_datasets//
     - type: s3
       path: s3://openproblems-data/resources_test/grn/evaluation_datasets/
-      dest: resources_test/evaluation_datasets/
+      dest: resources_test/grn_benchmark/evaluation_datasets//
     - type: s3
       path: s3://openproblems-data/resources_test/grn/prior/
       dest: resources_test/prior/
@@ -67,7 +67,7 @@ info:
 
     ```bash
     viash run src/control_methods/pearson_corr/config.vsh.yaml -- \
-              --rna resources/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad
+              --rna resources/grn_benchmark/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad
     ```
 
     ## Evaluate a GRN

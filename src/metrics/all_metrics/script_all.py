@@ -15,8 +15,8 @@ from all_metrics.helper import run_consensus, run_ws_distance_background, run_sc
 
 par = {
       'layer': 'X_norm',
-      "tf_all": "resources/prior/tf_all.csv",
-      'skeleton': 'resources/prior/skeleton.csv', 
+      "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
+      'skeleton': 'resources/grn_benchmark/prior/skeleton.csv', 
       "apply_tf": True,
       'subsample': -1,
       'verbose': 4,
@@ -146,13 +146,13 @@ if __name__ == '__main__':
 # def define_par(dataset):
 
 #   par = {
-#       "evaluation_data": f"resources/evaluation_datasets/{dataset}_perturbation.h5ad",
-#       'consensus':  f'resources/prior/{dataset}_consensus-num-regulators.json',
+#       "evaluation_data": f"resources/grn_benchmark/evaluation_datasets//{dataset}_perturbation.h5ad",
+#       'consensus':  f'resources/grn_benchmark/prior/{dataset}_consensus-num-regulators.json',
 
 #       'layer': 'X_norm',
       
-#       "tf_all": "resources/prior/tf_all.csv",
-#       'skeleton': 'resources/prior/skeleton.csv', 
+#       "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
+#       'skeleton': 'resources/grn_benchmark/prior/skeleton.csv', 
 #       "apply_tf": True,
 #       'subsample': -1,
 #       'verbose': 4,

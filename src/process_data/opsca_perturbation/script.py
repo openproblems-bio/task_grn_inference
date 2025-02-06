@@ -8,14 +8,22 @@ import sctk
 from scipy import sparse
 import scanpy as sc
 from scipy.sparse import csr_matrix
+import sys
 
 ## VIASH START
 par = {
     'perturbation_counts': 'resources/datasets_raw/op_perturbation_sc_counts.h5ad',
-    'pseudobulked_data': 'resources/datasets_raw/op_bulked.h5ad',
-    'evaluation_data': 'resources/evaluation_datasets/op_perturbation.h5ad',
+    'perturbation_bulk': 'resources/extended_data/op_perturbation_bulk.h5ad',
+    'evaluation_data': 'resources/grn_benchmark/evaluation_datasets/op_bulk.h5ad',
 }
 ## VIASH END
+meta = { 
+    'resources': 'src/utils/'
+}   
+
+sys.path.append(meta['resources'])
+
+from util import sum_by
 
 def preprocess_sc(par):
     # clean up
@@ -77,49 +85,7 @@ def preprocess_sc(par):
     del sc_counts.obsm
     del sc_counts.uns
     return sc_counts
-def sum_by(adata: ad.AnnData, col: str) -> ad.AnnData:
-    """
-    Adapted from this forum post: 
-    https://discourse.scverse.org/t/group-sum-rows-based-on-jobs-feature/371/4
-    """
-    
-    assert pd.api.types.is_categorical_dtype(adata.obs[col])
 
-    # sum `.X` entries for each unique value in `col`
-    cat = adata.obs[col].values
-
-    indicator = sparse.coo_matrix(
-        (
-            np.broadcast_to(True, adata.n_obs),
-            (cat.codes, np.arange(adata.n_obs))
-        ),
-        shape=(len(cat.categories), adata.n_obs),
-    )
-  
-    sum_adata = ad.AnnData(
-        indicator @ adata.X,
-        var=adata.var,
-        obs=pd.DataFrame(index=cat.categories),
-    )
-    
-    # copy over `.obs` values that have a one-to-one-mapping with `.obs[col]`
-    obs_cols = adata.obs.columns
-    obs_cols = list(set(adata.obs.columns) - set([col]))
-    
-    one_to_one_mapped_obs_cols = []
-    nunique_in_col = adata.obs[col].nunique()
-    for other_col in obs_cols:
-        if len(adata.obs[[col, other_col]].drop_duplicates()) == nunique_in_col:
-            one_to_one_mapped_obs_cols.append(other_col)
-
-    joining_df = adata.obs[[col] + one_to_one_mapped_obs_cols].drop_duplicates().set_index(col)
-    assert (sum_adata.obs.index == sum_adata.obs.join(joining_df).index).all()
-    sum_adata.obs = sum_adata.obs.join(joining_df)
-    sum_adata.obs.index.name = col
-    sum_adata.obs = sum_adata.obs.reset_index()
-    sum_adata.obs.index = sum_adata.obs.index.astype('str')
-
-    return sum_adata
 def pseudobulk_sum_func(sc_counts):
     # pseudobulk
     #group cell types per well
@@ -225,5 +191,5 @@ if __name__ == '__main__':
     bulk_adata.obs['is_control'] = bulk_adata.obs['perturbation'].isin(['Dimethyl Sulfoxide'])
     bulk_adata.obs['is_positive_control'] = bulk_adata.obs['perturbation'].isin(['Dabrafenib', 'Belinostat'])
 
-    bulk_adata.write(par['pseudobulked_data'])
+    bulk_adata.write(par['perturbation_bulk'])
     bulk_adata.write(par['evaluation_data'])

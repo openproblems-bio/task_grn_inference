@@ -1,5 +1,5 @@
 type: file
-example: resources_test/inference_datasets/op_atac.h5ad
+example: resources_test/grn_benchmark/inference_datasets//op_atac.h5ad
 label:  chromatin accessibility data
 summary: "Chromatin accessibility data"
 info:

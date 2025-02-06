@@ -4,8 +4,8 @@ import numpy as np
 ## VIASH START
 par = {
     'multiome_counts': 'resources/datasets_raw/op_multiome_sc_counts.h5ad',
-    'multiomics_rna': 'resources/inference_datasets/op_rna.h5ad',
-    'multiomics_atac': 'resources/inference_datasets/op_atac.h5ad'
+    'multiomics_rna': 'resources/grn_benchmark/inference_datasets/op_rna.h5ad',
+    'multiomics_atac': 'resources/grn_benchmark/inference_datasets/op_atac.h5ad'
 }
 ## VIASH END
 

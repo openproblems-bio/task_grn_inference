@@ -71,7 +71,7 @@ flowchart TB
 
 Chromatin accessibility data
 
-Example file: `resources_test/inference_datasets/op_atac.h5ad`
+Example file: `resources_test/grn_benchmark/inference_datasets//op_atac.h5ad`
 
 Format:
 
@@ -245,7 +245,7 @@ Data structure:
 
 Perturbation dataset for benchmarking.
 
-Example file: `resources_test/evaluation_datasets/op_perturbation.h5ad`
+Example file: `resources_test/grn_benchmark/evaluation_datasets//op_perturbation.h5ad`
 
 Format:
 
@@ -275,7 +275,7 @@ Data structure:
 
 RNA expression data.
 
-Example file: `resources_test/inference_datasets/op_rna.h5ad`
+Example file: `resources_test/grn_benchmark/inference_datasets//op_rna.h5ad`
 
 Format:
 

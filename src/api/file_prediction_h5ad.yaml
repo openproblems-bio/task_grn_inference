@@ -15,7 +15,7 @@ info:
         name: method_id
         description: "A unique identifier for the inference method"
         required: true
-      - type: DataFrame
+      - type: object
         name: prediction
         description: "Inferred GRNs in the format of source, target, weight"
         required: true

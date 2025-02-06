@@ -38,7 +38,7 @@ functionality:
           type: file
           required: false
           direction: input
-          default: resources/prior/consensus.json
+          default: resources/grn_benchmark/prior/consensus.json
         - name: --degree
           type: integer
           required: false

@@ -38,12 +38,12 @@ functionality:
           type: file
           required: false
           direction: input
-          default: resources/prior/tf_all.csv
+          default: resources/grn_benchmark/prior/tf_all.csv
         - name: --consensus
           type: file
           required: false
           direction: input
-          default: resources/prior/consensus.json
+          default: resources/grn_benchmark/prior/consensus.json
         - name: --layer
           type: string
           required: false

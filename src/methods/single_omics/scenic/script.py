@@ -19,7 +19,7 @@ import anndata as ad
 ## VIASH START
 par = {
   'rna': 'resources/grn-benchmark/rna_0.h5ad',
-  "tf_all": 'resources/prior/tf_all.csv',
+  "tf_all": 'resources/grn_benchmark/prior/tf_all.csv',
   'prediction': 'output/scenic_0_hvgs.csv',
   'temp_dir': 'output/scenic',
   'num_workers': 20,
