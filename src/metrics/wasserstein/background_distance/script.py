@@ -5,14 +5,17 @@ import scipy
 import pandas as pd
 import numpy as np
 
+from multiprocessing import Pool
+
 
 
 # - create background dist. 
 par = {
-    'evaluation_data_sc': f'resources/grn_benchmark/evaluation_datasets//replogle_sc.h5ad',
+    'evaluation_data_sc': f'resources/grn_benchmark/evaluation_data//replogle_sc.h5ad',
     'background_distance': 'resources/grn_benchmark/prior/ws_distance_background_replogle.csv',
     'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
-    'layer': 'X_norm'
+    'layer': 'X_norm',
+    'max_workers': 100
 }
 
 
@@ -50,23 +53,50 @@ def calculate_ws_distance(net, adata) -> pd.DataFrame:
     return net
 
 
-def main(par):
+# def main(par):
+#     adata = ad.read_h5ad(par['evaluation_data_sc'])
+#     adata.X = adata.layers[par['layer']]
+
+#     tf_all = np.loadtxt(par['tf_all'], dtype='str')
+#     available_tfs = np.intersect1d(adata.obs['perturbation'].unique(), tf_all)
+
+#     # - for each tf, calculate the distances for all possible genes in the network
+#     net_all_store = []
+#     for tf in tqdm(available_tfs):
+#         net_all = pd.DataFrame([{'source':tf, 'target': gene} for gene in adata.var_names]) 
+#         net_all = calculate_ws_distance(net_all, adata)
+#         net_all_store.append(net_all)
+#     net_all_ws_distance = pd.concat(net_all_store)
+#     net_all_ws_distance.to_csv(par['background_distance'])
+
+def load_adata(par):
     adata = ad.read_h5ad(par['evaluation_data_sc'])
     adata.X = adata.layers[par['layer']]
+    return adata
 
-    tf_all = np.loadtxt(par['tf_all'], dtype='str')
+def process_tf(tf_adata):
+    """Calculate ws distance for a given TF"""
+    adata = load_adata(par)
+    tf = tf_adata  # Unpack tuple
+    net_all = pd.DataFrame([{'source': tf, 'target': gene} for gene in adata.var_names])
+    net_all = calculate_ws_distance(net_all, adata)
+    return net_all
+
+def main(par):
+    adata = ad.read_h5ad(par['evaluation_data_sc'], backed='r')
+
+    tf_all = np.loadtxt(par['tf_all'], dtype=str)
     available_tfs = np.intersect1d(adata.obs['perturbation'].unique(), tf_all)
 
-    # - for each tf, select a random background net and calculate the distances
+    # Set up multiprocessing pool
+    num_workers = min(par['max_workers'], len(available_tfs))  # Use available cores
+    with Pool(num_workers) as pool:
+        # tqdm now tracks progress inside imap_unordered()
+        results = list(tqdm(pool.imap(process_tf, [(tf) for tf in available_tfs]), 
+                            total=len(available_tfs), desc="Processing TFs"))
 
-    random_grn_store = []
-    for tf in tqdm(available_tfs):
-        # random_genes = np.random.choice(adata.var_names, par['n_selection'], replace=False)
-        random_grn = pd.DataFrame([{'source':tf, 'target': gene} for gene in adata.var_names]) 
-        
-        random_grn = calculate_ws_distance(random_grn, adata)
-        random_grn_store.append(random_grn)
-    random_grn_ws_distance = pd.concat(random_grn_store)
-    random_grn_ws_distance.to_csv(par['background_distance'])
+    # Combine results
+    net_all_ws_distance = pd.concat(results)
+    net_all_ws_distance.to_csv(par['background_distance'])
 if __name__ == '__main__':
     main(par)

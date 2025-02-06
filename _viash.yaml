@@ -32,8 +32,8 @@ info:
       path: s3://openproblems-data/resources_test/grn/inference_datasets/
       dest: resources_test/grn_benchmark/inference_datasets//
     - type: s3
-      path: s3://openproblems-data/resources_test/grn/evaluation_datasets/
-      dest: resources_test/grn_benchmark/evaluation_datasets//
+      path: s3://openproblems-data/resources_test/grn/evaluation_data/
+      dest: resources_test/grn_benchmark/evaluation_data//
     - type: s3
       path: s3://openproblems-data/resources_test/grn/prior/
       dest: resources_test/grn_benchmark/prior/

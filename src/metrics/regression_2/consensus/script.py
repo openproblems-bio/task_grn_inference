@@ -10,7 +10,7 @@ import numpy as np
 
 ## VIASH START
 par = {
-    'evaluation_data': 'resources/grn_benchmark/evaluation_datasets//op_perturbation.h5ad',
+    'evaluation_data': 'resources/grn_benchmark/evaluation_data//op.h5ad',
     'models_dir': 'resources/grn_models/op/',
     'models': ['pearson_corr', 'pearson_causal', 'portia', 'ppcor', 'genie3', 'grnboost2', 'scenic', 'scglue', 'celloracle'],
     'regulators_consensus': 'resources/grn_benchmark/prior/regulators_consensus_op.json'

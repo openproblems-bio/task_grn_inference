@@ -19,15 +19,15 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 ## VIASH START
 par = {
-  "evaluation_data": f"resources/grn_benchmark/evaluation_datasets//op.h5ad",
+  "evaluation_data": f"resources/grn_benchmark/evaluation_data//op.h5ad",
   "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
-  "prediction": f"resources/grn_models/op/grnboost2.csv",
+  "prediction": f"resources/grn_models/op/grnboost2.h5ad",
   "method_id": "scenic",
   "max_n_links": 50000,
   "apply_tf": True,
   'score': 'output/score.h5ad',
   'reg_type': 'ridge',
-  'layer': 'pearson',
+  'layer': 'X_norm',
   'subsample': -1,
   'num_workers': 4,
   'skeleton': 'resources/grn_benchmark/prior/skeleton.csv',
@@ -42,19 +42,18 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--run_local', action='store_true', help='Run locally')
 parser.add_argument('--evaluation_data', type=str, help='Path to the evaluation_data file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-parser.add_argument('--num_workers', type=str, help='Number of cores')
-parser.add_argument('--layer', type=str, help='Layer to use')
-parser.add_argument('--causal', action='store_true', help='Enable causal mode')
-parser.add_argument('--normalize', action='store_true')
+parser.add_argument('--method_id', type=str, help='Method id')
+parser.add_argument('--dataset_id', type=str, help='Dataset id')
+parser.add_argument('--score', type=str, help='score file')
 
 args = parser.parse_args()
 
-var_local = vars(args)
 
+var_local = vars(args)
 if args.run_local:
     for key in var_local:
-        par[key] = var_local[key]
+        if var_local[key] is not None:
+            par[key] = var_local[key]
     meta = {
       "resources_dir":'src/metrics/regression_1/',
       "util_dir":'src/utils'
@@ -65,12 +64,14 @@ if args.run_local:
 else:
   sys.path.append(meta["resources_dir"])
 
-from util import verbose_print, process_links, verbose_tqdm, process_net, binarize_weight
-from helper import set_global_seed
+from util import verbose_print, process_links, verbose_tqdm, binarize_weight
+from helper import set_global_seed, process_net, cross_validation
 
 def read_net(par):
+    print(par['prediction'], flush=True)
     net = ad.read_h5ad(par['prediction'])
     net = pd.DataFrame(net.uns['prediction'])
+    net['weight'] = net['weight'].astype(float)
     if par['binarize']:
       net['weight'] = net['weight'].apply(binarize_weight)  
     if par['apply_skeleton']: #apply skeleton
@@ -83,8 +84,7 @@ def read_net(par):
         net = net[net['link'].isin(skeleton)]
         print('After filtering with skeleton:', net.shape)
 
-    if par['apply_tf']:
-        net = net[net.source.isin(tf_all)]
+    
     if 'cell_type' in net.columns:
         print('Taking mean of cell type specific grns')
         net.drop(columns=['cell_type'], inplace=True)
@@ -102,11 +102,14 @@ def main(par):
     set_global_seed(random_state)
 
     # -- read input data
+    tf_all = np.loadtxt(par['tf_all'], dtype=str)
     net = read_net(par)
+    if par['apply_tf']:
+        net = net[net.source.isin(tf_all)]
     evaluation_data = ad.read_h5ad(par['evaluation_data'])
     evaluation_data.X = evaluation_data.layers[par["layer"]]
     gene_names = evaluation_data.var.index.to_numpy()
-    tf_all = np.loadtxt(par['tf_all'], dtype=str)
+    
     
     # -- calclate scores 
     results = cross_validation(net, evaluation_data, par)
@@ -114,11 +117,11 @@ def main(par):
     return results
 
 if __name__ == '__main__':
-  print(par)
+#   print(par)
   results = main(par) 
 
   # - formatize results  
-  results = dict(all=[results['r2score-aver-all']], grn=[results['r2score-aver-grn']])
+  results = dict(r1_all=[results['r2score-aver-all']], r1_grn=[results['r2score-aver-grn']])
   results = pd.DataFrame(results)
   print(results)
 

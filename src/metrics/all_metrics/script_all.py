@@ -62,7 +62,7 @@ if __name__ == '__main__':
   run_scores_flag = True
   run_consensus_flag = False 
   run_ws_distance_background_flag = False 
-  datasets = ['op', 'replogle2', 'nakatake', 'norman', 'adamson']
+  datasets = ['op', 'replogle', 'nakatake', 'norman', 'adamson']
 
   if run_consensus_flag: # run consensus
     run_consensus(datasets)
@@ -88,7 +88,7 @@ if __name__ == '__main__':
       run_evaluation(dataset, models, models_dir, scores_dir, save_file_name)
 
   if True: # subsample
-    # for dataset in ['op', 'replogle2', 'nakatake', 'norman', 'adamson']: #'op', 'replogle2', 'nakatake', 'norman', 'adamson'
+    # for dataset in ['op', 'replogle', 'nakatake', 'norman', 'adamson']: #'op', 'replogle', 'nakatake', 'norman', 'adamson'
     for dataset in ['op']:
       if dataset == 'op':
         models_subsampled = [f'{model}_{subsample}' for subsample in [1, 2] for model in models]
@@ -146,7 +146,7 @@ if __name__ == '__main__':
 # def define_par(dataset):
 
 #   par = {
-#       "evaluation_data": f"resources/grn_benchmark/evaluation_datasets//{dataset}_perturbation.h5ad",
+#       "evaluation_data": f"resources/grn_benchmark/evaluation_data//{dataset}.h5ad",
 #       'consensus':  f'resources/grn_benchmark/prior/{dataset}_consensus-num-regulators.json',
 
 #       'layer': 'X_norm',

@@ -54,7 +54,7 @@ def process_dataset(file_name):
     adata.obs = adata.obs[['perturbation', 'is_control', 'perturbation_type']]
 
     # - data split 
-    if file_name == 'replogle2':
+    if file_name == 'replogle':
         ctr_samples = adata.obs.is_control
         samples = adata.obs.index[~ctr_samples] 
         _, test_samples = train_test_split(samples, test_size=.2, random_state=32)
@@ -102,11 +102,11 @@ def process_dataset(file_name):
     adata.layers['X_norm'] = adata.X.copy()
 
     if file_name in ['norman', 'adamson']:
-        adata.write(f'resources/grn_benchmark/evaluation_datasets/{file_name}_sc.h5ad')
+        adata.write(f'resources/grn_benchmark/evaluation_data/{file_name}_sc.h5ad')
 
     adata_bulked.write(f'resources/extended_data/{file_name}_bulk.h5ad')
     adata_train.write(f'resources/grn_benchmark/inference_datasets/{file_name}_rna.h5ad')
-    adata_test.write(f'resources/grn_benchmark/evaluation_datasets/{file_name}_bulk.h5ad')
+    adata_test.write(f'resources/grn_benchmark/evaluation_data/{file_name}_bulk.h5ad')
     
 
 def main(par):

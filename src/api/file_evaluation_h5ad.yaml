@@ -1,5 +1,5 @@
 type: file
-example: resources_test/grn_benchmark/evaluation_datasets/op_bulk.h5ad
+example: resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad
 label: perturbation data
 summary: "Perturbation dataset for benchmarking."
 

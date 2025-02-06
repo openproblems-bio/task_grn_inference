@@ -57,8 +57,8 @@ append_entry() {
   cat >> $param_file << HERE
   - id: ${reg_type}_${1}
     metric_ids: ${metric_ids}
-    evaluation_data: ${resources_dir}/evaluation_datasets/${dataset}_perturbation.h5ad
-    evaluation_data_sc: ${resources_dir}/evaluation_datasets/${dataset}_sc_counts.h5ad
+    evaluation_data: ${resources_dir}/evaluation_data/${dataset}.h5ad
+    evaluation_data_sc: ${resources_dir}/evaluation_data/${dataset}_sc_counts.h5ad
     reg_type: $reg_type
     method_id: $1
     num_workers: $num_workers
