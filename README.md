@@ -106,7 +106,7 @@ Arguments:
 | `--rna` | `file` | RNA expression data. |
 | `--atac` | `file` | (*Optional*) Chromatin accessibility data. |
 | `--prediction` | `file` | (*Optional, Output*) File indicating the inferred GRN. |
-| `--tf_all` | `file` | (*Optional*) NA. Default: `resources_test/prior/tf_all.csv`. |
+| `--tf_all` | `file` | (*Optional*) NA. Default: `resources_test/grn_benchmark/prior/tf_all.csv`. |
 | `--max_n_links` | `integer` | (*Optional*) NA. Default: `50000`. |
 | `--num_workers` | `integer` | (*Optional*) NA. Default: `4`. |
 | `--temp_dir` | `string` | (*Optional*) NA. Default: `output/temdir`. |

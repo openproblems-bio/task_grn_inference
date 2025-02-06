@@ -48,7 +48,7 @@ warnings.filterwarnings('ignore')
 ## VIASH START
 par = {
   'rna': 'resources_test/grn-benchmark/multiomics_rna.h5ad',
-  'tf_all': 'resources_test/prior/tf_all.csv',
+  'tf_all': 'resources_test/grn_benchmark/prior/tf_all.csv',
   'prediction': 'output/prediction_scgpt.csv',
   'max_n_links': 50000,
   'model_file': 'resources_test/supplementary/finetuned_scGPT_adamson/best_model.pt',

@@ -29,7 +29,7 @@ argument_groups:
         type: file
         direction: input
         required: true
-        example: resources_test/prior/tf_all.csv
+        example: resources_test/grn_benchmark/prior/tf_all.csv
       - name: --reg_type
         type: string
         direction: input
@@ -58,7 +58,7 @@ argument_groups:
         direction: input
         must_exist: false
         required: true
-        example: resources_test/prior/regulators_consensus_norman.json
+        example: resources_test/grn_benchmark/prior/regulators_consensus_norman.json
       - name: --static_only
         direction: input
         type: boolean
@@ -73,13 +73,13 @@ argument_groups:
         direction: input
         must_exist: false
         required: true
-        example: resources_test/prior/ws_consensus_norman.csv 
+        example: resources_test/grn_benchmark/prior/ws_consensus_norman.csv 
       - name: --ws_distance_background
         type: file
         direction: input
         must_exist: false
         required: true
-        example: resources_test/prior/ws_distance_background_norman.csv
+        example: resources_test/grn_benchmark/prior/ws_distance_background_norman.csv
       - name: --evaluation_data_sc
         type: file
         required: true

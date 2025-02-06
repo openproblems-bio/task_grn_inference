@@ -10,7 +10,7 @@ import pandas as pd
 ## VIASH START
 par = {
     'multiomics_rna': 'resources_test/grn-benchmark/multiomics_rna.h5ad',
-    'tf_all': 'resources_test/prior/tf_all.csv',
+    'tf_all': 'resources_test/grn_benchmark/prior/tf_all.csv',
     'prediction': 'output/pidc/prediction.csv',
     'temp_dir': 'output/pidc',
     'max_n_links': 50000
