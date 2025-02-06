@@ -18,5 +18,5 @@ python src/process_data/replogle_k562_gwps/script.py \
         --adata_bulk resources/extended_data/replogle_bulk.h5ad \
         --adata_test_sc resources/grn_benchmark/evaluation_data/replogle_sc.h5ad \
         --adata_test_bulk resources/grn_benchmark/evaluation_data/replogle_bulk.h5ad \
-        --adata_train_bulk resources/grn_benchmark/inference_datasets/replogle_rna.h5ad \
+        --adata_train_bulk resources/grn_benchmark/inference_data/replogle_rna.h5ad \
         --adata_train_sc resources/extended_data/replogle_train_sc.h5ad \

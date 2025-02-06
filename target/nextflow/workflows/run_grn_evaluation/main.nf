@@ -3080,6 +3080,14 @@ meta = [
           "multiple_sep" : ";"
         },
         {
+          "type" : "string",
+          "name" : "--dataset_id",
+          "required" : true,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
           "type" : "file",
           "name" : "--tf_all",
           "example" : [
@@ -3378,7 +3386,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.1",
-    "git_commit" : "3ff38ca7c76292007a51aad0fa765a77b6d5cafc",
+    "git_commit" : "2c98e0f40698a1b852abc5657b551f29ca355389",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3396,7 +3404,7 @@ meta = [
           "dest" : "resources_test/"
         }
       ],
-      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\n\n# download resources \nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Infer a GRN \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n          --rna resources/grn_benchmark/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad\n```\n\n## Evaluate a GRN\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\n\nThis will calculate and print the scores as well as output the scores into `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
+      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\n\n# download resources \nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Infer a GRN \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n          --rna resources/grn_benchmark/inference_data/norman_rna.h5ad --prediction output/net.h5ad\n```\n\n## Evaluate a GRN\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\n\nThis will calculate and print the scores as well as output the scores into `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
     },
     "repositories" : [
       {
@@ -3526,11 +3534,13 @@ workflow run_wf {
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
         evaluation_data: "evaluation_data",
+        evaluation_data_sc: "evaluation_data_sc",
         prediction: "prediction",
         ws_distance_background: "ws_distance_background",
         subsample: "subsample",
         reg_type: "reg_type",
         method_id: "method_id",
+        dataset_id: "method_id",
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",

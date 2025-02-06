@@ -105,7 +105,7 @@ def process_dataset(file_name):
         adata.write(f'resources/grn_benchmark/evaluation_data/{file_name}_sc.h5ad')
 
     adata_bulked.write(f'resources/extended_data/{file_name}_bulk.h5ad')
-    adata_train.write(f'resources/grn_benchmark/inference_datasets/{file_name}_rna.h5ad')
+    adata_train.write(f'resources/grn_benchmark/inference_data/{file_name}_rna.h5ad')
     adata_test.write(f'resources/grn_benchmark/evaluation_data/{file_name}_bulk.h5ad')
     
 

@@ -57,15 +57,16 @@ append_entry() {
   cat >> $param_file << HERE
   - id: ${reg_type}_${1}
     metric_ids: ${metric_ids}
-    evaluation_data: ${resources_dir}/evaluation_data/${dataset}.h5ad
-    evaluation_data_sc: ${resources_dir}/evaluation_data/${dataset}_sc_counts.h5ad
+    evaluation_data: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}.h5ad
+    evaluation_data_sc: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_sc.h5ad
     reg_type: $reg_type
     method_id: $1
+    dataset_id: $dataset
     num_workers: $num_workers
-    tf_all: ${resources_dir}/prior/tf_all.csv
-    regulators_consensus: ${resources_dir}/prior/regulators_consensus_${dataset}.json
-    ws_consensus: ${resources_dir}/prior/ws_consensus_${dataset}.json
-    ws_distance_background: ${resources_dir}/prior/ws_distance_background_${dataset}.json
+    tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
+    regulators_consensus: ${resources_dir}/grn_benchmark/prior/regulators_consensus_${dataset}.json
+    ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
+    ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv
     prediction: ${grn_models_folder}/${dataset}/$1.h5ad
     layer: "X_norm"
 HERE

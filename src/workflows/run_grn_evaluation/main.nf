@@ -39,11 +39,13 @@ workflow run_wf {
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
         evaluation_data: "evaluation_data",
+        evaluation_data_sc: "evaluation_data_sc",
         prediction: "prediction",
         ws_distance_background: "ws_distance_background",
         subsample: "subsample",
         reg_type: "reg_type",
         method_id: "method_id",
+        dataset_id: "method_id",
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",

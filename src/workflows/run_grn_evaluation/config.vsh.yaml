@@ -25,6 +25,10 @@ argument_groups:
         type: string
         required: true
         direction: input
+      - name: --dataset_id
+        type: string
+        required: true
+        direction: input
       - name: --tf_all
         type: file
         direction: input

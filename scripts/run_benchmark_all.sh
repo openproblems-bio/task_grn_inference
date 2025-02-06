@@ -22,8 +22,8 @@ param_list:
     metric_ids: $metric_ids
     method_ids: $method_ids
     evaluation_data: ${resources_dir}/evaluation_data/${dataset}.h5ad
-    rna: ${resources_dir}/inference_datasets/${dataset}_rna.h5ad
-    atac: ${resources_dir}/inference_datasets/${dataset}_atac.h5ad
+    rna: ${resources_dir}/inference_data/${dataset}_rna.h5ad
+    atac: ${resources_dir}/inference_data/${dataset}_atac.h5ad
     reg_type: $reg_type
     subsample: $subsample
     num_workers: $num_workers

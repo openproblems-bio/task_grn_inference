@@ -456,9 +456,9 @@ pip install -e GRnnData[dev]   && \
 pip install -e benGRN[dev]  
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-02-06T22:29:49Z"
+LABEL org.opencontainers.image.created="2025-02-06T22:52:53Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="3ff38ca7c76292007a51aad0fa765a77b6d5cafc"
+LABEL org.opencontainers.image.revision="2c98e0f40698a1b852abc5657b551f29ca355389"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -581,11 +581,11 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --rna"
   echo "        type: file, required parameter, file must exist"
-  echo "        example: resources_test/grn_benchmark/inference_datasets/op_rna.h5ad"
+  echo "        example: resources_test/grn_benchmark/inference_data/op_rna.h5ad"
   echo ""
   echo "    --atac"
   echo "        type: file, file must exist"
-  echo "        example: resources_test/grn_benchmark/inference_datasets/op_atac.h5ad"
+  echo "        example: resources_test/grn_benchmark/inference_data/op_atac.h5ad"
   echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"

@@ -71,7 +71,8 @@ flowchart TB
 
 Chromatin accessibility data
 
-Example file: `resources_test/grn_benchmark/inference_datasets//op_atac.h5ad`
+Example file:
+`resources_test/grn_benchmark/inference_data//op_atac.h5ad`
 
 Format:
 
@@ -120,7 +121,7 @@ Arguments:
 
 File indicating the inferred GRN.
 
-Example file: `resources/grn_models/op/collectri.h5ad`
+Example file: `resources_test/grn_models/op/collectri.h5ad`
 
 Format:
 
@@ -139,7 +140,7 @@ Data structure:
 |:---|:---|:---|
 | `uns["dataset_id"]` | `string` | A unique identifier for the dataset. |
 | `uns["method_id"]` | `string` | A unique identifier for the inference method. |
-| `uns["prediction"]` | `DataFrame` | Inferred GRNs in the format of source, target, weight. |
+| `uns["prediction"]` | `object` | Inferred GRNs in the format of source, target, weight. |
 
 </div>
 
@@ -245,7 +246,8 @@ Data structure:
 
 Perturbation dataset for benchmarking.
 
-Example file: `resources_test/grn_benchmark/evaluation_data//op.h5ad`
+Example file:
+`resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad`
 
 Format:
 
@@ -275,7 +277,8 @@ Data structure:
 
 RNA expression data.
 
-Example file: `resources_test/grn_benchmark/inference_datasets//op_rna.h5ad`
+Example file:
+`resources_test/grn_benchmark/inference_data/op_rna.h5ad`
 
 Format:
 
