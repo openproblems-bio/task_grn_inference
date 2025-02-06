@@ -68,7 +68,22 @@ def cv_5(genes_n):
         groups = np.concatenate((groups, np.arange(genes_n % num_groups)))
     np.random.shuffle(groups)
     return groups
+def pivot_grn(net):
+    ''' make net to have gene*tf format'''
+    net = net.drop_duplicates(subset=['target', 'source'])
+    df_tmp = net.pivot(index='target', columns='source', values='weight')
+    return df_tmp.fillna(0)
 
+
+def process_net(net, gene_names):
+    # Remove self-regulations
+    net = net.drop_duplicates()
+    net = net[net['source'] != net['target']]
+    # pivot
+    net = pivot_grn(net)
+    # subset 
+    net = net[net.index.isin(gene_names)]
+    return net
 def cross_validation(net, prturb_adata, par:dict):
     np.random.seed(32)
     
@@ -129,7 +144,7 @@ def cross_validation(net, prturb_adata, par:dict):
     n_baselines = 100
     unique_groups = np.unique(groups)
     y_pred_baselines = [y_pred.copy() for i in range(n_baselines)]
-    for group in verbose_tqdm(unique_groups, "Processing groups", 2, par['verbose']):
+    for group in tqdm(unique_groups, "Cross validation"):
         mask_va = groups == group
         mask_tr = ~mask_va
         X_tr = X[mask_tr & mask_gene_net, :]

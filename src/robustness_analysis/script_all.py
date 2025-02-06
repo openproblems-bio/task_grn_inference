@@ -17,7 +17,7 @@ par = {
   'methods': ['negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
   # 'methods': ['pearson_corr'],
 
-  "evaluation_data": "resources/grn_benchmark/evaluation_datasets//op_perturbation.h5ad",
+  "evaluation_data": "resources/grn_benchmark/evaluation_data//op.h5ad",
   "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
   "max_n_links": 50000,
   "apply_tf": False,

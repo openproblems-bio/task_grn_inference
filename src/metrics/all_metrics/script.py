@@ -9,14 +9,14 @@ import scanpy as sc
 argparser = argparse.ArgumentParser()
 argparser.add_argument('--run_local', action='store_true', help='Run locally')
 argparser.add_argument('--prediction', help='Path to the GRN prediction file')
-argparser.add_argument('--evaluation_dataset')
-argparser.add_argument('--evaluation_dataset_sc')
-argparser.add_argument('--regulators_consensus')
-argparser.add_argument('--ws_consensus')
-argparser.add_argument('--ws_distance_background')
-argparser.add_argument('--method_id', help='Method ID')
-argparser.add_argument('--dataset_id', help='Dataset ID')
-argparser.add_argument('--score', help='Where to store scores')
+# argparser.add_argument('--evaluation_data')
+# argparser.add_argument('--evaluation_data_sc')
+# argparser.add_argument('--regulators_consensus')
+# argparser.add_argument('--ws_consensus')
+# argparser.add_argument('--ws_distance_background')
+# argparser.add_argument('--method_id', help='Method ID')
+# argparser.add_argument('--dataset_id', help='Dataset ID')
+# argparser.add_argument('--score', help='Where to store scores')
 
 par_local = vars(argparser.parse_args())
 
@@ -78,7 +78,7 @@ def main(par):
     assert par['dataset_id']
     dataset = par['dataset_id']
 
-    # par['evaluation_data'] = f'resources/grn_benchmark/evaluation_datasets/{dataset}_perturbation.h5ad'
+    # par['evaluation_data'] = f'resources/grn_benchmark/evaluation_data/{dataset}.h5ad'
     # par['evaluation_data_sc'] = f'resources/datasets_raw/{dataset}_sc_counts.h5ad'
     # par['regulators_consensus'] = f'resources/grn_benchmark/prior/regulators_consensus_{dataset}.json'
     # par['ws_consensus'] = f'resources/grn_benchmark/prior/ws_consensus_{dataset}.csv'

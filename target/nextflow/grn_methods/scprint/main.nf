@@ -3405,7 +3405,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scprint",
     "viash_version" : "0.9.1",
-    "git_commit" : "16590d3197a12ac514e3cf1fa32eab2473f75279",
+    "git_commit" : "cb0cafc792311922e3d17bf11f078864c0fec9b5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3424,8 +3424,8 @@ meta = [
         },
         {
           "type" : "s3",
-          "path" : "s3://openproblems-data/resources_test/grn/evaluation_datasets/",
-          "dest" : "resources_test/grn_benchmark/evaluation_datasets//"
+          "path" : "s3://openproblems-data/resources_test/grn/evaluation_data/",
+          "dest" : "resources_test/grn_benchmark/evaluation_data//"
         },
         {
           "type" : "s3",

@@ -6,6 +6,7 @@ import numpy as np
 def main(par):
     prediction = ad.read_h5ad(par['prediction'])
     prediction = pd.DataFrame(prediction.uns['prediction'])
+    prediction['weight'] = prediction['weight'].astype(float)
     consensus = pd.read_csv(par['ws_consensus'], index_col=0)
     background_distance = pd.read_csv(par['ws_distance_background'], index_col=0)
     evaluation_data = ad.read_h5ad(par['evaluation_data_sc'])

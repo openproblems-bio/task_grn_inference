@@ -174,7 +174,7 @@ if __name__ == '__main__':
     main(par)
     
     # if False: # subsample
-    #     # for dataset in ['replogle2', 'norman', 'adamson', 'nakatake']: # 'replogle2' 'op' norman
+    #     # for dataset in ['replogle', 'norman', 'adamson', 'nakatake']: # 'replogle' 'op' norman
     #     for dataset in ['op']:
     #         if dataset == 'op':
     #             for subsample in [1, 2]: #number of donors 

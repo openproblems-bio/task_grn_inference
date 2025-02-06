@@ -278,86 +278,70 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     
     net = ad.read_h5ad(par['prediction'])
     net = pd.DataFrame(net.uns['prediction'])
-    if 'donor_id' not in prturb_adata.obs.columns:
-        prturb_adata.obs['donor_id']= 'onebatch'
-    donor_ids = prturb_adata.obs.donor_id.unique()
-    df_results_store = []
-    for donor_id in donor_ids:
-        prturb_adata_sub = prturb_adata[prturb_adata.obs.donor_id==donor_id,:]
-        if 'donor_id' in net.columns:
-            if donor_id not in net.donor_id.unique():
-                raise ValueError(f'{donor_id} is not present in grn.')
-            net_sub = net[net.donor_id==donor_id]
-        else:
-            net_sub = net
-        net_matrix = net_to_matrix(net, gene_names, par)
-
-        # groups = LabelEncoder().fit_transform(evaluation_data.obs.plate_name)
-        # groups = LabelEncoder().fit_transforcross_validatem(prturb_adata_sub.obs.cell_type)
-        n_cells = prturb_adata_sub.shape[0]
-        random_groups = np.random.choice(range(1, 5+1), size=n_cells, replace=True) # random sampling
-        groups = LabelEncoder().fit_transform(random_groups)
-
-        # Load and standardize perturbation data
-        layer = par['layer']
-        if  layer=='X':
-            X = prturb_adata_sub.X
-        else:
-            X = prturb_adata_sub.layers[layer]
-        
-        try:
-            X = X.todense().A
-        except:
-            pass
-
-        X = RobustScaler().fit_transform(X)
-
-        # Load consensus numbers of putative regulators
-        with open(par['regulators_consensus'], 'r') as f:
-            data = json.load(f)
-
-        gene_names_ = np.asarray(list(data.keys()), dtype=object)
-
-        n_features_theta_min = np.asarray([data[gene_name]['0'] for gene_name in gene_names], dtype=int)
-        n_features_theta_median = np.asarray([data[gene_name]['0.5'] for gene_name in gene_names], dtype=int)
-        n_features_theta_max = np.asarray([data[gene_name]['1'] for gene_name in gene_names], dtype=int)
-
-        # Load list of putative TFs
-        tf_names = np.loadtxt(par['tf_all'], dtype=str)
-        if par['apply_tf']==False:
-            tf_names = gene_names
-
-        # Evaluate GRN
-        verbose_print(par['verbose'], f'Compute metrics for layer: {layer}', 3)
-        verbose_print(par['verbose'], f'Static approach (theta=0):', 3)
-        if (n_features_theta_min!=0).any()==False:
-            score_static_min = np.nan
-        else:
-            score_static_min = static_approach(net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
-        verbose_print(par['verbose'], f'Static approach (theta=0.5):', 3)
-        score_static_median = static_approach(net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
-        print(f'Static approach (theta=1):', flush=True)
-        score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
-
-        results = {
-            'reg2-theta-0.0': [float(score_static_min)],
-            'reg2-theta-0.5': [float(score_static_median)],
-            'reg2-theta-1.0': [float(score_static_max)],
-        }
-
-        # # Add dynamic score
-        # if not par['static_only']:
-        #     score_dynamic = dynamic_approach(grn, X, groups, gene_names, tf_names, par['reg_type'])
-        #     score_overall = score_dynamic + score_static_min + score_static_median + score_static_max
-        #     results['dynamic'] = [float(score_dynamic)]
-        #     results['Overall'] = [float(score_overall)]
-
-        # Convert results to DataFrame
-        df_results = pd.DataFrame(results)
-        df_results.index=[donor_id]
-
-        df_results_store.append(df_results)
+    net['weight'] = net['weight'].astype(float)
     
-    df_results_concat = pd.concat(df_results_store, axis=0)
-    df_results_mean = df_results_concat.mean(axis=0).to_frame().T
-    return df_results_mean
+   
+    net_matrix = net_to_matrix(net, gene_names, par)
+
+    n_cells = prturb_adata.shape[0]
+    random_groups = np.random.choice(range(1, 5+1), size=n_cells, replace=True) # random sampling
+    groups = LabelEncoder().fit_transform(random_groups)
+
+    # Load and standardize perturbation data
+    layer = par['layer']
+    if  layer=='X':
+        X = prturb_adata.X
+    else:
+        X = prturb_adata.layers[layer]
+    
+    try:
+        X = X.todense().A
+    except:
+        pass
+
+    X = RobustScaler().fit_transform(X)
+
+    # Load consensus numbers of putative regulators
+    with open(par['regulators_consensus'], 'r') as f:
+        data = json.load(f)
+
+    gene_names_ = np.asarray(list(data.keys()), dtype=object)
+
+    n_features_theta_min = np.asarray([data[gene_name]['0'] for gene_name in gene_names], dtype=int)
+    n_features_theta_median = np.asarray([data[gene_name]['0.5'] for gene_name in gene_names], dtype=int)
+    n_features_theta_max = np.asarray([data[gene_name]['1'] for gene_name in gene_names], dtype=int)
+
+    # Load list of putative TFs
+    tf_names = np.loadtxt(par['tf_all'], dtype=str)
+    if par['apply_tf']==False:
+        tf_names = gene_names
+
+    # Evaluate GRN
+    verbose_print(par['verbose'], f'Compute metrics for layer: {layer}', 3)
+    verbose_print(par['verbose'], f'Static approach (theta=0):', 3)
+    if (n_features_theta_min!=0).any()==False:
+        score_static_min = np.nan
+    else:
+        score_static_min = static_approach(net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
+    verbose_print(par['verbose'], f'Static approach (theta=0.5):', 3)
+    score_static_median = static_approach(net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
+    print(f'Static approach (theta=1):', flush=True)
+    score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
+
+    results = {
+        'reg2-theta-0.0': [float(score_static_min)],
+        'reg2-theta-0.5': [float(score_static_median)],
+        'reg2-theta-1.0': [float(score_static_max)],
+    }
+
+    # # Add dynamic score
+    # if not par['static_only']:
+    #     score_dynamic = dynamic_approach(grn, X, groups, gene_names, tf_names, par['reg_type'])
+    #     score_overall = score_dynamic + score_static_min + score_static_median + score_static_max
+    #     results['dynamic'] = [float(score_dynamic)]
+    #     results['Overall'] = [float(score_overall)]
+
+    # Convert results to DataFrame
+    df_results = pd.DataFrame(results)
+
+    return df_results

@@ -445,9 +445,9 @@ function ViashDockerfile {
     cat << 'VIASHDOCKER'
 FROM janursa/figr:19-08-2024
 LABEL org.opencontainers.image.description="Companion container for running component multiomics format_resources_r"
-LABEL org.opencontainers.image.created="2025-02-06T13:24:20Z"
+LABEL org.opencontainers.image.created="2025-02-06T18:51:14Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="16590d3197a12ac514e3cf1fa32eab2473f75279"
+LABEL org.opencontainers.image.revision="cb0cafc792311922e3d17bf11f078864c0fec9b5"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

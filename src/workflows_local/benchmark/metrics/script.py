@@ -26,7 +26,9 @@ sys.path.append(meta["resources_dir"])
 sys.path.append(meta["util"])
 
 dependencies={
-  'all_metrics': 'src/metrics/all_metrics/script.py'
+  'regression_1': 'src/metrics/regression_1/script.py',
+  'regression_2': 'src/metrics/regression_2/script.py',
+  'ws_distance': 'src/metrics/wasserstein/script.py',
 }
 
 # - run consensus 
@@ -55,11 +57,11 @@ global_models = [
 def define_par(dataset):
 
   par_local = {
-      "evaluation_dataset": f"resources/grn_benchmark/evaluation_datasetsets/{dataset}_bulk.h5ad",
-      "evaluation_dataset_sc": f"resources/grn_benchmark/evaluation_datasetsets/{dataset}_sc.h5ad",
+      "evaluation_data": f"resources/grn_benchmark/evaluation_data/{dataset}_bulk.h5ad",
+      "evaluation_data_sc": f"resources/grn_benchmark/evaluation_data/{dataset}_sc.h5ad",
       'regulators_consensus':  f'resources/grn_benchmark/prior/regulators_consensus_{dataset}.json',
-      'ws_consensus': f'resources/grn_benchmark/prior/ws_consensus_{dataset}.json',
-      'ws_distance_background': f'resources/grn_benchmark/prior/ws_distance_background_{dataset}.json',
+      'ws_consensus': f'resources/grn_benchmark/prior/ws_consensus_{dataset}.csv',
+      'ws_distance_background': f'resources/grn_benchmark/prior/ws_distance_background_{dataset}.csv',
 
       'layer': 'X_norm',
       "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
@@ -77,22 +79,66 @@ def run_consensus(dataset):
   main_consensus(par_local)
 
 def run_metrics(par):
-    par['score'] = f"output/score_{par['dataset_id']}_{par['method_id']}.h5ad"
-    args = f"--run_local --prediction {par['prediction']} \
+  scores_store = []
+  par['score'] = f"output/score_{par['dataset_id']}_{par['method_id']}.h5ad"
+  # -- reg1
+  print('Running regression 1 ...')
+  args = f"--run_local --prediction {par['prediction']} \
+          --dataset_id {par['dataset_id']} \
+          --method_id {par['method_id']} \
+          --evaluation_data {par['evaluation_data']} \
+          --score {par['score']} "
+  
+  command = f"python {dependencies['regression_1']} {args}"
+
+  result = subprocess.run(command, shell=True, capture_output=True, text=True)
+
+  if result.returncode != 0:
+      print("STDOUT:", result.stdout)
+      print("STDERR:", result.stderr)
+      raise RuntimeError(f"Error: command proprocess failed with exit code {result.returncode}")
+  print('preprocess completed')
+
+  score_reg1 = ad.read_h5ad(par['score'])
+  score_reg1 = pd.DataFrame([score_reg1.uns["metric_values"]], columns=score_reg1.uns["metric_ids"])
+
+  scores_store.append(score_reg1)
+  # -- reg2
+  print('Running regression 2 ...')
+  args = f"--run_local \
+          --prediction {par['prediction']} \
+          --dataset_id {par['dataset_id']} \
+          --method_id {par['method_id']} \
+          --evaluation_data {par['evaluation_data']} \
+          --regulators_consensus {par['regulators_consensus']} \
+          --score {par['score']} "
+  
+  command = f"python {dependencies['regression_2']} {args}"
+  result = subprocess.run(command, shell=True, capture_output=True, text=True)
+
+  if result.returncode != 0:
+      print("STDOUT:", result.stdout)
+      print("STDERR:", result.stderr)
+      raise RuntimeError(f"Error: command proprocess failed with exit code {result.returncode}")
+  print('preprocess completed')
+
+  score_reg2 = ad.read_h5ad(par['score'])
+  score_reg2 = pd.DataFrame([score_reg2.uns["metric_values"]], columns=score_reg2.uns["metric_ids"])
+
+  scores_store.append(score_reg2)
+  # -- ws distance 
+  if par['dataset_id'] in ['replogle', 'norman', 'adamson']:
+    print('Running WS disance ...')
+    args = f"--run_local \
+            --prediction {par['prediction']} \
             --dataset_id {par['dataset_id']} \
             --method_id {par['method_id']} \
-            --evaluation_dataset {par['evaluation_dataset']} \
-            --evaluation_dataset_sc {par['evaluation_dataset_sc']} \
-            --regulators_consensus {par['regulators_consensus']} \
+            --evaluation_data_sc {par['evaluation_data_sc']} \
             --ws_consensus {par['ws_consensus']} \
             --ws_distance_background {par['ws_distance_background']} \
             --score {par['score']} "
     
-
-    command = f"python {dependencies['all_metrics']} {args}"
-
-    print(command)
-
+    command = f"python {dependencies['ws_distance']} {args}"
     result = subprocess.run(command, shell=True, capture_output=True, text=True)
 
     if result.returncode != 0:
@@ -101,9 +147,15 @@ def run_metrics(par):
         raise RuntimeError(f"Error: command proprocess failed with exit code {result.returncode}")
     print('preprocess completed')
 
-    score = ad.read_h5ad(par['score']).uns['score']
-  
-    return score
+    score_ws = ad.read_h5ad(par['score'])
+    score_ws = pd.DataFrame([score_ws.uns["metric_values"]], columns=score_ws.uns["metric_ids"])
+
+    scores_store.append(score_ws)
+  # - merge
+  score = pd.concat(scores_store, axis=1)
+  print(score)
+
+  return score
 
 
 def run_evaluation(dataset, binarize=False, max_n_links=50000, apply_skeleton=False,  reg_type='ridge'):
@@ -121,7 +173,7 @@ def run_evaluation(dataset, binarize=False, max_n_links=50000, apply_skeleton=Fa
   # - add models
   for model in par['methods']:
     print(model)
-    grn_file = f"{models_dir}/{model}.csv"
+    grn_file = f"{models_dir}/{model}.h5ad"
     if not os.path.exists(grn_file):
       print(f"{grn_file} doesnt exist. Skipped.")
       continue
@@ -168,7 +220,7 @@ if __name__ == '__main__':
   
 
   # if False: # subsample
-  #   # for dataset in ['op', 'replogle2', 'nakatake', 'norman', 'adamson']: #'op', 'replogle2', 'nakatake', 'norman', 'adamson'
+  #   # for dataset in ['op', 'replogle', 'nakatake', 'norman', 'adamson']: #'op', 'replogle', 'nakatake', 'norman', 'adamson'
   #   save_scores_file = f"{scores_dir}/subsampled.csv" 
   #   for i, dataset in enumerate(['op']):
   #     if dataset == 'op':

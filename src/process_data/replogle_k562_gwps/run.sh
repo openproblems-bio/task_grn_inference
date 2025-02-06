@@ -16,7 +16,7 @@ python src/process_data/replogle_k562_gwps/script.py \
         --input resources/datasets_raw/replogle_K562_gwps_raw_singlecell.h5ad \
         --tf_all resources/grn_benchmark/prior/tf_all.csv  \
         --adata_bulk resources/extended_data/replogle_bulk.h5ad \
-        --adata_test_sc resources/grn_benchmark/evaluation_datasets/replogle_sc.h5ad \
-        --adata_test_bulk resources/grn_benchmark/evaluation_datasets/replogle_bulk.h5ad \
+        --adata_test_sc resources/grn_benchmark/evaluation_data/replogle_sc.h5ad \
+        --adata_test_bulk resources/grn_benchmark/evaluation_data/replogle_bulk.h5ad \
         --adata_train_bulk resources/grn_benchmark/inference_datasets/replogle_rna.h5ad \
         --adata_train_sc resources/extended_data/replogle_train_sc.h5ad \

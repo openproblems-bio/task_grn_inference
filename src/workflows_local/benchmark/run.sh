@@ -20,21 +20,20 @@ METHODS=(
     "scprint"
 )
 
-SAVE_SCORES_FILE="output/scores.h5ad"
+SAVE_SCORES_FILE="output/scores.csv"
 
 FORCE=true
 RUN_CONSENSUS_FLAG=False
 
-
 # ----- run methods -----
-# cmd="python src/workflows_local/benchmark/methods/script.py 
-#         --datasets ${DATASETS[@]} 
-#         --methods ${METHODS[@]}"
+cmd="python src/workflows_local/benchmark/methods/script.py 
+        --datasets ${DATASETS[@]} 
+        --methods ${METHODS[@]}"
 
-# [ "$FORCE" = true ] && cmd="${cmd} --force"
+[ "$FORCE" = true ] && cmd="${cmd} --force"
 
-# echo "Running: $cmd"
-# $cmd
+echo "Running: $cmd"
+$cmd
 
 # ----- run metrics -----
 cmd="python src/workflows_local/benchmark/metrics/script.py 

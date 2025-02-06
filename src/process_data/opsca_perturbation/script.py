@@ -14,7 +14,7 @@ import sys
 par = {
     'perturbation_counts': 'resources/datasets_raw/op_perturbation_sc_counts.h5ad',
     'perturbation_bulk': 'resources/extended_data/op_perturbation_bulk.h5ad',
-    'evaluation_data': 'resources/grn_benchmark/evaluation_datasets/op_bulk.h5ad',
+    'evaluation_data': 'resources/grn_benchmark/evaluation_data/op_bulk.h5ad',
 }
 ## VIASH END
 meta = { 

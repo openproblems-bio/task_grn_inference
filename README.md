@@ -245,7 +245,7 @@ Data structure:
 
 Perturbation dataset for benchmarking.
 
-Example file: `resources_test/grn_benchmark/evaluation_datasets//op_perturbation.h5ad`
+Example file: `resources_test/grn_benchmark/evaluation_data//op.h5ad`
 
 Format:
 
