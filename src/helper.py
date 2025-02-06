@@ -40,7 +40,7 @@ def analyse_meta_cells(task_grn_inference_dir):
 
 
     par = {
-        'rna': f'{task_grn_inference_dir}/resources/grn_benchmark/inference_datasets/{dataset}_rna.h5ad',
+        'rna': f'{task_grn_inference_dir}/resources/grn_benchmark/inference_data/{dataset}_rna.h5ad',
         "evaluation_data": f"{task_grn_inference_dir}/resources/grn_benchmark/evaluation_data//{dataset}.h5ad",
 
         'layer': 'X_norm',
@@ -123,7 +123,7 @@ def analyse_imputation(task_grn_inference_dir):
 
 
     par = {
-        'rna': f'{task_grn_inference_dir}/resources/grn_benchmark/inference_datasets/{dataset}_rna.h5ad',
+        'rna': f'{task_grn_inference_dir}/resources/grn_benchmark/inference_data/{dataset}_rna.h5ad',
         "evaluation_data": f"{task_grn_inference_dir}/resources/grn_benchmark/evaluation_data//{dataset}.h5ad",
 
         'layer': 'X_norm',
@@ -204,7 +204,7 @@ def analyse_imputation(task_grn_inference_dir):
 def analyse_corr_vs_tfmasked_corr(task_grn_inference_dir):
     for i_run, dataset in enumerate(['op', 'replogle', 'nakatake', 'norman', 'adamson']):
         par = {
-            'rna': f'{task_grn_inference_dir}/resources/grn_benchmark/inference_datasets/{dataset}_rna.h5ad',
+            'rna': f'{task_grn_inference_dir}/resources/grn_benchmark/inference_data/{dataset}_rna.h5ad',
             "evaluation_data": f"{task_grn_inference_dir}/resources/grn_benchmark/evaluation_data//{dataset}.h5ad",
 
             'layer': 'X_norm',

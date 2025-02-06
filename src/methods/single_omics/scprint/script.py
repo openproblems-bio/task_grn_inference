@@ -28,7 +28,7 @@ torch.set_float32_matmul_precision('medium')
 
 ## VIASH START
 par = {
-    'rna': 'resources/grn_benchmark/inference_datasets/op_rna.h5ad',
+    'rna': 'resources/grn_benchmark/inference_data/op_rna.h5ad',
     'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
     'prediction': 'output/grn.h5ad',
     'filtration': 'top-k',

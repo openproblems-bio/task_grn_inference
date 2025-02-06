@@ -27,7 +27,7 @@ viash run src/methods/$method_id/config.vsh.yaml -- \
 
 # run the inference using the method for op dataset using only RNA data. Add more aurguments if needed.
 viash run src/methods/$method_id/config.vsh.yaml -- \
-  --rna "resources/grn_benchmark/inference_datasets/op_rna.h5ad" \
+  --rna "resources/grn_benchmark/inference_data/op_rna.h5ad" \
   --prediction "output/prediction.h5ad"
 
 # run evaluation metrics

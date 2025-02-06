@@ -20,8 +20,8 @@ par = vars(args)
 def run_grn_inference(par, dataset='op', subsample=None):
     par_local = {
         'models_dir': f'resources/grn_models/{dataset}/',
-        'rna': f'resources/grn_benchmark/inference_datasets/{dataset}_rna.h5ad',
-        'atac': f'resources/grn_benchmark/inference_datasets/{dataset}_atac.h5ad', 
+        'rna': f'resources/grn_benchmark/inference_data/{dataset}_rna.h5ad',
+        'atac': f'resources/grn_benchmark/inference_data/{dataset}_atac.h5ad', 
         'rna_positive_control': f'resources/datasets_raw/{dataset}.h5ad', 
         'num_workers': 10,
         'tmp_dir': 'output/grn_inference'
