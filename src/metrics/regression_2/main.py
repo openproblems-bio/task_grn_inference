@@ -17,7 +17,6 @@ from util import verbose_print, process_links, verbose_tqdm
 SEED = 0xCAFE
 N_POINTS_TO_ESTIMATE_BACKGROUND = 20
 
-
 def net_to_matrix(net, gene_names: np.ndarray, par: Dict[str, Any]) -> np.ndarray:
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
     if 'cell_type' in net.columns:
@@ -316,6 +315,7 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         # Load consensus numbers of putative regulators
         with open(par['regulators_consensus'], 'r') as f:
             data = json.load(f)
+
         gene_names_ = np.asarray(list(data.keys()), dtype=object)
 
         n_features_theta_min = np.asarray([data[gene_name]['0'] for gene_name in gene_names], dtype=int)

@@ -6,8 +6,8 @@ import argparse
 
 ## VIASH START
 par = {
-  "rna": "resources/inference_datasets/op_rna.h5ad",
-  "atac": "resources/inference_datasets/op_atac.h5ad",
+  "rna": "resources/grn_benchmark/inference_datasets/op_rna.h5ad",
+  "atac": "resources/grn_benchmark/inference_datasets/op_atac.h5ad",
   "base_grn": 'output/celloracle/base_grn.csv',
   "temp_dir": 'output/celloracle/',
   "num_workers": 10,

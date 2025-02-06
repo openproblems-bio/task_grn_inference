@@ -14,7 +14,13 @@ colors_blind = [
     '#D55E00',  # Vermillion
     '#CC79A7']  # Reddish Purple
 
-
+def binarize_weight(weight):
+    if weight > 0:
+        return 1
+    elif weight < 0:
+        return -1
+    else:
+        return 0
 def verbose_print(verbose_level, message, level):
     if level <= verbose_level:
         print(message)
@@ -116,3 +122,48 @@ def read_gmt(file_path:str) -> dict[str, list[str]]:
                 'genes': genes
             }
     return gene_sets
+def sum_by(adata: ad.AnnData, col: str) -> ad.AnnData:
+    """
+    Adapted from this forum post: 
+    https://discourse.scverse.org/t/group-sum-rows-based-on-jobs-feature/371/4
+    """
+    
+    assert pd.api.types.is_categorical_dtype(adata.obs[col])
+    from scipy import sparse
+    
+
+    # sum `.X` entries for each unique value in `col`
+    cat = adata.obs[col].values
+
+    indicator = sparse.coo_matrix(
+        (
+            np.broadcast_to(True, adata.n_obs),
+            (cat.codes, np.arange(adata.n_obs))
+        ),
+        shape=(len(cat.categories), adata.n_obs),
+    )
+  
+    sum_adata = ad.AnnData(
+        indicator @ adata.X,
+        var=adata.var,
+        obs=pd.DataFrame(index=cat.categories),
+    )
+    
+    # copy over `.obs` values that have a one-to-one-mapping with `.obs[col]`
+    obs_cols = adata.obs.columns
+    obs_cols = list(set(adata.obs.columns) - set([col]))
+    
+    one_to_one_mapped_obs_cols = []
+    nunique_in_col = adata.obs[col].nunique()
+    for other_col in obs_cols:
+        if len(adata.obs[[col, other_col]].drop_duplicates()) == nunique_in_col:
+            one_to_one_mapped_obs_cols.append(other_col)
+
+    joining_df = adata.obs[[col] + one_to_one_mapped_obs_cols].drop_duplicates().set_index(col)
+    assert (sum_adata.obs.index == sum_adata.obs.join(joining_df).index).all()
+    sum_adata.obs = sum_adata.obs.join(joining_df)
+    sum_adata.obs.index.name = col
+    sum_adata.obs = sum_adata.obs.reset_index()
+    sum_adata.obs.index = sum_adata.obs.index.astype('str')
+
+    return sum_adata

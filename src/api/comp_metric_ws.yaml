@@ -14,13 +14,13 @@ arguments:
     direction: input
     must_exist: false
     required: true
-    example: resources_test/prior/ws_consensus_norman.csv 
+    example: resources_test/grn_benchmark/prior/ws_consensus_norman.csv 
   - name: --ws_distance_background
     type: file
     direction: input
     must_exist: false
     required: true
-    example: resources_test/prior/ws_distance_background_norman.csv
+    example: resources_test/grn_benchmark/prior/ws_distance_background_norman.csv
   - name: --evaluation_data_sc
     type: file_evaluation_h5ad.yaml
     required: true

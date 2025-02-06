@@ -7,8 +7,8 @@ import os
 # - determine consensus 
 par = {
     'evaluation_data_sc': f'resources/datasets_raw/norman_sc_counts.h5ad',
-    'ws_consensus': 'resources/prior/consensus_ws_distance_norman.csv',
-    'tf_all': 'resources/prior/tf_all.csv',
+    'ws_consensus': 'resources/grn_benchmark/prior/consensus_ws_distance_norman.csv',
+    'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
     'models_dir': 'resources/grn_models/norman',
     'models': ['pearson_corr', 'grnboost2','portia', 'ppcor','scenic']
 }

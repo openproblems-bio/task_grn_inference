@@ -3065,7 +3065,7 @@ meta = [
                   "required" : true
                 },
                 {
-                  "type" : "DataFrame",
+                  "type" : "object",
                   "name" : "prediction",
                   "description" : "Inferred GRNs in the format of source, target, weight",
                   "required" : true
@@ -3200,7 +3200,7 @@ meta = [
           "type" : "file",
           "name" : "--tf_all",
           "example" : [
-            "resources_test/prior/tf_all.csv"
+            "resources_test/grn_benchmark/prior/tf_all.csv"
           ],
           "must_exist" : true,
           "create_parent" : true,
@@ -3270,7 +3270,7 @@ meta = [
           "type" : "file",
           "name" : "--regulators_consensus",
           "example" : [
-            "resources_test/prior/regulators_consensus_norman.json"
+            "resources_test/grn_benchmark/prior/regulators_consensus_norman.json"
           ],
           "must_exist" : false,
           "create_parent" : true,
@@ -3306,7 +3306,7 @@ meta = [
           "type" : "file",
           "name" : "--ws_consensus",
           "example" : [
-            "resources_test/prior/ws_consensus_norman.csv"
+            "resources_test/grn_benchmark/prior/ws_consensus_norman.csv"
           ],
           "must_exist" : false,
           "create_parent" : true,
@@ -3319,7 +3319,7 @@ meta = [
           "type" : "file",
           "name" : "--ws_distance_background",
           "example" : [
-            "resources_test/prior/ws_distance_background_norman.csv"
+            "resources_test/grn_benchmark/prior/ws_distance_background_norman.csv"
           ],
           "must_exist" : false,
           "create_parent" : true,
@@ -3357,7 +3357,7 @@ meta = [
     },
     {
       "type" : "file",
-      "path" : "/src/metrics/regression_1/main.py",
+      "path" : "/src/metrics/regression_1/script.py",
       "dest" : "reg1_main.py"
     },
     {
@@ -3500,7 +3500,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/metrics_all",
     "viash_version" : "0.9.1",
-    "git_commit" : "ccb9e8f8a5e6c929dde065cf4fe0f0b90e07bcfc",
+    "git_commit" : "16590d3197a12ac514e3cf1fa32eab2473f75279",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3515,17 +3515,17 @@ meta = [
         {
           "type" : "s3",
           "path" : "s3://openproblems-data/resources_test/grn/inference_datasets/",
-          "dest" : "resources_test/inference_datasets/"
+          "dest" : "resources_test/grn_benchmark/inference_datasets//"
         },
         {
           "type" : "s3",
           "path" : "s3://openproblems-data/resources_test/grn/evaluation_datasets/",
-          "dest" : "resources_test/evaluation_datasets/"
+          "dest" : "resources_test/grn_benchmark/evaluation_datasets//"
         },
         {
           "type" : "s3",
           "path" : "s3://openproblems-data/resources_test/grn/prior/",
-          "dest" : "resources_test/prior/"
+          "dest" : "resources_test/grn_benchmark/prior/"
         },
         {
           "type" : "s3",
@@ -3533,7 +3533,7 @@ meta = [
           "dest" : "resources_test/grn_models/"
         }
       ],
-      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\n\n# download resources \nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Infer a GRN \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n          --rna resources/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad\n```\n\n## Evaluate a GRN\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\n\nThis will calculate and print the scores as well as output the scores into `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
+      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\n\n# download resources \nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Infer a GRN \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n          --rna resources/grn_benchmark/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad\n```\n\n## Evaluate a GRN\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\n\nThis will calculate and print the scores as well as output the scores into `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
     },
     "repositories" : [
       {
@@ -3627,7 +3627,22 @@ import anndata as ad
 import sys
 import numpy as np
 import os 
+import argparse
+import scanpy as sc
 
+argparser = argparse.ArgumentParser()
+argparser.add_argument('--run_local', action='store_true', help='Run locally')
+argparser.add_argument('--prediction', help='Path to the GRN prediction file')
+argparser.add_argument('--evaluation_dataset')
+argparser.add_argument('--evaluation_dataset_sc')
+argparser.add_argument('--regulators_consensus')
+argparser.add_argument('--ws_consensus')
+argparser.add_argument('--ws_distance_background')
+argparser.add_argument('--method_id', help='Method ID')
+argparser.add_argument('--dataset_id', help='Dataset ID')
+argparser.add_argument('--score', help='Where to store scores')
+
+par_local = vars(argparser.parse_args())
 
 ## VIASH START
 # The following code has been auto-generated by Viash.
@@ -3678,10 +3693,22 @@ dep = {
 }
 
 ## VIASH END
-sys.path.append(meta["resources_dir"])
-from reg1_main import main as main_reg1
-from reg2_main import main as main_reg2
-from ws_main import main as main_ws
+if par_local['run_local']:
+    for key in par_local:
+        par[key] = par_local[key]
+    
+    meta = {
+        "resources_dir": 'src/metrics/',
+    }
+    sys.path.append(meta["resources_dir"])
+    from regression_1.script import main as main_reg1
+    from regression_2.main import main as main_reg2
+    from wasserstein.script import main as main_ws
+else:
+    sys.path.append(meta["resources_dir"])
+    from reg1_main import main as main_reg1
+    from reg2_main import main as main_reg2
+    from ws_main import main as main_ws
 
 # try:
 #     sys.path.append(meta["resources_dir"])
@@ -3709,11 +3736,11 @@ def main(par):
     assert par['dataset_id']
     dataset = par['dataset_id']
 
-    # par['evaluation_data'] = f'resources/evaluation_datasets/{dataset}_perturbation.h5ad'
+    # par['evaluation_data'] = f'resources/grn_benchmark/evaluation_datasets/{dataset}_perturbation.h5ad'
     # par['evaluation_data_sc'] = f'resources/datasets_raw/{dataset}_sc_counts.h5ad'
-    # par['regulators_consensus'] = f'resources/prior/regulators_consensus_{dataset}.json'
-    # par['ws_consensus'] = f'resources/prior/ws_consensus_{dataset}.csv'
-    # par['ws_distance_background'] = f'resources/prior/ws_distance_background_{dataset}.csv'
+    # par['regulators_consensus'] = f'resources/grn_benchmark/prior/regulators_consensus_{dataset}.json'
+    # par['ws_consensus'] = f'resources/grn_benchmark/prior/ws_consensus_{dataset}.csv'
+    # par['ws_distance_background'] = f'resources/grn_benchmark/prior/ws_distance_background_{dataset}.csv'
     
     scores_all = []
 

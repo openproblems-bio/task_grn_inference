@@ -9,8 +9,8 @@ par = {
     'prediction': 'resources/grn_models/adamson/pearson_corr.csv',
     'evaluation_data_sc': 'resources/datasets_raw/adamson_sc_counts.h5ad',
     'score': 'output/score.h5ad',
-    'ws_consensus': 'resources/prior/consensus_ws_distance_adamson.csv',
-    'ws_distance_background':'resources/prior/ws_distance_background_adamson.csv',
+    'ws_consensus': 'resources/grn_benchmark/prior/consensus_ws_distance_adamson.csv',
+    'ws_distance_background':'resources/grn_benchmark/prior/ws_distance_background_adamson.csv',
     'layer': 'X_norm',
     'dataset_id': 'dataset_id',
     'method_id': 'pearson_corr'

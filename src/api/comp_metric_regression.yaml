@@ -18,7 +18,7 @@ arguments:
     type: file
     direction: input
     required: true
-    example: resources_test/prior/tf_all.csv
+    example: resources_test/grn_benchmark/prior/tf_all.csv
   - name: --reg_type
     type: string
     direction: input

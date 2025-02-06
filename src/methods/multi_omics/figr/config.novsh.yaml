@@ -12,7 +12,7 @@ info:
 arguments:
   - name: --cell_topic
     type: file
-    default: resources_test/prior/cell_topic.csv
+    default: resources_test/grn_benchmark/prior/cell_topic.csv
     required: true
     direction: input
   - name: --n_topics

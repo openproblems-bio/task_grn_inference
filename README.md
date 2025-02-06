@@ -71,7 +71,7 @@ flowchart TB
 
 Chromatin accessibility data
 
-Example file: `resources_test/inference_datasets/op_atac.h5ad`
+Example file: `resources_test/grn_benchmark/inference_datasets//op_atac.h5ad`
 
 Format:
 
@@ -106,7 +106,7 @@ Arguments:
 | `--rna` | `file` | RNA expression data. |
 | `--atac` | `file` | (*Optional*) Chromatin accessibility data. |
 | `--prediction` | `file` | (*Optional, Output*) File indicating the inferred GRN. |
-| `--tf_all` | `file` | (*Optional*) NA. Default: `resources_test/prior/tf_all.csv`. |
+| `--tf_all` | `file` | (*Optional*) NA. Default: `resources_test/grn_benchmark/prior/tf_all.csv`. |
 | `--max_n_links` | `integer` | (*Optional*) NA. Default: `50000`. |
 | `--num_workers` | `integer` | (*Optional*) NA. Default: `4`. |
 | `--temp_dir` | `string` | (*Optional*) NA. Default: `output/temdir`. |
@@ -245,7 +245,7 @@ Data structure:
 
 Perturbation dataset for benchmarking.
 
-Example file: `resources_test/evaluation_datasets/op_perturbation.h5ad`
+Example file: `resources_test/grn_benchmark/evaluation_datasets//op_perturbation.h5ad`
 
 Format:
 
@@ -275,7 +275,7 @@ Data structure:
 
 RNA expression data.
 
-Example file: `resources_test/inference_datasets/op_rna.h5ad`
+Example file: `resources_test/grn_benchmark/inference_datasets//op_rna.h5ad`
 
 Format:
 

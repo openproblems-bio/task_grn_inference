@@ -11,7 +11,7 @@ functionality:
       type: file
       required: false
       direction: output
-      example: resources/prior/gene_annotations.txt
+      example: resources/grn_benchmark/prior/gene_annotations.txt
 
   resources:
     - type: python_script

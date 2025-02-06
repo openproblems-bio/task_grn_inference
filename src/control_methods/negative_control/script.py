@@ -8,7 +8,7 @@ import sys
 par = {
   "rna": "resources/grn-benchmark/rna.h5ad",
   "prediction": "resources/grn_models/default/negative_control.csv",
-  "tf_all": "resources/prior/tf_all.csv",
+  "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
   "max_n_links": 50000
 }
 ## VIASH END

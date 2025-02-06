@@ -10,8 +10,8 @@ import numpy as np
 
 ## VIASH START
 par = {
-    'rna': 'resources/evaluation_datasets/op_rna.h5ad',
-    'tf_all': 'resources/prior/tf_all.csv',
+    'rna': 'resources/grn_benchmark/evaluation_datasets//op_rna.h5ad',
+    'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
     'cell_type_specific': False,
     'max_n_links': 50000,
     'prediction': 'output/pearson_net.h5ad',

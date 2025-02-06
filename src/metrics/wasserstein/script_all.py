@@ -17,9 +17,9 @@ par = {
     'evaluation_data_sc': 'resources/datasets_raw/adamson_sc_counts.h5ad',
     'mean_scores_all': 'resources/scores/ws_distance_mean.csv',
     'scores_all': 'resources/scores/ws_distance.csv',
-    'consensus': 'resources/prior/consensus_ws_distance_adamson.csv',
-    'tf_all': 'resources/prior/tf_all.csv',
-    'background_distance':'resources/prior/ws_distance_background_adamson.csv',
+    'consensus': 'resources/grn_benchmark/prior/consensus_ws_distance_adamson.csv',
+    'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
+    'background_distance':'resources/grn_benchmark/prior/ws_distance_background_adamson.csv',
     'layer': 'X_norm',
 }
 
@@ -30,8 +30,8 @@ def main(par):
         par['grns_dir'] = f'resources/grn_models/{dataset}'
 
         par['evaluation_data_sc'] = f'resources/datasets_raw/{dataset}_sc_counts.h5ad'
-        par['consensus'] = f'resources/prior/consensus_ws_distance_{dataset}.csv'
-        par['background_distance'] = f'resources/prior/ws_distance_background_{dataset}.csv'
+        par['consensus'] = f'resources/grn_benchmark/prior/consensus_ws_distance_{dataset}.csv'
+        par['background_distance'] = f'resources/grn_benchmark/prior/ws_distance_background_{dataset}.csv'
 
         if True:
             main_consensus(par)

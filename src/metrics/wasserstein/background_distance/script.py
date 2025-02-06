@@ -9,9 +9,9 @@ import numpy as np
 
 # - create background dist. 
 par = {
-    'evaluation_data_sc': f'resources/datasets_raw/norman_sc_counts.h5ad',
-    'background_distance': 'resources/prior/ws_distance_background_norman.csv',
-    'tf_all': 'resources/prior/tf_all.csv',
+    'evaluation_data_sc': f'resources/grn_benchmark/evaluation_datasets//replogle_sc.h5ad',
+    'background_distance': 'resources/grn_benchmark/prior/ws_distance_background_replogle.csv',
+    'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
     'layer': 'X_norm'
 }
 
@@ -27,6 +27,9 @@ def calculate_ws_distance(net, adata) -> pd.DataFrame:
     for parent, child in zip(net['source'],net['target']): 
         # - get observational X
         mask_gene = gene_names==child
+        if 'is_control' not in adata.obs.columns:
+            adata.obs['is_control'] = adata.obs['perturbation']=='non-targeting'
+        
         mask_sample =  adata.obs['is_control']
         X_observ = adata[mask_sample, mask_gene].X.todense().A
         # - get interventional

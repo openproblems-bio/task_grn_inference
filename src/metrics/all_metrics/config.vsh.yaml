@@ -17,7 +17,7 @@ arguments:
     type: file
     direction: input
     required: true
-    example: resources_test/prior/tf_all.csv
+    example: resources_test/grn_benchmark/prior/tf_all.csv
   - name: --reg_type
     type: string
     direction: input
@@ -46,7 +46,7 @@ arguments:
     direction: input
     must_exist: false
     required: true
-    example: resources_test/prior/regulators_consensus_norman.json
+    example: resources_test/grn_benchmark/prior/regulators_consensus_norman.json
   - name: --static_only
     direction: input
     type: boolean
@@ -61,13 +61,13 @@ arguments:
     direction: input
     must_exist: false
     required: true
-    example: resources_test/prior/ws_consensus_norman.csv 
+    example: resources_test/grn_benchmark/prior/ws_consensus_norman.csv 
   - name: --ws_distance_background
     type: file
     direction: input
     must_exist: false
     required: true
-    example: resources_test/prior/ws_distance_background_norman.csv
+    example: resources_test/grn_benchmark/prior/ws_distance_background_norman.csv
   - name: --evaluation_data_sc
     type: file
     required: true
@@ -80,7 +80,7 @@ resources:
     path: script.py
   - path: /src/utils/util.py
     dest: util.py
-  - path: /src/metrics/regression_1/main.py
+  - path: /src/metrics/regression_1/script.py
     dest: reg1_main.py
   - path: /src/metrics/regression_2/main.py
     dest: reg2_main.py

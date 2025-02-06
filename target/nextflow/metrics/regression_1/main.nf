@@ -3065,7 +3065,7 @@ meta = [
                   "required" : true
                 },
                 {
-                  "type" : "DataFrame",
+                  "type" : "object",
                   "name" : "prediction",
                   "description" : "Inferred GRNs in the format of source, target, weight",
                   "required" : true
@@ -3231,7 +3231,7 @@ meta = [
             }
           },
           "example" : [
-            "resources_test/evaluation_datasets/op_perturbation.h5ad"
+            "resources_test/grn_benchmark/evaluation_datasets/op_bulk.h5ad"
           ],
           "must_exist" : true,
           "create_parent" : true,
@@ -3244,7 +3244,7 @@ meta = [
           "type" : "file",
           "name" : "--tf_all",
           "example" : [
-            "resources_test/prior/tf_all.csv"
+            "resources_test/grn_benchmark/prior/tf_all.csv"
           ],
           "must_exist" : true,
           "create_parent" : true,
@@ -3333,7 +3333,7 @@ meta = [
     },
     {
       "type" : "file",
-      "path" : "main.py"
+      "path" : "helper.py"
     },
     {
       "type" : "file",
@@ -3470,7 +3470,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression_1",
     "viash_version" : "0.9.1",
-    "git_commit" : "ccb9e8f8a5e6c929dde065cf4fe0f0b90e07bcfc",
+    "git_commit" : "16590d3197a12ac514e3cf1fa32eab2473f75279",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3485,17 +3485,17 @@ meta = [
         {
           "type" : "s3",
           "path" : "s3://openproblems-data/resources_test/grn/inference_datasets/",
-          "dest" : "resources_test/inference_datasets/"
+          "dest" : "resources_test/grn_benchmark/inference_datasets//"
         },
         {
           "type" : "s3",
           "path" : "s3://openproblems-data/resources_test/grn/evaluation_datasets/",
-          "dest" : "resources_test/evaluation_datasets/"
+          "dest" : "resources_test/grn_benchmark/evaluation_datasets//"
         },
         {
           "type" : "s3",
           "path" : "s3://openproblems-data/resources_test/grn/prior/",
-          "dest" : "resources_test/prior/"
+          "dest" : "resources_test/grn_benchmark/prior/"
         },
         {
           "type" : "s3",
@@ -3503,7 +3503,7 @@ meta = [
           "dest" : "resources_test/grn_models/"
         }
       ],
-      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\n\n# download resources \nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Infer a GRN \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n          --rna resources/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad\n```\n\n## Evaluate a GRN\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\n\nThis will calculate and print the scores as well as output the scores into `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
+      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\n\n# download resources \nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Infer a GRN \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n          --rna resources/grn_benchmark/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad\n```\n\n## Evaluate a GRN\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\n\nThis will calculate and print the scores as well as output the scores into `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
     },
     "repositories" : [
       {
@@ -3596,9 +3596,20 @@ import pandas as pd
 import anndata as ad
 import sys
 import numpy as np
+from sklearn.metrics import r2_score
+from sklearn.pipeline import Pipeline
+from sklearn.linear_model import Ridge
+from sklearn.preprocessing import StandardScaler
+import lightgbm
+import random 
+from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
+from sklearn.multioutput import MultiOutputRegressor
+import os
+import warnings
 
+warnings.filterwarnings("ignore", category=FutureWarning)
 
-file_name = 'op' #nakatake
 
 ## VIASH START
 # The following code has been auto-generated by Viash.
@@ -3647,6 +3658,7 @@ dep = {
 
 import argparse
 parser = argparse.ArgumentParser()
+parser.add_argument('--run_local', action='store_true', help='Run locally')
 parser.add_argument('--evaluation_data', type=str, help='Path to the evaluation_data file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
@@ -3657,52 +3669,93 @@ parser.add_argument('--normalize', action='store_true')
 
 args = parser.parse_args()
 
-if args.evaluation_data:
-    par['evaluation_data'] = args.evaluation_data
-if args.layer:
-  par['layer'] = args.layer
-if args.causal:
-    par['causal'] = True
-else:
-    par['causal'] = False
+var_local = vars(args)
 
-if args.prediction:
-    par['prediction'] = args.prediction
-if args.tf_all:
-    par['tf_all'] = args.tf_all
-if args.num_workers:
-    par['num_workers'] = args.num_workers
-
-try:
-  sys.path.append(meta["resources_dir"])
-except:
-  meta = {
-    "resources_dir":'src/metrics/regression_1/',
-    "util_dir":'src/utils'
-  }
-  sys.path.append(meta["resources_dir"])
-  sys.path.append(meta["util_dir"])
-
-from main import main 
-print(par)
-output = main(par) 
-print(output)
-
-metric_ids = output.columns.to_numpy()
-metric_values = output.values[0]
-
-print(metric_ids.shape, metric_values.shape)
-output = ad.AnnData(
-    X=np.empty((0, 0)),
-    uns={
-        "dataset_id": par["dataset_id"],
-        "method_id": f"reg1-{par['method_id']}",
-        "metric_ids": metric_ids,
-        "metric_values": metric_values
+if args.run_local:
+    for key in var_local:
+        par[key] = var_local[key]
+    meta = {
+      "resources_dir":'src/metrics/regression_1/',
+      "util_dir":'src/utils'
     }
-)
+    sys.path.append(meta["resources_dir"])
+    sys.path.append(meta["util_dir"])
 
-output.write_h5ad(par["score"], compression="gzip")
+else:
+  sys.path.append(meta["resources_dir"])
+
+from util import verbose_print, process_links, verbose_tqdm, process_net, binarize_weight
+from helper import set_global_seed
+
+def read_net(par):
+    net = ad.read_h5ad(par['prediction'])
+    net = pd.DataFrame(net.uns['prediction'])
+    if par['binarize']:
+      net['weight'] = net['weight'].apply(binarize_weight)  
+    if par['apply_skeleton']: #apply skeleton
+        print('Before filtering with skeleton:', net.shape)
+        skeleton = pd.read_csv(par['skeleton'])
+        skeleton['link'] = skeleton['source'].astype(str) + '_' + skeleton['target'].astype(str)
+        skeleton = skeleton['link'].values.flatten()
+        
+        net['link'] = net['source'].astype(str) + '_' + net['target'].astype(str)
+        net = net[net['link'].isin(skeleton)]
+        print('After filtering with skeleton:', net.shape)
+
+    if par['apply_tf']:
+        net = net[net.source.isin(tf_all)]
+    if 'cell_type' in net.columns:
+        print('Taking mean of cell type specific grns')
+        net.drop(columns=['cell_type'], inplace=True)
+        net = net.groupby(['source', 'target']).mean().reset_index()
+      
+    if (len(net)>par['max_n_links']) and (par['max_n_links']!=-1):
+        net = process_links(net, par) #only top links are considered
+        verbose_print(par['verbose'], f"Number of links reduced to {par['max_n_links']}", 2)
+  
+
+    return net
+    
+def main(par):
+    random_state = 42
+    set_global_seed(random_state)
+
+    # -- read input data
+    net = read_net(par)
+    evaluation_data = ad.read_h5ad(par['evaluation_data'])
+    evaluation_data.X = evaluation_data.layers[par["layer"]]
+    gene_names = evaluation_data.var.index.to_numpy()
+    tf_all = np.loadtxt(par['tf_all'], dtype=str)
+    
+    # -- calclate scores 
+    results = cross_validation(net, evaluation_data, par)
+
+    return results
+
+if __name__ == '__main__':
+  print(par)
+  results = main(par) 
+
+  # - formatize results  
+  results = dict(all=[results['r2score-aver-all']], grn=[results['r2score-aver-grn']])
+  results = pd.DataFrame(results)
+  print(results)
+
+  metric_ids = results.columns.to_numpy()
+  metric_values = results.values[0]
+
+  print(metric_ids.shape, metric_values.shape)
+  results = ad.AnnData(
+      X=np.empty((0, 0)),
+      uns={
+          "dataset_id": par["dataset_id"],
+          "method_id": f"reg1-{par['method_id']}",
+          "metric_ids": metric_ids,
+          "metric_values": metric_values
+      }
+  )
+
+  results.write_h5ad(par["score"], compression="gzip")
 VIASHMAIN
 python -B "$tempscript"
 '''

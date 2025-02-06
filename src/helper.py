@@ -40,12 +40,12 @@ def analyse_meta_cells(task_grn_inference_dir):
 
 
     par = {
-        'rna': f'{task_grn_inference_dir}/resources/inference_datasets/{dataset}_rna.h5ad',
-        "evaluation_data": f"{task_grn_inference_dir}/resources/evaluation_datasets/{dataset}_perturbation.h5ad",
+        'rna': f'{task_grn_inference_dir}/resources/grn_benchmark/inference_datasets/{dataset}_rna.h5ad',
+        "evaluation_data": f"{task_grn_inference_dir}/resources/grn_benchmark/evaluation_datasets//{dataset}_perturbation.h5ad",
 
         'layer': 'X_norm',
-        'consensus':  f'{task_grn_inference_dir}/resources/prior/{dataset}_consensus-num-regulators.json',
-        'tf_all': f'{task_grn_inference_dir}/resources/prior/tf_all.csv',
+        'consensus':  f'{task_grn_inference_dir}/resources/grn_benchmark/prior/{dataset}_consensus-num-regulators.json',
+        'tf_all': f'{task_grn_inference_dir}/resources/grn_benchmark/prior/tf_all.csv',
         'apply_tf': True,
         'apply_skeleton': False,
         'verbose': 2,
@@ -123,12 +123,12 @@ def analyse_imputation(task_grn_inference_dir):
 
 
     par = {
-        'rna': f'{task_grn_inference_dir}/resources/inference_datasets/{dataset}_rna.h5ad',
-        "evaluation_data": f"{task_grn_inference_dir}/resources/evaluation_datasets/{dataset}_perturbation.h5ad",
+        'rna': f'{task_grn_inference_dir}/resources/grn_benchmark/inference_datasets/{dataset}_rna.h5ad',
+        "evaluation_data": f"{task_grn_inference_dir}/resources/grn_benchmark/evaluation_datasets//{dataset}_perturbation.h5ad",
 
         'layer': 'X_norm',
-        'consensus':  f'{task_grn_inference_dir}/resources/prior/{dataset}_consensus-num-regulators.json',
-        'tf_all': f'{task_grn_inference_dir}/resources/prior/tf_all.csv',
+        'consensus':  f'{task_grn_inference_dir}/resources/grn_benchmark/prior/{dataset}_consensus-num-regulators.json',
+        'tf_all': f'{task_grn_inference_dir}/resources/grn_benchmark/prior/tf_all.csv',
         'apply_tf': True,
         'apply_skeleton': False,
         'verbose': 2,
@@ -204,12 +204,12 @@ def analyse_imputation(task_grn_inference_dir):
 def analyse_corr_vs_tfmasked_corr(task_grn_inference_dir):
     for i_run, dataset in enumerate(['op', 'replogle2', 'nakatake', 'norman', 'adamson']):
         par = {
-            'rna': f'{task_grn_inference_dir}/resources/inference_datasets/{dataset}_rna.h5ad',
-            "evaluation_data": f"{task_grn_inference_dir}/resources/evaluation_datasets/{dataset}_perturbation.h5ad",
+            'rna': f'{task_grn_inference_dir}/resources/grn_benchmark/inference_datasets/{dataset}_rna.h5ad',
+            "evaluation_data": f"{task_grn_inference_dir}/resources/grn_benchmark/evaluation_datasets//{dataset}_perturbation.h5ad",
 
             'layer': 'X_norm',
-            'consensus':  f'{task_grn_inference_dir}/resources/prior/{dataset}_consensus-num-regulators.json',
-            'tf_all': f'{task_grn_inference_dir}/resources/prior/tf_all.csv',
+            'consensus':  f'{task_grn_inference_dir}/resources/grn_benchmark/prior/{dataset}_consensus-num-regulators.json',
+            'tf_all': f'{task_grn_inference_dir}/resources/grn_benchmark/prior/tf_all.csv',
             'apply_skeleton': False,
             'verbose': 2,
             'max_n_links': 50_000,
@@ -342,7 +342,7 @@ def create_skeleton():
     skeleton = skeleton.drop_duplicates().reset_index(drop=True)
     skeleton.nunique()
     all_links = skeleton['source'].astype(str) + '_' + skeleton['target'].astype(str)
-    np.savetxt('resources/prior/skeleton.csv', all_links.values, fmt='%s')
+    np.savetxt('resources/grn_benchmark/prior/skeleton.csv', all_links.values, fmt='%s')
 
 def merge_tf_motifs():
     cols = ['chrom', 'chromStart',  'chromEnd', 'name']

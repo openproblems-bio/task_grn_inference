@@ -12,7 +12,7 @@ import scanpy as sc
 ## VIASH START
 par = {
     'rna': 'resources/grn-benchmark/rna.h5ad',
-    'tf_all': 'resources/prior/tf_all.csv',
+    'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
     'max_n_links': 50000,
     'prediction': 'resources/grn_models/positive_control.csv',
     "seed": 32,

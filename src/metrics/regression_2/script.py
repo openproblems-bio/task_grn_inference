@@ -6,10 +6,10 @@ import numpy as np
 
 ## VIASH START
 par = {
-    'evaluation_data': 'resources/evaluation_datasets/op_perturbation.h5ad',
+    'evaluation_data': 'resources/grn_benchmark/evaluation_datasets//op_perturbation.h5ad',
     'layer': 'X_norm',
     "prediction": "output/models/collectri.csv",
-    'tf_all': 'resources/prior/tf_all.csv',
+    'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
     "max_n_links": 50000,
     'consensus': 'output/models/op_consensus-num-regulators.json',
     'score': 'output/score_regression2.h5ad',
@@ -21,7 +21,7 @@ par = {
     'clip_scores': True,
     'method_id': 'grnboost',
     'apply_skeleton': False,
-    'skeleton': 'resources/prior/skeleton.csv',
+    'skeleton': 'resources/grn_benchmark/prior/skeleton.csv',
     'verbose': 2
     
 }

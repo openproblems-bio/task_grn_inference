@@ -12,7 +12,7 @@ import anndata as ad
 ## VIASH START
 par = {
   'rna': 'resources/grn-benchmark/rna.h5ad',
-  'tf_all': 'resources/prior/tf_all.csv',
+  'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
   'prediction': 'output/portia.csv',
   'max_n_links': 50000,
   'donor_specific': False,

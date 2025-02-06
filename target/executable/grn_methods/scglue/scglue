@@ -454,9 +454,9 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scglue"
-LABEL org.opencontainers.image.created="2025-02-05T08:32:57Z"
+LABEL org.opencontainers.image.created="2025-02-06T13:24:20Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="ccb9e8f8a5e6c929dde065cf4fe0f0b90e07bcfc"
+LABEL org.opencontainers.image.revision="16590d3197a12ac514e3cf1fa32eab2473f75279"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -579,11 +579,11 @@ function ViashHelp {
   echo "Arguments:"
   echo "    --rna"
   echo "        type: file, required parameter, file must exist"
-  echo "        example: resources_test/inference_datasets/op_rna.h5ad"
+  echo "        example: resources_test/grn_benchmark/inference_datasets/op_rna.h5ad"
   echo ""
   echo "    --atac"
   echo "        type: file, file must exist"
-  echo "        example: resources_test/inference_datasets/op_atac.h5ad"
+  echo "        example: resources_test/grn_benchmark/inference_datasets/op_atac.h5ad"
   echo ""
   echo "    --prediction"
   echo "        type: file, output, file must exist"
@@ -591,8 +591,8 @@ function ViashHelp {
   echo ""
   echo "    --tf_all"
   echo "        type: file, file must exist"
-  echo "        default: resources_test/prior/tf_all.csv"
-  echo "        example: resources_test/prior/tf_all.csv"
+  echo "        default: resources_test/grn_benchmark/prior/tf_all.csv"
+  echo "        example: resources_test/grn_benchmark/prior/tf_all.csv"
   echo ""
   echo "    --max_n_links"
   echo "        type: integer"
@@ -1042,7 +1042,7 @@ fi
 
 # filling in defaults
 if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
-  VIASH_PAR_TF_ALL="resources_test/prior/tf_all.csv"
+  VIASH_PAR_TF_ALL="resources_test/grn_benchmark/prior/tf_all.csv"
 fi
 if [ -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then
   VIASH_PAR_MAX_N_LINKS="50000"

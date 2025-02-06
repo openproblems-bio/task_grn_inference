@@ -4,19 +4,31 @@ import sys
 import subprocess
 import anndata as ad
 import numpy as np
+import argparse
+
+argparser = argparse.ArgumentParser()
+argparser.add_argument('--force', action='store_true', help='Force overwrite exisiting GRN predictions')
+argparser.add_argument('--sbatch', action='store_true', help='Submit jobs to SLURM')
+argparser.add_argument('--partition', type=str, default='cpu', help='Partition to submit jobs to')
+argparser.add_argument('--methods', type=str, nargs='+', required=True,help='Methods to run')
+argparser.add_argument('--datasets', type=str, nargs='+', required=True, help='Datasets to run inference on')
+args = argparser.parse_args()
+par = vars(args)
 
 
-def run_grn_inference(dataset='op', subsample=None):
-    par = {
+
+def run_grn_inference(par, dataset='op', subsample=None):
+    par_local = {
         'models_dir': f'resources/grn_models/{dataset}/',
-        'rna': f'resources/inference_datasets/{dataset}_rna.h5ad',
-        'atac': f'resources/inference_datasets/{dataset}_atac.h5ad', 
+        'rna': f'resources/grn_benchmark/inference_datasets/{dataset}_rna.h5ad',
+        'atac': f'resources/grn_benchmark/inference_datasets/{dataset}_atac.h5ad', 
         'rna_positive_control': f'resources/datasets_raw/{dataset}.h5ad', 
         'num_workers': 10,
         'tmp_dir': 'output/grn_inference'
         # 'max_n_links': 10000,
     }
-   
+    par.update(par_local)
+
     os.makedirs(par['models_dir'], exist_ok=True)
     os.makedirs(par['tmp_dir'], exist_ok=True)
 
@@ -54,14 +66,14 @@ def run_grn_inference(dataset='op', subsample=None):
             par['rna'] = new_rna
         
 
-    for method in methods:
+    for method in par['methods']:
         print(method)
         if subsample is None:
             par['prediction'] = f"{par['models_dir']}/{method}.h5ad"
         else:
             par['prediction'] = f"{par['models_dir']}/{method}_{subsample}.h5ad"
         
-        if (force == False) & (os.path.exists(par['prediction'])):
+        if (par['force'] == False) & (os.path.exists(par['prediction'])):
             continue
         
         # Method arguments
@@ -126,7 +138,7 @@ def run_grn_inference(dataset='op', subsample=None):
         # Prepare sbatch command
         tag = f"--job-name={method}"  # No spaces around '='
         resources = (f"--cpus-per-task={par['num_workers']} "
-                     f"--mem={mem} --time={time} --partition={partition}")
+                     f"--mem={mem} --time={time} --partition={par['partition']}")
         
         # Combine tags and resources
         full_tag = [tag] + resources.split()
@@ -136,7 +148,7 @@ def run_grn_inference(dataset='op', subsample=None):
             full_tag += ["--partition=gpu", "--gres=gpu:1"]
 
         try:
-            if sbatch:
+            if par['sbatch']:
                 result = subprocess.run(['sbatch'] + full_tag + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
             else:
                 result = subprocess.run(['bash'] + ['scripts/sbatch/grn_inference.sh', command], check=True, capture_output=True, text=True)
@@ -152,27 +164,21 @@ def run_grn_inference(dataset='op', subsample=None):
             print(f"Command output: {e.output}")
             print(f"Command error output: {e.stderr}")
 
+def main(par):
+    for dataset in par['datasets']:
+        run_grn_inference(par, dataset, subsample=None)
+
+
 if __name__ == '__main__':
-    force = True
-    sbatch = False
-    # methods = ["positive_control", "negative_control", "pearson_corr", "portia", "grnboost2", "ppcor", "scenic"],
-    # methods = ["portia", "grnboost2"]
-    methods = ["scprint"]
-    datasets = ['norman'] # 'replogle2', 'norman', 'adamson', 'nakatake', 'op'
-
-    partition='cpu'
-
-
-    if True: # normal run 
-        for dataset in datasets:
-            run_grn_inference(dataset, subsample=None)
-
-    if False: # subsample
-        # for dataset in ['replogle2', 'norman', 'adamson', 'nakatake']: # 'replogle2' 'op' norman
-        for dataset in ['op']:
-            if dataset == 'op':
-                for subsample in [1, 2]: #number of donors 
-                    run_grn_inference(dataset, subsample=subsample)
-            else:
-                for subsample in [0.2, 0.5, 1.0]:
-                    run_grn_inference(dataset, subsample=subsample)
+    print(par)
+    main(par)
+    
+    # if False: # subsample
+    #     # for dataset in ['replogle2', 'norman', 'adamson', 'nakatake']: # 'replogle2' 'op' norman
+    #     for dataset in ['op']:
+    #         if dataset == 'op':
+    #             for subsample in [1, 2]: #number of donors 
+    #                 run_grn_inference(dataset, subsample=subsample)
+    #         else:
+    #             for subsample in [0.2, 0.5, 1.0]:
+    #                 run_grn_inference(dataset, subsample=subsample)

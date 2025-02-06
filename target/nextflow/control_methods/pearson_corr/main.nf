@@ -3082,7 +3082,7 @@ meta = [
             }
           },
           "example" : [
-            "resources_test/inference_datasets/op_rna.h5ad"
+            "resources_test/grn_benchmark/inference_datasets/op_rna.h5ad"
           ],
           "must_exist" : true,
           "create_parent" : true,
@@ -3116,7 +3116,7 @@ meta = [
             }
           },
           "example" : [
-            "resources_test/inference_datasets/op_atac.h5ad"
+            "resources_test/grn_benchmark/inference_datasets/op_atac.h5ad"
           ],
           "must_exist" : true,
           "create_parent" : true,
@@ -3147,7 +3147,7 @@ meta = [
                   "required" : true
                 },
                 {
-                  "type" : "DataFrame",
+                  "type" : "object",
                   "name" : "prediction",
                   "description" : "Inferred GRNs in the format of source, target, weight",
                   "required" : true
@@ -3169,10 +3169,10 @@ meta = [
           "type" : "file",
           "name" : "--tf_all",
           "example" : [
-            "resources_test/prior/tf_all.csv"
+            "resources_test/grn_benchmark/prior/tf_all.csv"
           ],
           "default" : [
-            "resources_test/prior/tf_all.csv"
+            "resources_test/grn_benchmark/prior/tf_all.csv"
           ],
           "must_exist" : true,
           "create_parent" : true,
@@ -3402,7 +3402,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/control_methods/pearson_corr",
     "viash_version" : "0.9.1",
-    "git_commit" : "ccb9e8f8a5e6c929dde065cf4fe0f0b90e07bcfc",
+    "git_commit" : "16590d3197a12ac514e3cf1fa32eab2473f75279",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3417,17 +3417,17 @@ meta = [
         {
           "type" : "s3",
           "path" : "s3://openproblems-data/resources_test/grn/inference_datasets/",
-          "dest" : "resources_test/inference_datasets/"
+          "dest" : "resources_test/grn_benchmark/inference_datasets//"
         },
         {
           "type" : "s3",
           "path" : "s3://openproblems-data/resources_test/grn/evaluation_datasets/",
-          "dest" : "resources_test/evaluation_datasets/"
+          "dest" : "resources_test/grn_benchmark/evaluation_datasets//"
         },
         {
           "type" : "s3",
           "path" : "s3://openproblems-data/resources_test/grn/prior/",
-          "dest" : "resources_test/prior/"
+          "dest" : "resources_test/grn_benchmark/prior/"
         },
         {
           "type" : "s3",
@@ -3435,7 +3435,7 @@ meta = [
           "dest" : "resources_test/grn_models/"
         }
       ],
-      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\n\n# download resources \nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Infer a GRN \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n          --rna resources/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad\n```\n\n## Evaluate a GRN\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\n\nThis will calculate and print the scores as well as output the scores into `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
+      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\n\n# download resources \nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Infer a GRN \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n          --rna resources/grn_benchmark/inference_datasets/norman_rna.h5ad --prediction output/net.h5ad\n```\n\n## Evaluate a GRN\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\n\nThis will calculate and print the scores as well as output the scores into `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
     },
     "repositories" : [
       {

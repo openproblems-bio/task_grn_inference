@@ -37,12 +37,12 @@ def run_consensus(datasets):
     for dataset in datasets:
         par = {
             'models': models,
-            'evaluation_data': f'resources/evaluation_datasets/{dataset}_perturbation.h5ad',
+            'evaluation_data': f'resources/grn_benchmark/evaluation_datasets//{dataset}_perturbation.h5ad',
             'evaluation_data_sc': f'resources/datasets_raw/{dataset}_sc_counts.h5ad',
             'models_dir': f'resources/grn_models/{dataset}/',
-            'regulators_consensus': f'resources/prior/regulators_consensus_{dataset}.json',
-            'ws_consensus': f'resources/prior/ws_consensus_{dataset}.csv',
-            'tf_all': 'resources/prior/tf_all.csv',
+            'regulators_consensus': f'resources/grn_benchmark/prior/regulators_consensus_{dataset}.json',
+            'ws_consensus': f'resources/grn_benchmark/prior/ws_consensus_{dataset}.csv',
+            'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
 
         }
         # - reg2 consensus 
@@ -57,8 +57,8 @@ def run_ws_distance_background(datasets):
   for dataset in datasets:
     par = {
           'evaluation_data_sc': f'resources/datasets_raw/{dataset}_sc_counts.h5ad',
-          'background_distance': f'resources/prior/ws_distance_background_{dataset}.csv',
-          'tf_all': 'resources/prior/tf_all.csv',
+          'background_distance': f'resources/grn_benchmark/prior/ws_distance_background_{dataset}.csv',
+          'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
           'layer': 'X_norm'
     }
     print(f'--run ws distance background --{dataset}')
