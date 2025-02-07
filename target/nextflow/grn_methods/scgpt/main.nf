@@ -3432,7 +3432,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scgpt",
     "viash_version" : "0.9.1",
-    "git_commit" : "2c98e0f40698a1b852abc5657b551f29ca355389",
+    "git_commit" : "aa9c057075992cecbcf6abe330d9608be1f89504",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

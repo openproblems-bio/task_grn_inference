@@ -3382,7 +3382,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/grnboost2",
     "viash_version" : "0.9.1",
-    "git_commit" : "2c98e0f40698a1b852abc5657b551f29ca355389",
+    "git_commit" : "aa9c057075992cecbcf6abe330d9608be1f89504",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3575,10 +3575,11 @@ def main(par: dict) -> pd.DataFrame:
 
 if __name__ == '__main__':
     net = main(par)   
+
     # Save inferred GRN
     print('Output GRN')
     # convert the predictions to the benchmark format
-    net['weight'] = net['weight'].astype(str)
+    net = net.astype(str)
     output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])
 VIASHMAIN

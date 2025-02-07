@@ -3187,10 +3187,43 @@ meta = [
           "multiple_sep" : ";"
         },
         {
+          "type" : "integer",
+          "name" : "--num_workers",
+          "default" : [
+            4
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "boolean",
+          "name" : "--apply_tf",
+          "default" : [
+            true
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "boolean",
+          "name" : "--apply_skeleton",
+          "default" : [
+            false
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
           "type" : "file",
           "name" : "--ws_consensus",
           "example" : [
-            "resources_test/grn_benchmark/prior/ws_consensus_adamson.csv"
+            "resources_test/grn_benchmark/prior/ws_consensus_norman.csv"
           ],
           "must_exist" : false,
           "create_parent" : true,
@@ -3203,7 +3236,7 @@ meta = [
           "type" : "file",
           "name" : "--ws_distance_background",
           "example" : [
-            "resources_test/grn_benchmark/prior/ws_distance_background_adamson.csv"
+            "resources_test/grn_benchmark/prior/ws_distance_background_norman.csv"
           ],
           "must_exist" : false,
           "create_parent" : true,
@@ -3216,7 +3249,7 @@ meta = [
           "type" : "file",
           "name" : "--evaluation_data_sc",
           "example" : [
-            "resources_test/datasets_raw/adamson_sc_counts.h5ad"
+            "resources_test/grn_benchmark/evaluation_data/norman_sc.h5ad"
           ],
           "must_exist" : true,
           "create_parent" : true,
@@ -3372,7 +3405,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/ws_distance",
     "viash_version" : "0.9.1",
-    "git_commit" : "2c98e0f40698a1b852abc5657b551f29ca355389",
+    "git_commit" : "aa9c057075992cecbcf6abe330d9608be1f89504",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3496,6 +3529,9 @@ par = {
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'verbose': $( if [ ! -z ${VIASH_PAR_VERBOSE+x} ]; then echo "int(r'${VIASH_PAR_VERBOSE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
+  'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'ws_consensus': $( if [ ! -z ${VIASH_PAR_WS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_WS_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'ws_distance_background': $( if [ ! -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then echo "r'${VIASH_PAR_WS_DISTANCE_BACKGROUND//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'evaluation_data_sc': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA_SC+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA_SC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )

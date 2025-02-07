@@ -267,12 +267,6 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     
     # Load perturbation data
     prturb_adata = ad.read_h5ad(par['evaluation_data'])
-    subsample = par['subsample']
-    if subsample == -1:
-        pass
-    else:
-        raise ValueError('fix this')
-
     gene_names = prturb_adata.var.index.to_numpy()
     n_genes = len(gene_names)
     
