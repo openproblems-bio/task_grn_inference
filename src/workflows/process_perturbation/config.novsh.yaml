@@ -16,7 +16,7 @@ functionality:
       description: single cell perturbation data 
 
     - name: --pseudobulked_data
-      __merge__: ../../api/file_evaluation_h5ad.yaml
+      __merge__: ../../api/file_evaluation_bulk_h5ad.yaml
       required: false
       direction: output
     

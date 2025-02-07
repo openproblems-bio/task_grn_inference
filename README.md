@@ -44,15 +44,13 @@ git clone git@github.com:openproblems-bio/task_grn_inference.git
 
 cd task_grn_inference
 ```
-
-# download resources 
 To interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.
 
 ```bash
 scripts/download_resources.sh
 ```
 
-## Infer a GRN 
+## Run a GRN inference method 
 
 To infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:
 
@@ -61,14 +59,14 @@ viash run src/control_methods/pearson_corr/config.vsh.yaml -- \
             --rna resources/grn_benchmark/inference_data/norman_rna.h5ad --prediction output/net.h5ad
 ```
 
-## Evaluate a GRN
+## Evaluate a GRN prediction
 Once got the prediction for a given dataset, use the following code to obtain evaluation scores. 
 
 ```bash
 scripts/single_grn_evaluation.sh output/net.h5ad norman
 ```
 
-This will calculate and print the scores as well as output the scores into `output/score.h5ad`. Look at the `.uns` for the scores. 
+This outputs the scores into `output/test_run/scores.json`
 
 ## Add a method
 
@@ -92,21 +90,15 @@ flowchart TB
   file_atac_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-chromatin-accessibility-data'>chromatin accessibility data</a>")
   comp_method[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-method'>method</a>"/]
   file_prediction_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-grn-prediction'>GRN prediction</a>")
-  comp_metric_regression[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-feature-based-metrics'>Feature-based metrics</a>"/]
-  comp_metric_ws[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-wasserstein-distance-metric'>Wasserstein distance metric</a>"/]
   comp_metric[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-metrics'>metrics</a>"/]
   file_score_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-score'>score</a>")
-  file_evaluation_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-perturbation-data'>perturbation data</a>")
+  file_evaluation_bulk_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-perturbation-data--pseudo-bulk'>perturbation data (pseudo)bulk</a>")
+  file_evaluation_sc_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-perturbation-data--sc-'>perturbation data (sc)</a>")
   file_rna_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-gene-expression-data'>gene expression data</a>")
   file_atac_h5ad-.-comp_method
   comp_method-.->file_prediction_h5ad
-  file_prediction_h5ad---comp_metric_regression
-  file_prediction_h5ad---comp_metric_ws
   file_prediction_h5ad---comp_metric
-  comp_metric_regression-->file_score_h5ad
-  comp_metric_ws-->file_score_h5ad
   comp_metric-->file_score_h5ad
-  file_evaluation_h5ad---comp_metric_regression
   file_rna_h5ad---comp_method
 ```
 
@@ -187,56 +179,6 @@ Data structure:
 
 </div>
 
-## Component type: Feature-based metrics
-
-Calculates regression scores
-
-Arguments:
-
-<div class="small">
-
-| Name | Type | Description |
-|:---|:---|:---|
-| `--prediction` | `file` | File indicating the inferred GRN. |
-| `--score` | `file` | (*Output*) File indicating the score of a metric. |
-| `--method_id` | `string` | (*Optional*) NA. |
-| `--layer` | `string` | (*Optional*) NA. Default: `X_norm`. |
-| `--max_n_links` | `integer` | (*Optional*) NA. Default: `50000`. |
-| `--verbose` | `integer` | (*Optional*) NA. Default: `2`. |
-| `--dataset_id` | `string` | (*Optional*) NA. Default: `op`. |
-| `--evaluation_data` | `file` | Perturbation dataset for benchmarking. |
-| `--tf_all` | `file` | NA. |
-| `--reg_type` | `string` | (*Optional*) NA. Default: `ridge`. |
-| `--subsample` | `integer` | (*Optional*) NA. Default: `-1`. |
-| `--num_workers` | `integer` | (*Optional*) NA. Default: `4`. |
-| `--apply_tf` | `boolean` | (*Optional*) NA. Default: `TRUE`. |
-| `--apply_skeleton` | `boolean` | (*Optional*) NA. Default: `FALSE`. |
-
-</div>
-
-## Component type: Wasserstein distance metric
-
-Calculates Wasserstein distance for a given GRN and dataset
-
-Arguments:
-
-<div class="small">
-
-| Name | Type | Description |
-|:---|:---|:---|
-| `--prediction` | `file` | File indicating the inferred GRN. |
-| `--score` | `file` | (*Output*) File indicating the score of a metric. |
-| `--method_id` | `string` | (*Optional*) NA. |
-| `--layer` | `string` | (*Optional*) NA. Default: `X_norm`. |
-| `--max_n_links` | `integer` | (*Optional*) NA. Default: `50000`. |
-| `--verbose` | `integer` | (*Optional*) NA. Default: `2`. |
-| `--dataset_id` | `string` | (*Optional*) NA. Default: `op`. |
-| `--ws_consensus` | `file` | NA. |
-| `--ws_distance_background` | `file` | NA. |
-| `--evaluation_data_sc` | `file_evaluation_h5ad.yaml` | NA. |
-
-</div>
-
 ## Component type: metrics
 
 A metric to evaluate the performance of the inferred GRN
@@ -254,6 +196,9 @@ Arguments:
 | `--max_n_links` | `integer` | (*Optional*) NA. Default: `50000`. |
 | `--verbose` | `integer` | (*Optional*) NA. Default: `2`. |
 | `--dataset_id` | `string` | (*Optional*) NA. Default: `op`. |
+| `--num_workers` | `integer` | (*Optional*) NA. Default: `4`. |
+| `--apply_tf` | `boolean` | (*Optional*) NA. Default: `TRUE`. |
+| `--apply_skeleton` | `boolean` | (*Optional*) NA. Default: `FALSE`. |
 
 </div>
 
@@ -285,12 +230,43 @@ Data structure:
 
 </div>
 
-## File format: perturbation data
+## File format: perturbation data (pseudo)bulk
 
-Perturbation dataset for benchmarking.
+Perturbation dataset for benchmarking
 
 Example file:
 `resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad`
+
+Format:
+
+<div class="small">
+
+    AnnData object
+     obs: 'cell_type', 'perturbation', 'donor_id', 'perturbation_type'
+     layers: 'X_norm'
+
+</div>
+
+Data structure:
+
+<div class="small">
+
+| Slot | Type | Description |
+|:---|:---|:---|
+| `obs["cell_type"]` | `string` | The annotated cell type of each cell based on RNA expression. |
+| `obs["perturbation"]` | `string` | Name of the column containing perturbation names. |
+| `obs["donor_id"]` | `string` | (*Optional*) Donor id. |
+| `obs["perturbation_type"]` | `string` | (*Optional*) Name of the column indicating perturbation type. |
+| `layers["X_norm"]` | `double` | Normalized values. |
+
+</div>
+
+## File format: perturbation data (sc)
+
+Perturbation dataset for benchmarking (sinlge cell).
+
+Example file:
+`resources_test/grn_benchmark/evaluation_data/norman_sc.h5ad`
 
 Format:
 
@@ -320,8 +296,7 @@ Data structure:
 
 RNA expression data.
 
-Example file:
-`resources_test/grn_benchmark/inference_data/op_rna.h5ad`
+Example file: `resources_test/grn_benchmark/inference_data/op_rna.h5ad`
 
 Format:
 

@@ -1,0 +1,33 @@
+type: file
+example: resources_test/grn_benchmark/evaluation_data/norman_sc.h5ad
+label: perturbation data (sc)
+summary: "Perturbation dataset for benchmarking (sinlge cell)."
+
+info:
+  format:
+    type: h5ad
+    obs:
+      - name: cell_type
+        type: string
+        description: "The annotated cell type of each cell based on RNA expression."
+        required: true
+      - name: perturbation
+        type: string
+        description: "Name of the column containing perturbation names"
+        required: true
+      - name: donor_id
+        type: string
+        description: "Donor id"
+        required: false
+      - name: perturbation_type
+        type: string
+        description: "Name of the column indicating perturbation type"
+        required: false
+
+    layers:
+      - name: X_norm
+        type: double
+        description: "Normalized values"
+        required: true
+      
+      

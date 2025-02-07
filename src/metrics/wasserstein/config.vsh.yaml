@@ -19,10 +19,9 @@ arguments:
     required: true
     example: resources_test/grn_benchmark/prior/ws_distance_background_norman.csv
   - name: --evaluation_data_sc
-    type: file
+    __merge__: ../../api/file_evaluation_sc_h5ad.yaml
     required: true
     direction: input
-    example: 'resources_test/grn_benchmark/evaluation_data/norman_sc.h5ad'
 resources:
   - type: python_script
     path: script.py

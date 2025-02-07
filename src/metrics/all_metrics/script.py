@@ -6,20 +6,6 @@ import os
 import argparse
 import scanpy as sc
 
-argparser = argparse.ArgumentParser()
-argparser.add_argument('--run_local', action='store_true', help='Run locally')
-argparser.add_argument('--prediction', help='Path to the GRN prediction file')
-# argparser.add_argument('--evaluation_data')
-# argparser.add_argument('--evaluation_data_sc')
-# argparser.add_argument('--regulators_consensus')
-# argparser.add_argument('--ws_consensus')
-# argparser.add_argument('--ws_distance_background')
-# argparser.add_argument('--method_id', help='Method ID')
-# argparser.add_argument('--dataset_id', help='Dataset ID')
-# argparser.add_argument('--score', help='Where to store scores')
-
-par_local = vars(argparser.parse_args())
-
 ## VIASH START
 par = {
     "tf_all": f"resources/grn_benchmark/prior/tf_all.csv",
@@ -35,22 +21,11 @@ par = {
     'reg_type':'ridge', 
 }
 ## VIASH END
-if par_local['run_local']:
-    for key in par_local:
-        par[key] = par_local[key]
-    
-    meta = {
-        "resources_dir": 'src/metrics/',
-    }
-    sys.path.append(meta["resources_dir"])
-    from regression_1.script import main as main_reg1
-    from regression_2.main import main as main_reg2
-    from wasserstein.script import main as main_ws
-else:
-    sys.path.append(meta["resources_dir"])
-    from reg1_main import main as main_reg1
-    from reg2_main import main as main_reg2
-    from ws_main import main as main_ws
+
+sys.path.append(meta["resources_dir"])
+from reg1_main import main as main_reg1
+from reg2_main import main as main_reg2
+from ws_main import main as main_ws
 
 # try:
 #     sys.path.append(meta["resources_dir"])
