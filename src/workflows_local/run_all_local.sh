@@ -13,16 +13,16 @@
 
 set -e
 # - data preprocessing 
-echo "Running opsc_perturbation ..."
-python src/process_data/opsca_perturbation/script.py 
-echo "Running replogle_k562_gwps ..."
-bash src/process_data/replogle_k562_gwps/run.sh 
-echo "Running pereggrn ..."
-bash src/process_data/pereggrn/run.sh 
+# echo "Running opsc_perturbation ..."
+# python src/process_data/opsca_perturbation/script.py 
+# echo "Running replogle_k562_gwps ..."
+# bash src/process_data/replogle_k562_gwps/run.sh 
+# echo "Running pereggrn ..."
+# bash src/process_data/pereggrn/run.sh 
 echo "Running test_data ..."
-python src/process_data/test_data/script.py
+python src/process_data/test_data/datasets/script.py
 
 # - GRN inference and evaluation
-echo "Running workflows_local ..."
-bash src/workflows_local/benchmark/run.sh
+# echo "Running workflows_local ..."
+# bash src/workflows_local/benchmark/run.sh
 

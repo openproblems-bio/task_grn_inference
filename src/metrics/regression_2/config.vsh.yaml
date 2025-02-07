@@ -1,4 +1,4 @@
-__merge__: ../../api/comp_metric_regression.yaml
+__merge__: ../../api/comp_metric.yaml
 
 name: regression_2
 namespace: "metrics"
@@ -17,6 +17,21 @@ arguments:
     direction: input
     type: boolean
     default: true
+  - name: --evaluation_data
+    __merge__: ../../api/file_evaluation_h5ad.yaml
+    required: true
+    direction: input
+  - name: --tf_all
+    type: file
+    direction: input
+    required: true
+    example: resources_test/grn_benchmark/prior/tf_all.csv
+  - name: --reg_type
+    type: string
+    direction: input
+    default: ridge
+    description: name of regretion to use
+    multiple: false
 resources:
   - type: python_script
     path: script.py

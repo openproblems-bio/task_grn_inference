@@ -37,6 +37,18 @@ arguments:
     direction: input
     required: false
     default: op
+  - name: --num_workers
+    type: integer
+    direction: input
+    default: 4
+  - name: --apply_tf
+    type: boolean 
+    required: false
+    default: true
+  - name: --apply_skeleton
+    type: boolean 
+    required: false
+    default: false
 
 
 test_resources:

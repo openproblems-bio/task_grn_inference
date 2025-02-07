@@ -56,9 +56,10 @@ def main(par: dict) -> pd.DataFrame:
 
 if __name__ == '__main__':
     net = main(par)   
+
     # Save inferred GRN
     print('Output GRN')
     # convert the predictions to the benchmark format
-    net['weight'] = net['weight'].astype(str)
+    net = net.astype(str)
     output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])

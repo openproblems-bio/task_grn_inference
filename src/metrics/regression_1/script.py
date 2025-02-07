@@ -28,7 +28,6 @@ par = {
   'score': 'output/score.h5ad',
   'reg_type': 'ridge',
   'layer': 'X_norm',
-  'subsample': -1,
   'num_workers': 4,
   'skeleton': 'resources/grn_benchmark/prior/skeleton.csv',
   'apply_skeleton': False,
