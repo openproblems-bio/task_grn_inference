@@ -5,13 +5,14 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=10
 #SBATCH --time=10:00:00
-#SBATCH --mem=100GB
-#SBATCH --partition=cpu
+#SBATCH --mem=250GB
+#SBATCH --partition=gpu
+#SBATCH --gres=gpu:1
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com
 
 set -e
-
+source ~/miniconda3/bin/activate scprint
 
 DATASETS=(
     "op"
@@ -20,9 +21,11 @@ METHODS=(
     "scprint"
 )
 
+# - where to save the scores (all metrics, datasets, methods)
 SAVE_SCORES_FILE="output/scores.csv"
-
+# - whether to force re-run the inference if the files exists
 FORCE=true
+# - whether to run the consensus for reg2 (only run when to update the consensus)
 RUN_CONSENSUS_FLAG=False
 
 # ----- run methods -----

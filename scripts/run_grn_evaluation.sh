@@ -83,9 +83,17 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
-nextflow run . \
+# nextflow run . \
+#   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
+#   -profile docker \
+#   -with-trace \
+#   -c common/nextflow_helpers/labels_ci.config \
+#   -params-file ${param_file}
+
+nextflow run openproblems-bio/task_grn_inference -r build/main \
+  -latest \
   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
-  -profile docker \
+  -profile singularity \
   -with-trace \
   -c common/nextflow_helpers/labels_ci.config \
   -params-file ${param_file}

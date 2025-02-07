@@ -323,9 +323,9 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
 
     results = {
-        'reg2-theta-0.0': [float(score_static_min)],
-        'reg2-theta-0.5': [float(score_static_median)],
-        'reg2-theta-1.0': [float(score_static_max)],
+        'r2-theta-0.0': [float(score_static_min)],
+        'r2-theta-0.5': [float(score_static_median)],
+        'r2-theta-1.0': [float(score_static_max)],
     }
 
     # # Add dynamic score

@@ -4,6 +4,7 @@ import numpy as np
 from tqdm import tqdm
 from sklearn.preprocessing import StandardScaler
 import scipy.sparse as sp
+import matplotlib.pyplot as plt
 
 colors_blind = [
     '#E69F00',  # Orange
@@ -107,6 +108,49 @@ def corr_net(X, gene_names, par):
     print('Corr results are ready')
     return net
 
+def plot_heatmap(scores, ax=None, name='', fmt='0.02f', cmap="viridis"):
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import seaborn
+
+    if ax is None:
+        fig, ax = plt.subplots(1, 1, figsize=(4, 4), sharey=True)
+
+    # Normalize each column individually
+    scores_normalized = scores.apply(lambda x: (x - np.nanmin(x)) / (np.nanmax(x) - np.nanmin(x)), axis=0)
+    scores_normalized = scores_normalized.round(2)
+    # scores_normalized['Rank'] = scores['Rank'].max()-scores['Rank']
+    # scores_normalized['Rank'] = scores_normalized['Rank']/scores_normalized['Rank'].max()
+
+    # Define the color scale range for each column (0 to 1 after normalization)
+    vmin = 0
+    vmax = 1
+
+
+
+    # Plot the heatmap with normalized scores
+    seaborn.heatmap(scores_normalized, ax=ax, square=False, cbar=False, annot=True, fmt=fmt, vmin=vmin, vmax=vmax, cmap=cmap)
+    # Overlay the original (unnormalized) scores as annotations
+    # scores['Rank'] = scores['Rank'].astype(int)
+    # print(scores['Rank'])
+    # Overlay the original (unnormalized) scores as annotations
+    for text, (i, j) in zip(ax.texts, np.ndindex(scores.shape)):
+        value = scores.iloc[i, j]
+        if isinstance(value, np.int64):  # Check if the value is an integer for 'Rank'
+            text.set_text(f'{value:d}')
+        else:
+            text.set_text(f'{value:.2f}')
+
+    # Customize the axes and title
+    ax.tick_params(left=False, bottom=False)
+    ax.xaxis.set_tick_params(width=0)
+    ax.yaxis.set_tick_params(width=0)
+    ax.set_title(name, pad=10)
+
+    ax.xaxis.set_label_position('top')
+    ax.xaxis.tick_top()
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='left')
+    
 
 def read_gmt(file_path:str) -> dict[str, list[str]]:
     '''Reas gmt file and returns a dict of gene'''
@@ -122,7 +166,7 @@ def read_gmt(file_path:str) -> dict[str, list[str]]:
                 'genes': genes
             }
     return gene_sets
-def sum_by(adata: ad.AnnData, col: str) -> ad.AnnData:
+def sum_by(adata: ad.AnnData, col: str, unique_mapping: bool=True) -> ad.AnnData:
     """
     Adapted from this forum post: 
     https://discourse.scverse.org/t/group-sum-rows-based-on-jobs-feature/371/4
@@ -153,11 +197,14 @@ def sum_by(adata: ad.AnnData, col: str) -> ad.AnnData:
     obs_cols = adata.obs.columns
     obs_cols = list(set(adata.obs.columns) - set([col]))
     
-    one_to_one_mapped_obs_cols = []
-    nunique_in_col = adata.obs[col].nunique()
-    for other_col in obs_cols:
-        if len(adata.obs[[col, other_col]].drop_duplicates()) == nunique_in_col:
-            one_to_one_mapped_obs_cols.append(other_col)
+    if unique_mapping:
+        one_to_one_mapped_obs_cols = []
+        nunique_in_col = adata.obs[col].nunique()
+        for other_col in obs_cols:
+            if len(adata.obs[[col, other_col]].drop_duplicates()) == nunique_in_col:
+                one_to_one_mapped_obs_cols.append(other_col)
+    else:
+        one_to_one_mapped_obs_cols = obs_cols
 
     joining_df = adata.obs[[col] + one_to_one_mapped_obs_cols].drop_duplicates().set_index(col)
     assert (sum_adata.obs.index == sum_adata.obs.join(joining_df).index).all()

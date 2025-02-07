@@ -3405,7 +3405,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scprint",
     "viash_version" : "0.9.1",
-    "git_commit" : "aa9c057075992cecbcf6abe330d9608be1f89504",
+    "git_commit" : "fd1e25f5a4f85998e6c8cd446ca72d2bd14f8620",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3423,7 +3423,7 @@ meta = [
           "dest" : "resources_test/"
         }
       ],
-      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\n\n# download resources \nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Infer a GRN \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n          --rna resources/grn_benchmark/inference_data/norman_rna.h5ad --prediction output/net.h5ad\n```\n\n## Evaluate a GRN\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\n\nThis will calculate and print the scores as well as output the scores into `output/score.h5ad`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
+      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\n\n# download resources \nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Infer a GRN \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n            --rna resources/grn_benchmark/inference_data/norman_rna.h5ad --prediction output/net.h5ad\n```\n\n## Evaluate a GRN\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\n\nThis will calculate and print the scores as well as output the scores into `output/score.h5ad`. Look at the `.uns` for the scores. \n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
     },
     "repositories" : [
       {
@@ -3623,6 +3623,7 @@ def main_sub(adata, model, par):
                         max_cells=par['max_cells'],
                         doplot=False,
                         batch_size=16,
+                        precision="32-mixed",
                         k=par['max_n_links'],
                         )
 
@@ -3689,16 +3690,16 @@ def main(par):
 
     
 if __name__ == '__main__':
-    if False: #TODO:remove this
+    if par['populate_ontology']: 
         populate_my_ontology( 
             organisms= ["NCBITaxon:9606"]
         )
     par['checkpoint'] = par['temp_dir'] + '/scprint.ckpt'
-    if False: 
+    if par['download_checkpoint']:
 
         os.makedirs(par['temp_dir'], exist_ok=True)
         print(f"Downloading checkpoint")
-        checkpoint_link = 'https://huggingface.co/jkobject/scPRINT/resolve/main/medium.ckpt' #TODO: experiment with this
+        checkpoint_link = f"https://huggingface.co/jkobject/scPRINT/resolve/main/{par['model']}.ckpt" #TODO: experiment with this
         
         response = requests.get(checkpoint_link, stream=True)
         if response.status_code == 200:

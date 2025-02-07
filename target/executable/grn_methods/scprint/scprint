@@ -456,9 +456,9 @@ pip install -e GRnnData[dev]   && \
 pip install -e benGRN[dev]  
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-02-07T11:03:06Z"
+LABEL org.opencontainers.image.created="2025-02-07T18:01:54Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="aa9c057075992cecbcf6abe330d9608be1f89504"
+LABEL org.opencontainers.image.revision="fd1e25f5a4f85998e6c8cd446ca72d2bd14f8620"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1388,6 +1388,7 @@ def main_sub(adata, model, par):
                         max_cells=par['max_cells'],
                         doplot=False,
                         batch_size=16,
+                        precision="32-mixed",
                         k=par['max_n_links'],
                         )
 
@@ -1454,16 +1455,16 @@ def main(par):
 
     
 if __name__ == '__main__':
-    if False: #TODO:remove this
+    if par['populate_ontology']: 
         populate_my_ontology( 
             organisms= ["NCBITaxon:9606"]
         )
     par['checkpoint'] = par['temp_dir'] + '/scprint.ckpt'
-    if False: 
+    if par['download_checkpoint']:
 
         os.makedirs(par['temp_dir'], exist_ok=True)
         print(f"Downloading checkpoint")
-        checkpoint_link = 'https://huggingface.co/jkobject/scPRINT/resolve/main/medium.ckpt' #TODO: experiment with this
+        checkpoint_link = f"https://huggingface.co/jkobject/scPRINT/resolve/main/{par['model']}.ckpt" #TODO: experiment with this
         
         response = requests.get(checkpoint_link, stream=True)
         if response.status_code == 200:

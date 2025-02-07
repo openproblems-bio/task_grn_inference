@@ -32,6 +32,49 @@ both single and multi-omics, 8 evalation metrics, and five datasets
 
 See our publication for the details of methods.
 
+## Installation
+
+You need to have Docker, Java, and Viash installed. Follow
+[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)
+to install the required dependencies. 
+
+## Download resources
+```bash
+git clone git@github.com:openproblems-bio/task_grn_inference.git
+
+cd task_grn_inference
+```
+
+# download resources 
+To interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.
+
+```bash
+scripts/download_resources.sh
+```
+
+## Infer a GRN 
+
+To infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:
+
+```bash
+viash run src/control_methods/pearson_corr/config.vsh.yaml -- \
+            --rna resources/grn_benchmark/inference_data/norman_rna.h5ad --prediction output/net.h5ad
+```
+
+## Evaluate a GRN
+Once got the prediction for a given dataset, use the following code to obtain evaluation scores. 
+
+```bash
+scripts/single_grn_evaluation.sh output/net.h5ad norman
+```
+
+This will calculate and print the scores as well as output the scores into `output/score.h5ad`. Look at the `.uns` for the scores. 
+
+## Add a method
+
+To add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.
+
+
 ## Authors & contributors
 
 | name              | roles       |

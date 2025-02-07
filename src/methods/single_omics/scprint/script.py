@@ -33,9 +33,12 @@ par = {
     'prediction': 'output/grn.h5ad',
     'filtration': 'top-k',
     'max_n_links': 50_000,
-    'num_genes': 5000,
+    'num_genes': 10000,
     'max_cells': 1000,
     'num_workers': 8,
+    'model': 'medium',
+    'download_checkpoint': True,
+    'populate_ontology': False,
     'temp_dir': 'output/scprint/',
     'method_id': 'scprint',
     'dataset_id': 'op'
@@ -82,6 +85,7 @@ def main_sub(adata, model, par):
                         max_cells=par['max_cells'],
                         doplot=False,
                         batch_size=16,
+                        precision="32-mixed",
                         k=par['max_n_links'],
                         )
 
@@ -148,16 +152,16 @@ def main(par):
 
     
 if __name__ == '__main__':
-    if False: #TODO:remove this
+    if par['populate_ontology']: 
         populate_my_ontology( 
             organisms= ["NCBITaxon:9606"]
         )
     par['checkpoint'] = par['temp_dir'] + '/scprint.ckpt'
-    if False: 
+    if par['download_checkpoint']:
 
         os.makedirs(par['temp_dir'], exist_ok=True)
         print(f"Downloading checkpoint")
-        checkpoint_link = 'https://huggingface.co/jkobject/scPRINT/resolve/main/medium.ckpt' #TODO: experiment with this
+        checkpoint_link = f"https://huggingface.co/jkobject/scPRINT/resolve/main/{par['model']}.ckpt" #TODO: experiment with this
         
         response = requests.get(checkpoint_link, stream=True)
         if response.status_code == 200:
