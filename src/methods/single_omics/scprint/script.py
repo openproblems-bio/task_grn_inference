@@ -153,11 +153,11 @@ if __name__ == '__main__':
             organisms= ["NCBITaxon:9606"]
         )
     par['checkpoint'] = par['temp_dir'] + '/scprint.ckpt'
-    if False: 
+    if False: #TODO:remove this
 
         os.makedirs(par['temp_dir'], exist_ok=True)
         print(f"Downloading checkpoint")
-        checkpoint_link = 'https://huggingface.co/jkobject/scPRINT/resolve/main/medium.ckpt' #TODO: experiment with this
+        checkpoint_link = 'https://huggingface.co/jkobject/scPRINT/resolve/main/large.ckpt' #TODO: experiment with this
         
         response = requests.get(checkpoint_link, stream=True)
         if response.status_code == 200:
