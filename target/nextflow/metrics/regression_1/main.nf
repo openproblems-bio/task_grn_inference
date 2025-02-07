@@ -3220,18 +3220,6 @@ meta = [
           "multiple_sep" : ";"
         },
         {
-          "type" : "boolean",
-          "name" : "--binarize",
-          "description" : "whether to binarize the weight",
-          "default" : [
-            true
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
           "type" : "file",
           "name" : "--evaluation_data",
           "label" : "perturbation data (pseudo)bulk",
@@ -3309,6 +3297,18 @@ meta = [
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
+        },
+        {
+          "type" : "boolean",
+          "name" : "--binarize",
+          "description" : "whether to binarize the weight",
+          "default" : [
+            true
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
         }
       ]
     }
@@ -3344,10 +3344,10 @@ meta = [
   "info" : {
     "label" : "regression_1",
     "summary" : "Calculates regression scores 1",
-    "type" : "metrics",
+    "type" : "metrics_regression",
     "type_info" : {
-      "label" : "metrics",
-      "summary" : "A metric to evaluate the performance of the inferred GRN",
+      "label" : "feature-based metrics",
+      "summary" : "A regression metric to evaluate the performance of the inferred GRN",
       "description" : "A metric to evaluate the performance of the inferred GRN\n"
     }
   },
@@ -3458,7 +3458,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression_1",
     "viash_version" : "0.9.1",
-    "git_commit" : "613f121340161c44c1fe038a567988c3046e6cc0",
+    "git_commit" : "83dfc07f96d4e6bbf87f5bb61261ed4a7a911623",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3597,10 +3597,10 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'binarize': $( if [ ! -z ${VIASH_PAR_BINARIZE+x} ]; then echo "r'${VIASH_PAR_BINARIZE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'evaluation_data': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'binarize': $( if [ ! -z ${VIASH_PAR_BINARIZE+x} ]; then echo "r'${VIASH_PAR_BINARIZE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),

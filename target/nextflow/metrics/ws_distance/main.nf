@@ -3221,32 +3221,6 @@ meta = [
         },
         {
           "type" : "file",
-          "name" : "--ws_consensus",
-          "example" : [
-            "resources_test/grn_benchmark/prior/ws_consensus_norman.csv"
-          ],
-          "must_exist" : false,
-          "create_parent" : true,
-          "required" : true,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--ws_distance_background",
-          "example" : [
-            "resources_test/grn_benchmark/prior/ws_distance_background_norman.csv"
-          ],
-          "must_exist" : false,
-          "create_parent" : true,
-          "required" : true,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
           "name" : "--evaluation_data_sc",
           "label" : "perturbation data (sc)",
           "summary" : "Perturbation dataset for benchmarking (sinlge cell).",
@@ -3298,6 +3272,32 @@ meta = [
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--ws_consensus",
+          "example" : [
+            "resources_test/grn_benchmark/prior/ws_consensus_norman.csv"
+          ],
+          "must_exist" : false,
+          "create_parent" : true,
+          "required" : true,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--ws_distance_background",
+          "example" : [
+            "resources_test/grn_benchmark/prior/ws_distance_background_norman.csv"
+          ],
+          "must_exist" : false,
+          "create_parent" : true,
+          "required" : true,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
         }
       ]
     }
@@ -3333,10 +3333,10 @@ meta = [
   "info" : {
     "label" : "ws_distance",
     "summary" : "Calculates Wasserstein distance for a given GRN and dataset",
-    "type" : "metrics",
+    "type" : "metrics_ws",
     "type_info" : {
-      "label" : "metrics",
-      "summary" : "A metric to evaluate the performance of the inferred GRN",
+      "label" : "Wasserstein distance metrics",
+      "summary" : "A Wasserstein distance based metric to evaluate the performance of the inferred GRN",
       "description" : "A metric to evaluate the performance of the inferred GRN\n"
     }
   },
@@ -3446,7 +3446,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/ws_distance",
     "viash_version" : "0.9.1",
-    "git_commit" : "613f121340161c44c1fe038a567988c3046e6cc0",
+    "git_commit" : "83dfc07f96d4e6bbf87f5bb61261ed4a7a911623",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3573,9 +3573,9 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'evaluation_data_sc': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA_SC+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA_SC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'ws_consensus': $( if [ ! -z ${VIASH_PAR_WS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_WS_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'ws_distance_background': $( if [ ! -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then echo "r'${VIASH_PAR_WS_DISTANCE_BACKGROUND//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'evaluation_data_sc': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA_SC+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA_SC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'ws_distance_background': $( if [ ! -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then echo "r'${VIASH_PAR_WS_DISTANCE_BACKGROUND//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
