@@ -24,8 +24,8 @@
 #     --prediction output/prediction.h5ad
 
 # Exit immediately if a command exits with a non-zero status
-set -e
-source ~/miniconda3/bin/activate scprint
+# set -e
+# source ~/miniconda3/bin/activate scprint
 
-python src/methods/script_all.py
-python src/metrics/script_all_experiment.py
+# python src/methods/script_all.py
+# python src/metrics/script_all_experiment.py
