@@ -1,0 +1,25 @@
+__merge__: comp_metric.yaml
+
+namespace: "metrics"
+info:
+  type: metrics_regression
+  type_info:
+    label: feature-based metrics 
+    summary: A regression metric to evaluate the performance of the inferred GRN
+
+arguments: 
+  - name: --evaluation_data
+    __merge__: file_evaluation_bulk_h5ad.yaml
+    required: true
+    direction: input
+  - name: --tf_all
+    type: file
+    direction: input
+    required: true
+    example: resources_test/grn_benchmark/prior/tf_all.csv
+  - name: --reg_type
+    type: string
+    direction: input
+    default: ridge
+    description: name of regretion to use
+

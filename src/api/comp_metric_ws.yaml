@@ -1,0 +1,15 @@
+__merge__: comp_metric.yaml
+
+namespace: "metrics"
+info:
+  type: metrics_ws
+  type_info:
+    label: Wasserstein distance metrics 
+    summary: A Wasserstein distance based metric to evaluate the performance of the inferred GRN
+
+arguments: 
+  - name: --evaluation_data_sc
+    __merge__: file_evaluation_sc_h5ad.yaml
+    required: true
+    direction: input
+

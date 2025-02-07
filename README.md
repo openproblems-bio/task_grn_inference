@@ -32,7 +32,7 @@ both single and multi-omics, 8 evalation metrics, and five datasets
 
 See our publication for the details of methods.
 
-## Installation
+llation
 
 You need to have Docker, Java, and Viash installed. Follow
 [these instructions](https://openproblems.bio/documentation/fundamentals/requirements)
@@ -72,7 +72,6 @@ This outputs the scores into `output/test_run/scores.json`
 
 To add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.
 
-
 ## Authors & contributors
 
 | name              | roles       |
@@ -90,6 +89,8 @@ flowchart TB
   file_atac_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-chromatin-accessibility-data'>chromatin accessibility data</a>")
   comp_method[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-method'>method</a>"/]
   file_prediction_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-grn-prediction'>GRN prediction</a>")
+  comp_metric_regression[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-feature-based-metrics'>feature-based metrics</a>"/]
+  comp_metric_ws[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-wasserstein-distance-metrics'>Wasserstein distance metrics</a>"/]
   comp_metric[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-metrics'>metrics</a>"/]
   file_score_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-score'>score</a>")
   file_evaluation_bulk_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-perturbation-data--pseudo-bulk'>perturbation data (pseudo)bulk</a>")
@@ -97,8 +98,14 @@ flowchart TB
   file_rna_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-gene-expression-data'>gene expression data</a>")
   file_atac_h5ad-.-comp_method
   comp_method-.->file_prediction_h5ad
+  file_prediction_h5ad---comp_metric_regression
+  file_prediction_h5ad---comp_metric_ws
   file_prediction_h5ad---comp_metric
+  comp_metric_regression-->file_score_h5ad
+  comp_metric_ws-->file_score_h5ad
   comp_metric-->file_score_h5ad
+  file_evaluation_bulk_h5ad---comp_metric_regression
+  file_evaluation_sc_h5ad---comp_metric_ws
   file_rna_h5ad---comp_method
 ```
 
@@ -176,6 +183,57 @@ Data structure:
 | `uns["dataset_id"]` | `string` | A unique identifier for the dataset. |
 | `uns["method_id"]` | `string` | A unique identifier for the inference method. |
 | `uns["prediction"]` | `object` | Inferred GRNs in the format of source, target, weight. |
+
+</div>
+
+## Component type: feature-based metrics
+
+A regression metric to evaluate the performance of the inferred GRN
+
+Arguments:
+
+<div class="small">
+
+| Name | Type | Description |
+|:---|:---|:---|
+| `--prediction` | `file` | File indicating the inferred GRN. |
+| `--score` | `file` | (*Output*) File indicating the score of a metric. |
+| `--method_id` | `string` | (*Optional*) NA. |
+| `--layer` | `string` | (*Optional*) NA. Default: `X_norm`. |
+| `--max_n_links` | `integer` | (*Optional*) NA. Default: `50000`. |
+| `--verbose` | `integer` | (*Optional*) NA. Default: `2`. |
+| `--dataset_id` | `string` | (*Optional*) NA. Default: `op`. |
+| `--num_workers` | `integer` | (*Optional*) NA. Default: `4`. |
+| `--apply_tf` | `boolean` | (*Optional*) NA. Default: `TRUE`. |
+| `--apply_skeleton` | `boolean` | (*Optional*) NA. Default: `FALSE`. |
+| `--evaluation_data` | `file` | Perturbation dataset for benchmarking. |
+| `--tf_all` | `file` | NA. |
+| `--reg_type` | `string` | (*Optional*) NA. Default: `ridge`. |
+
+</div>
+
+## Component type: Wasserstein distance metrics
+
+A Wasserstein distance based metric to evaluate the performance of the
+inferred GRN
+
+Arguments:
+
+<div class="small">
+
+| Name | Type | Description |
+|:---|:---|:---|
+| `--prediction` | `file` | File indicating the inferred GRN. |
+| `--score` | `file` | (*Output*) File indicating the score of a metric. |
+| `--method_id` | `string` | (*Optional*) NA. |
+| `--layer` | `string` | (*Optional*) NA. Default: `X_norm`. |
+| `--max_n_links` | `integer` | (*Optional*) NA. Default: `50000`. |
+| `--verbose` | `integer` | (*Optional*) NA. Default: `2`. |
+| `--dataset_id` | `string` | (*Optional*) NA. Default: `op`. |
+| `--num_workers` | `integer` | (*Optional*) NA. Default: `4`. |
+| `--apply_tf` | `boolean` | (*Optional*) NA. Default: `TRUE`. |
+| `--apply_skeleton` | `boolean` | (*Optional*) NA. Default: `FALSE`. |
+| `--evaluation_data_sc` | `file` | Perturbation dataset for benchmarking (sinlge cell). |
 
 </div>
 
