@@ -11,18 +11,18 @@ arguments:
     direction: input
     must_exist: false
     required: true
-    example: resources_test/grn_benchmark/prior/ws_consensus_adamson.csv 
+    example: resources_test/grn_benchmark/prior/ws_consensus_norman.csv 
   - name: --ws_distance_background
     type: file
     direction: input
     must_exist: false
     required: true
-    example: resources_test/grn_benchmark/prior/ws_distance_background_adamson.csv
+    example: resources_test/grn_benchmark/prior/ws_distance_background_norman.csv
   - name: --evaluation_data_sc
     type: file
     required: true
     direction: input
-    example: 'resources_test/datasets_raw/adamson_sc_counts.h5ad'
+    example: 'resources_test/grn_benchmark/evaluation_data/norman_sc.h5ad'
 resources:
   - type: python_script
     path: script.py
