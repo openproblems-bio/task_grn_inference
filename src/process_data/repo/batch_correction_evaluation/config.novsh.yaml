@@ -7,7 +7,7 @@ functionality:
   
   arguments:
     - name: --perturbation_data
-      __merge__: ../../../api/file_evaluation_h5ad.yaml
+      __merge__: ../../../api/file_evaluation_bulk_h5ad.yaml
       required: true
       direction: input
     - name: --output

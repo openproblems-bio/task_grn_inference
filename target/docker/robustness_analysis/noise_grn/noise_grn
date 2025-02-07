@@ -447,9 +447,9 @@ FROM ghcr.io/openproblems-bio/base_python:1.0.4
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component robustness_analysis noise_grn"
-LABEL org.opencontainers.image.created="2025-02-07T18:01:54Z"
+LABEL org.opencontainers.image.created="2025-02-07T18:48:44Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="fd1e25f5a4f85998e6c8cd446ca72d2bd14f8620"
+LABEL org.opencontainers.image.revision="613f121340161c44c1fe038a567988c3046e6cc0"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

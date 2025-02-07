@@ -10,9 +10,14 @@ info:
 
 arguments: 
   - name: --evaluation_data
-    type: file
+    __merge__: ../../api/file_evaluation_bulk_h5ad.yaml
     required: true
     direction: input
+  - name: --evaluation_data_sc
+    __merge__: ../../api/file_evaluation_sc_h5ad.yaml
+    required: true
+    direction: input
+
 
   - name: --reg_type
     type: string
@@ -48,11 +53,6 @@ arguments:
     must_exist: false
     required: true
     example: resources_test/grn_benchmark/prior/ws_distance_background_norman.csv
-  - name: --evaluation_data_sc
-    type: file
-    required: true
-    direction: input
-    example: 'resources_test/grn_benchmark/evaluation_data/norman_sc_counts.h5ad'
 
   - name: --tf_all
     type: file
@@ -73,7 +73,7 @@ resources:
   - path: /src/metrics/wasserstein/main.py
     dest: ws_main.py
 
-      
+
 engines:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4

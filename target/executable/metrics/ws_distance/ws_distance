@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics ws_distance"
-LABEL org.opencontainers.image.created="2025-02-07T18:01:55Z"
+LABEL org.opencontainers.image.created="2025-02-07T18:48:45Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="fd1e25f5a4f85998e6c8cd446ca72d2bd14f8620"
+LABEL org.opencontainers.image.revision="613f121340161c44c1fe038a567988c3046e6cc0"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1364,7 +1364,7 @@ if __name__ == '__main__':
         X=np.empty((0, 0)),
         uns={
             "dataset_id": str(par["dataset_id"]),
-            "method_id": f"reg2-{par['method_id']}",
+            "method_id": f"ws-{par['method_id']}",
             "metric_ids": mean_scores.columns.values,
             "metric_values": mean_scores.values[0]
         }

@@ -1,7 +1,7 @@
 type: file
 example: resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad
-label: perturbation data
-summary: "Perturbation dataset for benchmarking."
+label: perturbation data (pseudo)bulk
+summary: "Perturbation dataset for benchmarking"
 
 info:
   format:
