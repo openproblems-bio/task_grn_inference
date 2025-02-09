@@ -17,8 +17,8 @@ set -e
 # echo "Running opsc_perturbation ..."
 # python src/process_data/opsca_perturbation/script.py 
 
-# echo "Running replogle_k562_gwps ..."
-# bash src/process_data/replogle_k562_gwps/run.sh 
+echo "Running replogle_k562_gwps ..."
+bash src/process_data/replogle_k562_gwps/run.sh 
 
 # echo "Running pereggrn ..."
 # bash src/process_data/pereggrn/run.sh 

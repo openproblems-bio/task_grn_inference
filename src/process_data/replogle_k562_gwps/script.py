@@ -132,6 +132,12 @@ def main(par):
     adata_train_bulk.write(par['adata_train_bulk'])
     adata_train_sc.write(par['adata_train_sc'])
 
+    print('adata_train_bulk: ', adata_train_bulk.shape)
+    print('pertrbations in adata_train_bulk: ', adata_train_bulk.obs['perturbation'].nunique())
+    print('adata_train_sc: ', adata_train_sc.shape)
+    print('pertrbations in adata_train_sc: ', adata_train_sc.obs['perturbation'].nunique())
+
+
     del adata_train_sc, adata_train_bulk
     gc.collect()
 
