@@ -26,7 +26,7 @@ meta = {
 }
 sys.path.append(meta["resources_dir"])
 
-from util import sum_by
+from util import sum_by, fetch_gene_info
 
 
 def format_raw_data(adata: ad.AnnData) -> ad.AnnData:
@@ -42,6 +42,7 @@ def format_raw_data(adata: ad.AnnData) -> ad.AnnData:
     adata.var_names_make_unique()  
     adata.var['gene_id'] = adata.var['gene_id'].astype(str)
     adata.obs['is_control'] = adata.obs['perturbation']=='non-targeting'
+    
     return adata
 
 def split_data(adata: ad.AnnData):

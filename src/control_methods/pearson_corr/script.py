@@ -5,8 +5,8 @@ import os
 import scanpy as sc 
 import sys
 import numpy as np
+import argparse
 
-# - whatever is between viash start and end will be replaced by Viash with the parameters from the config. file
 
 ## VIASH START
 par = {
@@ -19,30 +19,39 @@ par = {
     'normalize': True}
 ## VIASH END
 
-sys.path.append(meta["resources_dir"])
+## LOCAL START
+
+parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
+parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--prediction', type=str, help='Path to the prediction file')
+parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
+parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
+parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
+parser.add_argument('--dataset_id', type=str, help='Dataset id')
+parser.add_argument('--normalize', action='store_true')
+args = parser.parse_args()
+
+par_local = vars(args)
+
+for key, value in par_local.items():
+    if value is not None:
+        par[key] = value
+
+## LOCAL END
+
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta = {
+        "resources_dir": 'src/utils'
+    }
+    sys.path.append(meta["resources_dir"])
 from util import corr_net
 
 
-def infer_net(par: dict) -> pd.DataFrame:
-    print(par)
-    print('Read data')
-    adata = ad.read_h5ad(par["rna"])
-    try:
-        X = adata.layers['X_norm'].todense().A
-    except:
-        X = adata.X
-
-    # - remove genes with 0 standard deviation
-    gene_std = np.std(X, axis=0)
-    nonzero_std_genes = gene_std > 0
-    X = X[:, nonzero_std_genes]
-    # - get the net
-    gene_names = adata[:, nonzero_std_genes].var_names.to_numpy()
-    grn = corr_net(X, gene_names, par)    
-    return grn
-
 if __name__ == '__main__':
-    net = infer_net(par)
+    net = corr_net(par)
     # - format of et
     '''
         the net is a pandas dataframe with the following columns:
@@ -53,5 +62,5 @@ if __name__ == '__main__':
 
     print('Output GRN')
     net['weight'] = net['weight'].astype(str)
-    output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+    output = ad.AnnData(X=None, uns={"method_id": 'pearson_corr', "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])

@@ -66,7 +66,7 @@ net = main(par)
 
 print('Write output to file', flush=True)
 net['weight'] = net['weight'].astype(str)
-output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+output = ad.AnnData(X=None, uns={"method_id": 'scglue', "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
 output.write(par['prediction'])
 
 

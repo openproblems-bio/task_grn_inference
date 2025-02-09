@@ -78,7 +78,7 @@ net$weight <- as.character(net$weight)
 output <- AnnData(
   X = matrix(nrow = 0, ncol = 0),
   uns = list(
-    method_id = par$method_id,
+    method_id = "ppcor",
     dataset_id = par$dataset_id,
     prediction = net[, c("source", "target", "weight")]
   )
