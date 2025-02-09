@@ -3470,7 +3470,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression_2",
     "viash_version" : "0.9.1",
-    "git_commit" : "fb3f2d44ec865e17a180160dc53034179968b61f",
+    "git_commit" : "771a896bfa88cdfad501d1605fdf4f77d6ed92bd",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3672,7 +3672,7 @@ output = ad.AnnData(
     X=np.empty((0, 0)),
     uns={
         "dataset_id": str(par["dataset_id"]),
-        "method_id": f"reg2-{par['method_id']}",
+        "method_id": f"{par['method_id']}",
         "metric_ids": metric_ids,
         "metric_values": metric_values
     }

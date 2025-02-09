@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_2"
-LABEL org.opencontainers.image.created="2025-02-09T22:15:09Z"
+LABEL org.opencontainers.image.created="2025-02-09T22:44:09Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="fb3f2d44ec865e17a180160dc53034179968b61f"
+LABEL org.opencontainers.image.revision="771a896bfa88cdfad501d1605fdf4f77d6ed92bd"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1415,7 +1415,7 @@ output = ad.AnnData(
     X=np.empty((0, 0)),
     uns={
         "dataset_id": str(par["dataset_id"]),
-        "method_id": f"reg2-{par['method_id']}",
+        "method_id": f"{par['method_id']}",
         "metric_ids": metric_ids,
         "metric_values": metric_values
     }

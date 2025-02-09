@@ -6,7 +6,7 @@
 #SBATCH --cpus-per-task=100
 #SBATCH --time=5-00:00:00
 #SBATCH --qos long
-#SBATCH --mem=1500GB
+#SBATCH --mem=1000GB
 #SBATCH --partition=cpu
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com   

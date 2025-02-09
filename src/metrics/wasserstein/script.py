@@ -51,7 +51,7 @@ if __name__ == '__main__':
         X=np.empty((0, 0)),
         uns={
             "dataset_id": str(par["dataset_id"]),
-            "method_id": f"ws-{par['method_id']}",
+            "method_id": f"{par['method_id']}",
             "metric_ids": mean_scores.columns.values,
             "metric_values": mean_scores.values[0]
         }

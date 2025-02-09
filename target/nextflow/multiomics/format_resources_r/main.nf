@@ -3243,7 +3243,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/multiomics/format_resources_r",
     "viash_version" : "0.9.1",
-    "git_commit" : "fb3f2d44ec865e17a180160dc53034179968b61f",
+    "git_commit" : "771a896bfa88cdfad501d1605fdf4f77d6ed92bd",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

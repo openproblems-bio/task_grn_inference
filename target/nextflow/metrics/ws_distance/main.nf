@@ -3446,7 +3446,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/ws_distance",
     "viash_version" : "0.9.1",
-    "git_commit" : "fb3f2d44ec865e17a180160dc53034179968b61f",
+    "git_commit" : "771a896bfa88cdfad501d1605fdf4f77d6ed92bd",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3643,7 +3643,7 @@ if __name__ == '__main__':
         X=np.empty((0, 0)),
         uns={
             "dataset_id": str(par["dataset_id"]),
-            "method_id": f"ws-{par['method_id']}",
+            "method_id": f"{par['method_id']}",
             "metric_ids": mean_scores.columns.values,
             "metric_values": mean_scores.values[0]
         }
