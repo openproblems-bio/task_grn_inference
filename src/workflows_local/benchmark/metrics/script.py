@@ -127,7 +127,7 @@ def run_metrics(par):
 
   scores_store.append(score_reg2)
   # -- ws distance 
-  if par['dataset_id'] in ['replogle', 'norman', 'adamson']:
+  if par['dataset_id'] in ['norman', 'adamson']:
     print('Running WS disance ...')
     args = f"--run_local \
             --prediction {par['prediction']} \

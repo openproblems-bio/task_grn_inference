@@ -135,7 +135,7 @@ if __name__ == '__main__':
       X=np.empty((0, 0)),
       uns={
           "dataset_id": par["dataset_id"],
-          "method_id": f"reg1-{par['method_id']}",
+          "method_id": f"{par['method_id']}",
           "metric_ids": metric_ids,
           "metric_values": metric_values
       }

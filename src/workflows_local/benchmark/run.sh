@@ -4,8 +4,8 @@
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=10
-#SBATCH --time=10:00:00
-#SBATCH --mem=1000GB
+#SBATCH --time=48:00:00
+#SBATCH --mem=500GB
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
 #SBATCH --mail-type=END,FAIL      
@@ -17,18 +17,18 @@ set -e
 
 
 DATASETS=(
-    "op norman replogle"
+    " op norman nakatake adamson replogle"
 )
+METHODS=(
+    "scglue scenicplus celloracle granie figr collectri grnboost2 ppcor portia scenic positive_control pearson_corr negative_control scprint"
+)
+
 # METHODS=(
-#     "scprint"  "positive_control pearson_corr portia ppcor grnboost2 scenic "
+#     "scprint "
 # )
 
-METHODS=(
-    "scprint "
-)
-
 # - where to save the scores (all metrics, datasets, methods)
-SAVE_SCORES_FILE="resources/scores/scores_scprint.csv"
+SAVE_SCORES_FILE="resources/scores/scores_new.csv"
 # - whether to force re-run the inference if the files exists
 FORCE=true
 SBATCH=false
@@ -58,3 +58,5 @@ if [ "$SBATCH" = false ]; then
     echo "Running: $cmd"
     $cmd
 fi
+
+echo $SAVE_SCORES_FILE
