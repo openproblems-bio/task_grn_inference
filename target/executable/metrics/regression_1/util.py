@@ -75,9 +75,11 @@ def basic_qc(adata, min_genes_per_cell = 200, max_genes_per_cell = 5000, min_cel
     return adata_f
 
 def process_links(net, par):
+    # - remove self loops
     net = net[net.source!=net.target]
-    
+    # - limit the number of links
     if par['max_n_links'] != -1:
+        print(net)
         net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
         net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
     return net

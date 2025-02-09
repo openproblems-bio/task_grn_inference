@@ -1,9 +1,66 @@
-name: "regression_1"
-namespace: "metrics"
+name: "scprint"
+namespace: "grn_methods"
 version: "build_main"
 argument_groups:
 - name: "Arguments"
   arguments:
+  - type: "file"
+    name: "--rna"
+    label: "gene expression data"
+    summary: "RNA expression data."
+    info:
+      format:
+        type: "h5ad"
+        obs:
+        - name: "cell_type"
+          type: "string"
+          description: "The annotated cell type of each cell based on RNA expression."
+          required: false
+        - name: "donor_id"
+          type: "string"
+          description: "Donor id"
+          required: false
+        layers:
+        - name: "counts"
+          type: "double"
+          description: "Counts matrix"
+          required: false
+        - name: "X_norm"
+          type: "double"
+          description: "Normalized values"
+          required: true
+    example:
+    - "resources_test/grn_benchmark/inference_data/op_rna.h5ad"
+    must_exist: true
+    create_parent: true
+    required: true
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--atac"
+    label: "chromatin accessibility data"
+    summary: "Chromatin accessibility data"
+    info:
+      format:
+        type: "h5ad"
+        obs:
+        - name: "cell_type"
+          type: "string"
+          description: "The annotated cell type of each cell based on RNA expression."
+          required: false
+        - name: "donor_id"
+          type: "string"
+          description: "Donor id"
+          required: false
+    example:
+    - "resources_test/grn_benchmark/inference_data/op_atac.h5ad"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
   - type: "file"
     name: "--prediction"
     label: "GRN prediction"
@@ -28,59 +85,19 @@ argument_groups:
     - "resources_test/grn_models/op/collectri.h5ad"
     must_exist: true
     create_parent: true
-    required: true
-    direction: "input"
-    multiple: false
-    multiple_sep: ";"
-  - type: "file"
-    name: "--score"
-    label: "score"
-    summary: "File indicating the score of a metric."
-    info:
-      format:
-        type: "h5ad"
-        uns:
-        - type: "string"
-          name: "dataset_id"
-          description: "A unique identifier for the dataset"
-          required: true
-        - type: "string"
-          name: "method_id"
-          description: "A unique identifier for the method"
-          required: true
-        - type: "string"
-          name: "metric_ids"
-          description: "One or more unique metric identifiers"
-          multiple: true
-          required: true
-        - type: "double"
-          name: "metric_values"
-          description: "The metric values obtained for the given prediction. Must\
-            \ be of same length as 'metric_ids'."
-          multiple: true
-          required: true
-    example:
-    - "resources_test/scores/score.h5ad"
-    must_exist: true
-    create_parent: true
-    required: true
+    required: false
     direction: "output"
     multiple: false
     multiple_sep: ";"
-  - type: "string"
-    name: "--method_id"
+  - type: "file"
+    name: "--tf_all"
     info: null
     example:
-    - "grnboost2"
-    required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ";"
-  - type: "string"
-    name: "--layer"
-    info: null
+    - "resources_test/grn_benchmark/prior/tf_all.csv"
     default:
-    - "X_norm"
+    - "resources_test/grn_benchmark/prior/tf_all.csv"
+    must_exist: true
+    create_parent: true
     required: false
     direction: "input"
     multiple: false
@@ -95,10 +112,28 @@ argument_groups:
     multiple: false
     multiple_sep: ";"
   - type: "integer"
-    name: "--verbose"
+    name: "--num_workers"
     info: null
     default:
-    - 2
+    - 4
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "string"
+    name: "--temp_dir"
+    info: null
+    default:
+    - "output/temdir"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "integer"
+    name: "--seed"
+    info: null
+    default:
+    - 32
     required: false
     direction: "input"
     multiple: false
@@ -112,97 +147,38 @@ argument_groups:
     direction: "input"
     multiple: false
     multiple_sep: ";"
-  - type: "integer"
-    name: "--num_workers"
+  - type: "string"
+    name: "--method_id"
     info: null
     default:
-    - 4
+    - "grnboost2"
     required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ";"
-  - type: "boolean"
-    name: "--apply_tf"
-    info: null
-    default:
-    - true
-    required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ";"
-  - type: "boolean"
-    name: "--apply_skeleton"
-    info: null
-    default:
-    - false
-    required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ";"
-  - type: "file"
-    name: "--evaluation_data"
-    label: "perturbation data (pseudo)bulk"
-    summary: "Perturbation dataset for benchmarking"
-    info:
-      format:
-        type: "h5ad"
-        obs:
-        - name: "cell_type"
-          type: "string"
-          description: "The annotated cell type of each cell based on RNA expression."
-          required: true
-        - name: "perturbation"
-          type: "string"
-          description: "Name of the column containing perturbation names"
-          required: true
-        - name: "donor_id"
-          type: "string"
-          description: "Donor id"
-          required: false
-        - name: "perturbation_type"
-          type: "string"
-          description: "Name of the column indicating perturbation type"
-          required: false
-        layers:
-        - name: "X_norm"
-          type: "double"
-          description: "Normalized values"
-          required: true
-    example:
-    - "resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad"
-    must_exist: true
-    create_parent: true
-    required: true
-    direction: "input"
-    multiple: false
-    multiple_sep: ";"
-  - type: "file"
-    name: "--tf_all"
-    info: null
-    example:
-    - "resources_test/grn_benchmark/prior/tf_all.csv"
-    must_exist: true
-    create_parent: true
-    required: true
     direction: "input"
     multiple: false
     multiple_sep: ";"
   - type: "string"
-    name: "--reg_type"
-    description: "name of regretion to use"
+    name: "--filtration"
     info: null
     default:
-    - "ridge"
+    - "top-k"
     required: false
     direction: "input"
     multiple: false
     multiple_sep: ";"
-  - type: "boolean"
-    name: "--binarize"
-    description: "whether to binarize the weight"
+  - type: "integer"
+    name: "--num_genes"
     info: null
     default:
-    - true
+    - 5000
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "integer"
+    name: "--max_cells"
+    info: null
+    default:
+    - 1000
     required: false
     direction: "input"
     multiple: false
@@ -211,8 +187,6 @@ resources:
 - type: "python_script"
   path: "script.py"
   is_executable: true
-- type: "file"
-  path: "helper.py"
 - type: "file"
   path: "util.py"
   dest: "util.py"
@@ -224,13 +198,15 @@ test_resources:
   path: "resources_test/"
   dest: "resources_test/"
 info:
-  label: "regression_1"
-  summary: "Calculates regression scores 1"
-  type: "metrics_regression"
+  label: "scprint"
+  summary: "GRN inference using scPRINT"
+  description: "GRN inference using scPRINT.\n"
+  documentation_url: "https://github.com/cantinilab/scPRINT/"
+  type: "method"
   type_info:
-    label: "feature-based metrics"
-    summary: "A regression metric to evaluate the performance of the inferred GRN"
-    description: "A metric to evaluate the performance of the inferred GRN\n"
+    label: "method"
+    summary: "A GRN inference method"
+    description: "A method for inferring GRN from expression data.\n"
 status: "enabled"
 scope:
   image: "public"
@@ -253,8 +229,9 @@ runners:
   directives:
     label:
     - "midtime"
-    - "highmem"
-    - "highcpu"
+    - "midmem"
+    - "midcpu"
+    - "biggpu"
     tag: "$id"
   auto:
     simplifyInput: true
@@ -278,39 +255,27 @@ runners:
 engines:
 - type: "docker"
   id: "docker"
-  image: "ghcr.io/openproblems-bio/base_python:1.0.4"
+  image: "openproblems/base_pytorch_nvidia:1.0.0"
   namespace_separator: "/"
   setup:
-  - type: "apt"
-    packages:
-    - "procps"
-    - "git"
-    interactive: false
-  - type: "python"
-    user: false
-    packages:
-    - "anndata~=0.10.0"
-    - "scanpy~=1.10.0"
-    - "pyyaml"
-    - "requests"
-    - "jsonschema"
-    github:
-    - "openproblems-bio/core#subdirectory=packages/python/openproblems"
-    upgrade: true
-  - type: "python"
-    user: false
-    packages:
-    - "lightgbm==4.3.0"
-    - "numpy==1.26.4"
-    upgrade: true
+  - type: "docker"
+    run:
+    - "apt install git && \\\ngit clone https://github.com/cantinilab/scPRINT   &&\
+      \ \\\ngit clone https://github.com/jkobject/scDataLoader   && \\\ngit clone\
+      \ https://github.com/cantinilab/GRnnData   && \\\ngit clone https://github.com/jkobject/benGRN\
+      \    && \\\npip install -e scPRINT[dev]   && \\\npip install -e scDataLoader[dev]\
+      \   && \\\npip install -e GRnnData[dev]   && \\\npip install -e benGRN[dev]\
+      \  \n"
   entrypoint: []
   cmd: null
+- type: "native"
+  id: "native"
 build_info:
-  config: "src/metrics/regression_1/config.vsh.yaml"
-  runner: "executable"
-  engine: "docker"
-  output: "target/executable/metrics/regression_1"
-  executable: "target/executable/metrics/regression_1/regression_1"
+  config: "src/methods/single_omics/scprint/config.vsh.yaml"
+  runner: "nextflow"
+  engine: "docker|native"
+  output: "target/nextflow/grn_methods/scprint"
+  executable: "target/nextflow/grn_methods/scprint/main.nf"
   viash_version: "0.9.1"
   git_commit: "12601c7b697ec0dd4536506955f4f68832c3b59a"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"

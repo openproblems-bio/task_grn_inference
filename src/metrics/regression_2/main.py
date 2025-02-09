@@ -20,10 +20,9 @@ N_POINTS_TO_ESTIMATE_BACKGROUND = 20
 def net_to_matrix(net, gene_names: np.ndarray, par: Dict[str, Any]) -> np.ndarray:
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
     if 'cell_type' in net.columns:
-        # verbose_print(par['verbose'], 'Taking mean of cell type specific grns', 3)
-        # net.drop(columns=['cell_type'], inplace=True)
-        # net = net.groupby(['source', 'target']).mean().reset_index()
-        raise ValueError('Fix this')
+        verbose_print(par['verbose'], 'Taking mean of cell type specific grns', 3)
+        net.drop(columns=['cell_type'], inplace=True)
+        net = net.groupby(['source', 'target']).mean().reset_index()
     if par['apply_skeleton']: #apply skeleton
         print('Before filtering with skeleton:', net.shape)
         skeleton = pd.read_csv(par['skeleton'])
@@ -298,8 +297,10 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     # Load consensus numbers of putative regulators
     with open(par['regulators_consensus'], 'r') as f:
         data = json.load(f)
+    
+    # - make present genes consistent across all data
+    # gene_names = np.intersect1d(gene_names, np.asarray(list(data.keys()), dtype=object))
 
-    gene_names_ = np.asarray(list(data.keys()), dtype=object)
 
     n_features_theta_min = np.asarray([data[gene_name]['0'] for gene_name in gene_names], dtype=int)
     n_features_theta_median = np.asarray([data[gene_name]['0.5'] for gene_name in gene_names], dtype=int)

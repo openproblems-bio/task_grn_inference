@@ -140,8 +140,13 @@ def run_grn_inference(par, dataset='op', subsample=None):
             mem = "250GB"
             time = "24:00:00"
         elif method in ["scprint"]:
-            mem = "250GB"
-            time = "24:00:00"
+            if dataset == 'replogle':
+                mem = "500GB"
+                time = "24:00:00"
+            else:
+                mem = "120GB"
+                time = "24:00:00"
+
         # Prepare sbatch command
         tag = f"--job-name={method}"  # No spaces around '='
         resources = (f"--cpus-per-task={par['num_workers']} "
@@ -151,7 +156,7 @@ def run_grn_inference(par, dataset='op', subsample=None):
         full_tag = [tag] + resources.split()
         
         # Add GPU partition if method is 'scglue'
-        if method == 'scglue':
+        if method in ['scglue', 'scprint']:
             full_tag += ["--partition=gpu", "--gres=gpu:1"]
 
         try:

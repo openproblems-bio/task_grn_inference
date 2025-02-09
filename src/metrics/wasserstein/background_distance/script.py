@@ -7,15 +7,13 @@ import numpy as np
 
 from multiprocessing import Pool
 
-
-
 # - create background dist. 
 par = {
     'evaluation_data_sc': f'resources/grn_benchmark/evaluation_data//replogle_sc.h5ad',
     'background_distance': 'resources/grn_benchmark/prior/ws_distance_background_replogle.csv',
     'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
     'layer': 'X_norm',
-    'max_workers': 100
+    'max_workers': 20
 }
 
 

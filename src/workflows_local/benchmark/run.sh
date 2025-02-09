@@ -15,7 +15,7 @@ set -e
 source ~/miniconda3/bin/activate scprint
 
 DATASETS=(
-    "replogle"
+    "op norman replogle"
 )
 # METHODS=(
 #     "scprint"  "positive_control pearson_corr portia ppcor grnboost2 scenic "
@@ -29,20 +29,20 @@ METHODS=(
 SAVE_SCORES_FILE="resources/scores/scores_scprint.csv"
 # - whether to force re-run the inference if the files exists
 FORCE=true
-SBATCH=true
+SBATCH=false
 # - whether to run the consensus for reg2 (only run when to update the consensus)
 RUN_CONSENSUS_FLAG=False
 
 # ----- run methods -----
-cmd="python src/workflows_local/benchmark/methods/script.py 
-        --datasets ${DATASETS[@]} 
-        --methods ${METHODS[@]}"
+# cmd="python src/workflows_local/benchmark/methods/script.py 
+#         --datasets ${DATASETS[@]} 
+#         --methods ${METHODS[@]}"
 
-[ "$FORCE" = true ] && cmd="${cmd} --force"
-[ "$SBATCH" = true ] && cmd="${cmd} --sbatch"
+# [ "$FORCE" = true ] && cmd="${cmd} --force"
+# [ "$SBATCH" = true ] && cmd="${cmd} --sbatch"
 
-echo "Running: $cmd"
-$cmd
+# echo "Running: $cmd"
+# $cmd
 
 if [ "$SBATCH" = false ]; then
     # ----- run metrics -----
