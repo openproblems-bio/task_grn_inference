@@ -456,9 +456,9 @@ pip install -e GRnnData[dev]   && \
 pip install -e benGRN[dev]  
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-02-09T19:54:52Z"
+LABEL org.opencontainers.image.created="2025-02-09T22:15:09Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="fc0e8356d0acaa80e10f361a84805969635baf48"
+LABEL org.opencontainers.image.revision="fb3f2d44ec865e17a180160dc53034179968b61f"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -631,6 +631,18 @@ function ViashHelp {
   echo "    --max_cells"
   echo "        type: integer"
   echo "        default: 1000"
+  echo ""
+  echo "    --populate_ontology"
+  echo "        type: boolean"
+  echo "        default: true"
+  echo ""
+  echo "    --download_checkpoint"
+  echo "        type: boolean"
+  echo "        default: true"
+  echo ""
+  echo "    --model"
+  echo "        type: string"
+  echo "        default: medium"
   echo ""
   echo "Viash built in Computational Requirements:"
   echo "    ---cpus=INT"
@@ -823,6 +835,39 @@ while [[ $# -gt 0 ]]; do
         --max_cells=*)
             [ -n "$VIASH_PAR_MAX_CELLS" ] && ViashError Bad arguments for option \'--max_cells=*\': \'$VIASH_PAR_MAX_CELLS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_MAX_CELLS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --populate_ontology)
+            [ -n "$VIASH_PAR_POPULATE_ONTOLOGY" ] && ViashError Bad arguments for option \'--populate_ontology\': \'$VIASH_PAR_POPULATE_ONTOLOGY\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_POPULATE_ONTOLOGY="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --populate_ontology. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --populate_ontology=*)
+            [ -n "$VIASH_PAR_POPULATE_ONTOLOGY" ] && ViashError Bad arguments for option \'--populate_ontology=*\': \'$VIASH_PAR_POPULATE_ONTOLOGY\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_POPULATE_ONTOLOGY=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --download_checkpoint)
+            [ -n "$VIASH_PAR_DOWNLOAD_CHECKPOINT" ] && ViashError Bad arguments for option \'--download_checkpoint\': \'$VIASH_PAR_DOWNLOAD_CHECKPOINT\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_DOWNLOAD_CHECKPOINT="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --download_checkpoint. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --download_checkpoint=*)
+            [ -n "$VIASH_PAR_DOWNLOAD_CHECKPOINT" ] && ViashError Bad arguments for option \'--download_checkpoint=*\': \'$VIASH_PAR_DOWNLOAD_CHECKPOINT\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_DOWNLOAD_CHECKPOINT=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --model)
+            [ -n "$VIASH_PAR_MODEL" ] && ViashError Bad arguments for option \'--model\': \'$VIASH_PAR_MODEL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MODEL="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --model. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --model=*)
+            [ -n "$VIASH_PAR_MODEL" ] && ViashError Bad arguments for option \'--model=*\': \'$VIASH_PAR_MODEL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_MODEL=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---engine)
@@ -1057,6 +1102,15 @@ fi
 if [ -z ${VIASH_PAR_MAX_CELLS+x} ]; then
   VIASH_PAR_MAX_CELLS="1000"
 fi
+if [ -z ${VIASH_PAR_POPULATE_ONTOLOGY+x} ]; then
+  VIASH_PAR_POPULATE_ONTOLOGY="true"
+fi
+if [ -z ${VIASH_PAR_DOWNLOAD_CHECKPOINT+x} ]; then
+  VIASH_PAR_DOWNLOAD_CHECKPOINT="true"
+fi
+if [ -z ${VIASH_PAR_MODEL+x} ]; then
+  VIASH_PAR_MODEL="medium"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_RNA" ] && [ ! -e "$VIASH_PAR_RNA" ]; then
@@ -1100,6 +1154,18 @@ fi
 if [[ -n "$VIASH_PAR_MAX_CELLS" ]]; then
   if ! [[ "$VIASH_PAR_MAX_CELLS" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--max_cells' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_POPULATE_ONTOLOGY" ]]; then
+  if ! [[ "$VIASH_PAR_POPULATE_ONTOLOGY" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--populate_ontology' has to be a boolean. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_DOWNLOAD_CHECKPOINT" ]]; then
+  if ! [[ "$VIASH_PAR_DOWNLOAD_CHECKPOINT" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--download_checkpoint' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1321,7 +1387,10 @@ par = {
   'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'filtration': $( if [ ! -z ${VIASH_PAR_FILTRATION+x} ]; then echo "r'${VIASH_PAR_FILTRATION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'num_genes': $( if [ ! -z ${VIASH_PAR_NUM_GENES+x} ]; then echo "int(r'${VIASH_PAR_NUM_GENES//\'/\'\"\'\"r\'}')"; else echo None; fi ),
-  'max_cells': $( if [ ! -z ${VIASH_PAR_MAX_CELLS+x} ]; then echo "int(r'${VIASH_PAR_MAX_CELLS//\'/\'\"\'\"r\'}')"; else echo None; fi )
+  'max_cells': $( if [ ! -z ${VIASH_PAR_MAX_CELLS+x} ]; then echo "int(r'${VIASH_PAR_MAX_CELLS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'populate_ontology': $( if [ ! -z ${VIASH_PAR_POPULATE_ONTOLOGY+x} ]; then echo "r'${VIASH_PAR_POPULATE_ONTOLOGY//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
+  'download_checkpoint': $( if [ ! -z ${VIASH_PAR_DOWNLOAD_CHECKPOINT+x} ]; then echo "r'${VIASH_PAR_DOWNLOAD_CHECKPOINT//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
+  'model': $( if [ ! -z ${VIASH_PAR_MODEL+x} ]; then echo "r'${VIASH_PAR_MODEL//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),

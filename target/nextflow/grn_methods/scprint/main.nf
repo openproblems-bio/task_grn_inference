@@ -3279,6 +3279,39 @@ meta = [
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
+        },
+        {
+          "type" : "boolean",
+          "name" : "--populate_ontology",
+          "default" : [
+            true
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "boolean",
+          "name" : "--download_checkpoint",
+          "default" : [
+            true
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "string",
+          "name" : "--model",
+          "default" : [
+            "medium"
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
         }
       ]
     }
@@ -3405,7 +3438,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scprint",
     "viash_version" : "0.9.1",
-    "git_commit" : "fc0e8356d0acaa80e10f361a84805969635baf48",
+    "git_commit" : "fb3f2d44ec865e17a180160dc53034179968b61f",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3556,7 +3589,10 @@ par = {
   'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'filtration': $( if [ ! -z ${VIASH_PAR_FILTRATION+x} ]; then echo "r'${VIASH_PAR_FILTRATION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'num_genes': $( if [ ! -z ${VIASH_PAR_NUM_GENES+x} ]; then echo "int(r'${VIASH_PAR_NUM_GENES//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'max_cells': $( if [ ! -z ${VIASH_PAR_MAX_CELLS+x} ]; then echo "int(r'${VIASH_PAR_MAX_CELLS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi )
+  'max_cells': $( if [ ! -z ${VIASH_PAR_MAX_CELLS+x} ]; then echo "int(r'${VIASH_PAR_MAX_CELLS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
+  'populate_ontology': $( if [ ! -z ${VIASH_PAR_POPULATE_ONTOLOGY+x} ]; then echo "r'${VIASH_PAR_POPULATE_ONTOLOGY//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'download_checkpoint': $( if [ ! -z ${VIASH_PAR_DOWNLOAD_CHECKPOINT+x} ]; then echo "r'${VIASH_PAR_DOWNLOAD_CHECKPOINT//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
+  'model': $( if [ ! -z ${VIASH_PAR_MODEL+x} ]; then echo "r'${VIASH_PAR_MODEL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
