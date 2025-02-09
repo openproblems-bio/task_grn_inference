@@ -3398,7 +3398,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.9.1",
-    "git_commit" : "83dfc07f96d4e6bbf87f5bb61261ed4a7a911623",
+    "git_commit" : "f9662153c1c4c8ba846fdb8748a1b2534ad9b69a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3624,7 +3624,7 @@ net\\$weight <- as.character(net\\$weight)
 output <- AnnData(
   X = matrix(nrow = 0, ncol = 0),
   uns = list(
-    method_id = par\\$method_id,
+    method_id = "ppcor",
     dataset_id = par\\$dataset_id,
     prediction = net[, c("source", "target", "weight")]
   )

@@ -181,6 +181,7 @@ def run_evaluation(dataset, binarize=False, max_n_links=50000, apply_skeleton=Fa
         
   # - actual runs 
   i = 0
+  assert len(grn_files_dict) > 0, 'No models to run'
   for model, grn_file in grn_files_dict.items():
     par['prediction'] = grn_file
     par['method_id'] = model

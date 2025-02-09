@@ -445,9 +445,9 @@ function ViashDockerfile {
     cat << 'VIASHDOCKER'
 FROM ghcr.io/openproblems-bio/base_python:1.0.4
 LABEL org.opencontainers.image.description="Companion container for running component multiomics multiome_matrix"
-LABEL org.opencontainers.image.created="2025-02-07T19:43:02Z"
+LABEL org.opencontainers.image.created="2025-02-09T08:32:23Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="83dfc07f96d4e6bbf87f5bb61261ed4a7a911623"
+LABEL org.opencontainers.image.revision="f9662153c1c4c8ba846fdb8748a1b2534ad9b69a"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

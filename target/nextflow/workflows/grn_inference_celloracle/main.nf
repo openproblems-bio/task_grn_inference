@@ -3372,7 +3372,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/grn_inference_celloracle",
     "viash_version" : "0.9.1",
-    "git_commit" : "83dfc07f96d4e6bbf87f5bb61261ed4a7a911623",
+    "git_commit" : "f9662153c1c4c8ba846fdb8748a1b2534ad9b69a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

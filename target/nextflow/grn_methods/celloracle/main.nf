@@ -3396,7 +3396,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/celloracle",
     "viash_version" : "0.9.1",
-    "git_commit" : "83dfc07f96d4e6bbf87f5bb61261ed4a7a911623",
+    "git_commit" : "f9662153c1c4c8ba846fdb8748a1b2534ad9b69a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3593,7 +3593,7 @@ net = main(par)
 
 print('Write output to file', flush=True)
 net['weight'] = net['weight'].astype(str)
-output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+output = ad.AnnData(X=None, uns={"method_id": 'celloracle', "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
 output.write(par['prediction'])
 VIASHMAIN
 python -B "$tempscript"

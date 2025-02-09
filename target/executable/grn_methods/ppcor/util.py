@@ -4,7 +4,8 @@ import numpy as np
 from tqdm import tqdm
 from sklearn.preprocessing import StandardScaler
 import scipy.sparse as sp
-import matplotlib.pyplot as plt
+
+
 
 colors_blind = [
     '#E69F00',  # Orange
@@ -81,32 +82,35 @@ def process_links(net, par):
         net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
     return net
 
-    
-
-def corr_net(X, gene_names, par):
-    print('calculate correlation')
+def corr_net(par: dict) -> pd.DataFrame:
+    # - read data
+    adata = ad.read_h5ad(par["rna"])
+    tf_all = np.loadtxt(par['tf_all'], dtype=str)
+    if 'X_norm' in adata.layers.keys():
+        X = adata.layers['X_norm']
+    else:
+        X = adata.X
+    # - remove genes with 0 standard deviation
+    gene_std = np.std(X, axis=0)
+    nonzero_std_genes = gene_std > 0
+    X = X[:, nonzero_std_genes]
+    gene_names = adata[:, nonzero_std_genes].var_names.to_numpy()
+    # - calculate correlation
     if hasattr(X, 'todense'):
         net = np.corrcoef(X.todense().T)
     else:
-        net = np.corrcoef(X.T)
-    print('process corr results')
-    
-    tf_all = np.loadtxt(par['tf_all'], dtype=str)
-    tf_all = np.intersect1d(tf_all, gene_names)
-
-    # # Convert to a DataFrame with gene names as both row and column indices
-    net = pd.DataFrame(net, index=gene_names, columns=gene_names)
-    
-    net = net.values
-
+        net = np.corrcoef(X.T)    
+    # - melt the matrix
+    net = pd.DataFrame(net, index=gene_names, columns=gene_names).values
     net = efficient_melting(net, gene_names)
-
-    print('TF subsetting')
+    # - subset to known TFs
+    tf_all = np.intersect1d(tf_all, gene_names)
     net = net[net.source.isin(tf_all)]
-    
+    # - process links: size control
     net = process_links(net, par)
-    print('Corr results are ready')
+  
     return net
+
 
 def plot_heatmap(scores, ax=None, name='', fmt='0.02f', cmap="viridis"):
     import matplotlib.pyplot as plt
@@ -214,3 +218,31 @@ def sum_by(adata: ad.AnnData, col: str, unique_mapping: bool=True) -> ad.AnnData
     sum_adata.obs.index = sum_adata.obs.index.astype('str')
 
     return sum_adata
+
+
+def fetch_gene_info():
+
+    from pybiomart import Server
+    # Connect to Ensembl server
+    server = Server(host='http://www.ensembl.org')
+
+    # Select the dataset for human genes
+    dataset = server.marts['ENSEMBL_MART_ENSEMBL'].datasets['hsapiens_gene_ensembl']
+
+    # Query relevant attributes
+    df = dataset.query(
+        attributes=[
+            'ensembl_gene_id',        # Ensembl Gene ID
+            'external_gene_name',     # Gene Name
+            'chromosome_name',        # Chromosome
+            'start_position',         # Start site
+            'end_position'            # End site
+        ]
+    )
+    df.columns = ['gene_id', 'gene_name', 'chr', 'start', 'end']
+    # df = df[df['chr'].isin(['X', 'Y']+list(map(str, range(1, 23))))]
+    # - keep those genes with one mapping
+    df = df.groupby('gene_name').filter(lambda x: len(x) == 1)
+    df.set_index('gene_name', inplace=True)
+
+    return df

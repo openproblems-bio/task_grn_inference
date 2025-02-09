@@ -3400,7 +3400,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/portia",
     "viash_version" : "0.9.1",
-    "git_commit" : "83dfc07f96d4e6bbf87f5bb61261ed4a7a911623",
+    "git_commit" : "f9662153c1c4c8ba846fdb8748a1b2534ad9b69a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3508,7 +3508,6 @@ def innerWorkflowFactory(args) {
 tempscript=".viash_script.sh"
 cat > "$tempscript" << VIASHMAIN
 import os
-
 import anndata
 import numpy as np
 import pandas as pd
@@ -3516,6 +3515,8 @@ import scipy.sparse
 import portia as pt
 from tqdm import tqdm
 import anndata as ad
+import sys
+import argparse
 
 
 ## VIASH START
@@ -3558,33 +3559,25 @@ dep = {
 
 ## VIASH END
 
-import sys
-
-
-import argparse
+## LOCAL START
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
 parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
+parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
 parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
-
+parser.add_argument('--dataset_id', type=str, help='Dataset id')
+parser.add_argument('--normalize', action='store_true')
 args = parser.parse_args()
 
-if args.rna:
-    par['rna'] = args.rna
+par_local = vars(args)
 
-if args.prediction:
-    par['prediction'] = args.prediction
-if args.tf_all:
-    par['tf_all'] = args.tf_all
-if args.num_workers:
-    par['num_workers'] = args.num_workers
-if args.max_n_links:
-    par['max_n_links'] = int(args.max_n_links)
+for key, value in par_local.items():
+    if value is not None:
+        par[key] = value
 
-os.makedirs(par['temp_dir'], exist_ok=True)
-import sys
+## LOCAL END
 
 try:
     sys.path.append(meta["resources_dir"])
@@ -3636,7 +3629,7 @@ if __name__ == '__main__':
 
     print('Output GRN')
     net['weight'] = net['weight'].astype(str)
-    output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+    output = ad.AnnData(X=None, uns={"method_id": 'portia', "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])
 VIASHMAIN
 python -B "$tempscript"

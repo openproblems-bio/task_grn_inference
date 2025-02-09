@@ -15,7 +15,7 @@ par = {
     'background_distance': 'resources/grn_benchmark/prior/ws_distance_background_replogle.csv',
     'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
     'layer': 'X_norm',
-    'max_workers': 20
+    'max_workers': 100
 }
 
 

@@ -16,6 +16,7 @@ meta = {
 sys.path.append(meta["resources_dir"])
 
 from util import sum_by
+from util import fetch_gene_info
 
 def psedudobulk_fun(adata: ad.AnnData) -> ad.AnnData:
     metadata = (
@@ -52,7 +53,15 @@ def process_dataset(file_name):
     else:
         adata.var = adata.var[[]]
     adata.obs = adata.obs[['perturbation', 'is_control', 'perturbation_type']]
-
+    
+    # if dataset == 'norman':
+    #     # - add gene info
+    #     df_map = fetch_gene_info()
+    #     print(adata.shape, flush=True)
+    #     adata.var = adata.var.merge(df_map, how='left', left_index=True, right_index=True)
+    #     mask_na = adata.var['gene_id'].isna()
+    #     adata = adata[:, ~mask_na]
+    #     print(adata.shape, flush=True)
     # - data split 
     if file_name == 'replogle':
         ctr_samples = adata.obs.is_control
@@ -84,7 +93,6 @@ def process_dataset(file_name):
 
     adata_test = adata_bulked[adata_bulked.obs['is_test']] # we use bulked data for test 
 
-
     # - duplicated gene names
     duplicates = adata_train.var_names[adata_train.var_names.duplicated()].unique()
     adata_train = adata_train[:, ~adata_train.var_names.isin(duplicates)]
@@ -97,10 +105,12 @@ def process_dataset(file_name):
     adata_train = adata_train.copy()  # Ensure it's a full AnnData object
     adata = adata.copy()  # Ensure it's a full AnnData object
 
+    print(adata_train)
     adata_train.layers['X_norm'] = adata_train.X.copy()
     adata_test.layers['X_norm'] = adata_test.X.copy()
     adata.layers['X_norm'] = adata.X.copy()
 
+   
     if file_name in ['norman', 'adamson']:
         adata.write(f'resources/grn_benchmark/evaluation_data/{file_name}_sc.h5ad')
 
@@ -116,7 +126,7 @@ def main(par):
 if __name__ == '__main__':
     
     par = {
-        'datasets': ['norman', 'adamson', 'nakatake']
+        'datasets': ['norman', 'adamson', 'nakatake'] #'norman'
     }
     
 

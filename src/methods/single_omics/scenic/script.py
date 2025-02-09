@@ -8,7 +8,7 @@ import requests
 import scipy.sparse as sp
 import sys
 import anndata as ad
-
+import argparse
 
 
 # wget https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/refseq_r80/mc_v10_clust/gene_based/hg38_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather
@@ -31,32 +31,31 @@ par = {
   'normalize': False
 }
 ## VIASH END
-import argparse
+## LOCAL START
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
 parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
+parser.add_argument('--dataset_id', type=str, help='Dataset id')
+parser.add_argument('--normalize', action='store_true')
 args = parser.parse_args()
 
-if args.rna:
-    par['rna'] = args.rna
-if args.prediction:
-    par['prediction'] = args.prediction
-if args.tf_all:
-    par['tf_all'] = args.tf_all
-if args.num_workers:
-    par['num_workers'] = args.num_workers
-    
-if args.resources_dir:
-    meta = {'resources_dir': args.resources_dir} 
+par_local = vars(args)
+
+for key, value in par_local.items():
+    if value is not None:
+        par[key] = value
+
+## LOCAL END
 
 try:
     sys.path.append(meta["resources_dir"])
 except:
-    meta= {
-    "resources_dir": 'src/utils/'
+    meta = {
+    'resources_dir': 'src/utils'
     }
     sys.path.append(meta["resources_dir"])
 from util import process_links
@@ -156,7 +155,7 @@ if __name__=='__main__':
   os.makedirs(par['temp_dir'], exist_ok=True)
 
   net['weight'] = net['weight'].astype(str)
-  output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+  output = ad.AnnData(X=None, uns={"method_id": "scenic", "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
   output.write(par['prediction'])
 
 

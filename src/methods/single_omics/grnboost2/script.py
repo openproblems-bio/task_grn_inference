@@ -5,6 +5,7 @@ from distributed import Client, LocalCluster
 from tqdm import tqdm
 import sys
 import anndata as ad
+import argparse
 
 ## VIASH START
 par = {
@@ -17,9 +18,33 @@ par = {
   'qc': False
 }
 ## VIASH END
-if False:
-    pass # This block is just a placeholder for the local runs
-else:
+
+## LOCAL START
+parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
+parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--prediction', type=str, help='Path to the prediction file')
+parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
+parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
+parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
+parser.add_argument('--dataset_id', type=str, help='Dataset id')
+parser.add_argument('--normalize', action='store_true')
+args = parser.parse_args()
+
+par_local = vars(args)
+
+for key, value in par_local.items():
+    if value is not None:
+        par[key] = value
+
+## LOCAL END
+
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta = {
+    'resources_dir': 'src/utils'
+    }
     sys.path.append(meta["resources_dir"])
 
 from util import process_links, basic_qc
@@ -61,5 +86,5 @@ if __name__ == '__main__':
     print('Output GRN')
     # convert the predictions to the benchmark format
     net = net.astype(str)
-    output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+    output = ad.AnnData(X=None, uns={"method_id": 'grnboost2', "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])

@@ -33,11 +33,11 @@ par = {
     'prediction': 'output/grn.h5ad',
     'filtration': 'top-k',
     'max_n_links': 50_000,
-    'num_genes': 10000,
+    'num_genes': 5000,
     'max_cells': 1000,
-    'num_workers': 8,
+    'num_workers': 20,
     'model': 'medium',
-    'download_checkpoint': True,
+    'download_checkpoint': False,
     'populate_ontology': False,
     'temp_dir': 'output/scprint/',
     'method_id': 'scprint',
@@ -132,12 +132,15 @@ def main(par):
 
     # adata.obs["cell_type_ontology_term_id"] = adata.obs["cell_type"].apply(lambda name: cell_type_to_ontology.get(name, name))
     print(adata.X.data)
-    preprocessor = Preprocessor(do_postp=False, is_symbol=True, skip_validate=True, force_preprocess=False, use_raw=False)
+    preprocessor = Preprocessor(do_postp=False, is_symbol=True, skip_validate=True, 
+                                force_preprocess=False, use_raw=False, min_valid_genes_id=2000)
     adata = preprocessor(adata)
 
     model = scPrint.load_from_checkpoint(par['checkpoint'], 
     precpt_gene_emb = None)
 
+    if 'cell_type' not in adata.obs:
+        adata.obs['cell_type'] = 'dummy_cell_type'
     for i, cell_type in enumerate(adata.obs["cell_type"].unique()):
         print(cell_type)
         adata_cell_type = adata[adata.obs["cell_type"] == cell_type].copy()
@@ -175,6 +178,7 @@ if __name__ == '__main__':
     net = main(par)
 
     print(f"Writing results to {par['prediction']}")
-    net['weight'] = net['weight'].astype(str)
-    output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+    net = net.astype(str)
+    print(net.head())
+    output = ad.AnnData(X=None, uns={"method_id": "scprint", "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])
