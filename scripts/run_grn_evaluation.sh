@@ -1,12 +1,13 @@
 #!/bin/bash
 
-RUN_ID="scores_workflow"
+RUN_ID="scores"
+dataset="op"
+
 echo $RUN_ID
 # resources_dir="s3://openproblems-data/resources/grn/"
 resources_dir="./resources/"
 publish_dir="${resources_dir}/results/${RUN_ID}"
 
-dataset="norman"
 grn_models_folder="${resources_dir}/grn_models/" #TODO: change this
 
 reg_type="ridge"
@@ -15,40 +16,26 @@ metric_ids="[regression_1, regression_2, ws_distance]"
 
 param_file="./params/${RUN_ID}.yaml"
 
-# grn_names=(
-#     "scglue"
-#     "scenicplus"
-#     "celloracle"
-#     "granie"
-#     "figr"
-#     "collectri"
-#     "genie3"
-#     "grnboost2"
-#     "ppcor"
-#     "portia"
-#     "positive_control"
-#     "pearson_causal"
-#     "pearson"
-#     )
-grn_names=(
-    # "scglue"
-    # "celloracle"
-
+grn_names_op=(
+    "scglue"
+    "scenicplus"
+    "celloracle"
+    "granie"
+    "figr"
+    "collectri"
     "grnboost2"
-    # "genie3"
-    # "ppcor"
-    # "scenic"
-    # "portia"
-    
-    # "negative_control"
-    # "positive_control"
-    # "pearson_causal"
+    "ppcor"
+    "portia"
+    "scenic"
+    "positive_control"
     "pearson_corr"
-
-    # "collectri"
+    "negative_control"
+    "scprint"
     )
+
 echo $grn_names
-# Start writing to the YAML file
+
+
 cat > $param_file << HERE
 param_list:
 HERE

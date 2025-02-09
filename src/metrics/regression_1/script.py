@@ -6,7 +6,6 @@ from sklearn.metrics import r2_score
 from sklearn.pipeline import Pipeline
 from sklearn.linear_model import Ridge
 from sklearn.preprocessing import StandardScaler
-import lightgbm
 import random 
 from concurrent.futures import ThreadPoolExecutor
 from tqdm import tqdm
@@ -15,7 +14,6 @@ import os
 import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning)
-
 
 ## VIASH START
 par = {
@@ -36,6 +34,7 @@ par = {
 }
 ## VIASH END
 
+## LOCAL START
 import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--run_local', action='store_true', help='Run locally')
@@ -49,19 +48,23 @@ args = parser.parse_args()
 
 
 var_local = vars(args)
+
 if args.run_local:
     for key in var_local:
         if var_local[key] is not None:
             par[key] = var_local[key]
+
+## LOCAL END
+try:
+    sys.path.append(meta["resources_dir"])
+except:
     meta = {
       "resources_dir":'src/metrics/regression_1/',
       "util_dir":'src/utils'
     }
     sys.path.append(meta["resources_dir"])
     sys.path.append(meta["util_dir"])
-
-else:
-  sys.path.append(meta["resources_dir"])
+  
 
 from util import verbose_print, process_links, verbose_tqdm, binarize_weight
 from helper import set_global_seed, process_net, cross_validation
@@ -73,7 +76,7 @@ def read_net(par):
     net['weight'] = net['weight'].astype(float)
     if par['binarize']:
       net['weight'] = net['weight'].apply(binarize_weight)  
-    if par['apply_skeleton']: #apply skeleton
+    if par['apply_skeleton']: 
         print('Before filtering with skeleton:', net.shape)
         skeleton = pd.read_csv(par['skeleton'])
         skeleton['link'] = skeleton['source'].astype(str) + '_' + skeleton['target'].astype(str)
