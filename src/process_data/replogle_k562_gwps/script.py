@@ -26,7 +26,7 @@ meta = {
 }
 sys.path.append(meta["resources_dir"])
 
-from util import sum_by
+from util import sum_by, fetch_gene_info
 
 
 def format_raw_data(adata: ad.AnnData) -> ad.AnnData:
@@ -42,6 +42,7 @@ def format_raw_data(adata: ad.AnnData) -> ad.AnnData:
     adata.var_names_make_unique()  
     adata.var['gene_id'] = adata.var['gene_id'].astype(str)
     adata.obs['is_control'] = adata.obs['perturbation']=='non-targeting'
+    
     return adata
 
 def split_data(adata: ad.AnnData):
@@ -130,6 +131,12 @@ def main(par):
     adata_train_bulk = normalize(adata_train_bulk)
     adata_train_bulk.write(par['adata_train_bulk'])
     adata_train_sc.write(par['adata_train_sc'])
+
+    print('adata_train_bulk: ', adata_train_bulk.shape)
+    print('pertrbations in adata_train_bulk: ', adata_train_bulk.obs['perturbation'].nunique())
+    print('adata_train_sc: ', adata_train_sc.shape)
+    print('pertrbations in adata_train_sc: ', adata_train_sc.obs['perturbation'].nunique())
+
 
     del adata_train_sc, adata_train_bulk
     gc.collect()

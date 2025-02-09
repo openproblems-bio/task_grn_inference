@@ -7,8 +7,6 @@ import numpy as np
 
 from multiprocessing import Pool
 
-
-
 # - create background dist. 
 par = {
     'evaluation_data_sc': f'resources/grn_benchmark/evaluation_data//replogle_sc.h5ad',

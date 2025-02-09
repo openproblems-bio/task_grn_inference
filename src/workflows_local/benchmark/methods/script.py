@@ -16,19 +16,27 @@ args = argparser.parse_args()
 par = vars(args)
 
 
+def exception_handler(par, method, dataset):
+    if (method == 'scprint') & (dataset == 'replogle'):
+        par['rna'] = f'resources/extended_data/replogle_train_sc.h5ad'
+    if (method == 'positive_control') & (dataset == 'op'):
+        par['rna'] = f'resources/grn_benchmark/evaluation_data/{dataset}_bulk.h5ad'
+    if (method == 'positive_control') & (dataset in ['replogle', 'norman', 'adamson', 'nakatake']):
+        par['rna'] = f'resources/extended_data/{dataset}_bulk.h5ad'
+    return par
+
 
 def run_grn_inference(par, dataset='op', subsample=None):
     par_local = {
         'models_dir': f'resources/grn_models/{dataset}/',
         'rna': f'resources/grn_benchmark/inference_data/{dataset}_rna.h5ad',
         'atac': f'resources/grn_benchmark/inference_data/{dataset}_atac.h5ad', 
-        'rna_positive_control': f'resources/datasets_raw/{dataset}.h5ad', 
+        'dataset_id': dataset,
         'num_workers': 10,
         'tmp_dir': 'output/grn_inference'
-        # 'max_n_links': 10000,
     }
     par.update(par_local)
-
+    
     os.makedirs(par['models_dir'], exist_ok=True)
     os.makedirs(par['tmp_dir'], exist_ok=True)
 
@@ -67,6 +75,7 @@ def run_grn_inference(par, dataset='op', subsample=None):
         
 
     for method in par['methods']:
+        par = exception_handler(par, method, dataset)
         print(method)
         if subsample is None:
             par['prediction'] = f"{par['models_dir']}/{method}.h5ad"
@@ -77,14 +86,12 @@ def run_grn_inference(par, dataset='op', subsample=None):
             continue
         
         # Method arguments
-        if method == 'positive_control':
-            method_args = (f"--rna {par['rna_positive_control']} ")
-        else:
-            method_args = (f"--rna {par['rna']} ")
 
-        method_args += (
+        method_args = (
+                        f"--rna {par['rna']} "
                         f"--prediction {par['prediction']} "
                         f"--num_workers {par['num_workers']} "
+                        f"--dataset_id {par['dataset_id']} "
                         #    f"--max_n_links {par['max_n_links']} "
                         )
         
@@ -133,8 +140,13 @@ def run_grn_inference(par, dataset='op', subsample=None):
             mem = "250GB"
             time = "24:00:00"
         elif method in ["scprint"]:
-            mem = "250GB"
-            time = "24:00:00"
+            if dataset == 'replogle':
+                mem = "500GB"
+                time = "24:00:00"
+            else:
+                mem = "120GB"
+                time = "24:00:00"
+
         # Prepare sbatch command
         tag = f"--job-name={method}"  # No spaces around '='
         resources = (f"--cpus-per-task={par['num_workers']} "
@@ -144,7 +156,7 @@ def run_grn_inference(par, dataset='op', subsample=None):
         full_tag = [tag] + resources.split()
         
         # Add GPU partition if method is 'scglue'
-        if method == 'scglue':
+        if method in ['scglue', 'scprint']:
             full_tag += ["--partition=gpu", "--gres=gpu:1"]
 
         try:

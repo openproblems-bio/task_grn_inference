@@ -9,6 +9,7 @@ import anndata as ad
 import pandas as pd
 import requests
 import torch
+import argparse
 
 
 import lamindb_setup as ln_setup
@@ -33,45 +34,47 @@ par = {
     'prediction': 'output/grn.h5ad',
     'filtration': 'top-k',
     'max_n_links': 50_000,
-    'num_genes': 10000,
+    'num_genes': 5000,
     'max_cells': 1000,
-    'num_workers': 8,
+    'num_workers': 20,
     'model': 'medium',
     'download_checkpoint': True,
-    'populate_ontology': False,
+    'populate_ontology': True,
     'temp_dir': 'output/scprint/',
     'method_id': 'scprint',
     'dataset_id': 'op'
 }
 ## VIASH END
-import argparse
+
+## LOCAL START
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
 parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
+parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=int, help='Number of cores')
-parser.add_argument('--max_n_links', type=str, help='Number of links')
-
+parser.add_argument('--max_n_links', type=int, help='Number of top links to retain')
+parser.add_argument('--dataset_id', type=str, help='Dataset id')
+parser.add_argument('--normalize', action='store_true')
 args = parser.parse_args()
 
-if args.max_n_links:
-    par['max_n_links'] = int(args.max_n_links)
-if args.rna:
-    par['rna'] = args.rna
-if args.prediction:
-    par['prediction'] = args.prediction
-if args.tf_all:
-    par['tf_all'] = args.tf_all
-if args.num_workers:
-    par['num_workers'] = args.num_workers
+par_local = vars(args)
 
-print(par)
-meta= {
-    "resources_dir": 'src/utils/'
-}
-sys.path.append(meta["resources_dir"])
+for key, value in par_local.items():
+    if value is not None:
+        par[key] = value
 
-from util import efficient_melting 
+## LOCAL END
+
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta = {
+    'resources_dir': 'src/utils'
+    }
+    sys.path.append(meta["resources_dir"])
+from util import process_links, efficient_melting
+
 
 def main_sub(adata, model, par):
     grn_inferer = GNInfer(
@@ -97,13 +100,13 @@ def main_sub(adata, model, par):
     gene_names = grn.var['gene_name'].values
     net = efficient_melting(net, gene_names)
     net = net[net['weight'] != 0]
-    net = net.sort_values(by='weight', ascending=False, key=abs)[:par['max_n_links']]
-    print(net.shape)
-    print(net.head())
     # - subset to TFs
     tfs = np.loadtxt(par["tf_all"], dtype=str)
     tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
     net = net[net['source'].isin(tf_names)]
+
+    net = net.sort_values(by='weight', ascending=False, key=abs)[:par['max_n_links']]
+    
     return net
 def main(par):
     adata = ad.read_h5ad(par['rna'])
@@ -132,12 +135,15 @@ def main(par):
 
     # adata.obs["cell_type_ontology_term_id"] = adata.obs["cell_type"].apply(lambda name: cell_type_to_ontology.get(name, name))
     print(adata.X.data)
-    preprocessor = Preprocessor(do_postp=False, is_symbol=True, skip_validate=True, force_preprocess=False, use_raw=False)
+    preprocessor = Preprocessor(do_postp=False, is_symbol=True, skip_validate=True, 
+                                force_preprocess=False, use_raw=False, min_valid_genes_id=2000)
     adata = preprocessor(adata)
 
     model = scPrint.load_from_checkpoint(par['checkpoint'], 
     precpt_gene_emb = None)
 
+    if 'cell_type' not in adata.obs:
+        adata.obs['cell_type'] = 'dummy_cell_type'
     for i, cell_type in enumerate(adata.obs["cell_type"].unique()):
         print(cell_type)
         adata_cell_type = adata[adata.obs["cell_type"] == cell_type].copy()
@@ -175,6 +181,6 @@ if __name__ == '__main__':
     net = main(par)
 
     print(f"Writing results to {par['prediction']}")
-    net['weight'] = net['weight'].astype(str)
-    output = ad.AnnData(X=None, uns={"method_id": par['method_id'], "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+    net = net.astype(str)
+    output = ad.AnnData(X=None, uns={"method_id": "scprint", "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight", "cell_type"]]})
     output.write(par['prediction'])
