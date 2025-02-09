@@ -21,6 +21,19 @@ arguments:
     type: integer
     direction: input
     default: 1000
+  - name: --populate_ontology
+    type: boolean
+    direction: input
+    default: true
+  - name: --download_checkpoint
+    type: boolean
+    direction: input
+    default: true
+  - name: --model
+    type: string
+    direction: input
+    default: 'medium'
+  
     
 resources:
   - type: python_script
