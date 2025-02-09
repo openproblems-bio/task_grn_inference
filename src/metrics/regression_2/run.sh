@@ -7,7 +7,7 @@
 
 python src/metrics/regression_2/script.py \
     --run_local \
-    --prediction resources/grn_models/op/grnboost2.h5ad \
+    --prediction resources/grn_models/op/scprint.h5ad \
     --dataset_id op \
     --method_id op \
     --evaluation_data resources/grn_benchmark/evaluation_data/op_bulk.h5ad \

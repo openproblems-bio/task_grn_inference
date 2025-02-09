@@ -3201,7 +3201,7 @@ meta = [
           ],
           "must_exist" : false,
           "create_parent" : true,
-          "required" : true,
+          "required" : false,
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
@@ -3214,7 +3214,7 @@ meta = [
           ],
           "must_exist" : false,
           "create_parent" : true,
-          "required" : true,
+          "required" : false,
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
@@ -3227,7 +3227,7 @@ meta = [
           ],
           "must_exist" : true,
           "create_parent" : true,
-          "required" : true,
+          "required" : false,
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
@@ -3386,7 +3386,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.1",
-    "git_commit" : "12601c7b697ec0dd4536506955f4f68832c3b59a",
+    "git_commit" : "fc0e8356d0acaa80e10f361a84805969635baf48",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

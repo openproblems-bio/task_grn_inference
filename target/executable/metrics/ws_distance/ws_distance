@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics ws_distance"
-LABEL org.opencontainers.image.created="2025-02-09T18:56:16Z"
+LABEL org.opencontainers.image.created="2025-02-09T19:54:52Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="12601c7b697ec0dd4536506955f4f68832c3b59a"
+LABEL org.opencontainers.image.revision="fc0e8356d0acaa80e10f361a84805969635baf48"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -621,15 +621,15 @@ function ViashHelp {
   echo "        default: false"
   echo ""
   echo "    --evaluation_data_sc"
-  echo "        type: file, required parameter, file must exist"
+  echo "        type: file, file must exist"
   echo "        example: resources_test/grn_benchmark/evaluation_data/norman_sc.h5ad"
   echo ""
   echo "    --ws_consensus"
-  echo "        type: file, required parameter"
+  echo "        type: file"
   echo "        example: resources_test/grn_benchmark/prior/ws_consensus_norman.csv"
   echo ""
   echo "    --ws_distance_background"
-  echo "        type: file, required parameter"
+  echo "        type: file"
   echo "        example:"
   echo "resources_test/grn_benchmark/prior/ws_distance_background_norman.csv"
   echo ""
@@ -1002,18 +1002,6 @@ if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
 fi
 if [ -z ${VIASH_PAR_SCORE+x} ]; then
   ViashError '--score' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_EVALUATION_DATA_SC+x} ]; then
-  ViashError '--evaluation_data_sc' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_WS_CONSENSUS+x} ]; then
-  ViashError '--ws_consensus' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then
-  ViashError '--ws_distance_background' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
 if [ -z ${VIASH_META_NAME+x} ]; then

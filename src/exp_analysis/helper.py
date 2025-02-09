@@ -132,7 +132,11 @@ def jaccard_similarity_net(nets_dict, col_name='link', figsize=(4, 4), title='ja
         jaccard_matrix[i, j] = jaccard_similarity
         jaccard_matrix[j, i] = jaccard_similarity
     # Fill diagonal with 1s (as similarity of a network with itself is 1)
-    np.fill_diagonal(jaccard_matrix, np.NaN)
+    try:
+        np.fill_diagonal(jaccard_matrix, np.NaN)
+    except:
+        np.fill_diagonal(jaccard_matrix, np.nan)
+
     # 4. Visualize the Jaccard matrix as a heatmap
     if ax is None:
         fig, ax = plt.subplots(1, 1, figsize=figsize)
