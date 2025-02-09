@@ -10,10 +10,12 @@ resources_dir="s3://openproblems-data/resources/grn"
 
 publish_dir="${resources_dir}/results/${RUN_ID}"
 grn_models_folder="${resources_dir}/grn_models/"
+grn_models_folder_local="./resources/grn_models/"
 
 reg_type="ridge"
 num_workers=10
 metric_ids="[regression_1, regression_2, ws_distance]"
+datasets="norman adamson"
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -76,9 +78,9 @@ HERE
 }
 
 # Iterate over datasets and GRN models
-for dataset in "norman" "adamson" "op" "nakatake" "replogle"; do
+for dataset in $datasets; do
   for grn_name in "${grn_names[@]}"; do
-    if [[ -f "${grn_models_folder}/${dataset}/${grn_name}.h5ad" ]]; then
+    if [[ -f "${grn_models_folder_local}/${dataset}/${grn_name}.h5ad" ]]; then
       append_entry "$grn_name" "$dataset"
     fi
   done
@@ -95,7 +97,7 @@ HERE
 tw launch https://github.com/openproblems-bio/task_grn_inference \
   --revision build/main \
   --pull-latest \
-  --main-script target/nextflow/workflows/run_benchmark/main.nf \
+  --main-script target/nextflow/workflows/run_grn_evaluation/main.nf \
   --workspace 53907369739130 \
   --compute-env 7gRyww9YNGb0c6BUBtLhDP \
   --params-file ${param_file} \
