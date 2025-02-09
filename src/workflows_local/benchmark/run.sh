@@ -12,7 +12,9 @@
 #SBATCH --mail-user=jalil.nourisa@gmail.com
 
 set -e
-source ~/miniconda3/bin/activate scprint
+# source ~/miniconda3/bin/activate scprint
+
+
 
 DATASETS=(
     "op norman replogle"
