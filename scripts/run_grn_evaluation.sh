@@ -90,15 +90,27 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
+aws s3 cp $param_file s3://openproblems-data/resources/grn/results/params/${RUN_ID}.yaml
+
 tw launch https://github.com/openproblems-bio/task_grn_inference \
   --revision build/main \
   --pull-latest \
   --main-script target/nextflow/workflows/run_grn_evaluation/main.nf \
   --workspace 53907369739130 \
   --compute-env 7gRyww9YNGb0c6BUBtLhDP \
-  --params-file ${param_file} \
+  --params-file s3://openproblems-data/resources/grn/results/params/${RUN_ID}.yaml \
   --config common/nextflow_helpers/labels_tw.config
 
+# tw launch https://github.com/openproblems-bio/task_grn_inference \
+#   --revision build/main \
+#   --pull-latest \
+#   --main-script target/nextflow/workflows/run_grn_evaluation/main.nf \
+#   --workspace 53907369739130 \
+#   --compute-env 7gRyww9YNGb0c6BUBtLhDP \
+#   --params-file ${param_file} \
+#   --config common/nextflow_helpers/labels_tw.config
+
+# viash ns build --parallel 
 # nextflow run . \
 #   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
 #   -profile docker \
