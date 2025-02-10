@@ -303,7 +303,7 @@ build_info:
   output: "target/nextflow/metrics/ws_distance"
   executable: "target/nextflow/metrics/ws_distance/main.nf"
   viash_version: "0.9.1"
-  git_commit: "9e3e9a9a72bad9b7ebce077e2ca86a88a08a8795"
+  git_commit: "ff31942906e9a510b9918d0a440c02556f1ea0d6"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
 package_config:
   name: "task_grn_inference"
