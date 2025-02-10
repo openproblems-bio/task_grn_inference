@@ -32,7 +32,7 @@ both single and multi-omics, 8 evalation metrics, and five datasets
 
 See our publication for the details of methods.
 
-llation
+## Installation
 
 You need to have Docker, Java, and Viash installed. Follow
 [these instructions](https://openproblems.bio/documentation/fundamentals/requirements)
@@ -56,7 +56,9 @@ To infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlat
 
 ```bash
 viash run src/control_methods/pearson_corr/config.vsh.yaml -- \
-            --rna resources/grn_benchmark/inference_data/norman_rna.h5ad --prediction output/net.h5ad
+            --rna resources/grn_benchmark/inference_data/norman_rna.h5ad \
+            --prediction output/net.h5ad \
+            --tf_all resources/grn_benchmark/prior/tf_all.csv
 ```
 
 ## Evaluate a GRN prediction
@@ -71,6 +73,7 @@ This outputs the scores into `output/test_run/scores.json`
 ## Add a method
 
 To add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.
+
 
 ## Authors & contributors
 
@@ -105,7 +108,7 @@ flowchart TB
   comp_metric_ws-->file_score_h5ad
   comp_metric-->file_score_h5ad
   file_evaluation_bulk_h5ad---comp_metric_regression
-  file_evaluation_sc_h5ad---comp_metric_ws
+  file_evaluation_sc_h5ad-.-comp_metric_ws
   file_rna_h5ad---comp_method
 ```
 
@@ -149,9 +152,9 @@ Arguments:
 | `--rna` | `file` | RNA expression data. |
 | `--atac` | `file` | (*Optional*) Chromatin accessibility data. |
 | `--prediction` | `file` | (*Optional, Output*) File indicating the inferred GRN. |
-| `--tf_all` | `file` | (*Optional*) NA. Default: `resources_test/grn_benchmark/prior/tf_all.csv`. |
+| `--tf_all` | `file` | NA. Default: `resources_test/grn_benchmark/prior/tf_all.csv`. |
 | `--max_n_links` | `integer` | (*Optional*) NA. Default: `50000`. |
-| `--num_workers` | `integer` | (*Optional*) NA. Default: `4`. |
+| `--num_workers` | `integer` | (*Optional*) NA. Default: `20`. |
 | `--temp_dir` | `string` | (*Optional*) NA. Default: `output/temdir`. |
 | `--seed` | `integer` | (*Optional*) NA. Default: `32`. |
 | `--dataset_id` | `string` | (*Optional*) NA. Default: `op`. |
@@ -203,7 +206,7 @@ Arguments:
 | `--max_n_links` | `integer` | (*Optional*) NA. Default: `50000`. |
 | `--verbose` | `integer` | (*Optional*) NA. Default: `2`. |
 | `--dataset_id` | `string` | (*Optional*) NA. Default: `op`. |
-| `--num_workers` | `integer` | (*Optional*) NA. Default: `4`. |
+| `--num_workers` | `integer` | (*Optional*) NA. Default: `20`. |
 | `--apply_tf` | `boolean` | (*Optional*) NA. Default: `TRUE`. |
 | `--apply_skeleton` | `boolean` | (*Optional*) NA. Default: `FALSE`. |
 | `--evaluation_data` | `file` | Perturbation dataset for benchmarking. |
@@ -230,10 +233,10 @@ Arguments:
 | `--max_n_links` | `integer` | (*Optional*) NA. Default: `50000`. |
 | `--verbose` | `integer` | (*Optional*) NA. Default: `2`. |
 | `--dataset_id` | `string` | (*Optional*) NA. Default: `op`. |
-| `--num_workers` | `integer` | (*Optional*) NA. Default: `4`. |
+| `--num_workers` | `integer` | (*Optional*) NA. Default: `20`. |
 | `--apply_tf` | `boolean` | (*Optional*) NA. Default: `TRUE`. |
 | `--apply_skeleton` | `boolean` | (*Optional*) NA. Default: `FALSE`. |
-| `--evaluation_data_sc` | `file` | Perturbation dataset for benchmarking (sinlge cell). |
+| `--evaluation_data_sc` | `file` | (*Optional*) Perturbation dataset for benchmarking (sinlge cell). |
 
 </div>
 
@@ -254,7 +257,7 @@ Arguments:
 | `--max_n_links` | `integer` | (*Optional*) NA. Default: `50000`. |
 | `--verbose` | `integer` | (*Optional*) NA. Default: `2`. |
 | `--dataset_id` | `string` | (*Optional*) NA. Default: `op`. |
-| `--num_workers` | `integer` | (*Optional*) NA. Default: `4`. |
+| `--num_workers` | `integer` | (*Optional*) NA. Default: `20`. |
 | `--apply_tf` | `boolean` | (*Optional*) NA. Default: `TRUE`. |
 | `--apply_skeleton` | `boolean` | (*Optional*) NA. Default: `FALSE`. |
 

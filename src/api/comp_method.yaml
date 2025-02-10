@@ -21,7 +21,7 @@ arguments:
     direction: output
   - name: --tf_all
     type: file
-    required: false
+    required: true
     direction: input
     example: resources_test/grn_benchmark/prior/tf_all.csv
     default: resources_test/grn_benchmark/prior/tf_all.csv
@@ -31,7 +31,7 @@ arguments:
   - name: --num_workers
     type: integer
     direction: input
-    default: 4
+    default: 20
   - name: --temp_dir
     type: string
     direction: input
