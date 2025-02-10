@@ -10,10 +10,10 @@ import numpy as np
 
 ## VIASH START
 par = {
-    'evaluation_data': 'resources/grn_benchmark/evaluation_data//op.h5ad',
-    'models_dir': 'resources/grn_models/op/',
-    'models': ['pearson_corr', 'pearson_causal', 'portia', 'ppcor', 'genie3', 'grnboost2', 'scenic', 'scglue', 'celloracle'],
-    'regulators_consensus': 'resources/grn_benchmark/prior/regulators_consensus_op.json'
+    'evaluation_data': 'resources/grn_benchmark/evaluation_data//replogle_bulk.h5ad',
+    'models_dir': 'resources/grn_models/replogle/',
+    'models': ['pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'scprint'],
+    'regulators_consensus': 'resources/grn_benchmark/prior/regulators_consensus_replogle.json'
 }
 ## VIASH END
 def main(par):
@@ -27,7 +27,7 @@ def main(par):
     # Load inferred GRNs
     grns = []
     for model in par['models']:
-        filepath = os.path.join(par['models_dir'], f'{model}.csv')
+        filepath = os.path.join(par['models_dir'], f'{model}.h5ad')
         if not os.path.exists(filepath):
             print(f"{filepath} didnt exist. Skipped.")
             continue 
@@ -35,9 +35,11 @@ def main(par):
             print(f"skipping collectri")
             continue
         A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
-        df = pd.read_csv(filepath)
+        net = ad.read_h5ad(filepath)
+        net = pd.DataFrame(net.uns['prediction'])
+        net['weight'] = net['weight'].astype(float)
 
-        for source, target, weight in zip(df['source'], df['target'], df['weight']):
+        for source, target, weight in zip(net['source'], net['target'], net['weight']):
             if (source not in gene_dict) or (target not in gene_dict):
                 continue
             i = gene_dict[source]
