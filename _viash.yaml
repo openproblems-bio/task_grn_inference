@@ -69,7 +69,7 @@ info:
       scripts/single_grn_evaluation.sh output/net.h5ad norman
       ```
 
-      This outputs the scores into `output/test_run/scores.json`
+      This outputs the scores into `output/test_run/scores.yaml`
 
       ## Add a method
 
