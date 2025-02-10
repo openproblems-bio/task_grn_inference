@@ -32,14 +32,14 @@ par = {
     'rna': 'resources/grn_benchmark/inference_data/op_rna.h5ad',
     'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
     'prediction': 'output/grn.h5ad',
-    'filtration': 'top-k',
+    'filtration': 'none', #'top-k',
     'max_n_links': 50_000,
     'num_genes': 5000,
     'max_cells': 1000,
     'num_workers': 20,
     'model': 'medium',
-    'download_checkpoint': True,
-    'populate_ontology': True,
+    'download_checkpoint': False,
+    'populate_ontology': False,
     'temp_dir': 'output/scprint/',
     'method_id': 'scprint',
     'dataset_id': 'op'
@@ -89,17 +89,23 @@ def main_sub(adata, model, par):
                         doplot=False,
                         batch_size=16,
                         precision="32-mixed",
-                        k=par['max_n_links'],
                         )
 
     grn = grn_inferer(model, adata)
 
-    net = grn.varp['GRN'].todense().A
+    net = grn.varp['GRN']
+    if hasattr(net, "todense"):  # Check if it's a sparse matrix
+        net = net.todense().A.T
+    else:  # Already a NumPy array
+        net = net.T
     
     # - melt to have the format of the benchmark
     gene_names = grn.var['gene_name'].values
     net = efficient_melting(net, gene_names)
     net = net[net['weight'] != 0]
+    assert ~net[['source', 'target', 'weight']].duplicated().any()
+    
+
     # - subset to TFs
     tfs = np.loadtxt(par["tf_all"], dtype=str)
     tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
@@ -134,9 +140,10 @@ def main(par):
     # }
 
     # adata.obs["cell_type_ontology_term_id"] = adata.obs["cell_type"].apply(lambda name: cell_type_to_ontology.get(name, name))
-    print(adata.X.data)
+    min_valid_genes = min(adata.X.shape[1]-1, 2000)
+    print(f'Min valid genes: {min_valid_genes} ')
     preprocessor = Preprocessor(do_postp=False, is_symbol=True, skip_validate=True, 
-                                force_preprocess=False, use_raw=False, min_valid_genes_id=2000)
+                                force_preprocess=False, use_raw=False, min_valid_genes_id=min_valid_genes, min_dataset_size=1024)
     adata = preprocessor(adata)
 
     model = scPrint.load_from_checkpoint(par['checkpoint'], 

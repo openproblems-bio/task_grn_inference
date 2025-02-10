@@ -52,6 +52,7 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
+
 nextflow run . \
   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
   -profile docker \

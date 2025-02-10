@@ -31,8 +31,8 @@ def verbose_tqdm(iterable, desc, level, verbose_level):
         return tqdm(iterable, desc=desc)
     else:
         return iterable  # Return the iterable without a progress bar
-def efficient_melting(net, gene_names):
-    '''to replace pandas melting'''
+def efficient_melting_symmetry(net, gene_names):
+    '''to replace pandas melting with symmetry assumption'''
     upper_triangle_indices = np.triu_indices_from(net, k=1)
 
     # Extract the source and target gene names based on the indices
@@ -49,6 +49,27 @@ def efficient_melting(net, gene_names):
     # print('convert to df')
     net = pd.DataFrame(data, columns=['source', 'target', 'weight'])
     return net
+
+
+def efficient_melting(net, gene_names):
+    '''to replace pandas melting '''
+    
+    # Get indices for all elements in the matrix (not just upper triangle)
+    row_indices, col_indices = np.triu_indices_from(net, k=0)  # k=0 ensures no exclusion of diagonal
+
+    # Extract the source and target gene names based on the indices
+    sources = np.array(gene_names)[row_indices]
+    targets = np.array(gene_names)[col_indices]
+
+    # Extract the corresponding correlation values
+    weights = net[row_indices, col_indices]
+
+    # Create a structured array
+    data = np.column_stack((sources, targets, weights))
+
+    # Convert to DataFrame
+    net_df = pd.DataFrame(data, columns=['source', 'target', 'weight'])
+    return net_df
 
 def basic_qc(adata, min_genes_per_cell = 200, max_genes_per_cell = 5000, min_cells_per_gene = 10):
     mt = adata.var_names.str.startswith('MT-')
@@ -75,6 +96,14 @@ def basic_qc(adata, min_genes_per_cell = 200, max_genes_per_cell = 5000, min_cel
     return adata_f
 
 def process_links(net, par):
+    # - check for symmetriy
+    flipped = net.rename(columns={'source': 'target', 'target': 'source'})
+    merged = net.merge(flipped, on=['source', 'target', 'weight'], how='outer', indicator=True)
+    asymmetric_links = merged[merged['_merge'] != 'both']
+    if not asymmetric_links.empty:
+        print("Warning: The network contains asymmetric links.")
+
+
     # - remove self loops
     net = net[net.source!=net.target]
     # - limit the number of links
