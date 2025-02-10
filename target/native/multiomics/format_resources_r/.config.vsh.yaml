@@ -162,7 +162,7 @@ build_info:
   output: "target/native/multiomics/format_resources_r"
   executable: "target/native/multiomics/format_resources_r/format_resources_r"
   viash_version: "0.9.1"
-  git_commit: "ff31942906e9a510b9918d0a440c02556f1ea0d6"
+  git_commit: "59e61e8f6ee32b6f68097ca4e56217b158a8e83a"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
 package_config:
   name: "task_grn_inference"
@@ -201,7 +201,7 @@ package_config:
       \ \\\n            --prediction output/net.h5ad \\\n            --tf_all resources/grn_benchmark/prior/tf_all.csv\n\
       ```\n\n## Evaluate a GRN prediction\nOnce got the prediction for a given dataset,\
       \ use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh\
-      \ output/net.h5ad norman\n```\n\nThis outputs the scores into `output/test_run/scores.json`\n\
+      \ output/net.h5ad norman\n```\n\nThis outputs the scores into `output/test_run/scores.yaml`\n\
       \n## Add a method\n\nTo add a method to the repository, follow the instructions\
       \ in the `scripts/add_a_method.sh` script.\n"
   repositories:

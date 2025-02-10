@@ -68,7 +68,7 @@ Once got the prediction for a given dataset, use the following code to obtain ev
 scripts/single_grn_evaluation.sh output/net.h5ad norman
 ```
 
-This outputs the scores into `output/test_run/scores.json`
+This outputs the scores into `output/test_run/scores.yaml`
 
 ## Add a method
 

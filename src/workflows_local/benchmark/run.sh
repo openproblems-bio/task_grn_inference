@@ -14,18 +14,19 @@
 set -e
 # source ~/miniconda3/bin/activate scprint
 
-
+RUN_GRN_INFERENCE=false
+RUN_GRN_EVALUATION=false
 
 DATASETS=(
     " op norman nakatake adamson replogle"
 )
-METHODS=(
-    "scglue scenicplus celloracle granie figr collectri grnboost2 ppcor portia scenic positive_control pearson_corr negative_control scprint"
-)
-
 # METHODS=(
-#     "scprint "
+#     "scglue scenicplus celloracle granie figr collectri grnboost2 ppcor portia scenic positive_control pearson_corr negative_control scprint"
 # )
+
+METHODS=(
+    "positive_control pearson_corr "
+)
 
 # - where to save the scores (all metrics, datasets, methods)
 SAVE_SCORES_FILE="resources/scores/scores_new.csv"
