@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_2"
-LABEL org.opencontainers.image.created="2025-02-09T22:44:09Z"
+LABEL org.opencontainers.image.created="2025-02-10T12:54:51Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="771a896bfa88cdfad501d1605fdf4f77d6ed92bd"
+LABEL org.opencontainers.image.revision="9e3e9a9a72bad9b7ebce077e2ca86a88a08a8795"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -610,7 +610,7 @@ function ViashHelp {
   echo ""
   echo "    --num_workers"
   echo "        type: integer"
-  echo "        default: 4"
+  echo "        default: 20"
   echo ""
   echo "    --apply_tf"
   echo "        type: boolean"
@@ -1085,7 +1085,7 @@ if [ -z ${VIASH_PAR_DATASET_ID+x} ]; then
   VIASH_PAR_DATASET_ID="op"
 fi
 if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
-  VIASH_PAR_NUM_WORKERS="4"
+  VIASH_PAR_NUM_WORKERS="20"
 fi
 if [ -z ${VIASH_PAR_APPLY_TF+x} ]; then
   VIASH_PAR_APPLY_TF="true"

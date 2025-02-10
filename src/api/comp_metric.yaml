@@ -40,7 +40,7 @@ arguments:
   - name: --num_workers
     type: integer
     direction: input
-    default: 4
+    default: 20
   - name: --apply_tf
     type: boolean 
     required: false

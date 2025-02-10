@@ -1,24 +1,6 @@
  
 #!/bin/bash
-
-RUN_ID="scores"
-
-echo "Run ID: $RUN_ID"
-
-# resources_dir="./resources/"
-resources_dir="s3://openproblems-data/resources/grn"
-
-publish_dir="${resources_dir}/results/${RUN_ID}"
-grn_models_folder="${resources_dir}/grn_models/"
-grn_models_folder_local="./resources/grn_models/"
-
-reg_type="ridge"
-num_workers=10
-metric_ids="[regression_1, regression_2, ws_distance]"
-datasets="norman adamson"
-
-param_file="./params/${RUN_ID}.yaml"
-
+datasets="nakatake norman op adamson replogle"
 grn_names=(
     "scglue"
     "scenicplus"
@@ -36,6 +18,23 @@ grn_names=(
     "scprint"
 )
 
+RUN_ID="scores"
+
+echo "Run ID: $RUN_ID"
+
+# resources_dir="./resources/"
+resources_dir="s3://openproblems-data/resources/grn"
+files_dir="${resources_dir}/grn_benchmark"
+
+publish_dir="${resources_dir}/results/${RUN_ID}"
+grn_models_folder="${resources_dir}/grn_models/"
+grn_models_folder_local="./resources/grn_models/"
+
+reg_type="ridge"
+num_workers=10
+metric_ids="[regression_1, regression_2, ws_distance]"
+
+param_file="./params/${RUN_ID}.yaml"
 
 
 # Print GRN names correctly
@@ -56,23 +55,20 @@ append_entry() {
   cat >> "$param_file" << HERE
   - id: ${reg_type}_${grn_name}_${dataset}
     metric_ids: ${metric_ids}
-    evaluation_data: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad
-    reg_type: $reg_type
+    evaluation_data: ${files_dir}/evaluation_data/${dataset}_bulk.h5ad
     method_id: $grn_name
     dataset_id: $dataset
-    num_workers: $num_workers
-    tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
-    regulators_consensus: ${resources_dir}/grn_benchmark/prior/regulators_consensus_${dataset}.json
+    tf_all: ${files_dir}/prior/tf_all.csv
+    regulators_consensus: ${files_dir}/prior/regulators_consensus_${dataset}.json
     prediction: ${grn_models_folder}/${dataset}/${grn_name}.h5ad
-    layer: "X_norm"
 HERE
 
   # Additional fields for specific datasets
-  if [[ "$dataset" == "norman" || "$dataset" == "adamson" ]]; then
+  if [[ "$dataset" == "norman" || "$dataset" == "adamson" || "$dataset" == "replogle" ]]; then
     cat >> "$param_file" << HERE
-    evaluation_data_sc: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_sc.h5ad
-    ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
-    ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv
+    evaluation_data_sc: ${files_dir}/evaluation_data/${dataset}_sc.h5ad
+    ws_consensus: ${files_dir}/prior/ws_consensus_${dataset}.csv
+    ws_distance_background: ${files_dir}/prior/ws_distance_background_${dataset}.csv
 HERE
   fi
 }

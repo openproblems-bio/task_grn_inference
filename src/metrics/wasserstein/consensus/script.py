@@ -6,11 +6,11 @@ import os
 
 # - determine consensus 
 par = {
-    'evaluation_data_sc': f'resources/datasets_raw/norman_sc_counts.h5ad',
-    'ws_consensus': 'resources/grn_benchmark/prior/consensus_ws_distance_norman.csv',
+    'evaluation_data_sc': f'resources/grn_benchmark/evaluation_data/replogle_bulk.h5ad',
+    'ws_consensus': 'resources/grn_benchmark/prior/ws_consensus_replogle.csv',
     'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
-    'models_dir': 'resources/grn_models/norman',
-    'models': ['pearson_corr', 'grnboost2','portia', 'ppcor','scenic']
+    'models_dir': 'resources/grn_models/replogle',
+    'models': ['pearson_corr', 'grnboost2', 'portia', 'ppcor', 'scenic', 'scprint']
 }
 def main(par):
 
@@ -21,12 +21,13 @@ def main(par):
     # - read all models
     grn_store = []
     for model in par['models']:
-        prediction_file = f"{par['models_dir']}/{model}.csv"
+        prediction_file = f"{par['models_dir']}/{model}.h5ad"
         if not os.path.exists(prediction_file):
             print(prediction_file, ' doesnt exists')
             continue
         else:
-            grn = pd.read_csv(prediction_file, index_col=0)
+            grn = ad.read_h5ad(prediction_file)
+            grn = pd.DataFrame(grn.uns['prediction'])
 
         grn['model'] = model
         grn_store.append(grn)
@@ -47,6 +48,7 @@ def main(par):
         consensus.append({'source':tf, 'theta':'ws-theta-1.0', 'value':int(np.quantile(row_nozero, 1))})
     consensus = pd.DataFrame(consensus)
     # - save 
+    print('saving the consensus to ', par['ws_consensus'])
     consensus.to_csv(par['ws_consensus'])
 
     return consensus

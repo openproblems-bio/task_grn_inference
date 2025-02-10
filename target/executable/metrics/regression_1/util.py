@@ -76,10 +76,9 @@ def basic_qc(adata, min_genes_per_cell = 200, max_genes_per_cell = 5000, min_cel
 
 def process_links(net, par):
     # - remove self loops
-    net = net[net.source!=net.target]
+    net = net[net['source'] != net['target']]
     # - limit the number of links
     if par['max_n_links'] != -1:
-        print(net)
         net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
         net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
     return net
@@ -92,25 +91,26 @@ def corr_net(par: dict) -> pd.DataFrame:
         X = adata.layers['X_norm']
     else:
         X = adata.X
+    if hasattr(X, 'todense'):
+        X = X.todense().A
+
     # - remove genes with 0 standard deviation
     gene_std = np.std(X, axis=0)
     nonzero_std_genes = gene_std > 0
     X = X[:, nonzero_std_genes]
     gene_names = adata[:, nonzero_std_genes].var_names.to_numpy()
     # - calculate correlation
-    if hasattr(X, 'todense'):
-        net = np.corrcoef(X.todense().T)
-    else:
-        net = np.corrcoef(X.T)    
+    net = np.corrcoef(X.T)
+  
     # - melt the matrix
     net = pd.DataFrame(net, index=gene_names, columns=gene_names).values
     net = efficient_melting(net, gene_names)
     # - subset to known TFs
     tf_all = np.intersect1d(tf_all, gene_names)
-    net = net[net.source.isin(tf_all)]
+    net = net[net['source'].isin(tf_all)]
     # - process links: size control
     net = process_links(net, par)
-  
+    net = net.reset_index(drop=True)
     return net
 
 
