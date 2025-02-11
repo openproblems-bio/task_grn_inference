@@ -15,27 +15,7 @@ meta = {
 
 sys.path.append(meta["resources_dir"])
 
-from util import sum_by
-from util import fetch_gene_info
 
-def psedudobulk_fun(adata: ad.AnnData) -> ad.AnnData:
-    metadata = (
-        adata.obs.groupby('perturbation')
-        .agg(lambda x: x.mode()[0] if x.nunique() == 1 else x.iloc[0])  
-    )
-
-    pseudobulk_data = adata.to_df().groupby(adata.obs['perturbation']).sum()
-    # Ensure the metadata index matches pseudobulk counts
-    metadata = metadata.loc[pseudobulk_data.index]
-
-    # Create a new AnnData object for pseudobulked data
-    adata_bulked = sc.AnnData(
-            X=pseudobulk_data.values,
-            obs=metadata.reset_index(),
-            var=adata.var.copy()
-        )
-
-    return adata_bulked
 
 def process_dataset(file_name):
     # - get the data
@@ -54,14 +34,6 @@ def process_dataset(file_name):
         adata.var = adata.var[[]]
     adata.obs = adata.obs[['perturbation', 'is_control', 'perturbation_type']]
     
-    # if dataset == 'norman':
-    #     # - add gene info
-    #     df_map = fetch_gene_info()
-    #     print(adata.shape, flush=True)
-    #     adata.var = adata.var.merge(df_map, how='left', left_index=True, right_index=True)
-    #     mask_na = adata.var['gene_id'].isna()
-    #     adata = adata[:, ~mask_na]
-    #     print(adata.shape, flush=True)
     # - data split 
     if file_name == 'replogle':
         ctr_samples = adata.obs.is_control
@@ -85,38 +57,49 @@ def process_dataset(file_name):
 
     adata_train = adata[~adata.obs['is_test']] # we use single cells for train (if not already bulked)
     
+    # - pseudo bulk if needed
     if file_name in ['norman', 'adamson']: # these two are single cells. for norman, we have .counts but not for adamson -> different preprocessing
-        adata_bulked = psedudobulk_fun(adata) # also normalize
+        if file_name == 'norman':
+            adata.X = adata.layers['counts'] 
+        adata_bulked = psedudobulk_fun(adata) 
     else:
         adata_bulked = adata
         # adata_bulked.layers['X_norm'] = adata_bulked.X.copy()
 
-    adata_test = adata_bulked[adata_bulked.obs['is_test']] # we use bulked data for test 
+
+    adata_test_bulk = adata_bulked[adata_bulked.obs['is_test']] # we use bulked data for feature-based evaluation 
 
     # - duplicated gene names
     duplicates = adata_train.var_names[adata_train.var_names.duplicated()].unique()
     adata_train = adata_train[:, ~adata_train.var_names.isin(duplicates)]
 
-    duplicates = adata_test.var_names[adata_test.var_names.duplicated()].unique()
-    adata_test = adata_test[:, ~adata_test.var_names.isin(duplicates)]
+    duplicates = adata_test_bulk.var_names[adata_test_bulk.var_names.duplicated()].unique()
+    adata_test_bulk = adata_test_bulk[:, ~adata_test_bulk.var_names.isin(duplicates)]
 
 
-    adata_test = adata_test.copy()  # Ensure it's a full AnnData object
+    adata_test_bulk = adata_test_bulk.copy()  # Ensure it's a full AnnData object
     adata_train = adata_train.copy()  # Ensure it's a full AnnData object
     adata = adata.copy()  # Ensure it's a full AnnData object
 
+    
     print(adata_train)
-    adata_train.layers['X_norm'] = adata_train.X.copy()
-    adata_test.layers['X_norm'] = adata_test.X.copy()
-    adata.layers['X_norm'] = adata.X.copy()
+    if file_name == 'norman':
+        adata_train.layers['counts'] = adata_train.X.copy()
+        adata_train.X = adata_train.layers['X_norm']
+    else:
+        adata_train.layers['X_norm'] = adata_train.X.copy()
+        adata_test_bulk.layers['X_norm'] = adata_test_bulk.X.copy()
+        adata.layers['X_norm'] = adata.X.copy()
 
-   
+    if file_nam == 'norman': # only dataset with counts
+        adata_train.X = adata_train.layers['counts']
+
     if file_name in ['norman', 'adamson']:
         adata.write(f'resources/grn_benchmark/evaluation_data/{file_name}_sc.h5ad')
 
     adata_bulked.write(f'resources/extended_data/{file_name}_bulk.h5ad')
     adata_train.write(f'resources/grn_benchmark/inference_data/{file_name}_rna.h5ad')
-    adata_test.write(f'resources/grn_benchmark/evaluation_data/{file_name}_bulk.h5ad')
+    adata_test_bulk.write(f'resources/grn_benchmark/evaluation_data/{file_name}_bulk.h5ad')
     
 
 def main(par):

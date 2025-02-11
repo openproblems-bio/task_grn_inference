@@ -57,7 +57,9 @@ info:
 
       ```bash
       viash run src/control_methods/pearson_corr/config.vsh.yaml -- \
-                  --rna resources/grn_benchmark/inference_data/norman_rna.h5ad --prediction output/net.h5ad
+                  --rna resources/grn_benchmark/inference_data/norman_rna.h5ad \
+                  --prediction output/net.h5ad \
+                  --tf_all resources/grn_benchmark/prior/tf_all.csv
       ```
 
       ## Evaluate a GRN prediction
@@ -67,7 +69,7 @@ info:
       scripts/single_grn_evaluation.sh output/net.h5ad norman
       ```
 
-      This outputs the scores into `output/test_run/scores.json`
+      This outputs the scores into `output/test_run/scores.yaml`
 
       ## Add a method
 

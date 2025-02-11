@@ -88,8 +88,7 @@ def psedudobulk_fun(adata: ad.AnnData) -> ad.AnnData:
         )
 
     return adata_bulked
-        
-
+    
 
 def normalize(adata: ad.AnnData) -> ad.AnnData:
     X_norm = sc.pp.normalize_total(adata, inplace=False)['X']
@@ -97,6 +96,12 @@ def normalize(adata: ad.AnnData) -> ad.AnnData:
 
     adata.layers['X_norm'] = X_norm
     return adata
+def normalize_pearson(adata: ad.AnnData) -> ad.AnnData:
+    X_norm = sc.experimental.pp.normalize_pearson_residuals(adata, inplace=False)['X']
+
+    adata.layers['X_norm'] = X_norm
+    return adata
+
 
 def main(par):
     adata = ad.read_h5ad(par['input'], backed='r') 
@@ -128,7 +133,7 @@ def main(par):
     adata_train_sc = adata_train_sc.to_memory()
     adata_train_bulk = psedudobulk_fun(adata_train_sc)
     adata_train_sc = normalize(adata_train_sc)
-    adata_train_bulk = normalize(adata_train_bulk)
+    adata_train_bulk = normalize_pearson(adata_train_bulk)
     adata_train_bulk.write(par['adata_train_bulk'])
     adata_train_sc.write(par['adata_train_sc'])
 
@@ -146,7 +151,7 @@ def main(par):
     adata_test_sc = adata_test_sc.to_memory()
     adata_test_bulk = psedudobulk_fun(adata_test_sc)
     adata_test_sc = normalize(adata_test_sc)
-    adata_test_bulk = normalize(adata_test_bulk)
+    adata_test_bulk = normalize_pearson(adata_test_bulk)
     adata_test_bulk.write(par['adata_test_bulk'])
     adata_test_sc.write(par['adata_test_sc'])
 

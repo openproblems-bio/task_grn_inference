@@ -31,45 +31,8 @@ def verbose_tqdm(iterable, desc, level, verbose_level):
         return tqdm(iterable, desc=desc)
     else:
         return iterable  # Return the iterable without a progress bar
-def efficient_melting_symmetry(net, gene_names):
-    '''to replace pandas melting with symmetry assumption'''
-    upper_triangle_indices = np.triu_indices_from(net, k=1)
-
-    # Extract the source and target gene names based on the indices
-    sources = np.array(gene_names)[upper_triangle_indices[0]]
-    targets = np.array(gene_names)[upper_triangle_indices[1]]
-
-    # Extract the corresponding correlation values
-    weights = net[upper_triangle_indices]
-
-    # Create a structured array
-    data = np.column_stack((targets, sources, weights))
-
-    # Convert to DataFrame
-    # print('convert to df')
-    net = pd.DataFrame(data, columns=['source', 'target', 'weight'])
-    return net
 
 
-def efficient_melting(net, gene_names):
-    '''to replace pandas melting '''
-    
-    # Get indices for all elements in the matrix (not just upper triangle)
-    row_indices, col_indices = np.triu_indices_from(net, k=0)  # k=0 ensures no exclusion of diagonal
-
-    # Extract the source and target gene names based on the indices
-    sources = np.array(gene_names)[row_indices]
-    targets = np.array(gene_names)[col_indices]
-
-    # Extract the corresponding correlation values
-    weights = net[row_indices, col_indices]
-
-    # Create a structured array
-    data = np.column_stack((sources, targets, weights))
-
-    # Convert to DataFrame
-    net_df = pd.DataFrame(data, columns=['source', 'target', 'weight'])
-    return net_df
 
 def basic_qc(adata, min_genes_per_cell = 200, max_genes_per_cell = 5000, min_cells_per_gene = 10):
     mt = adata.var_names.str.startswith('MT-')
@@ -98,48 +61,80 @@ def basic_qc(adata, min_genes_per_cell = 200, max_genes_per_cell = 5000, min_cel
 def process_links(net, par):
     # - check for symmetriy
     flipped = net.rename(columns={'source': 'target', 'target': 'source'})
-    merged = net.merge(flipped, on=['source', 'target', 'weight'], how='outer', indicator=True)
-    asymmetric_links = merged[merged['_merge'] != 'both']
-    if not asymmetric_links.empty:
-        print("Warning: The network contains asymmetric links.")
+    merged = net.merge(flipped, on=['source', 'target', 'weight'], how='inner')
 
+    if not merged.empty:
+        print("Warning: The network contains at least one symmetric link.")
 
     # - remove self loops
-    net = net[net.source!=net.target]
+    net = net[net['source'] != net['target']]
     # - limit the number of links
     if par['max_n_links'] != -1:
-        print(net)
         net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
         net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
     return net
+
+def efficient_melting(net, gene_names, tf_all=None, symmetric=False):
+    '''Efficiently converts a network matrix into a DataFrame. If symmetric, only the upper triangle is considered.
+    If not symmetric, all nonzero values are considered and rows are treated as source. 
+    If tf_all is not None, only the interactions with source as TFs are kept.
+    '''
+    if symmetric:
+        upper_triangle_indices = np.triu_indices_from(net, k=1)
+        sources = np.array(gene_names)[upper_triangle_indices[0]]
+        targets = np.array(gene_names)[upper_triangle_indices[1]]
+        weights = net[upper_triangle_indices]
+    else:
+        row_indices, col_indices = np.where(net != 0)  # Extract all nonzero values
+        sources = np.array(gene_names)[row_indices]
+        targets = np.array(gene_names)[col_indices]
+        weights = net[row_indices, col_indices]
+    if tf_all is not None:
+        mask_tf = np.isin(sources, tf_all)
+        sources = sources[mask_tf]
+        targets = targets[mask_tf]
+        weights = weights[mask_tf]
+
+    data = np.column_stack((sources, targets, weights))
+    net_df = pd.DataFrame(data, columns=['source', 'target', 'weight'])
+
+    return net_df
 
 def corr_net(par: dict) -> pd.DataFrame:
     # - read data
     adata = ad.read_h5ad(par["rna"])
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
+    
     if 'X_norm' in adata.layers.keys():
         X = adata.layers['X_norm']
     else:
         X = adata.X
+    if hasattr(X, 'todense'):
+        X = X.todense().A
     # - remove genes with 0 standard deviation
     gene_std = np.std(X, axis=0)
     nonzero_std_genes = gene_std > 0
     X = X[:, nonzero_std_genes]
     gene_names = adata[:, nonzero_std_genes].var_names.to_numpy()
     # - calculate correlation
-    if hasattr(X, 'todense'):
-        net = np.corrcoef(X.todense().T)
-    else:
-        net = np.corrcoef(X.T)    
+    net = np.corrcoef(X.T)
+  
     # - melt the matrix
-    net = pd.DataFrame(net, index=gene_names, columns=gene_names).values
-    net = efficient_melting(net, gene_names)
-    # - subset to known TFs
     tf_all = np.intersect1d(tf_all, gene_names)
-    net = net[net.source.isin(tf_all)]
+    # net = pd.DataFrame(net, columns=gene_names, index=gene_names)
+    # melted_net = net.reset_index().melt(id_vars='index', var_name='target', value_name='weight') #assuming that rows are source
+    # melted_net = melted_net.rename(columns={'index': 'source'})
+
+    net = efficient_melting(net, gene_names, symmetric=True)
+
+    # - subset to known TFs
+    
+    print('before', net.shape)
+    net = net[net['source'].isin(tf_all)]
+    print('after', net.shape)
     # - process links: size control
     net = process_links(net, par)
-  
+    net = net.reset_index(drop=True)
     return net
 
 

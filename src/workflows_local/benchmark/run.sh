@@ -16,7 +16,7 @@ source ~/miniconda3/bin/activate scprint
 
 # ----- parameters -----
 RUN_GRN_INFERENCE=true
-CALCULATE_METRICS=false
+CALCULATE_METRICS=true
 RUN_CONSENSUS_FLAG=false # - whether to run the consensus for reg2 (only run when to update the consensus), #TODO: update the code to handle other consensus
 FORCE=true
 SBATCH=false
@@ -28,7 +28,7 @@ DATASETS=(
 )
 
 # DATASETS=(
-#     " replogle "
+#     " op "
 # )
 
 # METHODS=(
@@ -36,7 +36,7 @@ DATASETS=(
 # )
 
 METHODS=(
-    " positive_control pearson_corr "
+    " pearson_corr positive_control "
 )
 
 

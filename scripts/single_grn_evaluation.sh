@@ -3,6 +3,17 @@
 prediction=${1}
 dataset=${2}
 
+if [ -z "$prediction" ]; then
+  echo "Error: prediction argument is missing"
+  exit 1
+fi
+
+if [ -z "$dataset" ]; then
+  echo "Error: dataset argument is missing"
+  exit 1
+fi
+
+mkdir -p output
 
 RUN_ID="test_run"
 echo $RUN_ID
@@ -52,6 +63,14 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
+<<<<<<< HEAD
+=======
+# build the images: this can be skipped after the first run
+viash ns build --parallel --setup build -s src/metrics/
+
+
+viash ns build --parallel 
+>>>>>>> 59e61e8f6ee32b6f68097ca4e56217b158a8e83a
 
 nextflow run . \
   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \

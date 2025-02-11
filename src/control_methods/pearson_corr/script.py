@@ -10,7 +10,7 @@ import argparse
 
 ## VIASH START
 par = {
-    'rna': 'resources/grn_benchmark/evaluation_data//op_rna.h5ad',
+    'rna': 'resources/grn_benchmark/inference_data//op_rna.h5ad',
     'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
     'cell_type_specific': False,
     'max_n_links': 50000,
@@ -61,6 +61,8 @@ if __name__ == '__main__':
     '''
 
     print('Output GRN')
-    net['weight'] = net['weight'].astype(str)
+    print('Shape of the network:', net.shape)
+    print(net.sort_values('weight', ascending=False, key=abs).head(10))
+    net = net.astype(str)
     output = ad.AnnData(X=None, uns={"method_id": 'pearson_corr', "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])
