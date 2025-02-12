@@ -86,17 +86,20 @@ def process_net(net, gene_names):
     return net
 def cross_validation(net, prturb_adata, par:dict):
     np.random.seed(32)
-    
     gene_names = prturb_adata.var_names
-    
     net = process_net(net.copy(), gene_names)
-
     gene_names_grn = net.index.to_numpy()   
+
+    # intersect 
+
+    gene_names = np.intersect1d(gene_names, gene_names_grn)
+    prturb_adata = prturb_adata[:, prturb_adata.var_names.isin(gene_names)]
+    net = net.loc[gene_names, :]
+
     
-    n_tfs = net.shape[1]
     # construct feature and target space
+    n_tfs = net.shape[1]
     X_df = pd.DataFrame(np.zeros((len(gene_names), n_tfs)), index=gene_names)
-    
     try:
         train_df = pd.DataFrame(prturb_adata.X, columns=gene_names).T
     except:
@@ -120,7 +123,6 @@ def cross_validation(net, prturb_adata, par:dict):
     # initialize y_true
     Y = Y_df.values
     y_true = Y.copy()
-
 
     # determine regressor 
     reg_type = par['reg_type']

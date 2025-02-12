@@ -11,14 +11,17 @@ import gc
 argparser = argparse.ArgumentParser()
 argparser.add_argument('--input', type=str, required=True)
 argparser.add_argument('--tf_all', type=str, required=True)
-argparser.add_argument('--adata_bulk', type=str, required=True)
 argparser.add_argument('--adata_test_sc', type=str, required=True)
-argparser.add_argument('--adata_test_bulk', type=str, required=True)
 argparser.add_argument('--adata_train_sc', type=str, required=True)
-argparser.add_argument('--adata_train_bulk', type=str, required=True)
+argparser.add_argument('--adata_train_sc_subset', type=str, required=True)
 
 args = argparser.parse_args()
 par = vars(args)
+
+par_local = {
+    'test_perturbs': f'resources/grn_benchmark/prior/replogle_test_perturbs.csv',
+
+}
 ## VIASH END
 
 meta = {
@@ -53,42 +56,24 @@ def split_data(adata: ad.AnnData):
     unique_perts = adata.obs['perturbation'].unique()
     
     tf_all = adata.obs[adata.obs['is_tf']]['perturbation'].unique()
-    non_tfs = np.setdiff1d(unique_perts, tf_all)
+    test_perturbs = np.loadtxt(par_local['test_perturbs'], dtype=str)
+    test_tfs = np.intersect1d(tf_all, test_perturbs)
+    train_pertubs = np.setdiff1d(unique_perts, test_perturbs)
 
-    n_tfs_in_test = int(len(tf_all)/2)
-
-    test_tfs = np.random.choice(tf_all, size=n_tfs_in_test, replace=False) 
     ctrs =  ['non-targeting']
     test_tfs = np.concatenate([test_tfs, ctrs])
     
-    print(f"Test TFs: {n_tfs_in_test}, Train TFs: {len(tf_all) - n_tfs_in_test}")
+    print(f"Test TFs: {len(test_tfs)}")
 
     adata_test = adata[adata.obs['perturbation'].isin(test_tfs)]
-    adata_train = adata[~adata.obs['perturbation'].isin(test_tfs)] # all perturbs
+    adata_train = adata[adata.obs['perturbation'].isin(train_pertubs)] # all perturbs
 
-    print(f"Train : {adata_train.shape}, Test: {adata_test.shape}")
+    adata_train_short = adata[adata.obs['perturbation'].isin(train_pertubs[:500])]
 
-    return adata_train, adata_test
+    print(f"Train : {adata_train.shape}, Test: {adata_test.shape}, Train_short: {adata_train_short.shape}")
 
-def psedudobulk_fun(adata: ad.AnnData) -> ad.AnnData:
-    metadata = (
-        adata.obs.groupby('perturbation')
-        .agg(lambda x: x.mode()[0] if x.nunique() == 1 else x.iloc[0])  
-    )
+    return adata_train, adata_test, adata_train_short
 
-    pseudobulk_data = adata.to_df().groupby(adata.obs['perturbation']).sum()
-    # Ensure the metadata index matches pseudobulk counts
-    metadata = metadata.loc[pseudobulk_data.index]
-
-    # Create a new AnnData object for pseudobulked data
-    adata_bulked = sc.AnnData(
-            X=pseudobulk_data.values,
-            obs=metadata.reset_index(),
-            var=adata.var.copy()
-        )
-
-    return adata_bulked
-        
 
 
 def normalize(adata: ad.AnnData) -> ad.AnnData:
@@ -97,6 +82,12 @@ def normalize(adata: ad.AnnData) -> ad.AnnData:
 
     adata.layers['X_norm'] = X_norm
     return adata
+def normalize_pearson(adata: ad.AnnData) -> ad.AnnData:
+    X_norm = sc.experimental.pp.normalize_pearson_residuals(adata, inplace=False)['X']
+
+    adata.layers['X_norm'] = X_norm
+    return adata
+
 
 def main(par):
     adata = ad.read_h5ad(par['input'], backed='r') 
@@ -112,47 +103,58 @@ def main(par):
     # - process adata
     print('Processing data...')
     adata_sc = adata.to_memory()
-    adata_bulk = psedudobulk_fun(adata_sc)
-    adata_bulk = normalize(adata_bulk)
-    adata_bulk.write(par['adata_bulk'])
-    del adata_bulk, adata_sc 
-    gc.collect()
+    if False:
+        adata_bulk = psedudobulk_fun(adata_sc)
+        adata_bulk = normalize(adata_bulk)
+        adata_bulk.write(par['adata_bulk'])
+        del adata_bulk, adata_sc 
+        gc.collect()
     # - data split
     print('Splitting data...')
-    adata_train_sc, adata_test_sc = split_data(adata)
+    adata_train_sc, adata_test_sc, adata_train_sc_subset = split_data(adata)
     del adata
     gc.collect()
 
     # - process inference data
     print('Process inference data...')
     adata_train_sc = adata_train_sc.to_memory()
-    adata_train_bulk = psedudobulk_fun(adata_train_sc)
     adata_train_sc = normalize(adata_train_sc)
-    adata_train_bulk = normalize(adata_train_bulk)
-    adata_train_bulk.write(par['adata_train_bulk'])
+    if False:
+        adata_train_bulk = sum_by(adata_train_sc, col='perturbation', unique_mapping=True)
+        adata_train_bulk = normalize_pearson(adata_train_bulk)
+        adata_train_bulk.uns['dataset_id'] = 'replogle'
+        adata_train_bulk.write(par['adata_train_bulk'])
+        
+        
+        del adata_train_bulk
+        gc.collect()
+
+    if False:
+        print('adata_train_bulk: ', adata_train_bulk.shape)
+        print('pertrbations in adata_train_bulk: ', adata_train_bulk.obs['perturbation'].nunique())
+        print('adata_train_sc: ', adata_train_sc.shape)
+        print('pertrbations in adata_train_sc: ', adata_train_sc.obs['perturbation'].nunique())
+    
+    adata_train_sc.uns['dataset_id'] = 'replogle'
     adata_train_sc.write(par['adata_train_sc'])
 
-    print('adata_train_bulk: ', adata_train_bulk.shape)
-    print('pertrbations in adata_train_bulk: ', adata_train_bulk.obs['perturbation'].nunique())
-    print('adata_train_sc: ', adata_train_sc.shape)
-    print('pertrbations in adata_train_sc: ', adata_train_sc.obs['perturbation'].nunique())
-
-
-    del adata_train_sc, adata_train_bulk
+    adata_train_sc_subset.uns['dataset_id'] = 'replogle'
+    adata_train_sc_subset.write(par['adata_train_sc_subset'])
+    del adata_train_sc, adata_train_sc_subset
     gc.collect()
 
     # - process test data
     print('Process test data...')
     adata_test_sc = adata_test_sc.to_memory()
-    adata_test_bulk = psedudobulk_fun(adata_test_sc)
     adata_test_sc = normalize(adata_test_sc)
-    adata_test_bulk = normalize(adata_test_bulk)
-    adata_test_bulk.write(par['adata_test_bulk'])
+    adata_test_sc.uns['dataset_id'] = 'replogle'
     adata_test_sc.write(par['adata_test_sc'])
 
-    del adata_test_sc, adata_test_bulk
-    gc.collect()
-
+    if False:
+        adata_test_bulk = sum_by(adata_test_sc, col='perturbation', unique_mapping=True)
+        adata_test_bulk.uns['dataset_id'] = 'replogle'
+        adata_test_bulk = normalize_pearson(adata_test_bulk)
+        adata_test_bulk.write(par['adata_test_bulk'])
 
 
 if __name__ == '__main__':

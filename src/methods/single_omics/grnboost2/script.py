@@ -15,7 +15,8 @@ par = {
   'max_n_links': 50000,
   'cell_type_specific': False,
   'normalize': False,
-  'qc': False
+  'qc': False,
+  'layer': 'X_norm'
 }
 ## VIASH END
 
@@ -62,7 +63,8 @@ def main(par: dict) -> pd.DataFrame:
             print('Shape after QC: ', adata_rna.shape)
 
     gene_names = adata_rna.var_names
-    X = adata_rna.X
+
+    X = adata_rna.layers[par['layer']] 
 
     # Load list of putative TFs
     tfs = np.loadtxt(par["tf_all"], dtype=str)

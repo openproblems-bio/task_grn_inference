@@ -3382,7 +3382,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/grnboost2",
     "viash_version" : "0.9.1",
-    "git_commit" : "59e61e8f6ee32b6f68097ca4e56217b158a8e83a",
+    "git_commit" : "5a896e6d14e7d8704bc35bd8bc1bdf6252219f32",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3581,7 +3581,8 @@ def main(par: dict) -> pd.DataFrame:
             print('Shape after QC: ', adata_rna.shape)
 
     gene_names = adata_rna.var_names
-    X = adata_rna.X
+
+    X = adata_rna.layers[par['layer']] 
 
     # Load list of putative TFs
     tfs = np.loadtxt(par["tf_all"], dtype=str)
