@@ -52,10 +52,10 @@ except:
 from util import corr_net
 
 if __name__ == '__main__':
-
+    dataset_id = ad.read_h5ad(par['inference_data'], backed='r').uns['dataset_id']
     net = corr_net(par)
 
     print('Output GRN')
     net['weight'] = net['weight'].astype(str)
-    output = ad.AnnData(X=None, uns={"method_id": 'positive_control', "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+    output = ad.AnnData(X=None, uns={"method_id": 'positive_control', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])

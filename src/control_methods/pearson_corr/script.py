@@ -51,18 +51,12 @@ from util import corr_net
 
 
 if __name__ == '__main__':
+    dataset_id = ad.read_h5ad(par['inference_data'], backed='r').uns['dataset_id']
     net = corr_net(par)
-    # - format of et
-    '''
-        the net is a pandas dataframe with the following columns:
-            - source: the source gene of the interaction
-            - target: the target gene of the interaction
-            - weight: the weight of the interaction
-    '''
 
     print('Output GRN')
     print('Shape of the network:', net.shape)
     print(net.sort_values('weight', ascending=False, key=abs).head(10))
     net = net.astype(str)
-    output = ad.AnnData(X=None, uns={"method_id": 'pearson_corr', "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+    output = ad.AnnData(X=None, uns={"method_id": 'pearson_corr', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])

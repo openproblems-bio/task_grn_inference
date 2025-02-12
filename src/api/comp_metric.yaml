@@ -15,11 +15,6 @@ arguments:
     __merge__: file_score_h5ad.yaml
     required: true
     direction: output
-  - name: --method_id 
-    type: string 
-    direction: input 
-    required: false
-    example: grnboost2
   - name: --layer
     type: string
     direction: input
@@ -32,11 +27,7 @@ arguments:
     type: integer
     default: 2
     direction: input
-  - name: --dataset_id
-    type: string
-    direction: input
-    required: false
-    default: op
+
   - name: --num_workers
     type: integer
     direction: input

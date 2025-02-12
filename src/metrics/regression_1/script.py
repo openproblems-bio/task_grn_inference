@@ -69,7 +69,7 @@ except:
 from util import verbose_print, process_links, verbose_tqdm, binarize_weight
 from helper import set_global_seed, process_net, cross_validation
 
-def read_net(par):
+def _net(par):
     print(par['prediction'], flush=True)
     net = ad.read_h5ad(par['prediction'])
     net = pd.DataFrame(net.uns['prediction'])
@@ -86,7 +86,6 @@ def read_net(par):
         net = net[net['link'].isin(skeleton)]
         print('After filtering with skeleton:', net.shape)
 
-    
     if 'cell_type' in net.columns:
         print('Taking mean of cell type specific grns')
         net.drop(columns=['cell_type'], inplace=True)
@@ -112,33 +111,34 @@ def main(par):
     evaluation_data.X = evaluation_data.layers[par["layer"]]
     gene_names = evaluation_data.var.index.to_numpy()
     
-    
     # -- calclate scores 
     results = cross_validation(net, evaluation_data, par)
 
     return results
 
 if __name__ == '__main__':
-#   print(par)
-  results = main(par) 
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+    print(f"Method id: {method_id}, Dataset id: {dataset_id}")
 
-  # - formatize results  
-  results = dict(r1_all=[results['r2score-aver-all']], r1_grn=[results['r2score-aver-grn']])
-  results = pd.DataFrame(results)
-  print(results)
+    # - run main function
+    results = main(par) 
 
-  metric_ids = results.columns.to_numpy()
-  metric_values = results.values[0]
 
-  print(metric_ids.shape, metric_values.shape)
-  results = ad.AnnData(
-      X=np.empty((0, 0)),
-      uns={
-          "dataset_id": par["dataset_id"],
-          "method_id": f"{par['method_id']}",
-          "metric_ids": metric_ids,
-          "metric_values": metric_values
-      }
-  )
+    # - formatize results  
+    results = dict(r1_all=[results['r2score-aver-all']], r1_grn=[results['r2score-aver-grn']])
+    results = pd.DataFrame(results)
+    print(results)
 
-  results.write_h5ad(par["score"], compression="gzip")
+    print(metric_ids.shape, metric_values.shape)
+    results = ad.AnnData(
+        X=np.empty((0, 0)),
+        uns={
+            "dataset_id": dataset_id,
+            "method_id": method_id,
+            "metric_ids": results.columns.to_numpy(),
+            "metric_values": results.values[0]
+        }
+    )
+
+    results.write_h5ad(par["score"], compression="gzip")

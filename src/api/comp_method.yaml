@@ -45,11 +45,7 @@ arguments:
     direction: input
     required: false
     default: op
-  - name: --method_id
-    type: string
-    direction: input
-    required: false
-    default: grnboost2
+
 
 test_resources:
   - type: python_script
