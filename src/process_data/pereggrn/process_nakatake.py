@@ -74,6 +74,11 @@ adata_bulk.layers['X_norm'] = adata_bulk.X.copy()
 adata_test_bulk.layers['X_norm'] = adata_test_bulk.X.copy()
 adata_train_bulk.layers['X_norm'] = adata_train_bulk.X.copy()
 
+# - add metadata
+adata_train_bulk.uns['dataset_id'] = 'nakatake'
+adata_test_bulk.uns['dataset_id'] = 'nakatake'
+adata_bulk.uns['dataset_id'] = 'nakatake'
+
 # - save 
 adata_bulk.write(par['adata_bulk'])
 adata_test_bulk.write(par['adata_test_bulk'])

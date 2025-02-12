@@ -24,7 +24,7 @@ SAVE_SCORES_FILE="resources/scores/scores_controls.csv" # - where to save the sc
 
 
 DATASETS=(
-    " replogle op norman nakatake adamson "
+    " replogle adamson nakatake norman op"
 )
 
 # DATASETS=(
@@ -36,7 +36,7 @@ DATASETS=(
 # )
 
 METHODS=(
-    " pearson_corr positive_control "
+    " pearson_corr "
 )
 
 

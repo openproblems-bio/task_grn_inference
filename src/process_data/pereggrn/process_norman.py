@@ -25,7 +25,6 @@ sys.path.append(meta["resources_dir"])
 
 from util import sum_by
 
-
 # - get the data
 adata = ad.read_h5ad(par['input_data'])
 adata.var_names_make_unique()
@@ -49,7 +48,7 @@ sc.pp.filter_cells(adata, min_genes=100)
 sc.pp.filter_genes(adata, min_cells=10)
 
 # - unique to norman
-adata.X = adata.layers['counts'] 
+adata.layers['X_norm'] = adata.X.copy()
 
 # - split to inference and evaluation datasets: unique to norman 
 ctr_pertb = adata[adata.obs['is_control']].obs['perturbation'].unique()
@@ -71,23 +70,21 @@ sc.pp.filter_genes(adata_test_sc, min_cells=10)
 
 # - pseudo bulk: unique to norman 
 adata_bulk = sum_by(adata, unique_mapping=True, col='perturbation') 
-adata_test_bulk = sum_by(adata_test_sc, unique_mapping=True, col='perturbation') 
+adata_test_bulk = sum_by(adata_test_sc, unique_mapping=True, col='perturbation') # summing over X_norm 
 
 
-# - normalize adata_bulk
-adata_bulk.layers['X_norm'] = sc.experimental.pp.normalize_pearson_residuals(adata_bulk, inplace=False)['X']
-
-# - normalize adata_test_sc
-X_norm = sc.pp.normalize_total(adata_test_sc, layer='counts', inplace=False)['X']
-adata_test_sc.layers['X_norm'] = sc.pp.log1p(X_norm, base=2, copy=True)
-
-# - normalize evaluation data: unique to norman
-adata_test_bulk.layers['X_norm'] = sc.experimental.pp.normalize_pearson_residuals(adata_test_bulk, inplace=False)['X']
+# - normalize evaluation data
+# sc.pp.normalize_total(adata_test_bulk)
+adata_test_bulk.layers['X_norm'] = adata_test_bulk.X.copy()
 
 # - normalize adata_train_sc
-X_norm = sc.pp.normalize_total(adata_train_sc, layer='counts', inplace=False)['X']
-adata_train_sc.layers['X_norm'] = sc.pp.log1p(X_norm, base=2, copy=True)
+adata_train_sc.layers['X_norm'] = adata_train_sc.X.copy()
 
+# - add metadata
+adata_train_sc.uns['dataset_id'] = 'norman'
+adata_test_sc.uns['dataset_id'] = 'norman'
+adata_test_bulk.uns['dataset_id'] = 'norman'
+adata_bulk.uns['dataset_id'] = 'norman'
 # - save 
 adata_bulk.write(par['adata_bulk'])
 adata_test_sc.write(par['adata_test_sc'])

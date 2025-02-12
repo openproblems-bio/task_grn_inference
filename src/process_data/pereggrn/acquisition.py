@@ -26,6 +26,8 @@ def get_dataset(par):
 
         adata = pereggrn_perturbations.load_perturbation(file_name) 
         # pereggrn_perturbations.check_perturbation_dataset(ad = adata)
+        if file_name == 'replogle2':
+            file_name = 'replogle'
         adata.write(f"{par['raw_datasets_dir']}/{file_name}.h5ad")
 
 def get_networks(par):
@@ -53,7 +55,7 @@ def main(par):
         
 if __name__ == '__main__':
     par = {
-        'datasets': ['norman', 'adamson', 'nakatake'],
+        'datasets': ['replogle2', 'norman', 'adamson', 'nakatake'],
         'nets': [
                             'ANANSE_tissue/networks/lung.parquet',
                             'ANANSE_tissue/networks/stomach.parquet', 

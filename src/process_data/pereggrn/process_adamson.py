@@ -48,7 +48,6 @@ adata.obs = adata.obs[['perturbation', 'is_control', 'perturbation_type']]
 sc.pp.filter_cells(adata, min_genes=100)
 sc.pp.filter_genes(adata, min_cells=10)
 
-
 # - split to inference and evaluation datasets
 ctr_pertb = adata[adata.obs['is_control']].obs['perturbation'].unique()
 non_ctr_pertubs =adata[~adata.obs['is_control']].obs['perturbation'].unique()
@@ -73,16 +72,22 @@ adata_test_bulk = sum_by(adata_test_sc, unique_mapping=True, col='perturbation')
 
 
 # - normalize adata_bulk
-adata_bulk.layers['X_norm'] = sc.experimental.pp.normalize_pearson_residuals(adata_bulk, inplace=False)['X']
+adata_bulk.layers['X_norm'] = adata_bulk.X.copy()
 
 # - normalize adata_test_sc
 adata_test_sc.layers['X_norm'] = adata_test_sc.X.copy()
 
 # - normalize evaluation data
-adata_test_bulk.layers['X_norm'] = sc.experimental.pp.normalize_pearson_residuals(adata_test_bulk, inplace=False)['X']
+adata_test_bulk.layers['X_norm'] = adata_test_bulk.X.copy()
 
 # - normalize adata_train_sc
 adata_train_sc.layers['X_norm'] = adata_train_sc.X.copy()
+
+# - add metadata
+adata_train_sc.uns['dataset_id'] = 'adamson'
+adata_test_sc.uns['dataset_id'] = 'adamson'
+adata_test_bulk.uns['dataset_id'] = 'adamson'
+adata_bulk.uns['dataset_id'] = 'adamson'
 
 # - save 
 adata_bulk.write(par['adata_bulk'])

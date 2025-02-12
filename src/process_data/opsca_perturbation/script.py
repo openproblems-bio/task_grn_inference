@@ -191,5 +191,6 @@ if __name__ == '__main__':
     bulk_adata.obs['is_control'] = bulk_adata.obs['perturbation'].isin(['Dimethyl Sulfoxide'])
     bulk_adata.obs['is_positive_control'] = bulk_adata.obs['perturbation'].isin(['Dabrafenib', 'Belinostat'])
 
+    bulk_adata.uns['dataset_id'] = 'op'
     bulk_adata.write(par['perturbation_bulk'])
     bulk_adata.write(par['evaluation_data'])
