@@ -10,7 +10,7 @@ import argparse
 
 ## VIASH START
 par = {
-    'rna': 'resources/grn_benchmark/evaluation_data//op_rna.h5ad',
+    'rna': 'resources/grn_benchmark/inference_data//op_rna.h5ad',
     'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
     'cell_type_specific': False,
     'max_n_links': 50000,

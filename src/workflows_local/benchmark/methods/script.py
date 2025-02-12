@@ -16,17 +16,8 @@ args = argparser.parse_args()
 par = vars(args)
 
 
-def exception_handler(par, method, dataset):
-    if (method == 'scprint') & (dataset == 'replogle'):
-        par['rna'] = f'resources/extended_data/replogle_train_sc.h5ad'
-    if (method == 'positive_control') & (dataset == 'op'):
-        par['rna'] = f'resources/grn_benchmark/evaluation_data/{dataset}_bulk.h5ad'
-    if (method == 'positive_control') & (dataset in ['replogle', 'norman', 'adamson', 'nakatake']):
-        par['rna'] = f'resources/extended_data/{dataset}_bulk.h5ad'
-    return par
 
-
-def run_grn_inference(par, dataset='op', subsample=None):
+def get_par(dataset, method):
     par_local = {
         'models_dir': f'resources/grn_models/{dataset}/',
         'rna': f'resources/grn_benchmark/inference_data/{dataset}_rna.h5ad',
@@ -35,48 +26,31 @@ def run_grn_inference(par, dataset='op', subsample=None):
         'num_workers': 10,
         'tmp_dir': 'output/grn_inference'
     }
-    par.update(par_local)
+
+    for key, value in par_local.items():
+        par[key] = value
+
+    if (method == 'scprint') & (dataset == 'replogle'):
+        par['rna'] = f'resources/extended_data/replogle_train_sc.h5ad'
+    if (method == 'positive_control') & (dataset == 'op'):
+        par['rna'] = f'resources/grn_benchmark/evaluation_data/{dataset}_bulk.h5ad'
+    if (method == 'positive_control') & (dataset in ['replogle', 'norman', 'adamson', 'nakatake']):
+        par['rna'] = f'resources/extended_data/{dataset}_bulk.h5ad'
+
+    return par
+
+def run_grn_inference(par, dataset='op', subsample=None):
     
-    os.makedirs(par['models_dir'], exist_ok=True)
-    os.makedirs(par['tmp_dir'], exist_ok=True)
-
-    if subsample is not None:
-        if dataset=='op':
-            new_atac = f"{par['tmp_dir']}/{dataset}_atac.h5ad"
-            new_rna = f"{par['tmp_dir']}/{dataset}_rna.h5ad"
-            if not os.path.exists(new_rna):
-                rna = ad.read_h5ad(par['rna'])
-                atac = ad.read_h5ad(par['atac'])
-                if subsample == 1:
-                    mask_rna = rna.obs['donor_id'] == 'donor_0'
-                    mask_atac = atac.obs['donor_id'] == 'donor_0'
-                elif subsample == 2:
-                    mask_rna = rna.obs['donor_id'].isin(['donor_0', 'donor_1'])
-                    mask_atac = atac.obs['donor_id'].isin(['donor_0', 'donor_1'])
-                rna = rna[mask_rna, :]
-                atac = atac[mask_rna, :]
-                
-                rna.write(new_rna)
-                atac.write(new_atac)
-                print(rna)
-            par['rna'] = new_rna
-            par['atac'] = new_atac
-        else:
-            new_rna = f"{par['tmp_dir']}/{dataset}_rna.h5ad"
-            if not os.path.exists(new_rna):
-                rna = ad.read_h5ad(par['rna'])
-                all_perturbation = rna.obs['perturbation'].unique()
-                sample_size = int(len(all_perturbation) * subsample)  # Number of samples
-                selected_samples = np.random.choice(all_perturbation, sample_size, replace=False)
-                rna = rna[rna.obs['perturbation'].isin(selected_samples), :]
-                rna.write(new_rna)
-                print(rna)
-            par['rna'] = new_rna
-        
-
     for method in par['methods']:
-        par = exception_handler(par, method, dataset)
-        print(method)
+        
+        if (method=='scprint') & (dataset in ['nakatake', 'adamson']):
+            continue
+        
+        par = get_par(dataset, method)
+
+        os.makedirs(par['models_dir'], exist_ok=True)
+        os.makedirs(par['tmp_dir'], exist_ok=True)
+
         if subsample is None:
             par['prediction'] = f"{par['models_dir']}/{method}.h5ad"
         else:
@@ -116,6 +90,7 @@ def run_grn_inference(par, dataset='op', subsample=None):
         elif method=='ppcor':
             command = f"singularity exec ../../images/ppcor Rscript src/methods/single_omics/{method}/script.R {method_args}"
         elif method=='scprint':
+            # command = "source ~/miniconda3/bin/activate scprint \n"
             command = f"python src/methods/single_omics/{method}/script.py {method_args}"
         else:
             command = f"singularity exec ../../images/{method} python src/methods/single_omics/{method}/script.py {method_args}"
@@ -146,6 +121,9 @@ def run_grn_inference(par, dataset='op', subsample=None):
             else:
                 mem = "120GB"
                 time = "24:00:00"
+        else:
+            print(method)
+            raise ValueError(f"Method {method} not recognized")
 
         # Prepare sbatch command
         tag = f"--job-name={method}"  # No spaces around '='
@@ -182,7 +160,6 @@ def main(par):
 
 
 if __name__ == '__main__':
-    print(par)
     main(par)
     
     # if False: # subsample

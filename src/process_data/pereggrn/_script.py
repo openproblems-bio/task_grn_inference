@@ -86,10 +86,9 @@ def process_dataset(file_name):
     adata_train = adata[~adata.obs['is_test']] # we use single cells for train (if not already bulked)
     
     if file_name in ['norman', 'adamson']: # these two are single cells. for norman, we have .counts but not for adamson -> different preprocessing
-        adata_bulked = psedudobulk_fun(adata) # also normalize
+        adata_bulked = psedudobulk_fun(adata) 
     else:
         adata_bulked = adata
-        # adata_bulked.layers['X_norm'] = adata_bulked.X.copy()
 
     adata_test = adata_bulked[adata_bulked.obs['is_test']] # we use bulked data for test 
 
@@ -113,6 +112,17 @@ def process_dataset(file_name):
    
     if file_name in ['norman', 'adamson']:
         adata.write(f'resources/grn_benchmark/evaluation_data/{file_name}_sc.h5ad')
+    
+    if file_name in ['norman']:
+        
+        # - filter genes and cells 
+        sc.pp.filter_cells(adata_train, min_genes=100)
+        sc.pp.filter_genes(adata_train, min_cells=10)
+       
+
+        sc.pp.filter_cells(adata_test, min_genes=100)
+        sc.pp.filter_genes(adata_test, min_cells=10)
+        print(f"Train : {adata_train.shape}, Test: {adata_test.shape}")
 
     adata_bulked.write(f'resources/extended_data/{file_name}_bulk.h5ad')
     adata_train.write(f'resources/grn_benchmark/inference_data/{file_name}_rna.h5ad')
@@ -126,7 +136,7 @@ def main(par):
 if __name__ == '__main__':
     
     par = {
-        'datasets': ['norman', 'adamson', 'nakatake'] #'norman'
+        'datasets': ['replogle'] #'norman'
     }
     
 

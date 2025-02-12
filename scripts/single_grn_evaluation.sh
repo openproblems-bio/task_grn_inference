@@ -63,11 +63,14 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
 
+<<<<<<< HEAD
+=======
 # build the images: this can be skipped after the first run
 viash ns build --parallel --setup build -s src/metrics/
 
 
 viash ns build --parallel 
+>>>>>>> 59e61e8f6ee32b6f68097ca4e56217b158a8e83a
 
 nextflow run . \
   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
