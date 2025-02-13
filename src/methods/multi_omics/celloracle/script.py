@@ -53,11 +53,12 @@ if 'base_grn' not in par:
 if 'links' not in par:
     par['links'] = f"{par['temp_dir']}/links.celloracle.links"
 
+dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
 net = main(par)
 
 print('Write output to file', flush=True)
 net['weight'] = net['weight'].astype(str)
-output = ad.AnnData(X=None, uns={"method_id": 'celloracle', "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+output = ad.AnnData(X=None, uns={"method_id": 'celloracle', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
 output.write(par['prediction'])
 
 

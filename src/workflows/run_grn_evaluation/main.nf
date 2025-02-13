@@ -44,8 +44,6 @@ workflow run_wf {
         ws_distance_background: "ws_distance_background",
         subsample: "subsample",
         reg_type: "reg_type",
-        method_id: "method_id",
-        dataset_id: "dataset_id",
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",

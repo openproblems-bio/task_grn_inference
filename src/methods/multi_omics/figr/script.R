@@ -8,14 +8,14 @@ library(BSgenome.Hsapiens.UCSC.hg38)
 
 ## VIASH START
 par <- list(
-  multiomics_rna_r = "resources/grn-benchmark/multiomics_rna.rds",
-  multiomics_atac_r = "resources/grn-benchmark/multiomics_atac.rds",
+  rna = "resources/grn-benchmark/multiomics_rna.rds",
+  atac = "resources/grn-benchmark/multiomics_atac.rds",
   temp_dir =  "output/figr/",
   cell_topic = "resources/grn_benchmark/prior/cell_topic.csv",
-  num_workers = 20,
+  num_workers = 2,
   n_topics = 48,
   peak_gene = "output/figr/peak_gene.csv",
-  prediction= "resources/grn_models/figr.csv"
+  prediction= "output/figr/figr.h5ad"
 )
 print(par)
 # meta <- list(
@@ -24,10 +24,11 @@ print(par)
 ## VIASH END
 dir.create(par$temp_dir, recursive = TRUE, showWarnings = TRUE)
 
-atac = readRDS(par$multiomics_atac_r)
+atac = readRDS(par$atac)
 colnames(atac) <- gsub("-", "", colnames(atac))
 
-rna  = readRDS(par$multiomics_rna_r)
+rna  = readRDS(par$rna)
+dataset_id = rna$dataset_id
 colnames(rna) <- gsub("-", "", colnames(rna))
 
 
@@ -135,31 +136,52 @@ extract_peak_gene_func <- function(par) {
   write.csv(peak_gene_figr, file = par$peak_gene, row.names = FALSE)
 }
 
-filter_figr_grn <- function(par) {
+filter_net <- function(par) {
   # Read the CSV file
-  figr_grn <- read.csv(file.path(par$temp_dir, "figR.d.csv"))
+  net <- read.csv(file.path(par$temp_dir, "figR.d.csv"))
 
   # Filter those that have a Score of 0
-  figr_grn <- subset(figr_grn, Score != 0)
+  net <- subset(net, Score != 0)
   
   # Filter based on enrichment
-  figr_grn <- subset(figr_grn, Enrichment.P < 0.05)
+  net <- subset(net, Enrichment.P < 0.05)
   
   # Filter based on correlation
-  # figr_grn <- subset(figr_grn, Corr.P < 0.05)
+  # net <- subset(net, Corr.P < 0.05)
   
   
   # Subset columns
-  figr_grn <- figr_grn[, c("Motif", "DORC", "Score")]
+  net <- net[, c("Motif", "DORC", "Score")]
   
   # Reset row names (equivalent to resetting the index in Python)
-  rownames(figr_grn) <- NULL
+  rownames(net) <- NULL
   
   # Rename columns
-  colnames(figr_grn) <- c("source", "target", "weight")
+  colnames(net) <- c("source", "target", "weight")
   
   # Write the result to a CSV file
-  write.csv(figr_grn, file = par$prediction, row.names = FALSE)
+  #TODO: make anndata and add dataset_id
+  cat("Output GRN\n")
+  print(head(net))
+  net$weight <- as.character(net$weight)
+  if (!is.data.frame(net)) {
+      stop("Error: 'net' is not a dataframe")
+  }
+
+
+  output <- AnnData(
+    X = matrix(nrow = 0, ncol = 0),
+    uns = list(
+      method_id = "ppcor",
+      dataset_id = dataset_id,
+      prediction = net[, c("source", "target", "weight")]
+    )
+  )
+
+  print(output)
+  # output$write(par$prediction)
+  print(par$prediction)
+  output$write_h5ad(par$prediction, compression = "gzip")
 }
 
 
@@ -175,4 +197,4 @@ tf_gene_association_func(par)
 print('3: tf_gene_association_func finished')
 extract_peak_gene_func(par)
 print('4: extract_peak_gene_func finished')
-filter_figr_grn(par)
+filter_net(par)

@@ -45,10 +45,14 @@ except:
     }
     sys.path.append(meta['resources_dir'])
 from main import main
-net = main(par)
 
-print('Output GRN')
-net['weight'] = net['weight'].astype(str)
-output = ad.AnnData(X=None, uns={"method_id": 'negative_control', "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
-output.write(par['prediction'])
+if __name__ == '__main__':
+    dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
+
+    net = main(par)
+
+    print('Output GRN')
+    net['weight'] = net['weight'].astype(str)
+    output = ad.AnnData(X=None, uns={"method_id": 'negative_control', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
+    output.write(par['prediction'])
 

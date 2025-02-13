@@ -54,23 +54,28 @@ else:
 
 from main import main
 
-print('Reading input data')
 
-output = main(par)
+if __name__ == '__main__':
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+    print(f"Method id: {method_id}, Dataset id: {dataset_id}")
 
-print('Write output to file', flush=True)
-print(output)
-metric_ids = output.columns.to_numpy()
-metric_values = output.values[0]
+    # - Main function
+    output = main(par)
 
-output = ad.AnnData(
-    X=np.empty((0, 0)),
-    uns={
-        "dataset_id": str(par["dataset_id"]),
-        "method_id": f"{par['method_id']}",
-        "metric_ids": metric_ids,
-        "metric_values": metric_values
-    }
-)
-output.write_h5ad(par['score'], compression='gzip')
-print('Completed', flush=True)
+    print('Write output to file', flush=True)
+    print(output)
+    metric_ids = output.columns.to_numpy()
+    metric_values = output.values[0]
+
+    output = ad.AnnData(
+        X=np.empty((0, 0)),
+        uns={
+            "dataset_id": dataset_id,
+            "method_id": method_id,
+            "metric_ids": metric_ids,
+            "metric_values": metric_values
+        }
+    )
+    output.write_h5ad(par['score'], compression='gzip')
+    print('Completed', flush=True)

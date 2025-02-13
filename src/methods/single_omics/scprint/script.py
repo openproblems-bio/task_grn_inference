@@ -165,6 +165,7 @@ def main(par):
 
     
 if __name__ == '__main__':
+    dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
     if par['populate_ontology']: 
         populate_my_ontology( 
             organisms= ["NCBITaxon:9606"]
@@ -189,5 +190,5 @@ if __name__ == '__main__':
 
     print(f"Writing results to {par['prediction']}")
     net = net.astype(str)
-    output = ad.AnnData(X=None, uns={"method_id": "scprint", "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight", "cell_type"]]})
+    output = ad.AnnData(X=None, uns={"method_id": "scprint", "dataset_id": dataset_id, "prediction": net[["source", "target", "weight", "cell_type"]]})
     output.write(par['prediction'])

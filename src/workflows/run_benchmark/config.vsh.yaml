@@ -12,18 +12,12 @@ argument_groups:
       - name: --atac
         type: file
         direction: input
-        must_exist: false
-        required: false
       - name: --evaluation_data
         type: file
         direction: input
       - name: --evaluation_data_sc
         type: file
         direction: input
-      - name: --prediction
-        type: file
-        direction: input
-        required: false
       - name: --reg_type
         type: string
         direction: input
@@ -36,7 +30,6 @@ argument_groups:
         type: file
         required: false
         direction: input
-        default: resources/grn_benchmark/prior/tf_all.csv
       - name: --regulators_consensus
         type: file
         direction: input
@@ -113,7 +106,7 @@ dependencies:
   - name: utils/extract_uns_metadata
     repository: openproblems
   # ---- single omics
-  - name: grn_methods/portia
+  # - name: grn_methods/portia
   # - name: grn_methods/grnboost2
   # - name: grn_methods/scenic
   # - name: grn_methods/genie3

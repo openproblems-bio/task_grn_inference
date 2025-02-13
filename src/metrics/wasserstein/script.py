@@ -45,13 +45,18 @@ else:
 from main import main 
 
 if __name__ == '__main__':
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+    dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
+    print(f"Method id: {method_id}, Dataset id: {dataset_id}")
+
+    # - main function
     _, mean_scores = main(par)
     print(mean_scores)
     output = ad.AnnData(
         X=np.empty((0, 0)),
         uns={
-            "dataset_id": str(par["dataset_id"]),
-            "method_id": f"{par['method_id']}",
+            "dataset_id": dataset_id,
+            "method_id": method_id,
             "metric_ids": mean_scores.columns.values,
             "metric_values": mean_scores.values[0]
         }
