@@ -3276,6 +3276,17 @@ meta = [
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
+        },
+        {
+          "type" : "boolean",
+          "name" : "--silent_missing_dependencies",
+          "default" : [
+            true
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
         }
       ]
     }
@@ -3424,7 +3435,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/ws_distance",
     "viash_version" : "0.9.1",
-    "git_commit" : "c120f91de2bdc2b39efd2f4bf3f09a4684cac2fe",
+    "git_commit" : "e039cbae7e0025d0b6ff84a10700a7a918d94444",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3536,6 +3547,7 @@ import anndata as ad
 import sys
 import numpy as np
 import argparse
+import os
 
 
 ## VIASH START
@@ -3551,7 +3563,8 @@ par = {
   'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'evaluation_data_sc': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA_SC+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA_SC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'ws_consensus': $( if [ ! -z ${VIASH_PAR_WS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_WS_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'ws_distance_background': $( if [ ! -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then echo "r'${VIASH_PAR_WS_DISTANCE_BACKGROUND//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'ws_distance_background': $( if [ ! -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then echo "r'${VIASH_PAR_WS_DISTANCE_BACKGROUND//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'silent_missing_dependencies': $( if [ ! -z ${VIASH_PAR_SILENT_MISSING_DEPENDENCIES+x} ]; then echo "r'${VIASH_PAR_SILENT_MISSING_DEPENDENCIES//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3614,19 +3627,32 @@ from main import main
 
 if __name__ == '__main__':
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-    dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
-    print(f"Method id: {method_id}, Dataset id: {dataset_id}")
 
-    # - main function
-    _, mean_scores = main(par)
-    print(mean_scores)
+    # - check dependencies
+    if par.get('ws_consensus') is None:
+        if par['silent_missing_dependencies']:
+            dataset_id = 'missing'
+            metric_ids =[]
+            metric_values = []
+        else:
+            raise FileNotFoundError(f"Dependencies missing {par['ws_consensus']}. Please check the paths of the dependencies")
+    else:
+        method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+        dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
+        print(f"Method id: {method_id}, Dataset id: {dataset_id}")
+        # - main function
+        _, mean_scores = main(par)
+        print(mean_scores)
+        metric_ids = mean_scores.columns.values
+        metric_values = mean_scores.values[0]
+
     output = ad.AnnData(
         X=np.empty((0, 0)),
         uns={
             "dataset_id": dataset_id,
             "method_id": method_id,
-            "metric_ids": mean_scores.columns.values,
-            "metric_values": mean_scores.values[0]
+            "metric_ids": metric_ids,
+            "metric_values": metric_values
         }
     )
     output.write_h5ad(par['score'], compression='gzip')

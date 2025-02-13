@@ -456,9 +456,9 @@ RUN pip install --upgrade pip && \
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component control_methods positive_control"
-LABEL org.opencontainers.image.created="2025-02-13T19:13:43Z"
+LABEL org.opencontainers.image.created="2025-02-13T22:57:18Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="c120f91de2bdc2b39efd2f4bf3f09a4684cac2fe"
+LABEL org.opencontainers.image.revision="e039cbae7e0025d0b6ff84a10700a7a918d94444"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
