@@ -19,12 +19,12 @@ RUN_GRN_INFERENCE=true
 CALCULATE_METRICS=true
 RUN_CONSENSUS_FLAG=false # - whether to run the consensus for reg2 (only run when to update the consensus), #TODO: update the code to handle other consensus
 FORCE=true
-SBATCH=false
+SBATCH=true
 SAVE_SCORES_FILE="resources/scores/scores_controls.csv" # - where to save the scores (all metrics, datasets, methods)
 
 
 DATASETS=(
-    " replogle adamson nakatake norman op"
+    " replogle adamson nakatake norman op "
 )
 
 # DATASETS=(
@@ -36,7 +36,7 @@ DATASETS=(
 # )
 
 METHODS=(
-    " pearson_corr "
+    " grnboost2 portia scenic positive_control pearson_corr negative_control scprint "
 )
 
 

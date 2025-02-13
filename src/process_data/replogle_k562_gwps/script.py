@@ -68,11 +68,11 @@ def split_data(adata: ad.AnnData):
     adata_test = adata[adata.obs['perturbation'].isin(test_tfs)]
     adata_train = adata[adata.obs['perturbation'].isin(train_pertubs)] # all perturbs
 
-    adata_train_short = adata[adata.obs['perturbation'].isin(train_pertubs[:500])]
+    adata_train_sc_subset = adata[adata.obs['perturbation'].isin(train_pertubs[:500])]
 
-    print(f"Train : {adata_train.shape}, Test: {adata_test.shape}, Train_short: {adata_train_short.shape}")
+    print(f"Train : {adata_train.shape}, Test: {adata_test.shape}, Train_short: {adata_train_sc_subset.shape}")
 
-    return adata_train, adata_test, adata_train_short
+    return adata_train, adata_test, adata_train_sc_subset
 
 
 
@@ -138,6 +138,7 @@ def main(par):
     adata_train_sc.uns['dataset_id'] = 'replogle'
     adata_train_sc.write(par['adata_train_sc'])
 
+    adata_train_sc_subset = adata_train_sc_subset.to_memory()
     adata_train_sc_subset.uns['dataset_id'] = 'replogle'
     adata_train_sc_subset.write(par['adata_train_sc_subset'])
     del adata_train_sc, adata_train_sc_subset
