@@ -69,7 +69,7 @@ except:
 from util import verbose_print, process_links, verbose_tqdm, binarize_weight
 from helper import set_global_seed, process_net, cross_validation
 
-def _net(par):
+def read_net(par):
     print(par['prediction'], flush=True)
     net = ad.read_h5ad(par['prediction'])
     net = pd.DataFrame(net.uns['prediction'])
@@ -130,7 +130,7 @@ if __name__ == '__main__':
     results = pd.DataFrame(results)
     print(results)
 
-    print(metric_ids.shape, metric_values.shape)
+    
     results = ad.AnnData(
         X=np.empty((0, 0)),
         uns={
@@ -140,5 +140,6 @@ if __name__ == '__main__':
             "metric_values": results.values[0]
         }
     )
+    print(results.uns)
 
     results.write_h5ad(par["score"], compression="gzip")

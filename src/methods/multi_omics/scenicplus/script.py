@@ -60,7 +60,8 @@ def print_memory_usage():
     print(f"Memory usage: {mem_info:.2f} MB")
 
 
-def main(par):
+def main(par):  
+    
 
     par['cistopic_object'] = f'{par["temp_dir"]}/cistopic_object.pkl'
     par['DB_PATH'] = os.path.join('output', 'db')
@@ -93,6 +94,11 @@ def main(par):
     snakemake_pipeline(par)
     print_memory_usage()
     print('------- post_process -------')
-    post_process(par)
+    net = post_process(par)
+    return net
 if __name__ == '__main__':
-    main(par)
+    net = main(par)
+
+    dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
+    output = ad.AnnData(X=None, uns={"method_id": 'scenicplus', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
+    output.write(par['prediction'])

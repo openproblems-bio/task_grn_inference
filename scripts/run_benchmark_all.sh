@@ -6,7 +6,7 @@ RUN_ID="scores_test"
 reg_type="ridge"
 label="test"
 
-dataset_ids=" norman "
+dataset_ids=" adamson "
 method_ids="[pearson_corr]"
 
 echo "Run ID: $RUN_ID"

@@ -151,11 +151,12 @@ def main(par):
   return network
   
 if __name__=='__main__':
+  dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
   net = main(par)
   os.makedirs(par['temp_dir'], exist_ok=True)
 
   net['weight'] = net['weight'].astype(str)
-  output = ad.AnnData(X=None, uns={"method_id": "scenic", "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+  output = ad.AnnData(X=None, uns={"method_id": "scenic", "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
   output.write(par['prediction'])
 
 

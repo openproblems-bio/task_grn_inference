@@ -4,8 +4,8 @@ library(dplyr)
 
 ## VIASH START
 par <- list(
-  rna = 'resources/grn-benchmark/rna.h5ad',
-  prediction = 'resources/grn_models/ppcor.csv',
+  rna = 'resources/grn_benchmark/inference_data/rna.h5ad',
+  prediction = 'resources/grn_models/ppcor.h5ad',
   tf_all = 'resources/grn_benchmark/prior/tf_all.csv',
   max_n_links = 50000
 )
@@ -41,6 +41,7 @@ while (i <= length(args)) {
 tf_names <- scan(par$tf_all, what = "", sep = "\n")
 
 ad <- anndata::read_h5ad(par$rna)
+dataset_id = ad$uns$dataset_id
 
 inputExpr <- ad$X
 geneNames <- colnames(inputExpr)
@@ -74,17 +75,26 @@ net <- head(df_filtered, par$max_n_links)
 # Save results
 
 cat("Output GRN\n")
+print(head(net))
 net$weight <- as.character(net$weight)
+if (!is.data.frame(net)) {
+    stop("Error: 'net' is not a dataframe")
+}
+
+
 output <- AnnData(
   X = matrix(nrow = 0, ncol = 0),
   uns = list(
     method_id = "ppcor",
-    dataset_id = par$dataset_id,
+    dataset_id = dataset_id,
     prediction = net[, c("source", "target", "weight")]
   )
 )
-output$write(par$prediction)
 
-# write.table(df_final, par$prediction, sep = ",", quote = FALSE, row.names = FALSE)
+print(output)
+# output$write(par$prediction)
+print(par$prediction)
+output$write_h5ad(par$prediction, compression = "gzip")
+# write.table(net, 'output/ne', sep = ",", quote = FALSE, row.names = FALSE)
 
 print("Finished.")

@@ -65,8 +65,9 @@ print(par)
 net = main(par)
 
 print('Write output to file', flush=True)
-net['weight'] = net['weight'].astype(str)
-output = ad.AnnData(X=None, uns={"method_id": 'scglue', "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+dataset_id = ad.read_h5ad(par['multiomics_rna'], backed='r').uns['dataset_id']
+net = net.astype(str)
+output = ad.AnnData(X=None, uns={"method_id": 'scglue', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
 output.write(par['prediction'])
 
 

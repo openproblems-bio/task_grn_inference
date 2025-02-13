@@ -95,7 +95,6 @@ def cross_validation(net, prturb_adata, par:dict):
     gene_names = np.intersect1d(gene_names, gene_names_grn)
     prturb_adata = prturb_adata[:, prturb_adata.var_names.isin(gene_names)]
     net = net.loc[gene_names, :]
-
     
     # construct feature and target space
     n_tfs = net.shape[1]

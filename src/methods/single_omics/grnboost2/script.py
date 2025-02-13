@@ -82,11 +82,13 @@ def main(par: dict) -> pd.DataFrame:
     return network  
 
 if __name__ == '__main__':
+    dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
+
     net = main(par)   
 
     # Save inferred GRN
     print('Output GRN')
     # convert the predictions to the benchmark format
     net = net.astype(str)
-    output = ad.AnnData(X=None, uns={"method_id": 'grnboost2', "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight"]]})
+    output = ad.AnnData(X=None, uns={"method_id": 'grnboost2', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])
