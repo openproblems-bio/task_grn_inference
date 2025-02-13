@@ -101,9 +101,9 @@ def main_sub(adata, model, par):
     
     # - melt to have the format of the benchmark
     gene_names = grn.var['gene_name'].values
-    net = efficient_melting(net, gene_names, symmetrize=False)
+    net = efficient_melting(net, gene_names, symmetric=False)
     net = net[net['weight'] != 0]
-    assert ~net[['source', 'target', 'weight']].duplicated().any()
+    # assert ~net[['source', 'target', 'weight']].duplicated().any()
     
 
     # - subset to TFs

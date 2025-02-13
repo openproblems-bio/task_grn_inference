@@ -16,7 +16,7 @@ source ~/miniconda3/bin/activate scprint
 
 # ----- parameters -----
 RUN_GRN_INFERENCE=true
-CALCULATE_METRICS=true
+CALCULATE_METRICS=false
 RUN_CONSENSUS_FLAG=false # - whether to run the consensus for reg2 (only run when to update the consensus), #TODO: update the code to handle other consensus
 FORCE=true
 SBATCH=true
@@ -24,7 +24,7 @@ SAVE_SCORES_FILE="resources/scores/scores_controls.csv" # - where to save the sc
 
 
 DATASETS=(
-    " replogle adamson nakatake norman op "
+    " adamson "
 )
 
 # DATASETS=(
@@ -36,7 +36,7 @@ DATASETS=(
 # )
 
 METHODS=(
-    " grnboost2 portia scenic positive_control pearson_corr negative_control scprint "
+    " scenic "
 )
 
 
