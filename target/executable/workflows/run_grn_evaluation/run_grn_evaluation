@@ -189,12 +189,6 @@ function ViashHelp {
   echo "    --layer"
   echo "        type: string, required parameter"
   echo ""
-  echo "    --method_id"
-  echo "        type: string, required parameter"
-  echo ""
-  echo "    --dataset_id"
-  echo "        type: string, required parameter"
-  echo ""
   echo "    --tf_all"
   echo "        type: file, required parameter, file must exist"
   echo "        example: resources_test/grn_benchmark/prior/tf_all.csv"
@@ -330,28 +324,6 @@ while [[ $# -gt 0 ]]; do
         --layer=*)
             [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer=*\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_LAYER=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --method_id)
-            [ -n "$VIASH_PAR_METHOD_ID" ] && ViashError Bad arguments for option \'--method_id\': \'$VIASH_PAR_METHOD_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_METHOD_ID="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --method_id. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --method_id=*)
-            [ -n "$VIASH_PAR_METHOD_ID" ] && ViashError Bad arguments for option \'--method_id=*\': \'$VIASH_PAR_METHOD_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_METHOD_ID=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --dataset_id)
-            [ -n "$VIASH_PAR_DATASET_ID" ] && ViashError Bad arguments for option \'--dataset_id\': \'$VIASH_PAR_DATASET_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_DATASET_ID="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --dataset_id. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --dataset_id=*)
-            [ -n "$VIASH_PAR_DATASET_ID" ] && ViashError Bad arguments for option \'--dataset_id=*\': \'$VIASH_PAR_DATASET_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_DATASET_ID=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --tf_all)
@@ -640,14 +612,6 @@ if [ -z ${VIASH_PAR_LAYER+x} ]; then
   ViashError '--layer' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
-if [ -z ${VIASH_PAR_METHOD_ID+x} ]; then
-  ViashError '--method_id' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_DATASET_ID+x} ]; then
-  ViashError '--dataset_id' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
 if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
   ViashError '--tf_all' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
@@ -928,8 +892,6 @@ workflow run_wf {
         ws_distance_background: "ws_distance_background",
         subsample: "subsample",
         reg_type: "reg_type",
-        method_id: "method_id",
-        dataset_id: "dataset_id",
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",

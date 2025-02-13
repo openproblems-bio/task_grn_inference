@@ -3133,17 +3133,6 @@ meta = [
         },
         {
           "type" : "string",
-          "name" : "--method_id",
-          "example" : [
-            "grnboost2"
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "string",
           "name" : "--layer",
           "default" : [
             "X_norm"
@@ -3169,17 +3158,6 @@ meta = [
           "name" : "--verbose",
           "default" : [
             2
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "string",
-          "name" : "--dataset_id",
-          "default" : [
-            "op"
           ],
           "required" : false,
           "direction" : "input",
@@ -3458,7 +3436,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression_1",
     "viash_version" : "0.9.1",
-    "git_commit" : "5a896e6d14e7d8704bc35bd8bc1bdf6252219f32",
+    "git_commit" : "1b201566f6c98b235b5d8da7ba05dc9ea084595e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3587,11 +3565,9 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 par = {
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'score': $( if [ ! -z ${VIASH_PAR_SCORE+x} ]; then echo "r'${VIASH_PAR_SCORE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'verbose': $( if [ ! -z ${VIASH_PAR_VERBOSE+x} ]; then echo "int(r'${VIASH_PAR_VERBOSE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
@@ -3678,7 +3654,6 @@ def read_net(par):
         net = net[net['link'].isin(skeleton)]
         print('After filtering with skeleton:', net.shape)
 
-    
     if 'cell_type' in net.columns:
         print('Taking mean of cell type specific grns')
         net.drop(columns=['cell_type'], inplace=True)
@@ -3704,36 +3679,38 @@ def main(par):
     evaluation_data.X = evaluation_data.layers[par["layer"]]
     gene_names = evaluation_data.var.index.to_numpy()
     
-    
     # -- calclate scores 
     results = cross_validation(net, evaluation_data, par)
 
     return results
 
 if __name__ == '__main__':
-#   print(par)
-  results = main(par) 
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+    print(f"Method id: {method_id}, Dataset id: {dataset_id}")
 
-  # - formatize results  
-  results = dict(r1_all=[results['r2score-aver-all']], r1_grn=[results['r2score-aver-grn']])
-  results = pd.DataFrame(results)
-  print(results)
+    # - run main function
+    results = main(par) 
 
-  metric_ids = results.columns.to_numpy()
-  metric_values = results.values[0]
 
-  print(metric_ids.shape, metric_values.shape)
-  results = ad.AnnData(
-      X=np.empty((0, 0)),
-      uns={
-          "dataset_id": par["dataset_id"],
-          "method_id": f"{par['method_id']}",
-          "metric_ids": metric_ids,
-          "metric_values": metric_values
-      }
-  )
+    # - formatize results  
+    results = dict(r1_all=[results['r2score-aver-all']], r1_grn=[results['r2score-aver-grn']])
+    results = pd.DataFrame(results)
+    print(results)
 
-  results.write_h5ad(par["score"], compression="gzip")
+    
+    results = ad.AnnData(
+        X=np.empty((0, 0)),
+        uns={
+            "dataset_id": dataset_id,
+            "method_id": method_id,
+            "metric_ids": results.columns.to_numpy(),
+            "metric_values": results.values[0]
+        }
+    )
+    print(results.uns)
+
+    results.write_h5ad(par["score"], compression="gzip")
 VIASHMAIN
 python -B "$tempscript"
 '''

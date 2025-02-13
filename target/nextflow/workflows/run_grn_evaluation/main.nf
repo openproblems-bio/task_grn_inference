@@ -3072,22 +3072,6 @@ meta = [
           "multiple_sep" : ";"
         },
         {
-          "type" : "string",
-          "name" : "--method_id",
-          "required" : true,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "string",
-          "name" : "--dataset_id",
-          "required" : true,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
           "type" : "file",
           "name" : "--tf_all",
           "example" : [
@@ -3386,7 +3370,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.1",
-    "git_commit" : "5a896e6d14e7d8704bc35bd8bc1bdf6252219f32",
+    "git_commit" : "1b201566f6c98b235b5d8da7ba05dc9ea084595e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3539,8 +3523,6 @@ workflow run_wf {
         ws_distance_background: "ws_distance_background",
         subsample: "subsample",
         reg_type: "reg_type",
-        method_id: "method_id",
-        dataset_id: "dataset_id",
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",

@@ -456,9 +456,9 @@ pip install -e GRnnData[dev]   && \
 pip install -e benGRN[dev]  
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-02-12T09:26:29Z"
+LABEL org.opencontainers.image.created="2025-02-13T16:00:21Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="5a896e6d14e7d8704bc35bd8bc1bdf6252219f32"
+LABEL org.opencontainers.image.revision="1b201566f6c98b235b5d8da7ba05dc9ea084595e"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -608,6 +608,10 @@ function ViashHelp {
   echo "        type: string"
   echo "        default: output/temdir"
   echo ""
+  echo "    --layer"
+  echo "        type: string"
+  echo "        default: X_norm"
+  echo ""
   echo "    --seed"
   echo "        type: integer"
   echo "        default: 32"
@@ -615,10 +619,6 @@ function ViashHelp {
   echo "    --dataset_id"
   echo "        type: string"
   echo "        default: op"
-  echo ""
-  echo "    --method_id"
-  echo "        type: string"
-  echo "        default: grnboost2"
   echo ""
   echo "    --filtration"
   echo "        type: string"
@@ -771,6 +771,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_TEMP_DIR=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --layer)
+            [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_LAYER="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --layer. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --layer=*)
+            [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer=*\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_LAYER=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --seed)
             [ -n "$VIASH_PAR_SEED" ] && ViashError Bad arguments for option \'--seed\': \'$VIASH_PAR_SEED\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_SEED="$2"
@@ -791,17 +802,6 @@ while [[ $# -gt 0 ]]; do
         --dataset_id=*)
             [ -n "$VIASH_PAR_DATASET_ID" ] && ViashError Bad arguments for option \'--dataset_id=*\': \'$VIASH_PAR_DATASET_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_DATASET_ID=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --method_id)
-            [ -n "$VIASH_PAR_METHOD_ID" ] && ViashError Bad arguments for option \'--method_id\': \'$VIASH_PAR_METHOD_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_METHOD_ID="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --method_id. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --method_id=*)
-            [ -n "$VIASH_PAR_METHOD_ID" ] && ViashError Bad arguments for option \'--method_id=*\': \'$VIASH_PAR_METHOD_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_METHOD_ID=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --filtration)
@@ -1085,14 +1085,14 @@ fi
 if [ -z ${VIASH_PAR_TEMP_DIR+x} ]; then
   VIASH_PAR_TEMP_DIR="output/temdir"
 fi
+if [ -z ${VIASH_PAR_LAYER+x} ]; then
+  VIASH_PAR_LAYER="X_norm"
+fi
 if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
 if [ -z ${VIASH_PAR_DATASET_ID+x} ]; then
   VIASH_PAR_DATASET_ID="op"
-fi
-if [ -z ${VIASH_PAR_METHOD_ID+x} ]; then
-  VIASH_PAR_METHOD_ID="grnboost2"
 fi
 if [ -z ${VIASH_PAR_FILTRATION+x} ]; then
   VIASH_PAR_FILTRATION="top-k"
@@ -1383,9 +1383,9 @@ par = {
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'filtration': $( if [ ! -z ${VIASH_PAR_FILTRATION+x} ]; then echo "r'${VIASH_PAR_FILTRATION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'num_genes': $( if [ ! -z ${VIASH_PAR_NUM_GENES+x} ]; then echo "int(r'${VIASH_PAR_NUM_GENES//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'max_cells': $( if [ ! -z ${VIASH_PAR_MAX_CELLS+x} ]; then echo "int(r'${VIASH_PAR_MAX_CELLS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
@@ -1538,6 +1538,7 @@ def main(par):
 
     
 if __name__ == '__main__':
+    dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
     if par['populate_ontology']: 
         populate_my_ontology( 
             organisms= ["NCBITaxon:9606"]
@@ -1562,7 +1563,7 @@ if __name__ == '__main__':
 
     print(f"Writing results to {par['prediction']}")
     net = net.astype(str)
-    output = ad.AnnData(X=None, uns={"method_id": "scprint", "dataset_id": par['dataset_id'], "prediction": net[["source", "target", "weight", "cell_type"]]})
+    output = ad.AnnData(X=None, uns={"method_id": "scprint", "dataset_id": dataset_id, "prediction": net[["source", "target", "weight", "cell_type"]]})
     output.write(par['prediction'])
 VIASHMAIN
 python -B "\$tempscript" &

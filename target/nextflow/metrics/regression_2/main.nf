@@ -3133,17 +3133,6 @@ meta = [
         },
         {
           "type" : "string",
-          "name" : "--method_id",
-          "example" : [
-            "grnboost2"
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "string",
           "name" : "--layer",
           "default" : [
             "X_norm"
@@ -3169,17 +3158,6 @@ meta = [
           "name" : "--verbose",
           "default" : [
             2
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "string",
-          "name" : "--dataset_id",
-          "default" : [
-            "op"
           ],
           "required" : false,
           "direction" : "input",
@@ -3470,7 +3448,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression_2",
     "viash_version" : "0.9.1",
-    "git_commit" : "5a896e6d14e7d8704bc35bd8bc1bdf6252219f32",
+    "git_commit" : "1b201566f6c98b235b5d8da7ba05dc9ea084595e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3588,11 +3566,9 @@ import argparse
 par = {
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'score': $( if [ ! -z ${VIASH_PAR_SCORE+x} ]; then echo "r'${VIASH_PAR_SCORE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'method_id': $( if [ ! -z ${VIASH_PAR_METHOD_ID+x} ]; then echo "r'${VIASH_PAR_METHOD_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'verbose': $( if [ ! -z ${VIASH_PAR_VERBOSE+x} ]; then echo "int(r'${VIASH_PAR_VERBOSE//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
@@ -3659,26 +3635,31 @@ else:
 
 from main import main
 
-print('Reading input data')
 
-output = main(par)
+if __name__ == '__main__':
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+    print(f"Method id: {method_id}, Dataset id: {dataset_id}")
 
-print('Write output to file', flush=True)
-print(output)
-metric_ids = output.columns.to_numpy()
-metric_values = output.values[0]
+    # - Main function
+    output = main(par)
 
-output = ad.AnnData(
-    X=np.empty((0, 0)),
-    uns={
-        "dataset_id": str(par["dataset_id"]),
-        "method_id": f"{par['method_id']}",
-        "metric_ids": metric_ids,
-        "metric_values": metric_values
-    }
-)
-output.write_h5ad(par['score'], compression='gzip')
-print('Completed', flush=True)
+    print('Write output to file', flush=True)
+    print(output)
+    metric_ids = output.columns.to_numpy()
+    metric_values = output.values[0]
+
+    output = ad.AnnData(
+        X=np.empty((0, 0)),
+        uns={
+            "dataset_id": dataset_id,
+            "method_id": method_id,
+            "metric_ids": metric_ids,
+            "metric_values": metric_values
+        }
+    )
+    output.write_h5ad(par['score'], compression='gzip')
+    print('Completed', flush=True)
 VIASHMAIN
 python -B "$tempscript"
 '''

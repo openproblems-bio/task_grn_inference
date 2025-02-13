@@ -184,15 +184,12 @@ function ViashHelp {
   echo "        type: file, file must exist"
   echo ""
   echo "    --atac"
-  echo "        type: file"
+  echo "        type: file, file must exist"
   echo ""
   echo "    --evaluation_data"
   echo "        type: file, file must exist"
   echo ""
   echo "    --evaluation_data_sc"
-  echo "        type: file, file must exist"
-  echo ""
-  echo "    --prediction"
   echo "        type: file, file must exist"
   echo ""
   echo "    --reg_type"
@@ -204,7 +201,6 @@ function ViashHelp {
   echo ""
   echo "    --tf_all"
   echo "        type: file, file must exist"
-  echo "        default: resources/grn_benchmark/prior/tf_all.csv"
   echo ""
   echo "    --regulators_consensus"
   echo "        type: file, required parameter"
@@ -334,17 +330,6 @@ while [[ $# -gt 0 ]]; do
         --evaluation_data_sc=*)
             [ -n "$VIASH_PAR_EVALUATION_DATA_SC" ] && ViashError Bad arguments for option \'--evaluation_data_sc=*\': \'$VIASH_PAR_EVALUATION_DATA_SC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_EVALUATION_DATA_SC=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --prediction)
-            [ -n "$VIASH_PAR_PREDICTION" ] && ViashError Bad arguments for option \'--prediction\': \'$VIASH_PAR_PREDICTION\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_PREDICTION="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --prediction. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --prediction=*)
-            [ -n "$VIASH_PAR_PREDICTION" ] && ViashError Bad arguments for option \'--prediction=*\': \'$VIASH_PAR_PREDICTION\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_PREDICTION=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --reg_type)
@@ -681,9 +666,6 @@ fi
 if [ -z ${VIASH_PAR_REG_TYPE+x} ]; then
   VIASH_PAR_REG_TYPE="ridge"
 fi
-if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
-  VIASH_PAR_TF_ALL="resources/grn_benchmark/prior/tf_all.csv"
-fi
 if [ -z ${VIASH_PAR_LAYER+x} ]; then
   VIASH_PAR_LAYER="pearson"
 fi
@@ -693,16 +675,16 @@ if [ ! -z "$VIASH_PAR_RNA" ] && [ ! -e "$VIASH_PAR_RNA" ]; then
   ViashError "Input file '$VIASH_PAR_RNA' does not exist."
   exit 1
 fi
+if [ ! -z "$VIASH_PAR_ATAC" ] && [ ! -e "$VIASH_PAR_ATAC" ]; then
+  ViashError "Input file '$VIASH_PAR_ATAC' does not exist."
+  exit 1
+fi
 if [ ! -z "$VIASH_PAR_EVALUATION_DATA" ] && [ ! -e "$VIASH_PAR_EVALUATION_DATA" ]; then
   ViashError "Input file '$VIASH_PAR_EVALUATION_DATA' does not exist."
   exit 1
 fi
 if [ ! -z "$VIASH_PAR_EVALUATION_DATA_SC" ] && [ ! -e "$VIASH_PAR_EVALUATION_DATA_SC" ]; then
   ViashError "Input file '$VIASH_PAR_EVALUATION_DATA_SC' does not exist."
-  exit 1
-fi
-if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -e "$VIASH_PAR_PREDICTION" ]; then
-  ViashError "Input file '$VIASH_PAR_PREDICTION' does not exist."
   exit 1
 fi
 if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
@@ -829,7 +811,6 @@ fi
 VIASH_DEP_METRICS_REGRESSION_2="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/regression_2/main.nf"
 VIASH_DEP_METRICS_REGRESSION_1="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/regression_1/main.nf"
 VIASH_DEP_METRICS_WS_DISTANCE="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/ws_distance/main.nf"
-VIASH_DEP_GRN_METHODS_PORTIA="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/portia/main.nf"
 VIASH_DEP_CONTROL_METHODS_PEARSON_CORR="$VIASH_META_RESOURCES_DIR/../../../nextflow/control_methods/pearson_corr/main.nf"
 VIASH_DEP_UTILS_EXTRACT_UNS_METADATA="$VIASH_TARGET_DIR/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
 
@@ -905,8 +886,6 @@ workflow run_wf {
         ws_distance_background: "ws_distance_background",
         subsample: "subsample",
         reg_type: "reg_type",
-        method_id: "method_id",
-        dataset_id: "dataset_id",
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",

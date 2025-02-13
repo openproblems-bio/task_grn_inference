@@ -3056,7 +3056,7 @@ meta = [
         {
           "type" : "file",
           "name" : "--atac",
-          "must_exist" : false,
+          "must_exist" : true,
           "create_parent" : true,
           "required" : false,
           "direction" : "input",
@@ -3076,16 +3076,6 @@ meta = [
         {
           "type" : "file",
           "name" : "--evaluation_data_sc",
-          "must_exist" : true,
-          "create_parent" : true,
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--prediction",
           "must_exist" : true,
           "create_parent" : true,
           "required" : false,
@@ -3115,9 +3105,6 @@ meta = [
         {
           "type" : "file",
           "name" : "--tf_all",
-          "default" : [
-            "resources/grn_benchmark/prior/tf_all.csv"
-          ],
           "must_exist" : true,
           "create_parent" : true,
           "required" : false,
@@ -3317,12 +3304,6 @@ meta = [
       }
     },
     {
-      "name" : "grn_methods/portia",
-      "repository" : {
-        "type" : "local"
-      }
-    },
-    {
       "name" : "control_methods/pearson_corr",
       "repository" : {
         "type" : "local"
@@ -3393,7 +3374,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_benchmark",
     "viash_version" : "0.9.1",
-    "git_commit" : "5a896e6d14e7d8704bc35bd8bc1bdf6252219f32",
+    "git_commit" : "1b201566f6c98b235b5d8da7ba05dc9ea084595e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3497,7 +3478,6 @@ include { regression_2 } from "${meta.resources_dir}/../../../nextflow/metrics/r
 include { regression_1 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_1/main.nf"
 include { ws_distance } from "${meta.resources_dir}/../../../nextflow/metrics/ws_distance/main.nf"
 include { extract_uns_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
-include { portia } from "${meta.resources_dir}/../../../nextflow/grn_methods/portia/main.nf"
 include { pearson_corr } from "${meta.resources_dir}/../../../nextflow/control_methods/pearson_corr/main.nf"
 
 // inner workflow
@@ -3556,8 +3536,6 @@ workflow run_wf {
         ws_distance_background: "ws_distance_background",
         subsample: "subsample",
         reg_type: "reg_type",
-        method_id: "method_id",
-        dataset_id: "dataset_id",
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",

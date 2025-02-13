@@ -37,8 +37,6 @@ grn_models_folder="${resources_dir}/grn_models/"
 grn_models_folder_local="./resources/grn_models/"
 
 
-
-
 params_dir="./params"
 param_file="${params_dir}/${RUN_ID}.yaml"
 param_list="${params_dir}/${RUN_ID}_param_list.yaml"
@@ -62,8 +60,6 @@ append_entry() {
   - id: ${reg_type}_${grn_name}_${dataset}
     metric_ids: ${metric_ids}
     evaluation_data: ${files_dir}/evaluation_data/${dataset}_bulk.h5ad
-    method_id: $grn_name
-    dataset_id: $dataset
     tf_all: ${files_dir}/prior/tf_all.csv
     regulators_consensus: ${files_dir}/prior/regulators_consensus_${dataset}.json
     prediction: ${grn_models_folder}/${dataset}/${grn_name}.h5ad

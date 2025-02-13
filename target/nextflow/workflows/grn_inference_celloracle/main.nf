@@ -3215,6 +3215,17 @@ meta = [
           "multiple_sep" : ";"
         },
         {
+          "type" : "string",
+          "name" : "--layer",
+          "default" : [
+            "X_norm"
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
           "type" : "integer",
           "name" : "--seed",
           "default" : [
@@ -3230,17 +3241,6 @@ meta = [
           "name" : "--dataset_id",
           "default" : [
             "op"
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "string",
-          "name" : "--method_id",
-          "default" : [
-            "grnboost2"
           ],
           "required" : false,
           "direction" : "input",
@@ -3372,7 +3372,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/grn_inference_celloracle",
     "viash_version" : "0.9.1",
-    "git_commit" : "5a896e6d14e7d8704bc35bd8bc1bdf6252219f32",
+    "git_commit" : "1b201566f6c98b235b5d8da7ba05dc9ea084595e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

@@ -209,6 +209,10 @@ function ViashHelp {
   echo "        type: string"
   echo "        default: output/temdir"
   echo ""
+  echo "    --layer"
+  echo "        type: string"
+  echo "        default: X_norm"
+  echo ""
   echo "    --seed"
   echo "        type: integer"
   echo "        default: 32"
@@ -216,10 +220,6 @@ function ViashHelp {
   echo "    --dataset_id"
   echo "        type: string"
   echo "        default: op"
-  echo ""
-  echo "    --method_id"
-  echo "        type: string"
-  echo "        default: grnboost2"
   echo ""
   echo "    --base_grn"
   echo "        type: file, output, file must exist"
@@ -339,6 +339,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_TEMP_DIR=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --layer)
+            [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_LAYER="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --layer. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --layer=*)
+            [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer=*\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_LAYER=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         --seed)
             [ -n "$VIASH_PAR_SEED" ] && ViashError Bad arguments for option \'--seed\': \'$VIASH_PAR_SEED\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_SEED="$2"
@@ -359,17 +370,6 @@ while [[ $# -gt 0 ]]; do
         --dataset_id=*)
             [ -n "$VIASH_PAR_DATASET_ID" ] && ViashError Bad arguments for option \'--dataset_id=*\': \'$VIASH_PAR_DATASET_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_DATASET_ID=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --method_id)
-            [ -n "$VIASH_PAR_METHOD_ID" ] && ViashError Bad arguments for option \'--method_id\': \'$VIASH_PAR_METHOD_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_METHOD_ID="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --method_id. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --method_id=*)
-            [ -n "$VIASH_PAR_METHOD_ID" ] && ViashError Bad arguments for option \'--method_id=*\': \'$VIASH_PAR_METHOD_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_METHOD_ID=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --base_grn)
@@ -529,14 +529,14 @@ fi
 if [ -z ${VIASH_PAR_TEMP_DIR+x} ]; then
   VIASH_PAR_TEMP_DIR="output/temdir"
 fi
+if [ -z ${VIASH_PAR_LAYER+x} ]; then
+  VIASH_PAR_LAYER="X_norm"
+fi
 if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"
 fi
 if [ -z ${VIASH_PAR_DATASET_ID+x} ]; then
   VIASH_PAR_DATASET_ID="op"
-fi
-if [ -z ${VIASH_PAR_METHOD_ID+x} ]; then
-  VIASH_PAR_METHOD_ID="grnboost2"
 fi
 if [ -z ${VIASH_PAR_BASE_GRN+x} ]; then
   VIASH_PAR_BASE_GRN="output/celloracle/base_grn.csv"
