@@ -18,15 +18,10 @@ par = {
     'atac': 'resources/grn_benchmark/inference_data/op_atac.h5ad',
     'atac_test': 'resources_test/grn_benchmark/inference_data//op_atac.h5ad',
     # - evaluation data
-    'evaluation_data': 'resources/grn_benchmark/evaluation_data//op.h5ad',
-    'evaluation_data_test': 'resources_test/grn_benchmark/evaluation_data//op.h5ad',
+    'evaluation_data': 'resources/grn_benchmark/evaluation_data//op_bulk.h5ad',
+    'evaluation_data_test': 'resources_test/grn_benchmark/evaluation_data//op_bulk.h5ad',
     'evaluation_data_sc': 'resources/grn_benchmark/evaluation_data/norman_sc.h5ad',
     'evaluation_data_sc_test': 'resources_test/grn_benchmark/evaluation_data/norman_sc.h5ad'
-
-    # 'multiomics_counts': 'resources/datasets_raw/op_multiome_sc_counts.h5ad',
-    # 'multiomics_counts_test': 'resources_test/datasets_raw/op_multiome_sc_counts.h5ad',
-
-
 }
 ## VIASH END
 
@@ -82,8 +77,8 @@ def shorten_evaluation_data_sc(par):
     print(evaluation_data_sc)
     evaluation_data_sc.write(par['evaluation_data_sc_test'])
 if __name__ == '__main__':
-    # shorten_inference_data(par)
-    # shorten_evaluation_data(par)
+    shorten_inference_data(par)
+    shorten_evaluation_data(par)
     shorten_evaluation_data_sc(par)
 
 # # - test datasets for raw counts

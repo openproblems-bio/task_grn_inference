@@ -27,6 +27,7 @@ from util import sum_by
 
 # - get the data
 adata = ad.read_h5ad(par['input_data'])
+adata = adata[:, ~adata.var_names.duplicated()]
 adata.var_names_make_unique()
 duplicates = adata.var_names[adata.var_names.duplicated()].unique()
 adata = adata[:, ~adata.var_names.isin(duplicates)]

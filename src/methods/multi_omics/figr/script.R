@@ -8,8 +8,8 @@ library(BSgenome.Hsapiens.UCSC.hg38)
 
 ## VIASH START
 par <- list(
-  rna = "resources/grn-benchmark/multiomics_rna.rds",
-  atac = "resources/grn-benchmark/multiomics_atac.rds",
+  rna = "resources_test/grn_benchmark/inference_data/op_rna.h5ad",
+  atac = "resources_test/grn_benchmark/inference_data/op_atac.h5ad",
   temp_dir =  "output/figr/",
   cell_topic = "resources/grn_benchmark/prior/cell_topic.csv",
   num_workers = 2,

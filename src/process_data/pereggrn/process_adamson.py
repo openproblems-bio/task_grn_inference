@@ -42,6 +42,7 @@ if 'gene_name' in adata.var.columns:
 else:
     adata.var = adata.var[[]]
 adata.var.index = adata.var.index.astype(str)
+adata = adata[:, ~adata.var_names.duplicated()]
 adata.obs = adata.obs[['perturbation', 'is_control', 'perturbation_type']]
 
 # preprocess  

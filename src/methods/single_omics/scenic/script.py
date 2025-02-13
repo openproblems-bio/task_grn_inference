@@ -18,9 +18,9 @@ import argparse
 
 ## VIASH START
 par = {
-  'rna': 'resources/grn-benchmark/rna_0.h5ad',
+  'rna': 'resources/grn_benchmark/inference_data/op_rna.h5ad',
   "tf_all": 'resources/grn_benchmark/prior/tf_all.csv',
-  'prediction': 'output/scenic_0_hvgs.csv',
+  'prediction': 'output/scenic_test.h5ad',
   'temp_dir': 'output/scenic',
   'num_workers': 20,
   'max_n_links': 50000,

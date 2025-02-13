@@ -3438,7 +3438,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scprint",
     "viash_version" : "0.9.1",
-    "git_commit" : "1b201566f6c98b235b5d8da7ba05dc9ea084595e",
+    "git_commit" : "c120f91de2bdc2b39efd2f4bf3f09a4684cac2fe",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3675,9 +3675,9 @@ def main_sub(adata, model, par):
     
     # - melt to have the format of the benchmark
     gene_names = grn.var['gene_name'].values
-    net = efficient_melting(net, gene_names)
+    net = efficient_melting(net, gene_names, symmetric=False)
     net = net[net['weight'] != 0]
-    assert ~net[['source', 'target', 'weight']].duplicated().any()
+    # assert ~net[['source', 'target', 'weight']].duplicated().any()
     
 
     # - subset to TFs
@@ -3685,7 +3685,7 @@ def main_sub(adata, model, par):
     tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
     net = net[net['source'].isin(tf_names)]
 
-    net = net.sort_values(by='weight', ascending=False, key=abs)[:par['max_n_links']]
+    net = net.sort_values(by='weight', ascending=False, key=abs)[:2*par['max_n_links']] # i set this to double of allowed link just in case the symmetry exists. metrics will take care of this 
     
     return net
 def main(par):

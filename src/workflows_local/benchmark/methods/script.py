@@ -31,7 +31,7 @@ def get_par(dataset, method):
         par[key] = value
 
     if (method == 'scprint') & (dataset == 'replogle'):
-        par['rna'] = f'resources/extended_data/replogle_train_sc.h5ad'
+        par['rna'] = f'resources/grn_benchmark/inference_data/replogle_rna_sc_subset.h5ad'
     if (method == 'positive_control') & (dataset == 'op'):
         par['rna'] = f'resources/grn_benchmark/evaluation_data/{dataset}_bulk.h5ad'
     if (method == 'positive_control') & (dataset in ['replogle', 'norman', 'adamson', 'nakatake']):
@@ -121,8 +121,12 @@ def run_grn_inference(par, dataset='op', subsample=None):
             else:
                 mem = "120GB"
                 time = "24:00:00"
+        elif method in ["scglue"]:
+            mem = "250GB"
+            time = "24:00:00"
+
         else:
-            print(method)
+            # print(f"Method {method} not recognized")
             raise ValueError(f"Method {method} not recognized")
 
         # Prepare sbatch command

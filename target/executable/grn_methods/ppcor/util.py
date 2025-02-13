@@ -65,7 +65,13 @@ def process_links(net, par):
 
     if not merged.empty:
         print("Warning: The network contains at least one symmetric link.")
-
+    # - check for duplicates
+    duplicates = net[['source', 'target', 'weight']].duplicated().any()
+    if duplicates:
+        # Remove duplicated edges, keeping the first occurrence
+        net = net[~net[['source', 'target', 'weight']].duplicated()]
+    else:
+        net = net
     # - remove self loops
     net = net[net['source'] != net['target']]
     # - limit the number of links

@@ -13,6 +13,7 @@ from tqdm import tqdm
 from sklearn.multioutput import MultiOutputRegressor
 import os
 import warnings
+import scipy
 
 def set_global_seed(seed):
     np.random.seed(seed)
@@ -92,17 +93,23 @@ def cross_validation(net, prturb_adata, par:dict):
 
     # intersect 
 
-    gene_names = np.intersect1d(gene_names, gene_names_grn)
-    prturb_adata = prturb_adata[:, prturb_adata.var_names.isin(gene_names)]
-    net = net.loc[gene_names, :]
+    gene_names = np.intersect1d(gene_names, prturb_adata.var_names)
+    # prturb_adata = prturb_adata[:, prturb_adata.var_names.isin(gene_names)]
+    prturb_adata = prturb_adata[:, ~prturb_adata.var_names.duplicated()]
+
+    # assert len(gene_names) == prturb_adata.n_vars
+    # net = net.loc[gene_names, :]
     
     # construct feature and target space
     n_tfs = net.shape[1]
     X_df = pd.DataFrame(np.zeros((len(gene_names), n_tfs)), index=gene_names)
-    try:
-        train_df = pd.DataFrame(prturb_adata.X, columns=gene_names).T
-    except:
-        train_df = pd.DataFrame(prturb_adata.X.todense().A, columns=gene_names).T
+
+
+    train_df = pd.DataFrame(
+        prturb_adata.X.toarray() if scipy.sparse.issparse(prturb_adata.X) else prturb_adata.X, 
+        columns=gene_names
+    ).T
+
     Y_df = train_df.loc[gene_names,:]
 
     mask_gene_net = X_df.index.isin(net.index)
@@ -175,11 +182,11 @@ def cross_validation(net, prturb_adata, par:dict):
     r2score_n_all = r2score - np.mean(r2score_baselines)
 
     # - normalized r2 score - S2
-    r2score = r2_score(y_true[mask_gene_net, :], y_pred[mask_gene_net, :], multioutput='variance_weighted')
+    r2score_grn = r2_score(y_true[mask_gene_net, :], y_pred[mask_gene_net, :], multioutput='variance_weighted')
     r2score_baselines = []
     for y_pred_baseline in y_pred_baselines:
         r2score_baselines.append(r2_score(y_true[mask_gene_net, :], y_pred_baseline[mask_gene_net, :], multioutput='variance_weighted'))
-    r2score_n_grn = r2score - np.mean(r2score_baselines)
+    r2score_n_grn = r2score_grn - np.mean(r2score_baselines)
     
     # - normalized r2 scores per sample
     r2score_samples = []
@@ -196,6 +203,7 @@ def cross_validation(net, prturb_adata, par:dict):
         'r2scores': r2score_samples,
         'reg_models' : reg_models
     }
+
     
     return results
 
