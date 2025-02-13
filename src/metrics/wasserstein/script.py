@@ -3,6 +3,7 @@ import anndata as ad
 import sys
 import numpy as np
 import argparse
+import os
 
 
 ## VIASH START
@@ -46,19 +47,32 @@ from main import main
 
 if __name__ == '__main__':
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-    dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
-    print(f"Method id: {method_id}, Dataset id: {dataset_id}")
 
-    # - main function
-    _, mean_scores = main(par)
-    print(mean_scores)
+    # - check dependencies
+    if par.get('ws_consensus') is None:
+        if par['silent_missing_dependencies']:
+            dataset_id = 'missing'
+            metric_ids =[]
+            metric_values = []
+        else:
+            raise FileNotFoundError(f"Dependencies missing {par['ws_consensus']}. Please check the paths of the dependencies")
+    else:
+        method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+        dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
+        print(f"Method id: {method_id}, Dataset id: {dataset_id}")
+        # - main function
+        _, mean_scores = main(par)
+        print(mean_scores)
+        metric_ids = mean_scores.columns.values
+        metric_values = mean_scores.values[0]
+
     output = ad.AnnData(
         X=np.empty((0, 0)),
         uns={
             "dataset_id": dataset_id,
             "method_id": method_id,
-            "metric_ids": mean_scores.columns.values,
-            "metric_values": mean_scores.values[0]
+            "metric_ids": metric_ids,
+            "metric_values": metric_values
         }
     )
     output.write_h5ad(par['score'], compression='gzip')
