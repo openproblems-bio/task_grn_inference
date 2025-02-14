@@ -1,29 +1,36 @@
 #!/bin/bash
-# datasets="adamson  norman replogle op nakatake"
+# datasets="norman replogle op nakatake adamson"
+datasets=" op "
+
 run_local=true
-datasets="op "
 num_workers=10
-metric_ids="[ws_distance]" #regression_1, regression_2, ws_distance
-RUN_ID="scores_test"
+metric_ids="[regression_1, regression_2]" #regression_1, regression_2, ws_distance
+RUN_ID="scores_op_skeleton"
 reg_type="ridge"
-label="test"
+label="scores_default"
+apply_skeleton=true
+apply_tf=true
 
 grn_names=(
-    # "positive_control"
-    # "pearson_corr"
-    # "negative_control"
-    # "scglue"
-    # "scenicplus"
-    # "celloracle"
-    # "granie"
-    # "figr"
-    # "collectri"
+    "positive_control"
+    "pearson_corr"
+    "negative_control"
+    "scglue"
+    "scenicplus"
+    "celloracle"
+    "granie"
+    "figr"
     "grnboost2"
-    # "ppcor"
-    # "portia"
-    # "scenic"
-    # "scprint"
+    "ppcor"
+    "portia"
+    "scenic"
+    "scprint"
 )
+
+# grn_names=(
+
+#     "negative_control"
+# )
 
 if [ "$run_local" = true ]; then
   resources_dir="./resources/"
@@ -70,7 +77,11 @@ append_entry() {
     tf_all: ${files_dir}/prior/tf_all.csv
     regulators_consensus: ${files_dir}/prior/regulators_consensus_${dataset}.json
     prediction: ${grn_models_folder}/${dataset}/${grn_name}.h5ad
+    skeleton: ${files_dir}/prior/skeleton.csv
     layer: 'X_norm'
+    apply_skeleton: ${apply_skeleton}
+    apply_tf: ${apply_tf}
+
 HERE
 
   # Additional fields for specific datasets

@@ -49,6 +49,9 @@ argument_groups:
         type: boolean 
         required: false
         default: false
+      - name: --skeleton
+        type: file 
+        required: false
       - name: --regulators_consensus
         type: file
         direction: input
