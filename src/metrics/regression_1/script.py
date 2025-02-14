@@ -17,9 +17,9 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 ## VIASH START
 par = {
-  "evaluation_data": f"resources/grn_benchmark/evaluation_data//op.h5ad",
+  "evaluation_data": f"resources/grn_benchmark/evaluation_data//op_bulk.h5ad",
   "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
-  "prediction": f"resources/grn_models/op/grnboost2.h5ad",
+  "prediction": f"resources/grn_models/op/negative_control.h5ad",
   "method_id": "scenic",
   "max_n_links": 50000,
   "apply_tf": True,

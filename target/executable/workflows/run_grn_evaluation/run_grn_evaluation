@@ -215,6 +215,9 @@ function ViashHelp {
   echo "        type: boolean"
   echo "        default: false"
   echo ""
+  echo "    --skeleton"
+  echo "        type: file, file must exist"
+  echo ""
   echo "    --regulators_consensus"
   echo "        type: file, required parameter"
   echo "        example:"
@@ -390,6 +393,17 @@ while [[ $# -gt 0 ]]; do
         --apply_skeleton=*)
             [ -n "$VIASH_PAR_APPLY_SKELETON" ] && ViashError Bad arguments for option \'--apply_skeleton=*\': \'$VIASH_PAR_APPLY_SKELETON\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_APPLY_SKELETON=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --skeleton)
+            [ -n "$VIASH_PAR_SKELETON" ] && ViashError Bad arguments for option \'--skeleton\': \'$VIASH_PAR_SKELETON\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_SKELETON="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --skeleton. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --skeleton=*)
+            [ -n "$VIASH_PAR_SKELETON" ] && ViashError Bad arguments for option \'--skeleton=*\': \'$VIASH_PAR_SKELETON\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_SKELETON=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --regulators_consensus)
@@ -689,6 +703,10 @@ if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
   ViashError "Input file '$VIASH_PAR_TF_ALL' does not exist."
   exit 1
 fi
+if [ ! -z "$VIASH_PAR_SKELETON" ] && [ ! -e "$VIASH_PAR_SKELETON" ]; then
+  ViashError "Input file '$VIASH_PAR_SKELETON' does not exist."
+  exit 1
+fi
 if [ ! -z "$VIASH_PAR_EVALUATION_DATA_SC" ] && [ ! -e "$VIASH_PAR_EVALUATION_DATA_SC" ]; then
   ViashError "Input file '$VIASH_PAR_EVALUATION_DATA_SC' does not exist."
   exit 1
@@ -892,6 +910,9 @@ workflow run_wf {
         ws_distance_background: "ws_distance_background",
         subsample: "subsample",
         reg_type: "reg_type",
+        apply_tf: "apply_tf",
+        apply_skeleton: "apply_skeleton",
+        skeleton: "skeleton",
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",

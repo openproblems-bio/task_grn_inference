@@ -3143,6 +3143,16 @@ meta = [
         },
         {
           "type" : "file",
+          "name" : "--skeleton",
+          "must_exist" : true,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
           "name" : "--regulators_consensus",
           "example" : [
             "resources_test/grn_benchmark/prior/regulators_consensus_norman.json"
@@ -3370,7 +3380,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.1",
-    "git_commit" : "e039cbae7e0025d0b6ff84a10700a7a918d94444",
+    "git_commit" : "048888d65fb1d9fb15775e8062f5418db356e314",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3523,6 +3533,9 @@ workflow run_wf {
         ws_distance_background: "ws_distance_background",
         subsample: "subsample",
         reg_type: "reg_type",
+        apply_tf: "apply_tf",
+        apply_skeleton: "apply_skeleton",
+        skeleton: "skeleton",
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",

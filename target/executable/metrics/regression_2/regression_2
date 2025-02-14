@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_2"
-LABEL org.opencontainers.image.created="2025-02-13T22:57:17Z"
+LABEL org.opencontainers.image.created="2025-02-14T21:32:39Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="e039cbae7e0025d0b6ff84a10700a7a918d94444"
+LABEL org.opencontainers.image.revision="048888d65fb1d9fb15775e8062f5418db356e314"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -611,6 +611,10 @@ function ViashHelp {
   echo "    --apply_skeleton"
   echo "        type: boolean"
   echo "        default: false"
+  echo ""
+  echo "    --skeleton"
+  echo "        type: file, file must exist"
+  echo "        example: resources_test/grn_benchmark/prior/skeleton.csv"
   echo ""
   echo "    --evaluation_data"
   echo "        type: file, required parameter, file must exist"
@@ -769,6 +773,17 @@ while [[ $# -gt 0 ]]; do
         --apply_skeleton=*)
             [ -n "$VIASH_PAR_APPLY_SKELETON" ] && ViashError Bad arguments for option \'--apply_skeleton=*\': \'$VIASH_PAR_APPLY_SKELETON\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_APPLY_SKELETON=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --skeleton)
+            [ -n "$VIASH_PAR_SKELETON" ] && ViashError Bad arguments for option \'--skeleton\': \'$VIASH_PAR_SKELETON\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_SKELETON="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --skeleton. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --skeleton=*)
+            [ -n "$VIASH_PAR_SKELETON" ] && ViashError Bad arguments for option \'--skeleton=*\': \'$VIASH_PAR_SKELETON\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_SKELETON=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --evaluation_data)
@@ -1072,6 +1087,10 @@ if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -e "$VIASH_PAR_PREDICTION" ]; then
   ViashError "Input file '$VIASH_PAR_PREDICTION' does not exist."
   exit 1
 fi
+if [ ! -z "$VIASH_PAR_SKELETON" ] && [ ! -e "$VIASH_PAR_SKELETON" ]; then
+  ViashError "Input file '$VIASH_PAR_SKELETON' does not exist."
+  exit 1
+fi
 if [ ! -z "$VIASH_PAR_EVALUATION_DATA" ] && [ ! -e "$VIASH_PAR_EVALUATION_DATA" ]; then
   ViashError "Input file '$VIASH_PAR_EVALUATION_DATA' does not exist."
   exit 1
@@ -1208,6 +1227,10 @@ if [ ! -z "$VIASH_PAR_SCORE" ]; then
   VIASH_PAR_SCORE=$(ViashDockerAutodetectMount "$VIASH_PAR_SCORE")
   VIASH_CHOWN_VARS+=( "$VIASH_PAR_SCORE" )
 fi
+if [ ! -z "$VIASH_PAR_SKELETON" ]; then
+  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_SKELETON")" )
+  VIASH_PAR_SKELETON=$(ViashDockerAutodetectMount "$VIASH_PAR_SKELETON")
+fi
 if [ ! -z "$VIASH_PAR_EVALUATION_DATA" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_EVALUATION_DATA")" )
   VIASH_PAR_EVALUATION_DATA=$(ViashDockerAutodetectMount "$VIASH_PAR_EVALUATION_DATA")
@@ -1304,6 +1327,7 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
+  'skeleton': $( if [ ! -z ${VIASH_PAR_SKELETON+x} ]; then echo "r'${VIASH_PAR_SKELETON//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'evaluation_data': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1407,6 +1431,9 @@ if [[ "$VIASH_ENGINE_TYPE" == "docker" ]]; then
   fi
   if [ ! -z "$VIASH_PAR_SCORE" ]; then
     VIASH_PAR_SCORE=$(ViashDockerStripAutomount "$VIASH_PAR_SCORE")
+  fi
+  if [ ! -z "$VIASH_PAR_SKELETON" ]; then
+    VIASH_PAR_SKELETON=$(ViashDockerStripAutomount "$VIASH_PAR_SKELETON")
   fi
   if [ ! -z "$VIASH_PAR_EVALUATION_DATA" ]; then
     VIASH_PAR_EVALUATION_DATA=$(ViashDockerStripAutomount "$VIASH_PAR_EVALUATION_DATA")

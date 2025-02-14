@@ -3387,7 +3387,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/control_methods/negative_control",
     "viash_version" : "0.9.1",
-    "git_commit" : "e039cbae7e0025d0b6ff84a10700a7a918d94444",
+    "git_commit" : "048888d65fb1d9fb15775e8062f5418db356e314",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
