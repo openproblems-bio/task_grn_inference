@@ -2,12 +2,14 @@
 run_local=true
 num_workers=10
 metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
-RUN_ID="scores_test"
+RUN_ID="all_test"
 reg_type="ridge"
-label="test"
+label="all_test"
 
 dataset_ids=" op  "
-method_ids="[pearson_corr]"
+# method_ids="[negative_control, positive_control, pearson_corr, portia, ppcor, scenic, scenicplus, scprint , grnboost2]"
+
+method_ids="[negative_control]"
 
 echo "Run ID: $RUN_ID"
 
@@ -30,6 +32,7 @@ param_local="${params_dir}/${RUN_ID}_param_local.yaml"
 param_aws="s3://openproblems-data/resources/grn/results/params/${RUN_ID}_param_local.yaml"
 
 # Print GRN names correctly
+echo $param_local
 echo "GRN models: ${grn_names[@]}"
 
 # Ensure param_file is clean
