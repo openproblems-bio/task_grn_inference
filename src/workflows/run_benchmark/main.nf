@@ -1,6 +1,14 @@
 // construct list of methods
 methods = [
-  pearson_corr
+  pearson_corr,
+  negative_control, 
+  positive_control, 
+  portia, 
+  ppcor, 
+  scenic, 
+  scenicplus, 
+  scprint, 
+  grnboost2
 ]
 
 // construct list of metrics

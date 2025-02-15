@@ -803,7 +803,16 @@ fi
 VIASH_DEP_METRICS_REGRESSION_2="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/regression_2/main.nf"
 VIASH_DEP_METRICS_REGRESSION_1="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/regression_1/main.nf"
 VIASH_DEP_METRICS_WS_DISTANCE="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/ws_distance/main.nf"
+VIASH_DEP_GRN_METHODS_PORTIA="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/portia/main.nf"
+VIASH_DEP_GRN_METHODS_GRNBOOST2="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/grnboost2/main.nf"
+VIASH_DEP_GRN_METHODS_SCENIC="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/scenic/main.nf"
+VIASH_DEP_GRN_METHODS_PPCOR="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/ppcor/main.nf"
+VIASH_DEP_GRN_METHODS_SCPRINT="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/scprint/main.nf"
+VIASH_DEP_GRN_METHODS_CELLORACLE="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/celloracle/main.nf"
+VIASH_DEP_GRN_METHODS_SCENICPLUS="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/scenicplus/main.nf"
 VIASH_DEP_CONTROL_METHODS_PEARSON_CORR="$VIASH_META_RESOURCES_DIR/../../../nextflow/control_methods/pearson_corr/main.nf"
+VIASH_DEP_CONTROL_METHODS_NEGATIVE_CONTROL="$VIASH_META_RESOURCES_DIR/../../../nextflow/control_methods/negative_control/main.nf"
+VIASH_DEP_CONTROL_METHODS_POSITIVE_CONTROL="$VIASH_META_RESOURCES_DIR/../../../nextflow/control_methods/positive_control/main.nf"
 VIASH_DEP_UTILS_EXTRACT_UNS_METADATA="$VIASH_TARGET_DIR/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
 
 ViashDebug "Running command: $(echo $VIASH_CMD)"
@@ -826,7 +835,15 @@ cat > "\$tempscript" << 'VIASHMAIN'
 //// VIASH END
 // construct list of methods
 methods = [
-  pearson_corr
+  pearson_corr,
+  negative_control, 
+  positive_control, 
+  portia, 
+  ppcor, 
+  scenic, 
+  scenicplus, 
+  scprint, 
+  grnboost2
 ]
 
 // construct list of metrics

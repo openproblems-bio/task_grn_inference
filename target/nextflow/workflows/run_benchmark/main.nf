@@ -3304,7 +3304,61 @@ meta = [
       }
     },
     {
+      "name" : "grn_methods/portia",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "grn_methods/grnboost2",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "grn_methods/scenic",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "grn_methods/ppcor",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "grn_methods/scprint",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "grn_methods/celloracle",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "grn_methods/scenicplus",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
       "name" : "control_methods/pearson_corr",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "control_methods/negative_control",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "control_methods/positive_control",
       "repository" : {
         "type" : "local"
       }
@@ -3374,7 +3428,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_benchmark",
     "viash_version" : "0.9.1",
-    "git_commit" : "ed03f80fd1c4d4e7130cb666baab0dcd1ca7e26c",
+    "git_commit" : "6d192ca26e40772ba6d95f1a651541d15eb4fa56",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3478,13 +3532,30 @@ include { regression_2 } from "${meta.resources_dir}/../../../nextflow/metrics/r
 include { regression_1 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_1/main.nf"
 include { ws_distance } from "${meta.resources_dir}/../../../nextflow/metrics/ws_distance/main.nf"
 include { extract_uns_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
+include { portia } from "${meta.resources_dir}/../../../nextflow/grn_methods/portia/main.nf"
+include { grnboost2 } from "${meta.resources_dir}/../../../nextflow/grn_methods/grnboost2/main.nf"
+include { scenic } from "${meta.resources_dir}/../../../nextflow/grn_methods/scenic/main.nf"
+include { ppcor } from "${meta.resources_dir}/../../../nextflow/grn_methods/ppcor/main.nf"
+include { scprint } from "${meta.resources_dir}/../../../nextflow/grn_methods/scprint/main.nf"
+include { celloracle } from "${meta.resources_dir}/../../../nextflow/grn_methods/celloracle/main.nf"
+include { scenicplus } from "${meta.resources_dir}/../../../nextflow/grn_methods/scenicplus/main.nf"
 include { pearson_corr } from "${meta.resources_dir}/../../../nextflow/control_methods/pearson_corr/main.nf"
+include { negative_control } from "${meta.resources_dir}/../../../nextflow/control_methods/negative_control/main.nf"
+include { positive_control } from "${meta.resources_dir}/../../../nextflow/control_methods/positive_control/main.nf"
 
 // inner workflow
 // user-provided Nextflow code
 // construct list of methods
 methods = [
-  pearson_corr
+  pearson_corr,
+  negative_control, 
+  positive_control, 
+  portia, 
+  ppcor, 
+  scenic, 
+  scenicplus, 
+  scprint, 
+  grnboost2
 ]
 
 // construct list of metrics
