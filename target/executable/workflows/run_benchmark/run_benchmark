@@ -208,11 +208,11 @@ function ViashHelp {
   echo "resources_test/grn_benchmark/prior/regulators_consensus_norman.json"
   echo ""
   echo "    --ws_consensus"
-  echo "        type: file, required parameter, file must exist"
+  echo "        type: file, file must exist"
   echo "        example: resources_test/grn_benchmark/prior/ws_consensus_norman.csv"
   echo ""
   echo "    --ws_distance_background"
-  echo "        type: file, required parameter, file must exist"
+  echo "        type: file, file must exist"
   echo "        example:"
   echo "resources_test/grn_benchmark/prior/ws_distance_background_norman.csv"
   echo ""
@@ -607,14 +607,6 @@ if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
 fi
 if [ -z ${VIASH_PAR_REGULATORS_CONSENSUS+x} ]; then
   ViashError '--regulators_consensus' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_WS_CONSENSUS+x} ]; then
-  ViashError '--ws_consensus' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then
-  ViashError '--ws_distance_background' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
 if [ -z ${VIASH_PAR_SCORES+x} ]; then

@@ -1,6 +1,6 @@
 #!/bin/bash
 run_local=true
-num_workers=1
+num_workers=10
 metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
 RUN_ID="scores_test"
 reg_type="ridge"
@@ -76,6 +76,7 @@ if [ "$run_local" = true ]; then
 output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
+  viash ns build --parallel 
   nextflow run . \
     -main-script  target/nextflow/workflows/run_benchmark/main.nf \
     -profile docker \

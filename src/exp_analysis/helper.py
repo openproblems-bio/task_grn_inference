@@ -284,7 +284,8 @@ class Exp_analysis:
             if net.duplicated(subset=['source','target']).any():
                 dup_flag = True
         if dup_flag:
-            raise ValueError('The network has duplicated source target combinations.')
+            print('Warning: the network has duplicated source target combinations.')
+            net = net.drop_duplicates(subset=['source','target', 'weight'])
         self.peak_annot = None
     @staticmethod
     def plot_centrality_barh(df, title='',ax=None, xlabel='Degree', ylabel='Gene', colors=None):

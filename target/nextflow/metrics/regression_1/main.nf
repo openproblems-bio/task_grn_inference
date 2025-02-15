@@ -3449,7 +3449,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression_1",
     "viash_version" : "0.9.1",
-    "git_commit" : "048888d65fb1d9fb15775e8062f5418db356e314",
+    "git_commit" : "ed03f80fd1c4d4e7130cb666baab0dcd1ca7e26c",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
