@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics ws_distance"
-LABEL org.opencontainers.image.created="2025-02-15T20:30:06Z"
+LABEL org.opencontainers.image.created="2025-02-16T14:28:06Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="6d192ca26e40772ba6d95f1a651541d15eb4fa56"
+LABEL org.opencontainers.image.revision="3d655d304d9519200622de4715c6b36baf48ce86"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1367,8 +1367,8 @@ if __name__ == '__main__':
     if par.get('ws_consensus') is None:
         if par['silent_missing_dependencies']:
             dataset_id = 'missing'
-            metric_ids =[]
-            metric_values = []
+            metric_ids =['ws']
+            metric_values = ['']
         else:
             raise FileNotFoundError(f"Dependencies missing {par['ws_consensus']}. Please check the paths of the dependencies")
     else:

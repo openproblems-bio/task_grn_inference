@@ -3340,6 +3340,12 @@ meta = [
       }
     },
     {
+      "name" : "grn_methods/scglue",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
       "name" : "grn_methods/scenicplus",
       "repository" : {
         "type" : "local"
@@ -3428,7 +3434,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_benchmark",
     "viash_version" : "0.9.1",
-    "git_commit" : "6d192ca26e40772ba6d95f1a651541d15eb4fa56",
+    "git_commit" : "3d655d304d9519200622de4715c6b36baf48ce86",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3538,6 +3544,7 @@ include { scenic } from "${meta.resources_dir}/../../../nextflow/grn_methods/sce
 include { ppcor } from "${meta.resources_dir}/../../../nextflow/grn_methods/ppcor/main.nf"
 include { scprint } from "${meta.resources_dir}/../../../nextflow/grn_methods/scprint/main.nf"
 include { celloracle } from "${meta.resources_dir}/../../../nextflow/grn_methods/celloracle/main.nf"
+include { scglue } from "${meta.resources_dir}/../../../nextflow/grn_methods/scglue/main.nf"
 include { scenicplus } from "${meta.resources_dir}/../../../nextflow/grn_methods/scenicplus/main.nf"
 include { pearson_corr } from "${meta.resources_dir}/../../../nextflow/control_methods/pearson_corr/main.nf"
 include { negative_control } from "${meta.resources_dir}/../../../nextflow/control_methods/negative_control/main.nf"
@@ -3555,7 +3562,8 @@ methods = [
   scenic, 
   scenicplus, 
   scprint, 
-  grnboost2
+  grnboost2,
+  scglue
 ]
 
 // construct list of metrics

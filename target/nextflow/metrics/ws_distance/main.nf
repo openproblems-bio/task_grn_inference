@@ -3448,7 +3448,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/ws_distance",
     "viash_version" : "0.9.1",
-    "git_commit" : "6d192ca26e40772ba6d95f1a651541d15eb4fa56",
+    "git_commit" : "3d655d304d9519200622de4715c6b36baf48ce86",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3646,8 +3646,8 @@ if __name__ == '__main__':
     if par.get('ws_consensus') is None:
         if par['silent_missing_dependencies']:
             dataset_id = 'missing'
-            metric_ids =[]
-            metric_values = []
+            metric_ids =['ws']
+            metric_values = ['']
         else:
             raise FileNotFoundError(f"Dependencies missing {par['ws_consensus']}. Please check the paths of the dependencies")
     else:

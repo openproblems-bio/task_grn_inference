@@ -52,8 +52,8 @@ if __name__ == '__main__':
     if par.get('ws_consensus') is None:
         if par['silent_missing_dependencies']:
             dataset_id = 'missing'
-            metric_ids =[]
-            metric_values = []
+            metric_ids =['ws']
+            metric_values = ['']
         else:
             raise FileNotFoundError(f"Dependencies missing {par['ws_consensus']}. Please check the paths of the dependencies")
     else:

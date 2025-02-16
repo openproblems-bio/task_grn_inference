@@ -456,9 +456,9 @@ pip install -e GRnnData[dev]   && \
 pip install -e benGRN[dev]  
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-02-15T20:30:06Z"
+LABEL org.opencontainers.image.created="2025-02-16T14:28:07Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="6d192ca26e40772ba6d95f1a651541d15eb4fa56"
+LABEL org.opencontainers.image.revision="3d655d304d9519200622de4715c6b36baf48ce86"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -622,7 +622,7 @@ function ViashHelp {
   echo ""
   echo "    --filtration"
   echo "        type: string"
-  echo "        default: top-k"
+  echo "        default: none"
   echo ""
   echo "    --num_genes"
   echo "        type: integer"
@@ -1095,7 +1095,7 @@ if [ -z ${VIASH_PAR_DATASET_ID+x} ]; then
   VIASH_PAR_DATASET_ID="op"
 fi
 if [ -z ${VIASH_PAR_FILTRATION+x} ]; then
-  VIASH_PAR_FILTRATION="top-k"
+  VIASH_PAR_FILTRATION="none"
 fi
 if [ -z ${VIASH_PAR_NUM_GENES+x} ]; then
   VIASH_PAR_NUM_GENES="5000"

@@ -449,9 +449,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenicplus"
-LABEL org.opencontainers.image.created="2025-02-15T20:30:07Z"
+LABEL org.opencontainers.image.created="2025-02-16T14:28:07Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="6d192ca26e40772ba6d95f1a651541d15eb4fa56"
+LABEL org.opencontainers.image.revision="3d655d304d9519200622de4715c6b36baf48ce86"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -632,6 +632,10 @@ function ViashHelp {
   echo "        type: file, output, file must exist"
   echo "        default: output/grn_extended.csv"
   echo "        Source-target-peak triplets"
+  echo ""
+  echo "    --chromsizes_file"
+  echo "        type: file, required parameter, file must exist"
+  echo "        example: resources_test/grn_benchmark/prior/chromsizes.csv"
   echo ""
   echo "Viash built in Computational Requirements:"
   echo "    ---cpus=INT"
@@ -837,6 +841,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_GRN_EXTENDED=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --chromsizes_file)
+            [ -n "$VIASH_PAR_CHROMSIZES_FILE" ] && ViashError Bad arguments for option \'--chromsizes_file\': \'$VIASH_PAR_CHROMSIZES_FILE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CHROMSIZES_FILE="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --chromsizes_file. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --chromsizes_file=*)
+            [ -n "$VIASH_PAR_CHROMSIZES_FILE" ] && ViashError Bad arguments for option \'--chromsizes_file=*\': \'$VIASH_PAR_CHROMSIZES_FILE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_CHROMSIZES_FILE=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         ---engine)
             VIASH_ENGINE_ID="$2"
             shift 2
@@ -1017,6 +1032,10 @@ if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
   ViashError '--tf_all' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
+if [ -z ${VIASH_PAR_CHROMSIZES_FILE+x} ]; then
+  ViashError '--chromsizes_file' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
 if [ -z ${VIASH_META_NAME+x} ]; then
   ViashError 'name' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
@@ -1085,6 +1104,10 @@ if [ ! -z "$VIASH_PAR_ATAC" ] && [ ! -e "$VIASH_PAR_ATAC" ]; then
 fi
 if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
   ViashError "Input file '$VIASH_PAR_TF_ALL' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_CHROMSIZES_FILE" ] && [ ! -e "$VIASH_PAR_CHROMSIZES_FILE" ]; then
+  ViashError "Input file '$VIASH_PAR_CHROMSIZES_FILE' does not exist."
   exit 1
 fi
 
@@ -1244,6 +1267,10 @@ if [ ! -z "$VIASH_PAR_GRN_EXTENDED" ]; then
   VIASH_PAR_GRN_EXTENDED=$(ViashDockerAutodetectMount "$VIASH_PAR_GRN_EXTENDED")
   VIASH_CHOWN_VARS+=( "$VIASH_PAR_GRN_EXTENDED" )
 fi
+if [ ! -z "$VIASH_PAR_CHROMSIZES_FILE" ]; then
+  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_CHROMSIZES_FILE")" )
+  VIASH_PAR_CHROMSIZES_FILE=$(ViashDockerAutodetectMount "$VIASH_PAR_CHROMSIZES_FILE")
+fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_META_RESOURCES_DIR")" )
   VIASH_META_RESOURCES_DIR=$(ViashDockerAutodetectMount "$VIASH_META_RESOURCES_DIR")
@@ -1330,7 +1357,8 @@ par = {
   'scplus_mdata': $( if [ ! -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then echo "r'${VIASH_PAR_SCPLUS_MDATA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'qc': $( if [ ! -z ${VIASH_PAR_QC+x} ]; then echo "r'${VIASH_PAR_QC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'grn_extended': $( if [ ! -z ${VIASH_PAR_GRN_EXTENDED+x} ]; then echo "r'${VIASH_PAR_GRN_EXTENDED//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'grn_extended': $( if [ ! -z ${VIASH_PAR_GRN_EXTENDED+x} ]; then echo "r'${VIASH_PAR_GRN_EXTENDED//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'chromsizes_file': $( if [ ! -z ${VIASH_PAR_CHROMSIZES_FILE+x} ]; then echo "r'${VIASH_PAR_CHROMSIZES_FILE//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1365,35 +1393,21 @@ parser.add_argument('--atac', type=str, help='Path to the multiomics atac file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--num_workers', type=int, help='Number of cores')
 parser.add_argument('--max_n_links', type=int)
 args = parser.parse_args()
 
-if args.rna:
-    par['rna'] = args.rna
-if args.atac:
-    par['atac'] = args.atac
-if args.prediction:
-    par['prediction'] = args.prediction
-if args.tf_all:
-    par['tf_all'] = args.tf_all
-if args.max_n_links:
-    par['max_n_links'] = args.max_n_links
-if args.num_workers:
-    par['num_workers'] = args.num_workers
+for key, value in vars(args).items():
+    if value:
+        par[key] = value
 
-
-if args.resources_dir:
-    meta = {}
-    meta['resources_dir'] = args.resources_dir  
-par['num_workers'] = int(par['num_workers'])
 print(par)
+
 try:
     sys.path.append(meta["resources_dir"])
 except:
     pass
 from main import * 
-
 
 def print_memory_usage():
     import psutil
@@ -1403,9 +1417,7 @@ def print_memory_usage():
     print(f"Memory usage: {mem_info:.2f} MB")
 
 
-def main(par):  
-    
-
+def main(par):
     par['cistopic_object'] = f'{par["temp_dir"]}/cistopic_object.pkl'
     par['DB_PATH'] = os.path.join('output', 'db')
     os.makedirs(par['DB_PATH'], exist_ok=True)
@@ -1475,6 +1487,9 @@ if [[ "$VIASH_ENGINE_TYPE" == "docker" ]]; then
   fi
   if [ ! -z "$VIASH_PAR_GRN_EXTENDED" ]; then
     VIASH_PAR_GRN_EXTENDED=$(ViashDockerStripAutomount "$VIASH_PAR_GRN_EXTENDED")
+  fi
+  if [ ! -z "$VIASH_PAR_CHROMSIZES_FILE" ]; then
+    VIASH_PAR_CHROMSIZES_FILE=$(ViashDockerStripAutomount "$VIASH_PAR_CHROMSIZES_FILE")
   fi
   if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
     VIASH_META_RESOURCES_DIR=$(ViashDockerStripAutomount "$VIASH_META_RESOURCES_DIR")

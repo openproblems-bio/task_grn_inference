@@ -809,6 +809,7 @@ VIASH_DEP_GRN_METHODS_SCENIC="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_me
 VIASH_DEP_GRN_METHODS_PPCOR="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/ppcor/main.nf"
 VIASH_DEP_GRN_METHODS_SCPRINT="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/scprint/main.nf"
 VIASH_DEP_GRN_METHODS_CELLORACLE="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/celloracle/main.nf"
+VIASH_DEP_GRN_METHODS_SCGLUE="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/scglue/main.nf"
 VIASH_DEP_GRN_METHODS_SCENICPLUS="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/scenicplus/main.nf"
 VIASH_DEP_CONTROL_METHODS_PEARSON_CORR="$VIASH_META_RESOURCES_DIR/../../../nextflow/control_methods/pearson_corr/main.nf"
 VIASH_DEP_CONTROL_METHODS_NEGATIVE_CONTROL="$VIASH_META_RESOURCES_DIR/../../../nextflow/control_methods/negative_control/main.nf"
@@ -843,7 +844,8 @@ methods = [
   scenic, 
   scenicplus, 
   scprint, 
-  grnboost2
+  grnboost2,
+  scglue
 ]
 
 // construct list of metrics

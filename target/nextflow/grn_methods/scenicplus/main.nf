@@ -3300,6 +3300,19 @@ meta = [
           "direction" : "output",
           "multiple" : false,
           "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--chromsizes_file",
+          "example" : [
+            "resources_test/grn_benchmark/prior/chromsizes.csv"
+          ],
+          "must_exist" : true,
+          "create_parent" : true,
+          "required" : true,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
         }
       ]
     }
@@ -3426,7 +3439,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.9.1",
-    "git_commit" : "6d192ca26e40772ba6d95f1a651541d15eb4fa56",
+    "git_commit" : "3d655d304d9519200622de4715c6b36baf48ce86",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3552,7 +3565,8 @@ par = {
   'scplus_mdata': $( if [ ! -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then echo "r'${VIASH_PAR_SCPLUS_MDATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'qc': $( if [ ! -z ${VIASH_PAR_QC+x} ]; then echo "r'${VIASH_PAR_QC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'grn_extended': $( if [ ! -z ${VIASH_PAR_GRN_EXTENDED+x} ]; then echo "r'${VIASH_PAR_GRN_EXTENDED//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'grn_extended': $( if [ ! -z ${VIASH_PAR_GRN_EXTENDED+x} ]; then echo "r'${VIASH_PAR_GRN_EXTENDED//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'chromsizes_file': $( if [ ! -z ${VIASH_PAR_CHROMSIZES_FILE+x} ]; then echo "r'${VIASH_PAR_CHROMSIZES_FILE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3587,35 +3601,21 @@ parser.add_argument('--atac', type=str, help='Path to the multiomics atac file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--num_workers', type=int, help='Number of cores')
 parser.add_argument('--max_n_links', type=int)
 args = parser.parse_args()
 
-if args.rna:
-    par['rna'] = args.rna
-if args.atac:
-    par['atac'] = args.atac
-if args.prediction:
-    par['prediction'] = args.prediction
-if args.tf_all:
-    par['tf_all'] = args.tf_all
-if args.max_n_links:
-    par['max_n_links'] = args.max_n_links
-if args.num_workers:
-    par['num_workers'] = args.num_workers
+for key, value in vars(args).items():
+    if value:
+        par[key] = value
 
-
-if args.resources_dir:
-    meta = {}
-    meta['resources_dir'] = args.resources_dir  
-par['num_workers'] = int(par['num_workers'])
 print(par)
+
 try:
     sys.path.append(meta["resources_dir"])
 except:
     pass
 from main import * 
-
 
 def print_memory_usage():
     import psutil
@@ -3625,9 +3625,7 @@ def print_memory_usage():
     print(f"Memory usage: {mem_info:.2f} MB")
 
 
-def main(par):  
-    
-
+def main(par):
     par['cistopic_object'] = f'{par["temp_dir"]}/cistopic_object.pkl'
     par['DB_PATH'] = os.path.join('output', 'db')
     os.makedirs(par['DB_PATH'], exist_ok=True)

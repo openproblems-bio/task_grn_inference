@@ -8,7 +8,8 @@ methods = [
   scenic, 
   scenicplus, 
   scprint, 
-  grnboost2
+  grnboost2,
+  scglue
 ]
 
 // construct list of metrics

@@ -3243,7 +3243,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/multiomics/multiome_matrix",
     "viash_version" : "0.9.1",
-    "git_commit" : "6d192ca26e40772ba6d95f1a651541d15eb4fa56",
+    "git_commit" : "3d655d304d9519200622de4715c6b36baf48ce86",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
