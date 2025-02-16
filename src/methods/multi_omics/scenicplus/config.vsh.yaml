@@ -33,7 +33,7 @@ arguments:
     required: false
     direction: output
     description: "Source-target-peak triplets"
-  - name: --chromsizes_file
+  - name: --chromsizes
     type: file
     required: true
     direction: input

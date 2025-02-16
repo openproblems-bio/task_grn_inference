@@ -51,6 +51,11 @@ argument_groups:
         required: false
         direction: input
         default: pearson
+      - name: --chromsizes
+        type: string
+        required: true
+        direction: input
+     
       
   - name: Outputs
     arguments:
@@ -80,6 +85,7 @@ argument_groups:
         required: true
         direction: output
         default: task_info.yaml
+      
 
   - name: Arguments
     arguments: 
