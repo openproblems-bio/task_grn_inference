@@ -129,7 +129,7 @@ def process_peak(par):
             names=['Chromosome', 'End']
         )
     except:
-        chromsizes = pd.read_csv(par['chromsizes_file'])
+        chromsizes = pd.read_csv(par['chromsizes'])
 
     chromsizes.insert(1, 'Start', 0)
 

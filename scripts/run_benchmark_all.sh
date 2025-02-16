@@ -2,14 +2,14 @@
 run_local=false
 num_workers=10
 metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
-RUN_ID="scenicplus_test"
+RUN_ID="scglue_test"
 reg_type="ridge"
 label=${RUN_ID}
 
 dataset_ids=" op  "
 # method_ids="[negative_control, positive_control, pearson_corr, portia, ppcor, scenic, scenicplus , grnboost2]"
 
-method_ids="[scenicplus]"
+method_ids="[scglue]"
 
 echo "Run ID: $RUN_ID"
 
@@ -58,7 +58,7 @@ append_entry() {
     regulators_consensus: ${files_dir}/prior/regulators_consensus_${dataset}.json
     layer: 'X_norm'
     num_workers: $num_workers
-    chromsizes_file = ${files_dir}/grn_benchmark/prior/chromsizes.csv
+    chromsizes: ${files_dir}/prior/chromsizes.csv
 
 HERE
   if [[ "$dataset" == "norman" || "$dataset" == "adamson" || "$dataset" == "replogle" ]]; then
@@ -72,6 +72,7 @@ HERE
     cat >> "$param_local" << HERE
     atac: ${files_dir}/inference_data/${dataset}_atac.h5ad
 HERE
+  fi
 }
 
 # Iterate over datasets and GRN models
