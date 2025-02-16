@@ -114,7 +114,7 @@ dependencies:
   
   # ---- multiomics 
   - name: grn_methods/celloracle
-  # - name: grn_methods/scglue
+  - name: grn_methods/scglue
   # - name: grn_methods/figr
   - name: grn_methods/scenicplus
   # - name: grn_methods/granie
