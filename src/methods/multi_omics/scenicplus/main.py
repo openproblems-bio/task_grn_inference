@@ -121,15 +121,21 @@ def process_peak(par):
     
 
     # Get chromosome sizes
-    try:
+    if False:
         print(f'Download chromosome sizes from UCSC')
         chromsizes = pd.read_table(
             'http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes',
             header=None,
             names=['Chromosome', 'End']
         )
-    except:
-        chromsizes = pd.read_csv(par['chromsizes'])
+    else:
+        par['chromsizes'] = par['temp_dir'] + 'chromsizes.tsv'
+
+        response = requests.get('http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes')
+        with open(par['chromsizes'], "wb") as file:
+            file.write(response.content)
+
+        chromsizes = pd.read_csv(par['chromsizes'], sep='\t', names=['Chromosome', 'End'])
 
     chromsizes.insert(1, 'Start', 0)
 
