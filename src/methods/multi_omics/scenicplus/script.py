@@ -1,17 +1,18 @@
 
 import sys 
 import os
+import anndata as ad
 ## VIASH START
 par = {
-  'rna': 'resources_test/grn-benchmark/rna.h5ad',
-  'atac': 'resources_test/grn-benchmark/atac.h5ad',
-  'temp_dir': 'output/scenicplus',
-  'prediction': 'output/prediction.csv',
+  'rna': 'resources_test/grn_benchmark/inference_data/op_rna.h5ad',
+  'atac': 'resources_test/grn_benchmark/inference_data/op_atac.h5ad',
+  'temp_dir': 'output/scenicplus_new',
+  'prediction': 'output/scenicplus_new/prediction.h5ad',
   'qc': False,
-  'num_workers': 4,
-  'scplus_mdata': 'output/scenicplus/scplus_mdata.h5mu',
-  'cell_topic': 'output/scenicplus/cell_topic.csv',
-  'grn_extended': 'output/scenicplus/grn_extended.csv'
+  'num_workers': 20,
+  'scplus_mdata': 'output/scenicplus_new/scplus_mdata.h5mu',
+  'cell_topic': 'output/scenicplus_new/cell_topic.csv',
+  'grn_extended': 'output/scenicplus_new/grn_extended.csv'
 }
 ## VIASH END
 
@@ -51,7 +52,6 @@ except:
     pass
 from main import * 
 
-
 def print_memory_usage():
     import psutil
 
@@ -61,8 +61,6 @@ def print_memory_usage():
 
 
 def main(par):  
-    
-
     par['cistopic_object'] = f'{par["temp_dir"]}/cistopic_object.pkl'
     par['DB_PATH'] = os.path.join('output', 'db')
     os.makedirs(par['DB_PATH'], exist_ok=True)
@@ -98,7 +96,6 @@ def main(par):
     return net
 if __name__ == '__main__':
     net = main(par)
-
     dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
     output = ad.AnnData(X=None, uns={"method_id": 'scenicplus', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])

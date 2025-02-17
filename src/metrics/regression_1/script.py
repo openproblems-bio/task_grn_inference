@@ -17,9 +17,9 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 ## VIASH START
 par = {
-  "evaluation_data": f"resources/grn_benchmark/evaluation_data//op.h5ad",
+  "evaluation_data": f"resources/grn_benchmark/evaluation_data/norman_bulk.h5ad",
   "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
-  "prediction": f"resources/grn_models/op/grnboost2.h5ad",
+  "prediction": f"resources/grn_models/norman/scprint.h5ad",
   "method_id": "scenic",
   "max_n_links": 50000,
   "apply_tf": True,
@@ -43,6 +43,8 @@ parser.add_argument('--prediction', type=str, help='Path to the prediction file'
 parser.add_argument('--method_id', type=str, help='Method id')
 parser.add_argument('--dataset_id', type=str, help='Dataset id')
 parser.add_argument('--score', type=str, help='score file')
+parser.add_argument('--reg_type', type=str)
+parser.add_argument('--apply_skeleton', action='store_true')
 
 args = parser.parse_args()
 
