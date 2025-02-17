@@ -446,7 +446,7 @@ function ViashDockerfile {
 FROM nvcr.io/nvidia/pytorch:24.06-py3
 ENTRYPOINT []
 RUN pip install --upgrade pip && \
-  pip install --upgrade --no-cache-dir "scglue==0.3.2" "pyscenic==0.12.1" "numpy==1.23.4" "anndata==0.11.3" "scanpy" "networkx" "pyarrow" "cytoolz" "scikit-misc" "cuda-python" "faiss-gpu" && \
+  pip install --upgrade --no-cache-dir "scglue==0.3.2" "pyscenic==0.12.1" "numpy==1.23.4" "anndata==0.9.2" "scanpy" "networkx" "pyarrow" "cytoolz" "scikit-misc" "cuda-python" && \
   pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
 
 RUN apt-get update && \
@@ -454,9 +454,9 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scglue"
-LABEL org.opencontainers.image.created="2025-02-16T18:02:17Z"
+LABEL org.opencontainers.image.created="2025-02-17T09:58:24Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="062f8843769b4056f3276ae5960c187ab380f486"
+LABEL org.opencontainers.image.revision="fe6e73f5590154b6cbff39e6f599c3d0e6133668"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1367,8 +1367,8 @@ if args.num_workers:
 # get gene annotation
 par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
 # par['motif_file'] = f"{par['temp_dir']}/JASPAR2022-hg38.bed.gz"
-# par['motif_file'] = f"{par['temp_dir']}/ENCODE-TF-ChIP-hg38.bed.gz"
-par['motif_file'] = f"output/db/jaspar_encode.bed.gz"
+par['motif_file'] = f"{par['temp_dir']}/ENCODE-TF-ChIP-hg38.bed.gz"
+# par['motif_file'] = f"output/db/jaspar_encode.bed.gz"
 
 try:
     sys.path.append(meta["resources_dir"])

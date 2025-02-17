@@ -456,9 +456,9 @@ pip install -e GRnnData[dev]   && \
 pip install -e benGRN[dev]  
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-02-16T18:02:18Z"
+LABEL org.opencontainers.image.created="2025-02-17T09:58:25Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="062f8843769b4056f3276ae5960c187ab380f486"
+LABEL org.opencontainers.image.revision="fe6e73f5590154b6cbff39e6f599c3d0e6133668"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

@@ -3409,14 +3409,13 @@ meta = [
             "scglue==0.3.2",
             "pyscenic==0.12.1",
             "numpy==1.23.4",
-            "anndata==0.11.3",
+            "anndata==0.9.2",
             "scanpy",
             "networkx",
             "pyarrow",
             "cytoolz",
             "scikit-misc",
-            "cuda-python",
-            "faiss-gpu"
+            "cuda-python"
           ],
           "github" : [
             "openproblems-bio/core#subdirectory=packages/python/openproblems"
@@ -3443,7 +3442,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scglue",
     "viash_version" : "0.9.1",
-    "git_commit" : "062f8843769b4056f3276ae5960c187ab380f486",
+    "git_commit" : "fe6e73f5590154b6cbff39e6f599c3d0e6133668",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3628,8 +3627,8 @@ if args.num_workers:
 # get gene annotation
 par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
 # par['motif_file'] = f"{par['temp_dir']}/JASPAR2022-hg38.bed.gz"
-# par['motif_file'] = f"{par['temp_dir']}/ENCODE-TF-ChIP-hg38.bed.gz"
-par['motif_file'] = f"output/db/jaspar_encode.bed.gz"
+par['motif_file'] = f"{par['temp_dir']}/ENCODE-TF-ChIP-hg38.bed.gz"
+# par['motif_file'] = f"output/db/jaspar_encode.bed.gz"
 
 try:
     sys.path.append(meta["resources_dir"])
