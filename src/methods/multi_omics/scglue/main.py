@@ -42,8 +42,8 @@ def download_motifs(par):
         print("Downloading motif ended")
 def preprocess(par):
     print('Reading input files', flush=True)
-    rna = ad.read_h5ad(par['multiomics_rna'])
-    atac = ad.read_h5ad(par['multiomics_atac'])
+    rna = ad.read_h5ad(par['rna'])
+    atac = ad.read_h5ad(par['atac'])
     
     rna.layers["counts"] = rna.X.copy()
     sc.pp.highly_variable_genes(rna, n_top_genes=2000, flavor="seurat_v3")

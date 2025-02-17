@@ -2,14 +2,14 @@
 run_local=false
 num_workers=10
 metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
-RUN_ID="scglue_test"
+RUN_ID="scenicplus_test"
 reg_type="ridge"
 label=${RUN_ID}
 
 dataset_ids=" op  "
 # method_ids="[negative_control, positive_control, pearson_corr, portia, ppcor, scenic, scenicplus , grnboost2]"
 
-method_ids="[scglue]"
+method_ids="[scenicplus]"
 
 echo "Run ID: $RUN_ID"
 
