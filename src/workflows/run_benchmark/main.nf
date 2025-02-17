@@ -1,6 +1,15 @@
 // construct list of methods
 methods = [
-  pearson_corr
+  pearson_corr,
+  negative_control, 
+  positive_control, 
+  portia, 
+  ppcor, 
+  scenic, 
+  scenicplus, 
+  scprint, 
+  grnboost2,
+  scglue
 ]
 
 // construct list of metrics
@@ -38,6 +47,7 @@ workflow run_wf {
           rna: state.rna,
           atac: state.atac,
           tf_all: state.tf_all,
+          chromsizes: state.chromsizes,
           num_workers: state.num_workers,
           output: 'predictions/$id.$key.output.h5ad',
           output_model: null

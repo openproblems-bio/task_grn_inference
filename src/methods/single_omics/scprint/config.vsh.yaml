@@ -12,7 +12,7 @@ arguments:
   - name: --filtration
     type: string
     direction: input
-    default: "top-k"
+    default: "none"
   - name: --num_genes
     type: integer
     direction: input

@@ -121,12 +121,16 @@ def process_peak(par):
     
 
     # Get chromosome sizes
-    print(f'Download chromosome sizes from UCSC')
-    chromsizes = pd.read_table(
-        'http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes',
-        header=None,
-        names=['Chromosome', 'End']
-    )
+    try:
+        print(f'Download chromosome sizes from UCSC')
+        chromsizes = pd.read_table(
+            'http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes',
+            header=None,
+            names=['Chromosome', 'End']
+        )
+    except:
+        chromsizes = pd.read_csv(par['chromsizes'])
+
     chromsizes.insert(1, 'Start', 0)
 
     print(f'Start pseudobulking')

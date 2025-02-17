@@ -6,8 +6,8 @@ import anndata as ad
 par = {
   'rna': 'resources_test/grn_benchmark/inference_data/op_rna.h5ad',
   'atac': 'resources_test/grn_benchmark/inference_data/op_atac.h5ad',
-  'temp_dir': 'output/scenicplus_new',
-  'prediction': 'output/scenicplus_new/prediction.h5ad',
+  'temp_dir': 'output/scenicplus',
+  'prediction': 'output/prediction.h5ad',
   'qc': False,
   'num_workers': 20,
   'scplus_mdata': 'output/scenicplus_new/scplus_mdata.h5mu',
@@ -23,29 +23,16 @@ parser.add_argument('--atac', type=str, help='Path to the multiomics atac file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-parser.add_argument('--num_workers', type=str, help='Number of cores')
+parser.add_argument('--num_workers', type=int, help='Number of cores')
 parser.add_argument('--max_n_links', type=int)
 args = parser.parse_args()
 
-if args.rna:
-    par['rna'] = args.rna
-if args.atac:
-    par['atac'] = args.atac
-if args.prediction:
-    par['prediction'] = args.prediction
-if args.tf_all:
-    par['tf_all'] = args.tf_all
-if args.max_n_links:
-    par['max_n_links'] = args.max_n_links
-if args.num_workers:
-    par['num_workers'] = args.num_workers
+for key, value in vars(args).items():
+    if value:
+        par[key] = value
 
-
-if args.resources_dir:
-    meta = {}
-    meta['resources_dir'] = args.resources_dir  
-par['num_workers'] = int(par['num_workers'])
 print(par)
+
 try:
     sys.path.append(meta["resources_dir"])
 except:
@@ -60,7 +47,7 @@ def print_memory_usage():
     print(f"Memory usage: {mem_info:.2f} MB")
 
 
-def main(par):  
+def main(par):
     par['cistopic_object'] = f'{par["temp_dir"]}/cistopic_object.pkl'
     par['DB_PATH'] = os.path.join('output', 'db')
     os.makedirs(par['DB_PATH'], exist_ok=True)

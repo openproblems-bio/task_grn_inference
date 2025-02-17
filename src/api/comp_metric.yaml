@@ -40,6 +40,10 @@ arguments:
     type: boolean 
     required: false
     default: false
+  - name: --skeleton
+    type: file 
+    required: false
+    example: resources_test/grn_benchmark/prior/skeleton.csv
 
 
 test_resources:

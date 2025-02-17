@@ -48,8 +48,8 @@ if args.num_workers:
 # get gene annotation
 par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
 # par['motif_file'] = f"{par['temp_dir']}/JASPAR2022-hg38.bed.gz"
-# par['motif_file'] = f"{par['temp_dir']}/ENCODE-TF-ChIP-hg38.bed.gz"
-par['motif_file'] = f"output/db/jaspar_encode.bed.gz"
+par['motif_file'] = f"{par['temp_dir']}/ENCODE-TF-ChIP-hg38.bed.gz"
+# par['motif_file'] = f"output/db/jaspar_encode.bed.gz"
 
 try:
     sys.path.append(meta["resources_dir"])

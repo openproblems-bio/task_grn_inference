@@ -1,22 +1,23 @@
 #!/bin/bash
-run_local=true
+run_local=false
 num_workers=10
-metric_ids="[regression_1, regression_2]" #regression_1, regression_2, ws_distance
-RUN_ID="scores_test"
+metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
+RUN_ID="scenicplus_test"
 reg_type="ridge"
-label="test"
+label=${RUN_ID}
 
-dataset_ids=" adamson "
-method_ids="[pearson_corr]"
+dataset_ids=" op  "
+# method_ids="[negative_control, positive_control, pearson_corr, portia, ppcor, scenic, scenicplus , grnboost2]"
+
+method_ids="[scenicplus]"
 
 echo "Run ID: $RUN_ID"
 
 if [ "$run_local" = true ]; then
-  resources_dir="./resources/"
+  resources_dir="./resources_test/"
 else
-  resources_dir="s3://openproblems-data/resources/grn"
+  resources_dir="s3://openproblems-data/resources_test/grn"
 fi
-
 
 files_dir="${resources_dir}/grn_benchmark"
 publish_dir="${resources_dir}/results/${RUN_ID}"
@@ -31,6 +32,7 @@ param_local="${params_dir}/${RUN_ID}_param_local.yaml"
 param_aws="s3://openproblems-data/resources/grn/results/params/${RUN_ID}_param_local.yaml"
 
 # Print GRN names correctly
+echo $param_local
 echo "GRN models: ${grn_names[@]}"
 
 # Ensure param_file is clean
@@ -45,7 +47,7 @@ fi
 
 append_entry() {
   local dataset="$1"
-
+  echo "Dataset: $dataset"
   cat >> "$param_local" << HERE
   - id: ${reg_type}_${grn_name}_${dataset}
     metric_ids: $metric_ids
@@ -56,13 +58,19 @@ append_entry() {
     regulators_consensus: ${files_dir}/prior/regulators_consensus_${dataset}.json
     layer: 'X_norm'
     num_workers: $num_workers
-HERE
+    chromsizes: ${files_dir}/prior/chromsizes.csv
 
+HERE
   if [[ "$dataset" == "norman" || "$dataset" == "adamson" || "$dataset" == "replogle" ]]; then
     cat >> "$param_local" << HERE
     evaluation_data_sc: ${files_dir}/evaluation_data/${dataset}_sc.h5ad
     ws_consensus: ${files_dir}/prior/ws_consensus_${dataset}.csv
     ws_distance_background: ${files_dir}/prior/ws_distance_background_${dataset}.csv
+HERE
+  fi
+  if [[ "$dataset" == "op" ]]; then
+    cat >> "$param_local" << HERE
+    atac: ${files_dir}/inference_data/${dataset}_atac.h5ad
 HERE
   fi
 }
@@ -78,6 +86,7 @@ if [ "$run_local" = true ]; then
 output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
+  viash ns build --parallel 
   nextflow run . \
     -main-script  target/nextflow/workflows/run_benchmark/main.nf \
     -profile docker \
@@ -103,6 +112,5 @@ HERE
     --params-file ${param_file} \
     --config common/nextflow_helpers/labels_tw.config \
     --labels ${label}
-fi  
-
+fi
 

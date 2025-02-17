@@ -39,18 +39,23 @@ argument_groups:
       - name: --ws_consensus
         type: file
         direction: input
-        required: true
+        required: false
         example: resources_test/grn_benchmark/prior/ws_consensus_norman.csv 
       - name: --ws_distance_background
         type: file
         direction: input
-        required: true
+        required: false
         example: resources_test/grn_benchmark/prior/ws_distance_background_norman.csv
       - name: --layer
         type: string
         required: false
         direction: input
         default: pearson
+      - name: --chromsizes
+        type: string
+        required: true
+        direction: input
+     
       
   - name: Outputs
     arguments:
@@ -80,6 +85,7 @@ argument_groups:
         required: true
         direction: output
         default: task_info.yaml
+      
 
   - name: Arguments
     arguments: 
@@ -106,23 +112,22 @@ dependencies:
   - name: utils/extract_uns_metadata
     repository: openproblems
   # ---- single omics
-  # - name: grn_methods/portia
-  # - name: grn_methods/grnboost2
-  # - name: grn_methods/scenic
-  # - name: grn_methods/genie3
-  # - name: grn_methods/ppcor #needs docker image
-  # - name: grn_methods/scgpt 
+  - name: grn_methods/portia
+  - name: grn_methods/grnboost2
+  - name: grn_methods/scenic
+  - name: grn_methods/ppcor 
+  - name: grn_methods/scprint 
   
   # ---- multiomics 
-  # - name: grn_methods/celloracle
-  # - name: grn_methods/scglue
+  - name: grn_methods/celloracle
+  - name: grn_methods/scglue
   # - name: grn_methods/figr
-  # - name: grn_methods/scenicplus
+  - name: grn_methods/scenicplus
   # - name: grn_methods/granie
   # ---- baselines
   - name: control_methods/pearson_corr
-  # - name: control_methods/negative_control
-  # - name: control_methods/positive_control
+  - name: control_methods/negative_control
+  - name: control_methods/positive_control
   # -- needs development
   # - name: grn_methods/pidc
   # - name: grn_methods/scsgl

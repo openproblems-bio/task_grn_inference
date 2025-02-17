@@ -33,6 +33,11 @@ arguments:
     required: false
     direction: output
     description: "Source-target-peak triplets"
+  - name: --chromsizes
+    type: file
+    required: true
+    direction: input
+    example: "resources_test/grn_benchmark/prior/chromsizes.csv"
 resources:
   - type: python_script
     path: script.py
