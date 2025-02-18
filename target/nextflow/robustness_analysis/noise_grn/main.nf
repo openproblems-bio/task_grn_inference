@@ -3183,7 +3183,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/robustness_analysis/noise_grn",
     "viash_version" : "0.9.1",
-    "git_commit" : "a37ef8c0a6316ec69732718c7e01350ce88c2d8b",
+    "git_commit" : "dcf29e099539fe422a88266a14b205537036d881",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

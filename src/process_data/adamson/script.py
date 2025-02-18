@@ -86,9 +86,29 @@ adata_train_sc.layers['X_norm'] = adata_train_sc.X.copy()
 
 # - add metadata
 adata_train_sc.uns['dataset_id'] = 'adamson'
+adata_train_sc.uns['dataset_name'] = 'Adamson'
+adata_train_sc.uns['dataset_summary'] = 'Perturbation RNA-seq data: sc data for GRN inference'
+adata_train_sc.uns['dataset_organism'] = 'human'
+adata_train_sc.uns['normalization_id'] = 'original'
+
 adata_test_sc.uns['dataset_id'] = 'adamson'
+adata_test_sc.uns['dataset_name'] = 'Adamson'
+adata_test_sc.uns['dataset_summary'] = 'Perturbation RNA-seq data: sc data for GRN evaluation'
+adata_test_sc.uns['dataset_organism'] = 'human'
+adata_test_sc.uns['normalization_id'] = 'original'
+
 adata_test_bulk.uns['dataset_id'] = 'adamson'
+adata_test_bulk.uns['dataset_name'] = 'Adamson'
+adata_test_bulk.uns['dataset_summary'] = 'Perturbation RNA-seq data: bulk data for GRN evaluation'
+adata_test_bulk.uns['dataset_organism'] = 'human'
+adata_test_bulk.uns['normalization_id'] = 'original'
+
 adata_bulk.uns['dataset_id'] = 'adamson'
+adata_bulk.uns['dataset_name'] = 'Adamson'
+adata_bulk.uns['dataset_summary'] = 'Perturbation RNA-seq data: bulk data containing both inference and evaluation data'
+adata_bulk.uns['dataset_organism'] = 'human'
+adata_bulk.uns['normalization_id'] = 'original'
+
 
 # - save 
 adata_bulk.write(par['adata_bulk'])

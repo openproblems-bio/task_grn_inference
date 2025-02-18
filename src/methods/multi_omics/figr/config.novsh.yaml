@@ -22,7 +22,7 @@ arguments:
 resources:
   - type: r_script
     path: script.R
-runners:
+engines:
   - type: docker
     image: janursa/figr:19-08-2024
   - type: native

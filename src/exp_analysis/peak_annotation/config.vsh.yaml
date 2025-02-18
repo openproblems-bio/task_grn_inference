@@ -1,0 +1,31 @@
+
+
+name: peak_annotation
+namespace: exp_analysis
+info:
+  label: peak_annotation
+  summary: "Annotating peaks in multiomics data"
+
+arguments:
+  - name: --atac
+    __merge__: ../../api/file_atac_h5ad.yaml
+    direction: input
+    required: true 
+  - name: --annot_peak_database
+    type: file
+    direction: output
+    required: true 
+  
+resources:
+  - type: r_script
+    path: script.R
+
+engines:
+  - type: docker
+    image: janursa/figr:19-08-2024
+  - type: native
+    
+runners:
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

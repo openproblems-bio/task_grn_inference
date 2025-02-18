@@ -121,7 +121,7 @@ def process_peak(par):
     
 
     # Get chromosome sizes
-    if False:
+    if True:
         print(f'Download chromosome sizes from UCSC')
         chromsizes = pd.read_table(
             'http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes',
@@ -395,8 +395,10 @@ def process_topics(par):
     cell_topic.index = cell_topic.index.str.split('-').str[0]
     cell_topic.to_csv(par['cell_topic'])
 
-    chromsizes = pd.read_table(os.path.join(par['temp_dir'], "qc", "hg38.chrom_sizes_and_alias.tsv"))
-    chromsizes.rename({"# ucsc": "Chromosome", "length": "End"}, axis = 1, inplace = True)
+    # chromsizes = pd.read_table(os.path.join(par['temp_dir'], "qc", "hg38.chrom_sizes_and_alias.tsv"))
+    
+    # chromsizes.rename({"# ucsc": "Chromosome", "length": "End"}, axis = 1, inplace = True)
+    chromsizes = pd.read_csv(par['chromsizes'], sep='\t', names=['Chromosome', 'End'])
     chromsizes['Start'] = 0
     chromsizes = pr.PyRanges(chromsizes[['Chromosome', 'Start', 'End']])
 

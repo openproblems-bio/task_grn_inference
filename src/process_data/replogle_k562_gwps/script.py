@@ -149,6 +149,11 @@ def main(par):
     adata_test_sc = adata_test_sc.to_memory()
     adata_test_sc = normalize(adata_test_sc)
     adata_test_sc.uns['dataset_id'] = 'replogle'
+    adata_test_sc.uns['dataset_name'] = 'Replogle'
+    adata_test_sc.uns['dataset_summary'] = 'Perturbation RNA-seq data: sc data containing evaluation data'
+    adata_test_sc.uns['dataset_organism'] = 'human'
+    adata_test_sc.uns['normalization_id'] = 'sla'
+
     adata_test_sc.write(par['adata_test_sc'])
 
     if False:

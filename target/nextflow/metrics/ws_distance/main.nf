@@ -3251,6 +3251,38 @@ meta = [
                   "description" : "Normalized values",
                   "required" : true
                 }
+              ],
+              "uns" : [
+                {
+                  "type" : "string",
+                  "name" : "dataset_id",
+                  "description" : "A unique identifier for the dataset",
+                  "required" : true
+                },
+                {
+                  "name" : "dataset_name",
+                  "type" : "string",
+                  "description" : "Nicely formatted name.",
+                  "required" : true
+                },
+                {
+                  "name" : "dataset_summary",
+                  "type" : "string",
+                  "description" : "Short description of the dataset.",
+                  "required" : true
+                },
+                {
+                  "name" : "dataset_organism",
+                  "type" : "string",
+                  "description" : "The organism of the sample in the dataset.",
+                  "required" : false
+                },
+                {
+                  "type" : "string",
+                  "name" : "normalization_id",
+                  "description" : "Which normalization was used",
+                  "required" : true
+                }
               ]
             }
           },
@@ -3448,7 +3480,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/ws_distance",
     "viash_version" : "0.9.1",
-    "git_commit" : "a37ef8c0a6316ec69732718c7e01350ce88c2d8b",
+    "git_commit" : "dcf29e099539fe422a88266a14b205537036d881",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

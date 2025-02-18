@@ -109,9 +109,24 @@ adata_test_bulk.layers['X_norm'] = adata_test_bulk.X.copy()
 adata_train_bulk.layers['X_norm'] = adata_train_bulk.X.copy()
 
 # - add metadata
+
 adata_train_bulk.uns['dataset_id'] = 'replogle'
+adata_train_bulk.uns['dataset_name'] = 'Replogle'
+adata_train_bulk.uns['dataset_summary'] = 'Perturbation RNA-seq data: bulk data for GRN inference'
+adata_train_bulk.uns['dataset_organism'] = 'human'
+adata_train_bulk.uns['normalization_id'] = 'original'
+
 adata_test_bulk.uns['dataset_id'] = 'replogle'
+adata_test_bulk.uns['dataset_name'] = 'Replogle'
+adata_test_bulk.uns['dataset_summary'] = 'Perturbation RNA-seq data: bulk data for GRN evaluation'
+adata_test_bulk.uns['dataset_organism'] = 'human'
+adata_test_bulk.uns['normalization_id'] = 'original'
+
 adata_bulk.uns['dataset_id'] = 'replogle'
+adata_bulk.uns['dataset_name'] = 'Replogle'
+adata_bulk.uns['dataset_summary'] = 'Perturbation RNA-seq data: bulk data containing both inference and evaluation data'
+adata_bulk.uns['dataset_organism'] = 'human'
+adata_bulk.uns['normalization_id'] = 'original'
 
 # - save 
 adata_bulk.write(par['adata_bulk'])
