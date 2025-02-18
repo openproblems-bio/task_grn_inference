@@ -6,6 +6,9 @@ namespace: control_methods
 info:
   label: pearson_corr
   summary: "Baseline based on correlation"
+  description: |
+    Baseline GRN inference method using Pearson correlation.
+
 arguments:
   - name: --normalize
     type: boolean 

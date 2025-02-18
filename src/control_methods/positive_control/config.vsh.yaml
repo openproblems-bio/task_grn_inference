@@ -6,6 +6,8 @@ namespace: control_methods
 info:
   label: positive_control
   summary: "Baseline based on correlation"
+  description: |
+    Baseline model based on Pearson correlation that uses both inference and evaluation dataset to infer the GRN.
 
 resources:
   - type: python_script
