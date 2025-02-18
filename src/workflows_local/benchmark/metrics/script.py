@@ -12,6 +12,9 @@ argparser.add_argument('--datasets', nargs='+', help='List of datasets to includ
 argparser.add_argument('--methods', nargs='+', help='List of methods to include', required=True)
 argparser.add_argument('--run_consensus_flag', action='store_true', help='Run consensus')
 argparser.add_argument('--save_scores_file',  help='Save file name', required=True)
+argparser.add_argument('--reg_type',  default='ridge', required=False)
+argparser.add_argument('--apply_skeleton', action='store_true')
+
 args = argparser.parse_args()
 par = vars(args)
 
@@ -87,7 +90,11 @@ def run_metrics(par):
           --dataset_id {par['dataset_id']} \
           --method_id {par['method_id']} \
           --evaluation_data {par['evaluation_data']} \
-          --score {par['score']} "
+          --score {par['score']} \
+          --reg_type {par['reg_type']}"
+  if par['apply_skeleton']:
+    args += f" --skeleton {par['skeleton']}"
+
   
   command = f"python {dependencies['regression_1']} {args}"
 
@@ -111,7 +118,10 @@ def run_metrics(par):
           --method_id {par['method_id']} \
           --evaluation_data {par['evaluation_data']} \
           --regulators_consensus {par['regulators_consensus']} \
-          --score {par['score']} "
+          --score {par['score']} \
+          --reg_type {par['reg_type']}"
+  if par['apply_skeleton']:
+    args += f" --skeleton {par['skeleton']}"
   
   command = f"python {dependencies['regression_2']} {args}"
   result = subprocess.run(command, shell=True, capture_output=True, text=True)

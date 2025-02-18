@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2025-02-17T09:58:26Z"
+LABEL org.opencontainers.image.created="2025-02-18T13:34:47Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="fe6e73f5590154b6cbff39e6f599c3d0e6133668"
+LABEL org.opencontainers.image.revision="a37ef8c0a6316ec69732718c7e01350ce88c2d8b"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1357,6 +1357,8 @@ parser.add_argument('--prediction', type=str, help='Path to the prediction file'
 parser.add_argument('--method_id', type=str, help='Method id')
 parser.add_argument('--dataset_id', type=str, help='Dataset id')
 parser.add_argument('--score', type=str, help='score file')
+parser.add_argument('--reg_type', type=str)
+parser.add_argument('--apply_skeleton', action='store_true')
 
 args = parser.parse_args()
 

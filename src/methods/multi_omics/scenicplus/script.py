@@ -1,6 +1,7 @@
 
 import sys 
 import os
+import anndata as ad
 ## VIASH START
 par = {
   'rna': 'resources_test/grn_benchmark/inference_data/op_rna.h5ad',
@@ -8,10 +9,10 @@ par = {
   'temp_dir': 'output/scenicplus',
   'prediction': 'output/prediction.h5ad',
   'qc': False,
-  'num_workers': 4,
-  'scplus_mdata': 'output/scenicplus/scplus_mdata.h5mu',
-  'cell_topic': 'output/scenicplus/cell_topic.csv',
-  'grn_extended': 'output/scenicplus/grn_extended.csv'
+  'num_workers': 20,
+  'scplus_mdata': 'output/scenicplus_new/scplus_mdata.h5mu',
+  'cell_topic': 'output/scenicplus_new/cell_topic.csv',
+  'grn_extended': 'output/scenicplus_new/grn_extended.csv'
 }
 ## VIASH END
 
@@ -82,7 +83,6 @@ def main(par):
     return net
 if __name__ == '__main__':
     net = main(par)
-
     dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
     output = ad.AnnData(X=None, uns={"method_id": 'scenicplus', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])

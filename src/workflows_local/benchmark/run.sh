@@ -15,29 +15,30 @@ set -e
 source ~/miniconda3/bin/activate scprint
 
 # ----- parameters -----
-RUN_GRN_INFERENCE=true
-CALCULATE_METRICS=false
+RUN_GRN_INFERENCE=false
+CALCULATE_METRICS=true
 RUN_CONSENSUS_FLAG=false # - whether to run the consensus for reg2 (only run when to update the consensus), #TODO: update the code to handle other consensus
 FORCE=true
-SBATCH=true
-SAVE_SCORES_FILE="resources/scores/scores_controls.csv" # - where to save the scores (all metrics, datasets, methods)
-
-
-DATASETS=(
-    " adamson "
-)
+SBATCH=false
+REG_TYPE="GB"
+APPLY_SKELETON=true
+SAVE_SCORES_FILE="resources/scores/scores_op_gb.csv" # - where to save the scores (all metrics, datasets, methods)
 
 # DATASETS=(
-#     " op "
+#     " adamson op nakatake replogle norman "
 # )
 
-# METHODS=(
-#     "scglue scenicplus celloracle granie figr collectri grnboost2 ppcor portia scenic positive_control pearson_corr negative_control scprint"
-# )
+DATASETS=(
+    " op "
+)
 
 METHODS=(
-    " scenic "
+    "scglue scenicplus celloracle granie figr grnboost2 ppcor portia scenic scprint positive_control pearson_corr negative_control  "
 )
+
+# METHODS=(
+#     " positive_control pearson_corr "
+# )
 
 
 if [ "$RUN_GRN_INFERENCE" = true ]; then
@@ -59,9 +60,11 @@ if [ "$CALCULATE_METRICS" = true ]; then
         cmd="python src/workflows_local/benchmark/metrics/script.py 
                 --datasets ${DATASETS[@]} 
                 --methods ${METHODS[@]}
-                --save_scores_file ${SAVE_SCORES_FILE}"
+                --save_scores_file ${SAVE_SCORES_FILE}
+                --reg_type ${REG_TYPE}"
 
-        [ "$RUN_CONSENSUS_FLAG" = true ] && cmd="${cmd} --run_consensus_flag"
+        [ "$RUN_CONSENSUS_FLAG" = true ] && cmd="${cmd} --run_consensus_flag" 
+        [ "$APPLY_SKELETON" = true ] && cmd="${cmd} --apply_skeleton" 
 
         echo "Running: $cmd"
         $cmd

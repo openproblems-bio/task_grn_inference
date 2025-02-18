@@ -3461,7 +3461,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression_2",
     "viash_version" : "0.9.1",
-    "git_commit" : "fe6e73f5590154b6cbff39e6f599c3d0e6133668",
+    "git_commit" : "a37ef8c0a6316ec69732718c7e01350ce88c2d8b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3627,6 +3627,8 @@ parser.add_argument('--prediction', type=str, help='Path to the prediction file'
 parser.add_argument('--method_id', type=str, help='Method id')
 parser.add_argument('--dataset_id', type=str, help='Dataset id')
 parser.add_argument('--score', type=str, help='score file')
+parser.add_argument('--reg_type', type=str)
+parser.add_argument('--apply_skeleton', action='store_true')
 
 args = parser.parse_args()
 var_local = vars(args)

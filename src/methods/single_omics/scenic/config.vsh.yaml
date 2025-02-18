@@ -6,6 +6,9 @@ namespace: "grn_methods"
 info:
   label: scenic
   summary: "GRN inference using scenic"
+  description: |
+    GRN inference using Scenic pipeline.
+
 
 arguments:
   - name: --rank_threshold

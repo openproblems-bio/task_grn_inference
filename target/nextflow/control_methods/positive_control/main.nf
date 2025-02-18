@@ -3277,6 +3277,7 @@ meta = [
   "info" : {
     "label" : "positive_control",
     "summary" : "Baseline based on correlation",
+    "description" : "Baseline model based on Pearson correlation that uses both inference and evaluation dataset to infer the GRN.\n",
     "type" : "method",
     "type_info" : {
       "label" : "method",
@@ -3391,7 +3392,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/control_methods/positive_control",
     "viash_version" : "0.9.1",
-    "git_commit" : "fe6e73f5590154b6cbff39e6f599c3d0e6133668",
+    "git_commit" : "a37ef8c0a6316ec69732718c7e01350ce88c2d8b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
