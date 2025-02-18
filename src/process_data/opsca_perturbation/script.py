@@ -192,5 +192,10 @@ if __name__ == '__main__':
     bulk_adata.obs['is_positive_control'] = bulk_adata.obs['perturbation'].isin(['Dabrafenib', 'Belinostat'])
 
     bulk_adata.uns['dataset_id'] = 'op'
+    bulk_adata.uns['dataset_name'] = 'OPSCA'
+    bulk_adata.uns['dataset_summary'] = 'RNA-seq data from the OPSCA dataset: perturbation data'
+    bulk_adata.uns['dataset_organism'] = 'human'
+    bulk_adata.uns['normalization_id'] = 'apr'
+
     bulk_adata.write(par['perturbation_bulk'])
     bulk_adata.write(par['evaluation_data'])

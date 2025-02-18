@@ -62,5 +62,16 @@ if __name__ == '__main__':
 
     multiomics_rna.uns['dataset_id'] = 'op'
     multiomics_atac.uns['dataset_id'] = 'op'
+
+    multiomics_rna.uns['dataset_summary'] = 'RNA-seq data from the OPSCA dataset'
+    multiomics_atac.uns['dataset_summary'] = 'ATAC-seq data from the OPSCA dataset'
+
+    multiomics_rna.uns['dataset_organism'] = 'human'
+    multiomics_atac.uns['dataset_organism'] = 'human'
+
+    multiomics_rna.uns['normalization_id'] = 'sla'
+    multiomics_atac.uns['normalization_id'] = 'sla'
+
+
     multiomics_rna.write(par['multiomics_rna'])
     multiomics_atac.write(par['multiomics_atac'])
