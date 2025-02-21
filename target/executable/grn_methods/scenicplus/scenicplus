@@ -449,9 +449,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenicplus"
-LABEL org.opencontainers.image.created="2025-02-18T17:59:36Z"
+LABEL org.opencontainers.image.created="2025-02-21T20:15:26Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="dcf29e099539fe422a88266a14b205537036d881"
+LABEL org.opencontainers.image.revision="5c2faff313fe80a240fab28d1bcdab659a41b741"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -632,10 +632,6 @@ function ViashHelp {
   echo "        type: file, output, file must exist"
   echo "        default: output/grn_extended.csv"
   echo "        Source-target-peak triplets"
-  echo ""
-  echo "    --chromsizes"
-  echo "        type: file, required parameter, file must exist"
-  echo "        example: resources_test/grn_benchmark/prior/chromsizes.csv"
   echo ""
   echo "Viash built in Computational Requirements:"
   echo "    ---cpus=INT"
@@ -841,17 +837,6 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_GRN_EXTENDED=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --chromsizes)
-            [ -n "$VIASH_PAR_CHROMSIZES" ] && ViashError Bad arguments for option \'--chromsizes\': \'$VIASH_PAR_CHROMSIZES\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CHROMSIZES="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --chromsizes. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --chromsizes=*)
-            [ -n "$VIASH_PAR_CHROMSIZES" ] && ViashError Bad arguments for option \'--chromsizes=*\': \'$VIASH_PAR_CHROMSIZES\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CHROMSIZES=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
         ---engine)
             VIASH_ENGINE_ID="$2"
             shift 2
@@ -1032,10 +1017,6 @@ if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
   ViashError '--tf_all' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
-if [ -z ${VIASH_PAR_CHROMSIZES+x} ]; then
-  ViashError '--chromsizes' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
 if [ -z ${VIASH_META_NAME+x} ]; then
   ViashError 'name' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
@@ -1104,10 +1085,6 @@ if [ ! -z "$VIASH_PAR_ATAC" ] && [ ! -e "$VIASH_PAR_ATAC" ]; then
 fi
 if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
   ViashError "Input file '$VIASH_PAR_TF_ALL' does not exist."
-  exit 1
-fi
-if [ ! -z "$VIASH_PAR_CHROMSIZES" ] && [ ! -e "$VIASH_PAR_CHROMSIZES" ]; then
-  ViashError "Input file '$VIASH_PAR_CHROMSIZES' does not exist."
   exit 1
 fi
 
@@ -1267,10 +1244,6 @@ if [ ! -z "$VIASH_PAR_GRN_EXTENDED" ]; then
   VIASH_PAR_GRN_EXTENDED=$(ViashDockerAutodetectMount "$VIASH_PAR_GRN_EXTENDED")
   VIASH_CHOWN_VARS+=( "$VIASH_PAR_GRN_EXTENDED" )
 fi
-if [ ! -z "$VIASH_PAR_CHROMSIZES" ]; then
-  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_CHROMSIZES")" )
-  VIASH_PAR_CHROMSIZES=$(ViashDockerAutodetectMount "$VIASH_PAR_CHROMSIZES")
-fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_META_RESOURCES_DIR")" )
   VIASH_META_RESOURCES_DIR=$(ViashDockerAutodetectMount "$VIASH_META_RESOURCES_DIR")
@@ -1358,8 +1331,7 @@ par = {
   'scplus_mdata': $( if [ ! -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then echo "r'${VIASH_PAR_SCPLUS_MDATA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'qc': $( if [ ! -z ${VIASH_PAR_QC+x} ]; then echo "r'${VIASH_PAR_QC//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'grn_extended': $( if [ ! -z ${VIASH_PAR_GRN_EXTENDED+x} ]; then echo "r'${VIASH_PAR_GRN_EXTENDED//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'chromsizes': $( if [ ! -z ${VIASH_PAR_CHROMSIZES+x} ]; then echo "r'${VIASH_PAR_CHROMSIZES//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'grn_extended': $( if [ ! -z ${VIASH_PAR_GRN_EXTENDED+x} ]; then echo "r'${VIASH_PAR_GRN_EXTENDED//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1487,9 +1459,6 @@ if [[ "$VIASH_ENGINE_TYPE" == "docker" ]]; then
   fi
   if [ ! -z "$VIASH_PAR_GRN_EXTENDED" ]; then
     VIASH_PAR_GRN_EXTENDED=$(ViashDockerStripAutomount "$VIASH_PAR_GRN_EXTENDED")
-  fi
-  if [ ! -z "$VIASH_PAR_CHROMSIZES" ]; then
-    VIASH_PAR_CHROMSIZES=$(ViashDockerStripAutomount "$VIASH_PAR_CHROMSIZES")
   fi
   if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
     VIASH_META_RESOURCES_DIR=$(ViashDockerStripAutomount "$VIASH_META_RESOURCES_DIR")

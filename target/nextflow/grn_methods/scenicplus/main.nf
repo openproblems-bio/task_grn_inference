@@ -3364,19 +3364,6 @@ meta = [
           "direction" : "output",
           "multiple" : false,
           "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--chromsizes",
-          "example" : [
-            "resources_test/grn_benchmark/prior/chromsizes.csv"
-          ],
-          "must_exist" : true,
-          "create_parent" : true,
-          "required" : true,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
         }
       ]
     }
@@ -3503,7 +3490,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.9.1",
-    "git_commit" : "dcf29e099539fe422a88266a14b205537036d881",
+    "git_commit" : "5c2faff313fe80a240fab28d1bcdab659a41b741",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3630,8 +3617,7 @@ par = {
   'scplus_mdata': $( if [ ! -z ${VIASH_PAR_SCPLUS_MDATA+x} ]; then echo "r'${VIASH_PAR_SCPLUS_MDATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'qc': $( if [ ! -z ${VIASH_PAR_QC+x} ]; then echo "r'${VIASH_PAR_QC//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'cell_topic': $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo "r'${VIASH_PAR_CELL_TOPIC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'grn_extended': $( if [ ! -z ${VIASH_PAR_GRN_EXTENDED+x} ]; then echo "r'${VIASH_PAR_GRN_EXTENDED//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'chromsizes': $( if [ ! -z ${VIASH_PAR_CHROMSIZES+x} ]; then echo "r'${VIASH_PAR_CHROMSIZES//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'grn_extended': $( if [ ! -z ${VIASH_PAR_GRN_EXTENDED+x} ]; then echo "r'${VIASH_PAR_GRN_EXTENDED//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),

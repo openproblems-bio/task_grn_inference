@@ -220,9 +220,6 @@ function ViashHelp {
   echo "        type: string"
   echo "        default: pearson"
   echo ""
-  echo "    --chromsizes"
-  echo "        type: string, required parameter"
-  echo ""
   echo "Outputs:"
   echo "    --scores"
   echo "        type: file, required parameter, output, file must exist"
@@ -410,17 +407,6 @@ while [[ $# -gt 0 ]]; do
         --layer=*)
             [ -n "$VIASH_PAR_LAYER" ] && ViashError Bad arguments for option \'--layer=*\': \'$VIASH_PAR_LAYER\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_LAYER=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --chromsizes)
-            [ -n "$VIASH_PAR_CHROMSIZES" ] && ViashError Bad arguments for option \'--chromsizes\': \'$VIASH_PAR_CHROMSIZES\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CHROMSIZES="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --chromsizes. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --chromsizes=*)
-            [ -n "$VIASH_PAR_CHROMSIZES" ] && ViashError Bad arguments for option \'--chromsizes=*\': \'$VIASH_PAR_CHROMSIZES\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CHROMSIZES=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --scores)
@@ -621,10 +607,6 @@ if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
 fi
 if [ -z ${VIASH_PAR_REGULATORS_CONSENSUS+x} ]; then
   ViashError '--regulators_consensus' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
-if [ -z ${VIASH_PAR_CHROMSIZES+x} ]; then
-  ViashError '--chromsizes' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
 if [ -z ${VIASH_PAR_SCORES+x} ]; then
@@ -901,7 +883,6 @@ workflow run_wf {
           rna: state.rna,
           atac: state.atac,
           tf_all: state.tf_all,
-          chromsizes: state.chromsizes,
           num_workers: state.num_workers,
           output: 'predictions/\$id.\$key.output.h5ad',
           output_model: null

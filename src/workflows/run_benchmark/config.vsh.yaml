@@ -51,10 +51,7 @@ argument_groups:
         required: false
         direction: input
         default: pearson
-      - name: --chromsizes
-        type: string
-        required: true
-        direction: input
+
      
       
   - name: Outputs

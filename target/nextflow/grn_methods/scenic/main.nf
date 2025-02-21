@@ -3492,7 +3492,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scenic",
     "viash_version" : "0.9.1",
-    "git_commit" : "dcf29e099539fe422a88266a14b205537036d881",
+    "git_commit" : "5c2faff313fe80a240fab28d1bcdab659a41b741",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

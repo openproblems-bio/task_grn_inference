@@ -3506,7 +3506,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scglue",
     "viash_version" : "0.9.1",
-    "git_commit" : "dcf29e099539fe422a88266a14b205537036d881",
+    "git_commit" : "5c2faff313fe80a240fab28d1bcdab659a41b741",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3666,27 +3666,18 @@ import sys
 
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--multiomics_atac', type=str, help='Path to the multiomics atac file')
+parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--atac', type=str, help='Path to the multiomics atac file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
 args = parser.parse_args()
 
-if args.multiomics_rna:
-    par['multiomics_rna'] = args.multiomics_rna
-if args.multiomics_atac:
-    par['multiomics_atac'] = args.multiomics_atac
-if args.prediction:
-    par['prediction'] = args.prediction
-if args.tf_all:
-    par['tf_all'] = args.tf_all
-if args.num_workers:
-    par['num_workers'] = args.num_workers
+for key, value in vars(args).items():
+    if value:
+        par[key] = value
     
-# if args.resources_dir:
-#     meta['resources_dir'] = args.resources_dir  
 
 # get gene annotation
 par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
@@ -3708,7 +3699,7 @@ print(par)
 net = main(par)
 
 print('Write output to file', flush=True)
-dataset_id = ad.read_h5ad(par['multiomics_rna'], backed='r').uns['dataset_id']
+dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
 net = net.astype(str)
 output = ad.AnnData(X=None, uns={"method_id": 'scglue', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
 output.write(par['prediction'])

@@ -3161,14 +3161,6 @@ meta = [
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
-        },
-        {
-          "type" : "string",
-          "name" : "--chromsizes",
-          "required" : true,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
         }
       ]
     },
@@ -3442,7 +3434,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_benchmark",
     "viash_version" : "0.9.1",
-    "git_commit" : "dcf29e099539fe422a88266a14b205537036d881",
+    "git_commit" : "5c2faff313fe80a240fab28d1bcdab659a41b741",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3609,7 +3601,6 @@ workflow run_wf {
           rna: state.rna,
           atac: state.atac,
           tf_all: state.tf_all,
-          chromsizes: state.chromsizes,
           num_workers: state.num_workers,
           output: 'predictions/$id.$key.output.h5ad',
           output_model: null
