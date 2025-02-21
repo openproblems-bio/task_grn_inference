@@ -5,8 +5,8 @@ import os
 import requests
 ## VIASH START
 par = {
-  "multiomics_rna": "resources/grn-benchmark/multiomics_rna_d0_hvg.h5ad",
-  "multiomics_atac": "resources/grn-benchmark/multiomics_atac_d0.h5ad",
+  "rna": "resources/grn-benchmark/op_rna.h5ad",
+  "atac": "resources/grn-benchmark/op_atac.h5ad",
   "temp_dir": 'output/scglue/',
   "num_workers": 20,
   "prediction": "output/scglue_d0_hvg.csv",
@@ -23,27 +23,18 @@ import sys
 
 import argparse
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--multiomics_rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--multiomics_atac', type=str, help='Path to the multiomics atac file')
+parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--atac', type=str, help='Path to the multiomics atac file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=str, help='Number of cores')
 args = parser.parse_args()
 
-if args.multiomics_rna:
-    par['multiomics_rna'] = args.multiomics_rna
-if args.multiomics_atac:
-    par['multiomics_atac'] = args.multiomics_atac
-if args.prediction:
-    par['prediction'] = args.prediction
-if args.tf_all:
-    par['tf_all'] = args.tf_all
-if args.num_workers:
-    par['num_workers'] = args.num_workers
+for key, value in vars(args).items():
+    if value:
+        par[key] = value
     
-# if args.resources_dir:
-#     meta['resources_dir'] = args.resources_dir  
 
 # get gene annotation
 par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
@@ -65,7 +56,7 @@ print(par)
 net = main(par)
 
 print('Write output to file', flush=True)
-dataset_id = ad.read_h5ad(par['multiomics_rna'], backed='r').uns['dataset_id']
+dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
 net = net.astype(str)
 output = ad.AnnData(X=None, uns={"method_id": 'scglue', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
 output.write(par['prediction'])
