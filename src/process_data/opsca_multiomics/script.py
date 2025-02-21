@@ -63,6 +63,9 @@ if __name__ == '__main__':
     multiomics_rna.uns['dataset_id'] = 'op'
     multiomics_atac.uns['dataset_id'] = 'op'
 
+    multiomics_rna.uns['dataset_name'] = 'OPSCA'
+    multiomics_atac.uns['dataset_name'] = 'OPSCA'
+
     multiomics_rna.uns['dataset_summary'] = 'RNA-seq data from the OPSCA dataset'
     multiomics_atac.uns['dataset_summary'] = 'ATAC-seq data from the OPSCA dataset'
 

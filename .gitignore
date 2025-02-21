@@ -3,7 +3,7 @@
 
 
 # related to files
-runs.ipynb
+# runs.ipynb
 .pybiomart.sqlite
 logs/
 params*

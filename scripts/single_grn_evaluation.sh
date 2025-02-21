@@ -23,7 +23,7 @@ publish_dir="./output/${RUN_ID}"
 grn_models_folder="${resources_dir}/grn_models/"
 
 reg_type="ridge"
-num_workers=1
+num_workers=4
 metric_ids="[regression_1, regression_2, ws_distance]"
 
 param_file="./output/${RUN_ID}.yaml"
@@ -38,19 +38,23 @@ append_entry() {
   - id: ${reg_type}
     metric_ids: ${metric_ids}
     evaluation_data: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad
-    evaluation_data_sc: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_sc.h5ad
     reg_type: $reg_type
-    method_id: "test_method"
-    dataset_id: $dataset
     num_workers: $num_workers
     tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
     regulators_consensus: ${resources_dir}/grn_benchmark/prior/regulators_consensus_${dataset}.json
-    ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
-    ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv
     prediction: $prediction
     layer: "X_norm"
 HERE
+  # Additional fields for specific datasets
+  if [[ "$dataset" == "norman" || "$dataset" == "adamson" || "$dataset" == "replogle" ]]; then
+    cat >> "$param_local" << HERE
+    evaluation_data_sc: ${files_dir}/evaluation_data/${dataset}_sc.h5ad
+    ws_consensus: ${files_dir}/prior/ws_consensus_${dataset}.csv
+    ws_distance_background: ${files_dir}/prior/ws_distance_background_${dataset}.csv
+HERE
+  fi
 }
+
 
 # Loop through grn_names and layers
 
@@ -65,7 +69,6 @@ HERE
 
 # build the images: this can be skipped after the first run
 viash ns build --parallel --setup build -s src/metrics/
-
 
 viash ns build --parallel 
 
