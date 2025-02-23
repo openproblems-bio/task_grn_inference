@@ -3380,7 +3380,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.1",
-    "git_commit" : "5c2faff313fe80a240fab28d1bcdab659a41b741",
+    "git_commit" : "43bbfe044ec816db6aff53b4447570245e8ea4cb",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

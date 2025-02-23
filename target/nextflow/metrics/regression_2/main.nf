@@ -3379,6 +3379,32 @@ meta = [
   "info" : {
     "label" : "regression_2",
     "summary" : "Calculates regression scores 2",
+    "metrics" : [
+      {
+        "name" : "r2-theta-0.0",
+        "label" : "R2 (precision)",
+        "summary" : "Captures the perfomance for the top regulatory links",
+        "min" : "-Inf",
+        "max" : 1,
+        "maximize" : true
+      },
+      {
+        "name" : "r2-theta-0.5",
+        "label" : "R2 (balanced)",
+        "summary" : "Balanced performance scores considering both prevision and recall",
+        "min" : "-Inf",
+        "max" : 1,
+        "maximize" : true
+      },
+      {
+        "name" : "r2-theta-1.0",
+        "label" : "R2 (recall)",
+        "summary" : "Captures the perfomance for the more broad regulatory links (recall)",
+        "min" : "-Inf",
+        "max" : 1,
+        "maximize" : true
+      }
+    ],
     "type" : "metrics_regression",
     "type_info" : {
       "label" : "feature-based metrics",
@@ -3493,7 +3519,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression_2",
     "viash_version" : "0.9.1",
-    "git_commit" : "5c2faff313fe80a240fab28d1bcdab659a41b741",
+    "git_commit" : "43bbfe044ec816db6aff53b4447570245e8ea4cb",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
