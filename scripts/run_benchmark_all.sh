@@ -1,13 +1,13 @@
 #!/bin/bash
-run_local=true
+run_local=false
 num_workers=20
-metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
-RUN_ID="all_test_local"
+metric_ids="[regression_1, regression_2]" #regression_1, regression_2, ws_distance
+RUN_ID="all_test"
 reg_type="ridge"
 label=${RUN_ID}
 
 dataset_ids=" op  "
-method_ids="[negative_control, positive_control, pearson_corr, portia, ppcor, scenic, scglue, scenicplus]"
+method_ids="[negative_control, positive_control, pearson_corr, portia, ppcor]"
 
 # method_ids="[scenicplus]"
 

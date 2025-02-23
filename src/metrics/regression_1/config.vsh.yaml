@@ -5,7 +5,19 @@ namespace: "metrics"
 info:
   label: regression_1
   summary: Calculates regression scores 1
-    
+  metrics:
+    - name: r1_all
+      label: R1 (all)
+      summary: Regression 1 score for all genes with mean gene expression set for missing genes
+      min: -Inf
+      max: +Inf
+      maximize: true
+    - name: r1_grn
+      label: R1 (grn)
+      summary: Regression 1 score for only genes in the network
+      min: -Inf
+      max: +Inf
+      maximize: true
 arguments: 
   - name: --binarize
     type: boolean 
