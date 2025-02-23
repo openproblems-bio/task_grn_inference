@@ -5,22 +5,30 @@ namespace: "metrics"
 info:
   label: ws_distance
   summary: Calculates Wasserstein distance for a given GRN and dataset
+  description: |
+    Calculates Wasserstein distance for a given GRN and dataset
   metrics:
     - name: ws-theta-0.0
       label: WS (precision)
       summary: Captures the perfomance for the top regulatory links
+      description: |
+        Captures the perfomance for the top regulatory links
       min: 0
       max: 1
       maximize: true
     - name: ws-theta-0.5
       label: WS (balanced)
       summary: Balanced performance scores considering both prevision and recall 
+      description: |
+        Balanced performance scores considering both prevision and recall
       min: 0
       max: 1
       maximize: true
     - name: ws-theta-1.0
       label: WS (recall)
       summary: Captures the perfomance for the more broad regulatory links (recall)
+      description: |
+        Captures the perfomance for the more broad regulatory links (recall)
       min: 0
       max: 1
       maximize: true
