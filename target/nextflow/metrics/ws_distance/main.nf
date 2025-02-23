@@ -3367,11 +3367,13 @@ meta = [
   "info" : {
     "label" : "ws_distance",
     "summary" : "Calculates Wasserstein distance for a given GRN and dataset",
+    "description" : "Calculates Wasserstein distance for a given GRN and dataset\n",
     "metrics" : [
       {
         "name" : "ws-theta-0.0",
         "label" : "WS (precision)",
         "summary" : "Captures the perfomance for the top regulatory links",
+        "description" : "Captures the perfomance for the top regulatory links\n",
         "min" : 0,
         "max" : 1,
         "maximize" : true
@@ -3380,6 +3382,7 @@ meta = [
         "name" : "ws-theta-0.5",
         "label" : "WS (balanced)",
         "summary" : "Balanced performance scores considering both prevision and recall",
+        "description" : "Balanced performance scores considering both prevision and recall\n",
         "min" : 0,
         "max" : 1,
         "maximize" : true
@@ -3388,6 +3391,7 @@ meta = [
         "name" : "ws-theta-1.0",
         "label" : "WS (recall)",
         "summary" : "Captures the perfomance for the more broad regulatory links (recall)",
+        "description" : "Captures the perfomance for the more broad regulatory links (recall)\n",
         "min" : 0,
         "max" : 1,
         "maximize" : true
@@ -3506,7 +3510,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/ws_distance",
     "viash_version" : "0.9.1",
-    "git_commit" : "43bbfe044ec816db6aff53b4447570245e8ea4cb",
+    "git_commit" : "40e4051728e992753049c0e15af22a99b8e9c592",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

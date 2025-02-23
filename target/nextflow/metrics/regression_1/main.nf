@@ -3367,11 +3367,13 @@ meta = [
   "info" : {
     "label" : "regression_1",
     "summary" : "Calculates regression scores 1",
+    "description" : "Calculates regression scores 1\n",
     "metrics" : [
       {
         "name" : "r1_all",
         "label" : "R1 (all)",
         "summary" : "Regression 1 score for all genes with mean gene expression set for missing genes",
+        "description" : "Regression 1 score for all genes with mean gene expression set for missing genes\n",
         "min" : "-Inf",
         "max" : "+Inf",
         "maximize" : true
@@ -3380,6 +3382,7 @@ meta = [
         "name" : "r1_grn",
         "label" : "R1 (grn)",
         "summary" : "Regression 1 score for only genes in the network",
+        "description" : "Regression 1 score for only genes in the network\n",
         "min" : "-Inf",
         "max" : "+Inf",
         "maximize" : true
@@ -3499,7 +3502,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression_1",
     "viash_version" : "0.9.1",
-    "git_commit" : "43bbfe044ec816db6aff53b4447570245e8ea4cb",
+    "git_commit" : "40e4051728e992753049c0e15af22a99b8e9c592",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
