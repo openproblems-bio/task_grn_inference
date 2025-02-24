@@ -15,7 +15,7 @@ par <- list(
   atac = "resources_test/grn_benchmark/inference_data/op_atac.h5ad",
   temp_dir =  "output/figr/",
   cell_topic = "resources/grn_benchmark/prior/cell_topic.csv",
-  num_workers = 2,
+  num_workers = 10,
   n_topics = 48,
   peak_gene = "output/figr/peak_gene.csv",
   prediction= "output/figr/figr.h5ad"
