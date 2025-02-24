@@ -1,6 +1,5 @@
 set.seed(42)
 suppressPackageStartupMessages(library(Seurat))
-
 suppressPackageStartupMessages(library(Signac))
 suppressPackageStartupMessages(library(Matrix))
 library(GRaNIEverse)
@@ -16,7 +15,7 @@ suppressPackageStartupMessages(library(SummarizedExperiment))
 
 ## VIASH START
 par <- list(
-  multiomics_rna_r = "resources_test/grn-benchmark/multiomics_rna.rds",
+  multiomics_rna_r = "resources_test/grn_benchmark/inference_data/op_rna.rds",
   multiomics_atac_r = "resources_test/grn-benchmark/multiomics_atac.rds",
   preprocessing_clusteringMethod = 1, # Seurat::FindClusters: (1 = original Louvain algorithm, 2 = Louvain algorithm with multilevel refinement, 3 = SLM algorithm, 4 = Leiden algorithm)
   preprocessing_clusterResolution = 14, # Typically between 5 and 20
@@ -52,20 +51,14 @@ if (!dir.exists(outputDir)) {
 # Downloading resources #
 #########################
 file_hocomoco_v12 = "https://s3.embl.de/zaugg-web/GRaNIE/TFBS/hg38/PWMScan_HOCOMOCOv12_H12INVIVO.tar.gz"
-
 destfile <- "PWMScan_HOCOMOCOv12_H12INVIVO.tar.gz"
-
 if (!file.exists(destfile)) {
-  
   options(timeout = 1200)
   download.file(file_hocomoco_v12, destfile)
 }
-
 # Define the directory to extract the files to
 exdir <- "PWMScan_HOCOMOCOv12_H12INVIVO"
-
 GRaNIE_TFBSFolder = paste0(exdir, "/H12INVIVO")
-
 if (!file.exists(GRaNIE_TFBSFolder)) {
   untar(destfile, exdir = exdir)
 }
@@ -83,16 +76,15 @@ if (!file.exists(file_RNA)) {
   download.file(file_RNA_URL, file_RNA)
 }
 
+print('Donwnloading resources finished')
 
 ###################
 # Preprocess data #
 ###################
 
 if (par$forceRerun | !file.exists(file_seurat)) {
-  
  # Sparse matrix
  rna.m = readRDS(par$multiomics_rna_r)
- 
  seurat_object <- CreateSeuratObject(count = rna.m, project = "PBMC", min.cells = 1, min.features = 1, assay = "RNA")
  
  # RangedSummarizedExperiment
@@ -158,18 +150,6 @@ if (file.exists(GRaNIE_file_peaks) & file.exists(GRaNIE_file_metadata) & file.ex
   cat("Preprocessing skipped because all files already exist anf forceRerun = FALSE.")
   
 } else {
-
-    # Subset for testing purposes
-    if (par$subset == TRUE) {
-        cat("SUBSET cells\n")
-        random_cells <- sample(Cells(seurat_object), size = 5000, replace = FALSE)
-        seurat_object = subset(seurat_object, cells = random_cells)
-        cat("SUBSET peaks\n")
-        peak_names <- rownames(seurat_object[["peaks"]])
-        selected_peaks <- sample(peak_names, size = 50000, replace = FALSE)
-        seurat_object[["peaks"]] = subset(seurat_object[["peaks"]], features = selected_peaks)
-    }
-
   seurat_object = prepareSeuratData_GRaNIE(seurat_object, 
                                            outputDir = outputDir,
                                            saveSeuratObject = TRUE,

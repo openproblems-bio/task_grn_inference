@@ -11,11 +11,11 @@ from sklearn.model_selection import train_test_split
 from scipy.sparse import csr_matrix
 
 par = {
-    'input_data': f'resources/datasets_raw/adamson.h5ad',
-    'adata_bulk': f'resources/extended_data/adamson_bulk.h5ad',
-    'adata_test_sc': f'resources/grn_benchmark/evaluation_data/adamson_sc.h5ad',
-    'adata_test_bulk': f'resources/grn_benchmark/evaluation_data/adamson_bulk.h5ad',
-    'adata_train_sc': f'resources/grn_benchmark/inference_data/adamson_rna.h5ad'
+    'adamson_raw': f'resources/datasets_raw/adamson.h5ad',
+    'adamson_bulk': f'resources/extended_data/adamson_bulk.h5ad',
+    'adamson_test_sc': f'resources/grn_benchmark/evaluation_data/adamson_sc.h5ad',
+    'adamson_test_bulk': f'resources/grn_benchmark/evaluation_data/adamson_bulk.h5ad',
+    'adamson_train_sc': f'resources/grn_benchmark/inference_data/adamson_rna.h5ad'
 }
 
 meta = {
@@ -27,7 +27,7 @@ from util import sum_by
 
 
 # - get the data
-adata = ad.read_h5ad(par['input_data'])
+adata = ad.read_h5ad(par['adamson_raw'])
 adata.var_names_make_unique()
 duplicates = adata.var_names[adata.var_names.duplicated()].unique()
 adata = adata[:, ~adata.var_names.isin(duplicates)]
@@ -111,7 +111,7 @@ adata_bulk.uns['normalization_id'] = 'original'
 
 
 # - save 
-adata_bulk.write(par['adata_bulk'])
-adata_test_sc.write(par['adata_test_sc'])
-adata_test_bulk.write(par['adata_test_bulk'])
-adata_train_sc.write(par['adata_train_sc'])
+adata_bulk.write(par['adamson_bulk'])
+adata_test_sc.write(par['adamson_test_sc'])
+adata_test_bulk.write(par['adamson_test_bulk'])
+adata_train_sc.write(par['adamson_train_sc'])

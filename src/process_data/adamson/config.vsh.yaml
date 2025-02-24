@@ -1,0 +1,46 @@
+
+name: adamon
+namespace: "process_data"
+info:
+  label: Process Adamson dataset
+  summary: "Process sourced Adamson data to generate inference and evaluation datasets"
+
+  
+arguments:
+  - name: --adamson_raw
+    type: file 
+    required: true
+    direction: input
+  - name: --adamson_bulk
+    type: file
+    required: false
+    direction: output
+  - name: --adamson_test_sc
+    type: file
+    required: false
+    direction: output
+  - name: --adamson_test_bulk
+    type: file
+    required: false
+    direction: output
+  - name: --adamson_train_sc
+    type: file
+    required: false
+    direction: output
+
+resources:
+  - type: python_script
+    path: script.py
+
+
+engines:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+
+  - type: native
+
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [midtime, midmem, midcpu]

@@ -12,9 +12,8 @@ import sys
 
 ## VIASH START
 par = {
-    'perturbation_counts': 'resources/datasets_raw/op_perturbation_sc_counts.h5ad',
-    'perturbation_bulk': 'resources/extended_data/op_perturbation_bulk.h5ad',
-    'evaluation_data': 'resources/grn_benchmark/evaluation_data/op_bulk.h5ad',
+    'op_perturbation_raw': 'resources/datasets_raw/op_perturbation_sc_counts.h5ad',
+    'op_perturbation_bulk': 'resources/grn_benchmark/evaluation_data/op_perturbation_bulk.h5ad',
 }
 ## VIASH END
 meta = { 
@@ -27,7 +26,7 @@ from util import sum_by
 
 def preprocess_sc(par):
     # clean up
-    sc_counts = ad.read_h5ad(par['perturbation_counts'])
+    sc_counts = ad.read_h5ad(par['op_perturbation_raw'])
     sc_counts.obs = sc_counts.obs[['well', 'row', 'col', 'plate_name', 'cell_type', 'donor_id', 'sm_name']]
     sc_counts.X = sc_counts.layers['counts']
     del sc_counts.layers 
@@ -197,5 +196,4 @@ if __name__ == '__main__':
     bulk_adata.uns['dataset_organism'] = 'human'
     bulk_adata.uns['normalization_id'] = 'apr'
 
-    bulk_adata.write(par['perturbation_bulk'])
-    bulk_adata.write(par['evaluation_data'])
+    bulk_adata.write(par['op_perturbation_bulk'])
