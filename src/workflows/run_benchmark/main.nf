@@ -9,7 +9,10 @@ methods = [
   scenicplus, 
   scprint, 
   grnboost2,
-  scglue
+  scglue,
+  granie,
+  figr,
+  celloracle
 ]
 
 // construct list of metrics

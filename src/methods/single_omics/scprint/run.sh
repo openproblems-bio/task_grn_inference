@@ -12,15 +12,15 @@
 
 
 
-# viash run src/methods/single_omics/scprint/config.vsh.yaml -- \
-#     --rna resources_test/grn_benchmark/inference_data//op_rna.h5ad \
-#     --tf_all resources/grn_benchmark/prior/tf_all.csv \
-#     --prediction output/prediction.h5ad
+viash run src/methods/single_omics/scprint/config.vsh.yaml -- \
+    --rna resources_test/grn_benchmark/inference_data//op_rna.h5ad \
+    --tf_all resources/grn_benchmark/prior/tf_all.csv \
+    --prediction output/prediction.h5ad \
 
 
 # python src/methods/single_omics/scprint/script.py  \
-#     --rna resources/grn_benchmark/inference_data/op_rna.h5ad \
-#     --tf_all resources/grn_benchmark/prior/tf_all.csv \
+#     --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \
+#     --tf_all resources_test/grn_benchmark/prior/tf_all.csv \
 #     --prediction output/prediction.h5ad
 
 # Exit immediately if a command exits with a non-zero status

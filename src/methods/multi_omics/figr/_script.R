@@ -5,9 +5,7 @@ library(doParallel)
 library(anndata)
 library(FigR)
 library(BSgenome.Hsapiens.UCSC.hg38)
-library(reticulate)
-library(SummarizedExperiment)
-# library(Seurat)
+
 
 ## VIASH START
 par <- list(
@@ -22,39 +20,15 @@ par <- list(
 )
 ## VIASH END
 dir.create(par$temp_dir, recursive = TRUE, showWarnings = TRUE)
-
-# ---------------- create summary experiment for rna 
-adata <- anndata::read_h5ad(par$rna)
-dataset_id = adata$dataset_id
-
-rna <- t(adata$X)  # Transpose to match R's column-major order
-rna <- Matrix(rna)
-# rna <- as(rna, "CsparseMatrix")
-rownames(rna) <- adata$var_names
-colnames(rna) <- adata$obs_names
+print(par)
+atac <- read_h5ad(par$atac)
+rna <- read_h5ad(par$rna)
 
 
-# ---------------- create summary experiment for atac 
-adata <- anndata::read_h5ad(par$atac)
-counts <- t(adata$X)  # Transpose to match R's column-major order
-rownames(counts) <- rownames(adata$var)
-colnames(counts) <- rownames(adata$obs)
-colData <- as.data.frame(adata$obs)
-# rowData <- as.data.frame(adata$var)
-atac <- SummarizedExperiment(
-  assays = list(counts = Matrix(counts)),
-  colData = colData,
-  # rowData = rowData
-  rowRanges = GRanges(adata$var$seqname,
-  IRanges(adata$var$ranges))
-)
-
-rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac)), sep=':')
-
-# ---------------- figr pipeline
-
+dataset_id = rna$dataset_id
 colnames(atac) <- gsub("-", "", colnames(atac))
 colnames(rna) <- gsub("-", "", colnames(rna))
+
 
 cellknn_func <- function(par) {
   ## load cell topic probabilities and create cell-cluster matrix
@@ -72,8 +46,7 @@ peak_gene_func <- function(par){
   common_cells <- intersect(colnames(atac), colnames(rna))
   rna = rna[,common_cells]
   atac = atac[,common_cells]
-  print(dim(atac))
-  print(dim(rna))
+
   cisCorr <- FigR::runGenePeakcorr(ATAC.se = atac,
                             RNAmat = rna,
                             genome = "hg38", # One of hg19, mm10 or hg38 

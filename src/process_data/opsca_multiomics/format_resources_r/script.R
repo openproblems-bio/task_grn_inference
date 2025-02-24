@@ -25,7 +25,7 @@ X <- t(X)
 annotation_peak <- read.csv(par$atac_peak_annot, row.names = 1)
 annotation_cells <- read.csv(par$atac_cell_annot, row.names = 1)
 
-# Filter out entries where seqname is 'chr10'
+# Filter out entries where seqname is 'chr'
 filter_indices <- grepl("^chr", annotation_peak$seqname)
 annotation_peak_filtered <- annotation_peak[filter_indices, ]
 

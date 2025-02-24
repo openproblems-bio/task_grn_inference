@@ -25,6 +25,9 @@ resources:
 engines:
   - type: docker
     image: janursa/figr:19-08-2024
+    # setup:
+    #   - type: r
+    #     bioc: seurat
   - type: native
 runners:
   - type: executable
