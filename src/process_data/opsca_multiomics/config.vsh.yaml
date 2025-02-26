@@ -5,17 +5,17 @@ info:
   summary: "Gets the raw counts and produces formatize scRNA and scATAC data"
 
 arguments:
-  - name: --multiome
+  - name: --op_multiome
     type: file 
     required: true
     direction: input
 
-  - name: --rna
+  - name: --op_rna
     type: file 
     required: false
     direction: output
 
-  - name: --atac
+  - name: --op_atac
     type: file 
     required: false
     direction: output

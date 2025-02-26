@@ -75,6 +75,12 @@ if __name__ == '__main__':
     rna.uns['normalization_id'] = 'sla'
     atac.uns['normalization_id'] = 'sla'
 
+    # - needed for some R packages
+    annotation_peak = atac.var.reset_index().location.str.split(':', expand=True)
+    atac.var['seqname'] = annotation_peak[0].values
+    atac.var['ranges'] = annotation_peak[1].values
+    atac.var['strand'] = '+'
+
 
     rna.write(par['op_rna'])
     atac.write(par['op_atac'])

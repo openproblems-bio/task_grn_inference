@@ -5,8 +5,8 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
 #SBATCH --time=10:00:00
-#SBATCH --mem=500GB
-#SBATCH --partition=cpu
+#SBATCH --mem=120GB
+#SBATCH --nodelist=bioinf008
 #SBATCH --qos long
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com   

@@ -16,11 +16,16 @@ par = {
     'op_perturbation_bulk': 'resources/grn_benchmark/evaluation_data/op_perturbation_bulk.h5ad',
 }
 ## VIASH END
-meta = { 
-    'resources': 'src/utils/'
-}   
 
-sys.path.append(meta['resources'])
+try: 
+    sys.path.append(meta['resources_dir'])
+except:
+    meta = { 
+        'resources_dir': 'src/utils/'
+    }   
+    sys.path.append(meta['resources_dir'])
+
+
 
 from util import sum_by
 

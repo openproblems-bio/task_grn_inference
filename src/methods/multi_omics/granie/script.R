@@ -11,12 +11,16 @@ suppressPackageStartupMessages(library(EnsDb.Mmusculus.v79))
 suppressPackageStartupMessages(library(BSgenome.Mmusculus.UCSC.mm39))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(SummarizedExperiment))
+# library(anndata)
+library(reticulate)
+py_install("anndata")
+anndata <- import("anndata")
 
 
 ## VIASH START
 par <- list(
-  multiomics_rna_r = "resources_test/grn_benchmark/inference_data/op_rna.rds",
-  multiomics_atac_r = "resources_test/grn-benchmark/multiomics_atac.rds",
+  rna = "resources_test/grn_benchmark/inference_data/op_rna.h5ad",
+  atac = "resources_test/grn_benchmark/inference_data/op_atac.h5ad",
   preprocessing_clusteringMethod = 1, # Seurat::FindClusters: (1 = original Louvain algorithm, 2 = Louvain algorithm with multilevel refinement, 3 = SLM algorithm, 4 = Leiden algorithm)
   preprocessing_clusterResolution = 14, # Typically between 5 and 20
   preprocessing_RNA_nDimensions = 50, # Default 50
@@ -83,12 +87,33 @@ print('Donwnloading resources finished')
 ###################
 
 if (par$forceRerun | !file.exists(file_seurat)) {
- # Sparse matrix
- rna.m = readRDS(par$multiomics_rna_r)
- seurat_object <- CreateSeuratObject(count = rna.m, project = "PBMC", min.cells = 1, min.features = 1, assay = "RNA")
+ # read rna 
+  adata <- anndata::read_h5ad(par$rna)
+  dataset_id = adata$dataset_id
+
+  rna <- t(adata$X)  # Transpose to match R's column-major order
+  rna <- Matrix(rna)
+  rownames(rna) <- adata$var_names
+  colnames(rna) <- adata$obs_names
+
+ seurat_object <- CreateSeuratObject(count = rna, project = "PBMC", min.cells = 1, min.features = 1, assay = "RNA")
  
- # RangedSummarizedExperiment
- atac = readRDS(par$multiomics_atac_r)
+ # RangedSummarizedExperiment for atac
+  adata <- anndata::read_h5ad(par$atac)
+  counts <- t(adata$X)  # Transpose to match R's column-major order
+  rownames(counts) <- rownames(adata$var)
+  colnames(counts) <- rownames(adata$obs)
+  colData <- as.data.frame(adata$obs)
+  atac <- SummarizedExperiment(
+    assays = list(counts = Matrix(counts)),
+    colData = colData,
+    # rowData = rowData
+    rowRanges = GRanges(adata$var$seqname,
+    IRanges(adata$var$ranges))
+  )
+
+rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac)), sep=':')
+
  
  # Extract counts and metadata from the RangedSummarizedExperiment
   atac_counts <- assays(atac)$counts
@@ -220,7 +245,29 @@ if (par$useWeightingLinks) {
   final.df = dplyr::mutate(final.df, weight = 1)
 }
 
-final.df %>%
-  dplyr::select(source, target, weight) %>%
-  readr::write_csv(par$prediction)
+net = final.df %>%
+  dplyr::select(source, target, weight) 
+
+
+cat("Output GRN\n")
+print(head(net))
+net$weight <- as.character(net$weight)
+if (!is.data.frame(net)) {
+    stop("Error: 'net' is not a dataframe")
+}
+
+
+output <- AnnData(
+  X = matrix(nrow = 0, ncol = 0),
+  uns = list(
+    method_id = "ppcor",
+    dataset_id = dataset_id,
+    prediction = net[, c("source", "target", "weight")]
+  )
+)
+
+print(output)
+# output$write(par$prediction)
+print(par$prediction)
+output$write_h5ad(par$prediction, compression = "gzip")
 

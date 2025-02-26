@@ -29,8 +29,8 @@ def format_data(par):
     os.makedirs("output/scRNA/", exist_ok=True)
     
     print('Reading input files', flush=True)
-    rna = ad.read_h5ad(par['multiomics_rna'])
-    atac = ad.read_h5ad(par['multiomics_atac'])
+    rna = ad.read_h5ad(par['rna'])
+    atac = ad.read_h5ad(par['atac'])
 
     # save sparse matrix
     print(atac)
