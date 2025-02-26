@@ -3238,12 +3238,12 @@ meta = [
     }
   ],
   "build_info" : {
-    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/opsca_multiomics/format_resources_r/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/opsca_multiomics/repo/format_resources_r/config.vsh.yaml",
     "runner" : "nextflow",
     "engine" : "docker|native",
     "output" : "target/nextflow/multiomics/format_resources_r",
     "viash_version" : "0.9.1",
-    "git_commit" : "40e4051728e992753049c0e15af22a99b8e9c592",
+    "git_commit" : "d10873d9c96847bd85ef98e5dd6bd47f705d6ef3",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3409,7 +3409,7 @@ X <- t(X)
 annotation_peak <- read.csv(par\\$atac_peak_annot, row.names = 1)
 annotation_cells <- read.csv(par\\$atac_cell_annot, row.names = 1)
 
-# Filter out entries where seqname is 'chr10'
+# Filter out entries where seqname is 'chr'
 filter_indices <- grepl("^chr", annotation_peak\\$seqname)
 annotation_peak_filtered <- annotation_peak[filter_indices, ]
 

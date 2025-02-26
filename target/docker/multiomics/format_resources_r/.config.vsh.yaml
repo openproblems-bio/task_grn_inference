@@ -156,13 +156,13 @@ engines:
 - type: "native"
   id: "native"
 build_info:
-  config: "src/process_data/opsca_multiomics/format_resources_r/config.vsh.yaml"
+  config: "src/process_data/opsca_multiomics/repo/format_resources_r/config.vsh.yaml"
   runner: "docker"
   engine: "docker|native"
   output: "target/docker/multiomics/format_resources_r"
   executable: "target/docker/multiomics/format_resources_r/format_resources_r"
   viash_version: "0.9.1"
-  git_commit: "40e4051728e992753049c0e15af22a99b8e9c592"
+  git_commit: "d10873d9c96847bd85ef98e5dd6bd47f705d6ef3"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
 package_config:
   name: "task_grn_inference"

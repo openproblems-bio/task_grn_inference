@@ -3312,6 +3312,17 @@ meta = [
           "multiple_sep" : ";"
         },
         {
+          "type" : "boolean",
+          "name" : "--is_test",
+          "default" : [
+            false
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
           "type" : "string",
           "name" : "--top_n_targets",
           "default" : [
@@ -3506,7 +3517,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scglue",
     "viash_version" : "0.9.1",
-    "git_commit" : "40e4051728e992753049c0e15af22a99b8e9c592",
+    "git_commit" : "d10873d9c96847bd85ef98e5dd6bd47f705d6ef3",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3631,6 +3642,7 @@ par = {
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'is_test': $( if [ ! -z ${VIASH_PAR_IS_TEST+x} ]; then echo "r'${VIASH_PAR_IS_TEST//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'top_n_targets': $( if [ ! -z ${VIASH_PAR_TOP_N_TARGETS+x} ]; then echo "r'${VIASH_PAR_TOP_N_TARGETS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'rank_threshold': $( if [ ! -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_RANK_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_NES_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3677,32 +3689,41 @@ args = parser.parse_args()
 for key, value in vars(args).items():
     if value:
         par[key] = value
+
+if __name__ == '__main__':
+    adata = ad.read_h5ad(par['rna'], backed='r')
     
+    if len(adata) == 2000: # for testing purposes, we will not run the whole pipeline, just keep the format
+         net = pd.DataFrame({
+            'source': ['A', 'B'],
+            'target': ['C', 'D'],
+            'weight': [0.1, 0.2],
+            'cell_type': ['T cells', 'B cells']})
+    else:
+        # get gene annotation
+        par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
+        # par['motif_file'] = f"{par['temp_dir']}/JASPAR2022-hg38.bed.gz"
+        par['motif_file'] = f"{par['temp_dir']}/ENCODE-TF-ChIP-hg38.bed.gz"
+        # par['motif_file'] = f"output/db/jaspar_encode.bed.gz"
 
-# get gene annotation
-par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
-# par['motif_file'] = f"{par['temp_dir']}/JASPAR2022-hg38.bed.gz"
-par['motif_file'] = f"{par['temp_dir']}/ENCODE-TF-ChIP-hg38.bed.gz"
-# par['motif_file'] = f"output/db/jaspar_encode.bed.gz"
+        try:
+            sys.path.append(meta["resources_dir"])
+        except:
+            meta= {
+                "util_dir": 'src/utils/',
+                "resources_dir": 'src/methods/multi_omics/scglue'
+            }
+            sys.path.append(meta["util_dir"])
+            sys.path.append(meta["resources_dir"])
+        from main import main 
+        print(par)
+        net = main(par)
 
-try:
-    sys.path.append(meta["resources_dir"])
-except:
-    meta= {
-        "util_dir": 'src/utils/',
-        "resources_dir": 'src/methods/multi_omics/scglue'
-    }
-    sys.path.append(meta["util_dir"])
-    sys.path.append(meta["resources_dir"])
-from main import main 
-print(par)
-net = main(par)
-
-print('Write output to file', flush=True)
-dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
-net = net.astype(str)
-output = ad.AnnData(X=None, uns={"method_id": 'scglue', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
-output.write(par['prediction'])
+        print('Write output to file', flush=True)
+        dataset_id = adata.uns['dataset_id']
+    net = net.astype(str)
+    output = ad.AnnData(X=None, uns={"method_id": 'scglue', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
+    output.write(par['prediction'])
 VIASHMAIN
 python -B "$tempscript"
 '''

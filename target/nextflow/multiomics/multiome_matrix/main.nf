@@ -3238,12 +3238,12 @@ meta = [
     }
   ],
   "build_info" : {
-    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/opsca_multiomics/multiome_matrix/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/process_data/opsca_multiomics/repo/multiome_matrix/config.vsh.yaml",
     "runner" : "nextflow",
     "engine" : "docker|native",
     "output" : "target/nextflow/multiomics/multiome_matrix",
     "viash_version" : "0.9.1",
-    "git_commit" : "40e4051728e992753049c0e15af22a99b8e9c592",
+    "git_commit" : "d10873d9c96847bd85ef98e5dd6bd47f705d6ef3",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3404,8 +3404,8 @@ def format_data(par):
     os.makedirs("output/scRNA/", exist_ok=True)
     
     print('Reading input files', flush=True)
-    rna = ad.read_h5ad(par['multiomics_rna'])
-    atac = ad.read_h5ad(par['multiomics_atac'])
+    rna = ad.read_h5ad(par['rna'])
+    atac = ad.read_h5ad(par['atac'])
 
     # save sparse matrix
     print(atac)

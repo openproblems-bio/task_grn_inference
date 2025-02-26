@@ -1,0 +1,36 @@
+__merge__: ../../../api/comp_method.yaml
+
+
+name: figr
+namespace: "grn_methods"
+info:
+  label: figr
+  summary: "GRN inference using figr"
+  description: |
+    GRN inference using figr.
+  documentation_url: https://buenrostrolab.github.io/FigR/articles/FigR_shareseq.html
+arguments:
+  - name: --cell_topic
+    type: file
+    default: resources_test/grn_benchmark/prior/cell_topic.csv
+    required: true
+    direction: input
+  - name: --n_topics
+    type: integer 
+    direction: input
+    default: 48
+resources:
+  - type: r_script
+    path: script.R
+engines:
+  - type: docker
+    image: janursa/figr:19-08-2024
+    # setup:
+    #   - type: r
+    #     bioc: seurat
+  - type: native
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [midtime,midmem,midcpu]

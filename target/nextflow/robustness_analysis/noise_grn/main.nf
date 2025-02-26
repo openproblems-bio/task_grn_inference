@@ -3178,12 +3178,12 @@ meta = [
     }
   ],
   "build_info" : {
-    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/robustness_analysis/permute_grn/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/stability_analysis/permute_grn/config.vsh.yaml",
     "runner" : "nextflow",
     "engine" : "docker",
     "output" : "target/nextflow/robustness_analysis/noise_grn",
     "viash_version" : "0.9.1",
-    "git_commit" : "40e4051728e992753049c0e15af22a99b8e9c592",
+    "git_commit" : "d10873d9c96847bd85ef98e5dd6bd47f705d6ef3",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

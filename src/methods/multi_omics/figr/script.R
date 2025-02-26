@@ -2,9 +2,12 @@ library(dplyr)
 library(FNN)
 library(chromVAR)
 library(doParallel)
+library(anndata)
 library(FigR)
 library(BSgenome.Hsapiens.UCSC.hg38)
-
+library(reticulate)
+library(SummarizedExperiment)
+# library(Seurat)
 
 ## VIASH START
 par <- list(
@@ -12,25 +15,45 @@ par <- list(
   atac = "resources_test/grn_benchmark/inference_data/op_atac.h5ad",
   temp_dir =  "output/figr/",
   cell_topic = "resources/grn_benchmark/prior/cell_topic.csv",
-  num_workers = 2,
+  num_workers = 10,
   n_topics = 48,
   peak_gene = "output/figr/peak_gene.csv",
   prediction= "output/figr/figr.h5ad"
 )
-print(par)
-# meta <- list(
-#   functionality_name = "my_method_r"
-# )
 ## VIASH END
 dir.create(par$temp_dir, recursive = TRUE, showWarnings = TRUE)
 
-atac = readRDS(par$atac)
+# ---------------- create summary experiment for rna 
+adata <- anndata::read_h5ad(par$rna)
+dataset_id = adata$dataset_id
+
+rna <- t(adata$X)  # Transpose to match R's column-major order
+rna <- Matrix(rna)
+rownames(rna) <- adata$var_names
+colnames(rna) <- adata$obs_names
+
+
+# ---------------- create summary experiment for atac 
+adata <- anndata::read_h5ad(par$atac)
+counts <- t(adata$X)  # Transpose to match R's column-major order
+rownames(counts) <- rownames(adata$var)
+colnames(counts) <- rownames(adata$obs)
+colData <- as.data.frame(adata$obs)
+# rowData <- as.data.frame(adata$var)
+atac <- SummarizedExperiment(
+  assays = list(counts = Matrix(counts)),
+  colData = colData,
+  # rowData = rowData
+  rowRanges = GRanges(adata$var$seqname,
+  IRanges(adata$var$ranges))
+)
+
+rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac)), sep=':')
+
+# ---------------- figr pipeline
+
 colnames(atac) <- gsub("-", "", colnames(atac))
-
-rna  = readRDS(par$rna)
-dataset_id = rna$dataset_id
 colnames(rna) <- gsub("-", "", colnames(rna))
-
 
 cellknn_func <- function(par) {
   ## load cell topic probabilities and create cell-cluster matrix
@@ -48,7 +71,8 @@ peak_gene_func <- function(par){
   common_cells <- intersect(colnames(atac), colnames(rna))
   rna = rna[,common_cells]
   atac = atac[,common_cells]
-
+  print(dim(atac))
+  print(dim(rna))
   cisCorr <- FigR::runGenePeakcorr(ATAC.se = atac,
                             RNAmat = rna,
                             genome = "hg38", # One of hg19, mm10 or hg38 

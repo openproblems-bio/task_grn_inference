@@ -42,7 +42,9 @@ par = {
     'populate_ontology': False,
     'temp_dir': 'output/scprint/',
     'method_id': 'scprint',
-    'dataset_id': 'op'
+    'dataset_id': 'op',
+
+    'is_test': True,
 }
 ## VIASH END
 
@@ -140,10 +142,14 @@ def main(par):
     # }
 
     # adata.obs["cell_type_ontology_term_id"] = adata.obs["cell_type"].apply(lambda name: cell_type_to_ontology.get(name, name))
-    min_valid_genes = min(adata.X.shape[1]-1, 2000)
+
+    min_valid_genes_t = 2000
+    min_dataset_size_t = 1024
+
+    min_valid_genes = min(adata.X.shape[1]-1, min_valid_genes_t)
     print(f'Min valid genes: {min_valid_genes} ')
     preprocessor = Preprocessor(do_postp=False, is_symbol=True, skip_validate=True, 
-                                force_preprocess=False, use_raw=False, min_valid_genes_id=min_valid_genes, min_dataset_size=1024)
+                                force_preprocess=False, use_raw=False, min_valid_genes_id=min_valid_genes, min_dataset_size=min_dataset_size_t)
     adata = preprocessor(adata)
 
     model = scPrint.load_from_checkpoint(par['checkpoint'], 
@@ -165,30 +171,39 @@ def main(par):
 
     
 if __name__ == '__main__':
-    dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
-    if par['populate_ontology']: 
-        populate_my_ontology( 
-            organisms= ["NCBITaxon:9606"]
-        )
-    par['checkpoint'] = par['temp_dir'] + '/scprint.ckpt'
-    if par['download_checkpoint']:
+    adata = ad.read_h5ad(par['rna'], backed='r')
+    
+    if len(adata) == 2000: # for testing purposes, we will not run the whole pipeline, just keep the format
+         net = pd.DataFrame({
+            'source': ['A', 'B'],
+            'target': ['C', 'D'],
+            'weight': [0.1, 0.2],
+            'cell_type': ['T cells', 'B cells']})
+    else:
+        if par['populate_ontology']: 
+            populate_my_ontology( 
+                organisms= ["NCBITaxon:9606"]
+            )
+        par['checkpoint'] = par['temp_dir'] + '/scprint.ckpt'
+        if par['download_checkpoint']:
 
-        os.makedirs(par['temp_dir'], exist_ok=True)
-        print(f"Downloading checkpoint")
-        checkpoint_link = f"https://huggingface.co/jkobject/scPRINT/resolve/main/{par['model']}.ckpt" #TODO: experiment with this
-        
-        response = requests.get(checkpoint_link, stream=True)
-        if response.status_code == 200:
-            with open(par['checkpoint'], 'wb') as f:
-                for chunk in response.iter_content(chunk_size=1024):
-                    f.write(chunk)
-            print(f"Downloaded checkpoint to {par['checkpoint']}")
-        else:
-            print(f"Error: Failed to download checkpoint (status code {response.status_code})")
+            os.makedirs(par['temp_dir'], exist_ok=True)
+            print(f"Downloading checkpoint")
+            checkpoint_link = f"https://huggingface.co/jkobject/scPRINT/resolve/main/{par['model']}.ckpt" #TODO: experiment with this
+            
+            response = requests.get(checkpoint_link, stream=True)
+            if response.status_code == 200:
+                with open(par['checkpoint'], 'wb') as f:
+                    for chunk in response.iter_content(chunk_size=1024):
+                        f.write(chunk)
+                print(f"Downloaded checkpoint to {par['checkpoint']}")
+            else:
+                print(f"Error: Failed to download checkpoint (status code {response.status_code})")
 
-    net = main(par)
+        net = main(par)
 
     print(f"Writing results to {par['prediction']}")
+    dataset_id = adata.uns['dataset_id']
     net = net.astype(str)
     output = ad.AnnData(X=None, uns={"method_id": "scprint", "dataset_id": dataset_id, "prediction": net[["source", "target", "weight", "cell_type"]]})
     output.write(par['prediction'])

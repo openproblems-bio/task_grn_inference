@@ -456,9 +456,9 @@ pip install -e GRnnData[dev]   && \
 pip install -e benGRN[dev]  
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-02-23T21:14:16Z"
+LABEL org.opencontainers.image.created="2025-02-26T11:57:58Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="40e4051728e992753049c0e15af22a99b8e9c592"
+LABEL org.opencontainers.image.revision="d10873d9c96847bd85ef98e5dd6bd47f705d6ef3"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -620,6 +620,10 @@ function ViashHelp {
   echo "        type: string"
   echo "        default: op"
   echo ""
+  echo "    --is_test"
+  echo "        type: boolean"
+  echo "        default: false"
+  echo ""
   echo "    --filtration"
   echo "        type: string"
   echo "        default: none"
@@ -634,11 +638,11 @@ function ViashHelp {
   echo ""
   echo "    --populate_ontology"
   echo "        type: boolean"
-  echo "        default: true"
+  echo "        default: false"
   echo ""
   echo "    --download_checkpoint"
   echo "        type: boolean"
-  echo "        default: true"
+  echo "        default: false"
   echo ""
   echo "    --model"
   echo "        type: string"
@@ -802,6 +806,17 @@ while [[ $# -gt 0 ]]; do
         --dataset_id=*)
             [ -n "$VIASH_PAR_DATASET_ID" ] && ViashError Bad arguments for option \'--dataset_id=*\': \'$VIASH_PAR_DATASET_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_DATASET_ID=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --is_test)
+            [ -n "$VIASH_PAR_IS_TEST" ] && ViashError Bad arguments for option \'--is_test\': \'$VIASH_PAR_IS_TEST\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_IS_TEST="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --is_test. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --is_test=*)
+            [ -n "$VIASH_PAR_IS_TEST" ] && ViashError Bad arguments for option \'--is_test=*\': \'$VIASH_PAR_IS_TEST\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_IS_TEST=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --filtration)
@@ -1094,6 +1109,9 @@ fi
 if [ -z ${VIASH_PAR_DATASET_ID+x} ]; then
   VIASH_PAR_DATASET_ID="op"
 fi
+if [ -z ${VIASH_PAR_IS_TEST+x} ]; then
+  VIASH_PAR_IS_TEST="false"
+fi
 if [ -z ${VIASH_PAR_FILTRATION+x} ]; then
   VIASH_PAR_FILTRATION="none"
 fi
@@ -1104,10 +1122,10 @@ if [ -z ${VIASH_PAR_MAX_CELLS+x} ]; then
   VIASH_PAR_MAX_CELLS="1000"
 fi
 if [ -z ${VIASH_PAR_POPULATE_ONTOLOGY+x} ]; then
-  VIASH_PAR_POPULATE_ONTOLOGY="true"
+  VIASH_PAR_POPULATE_ONTOLOGY="false"
 fi
 if [ -z ${VIASH_PAR_DOWNLOAD_CHECKPOINT+x} ]; then
-  VIASH_PAR_DOWNLOAD_CHECKPOINT="true"
+  VIASH_PAR_DOWNLOAD_CHECKPOINT="false"
 fi
 if [ -z ${VIASH_PAR_MODEL+x} ]; then
   VIASH_PAR_MODEL="medium"
@@ -1143,6 +1161,12 @@ fi
 if [[ -n "$VIASH_PAR_SEED" ]]; then
   if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_IS_TEST" ]]; then
+  if ! [[ "$VIASH_PAR_IS_TEST" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--is_test' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1386,6 +1410,7 @@ par = {
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'is_test': $( if [ ! -z ${VIASH_PAR_IS_TEST+x} ]; then echo "r'${VIASH_PAR_IS_TEST//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'filtration': $( if [ ! -z ${VIASH_PAR_FILTRATION+x} ]; then echo "r'${VIASH_PAR_FILTRATION//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'num_genes': $( if [ ! -z ${VIASH_PAR_NUM_GENES+x} ]; then echo "int(r'${VIASH_PAR_NUM_GENES//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'max_cells': $( if [ ! -z ${VIASH_PAR_MAX_CELLS+x} ]; then echo "int(r'${VIASH_PAR_MAX_CELLS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
@@ -1513,10 +1538,14 @@ def main(par):
     # }
 
     # adata.obs["cell_type_ontology_term_id"] = adata.obs["cell_type"].apply(lambda name: cell_type_to_ontology.get(name, name))
-    min_valid_genes = min(adata.X.shape[1]-1, 2000)
+
+    min_valid_genes_t = 2000
+    min_dataset_size_t = 1024
+
+    min_valid_genes = min(adata.X.shape[1]-1, min_valid_genes_t)
     print(f'Min valid genes: {min_valid_genes} ')
     preprocessor = Preprocessor(do_postp=False, is_symbol=True, skip_validate=True, 
-                                force_preprocess=False, use_raw=False, min_valid_genes_id=min_valid_genes, min_dataset_size=1024)
+                                force_preprocess=False, use_raw=False, min_valid_genes_id=min_valid_genes, min_dataset_size=min_dataset_size_t)
     adata = preprocessor(adata)
 
     model = scPrint.load_from_checkpoint(par['checkpoint'], 
@@ -1538,30 +1567,39 @@ def main(par):
 
     
 if __name__ == '__main__':
-    dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
-    if par['populate_ontology']: 
-        populate_my_ontology( 
-            organisms= ["NCBITaxon:9606"]
-        )
-    par['checkpoint'] = par['temp_dir'] + '/scprint.ckpt'
-    if par['download_checkpoint']:
+    adata = ad.read_h5ad(par['rna'], backed='r')
+    
+    if len(adata) == 2000: # for testing purposes, we will not run the whole pipeline, just keep the format
+         net = pd.DataFrame({
+            'source': ['A', 'B'],
+            'target': ['C', 'D'],
+            'weight': [0.1, 0.2],
+            'cell_type': ['T cells', 'B cells']})
+    else:
+        if par['populate_ontology']: 
+            populate_my_ontology( 
+                organisms= ["NCBITaxon:9606"]
+            )
+        par['checkpoint'] = par['temp_dir'] + '/scprint.ckpt'
+        if par['download_checkpoint']:
 
-        os.makedirs(par['temp_dir'], exist_ok=True)
-        print(f"Downloading checkpoint")
-        checkpoint_link = f"https://huggingface.co/jkobject/scPRINT/resolve/main/{par['model']}.ckpt" #TODO: experiment with this
-        
-        response = requests.get(checkpoint_link, stream=True)
-        if response.status_code == 200:
-            with open(par['checkpoint'], 'wb') as f:
-                for chunk in response.iter_content(chunk_size=1024):
-                    f.write(chunk)
-            print(f"Downloaded checkpoint to {par['checkpoint']}")
-        else:
-            print(f"Error: Failed to download checkpoint (status code {response.status_code})")
+            os.makedirs(par['temp_dir'], exist_ok=True)
+            print(f"Downloading checkpoint")
+            checkpoint_link = f"https://huggingface.co/jkobject/scPRINT/resolve/main/{par['model']}.ckpt" #TODO: experiment with this
+            
+            response = requests.get(checkpoint_link, stream=True)
+            if response.status_code == 200:
+                with open(par['checkpoint'], 'wb') as f:
+                    for chunk in response.iter_content(chunk_size=1024):
+                        f.write(chunk)
+                print(f"Downloaded checkpoint to {par['checkpoint']}")
+            else:
+                print(f"Error: Failed to download checkpoint (status code {response.status_code})")
 
-    net = main(par)
+        net = main(par)
 
     print(f"Writing results to {par['prediction']}")
+    dataset_id = adata.uns['dataset_id']
     net = net.astype(str)
     output = ad.AnnData(X=None, uns={"method_id": "scprint", "dataset_id": dataset_id, "prediction": net[["source", "target", "weight", "cell_type"]]})
     output.write(par['prediction'])

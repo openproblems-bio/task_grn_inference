@@ -445,9 +445,9 @@ function ViashDockerfile {
     cat << 'VIASHDOCKER'
 FROM ghcr.io/openproblems-bio/base_python:1.0.4
 LABEL org.opencontainers.image.description="Companion container for running component multiomics multiome_matrix"
-LABEL org.opencontainers.image.created="2025-02-23T21:14:16Z"
+LABEL org.opencontainers.image.created="2025-02-26T11:57:58Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="40e4051728e992753049c0e15af22a99b8e9c592"
+LABEL org.opencontainers.image.revision="d10873d9c96847bd85ef98e5dd6bd47f705d6ef3"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1218,8 +1218,8 @@ def format_data(par):
     os.makedirs("output/scRNA/", exist_ok=True)
     
     print('Reading input files', flush=True)
-    rna = ad.read_h5ad(par['multiomics_rna'])
-    atac = ad.read_h5ad(par['multiomics_atac'])
+    rna = ad.read_h5ad(par['rna'])
+    atac = ad.read_h5ad(par['atac'])
 
     # save sparse matrix
     print(atac)

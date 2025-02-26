@@ -24,11 +24,11 @@ arguments:
   - name: --populate_ontology
     type: boolean
     direction: input
-    default: true
+    default: false
   - name: --download_checkpoint
     type: boolean
     direction: input
-    default: true
+    default: false
   - name: --model
     type: string
     direction: input

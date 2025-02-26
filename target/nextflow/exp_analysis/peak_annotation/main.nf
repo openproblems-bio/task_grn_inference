@@ -3153,6 +3153,11 @@ meta = [
   },
   "runners" : [
     {
+      "type" : "executable",
+      "id" : "executable",
+      "docker_setup_strategy" : "ifneedbepullelsecachedbuild"
+    },
+    {
       "type" : "nextflow",
       "id" : "nextflow",
       "directives" : {
@@ -3192,7 +3197,18 @@ meta = [
       "type" : "docker",
       "id" : "docker",
       "image" : "janursa/figr:19-08-2024",
-      "namespace_separator" : "/"
+      "namespace_separator" : "/",
+      "setup" : [
+        {
+          "type" : "r",
+          "bioc" : [
+            "TxDb.Hsapiens.UCSC.hg38.knownGene",
+            "BiocGenerics"
+          ],
+          "bioc_force_install" : false,
+          "warnings_as_errors" : true
+        }
+      ]
     },
     {
       "type" : "native",
@@ -3205,7 +3221,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/exp_analysis/peak_annotation",
     "viash_version" : "0.9.1",
-    "git_commit" : "40e4051728e992753049c0e15af22a99b8e9c592",
+    "git_commit" : "d10873d9c96847bd85ef98e5dd6bd47f705d6ef3",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

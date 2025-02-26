@@ -3346,7 +3346,19 @@ meta = [
       }
     },
     {
+      "name" : "grn_methods/figr",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
       "name" : "grn_methods/scenicplus",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "grn_methods/granie",
       "repository" : {
         "type" : "local"
       }
@@ -3429,12 +3441,12 @@ meta = [
     }
   ],
   "build_info" : {
-    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/workflows/run_benchmark/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/workflows/run_benchmark_all/config.vsh.yaml",
     "runner" : "nextflow",
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_benchmark",
     "viash_version" : "0.9.1",
-    "git_commit" : "40e4051728e992753049c0e15af22a99b8e9c592",
+    "git_commit" : "d10873d9c96847bd85ef98e5dd6bd47f705d6ef3",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3545,7 +3557,9 @@ include { ppcor } from "${meta.resources_dir}/../../../nextflow/grn_methods/ppco
 include { scprint } from "${meta.resources_dir}/../../../nextflow/grn_methods/scprint/main.nf"
 include { celloracle } from "${meta.resources_dir}/../../../nextflow/grn_methods/celloracle/main.nf"
 include { scglue } from "${meta.resources_dir}/../../../nextflow/grn_methods/scglue/main.nf"
+include { figr } from "${meta.resources_dir}/../../../nextflow/grn_methods/figr/main.nf"
 include { scenicplus } from "${meta.resources_dir}/../../../nextflow/grn_methods/scenicplus/main.nf"
+include { granie } from "${meta.resources_dir}/../../../nextflow/grn_methods/granie/main.nf"
 include { pearson_corr } from "${meta.resources_dir}/../../../nextflow/control_methods/pearson_corr/main.nf"
 include { negative_control } from "${meta.resources_dir}/../../../nextflow/control_methods/negative_control/main.nf"
 include { positive_control } from "${meta.resources_dir}/../../../nextflow/control_methods/positive_control/main.nf"
@@ -3563,7 +3577,10 @@ methods = [
   scenicplus, 
   scprint, 
   grnboost2,
-  scglue
+  scglue,
+  granie,
+  figr,
+  celloracle
 ]
 
 // construct list of metrics
