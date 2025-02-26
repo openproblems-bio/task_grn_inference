@@ -3,16 +3,16 @@ import scanpy as sc
 import numpy as np
 ## VIASH START
 par = {
-    'multiome_counts': 'resources/datasets_raw/op_multiome_sc_counts.h5ad',
-    'multiomics_rna': 'resources/grn_benchmark/inference_data/op_rna.h5ad',
-    'multiomics_atac': 'resources/grn_benchmark/inference_data/op_atac.h5ad'
+    'op_multiome': 'resources/datasets_raw/op_multiome_sc_counts.h5ad',
+    'op_rna': 'resources/grn_benchmark/inference_data/op_rna.h5ad',
+    'op_atac': 'resources/grn_benchmark/inference_data/op_atac.h5ad'
 }
 ## VIASH END
 
 if __name__ == '__main__':
 
     # Load 
-    multiomics = ad.read_h5ad(par['multiome_counts'])
+    multiomics = ad.read_h5ad(par['op_multiome'])
     multiomics.X = multiomics.layers['counts']
     del multiomics.layers
     multiomics.layers['counts'] = multiomics.X.copy()
@@ -26,8 +26,8 @@ if __name__ == '__main__':
     cell_type_map = {cell_type: 'T cells' if cell_type in T_cell_types else cell_type for cell_type in cell_types_o}
     multiomics.obs['cell_type'] = multiomics.obs['cell_type'].map(cell_type_map)
     # RNA
-    multiomics_rna = multiomics[:,multiomics.var.feature_types=='Gene Expression']
-    multiomics_rna.var = multiomics_rna.var[['gene_ids', 'interval']]
+    rna = multiomics[:,multiomics.var.feature_types=='Gene Expression']
+    rna.var = rna.var[['gene_ids', 'interval']]
 
     # def high_coverage(adata):
     #     threshold = 0.1
@@ -36,45 +36,51 @@ if __name__ == '__main__':
     #     mask_var = (np.sum(mask, axis=0).A.flatten()/mask.shape[0])>threshold
     #     adata.obs['high_coverage'] = mask_obs
     #     adata.var['high_coverage'] = mask_var
-    # high_coverage(multiomics_rna)
+    # high_coverage(rna)
     #------ ATAC
-    multiomics_atac = multiomics[:,multiomics.var.feature_types=='Peaks']
-    multiomics_atac.var = multiomics_atac.var[[]]
+    atac = multiomics[:,multiomics.var.feature_types=='Peaks']
+    atac.var = atac.var[[]]
 
     # Find common cells (observations) in both RNA and ATAC datasets
-    common_obs = multiomics_rna.obs_names.intersection(multiomics_atac.obs_names)
+    common_obs = rna.obs_names.intersection(atac.obs_names)
     # Subset the RNA and ATAC data to keep only the common cells
-    multiomics_rna = multiomics_rna[common_obs, :]
-    multiomics_atac = multiomics_atac[common_obs, :]
+    rna = rna[common_obs, :]
+    atac = atac[common_obs, :]
 
-    print(multiomics_rna)
-    print(multiomics_atac)
+    print(rna)
+    print(atac)
 
     # change donor names
-    unique_donors = multiomics_rna.obs.donor_id.unique()
+    unique_donors = rna.obs.donor_id.unique()
     donor_map = {donor_id: f'donor_{i}' for i, donor_id in enumerate(unique_donors)}
-    multiomics_rna.obs['donor_id'] = multiomics_rna.obs['donor_id'].map(donor_map)
-    multiomics_atac.obs['donor_id'] = multiomics_atac.obs['donor_id'].map(donor_map)
+    rna.obs['donor_id'] = rna.obs['donor_id'].map(donor_map)
+    atac.obs['donor_id'] = atac.obs['donor_id'].map(donor_map)
 
     # normalize rna 
-    X_norm = sc.pp.normalize_total(multiomics_rna, inplace=False)['X']
-    multiomics_rna.layers['X_norm'] = sc.pp.log1p(X_norm, copy=True)
+    X_norm = sc.pp.normalize_total(rna, inplace=False)['X']
+    rna.layers['X_norm'] = sc.pp.log1p(X_norm, copy=True)
 
-    multiomics_rna.uns['dataset_id'] = 'op'
-    multiomics_atac.uns['dataset_id'] = 'op'
+    rna.uns['dataset_id'] = 'op'
+    atac.uns['dataset_id'] = 'op'
 
-    multiomics_rna.uns['dataset_name'] = 'OPSCA'
-    multiomics_atac.uns['dataset_id'] = 'OPSCA'
+    rna.uns['dataset_name'] = 'OPSCA'
+    atac.uns['dataset_id'] = 'OPSCA'
 
-    multiomics_rna.uns['dataset_summary'] = 'RNA-seq data from the OPSCA dataset'
-    multiomics_atac.uns['dataset_summary'] = 'ATAC-seq data from the OPSCA dataset'
+    rna.uns['dataset_summary'] = 'RNA-seq data from the OPSCA dataset'
+    atac.uns['dataset_summary'] = 'ATAC-seq data from the OPSCA dataset'
 
-    multiomics_rna.uns['dataset_organism'] = 'human'
-    multiomics_atac.uns['dataset_organism'] = 'human'
+    rna.uns['dataset_organism'] = 'human'
+    atac.uns['dataset_organism'] = 'human'
 
-    multiomics_rna.uns['normalization_id'] = 'sla'
-    multiomics_atac.uns['normalization_id'] = 'sla'
+    rna.uns['normalization_id'] = 'sla'
+    atac.uns['normalization_id'] = 'sla'
+
+    # - needed for some R packages
+    annotation_peak = atac.var.reset_index().location.str.split(':', expand=True)
+    atac.var['seqname'] = annotation_peak[0].values
+    atac.var['ranges'] = annotation_peak[1].values
+    atac.var['strand'] = '+'
 
 
-    multiomics_rna.write(par['multiomics_rna'])
-    multiomics_atac.write(par['multiomics_atac'])
+    rna.write(par['op_rna'])
+    atac.write(par['op_atac'])

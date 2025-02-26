@@ -29,7 +29,6 @@ dataset_id = adata$dataset_id
 
 rna <- t(adata$X)  # Transpose to match R's column-major order
 rna <- Matrix(rna)
-# rna <- as(rna, "CsparseMatrix")
 rownames(rna) <- adata$var_names
 colnames(rna) <- adata$obs_names
 

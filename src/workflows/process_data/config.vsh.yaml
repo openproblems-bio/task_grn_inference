@@ -1,0 +1,54 @@
+
+
+
+
+name: process_datasets
+namespace: "workflows"
+info:
+  label: Process Datasets
+  summary: "Processes all datasets from raw sources and generate standardized inference and evaluation datasets"
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --op_multiome
+        type: file 
+        required: true
+        direction: input
+      - name: --op_perturbation_raw
+        type: file 
+        required: true
+        direction: input
+
+  - name: Outputs
+    arguments:
+      - name: --op_rna
+        type: file 
+        required: false
+        direction: output
+      - name: --op_atac
+        type: file 
+        required: false
+        direction: output
+      - name: --op_perturbation_bulk
+        type: file 
+        required: false
+        direction: output
+      
+      
+      
+resources:
+  - type: nextflow_script
+    path: main.nf
+    entrypoint: run_wf
+
+dependencies:
+  - name: process_data/op_multiome 
+  - name: process_data/op_perturbation
+
+
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [ midtime, highmem, lowcpu]

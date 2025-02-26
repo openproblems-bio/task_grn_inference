@@ -129,10 +129,9 @@ def skeleton_peak(par):
 
 if __name__ == '__main__':
     par = {
-        'multiomics_atac': f"resources/grn-benchmark/multiomics_atac.h5ad",
-        'multiomics_rna': f"resources/grn-benchmark/multiomics_rna.h5ad",
+        'multiomics_atac': f"resources/grn_benchmark/inference_data/op_atac.h5ad",
+        'multiomics_rna': f"resources/grn_benchmark/inference_data/op_rna.h5ad",
         'annotation_file': f"output/db/gencode.v45.annotation.gtf.gz",
-        # 'motif_file':   'output/db/ENCODE-TF-ChIP-hg38.bed.gz',
         'temp_dir': 'output/skeleton',
         'extend_range': 150000,
         'flank_length': 1000,
@@ -154,9 +153,9 @@ if __name__ == '__main__':
 
 
     print('------- promotor based skeleton for different motif files ---------')
-    names = ['encode','jaspar']
+    names = ['encode', 'jaspar']
     motif_files = ['output/db/ENCODE-TF-ChIP-hg38.bed.gz', 'output/db/JASPAR2022-hg38.bed.gz']
-    if False:
+    if True:
         for i, motif_file in enumerate(motif_files):
             par['skeleton_promotor_file'] = f"{par['temp_dir']}/skeleton_{names[i]}_promotor.csv"
             par['motif_file'] = motif_file
@@ -171,8 +170,8 @@ if __name__ == '__main__':
                 skeleton = pd.concat([df, skeleton], axis=0).drop_duplicates()
             print(skeleton.shape)
         skeleton.to_csv(f"{par['temp_dir']}/skeleton_promotor.csv")
-    # print('------- peak based skeleton for different motif files ---------')
-    if False:
+    print('------- peak based skeleton for different motif files ---------')
+    if True:
         for i, motif_file in enumerate(motif_files):
             par['skeleton_peak_file'] = f"{par['temp_dir']}/skeleton_peak_{names[i]}.csv"
             par['motif_file'] = motif_file
@@ -189,7 +188,7 @@ if __name__ == '__main__':
                 skeleton_peak = pd.concat([df, skeleton_peak], axis=0).drop_duplicates()
         skeleton_peak.to_csv(f"{par['temp_dir']}/skeleton_peak.csv")
 
-    if False:
+    if True:
         print('------- mege peak based skeleton with promotor base skeleton ---------')
         # - read peak based and promotor based skeletons
         skeleton_peak = pd.read_csv(f"{par['temp_dir']}/skeleton_peak.csv")[['source', 'target']].drop_duplicates()

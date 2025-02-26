@@ -128,7 +128,7 @@ arguments:
   - name: --forceRerun
     type: boolean
     required: false
-    default: false
+    default: true
     direction: input
     description: "Flag to force rerun of the analysis regardless of existing results."
 
@@ -147,7 +147,9 @@ resources:
 engines:
   - type: docker
     image: chrarnold84/granieverse:v1.3
-    
+    setup:
+      - type: r
+        bioc: reticulate
   - type: native
 
 runners:

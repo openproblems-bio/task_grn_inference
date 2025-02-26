@@ -11,4 +11,6 @@
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com
 
-singularity run ../../images/scenicplus python src/methods/multi_omics/scenicplus/script.py 
+# singularity run ../../images/scenicplus python src/methods/multi_omics/scenicplus/script.py 
+viash run src/methods/multi_omics/scenicplus/config.vsh -- /
+    --
