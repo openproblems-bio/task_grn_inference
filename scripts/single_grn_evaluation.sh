@@ -47,10 +47,10 @@ append_entry() {
 HERE
   # Additional fields for specific datasets
   if [[ "$dataset" == "norman" || "$dataset" == "adamson" || "$dataset" == "replogle" ]]; then
-    cat >> "$param_local" << HERE
-    evaluation_data_sc: ${files_dir}/evaluation_data/${dataset}_sc.h5ad
-    ws_consensus: ${files_dir}/prior/ws_consensus_${dataset}.csv
-    ws_distance_background: ${files_dir}/prior/ws_distance_background_${dataset}.csv
+    cat >> "$param_file" << HERE
+    evaluation_data_sc: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_sc.h5ad
+    ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
+    ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv
 HERE
   fi
 }

@@ -109,6 +109,9 @@ def main(par):
     net = read_net(par)
     if par['apply_tf']:
         net = net[net.source.isin(tf_all)]
+    assert net.shape[0]>0, 'No links found in the network'
+    assert all(column in net.columns for column in ['source', 'target', 'weight']), 'Columns in the network should be source, target, weight'
+    
     evaluation_data = ad.read_h5ad(par['evaluation_data'])
     evaluation_data.X = evaluation_data.layers[par["layer"]]
     gene_names = evaluation_data.var.index.to_numpy()

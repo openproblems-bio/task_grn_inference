@@ -2,41 +2,39 @@
 run_local=true
 num_workers=20
 metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
-RUN_ID="all_main"
+RUN_ID="all_main_test"
+resources_folder='resources_test'
+
 reg_type="ridge"
 label=${RUN_ID}
 
-dataset_ids=" op  "
-method_ids="[pearson_corr,
-            negative_control, 
-            positive_control, 
-            portia, 
-            ppcor, 
-            scenic, 
-            scenicplus, 
-            scprint, 
-            grnboost2,
-            scglue,
-            granie,
-            figr,
-            celloracle]"
 
+dataset_ids=" op norman adamson nakatake replogle"
 # method_ids="[pearson_corr,
 #             negative_control, 
 #             positive_control, 
 #             portia, 
 #             ppcor, 
-#             scenicplus
-#             ]"
+#             scenic, 
+#             scprint, 
+#             grnboost2,
+#             scenicplus, 
+#             scglue,
+#             granie,
+#             figr,
+#             celloracle]"
+
+method_ids="[pearson_corr,
+            negative_control, 
+            positive_control,
+            portia,
+            ppcor]"
 
 
 echo "Run ID: $RUN_ID"
 
-if [ "$run_local" = true ]; then
-  resources_dir="./resources_test/"
-else
-  resources_dir="s3://openproblems-data/resources_test/grn"
-fi
+resources_dir="s3://openproblems-data/${resources_folder}/grn"
+
 
 files_dir="${resources_dir}/grn_benchmark"
 publish_dir="${resources_dir}/results/${RUN_ID}"
@@ -52,7 +50,7 @@ param_aws="s3://openproblems-data/resources/grn/results/params/${RUN_ID}_param_l
 
 # Print GRN names correctly
 echo $param_local
-echo "GRN models: ${grn_names[@]}"
+echo "GRN models: ${method_ids[@]}"
 
 # Ensure param_file is clean
 > "$param_local"
@@ -111,6 +109,8 @@ HERE
     -with-trace \
     -c common/nextflow_helpers/labels_ci.config \
     -params-file ${param_local}
+    --num_workers $num_workers
+  
 else
   cat >> "$param_file" << HERE
 output_state: "state.yaml"

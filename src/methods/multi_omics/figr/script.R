@@ -5,14 +5,14 @@ library(doParallel)
 library(anndata)
 library(FigR)
 library(BSgenome.Hsapiens.UCSC.hg38)
-library(reticulate)
+library(anndata)
 library(SummarizedExperiment)
 # library(Seurat)
 
 ## VIASH START
 par <- list(
-  rna = "resources_test/grn_benchmark/inference_data/op_rna.h5ad",
-  atac = "resources_test/grn_benchmark/inference_data/op_atac.h5ad",
+  rna = "resources/grn_benchmark/inference_data/op_rna.h5ad",
+  atac = "resources/grn_benchmark/inference_data/op_atac.h5ad",
   temp_dir =  "output/figr/",
   cell_topic = "resources/grn_benchmark/prior/cell_topic.csv",
   num_workers = 10,
@@ -39,6 +39,7 @@ counts <- t(adata$X)  # Transpose to match R's column-major order
 rownames(counts) <- rownames(adata$var)
 colnames(counts) <- rownames(adata$obs)
 colData <- as.data.frame(adata$obs)
+
 # rowData <- as.data.frame(adata$var)
 atac <- SummarizedExperiment(
   assays = list(counts = Matrix(counts)),
