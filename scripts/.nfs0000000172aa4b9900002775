@@ -2,7 +2,6 @@
 run_local=true
 num_workers=20
 metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
-
 RUN_ID="main_sub"
 resources_folder='resources'
 
@@ -14,13 +13,11 @@ dataset_ids=" op norman adamson nakatake replogle"
 # method_ids="[pearson_corr,
 #             negative_control, 
 #             positive_control, 
-
 #             portia, 
 #             ppcor, 
 #             scenic, 
 #             scprint, 
 #             grnboost2,
-
 #             scenicplus, 
 #             scglue,
 #             granie,
