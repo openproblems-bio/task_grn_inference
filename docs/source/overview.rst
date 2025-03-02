@@ -19,13 +19,12 @@ Built with modern computational tools like Docker and Viash, geneRNIB prioritize
 
 Installation
 ------------
-To install software dependencies, you need to have Docker, Java, and Viash installed. Follow `these instructions <https://openproblems.bio/documentation/fundamentals/requirements/>`_ to install the required dependencies.
 
-Clone the repository (?) and download the resources:
-git clone git@github.com:openproblems-bio/task_grn_benchmark.git
+For installation, follow the `task_gen_benchmark <https://github.com/openproblems-bio/task_grn_inference>`_. 
 
+Once the repository is cloned and the required software installed, proceed to the next steps.
 
-Download minimal resources for GRN inference and evalation:
+Download resources for GRN inference and evalation:
 ------------------
 
 .. code-block:: bash
@@ -34,6 +33,8 @@ Download minimal resources for GRN inference and evalation:
 
     # download resources
     scripts/download_resources.sh
+
+The full resources is acceesible  
 
 Infer a GRN
 -----------
