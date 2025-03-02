@@ -5,17 +5,17 @@ library(doParallel)
 library(anndata)
 library(FigR)
 library(BSgenome.Hsapiens.UCSC.hg38)
-library(anndata)
 library(SummarizedExperiment)
 # library(Seurat)
+# install.packages("bspm", repos="https://cran.r-project.org") #TOOD: check this
 
 ## VIASH START
 par <- list(
-  rna = "resources/grn_benchmark/inference_data/op_rna.h5ad",
-  atac = "resources/grn_benchmark/inference_data/op_atac.h5ad",
+  rna = "resources_test/grn_benchmark/inference_data/op_rna.h5ad",
+  atac = "resources_test/grn_benchmark/inference_data/op_atac.h5ad",
   temp_dir =  "output/figr/",
   cell_topic = "resources/grn_benchmark/prior/cell_topic.csv",
-  num_workers = 10,
+  num_workers = 5,
   n_topics = 48,
   peak_gene = "output/figr/peak_gene.csv",
   prediction= "output/figr/figr.h5ad"
@@ -51,6 +51,21 @@ atac <- SummarizedExperiment(
 
 rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac)), sep=':')
 
+test_flag = FALSE
+if (test_flag) {
+  common_cells <- intersect(colnames(rna), colnames(atac))
+  if (length(common_cells) > 2000) {
+    selected_cells <- sample(common_cells, 2000)
+  } else {
+    selected_cells <- common_cells  # Keep all if less than 2000
+  }
+  rna <- rna[, selected_cells]
+  atac <- atac[, selected_cells]
+  print(dim(rna))
+  print(dim(atac))
+
+
+}
 # ---------------- figr pipeline
 
 colnames(atac) <- gsub("-", "", colnames(atac))
@@ -101,9 +116,11 @@ dorc_genes_func <- function(par){
 
   cellkNN = cellkNN[common_cells,]
   dorcMat = dorcMat[,common_cells]
+  rna <- rna[, common_cells]
   cat('cellKNN dim:', dim(cellkNN), '\n')
   cat('dorcMat dim:', dim(dorcMat), '\n')
   cat('rna dim:', dim(rna), '\n')
+  cellkNN[cellkNN > ncol(dorcMat)] <- 1  # this is for test purposes
   dorcMat.s <- smoothScoresNN(NNmat = cellkNN, mat = dorcMat, nCores = par$num_workers) 
   cat('dorcMat.s completed')
   # Smooth RNA using cell KNNs
@@ -126,6 +143,12 @@ tf_gene_association_func <- function(par){
   cisCorr.filt = read.csv(paste0(par$temp_dir, "cisCorr.filt.csv"))
   RNAmat.s = readRDS(paste0(par$temp_dir, "RNAmat.s.RDS"))
   dorcMat.s = readRDS(paste0(par$temp_dir, "dorcMat.s.RDS"))
+
+  # - for test purposes
+  zero_var_rows <- which(apply(dorcMat.s, 1, var, na.rm = TRUE) == 0)
+  if (length(zero_var_rows) > 0) {
+    dorcMat.s <- dorcMat.s[-zero_var_rows, ]  # Remove zero-variance rows
+  }
 
   figR.d <- runFigRGRN(ATAC.se = atac, # Must be the same input as used in runGenePeakcorr()
                       dorcTab = cisCorr.filt, # Filtered peak-gene associations

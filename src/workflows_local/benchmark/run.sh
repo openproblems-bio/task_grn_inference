@@ -15,14 +15,14 @@ set -e
 source ~/miniconda3/bin/activate scprint
 
 # ----- parameters -----
-RUN_GRN_INFERENCE=false
-CALCULATE_METRICS=true
+RUN_GRN_INFERENCE=true
+CALCULATE_METRICS=false
 RUN_CONSENSUS_FLAG=false # - whether to run the consensus for reg2 (only run when to update the consensus), #TODO: update the code to handle other consensus
 FORCE=true
-SBATCH=false
+SBATCH=true
 REG_TYPE="GB"
-APPLY_SKELETON=true
-SAVE_SCORES_FILE="resources/scores/scores_op_gb.csv" # - where to save the scores (all metrics, datasets, methods)
+APPLY_SKELETON=false
+SAVE_SCORES_FILE="resources/scores/scores_test.csv" # - where to save the scores (all metrics, datasets, methods)
 
 # DATASETS=(
 #     " adamson op nakatake replogle norman "
@@ -32,13 +32,13 @@ DATASETS=(
     " op "
 )
 
-METHODS=(
-    "scglue scenicplus celloracle granie figr grnboost2 ppcor portia scenic scprint positive_control pearson_corr negative_control  "
-)
-
 # METHODS=(
-#     " positive_control pearson_corr "
+#     "scglue scenicplus celloracle granie figr grnboost2 ppcor portia scenic scprint positive_control pearson_corr negative_control  "
 # )
+
+METHODS=(
+    " figr "
+)
 
 
 if [ "$RUN_GRN_INFERENCE" = true ]; then

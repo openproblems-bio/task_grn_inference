@@ -92,6 +92,9 @@ def run_grn_inference(par, dataset='op', subsample=None):
         elif method=='scprint':
             # command = "source ~/miniconda3/bin/activate scprint \n"
             command = f"python src/methods/single_omics/{method}/script.py {method_args}"
+        elif method=='figr':
+            # command = "source ~/miniconda3/bin/activate scprint \n"
+            command = f"singularity exec ../../images/figr Rscript src/methods/multi_omics/figr/script.R {method_args}"
         else:
             command = f"singularity exec ../../images/{method} python src/methods/single_omics/{method}/script.py {method_args}"
         
@@ -121,9 +124,10 @@ def run_grn_inference(par, dataset='op', subsample=None):
             else:
                 mem = "120GB"
                 time = "24:00:00"
-        elif method in ["scglue"]:
+        elif method in ["scglue", "figr"]:
             mem = "250GB"
             time = "24:00:00"
+
 
         else:
             # print(f"Method {method} not recognized")

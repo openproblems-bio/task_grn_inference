@@ -2,8 +2,8 @@
 run_local=true
 num_workers=20
 metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
-RUN_ID="all_main_test"
-resources_folder='resources_test'
+RUN_ID="main_sub"
+resources_folder='resources'
 
 reg_type="ridge"
 label=${RUN_ID}
@@ -27,8 +27,7 @@ dataset_ids=" op norman adamson nakatake replogle"
 method_ids="[pearson_corr,
             negative_control, 
             positive_control,
-            portia,
-            ppcor]"
+            ]"
 
 
 echo "Run ID: $RUN_ID"
