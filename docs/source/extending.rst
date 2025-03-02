@@ -10,7 +10,3 @@ To add a method to the repository, follow the instructions in the ``scripts/add_
 ## - add a metric
 
 ## - add a dataset
-
-
-
-

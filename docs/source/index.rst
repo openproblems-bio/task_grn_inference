@@ -9,22 +9,11 @@ In the current version, geneRNIB contains 11 inference methods including both si
 
 
 This documentation is summlementary to the `task_gen_benchmark <https://github.com/openproblems-bio/task_grn_inference>`_ on the OpenProblems platform. You can find out the latest integrated GRN inference methods on this page.
-The results of the benchmark can be found `here <https://openproblems.bio/results/>`_.
-The paper outlining this benchmark can be found `here <?>`_.
 
 The overview of the benchmark can be found :doc:`overview`.
 
-
-
-
-This task is one of many other tasks hosted on the `OpenProblems benchmarking platform <https://openproblems.bio/>`_.
-The interactive benchmarking results are hosted `here <https://openproblems.bio/results/>`_.
-
-The **GRN inference** task focuses on the inference of gene regulatory networks (GRN) from RNA-Seq expression or chromatin accessibility data (ATAC-Seq) or both. 
-The pipeline evaluates inferred GRNs against pertubation data, by training two types of regression models. This type of evaluation is closer to evaluating the biological knowledge that a GRN should represent, instead of evaluating the presence of edges in a statistical way only, as commonly done by using metrics, such as AUPRC or AUROC.
-
-Jump to the :doc:`overview` section to get a first summary of the pipeline.
-If you want to add your own datasets or algorithms to the benchmark, check our the :doc:`extending` section.
+To integrate your method into geneRNIB, follow the :doc:`extending` section.
+Follow the :doc:`inference` section to access inference datasets and infer gene regulatory networks using your method without integrating it into geneRNIB.
 
 
 .. .. list-table:: Authors & contributors
@@ -55,4 +44,5 @@ Contents
    overview
    evaluation
    extending
+   inference
    

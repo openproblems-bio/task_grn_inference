@@ -3164,7 +3164,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/process_data/op_multiome",
     "viash_version" : "0.9.1",
-    "git_commit" : "d10873d9c96847bd85ef98e5dd6bd47f705d6ef3",
+    "git_commit" : "1dd631a6d80ed7f772513e6d3a850b3dc3edd779",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
