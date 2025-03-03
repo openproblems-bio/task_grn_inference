@@ -1,0 +1,155 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Documentation for Gene Regulatory Network Inference Benchmark (geneRNIB) &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Datasets" href="dataset.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            OpenProblems GRN benchmarking
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="dataset.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="evaluation.html">GRN evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extending.html">Adding GRN inference methods, metrics, and datasets</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">OpenProblems GRN benchmarking</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Documentation for Gene Regulatory Network Inference Benchmark (geneRNIB)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="documentation-for-gene-regulatory-network-inference-benchmark-genernib">
+<h1>Documentation for Gene Regulatory Network Inference Benchmark (geneRNIB)<a class="headerlink" href="#documentation-for-gene-regulatory-network-inference-benchmark-genernib" title="Link to this heading"></a></h1>
+<p>geneRNIB is a living benchmark platform for GRN inference. This platform provides curated datasets for GRN inference and evaluation, standardized evaluation protocols and metrics, computational infrastructure, and a dynamically updated leaderboard to track state-of-the-art methods. It runs novel GRNs in the cloud, offers competition scores, and stores them for future comparisons, reflecting new developments over time.</p>
+<p>The platform supports the integration of new inference methods, datasets, and protocols. When a new feature is added, previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly. The aim is to evaluate both the accuracy and completeness of inferred GRNs. It is designed for both single-modality and multi-omics GRN inference.</p>
+<a class="reference internal image-reference" href="_images/overview.png"><img alt="_images/overview.png" class="align-center" src="_images/overview.png" style="width: 70%;" />
+</a>
+<hr class="docutils" />
+<p>This documentation is supplementary to the paper <a class="reference external" href="addalinkhere">geneRNIB: a living benchmark for gene regulatory network inference</a> and the <a class="reference external" href="https://github.com/openproblems-bio/task_grn_inference">GitHub page</a> on the OpenProblems platform.</p>
+<p>To install geneRNIB, see the <a class="reference external" href="https://github.com/openproblems-bio/task_grn_inference">GitHub page</a>.</p>
+<p>For instructions on how to download and access datasets, refer to the <a class="reference internal" href="dataset.html"><span class="doc">Datasets</span></a> section.</p>
+<p>For information on evaluation metrics, refer to the <a class="reference internal" href="evaluation.html"><span class="doc">GRN evaluation</span></a> section.</p>
+<p>To integrate your GRN inference method, metric, or dataset, follow the instructions in the <a class="reference internal" href="extending.html"><span class="doc">Adding GRN inference methods, metrics, and datasets</span></a> section.</p>
+<p>Currently, 5 multi-omics GRN inference and 5 transcriptomics-based methods are integrated into geneRNIB. You can find the latest integrated GRN inference methods on that page.</p>
+<a class="reference internal image-reference" href="_images/grn_models.png"><img alt="_images/grn_models.png" class="align-center" src="_images/grn_models.png" style="width: 70%;" />
+</a>
+<hr class="docutils" />
+<p>In addition, three baseline methods are integrated into geneRNIB. These methods are used to evaluate the performance of new methods. The baseline methods are:</p>
+<ul class="simple">
+<li><p><strong>Negative control</strong>: Randomly assigns weights to edges. GRN inference methods should outperform this method.</p></li>
+<li><p><strong>Pearson correlation</strong>: Assigns weights based on the Pearson correlation between genes.</p></li>
+<li><p><strong>Positive control</strong>: Similar to Pearson correlation with the exception that it uses both inference and evaluation dataset to infer the GRN. This method is expected to outperform most methods.</p></li>
+</ul>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This project is under active development and this documentation is still a draft.</p>
+</div>
+<section id="contents">
+<h2>Contents<a class="headerlink" href="#contents" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataset.html">Datasets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dataset.html#downloading-the-test-datasets">Downloading the test datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataset.html#downloading-the-main-datasets">Downloading the main datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataset.html#downloading-the-extended-datasets">Downloading the extended datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataset.html#downloading-the-raw-unprocessed-data">Downloading the raw/unprocessed data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataset.html#downloading-the-grn-models">Downloading the GRN models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataset.html#downloading-the-results">Downloading the results</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="evaluation.html">GRN evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extending.html">Adding GRN inference methods, metrics, and datasets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#add-a-grn-inference-method">Add a GRN inference method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#add-a-grn-evaluation-metric">Add a GRN evaluation metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extending.html#add-a-grn-inference-and-evalaution-dataset">Add a GRN inference and evalaution dataset</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="dataset.html" class="btn btn-neutral float-right" title="Datasets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

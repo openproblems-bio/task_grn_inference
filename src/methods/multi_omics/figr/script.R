@@ -232,7 +232,9 @@ filter_net <- function(par) {
 
   print(output)
   print(par$prediction)
-  output$write_h5ad(par$prediction, compression = "gzip")
+  print(output$uns$dataset_id)
+  anndata::write_h5ad(output, par$prediction)
+  # output$write_h5ad(par$prediction, compression = "gzip")
 }
 
 
