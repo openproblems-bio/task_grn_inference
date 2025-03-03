@@ -5,17 +5,17 @@ library(doParallel)
 library(anndata)
 library(FigR)
 library(BSgenome.Hsapiens.UCSC.hg38)
-library(reticulate)
 library(SummarizedExperiment)
 # library(Seurat)
+# install.packages("bspm", repos="https://cran.r-project.org") #TOOD: check this
 
 ## VIASH START
 par <- list(
   rna = "resources_test/grn_benchmark/inference_data/op_rna.h5ad",
   atac = "resources_test/grn_benchmark/inference_data/op_atac.h5ad",
   temp_dir =  "output/figr/",
-  cell_topic = "resources/grn_benchmark/prior/cell_topic.csv",
-  num_workers = 10,
+  cell_topic = "resources_test/grn_benchmark/prior/cell_topic.csv",
+  num_workers = 5,
   n_topics = 48,
   peak_gene = "output/figr/peak_gene.csv",
   prediction= "output/figr/figr.h5ad"
@@ -25,7 +25,9 @@ dir.create(par$temp_dir, recursive = TRUE, showWarnings = TRUE)
 
 # ---------------- create summary experiment for rna 
 adata <- anndata::read_h5ad(par$rna)
-dataset_id = adata$dataset_id
+dataset_id = adata$uns$dataset_id
+
+
 
 rna <- t(adata$X)  # Transpose to match R's column-major order
 rna <- Matrix(rna)
@@ -39,6 +41,7 @@ counts <- t(adata$X)  # Transpose to match R's column-major order
 rownames(counts) <- rownames(adata$var)
 colnames(counts) <- rownames(adata$obs)
 colData <- as.data.frame(adata$obs)
+
 # rowData <- as.data.frame(adata$var)
 atac <- SummarizedExperiment(
   assays = list(counts = Matrix(counts)),
@@ -50,6 +53,21 @@ atac <- SummarizedExperiment(
 
 rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac)), sep=':')
 
+test_flag = FALSE
+if (test_flag) {
+  common_cells <- intersect(colnames(rna), colnames(atac))
+  if (length(common_cells) > 2000) {
+    selected_cells <- sample(common_cells, 2000)
+  } else {
+    selected_cells <- common_cells  # Keep all if less than 2000
+  }
+  rna <- rna[, selected_cells]
+  atac <- atac[, selected_cells]
+  print(dim(rna))
+  print(dim(atac))
+
+
+}
 # ---------------- figr pipeline
 
 colnames(atac) <- gsub("-", "", colnames(atac))
@@ -100,9 +118,11 @@ dorc_genes_func <- function(par){
 
   cellkNN = cellkNN[common_cells,]
   dorcMat = dorcMat[,common_cells]
+  rna <- rna[, common_cells]
   cat('cellKNN dim:', dim(cellkNN), '\n')
   cat('dorcMat dim:', dim(dorcMat), '\n')
   cat('rna dim:', dim(rna), '\n')
+  cellkNN[cellkNN > ncol(dorcMat)] <- 1  # this is for test purposes
   dorcMat.s <- smoothScoresNN(NNmat = cellkNN, mat = dorcMat, nCores = par$num_workers) 
   cat('dorcMat.s completed')
   # Smooth RNA using cell KNNs
@@ -126,6 +146,12 @@ tf_gene_association_func <- function(par){
   RNAmat.s = readRDS(paste0(par$temp_dir, "RNAmat.s.RDS"))
   dorcMat.s = readRDS(paste0(par$temp_dir, "dorcMat.s.RDS"))
 
+  # - for test purposes
+  zero_var_rows <- which(apply(dorcMat.s, 1, var, na.rm = TRUE) == 0)
+  if (length(zero_var_rows) > 0) {
+    dorcMat.s <- dorcMat.s[-zero_var_rows, ]  # Remove zero-variance rows
+  }
+
   figR.d <- runFigRGRN(ATAC.se = atac, # Must be the same input as used in runGenePeakcorr()
                       dorcTab = cisCorr.filt, # Filtered peak-gene associations
                       genome = "hg38",
@@ -138,7 +164,7 @@ tf_gene_association_func <- function(par){
 
 extract_peak_gene_func <- function(par) {
   # Read the CSV file
-  peak_gene_figr <- read.csv(file.path(par$temp_dir, "cisCorr.filt.csv"))
+  peak_gene_figr <- read.csv(paste0(par$temp_dir, "cisCorr.filt.csv"))
   
   # Calculate the number of peak ranges for each gene
   peak_gene_figr_n <- aggregate(PeakRanges ~ Gene, data = peak_gene_figr, length)
@@ -157,12 +183,15 @@ extract_peak_gene_func <- function(par) {
   colnames(peak_gene_figr) <- c("peak", "target")
   
   # Write the result to a CSV file
-  write.csv(peak_gene_figr, file = par$peak_gene, row.names = FALSE)
+  # if (par$peak_gene != ""){
+  #   write.csv(peak_gene_figr, file = par$peak_gene, row.names = FALSE)
+  # }
+  
 }
 
 filter_net <- function(par) {
   # Read the CSV file
-  net <- read.csv(file.path(par$temp_dir, "figR.d.csv"))
+  net <- read.csv(paste0(par$temp_dir, "figR.d.csv"))
 
   # Filter those that have a Score of 0
   net <- subset(net, Score != 0)
@@ -192,7 +221,6 @@ filter_net <- function(par) {
       stop("Error: 'net' is not a dataframe")
   }
 
-
   output <- AnnData(
     X = matrix(nrow = 0, ncol = 0),
     uns = list(
@@ -219,7 +247,7 @@ print('2: peak_gene_func finished')
 dorc_genes_func(par)
 print('3: dorc_genes_func finished')
 tf_gene_association_func(par)
-print('3: tf_gene_association_func finished')
+print('4: tf_gene_association_func finished')
 extract_peak_gene_func(par)
-print('4: extract_peak_gene_func finished')
+print('5: extract_peak_gene_func finished')
 filter_net(par)

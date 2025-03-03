@@ -149,7 +149,7 @@ engines:
     image: chrarnold84/granieverse:v1.3
     setup:
       - type: r
-        bioc: reticulate
+        bioc: [reticulate, anndata]
   - type: native
 
 runners:

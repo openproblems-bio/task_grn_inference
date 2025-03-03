@@ -272,6 +272,9 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     net = ad.read_h5ad(par['prediction'])
     net = pd.DataFrame(net.uns['prediction'])
     net['weight'] = net['weight'].astype(float)
+    assert net.shape[0]>0, 'No links found in the network'
+    assert all(column in net.columns for column in ['source', 'target', 'weight']), 'Columns in the network should be source, target, weight'
+    
     
    
     net_matrix = net_to_matrix(net, gene_names, par)
