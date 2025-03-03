@@ -1,0 +1,216 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Adding GRN inference methods, metrics, and datasets &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="GRN evaluation" href="evaluation.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenProblems GRN benchmarking
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dataset.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="evaluation.html">GRN evaluation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Adding GRN inference methods, metrics, and datasets</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#add-a-grn-inference-method">Add a GRN inference method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#add-a-grn-evaluation-metric">Add a GRN evaluation metric</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#add-a-grn-inference-and-evalaution-dataset">Add a GRN inference and evalaution dataset</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenProblems GRN benchmarking</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Adding GRN inference methods, metrics, and datasets</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/extending.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="adding-grn-inference-methods-metrics-and-datasets">
+<h1>Adding GRN inference methods, metrics, and datasets<a class="headerlink" href="#adding-grn-inference-methods-metrics-and-datasets" title="Link to this heading"></a></h1>
+<p>In this section, we provide instructions on how to add new GRN inference methods, metrics, and datasets to the geneRNIB platform. Installing geneRNIB is a prerequisite for integrating new features.</p>
+<section id="add-a-grn-inference-method">
+<h2>Add a GRN inference method<a class="headerlink" href="#add-a-grn-inference-method" title="Link to this heading"></a></h2>
+<p>Examples of GRN inference methods include GRNBoost2, CellOracle, and SCENIC. The list of integrated GRN inference methods can be found on the geneRNIB platform, <cite>src/methods</cite>, which are examples of how to integrate new methods for both R and Python.</p>
+<p>Each method requires a <cite>config.vsh</cite> file together
+with a <cite>script.py</cite>. Additionally, the method can have extra files to store and organize the code, such as <cite>helper</cite>, which are stored in the same folder and called by the <cite>script.py</cite>.</p>
+<p>The overlook of <cite>config.vsh</cite> is as follows. However, refer to the <cite>src/methods/dummpy/config.yaml</cite> for the updated formatting.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">Example of a <cite>config.vsh</cite> file</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">__merge__</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">../../../api/comp_method.yaml</span><span class="w"> </span><span class="c1"># merge with the common method schema</span>
+
+<span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">method_name</span>
+<span class="w"> </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;grn_methods&quot;</span>
+<span class="w"> </span><span class="nt">info</span><span class="p">:</span>
+<span class="w"> </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pretty method name</span>
+<span class="w"> </span><span class="nt">summary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;summary</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">your</span><span class="nv"> </span><span class="s">method&quot;</span>
+<span class="w"> </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">    </span><span class="no">more about your method</span>
+<span class="w"> </span><span class="nt">documentation_url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">link to your method documentation</span><span class="w"> </span><span class="c1"># optional</span>
+
+<span class="w"> </span><span class="nt">resources</span><span class="p">:</span>
+<span class="w">     </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python_script</span><span class="w"> </span><span class="c1"># or R_script</span>
+<span class="w">       </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">script.py</span><span class="w"> </span><span class="c1"># your main script (dont change it). or script.R</span>
+
+<span class="w"> </span><span class="nt">engines</span><span class="p">:</span>
+<span class="w">     </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker</span>
+<span class="w">         </span><span class="l l-Scalar l-Scalar-Plain">image</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/openproblems-bio/base_python:1.0.4</span><span class="w"> </span><span class="c1"># or base_R, which are base images with some essentials installed. or your own image</span>
+<span class="w">         </span><span class="nt">__merge__</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/src/api/base_requirements.yaml</span><span class="w"> </span><span class="c1"># merge with the base requirements schema required for the pipeline</span>
+<span class="w">         </span><span class="nt">setup</span><span class="p">:</span>
+<span class="w">         </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
+<span class="w">             </span><span class="l l-Scalar l-Scalar-Plain">packages</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">grnboost2</span><span class="w"> </span><span class="p p-Indicator">]</span><span class="w"> </span><span class="c1"># additional packages required for your method. see different methods for examples as this could get complicated. or, use your image and omit this.</span>
+
+<span class="w">     </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">native</span>
+<span class="w"> </span><span class="nt">runners</span><span class="p">:</span><span class="w"> </span><span class="c1"># this is for the nextflow pipeline.</span>
+<span class="w">     </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">executable</span>
+<span class="w">     </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nextflow</span>
+<span class="w">         </span><span class="l l-Scalar l-Scalar-Plain">directives</span><span class="p p-Indicator">:</span>
+<span class="w">         </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">midtime</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">midmem</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">midcpu</span><span class="p p-Indicator">]</span><span class="w"> </span><span class="c1"># expected resources. see _viash.yaml for their definition</span>
+</pre></div>
+</div>
+</div>
+<p>Your <cite>script.py</cite> should have the following structure:</p>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Example of a <cite>script.py</cite> file</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ad</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="o">...</span> <span class="c1"># import necessary libraries</span>
+
+ <span class="c1">## VIASH START  -&gt; this is necessary for the viash to work. It essentially replaces this with the parameters passed to the config.vsh file</span>
+ <span class="n">par</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s1">&#39;rna&#39;</span><span class="p">:</span> <span class="s1">&#39;resources/grn_benchmark/rna_op.h5ad&#39;</span><span class="p">,</span> <span class="c1"># example rna data</span>
+     <span class="s1">&#39;tf_all&#39;</span><span class="p">:</span> <span class="s1">&#39;resources/grn_benchmark/prior/tf_all.csv&#39;</span><span class="p">,</span> <span class="c1"># tf list. you will need this to filter the network to only tf-gene pairs. we only evaluate top 50k TF-gene edges so better to filter it.</span>
+     <span class="s1">&#39;prediction&#39;</span><span class="p">:</span> <span class="s1">&#39;output/prediction.h5ad&#39;</span> <span class="c1"># where to save the prediction</span>
+ <span class="p">}</span>
+ <span class="c1">## VIASH END</span>
+
+ <span class="c1"># Load some data</span>
+ <span class="n">rna</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">read_h5ad</span><span class="p">(</span><span class="n">par</span><span class="p">[</span><span class="s2">&quot;rna&quot;</span><span class="p">])</span>
+ <span class="n">tf_all</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">loadtxt</span><span class="p">(</span><span class="n">par</span><span class="p">[</span><span class="s2">&quot;tf_all&quot;</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
+
+ <span class="c1"># Your method code here</span>
+ <span class="n">net</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;TF1&quot;</span><span class="p">,</span> <span class="s2">&quot;TF2&quot;</span><span class="p">],</span> <span class="s2">&quot;target&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;gene1&quot;</span><span class="p">,</span> <span class="s2">&quot;gene2&quot;</span><span class="p">],</span> <span class="s2">&quot;weight&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]})</span> <span class="c1"># example network</span>
+
+
+ <span class="c1"># Save the inferred network</span>
+ <span class="n">net</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">net</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>  <span class="c1"># Ensure weight is stored as a string</span>
+ <span class="n">output</span> <span class="o">=</span> <span class="n">AnnData</span><span class="p">(</span>
+     <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+     <span class="n">uns</span><span class="o">=</span><span class="p">{</span>
+         <span class="s2">&quot;method_id&quot;</span><span class="p">:</span> <span class="s2">&quot;method_name&quot;</span><span class="p">,</span>
+         <span class="s2">&quot;dataset_id&quot;</span><span class="p">:</span> <span class="s2">&quot;dataset_name&quot;</span><span class="p">,</span> <span class="c1"># one of op, norman, etc.</span>
+         <span class="s2">&quot;prediction&quot;</span><span class="p">:</span> <span class="n">net</span><span class="p">[[</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">]]</span>
+     <span class="p">}</span>
+ <span class="p">)</span>
+ <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<p>Once you have added your method, you can test it by running the following command. For this, download and place the test datasets in <cite>resources_test/grn_benchmark</cite>.</p>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Download test data</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>aws<span class="w"> </span>s3<span class="w"> </span>cp<span class="w"> </span>s3://openproblems-data/resources_test/grn/grn_benchmark<span class="w"> </span>resources_test/grn_benchmark<span class="w"> </span>--no-sign-request
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id4">
+<div class="code-block-caption"><span class="caption-text">Test your method</span><a class="headerlink" href="#id4" title="Link to this code"></a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>viash<span class="w"> </span><span class="nb">test</span><span class="w"> </span>src/methods/your_method/config.vsh<span class="w"> </span><span class="c1"># path to the config.vsh file of your method</span>
+</pre></div>
+</div>
+</div>
+<p>Once the test is successful, you can submit a pull request to the geneRNIB repository to integrate your method.
+See additional Viash commands in the <a class="reference external" href="https://viash.io/guide/">Viash documentation</a> to run your method with different parameters.</p>
+</section>
+<section id="add-a-grn-evaluation-metric">
+<h2>Add a GRN evaluation metric<a class="headerlink" href="#add-a-grn-evaluation-metric" title="Link to this heading"></a></h2>
+<p>Under development …</p>
+</section>
+<section id="add-a-grn-inference-and-evalaution-dataset">
+<h2>Add a GRN inference and evalaution dataset<a class="headerlink" href="#add-a-grn-inference-and-evalaution-dataset" title="Link to this heading"></a></h2>
+<p>Under development …</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="evaluation.html" class="btn btn-neutral float-left" title="GRN evaluation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

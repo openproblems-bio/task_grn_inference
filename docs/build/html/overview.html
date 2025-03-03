@@ -1,0 +1,177 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=2709fde1"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            OpenProblems GRN benchmarking
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="dataset.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="evaluation.html">GRN inference and evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extending.html">Extending the pipeline</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenProblems GRN benchmarking</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Overview</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/overview.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<p>Overview of geneRNIB</p>
+<p>geneRNIB is a cloud-hosted platform designed to evaluate gene regulatory network (GRN) inference methods in a standardized and reproducible way. It brings together datasets, GRN models, evaluation metrics, and a dynamic leaderboard to track the latest advancements in GRN benchmarks.</p>
+<p>To ensure fair comparisons, geneRNIB provides five benchmark datasets, each tailored to assess different aspects of GRN inference. These datasets originate from the same cell types and experiments, allowing context-specific evaluations. The platform supports both transcriptomics-based GRN inference, which relies solely on gene expression data, and multi-omics approaches that integrate chromatin accessibility and gene expression to uncover regulatory interactions.</p>
+<p>Evaluating GRN performance is challenging due to the lack of a definitive “ground truth” network. To address this, geneRNIB employs eight standardized evaluation metrics that use perturbation data to assess inferred interactions. The Wasserstein (WS) distance measures shifts in gene expression after perturbations, helping to determine how well a model captures true regulatory effects. Additionally, regression-based metrics (R₁ and R₂) assess predictive accuracy, ensuring that inferred regulatory links contribute to meaningful predictions.</p>
+<p>To put GRN models into context, geneRNIB also includes three control models. A simple baseline computes Pearson correlations between genes, serving as a quick reference for benchmarking. A positive control model sets an upper bound by incorporating all available variation, while a negative control model generates random networks to ensure meaningful performance comparisons.</p>
+<p>Built with modern computational tools like Docker and Viash, geneRNIB prioritizes scalability and reproducibility. It provides a structured framework for integrating new datasets, inference methods, and evaluation metrics, making it a powerful resource for advancing GRN research.</p>
+<p>#TODO: Fig of the datasts and the table that shows inference and evaluation datassts
+#TODO: Fig of the evaluation metrics and explain</p>
+<section id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<p>For installation, follow the <a class="reference external" href="https://github.com/openproblems-bio/task_grn_inference">task_gen_benchmark</a>.</p>
+<p>Once the repository is cloned and the required software installed, proceed to the next steps.</p>
+</section>
+<section id="download-resources-for-grn-inference-and-evalation">
+<h2>Download resources for GRN inference and evalation:<a class="headerlink" href="#download-resources-for-grn-inference-and-evalation" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>task_grn_benchmark
+
+<span class="c1"># download resources</span>
+scripts/download_resources.sh
+</pre></div>
+</div>
+<p>The full resources is acceesible</p>
+</section>
+<section id="infer-a-grn">
+<h2>Infer a GRN<a class="headerlink" href="#infer-a-grn" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>viash<span class="w"> </span>run<span class="w"> </span>src/methods/dummy/config.vsh.yaml<span class="w"> </span>--<span class="w"> </span>--multiomics_rna<span class="w"> </span>resources/grn-benchmark/multiomics_rna.h5ad<span class="w"> </span>--multiomics_atac<span class="w"> </span>resources/grn-benchmark/multiomics_atac.h5ad<span class="w"> </span>--prediction<span class="w"> </span>output/dummy.csv
+</pre></div>
+</div>
+<p>Similarly, run the command for other methods.</p>
+</section>
+<section id="evaluate-a-grn">
+<h2>Evaluate a GRN<a class="headerlink" href="#evaluate-a-grn" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>scripts/run_evaluation.sh<span class="w"> </span>--grn<span class="w"> </span>resources/grn-benchmark/grn_models/collectri.csv
+</pre></div>
+</div>
+<p>Similarly, run the command for other GRN models.</p>
+<p>See examples of interacting with the framework can be found in section <span class="xref std std-doc">examples</span>.</p>
+<p>—- TODO:  improve this with info given above</p>
+<p>The pipeline can evaluate algorithms that leverage only one of the multi-omic data types (RNA-Seq or ATAC-Seq) or both.
+It also evaluates the performance of two controls:</p>
+<ol class="arabic simple">
+<li><p>As a <em>negative control</em>, the pipeline evaluates the performance of a random network.</p></li>
+<li><p>As a <em>positive control</em>, the pipeline evaluates the performance of a network derived from correlation of genes in the perturbation dataset used for evaluation.</p></li>
+</ol>
+<p>The two types of regression models are:</p>
+<ol class="arabic simple">
+<li><p>Regression from GRN regulations to target expression</p></li>
+<li><p>Regression from TF expression of predicted regulators to target expression</p></li>
+</ol>
+<p>The evaluation is done with the help of pertubation data, using two different approaches:</p>
+<ol class="arabic simple">
+<li><p>Regression from GRN regulations to target expression</p></li>
+<li><p>Regression from TF expression of predicted regulators to target expression</p></li>
+</ol>
+<div class="line-block">
+<div class="line"><br /></div>
+</div>
+<a class="reference internal image-reference" href="images/regressions.png"><img alt="overview of the two regression evaluation approaches" class="align-center" src="images/regressions.png" style="width: 100%;" />
+</a>
+<div class="line-block">
+<div class="line"><br /></div>
+<div class="line"><br /></div>
+</div>
+</section>
+<section id="evaluation-1-regression-from-grn-regulations-to-target-expression">
+<h2>Evaluation 1: Regression from GRN regulations to target expression<a class="headerlink" href="#evaluation-1-regression-from-grn-regulations-to-target-expression" title="Link to this heading"></a></h2>
+<p>The first approach we used is similar to GRaNPA and the multivariate decision tree in Decoupler, where regulatory weights from the GRN form the feature space to predict perturbation data. In this method, we train one model per sample. The feature space matrix has dimensions of genes by transcription factors (TFs), with values being the regulatory weights from the GRN or 0 if the link is absent. The target space matrix represents the perturbation data for each sample. We evaluate the model’s predictive performance using a 5-fold cross-validation scheme and the coefficient of determination (R²) as the metric. LightGBM is used for computational efficiency.</p>
+</section>
+<section id="evaluation-2-regression-from-tf-expression-of-predicted-regulators-to-target-expression">
+<h2>Evaluation 2: Regression from TF expression of predicted regulators to target expression<a class="headerlink" href="#evaluation-2-regression-from-tf-expression-of-predicted-regulators-to-target-expression" title="Link to this heading"></a></h2>
+<p>In the second approach, instead of using regulatory weights, we utilized the expression of putative regulators (TFs) from the perturbation data to construct the feature space. We fit one model per gene, selecting regulators based on the regulatory weights suggested by the GRNs. This method is similar to many modern GRN inference techniques.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

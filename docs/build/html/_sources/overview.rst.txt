@@ -15,6 +15,8 @@ To put GRN models into context, geneRNIB also includes three control models. A s
 Built with modern computational tools like Docker and Viash, geneRNIB prioritizes scalability and reproducibility. It provides a structured framework for integrating new datasets, inference methods, and evaluation metrics, making it a powerful resource for advancing GRN research.
 
 
+#TODO: Fig of the datasts and the table that shows inference and evaluation datassts
+#TODO: Fig of the evaluation metrics and explain 
 
 
 Installation
