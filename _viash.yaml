@@ -29,8 +29,8 @@ info:
   image: thumbnail.svg # todo: create a thumbnail
   test_resources:
     - type: s3
-      path: s3://openproblems-data/resources_test/grn/
-      dest: resources_test/
+      path: s3://openproblems-data/resources_test/grn/grn_benchmark
+      dest: resources_test/grn_benchmark
 
   readme: |
       ## Installation
@@ -41,7 +41,7 @@ info:
 
       ## Download resources
       ```bash
-      git clone git@github.com:openproblems-bio/task_grn_inference.git
+      git clone --recursive git@github.com:openproblems-bio/task_grn_inference.git
 
       cd task_grn_inference
       ```
