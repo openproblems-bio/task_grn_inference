@@ -55,22 +55,22 @@ from main import main
 if __name__ == '__main__':
     adata = ad.read_h5ad(par['rna'], backed='r')
     
-    if len(adata) == 2000: # for testing purposes, we will not run the whole pipeline, just keep the format
-         net = pd.DataFrame({
-            'source': ['A', 'B'],
-            'target': ['C', 'D'],
-            'weight': [0.1, 0.2],
-            'cell_type': ['T cells', 'B cells']})
-    else:
-        # get gene annotation
-        print(par)
-        net = main(par)
+    # if len(adata) == 2000: # for testing purposes, we will not run the whole pipeline, just keep the format
+    #      net = pd.DataFrame({
+    #         'source': ['A', 'B'],
+    #         'target': ['C', 'D'],
+    #         'weight': [0.1, 0.2],
+    #         'cell_type': ['T cells', 'B cells']})
+    # else:
+    # get gene annotation
+    print(par)
+    net = main(par)
 
-        print('Write output to file', flush=True)
-        dataset_id = adata.uns['dataset_id']
-        net = net.astype(str)
-        output = ad.AnnData(X=None, uns={"method_id": 'scglue', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
-        output.write(par['prediction'])
+    print('Write output to file', flush=True)
+    dataset_id = adata.uns['dataset_id']
+    net = net.astype(str)
+    output = ad.AnnData(X=None, uns={"method_id": 'scglue', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
+    output.write(par['prediction'])
 
 
 
