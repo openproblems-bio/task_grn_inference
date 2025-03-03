@@ -49,11 +49,7 @@ arguments:
     direction: input
     required: false
     default: op
-  - name: --is_test
-    type: boolean 
-    required: false
-    default: false
-  
+
 
 
 test_resources:

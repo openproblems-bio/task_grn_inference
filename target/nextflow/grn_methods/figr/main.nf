@@ -3312,26 +3312,25 @@ meta = [
           "multiple_sep" : ";"
         },
         {
-          "type" : "boolean",
-          "name" : "--is_test",
-          "default" : [
-            false
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
           "type" : "file",
           "name" : "--cell_topic",
-          "default" : [
+          "example" : [
             "resources_test/grn_benchmark/prior/cell_topic.csv"
           ],
           "must_exist" : true,
           "create_parent" : true,
           "required" : true,
           "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--peak_gene",
+          "must_exist" : true,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "output",
           "multiple" : false,
           "multiple_sep" : ";"
         },
@@ -3444,7 +3443,32 @@ meta = [
       "type" : "docker",
       "id" : "docker",
       "image" : "janursa/figr:19-08-2024",
-      "namespace_separator" : "/"
+      "namespace_separator" : "/",
+      "setup" : [
+        {
+          "type" : "apt",
+          "packages" : [
+            "procps",
+            "git"
+          ],
+          "interactive" : false
+        },
+        {
+          "type" : "python",
+          "user" : false,
+          "packages" : [
+            "anndata~=0.10.0",
+            "scanpy~=1.10.0",
+            "pyyaml",
+            "requests",
+            "jsonschema"
+          ],
+          "github" : [
+            "openproblems-bio/core#subdirectory=packages/python/openproblems"
+          ],
+          "upgrade" : true
+        }
+      ]
     },
     {
       "type" : "native",
@@ -3457,25 +3481,25 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/figr",
     "viash_version" : "0.9.1",
-    "git_commit" : "1dd631a6d80ed7f772513e6d3a850b3dc3edd779",
+    "git_commit" : "8d87cd76b95bdfb18b9c8400ce0724a66e4972ef",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
     "name" : "task_grn_inference",
     "version" : "build_main",
     "label" : "GRN Inference",
-    "summary" : "Benchmarking GRN inference methods\n",
-    "description" : "\ngeneRNIB is a living benchmark platform for GRN inference. This platform provides curated datasets for GRN inference and evaluation, standardized evaluation protocols and metrics, computational infrastructure, and a dynamically updated leaderboard to track state-of-the-art methods. It runs novel GRNs in the cloud, offers competition scores, and stores them for future comparisons, reflecting new developments over time.\n\nThe platform supports the integration of new inference methods, datasets and protocols. When a new feature is added, previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly. The aim is to evaluate both the accuracy and completeness of inferred GRNs. It is designed for both single-modality and multi-omics GRN inference. \n\nIn the current version, geneRNIB contains 11 inference methods including both single and multi-omics, 8 evalation metrics, and five datasets (OPSCA, Nakatake, Norman, Adamson, and Replogle). \n\nSee our publication for the details of methods. \n",
+    "summary" : "Benchmarking GRN inference methods\nDocumentation: \n[geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)\n\nLeaderboard: \n[openproblems/grn_inference](https://add-grn--openproblems.netlify.app/results/grn_inference/)\n\nRepository:\n[openproblems-bio/task_grn_inference](https://github.com/openproblems-bio/task_grn_inference)\n",
+    "description" : "\ngeneRNIB is a living benchmark platform for GRN inference. This platform provides curated datasets for GRN inference and evaluation, standardized evaluation protocols and metrics, computational infrastructure, and a dynamically updated leaderboard to track state-of-the-art methods. It runs novel GRNs in the cloud, offers competition scores, and stores them for future comparisons, reflecting new developments over time.\n\nThe platform supports the integration of new inference methods, datasets and protocols. When a new feature is added, previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly. The aim is to evaluate both the accuracy and completeness of inferred GRNs. It is designed for both single-modality and multi-omics GRN inference. \n\nIn the current version, geneRNIB contains 10 inference methods including both single and multi-omics, 8 evalation metrics, and five datasets. \n\nSee our publication for the details of methods. \n",
     "info" : {
       "image" : "thumbnail.svg",
       "test_resources" : [
         {
           "type" : "s3",
-          "path" : "s3://openproblems-data/resources_test/grn/",
-          "dest" : "resources_test/"
+          "path" : "s3://openproblems-data/resources_test/grn/grn_benchmark",
+          "dest" : "resources_test/grn_benchmark"
         }
       ],
-      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n            --rna resources/grn_benchmark/inference_data/norman_rna.h5ad \\\\\n            --prediction output/net.h5ad \\\\\n            --tf_all resources/grn_benchmark/prior/tf_all.csv\n```\n\n## Evaluate a GRN prediction\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\n\nThis outputs the scores into `output/test_run/scores.yaml`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
+      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone --recursive git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started. \nHere, we download the test resources which are used for testing the framework. Refer to the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/) for downloading the actual datasets.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \n            --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad\n            --prediction output/net.h5ad \n            --tf_all resources_test/grn_benchmark/prior/tf_all.csv\n```\n\n## Evaluate a GRN prediction\nOnce got the prediction for a given dataset (e.g. op), use the following code to obtain evaluation scores. \n\n```bash\nscripts/test_grn_evaluation.sh output/net.h5ad op\n```\n\nThis outputs the scores into `output/test_run/scores.yaml`\n\n## Add a GRN inference method, evaluation metric, or dataset\n\nTo add a new component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n"
     },
     "repositories" : [
       {
@@ -3571,9 +3595,9 @@ library(doParallel)
 library(anndata)
 library(FigR)
 library(BSgenome.Hsapiens.UCSC.hg38)
-library(reticulate)
 library(SummarizedExperiment)
 # library(Seurat)
+# install.packages("bspm", repos="https://cran.r-project.org") #TOOD: check this
 
 ## VIASH START
 # The following code has been auto-generated by Viash.
@@ -3591,8 +3615,8 @@ par <- list(
   "layer" = $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_LAYER" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "dataset_id" = $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_DATASET_ID" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "is_test" = $( if [ ! -z ${VIASH_PAR_IS_TEST+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_IS_TEST" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi ),
   "cell_topic" = $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_CELL_TOPIC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
+  "peak_gene" = $( if [ ! -z ${VIASH_PAR_PEAK_GENE+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PEAK_GENE" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "n_topics" = $( if [ ! -z ${VIASH_PAR_N_TOPICS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_N_TOPICS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi )
 )
 meta <- list(
@@ -3629,7 +3653,9 @@ dir.create(par\\$temp_dir, recursive = TRUE, showWarnings = TRUE)
 
 # ---------------- create summary experiment for rna 
 adata <- anndata::read_h5ad(par\\$rna)
-dataset_id = adata\\$dataset_id
+dataset_id = adata\\$uns\\$dataset_id
+
+
 
 rna <- t(adata\\$X)  # Transpose to match R's column-major order
 rna <- Matrix(rna)
@@ -3643,6 +3669,7 @@ counts <- t(adata\\$X)  # Transpose to match R's column-major order
 rownames(counts) <- rownames(adata\\$var)
 colnames(counts) <- rownames(adata\\$obs)
 colData <- as.data.frame(adata\\$obs)
+
 # rowData <- as.data.frame(adata\\$var)
 atac <- SummarizedExperiment(
   assays = list(counts = Matrix(counts)),
@@ -3654,6 +3681,21 @@ atac <- SummarizedExperiment(
 
 rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac)), sep=':')
 
+test_flag = FALSE
+if (test_flag) {
+  common_cells <- intersect(colnames(rna), colnames(atac))
+  if (length(common_cells) > 2000) {
+    selected_cells <- sample(common_cells, 2000)
+  } else {
+    selected_cells <- common_cells  # Keep all if less than 2000
+  }
+  rna <- rna[, selected_cells]
+  atac <- atac[, selected_cells]
+  print(dim(rna))
+  print(dim(atac))
+
+
+}
 # ---------------- figr pipeline
 
 colnames(atac) <- gsub("-", "", colnames(atac))
@@ -3704,9 +3746,11 @@ dorc_genes_func <- function(par){
 
   cellkNN = cellkNN[common_cells,]
   dorcMat = dorcMat[,common_cells]
+  rna <- rna[, common_cells]
   cat('cellKNN dim:', dim(cellkNN), '\\\\n')
   cat('dorcMat dim:', dim(dorcMat), '\\\\n')
   cat('rna dim:', dim(rna), '\\\\n')
+  cellkNN[cellkNN > ncol(dorcMat)] <- 1  # this is for test purposes
   dorcMat.s <- smoothScoresNN(NNmat = cellkNN, mat = dorcMat, nCores = par\\$num_workers) 
   cat('dorcMat.s completed')
   # Smooth RNA using cell KNNs
@@ -3730,6 +3774,12 @@ tf_gene_association_func <- function(par){
   RNAmat.s = readRDS(paste0(par\\$temp_dir, "RNAmat.s.RDS"))
   dorcMat.s = readRDS(paste0(par\\$temp_dir, "dorcMat.s.RDS"))
 
+  # - for test purposes
+  zero_var_rows <- which(apply(dorcMat.s, 1, var, na.rm = TRUE) == 0)
+  if (length(zero_var_rows) > 0) {
+    dorcMat.s <- dorcMat.s[-zero_var_rows, ]  # Remove zero-variance rows
+  }
+
   figR.d <- runFigRGRN(ATAC.se = atac, # Must be the same input as used in runGenePeakcorr()
                       dorcTab = cisCorr.filt, # Filtered peak-gene associations
                       genome = "hg38",
@@ -3742,7 +3792,7 @@ tf_gene_association_func <- function(par){
 
 extract_peak_gene_func <- function(par) {
   # Read the CSV file
-  peak_gene_figr <- read.csv(file.path(par\\$temp_dir, "cisCorr.filt.csv"))
+  peak_gene_figr <- read.csv(paste0(par\\$temp_dir, "cisCorr.filt.csv"))
   
   # Calculate the number of peak ranges for each gene
   peak_gene_figr_n <- aggregate(PeakRanges ~ Gene, data = peak_gene_figr, length)
@@ -3761,12 +3811,15 @@ extract_peak_gene_func <- function(par) {
   colnames(peak_gene_figr) <- c("peak", "target")
   
   # Write the result to a CSV file
-  write.csv(peak_gene_figr, file = par\\$peak_gene, row.names = FALSE)
+  # if (par\\$peak_gene != ""){
+  #   write.csv(peak_gene_figr, file = par\\$peak_gene, row.names = FALSE)
+  # }
+  
 }
 
 filter_net <- function(par) {
   # Read the CSV file
-  net <- read.csv(file.path(par\\$temp_dir, "figR.d.csv"))
+  net <- read.csv(paste0(par\\$temp_dir, "figR.d.csv"))
 
   # Filter those that have a Score of 0
   net <- subset(net, Score != 0)
@@ -3796,7 +3849,6 @@ filter_net <- function(par) {
       stop("Error: 'net' is not a dataframe")
   }
 
-
   output <- AnnData(
     X = matrix(nrow = 0, ncol = 0),
     uns = list(
@@ -3807,9 +3859,10 @@ filter_net <- function(par) {
   )
 
   print(output)
-  # output\\$write(par\\$prediction)
   print(par\\$prediction)
-  output\\$write_h5ad(par\\$prediction, compression = "gzip")
+  print(output\\$uns\\$dataset_id)
+  anndata::write_h5ad(output, par\\$prediction)
+  # output\\$write_h5ad(par\\$prediction, compression = "gzip")
 }
 
 
@@ -3822,9 +3875,9 @@ print('2: peak_gene_func finished')
 dorc_genes_func(par)
 print('3: dorc_genes_func finished')
 tf_gene_association_func(par)
-print('3: tf_gene_association_func finished')
+print('4: tf_gene_association_func finished')
 extract_peak_gene_func(par)
-print('4: extract_peak_gene_func finished')
+print('5: extract_peak_gene_func finished')
 filter_net(par)
 VIASHMAIN
 Rscript "$tempscript"

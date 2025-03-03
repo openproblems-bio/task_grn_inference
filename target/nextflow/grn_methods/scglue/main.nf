@@ -3312,17 +3312,6 @@ meta = [
           "multiple_sep" : ";"
         },
         {
-          "type" : "boolean",
-          "name" : "--is_test",
-          "default" : [
-            false
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
           "type" : "string",
           "name" : "--top_n_targets",
           "default" : [
@@ -3517,25 +3506,25 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scglue",
     "viash_version" : "0.9.1",
-    "git_commit" : "1dd631a6d80ed7f772513e6d3a850b3dc3edd779",
+    "git_commit" : "8d87cd76b95bdfb18b9c8400ce0724a66e4972ef",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
     "name" : "task_grn_inference",
     "version" : "build_main",
     "label" : "GRN Inference",
-    "summary" : "Benchmarking GRN inference methods\n",
-    "description" : "\ngeneRNIB is a living benchmark platform for GRN inference. This platform provides curated datasets for GRN inference and evaluation, standardized evaluation protocols and metrics, computational infrastructure, and a dynamically updated leaderboard to track state-of-the-art methods. It runs novel GRNs in the cloud, offers competition scores, and stores them for future comparisons, reflecting new developments over time.\n\nThe platform supports the integration of new inference methods, datasets and protocols. When a new feature is added, previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly. The aim is to evaluate both the accuracy and completeness of inferred GRNs. It is designed for both single-modality and multi-omics GRN inference. \n\nIn the current version, geneRNIB contains 11 inference methods including both single and multi-omics, 8 evalation metrics, and five datasets (OPSCA, Nakatake, Norman, Adamson, and Replogle). \n\nSee our publication for the details of methods. \n",
+    "summary" : "Benchmarking GRN inference methods\nDocumentation: \n[geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)\n\nLeaderboard: \n[openproblems/grn_inference](https://add-grn--openproblems.netlify.app/results/grn_inference/)\n\nRepository:\n[openproblems-bio/task_grn_inference](https://github.com/openproblems-bio/task_grn_inference)\n",
+    "description" : "\ngeneRNIB is a living benchmark platform for GRN inference. This platform provides curated datasets for GRN inference and evaluation, standardized evaluation protocols and metrics, computational infrastructure, and a dynamically updated leaderboard to track state-of-the-art methods. It runs novel GRNs in the cloud, offers competition scores, and stores them for future comparisons, reflecting new developments over time.\n\nThe platform supports the integration of new inference methods, datasets and protocols. When a new feature is added, previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly. The aim is to evaluate both the accuracy and completeness of inferred GRNs. It is designed for both single-modality and multi-omics GRN inference. \n\nIn the current version, geneRNIB contains 10 inference methods including both single and multi-omics, 8 evalation metrics, and five datasets. \n\nSee our publication for the details of methods. \n",
     "info" : {
       "image" : "thumbnail.svg",
       "test_resources" : [
         {
           "type" : "s3",
-          "path" : "s3://openproblems-data/resources_test/grn/",
-          "dest" : "resources_test/"
+          "path" : "s3://openproblems-data/resources_test/grn/grn_benchmark",
+          "dest" : "resources_test/grn_benchmark"
         }
       ],
-      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n            --rna resources/grn_benchmark/inference_data/norman_rna.h5ad \\\\\n            --prediction output/net.h5ad \\\\\n            --tf_all resources/grn_benchmark/prior/tf_all.csv\n```\n\n## Evaluate a GRN prediction\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\n\nThis outputs the scores into `output/test_run/scores.yaml`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
+      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone --recursive git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started. \nHere, we download the test resources which are used for testing the framework. Refer to the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/) for downloading the actual datasets.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \n            --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad\n            --prediction output/net.h5ad \n            --tf_all resources_test/grn_benchmark/prior/tf_all.csv\n```\n\n## Evaluate a GRN prediction\nOnce got the prediction for a given dataset (e.g. op), use the following code to obtain evaluation scores. \n\n```bash\nscripts/test_grn_evaluation.sh output/net.h5ad op\n```\n\nThis outputs the scores into `output/test_run/scores.yaml`\n\n## Add a GRN inference method, evaluation metric, or dataset\n\nTo add a new component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n"
     },
     "repositories" : [
       {
@@ -3642,7 +3631,6 @@ par = {
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'is_test': $( if [ ! -z ${VIASH_PAR_IS_TEST+x} ]; then echo "r'${VIASH_PAR_IS_TEST//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'top_n_targets': $( if [ ! -z ${VIASH_PAR_TOP_N_TARGETS+x} ]; then echo "r'${VIASH_PAR_TOP_N_TARGETS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'rank_threshold': $( if [ ! -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_RANK_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "r'${VIASH_PAR_NES_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3690,37 +3678,39 @@ for key, value in vars(args).items():
     if value:
         par[key] = value
 
+par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
+# par['motif_file'] = f"{par['temp_dir']}/JASPAR2022-hg38.bed.gz"
+par['motif_file'] = f"{par['temp_dir']}/ENCODE-TF-ChIP-hg38.bed.gz"
+# par['motif_file'] = f"output/db/jaspar_encode.bed.gz"
+
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta= {
+        "util_dir": 'src/utils/',
+        "resources_dir": 'src/methods/multi_omics/scglue'
+    }
+    sys.path.append(meta["util_dir"])
+    sys.path.append(meta["resources_dir"])
+from main import main 
+
+
 if __name__ == '__main__':
     adata = ad.read_h5ad(par['rna'], backed='r')
     
-    if len(adata) == 2000: # for testing purposes, we will not run the whole pipeline, just keep the format
-         net = pd.DataFrame({
-            'source': ['A', 'B'],
-            'target': ['C', 'D'],
-            'weight': [0.1, 0.2],
-            'cell_type': ['T cells', 'B cells']})
-    else:
-        # get gene annotation
-        par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
-        # par['motif_file'] = f"{par['temp_dir']}/JASPAR2022-hg38.bed.gz"
-        par['motif_file'] = f"{par['temp_dir']}/ENCODE-TF-ChIP-hg38.bed.gz"
-        # par['motif_file'] = f"output/db/jaspar_encode.bed.gz"
+    # if len(adata) == 2000: # for testing purposes, we will not run the whole pipeline, just keep the format
+    #      net = pd.DataFrame({
+    #         'source': ['A', 'B'],
+    #         'target': ['C', 'D'],
+    #         'weight': [0.1, 0.2],
+    #         'cell_type': ['T cells', 'B cells']})
+    # else:
+    # get gene annotation
+    print(par)
+    net = main(par)
 
-        try:
-            sys.path.append(meta["resources_dir"])
-        except:
-            meta= {
-                "util_dir": 'src/utils/',
-                "resources_dir": 'src/methods/multi_omics/scglue'
-            }
-            sys.path.append(meta["util_dir"])
-            sys.path.append(meta["resources_dir"])
-        from main import main 
-        print(par)
-        net = main(par)
-
-        print('Write output to file', flush=True)
-        dataset_id = adata.uns['dataset_id']
+    print('Write output to file', flush=True)
+    dataset_id = adata.uns['dataset_id']
     net = net.astype(str)
     output = ad.AnnData(X=None, uns={"method_id": 'scglue', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])

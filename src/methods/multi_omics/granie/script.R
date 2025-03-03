@@ -11,10 +11,18 @@ suppressPackageStartupMessages(library(EnsDb.Mmusculus.v79))
 suppressPackageStartupMessages(library(BSgenome.Mmusculus.UCSC.mm39))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(SummarizedExperiment))
-# library(anndata)
-library(reticulate)
+
+# library(zellkonverter)
+
+
+suppressPackageStartupMessages(library(reticulate))
+reticulate::install_miniconda()
 py_install("anndata")
-anndata <- import("anndata")
+# install.packages("anndata")
+# anndata::install_anndata()
+suppressPackageStartupMessages(library(anndata))
+# py_install("anndata")
+# anndata <- import("anndata")
 
 
 ## VIASH START
@@ -34,7 +42,8 @@ par <- list(
   peak_gene = "output/granie/peak_gene.csv", # not yet implemented, should I?
   prediction= "output/granie/prediction.csv",
   useWeightingLinks = FALSE,
-  forceRerun = FALSE
+  forceRerun = FALSE,
+  temp_dir = "output/granie/"
 )
 ## VIASH END
 
@@ -44,10 +53,10 @@ str(par)
 
 #### STANDARD ASSIGNMENTS ###
 file_seurat = "seurat_granie.qs"
-outputDir = dirname(par$prediction)
 
-if (!dir.exists(outputDir)) {
-  dir.create(outputDir, recursive = TRUE)
+
+if (!dir.exists(par$temp_dir)) {
+  dir.create(par$temp_dir, recursive = TRUE)
 }
 
 
@@ -55,13 +64,13 @@ if (!dir.exists(outputDir)) {
 # Downloading resources #
 #########################
 file_hocomoco_v12 = "https://s3.embl.de/zaugg-web/GRaNIE/TFBS/hg38/PWMScan_HOCOMOCOv12_H12INVIVO.tar.gz"
-destfile <- "PWMScan_HOCOMOCOv12_H12INVIVO.tar.gz"
+destfile <- paste0(outputDir, "/PWMScan_HOCOMOCOv12_H12INVIVO.tar.gz")
 if (!file.exists(destfile)) {
   options(timeout = 1200)
   download.file(file_hocomoco_v12, destfile)
 }
 # Define the directory to extract the files to
-exdir <- "PWMScan_HOCOMOCOv12_H12INVIVO"
+exdir <- paste0(par$temp_dir, "/PWMScan_HOCOMOCOv12_H12INVIVO") 
 GRaNIE_TFBSFolder = paste0(exdir, "/H12INVIVO")
 if (!file.exists(GRaNIE_TFBSFolder)) {
   untar(destfile, exdir = exdir)
@@ -74,7 +83,7 @@ if (par$genomeAssembly == "hg38"){
   file_RNA_URL = "https://s3.embl.de/zaugg-web/GRaNIEverse/features_RNA_mm10.tsv.gz"
 }
 
-file_RNA <- paste0("features_RNA_", par$genomeAssembly, ".tsv.gz")
+file_RNA <- paste0(par$temp_dir, "/features_RNA_", par$genomeAssembly, ".tsv.gz")
 if (!file.exists(file_RNA)) {
   options(timeout = 1200)
   download.file(file_RNA_URL, file_RNA)
@@ -98,6 +107,7 @@ if (par$forceRerun | !file.exists(file_seurat)) {
 
  seurat_object <- CreateSeuratObject(count = rna, project = "PBMC", min.cells = 1, min.features = 1, assay = "RNA")
  
+ print('Seurat object created for rna')
  # RangedSummarizedExperiment for atac
   adata <- anndata::read_h5ad(par$atac)
   counts <- t(adata$X)  # Transpose to match R's column-major order
@@ -113,7 +123,7 @@ if (par$forceRerun | !file.exists(file_seurat)) {
   )
 
 rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac)), sep=':')
-
+print('Seurat object created for atac')
  
  # Extract counts and metadata from the RangedSummarizedExperiment
   atac_counts <- assays(atac)$counts
@@ -130,13 +140,11 @@ rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac))
    min.features = 1,
    colData = DataFrame(colData(atac))
   )
- 
-  if (par$genomeAssembly == "hg38"){
-    annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
+  print('ChromatinAssay created')
+  
+  annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
     
-  } else if (par$genomeAssembly == "mm10") {
-    annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Mmusculus.v79)
-  }
+  print('Annotations created')
   
   seqlevelsStyle(annotations) <- "UCSC"
   genome(annotations) <- par$genomeAssembly
@@ -151,7 +159,7 @@ rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac))
 
   seurat_object[["peaks"]] = chrom_assay
     
-  qs::qsave(seurat_object, "seurat_granie.qs")
+  qs::qsave(seurat_object, paste0(par$temp_dir, "seurat_granie.qs" ) )
     
 } else {
 
@@ -159,16 +167,17 @@ rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac))
   
 }
 
-output_seuratProcessed = paste0(outputDir, "/seuratObject.qs")
+output_seuratProcessed = paste0(par$temp_dir, "/seuratObject.qs")
 
+print('Preprocessing finished')
 ###################
 # Preprocess data #
 ###################
 
 # Take output from preprocessing steps
-GRaNIE_file_peaks = paste0(outputDir, "/atac.pseudobulkFromClusters_res", par$preprocessing_clusterResolution, "_mean.tsv.gz")
-GRaNIE_file_rna = paste0(outputDir, "/rna.pseudobulkFromClusters_res", par$preprocessing_clusterResolution, "_mean.tsv.gz")
-GRaNIE_file_metadata = paste0(outputDir, "/metadata_res", par$preprocessing_clusterResolution, "_mean.tsv.gz")
+GRaNIE_file_peaks = paste0(par$temp_dir, "/atac.pseudobulkFromClusters_res", par$preprocessing_clusterResolution, "_mean.tsv.gz")
+GRaNIE_file_rna = paste0(par$temp_dir, "/rna.pseudobulkFromClusters_res", par$preprocessing_clusterResolution, "_mean.tsv.gz")
+GRaNIE_file_metadata = paste0(par$temp_dir, "/metadata_res", par$preprocessing_clusterResolution, "_mean.tsv.gz")
 
 if (file.exists(GRaNIE_file_peaks) & file.exists(GRaNIE_file_metadata) & file.exists(GRaNIE_file_rna) & !par$forceRerun) {
   
@@ -176,7 +185,7 @@ if (file.exists(GRaNIE_file_peaks) & file.exists(GRaNIE_file_metadata) & file.ex
   
 } else {
   seurat_object = prepareSeuratData_GRaNIE(seurat_object, 
-                                           outputDir = outputDir,
+                                           outputDir = par$temp_dir,
                                            saveSeuratObject = TRUE,
                                            genome = par$genomeAssembly,
                                            assayName_RNA = "RNA", normRNA = "SCT", nDimensions_RNA = par$preprocessing_RNA_nDimensions, recalculateVariableFeatures = NULL,
@@ -200,7 +209,7 @@ if (file.exists(GRaNIE_file_peaks) & file.exists(GRaNIE_file_metadata) & file.ex
 ##############
 
 GRN = runGRaNIE(
-  dir_output = outputDir,
+  dir_output = par$temp_dir,
   datasetName = "undescribed",
   GRaNIE_file_peaks,
   GRaNIE_file_rna,

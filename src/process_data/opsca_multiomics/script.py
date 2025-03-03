@@ -81,6 +81,8 @@ if __name__ == '__main__':
     atac.var['ranges'] = annotation_peak[1].values
     atac.var['strand'] = '+'
 
+    atac = atac[:, atac.var['seqname'].str.startswith('chr')]
+
 
     rna.write(par['op_rna'])
     atac.write(par['op_atac'])

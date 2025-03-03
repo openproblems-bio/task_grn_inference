@@ -456,9 +456,9 @@ RUN pip install --upgrade pip && \
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component control_methods positive_control"
-LABEL org.opencontainers.image.created="2025-03-02T19:39:22Z"
+LABEL org.opencontainers.image.created="2025-03-03T20:12:33Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="1dd631a6d80ed7f772513e6d3a850b3dc3edd779"
+LABEL org.opencontainers.image.revision="8d87cd76b95bdfb18b9c8400ce0724a66e4972ef"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -620,10 +620,6 @@ function ViashHelp {
   echo "        type: string"
   echo "        default: op"
   echo ""
-  echo "    --is_test"
-  echo "        type: boolean"
-  echo "        default: false"
-  echo ""
   echo "Viash built in Computational Requirements:"
   echo "    ---cpus=INT"
   echo "        Number of CPUs to use"
@@ -782,17 +778,6 @@ while [[ $# -gt 0 ]]; do
         --dataset_id=*)
             [ -n "$VIASH_PAR_DATASET_ID" ] && ViashError Bad arguments for option \'--dataset_id=*\': \'$VIASH_PAR_DATASET_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_DATASET_ID=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --is_test)
-            [ -n "$VIASH_PAR_IS_TEST" ] && ViashError Bad arguments for option \'--is_test\': \'$VIASH_PAR_IS_TEST\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_IS_TEST="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --is_test. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --is_test=*)
-            [ -n "$VIASH_PAR_IS_TEST" ] && ViashError Bad arguments for option \'--is_test=*\': \'$VIASH_PAR_IS_TEST\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_IS_TEST=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---engine)
@@ -1019,9 +1004,6 @@ fi
 if [ -z ${VIASH_PAR_DATASET_ID+x} ]; then
   VIASH_PAR_DATASET_ID="op"
 fi
-if [ -z ${VIASH_PAR_IS_TEST+x} ]; then
-  VIASH_PAR_IS_TEST="false"
-fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_RNA" ] && [ ! -e "$VIASH_PAR_RNA" ]; then
@@ -1053,12 +1035,6 @@ fi
 if [[ -n "$VIASH_PAR_SEED" ]]; then
   if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_IS_TEST" ]]; then
-  if ! [[ "$VIASH_PAR_IS_TEST" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--is_test' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1260,8 +1236,7 @@ par = {
   'temp_dir': $( if [ ! -z ${VIASH_PAR_TEMP_DIR+x} ]; then echo "r'${VIASH_PAR_TEMP_DIR//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
-  'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'is_test': $( if [ ! -z ${VIASH_PAR_IS_TEST+x} ]; then echo "r'${VIASH_PAR_IS_TEST//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
+  'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),

@@ -5,8 +5,5 @@ viash run src/methods/multi_omics/figr/config.vsh.yaml -- \
     --cell_topic resources_test/grn_benchmark/prior/cell_topic.csv \
     --tf_all resources_test/grn_benchmark/prior/tf_all.csv \
     --temp_dir output/figr \
-    --num_workers 1
-
-
-
+    --num_workers 4
 

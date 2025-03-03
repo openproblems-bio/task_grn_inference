@@ -12,9 +12,13 @@ info:
 arguments:
   - name: --cell_topic
     type: file
-    default: resources_test/grn_benchmark/prior/cell_topic.csv
+    example: resources_test/grn_benchmark/prior/cell_topic.csv
     required: true
     direction: input
+  - name: --peak_gene
+    type: file
+    required: false
+    direction: output
   - name: --n_topics
     type: integer 
     direction: input
@@ -25,9 +29,12 @@ resources:
 engines:
   - type: docker
     image: janursa/figr:19-08-2024
+    __merge__: /src/api/base_requirements.yaml
     # setup:
-    #   - type: r
-    #     bioc: seurat
+    #   - type: python
+    #     packages: [ anndata ]
+    #     github:
+    #       - openproblems-bio/core#subdirectory=packages/python/openproblems
   - type: native
 runners:
   - type: executable

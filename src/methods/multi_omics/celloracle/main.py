@@ -14,7 +14,6 @@ def base_grn(par) -> None:
     print("Reading atac data")
     atac = ad.read_h5ad(par["atac"])
 
-   
     print("Format peak data")
     peaks = atac.var_names.to_numpy()
     peaks = [peak.replace(':','_').replace("-",'_') for peak in peaks]

@@ -454,9 +454,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods celloracle"
-LABEL org.opencontainers.image.created="2025-03-02T19:39:22Z"
+LABEL org.opencontainers.image.created="2025-03-03T20:12:33Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="1dd631a6d80ed7f772513e6d3a850b3dc3edd779"
+LABEL org.opencontainers.image.revision="8d87cd76b95bdfb18b9c8400ce0724a66e4972ef"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -620,10 +620,6 @@ function ViashHelp {
   echo "        type: string"
   echo "        default: op"
   echo ""
-  echo "    --is_test"
-  echo "        type: boolean"
-  echo "        default: false"
-  echo ""
   echo "    --base_grn"
   echo "        type: file, output, file must exist"
   echo "        default: output/celloracle/base_grn.csv"
@@ -786,17 +782,6 @@ while [[ $# -gt 0 ]]; do
         --dataset_id=*)
             [ -n "$VIASH_PAR_DATASET_ID" ] && ViashError Bad arguments for option \'--dataset_id=*\': \'$VIASH_PAR_DATASET_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_DATASET_ID=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --is_test)
-            [ -n "$VIASH_PAR_IS_TEST" ] && ViashError Bad arguments for option \'--is_test\': \'$VIASH_PAR_IS_TEST\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_IS_TEST="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --is_test. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --is_test=*)
-            [ -n "$VIASH_PAR_IS_TEST" ] && ViashError Bad arguments for option \'--is_test=*\': \'$VIASH_PAR_IS_TEST\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_IS_TEST=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --base_grn)
@@ -1032,9 +1017,6 @@ fi
 if [ -z ${VIASH_PAR_DATASET_ID+x} ]; then
   VIASH_PAR_DATASET_ID="op"
 fi
-if [ -z ${VIASH_PAR_IS_TEST+x} ]; then
-  VIASH_PAR_IS_TEST="false"
-fi
 if [ -z ${VIASH_PAR_BASE_GRN+x} ]; then
   VIASH_PAR_BASE_GRN="output/celloracle/base_grn.csv"
 fi
@@ -1069,12 +1051,6 @@ fi
 if [[ -n "$VIASH_PAR_SEED" ]]; then
   if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_IS_TEST" ]]; then
-  if ! [[ "$VIASH_PAR_IS_TEST" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--is_test' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1270,7 +1246,6 @@ par = {
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'is_test': $( if [ ! -z ${VIASH_PAR_IS_TEST+x} ]; then echo "r'${VIASH_PAR_IS_TEST//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'base_grn': $( if [ ! -z ${VIASH_PAR_BASE_GRN+x} ]; then echo "r'${VIASH_PAR_BASE_GRN//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
@@ -1303,32 +1278,22 @@ parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
 parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
 parser.add_argument('--atac', type=str, help='Path to the multiomics atac file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
 parser.add_argument('--num_workers', type=int, help='Number of cores')
 parser.add_argument('--max_n_links', type=int)
 args = parser.parse_args()
 
-if args.rna:
-    par['rna'] = args.rna
-if args.atac:
-    par['atac'] = args.atac
-if args.prediction:
-    par['prediction'] = args.prediction
-if args.tf_all:
-    par['tf_all'] = args.tf_all
-if args.num_workers:
-    par['num_workers'] = args.num_workers
-if args.max_n_links:
-    par['max_n_links'] = args.max_n_links
+for key in vars(args):
+    if getattr(args, key) is not None:
+        par[key] = getattr(args, key)
     
-if args.resources_dir:
-    meta = {}
-    meta['resources_dir'] = args.resources_dir   
+
 try:
     sys.path.append(meta["resources_dir"])
-except:
-    pass
+except: # for local run
+    meta = {'resources_dir': './'}
+    sys.path.append(meta["resources_dir"])
+
 from main import main 
 os.makedirs(par['temp_dir'], exist_ok=True)
 
@@ -1338,13 +1303,14 @@ if 'base_grn' not in par:
 if 'links' not in par:
     par['links'] = f"{par['temp_dir']}/links.celloracle.links"
 
-dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
-net = main(par)
+if __name__ == '__main__':
+    dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
+    net = main(par)
 
-print('Write output to file', flush=True)
-net['weight'] = net['weight'].astype(str)
-output = ad.AnnData(X=None, uns={"method_id": 'celloracle', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
-output.write(par['prediction'])
+    print('Write output to file', flush=True)
+    net['weight'] = net['weight'].astype(str)
+    output = ad.AnnData(X=None, uns={"method_id": 'celloracle', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
+    output.write(par['prediction'])
 VIASHMAIN
 python -B "\$tempscript" &
 wait "\$!"

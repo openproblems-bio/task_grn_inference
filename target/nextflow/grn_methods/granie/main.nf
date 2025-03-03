@@ -3312,17 +3312,6 @@ meta = [
           "multiple_sep" : ";"
         },
         {
-          "type" : "boolean",
-          "name" : "--is_test",
-          "default" : [
-            false
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
           "type" : "string",
           "name" : "--normRNA",
           "description" : "Normalization method for RNA data.",
@@ -3653,7 +3642,8 @@ meta = [
         {
           "type" : "r",
           "bioc" : [
-            "reticulate"
+            "reticulate",
+            "anndata"
           ],
           "bioc_force_install" : false,
           "warnings_as_errors" : true
@@ -3671,25 +3661,25 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/granie",
     "viash_version" : "0.9.1",
-    "git_commit" : "1dd631a6d80ed7f772513e6d3a850b3dc3edd779",
+    "git_commit" : "8d87cd76b95bdfb18b9c8400ce0724a66e4972ef",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
     "name" : "task_grn_inference",
     "version" : "build_main",
     "label" : "GRN Inference",
-    "summary" : "Benchmarking GRN inference methods\n",
-    "description" : "\ngeneRNIB is a living benchmark platform for GRN inference. This platform provides curated datasets for GRN inference and evaluation, standardized evaluation protocols and metrics, computational infrastructure, and a dynamically updated leaderboard to track state-of-the-art methods. It runs novel GRNs in the cloud, offers competition scores, and stores them for future comparisons, reflecting new developments over time.\n\nThe platform supports the integration of new inference methods, datasets and protocols. When a new feature is added, previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly. The aim is to evaluate both the accuracy and completeness of inferred GRNs. It is designed for both single-modality and multi-omics GRN inference. \n\nIn the current version, geneRNIB contains 11 inference methods including both single and multi-omics, 8 evalation metrics, and five datasets (OPSCA, Nakatake, Norman, Adamson, and Replogle). \n\nSee our publication for the details of methods. \n",
+    "summary" : "Benchmarking GRN inference methods\nDocumentation: \n[geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)\n\nLeaderboard: \n[openproblems/grn_inference](https://add-grn--openproblems.netlify.app/results/grn_inference/)\n\nRepository:\n[openproblems-bio/task_grn_inference](https://github.com/openproblems-bio/task_grn_inference)\n",
+    "description" : "\ngeneRNIB is a living benchmark platform for GRN inference. This platform provides curated datasets for GRN inference and evaluation, standardized evaluation protocols and metrics, computational infrastructure, and a dynamically updated leaderboard to track state-of-the-art methods. It runs novel GRNs in the cloud, offers competition scores, and stores them for future comparisons, reflecting new developments over time.\n\nThe platform supports the integration of new inference methods, datasets and protocols. When a new feature is added, previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly. The aim is to evaluate both the accuracy and completeness of inferred GRNs. It is designed for both single-modality and multi-omics GRN inference. \n\nIn the current version, geneRNIB contains 10 inference methods including both single and multi-omics, 8 evalation metrics, and five datasets. \n\nSee our publication for the details of methods. \n",
     "info" : {
       "image" : "thumbnail.svg",
       "test_resources" : [
         {
           "type" : "s3",
-          "path" : "s3://openproblems-data/resources_test/grn/",
-          "dest" : "resources_test/"
+          "path" : "s3://openproblems-data/resources_test/grn/grn_benchmark",
+          "dest" : "resources_test/grn_benchmark"
         }
       ],
-      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset (e.g. `norman`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n            --rna resources/grn_benchmark/inference_data/norman_rna.h5ad \\\\\n            --prediction output/net.h5ad \\\\\n            --tf_all resources/grn_benchmark/prior/tf_all.csv\n```\n\n## Evaluate a GRN prediction\nOnce got the prediction for a given dataset, use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad norman\n```\n\nThis outputs the scores into `output/test_run/scores.yaml`\n\n## Add a method\n\nTo add a method to the repository, follow the instructions in the `scripts/add_a_method.sh` script.\n"
+      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone --recursive git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started. \nHere, we download the test resources which are used for testing the framework. Refer to the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/) for downloading the actual datasets.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \n            --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad\n            --prediction output/net.h5ad \n            --tf_all resources_test/grn_benchmark/prior/tf_all.csv\n```\n\n## Evaluate a GRN prediction\nOnce got the prediction for a given dataset (e.g. op), use the following code to obtain evaluation scores. \n\n```bash\nscripts/test_grn_evaluation.sh output/net.h5ad op\n```\n\nThis outputs the scores into `output/test_run/scores.yaml`\n\n## Add a GRN inference method, evaluation metric, or dataset\n\nTo add a new component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n"
     },
     "repositories" : [
       {
@@ -3791,10 +3781,18 @@ suppressPackageStartupMessages(library(EnsDb.Mmusculus.v79))
 suppressPackageStartupMessages(library(BSgenome.Mmusculus.UCSC.mm39))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(SummarizedExperiment))
-# library(anndata)
-library(reticulate)
+
+# library(zellkonverter)
+
+
+suppressPackageStartupMessages(library(reticulate))
+reticulate::install_miniconda()
 py_install("anndata")
-anndata <- import("anndata")
+# install.packages("anndata")
+# anndata::install_anndata()
+suppressPackageStartupMessages(library(anndata))
+# py_install("anndata")
+# anndata <- import("anndata")
 
 
 ## VIASH START
@@ -3813,7 +3811,6 @@ par <- list(
   "layer" = $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_LAYER" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "dataset_id" = $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_DATASET_ID" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "is_test" = $( if [ ! -z ${VIASH_PAR_IS_TEST+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_IS_TEST" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi ),
   "normRNA" = $( if [ ! -z ${VIASH_PAR_NORMRNA+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_NORMRNA" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "normATAC" = $( if [ ! -z ${VIASH_PAR_NORMATAC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_NORMATAC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "LSI_featureCutoff" = $( if [ ! -z ${VIASH_PAR_LSI_FEATURECUTOFF+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_LSI_FEATURECUTOFF" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
@@ -3871,10 +3868,10 @@ str(par)
 
 #### STANDARD ASSIGNMENTS ###
 file_seurat = "seurat_granie.qs"
-outputDir = dirname(par\\$prediction)
 
-if (!dir.exists(outputDir)) {
-  dir.create(outputDir, recursive = TRUE)
+
+if (!dir.exists(par\\$temp_dir)) {
+  dir.create(par\\$temp_dir, recursive = TRUE)
 }
 
 
@@ -3882,13 +3879,13 @@ if (!dir.exists(outputDir)) {
 # Downloading resources #
 #########################
 file_hocomoco_v12 = "https://s3.embl.de/zaugg-web/GRaNIE/TFBS/hg38/PWMScan_HOCOMOCOv12_H12INVIVO.tar.gz"
-destfile <- "PWMScan_HOCOMOCOv12_H12INVIVO.tar.gz"
+destfile <- paste0(outputDir, "/PWMScan_HOCOMOCOv12_H12INVIVO.tar.gz")
 if (!file.exists(destfile)) {
   options(timeout = 1200)
   download.file(file_hocomoco_v12, destfile)
 }
 # Define the directory to extract the files to
-exdir <- "PWMScan_HOCOMOCOv12_H12INVIVO"
+exdir <- paste0(par\\$temp_dir, "/PWMScan_HOCOMOCOv12_H12INVIVO") 
 GRaNIE_TFBSFolder = paste0(exdir, "/H12INVIVO")
 if (!file.exists(GRaNIE_TFBSFolder)) {
   untar(destfile, exdir = exdir)
@@ -3901,7 +3898,7 @@ if (par\\$genomeAssembly == "hg38"){
   file_RNA_URL = "https://s3.embl.de/zaugg-web/GRaNIEverse/features_RNA_mm10.tsv.gz"
 }
 
-file_RNA <- paste0("features_RNA_", par\\$genomeAssembly, ".tsv.gz")
+file_RNA <- paste0(par\\$temp_dir, "/features_RNA_", par\\$genomeAssembly, ".tsv.gz")
 if (!file.exists(file_RNA)) {
   options(timeout = 1200)
   download.file(file_RNA_URL, file_RNA)
@@ -3925,6 +3922,7 @@ if (par\\$forceRerun | !file.exists(file_seurat)) {
 
  seurat_object <- CreateSeuratObject(count = rna, project = "PBMC", min.cells = 1, min.features = 1, assay = "RNA")
  
+ print('Seurat object created for rna')
  # RangedSummarizedExperiment for atac
   adata <- anndata::read_h5ad(par\\$atac)
   counts <- t(adata\\$X)  # Transpose to match R's column-major order
@@ -3940,7 +3938,7 @@ if (par\\$forceRerun | !file.exists(file_seurat)) {
   )
 
 rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac)), sep=':')
-
+print('Seurat object created for atac')
  
  # Extract counts and metadata from the RangedSummarizedExperiment
   atac_counts <- assays(atac)\\$counts
@@ -3957,13 +3955,11 @@ rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac))
    min.features = 1,
    colData = DataFrame(colData(atac))
   )
- 
-  if (par\\$genomeAssembly == "hg38"){
-    annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
+  print('ChromatinAssay created')
+  
+  annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Hsapiens.v86)
     
-  } else if (par\\$genomeAssembly == "mm10") {
-    annotations <- GetGRangesFromEnsDb(ensdb = EnsDb.Mmusculus.v79)
-  }
+  print('Annotations created')
   
   seqlevelsStyle(annotations) <- "UCSC"
   genome(annotations) <- par\\$genomeAssembly
@@ -3978,7 +3974,7 @@ rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac))
 
   seurat_object[["peaks"]] = chrom_assay
     
-  qs::qsave(seurat_object, "seurat_granie.qs")
+  qs::qsave(seurat_object, paste0(par\\$temp_dir, "seurat_granie.qs" ) )
     
 } else {
 
@@ -3986,16 +3982,17 @@ rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac))
   
 }
 
-output_seuratProcessed = paste0(outputDir, "/seuratObject.qs")
+output_seuratProcessed = paste0(par\\$temp_dir, "/seuratObject.qs")
 
+print('Preprocessing finished')
 ###################
 # Preprocess data #
 ###################
 
 # Take output from preprocessing steps
-GRaNIE_file_peaks = paste0(outputDir, "/atac.pseudobulkFromClusters_res", par\\$preprocessing_clusterResolution, "_mean.tsv.gz")
-GRaNIE_file_rna = paste0(outputDir, "/rna.pseudobulkFromClusters_res", par\\$preprocessing_clusterResolution, "_mean.tsv.gz")
-GRaNIE_file_metadata = paste0(outputDir, "/metadata_res", par\\$preprocessing_clusterResolution, "_mean.tsv.gz")
+GRaNIE_file_peaks = paste0(par\\$temp_dir, "/atac.pseudobulkFromClusters_res", par\\$preprocessing_clusterResolution, "_mean.tsv.gz")
+GRaNIE_file_rna = paste0(par\\$temp_dir, "/rna.pseudobulkFromClusters_res", par\\$preprocessing_clusterResolution, "_mean.tsv.gz")
+GRaNIE_file_metadata = paste0(par\\$temp_dir, "/metadata_res", par\\$preprocessing_clusterResolution, "_mean.tsv.gz")
 
 if (file.exists(GRaNIE_file_peaks) & file.exists(GRaNIE_file_metadata) & file.exists(GRaNIE_file_rna) & !par\\$forceRerun) {
   
@@ -4003,7 +4000,7 @@ if (file.exists(GRaNIE_file_peaks) & file.exists(GRaNIE_file_metadata) & file.ex
   
 } else {
   seurat_object = prepareSeuratData_GRaNIE(seurat_object, 
-                                           outputDir = outputDir,
+                                           outputDir = par\\$temp_dir,
                                            saveSeuratObject = TRUE,
                                            genome = par\\$genomeAssembly,
                                            assayName_RNA = "RNA", normRNA = "SCT", nDimensions_RNA = par\\$preprocessing_RNA_nDimensions, recalculateVariableFeatures = NULL,
@@ -4027,7 +4024,7 @@ if (file.exists(GRaNIE_file_peaks) & file.exists(GRaNIE_file_metadata) & file.ex
 ##############
 
 GRN = runGRaNIE(
-  dir_output = outputDir,
+  dir_output = par\\$temp_dir,
   datasetName = "undescribed",
   GRaNIE_file_peaks,
   GRaNIE_file_rna,

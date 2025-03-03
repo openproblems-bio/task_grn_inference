@@ -7,6 +7,9 @@ def main(par):
     prediction = ad.read_h5ad(par['prediction'])
     prediction = pd.DataFrame(prediction.uns['prediction'])
     prediction['weight'] = prediction['weight'].astype(float)
+    assert prediction.shape[0]>0, 'No links found in the network'
+    assert all(column in prediction.columns for column in ['source', 'target', 'weight']), 'Columns in the network should be source, target, weight'
+    
     consensus = pd.read_csv(par['ws_consensus'])
     background_distance = pd.read_csv(par['ws_distance_background'])
     evaluation_data = ad.read_h5ad(par['evaluation_data_sc'])

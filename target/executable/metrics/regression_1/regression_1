@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2025-03-02T19:39:24Z"
+LABEL org.opencontainers.image.created="2025-03-03T20:12:34Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="1dd631a6d80ed7f772513e6d3a850b3dc3edd779"
+LABEL org.opencontainers.image.revision="8d87cd76b95bdfb18b9c8400ce0724a66e4972ef"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1423,6 +1423,9 @@ def main(par):
     net = read_net(par)
     if par['apply_tf']:
         net = net[net.source.isin(tf_all)]
+    assert net.shape[0]>0, 'No links found in the network'
+    assert all(column in net.columns for column in ['source', 'target', 'weight']), 'Columns in the network should be source, target, weight'
+    
     evaluation_data = ad.read_h5ad(par['evaluation_data'])
     evaluation_data.X = evaluation_data.layers[par["layer"]]
     gene_names = evaluation_data.var.index.to_numpy()

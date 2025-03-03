@@ -446,9 +446,9 @@ function ViashDockerfile {
 FROM ghcr.io/openproblems-bio/base_python:1.0.4
 ENTRYPOINT []
 LABEL org.opencontainers.image.description="Companion container for running component process_data op_multiome"
-LABEL org.opencontainers.image.created="2025-03-02T19:39:23Z"
+LABEL org.opencontainers.image.created="2025-03-03T20:12:33Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="1dd631a6d80ed7f772513e6d3a850b3dc3edd779"
+LABEL org.opencontainers.image.revision="8d87cd76b95bdfb18b9c8400ce0724a66e4972ef"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1150,6 +1150,8 @@ if __name__ == '__main__':
     atac.var['seqname'] = annotation_peak[0].values
     atac.var['ranges'] = annotation_peak[1].values
     atac.var['strand'] = '+'
+
+    atac = atac[:, atac.var['seqname'].str.startswith('chr')]
 
 
     rna.write(par['op_rna'])

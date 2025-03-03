@@ -1,0 +1,60 @@
+namespace: control_methods
+info:
+  type: control_method
+  type_info:
+    label: Control Method
+    summary: Quality control methods for verifying the pipeline.
+    description: |
+      This folder contains control components for the task. 
+      These components have the same interface as the regular methods
+      but serve to verify the benchmark. They are either simply methods that 
+      are expected to be outperformed by actual GRN inference methods or they 
+      get evaluation data in addition to the inference data to yiled a higher performance,
+      aiming to outperform the actual GRN inference methods. 
+arguments:
+  - name: --rna
+    __merge__: file_rna_h5ad.yaml
+    required: true
+    direction: input
+  - name: --prediction
+    __merge__: file_prediction_h5ad.yaml
+    required: false
+    direction: output
+  - name: --tf_all
+    type: file
+    required: true
+    direction: input
+    example: resources_test/grn_benchmark/prior/tf_all.csv
+    default: resources_test/grn_benchmark/prior/tf_all.csv
+  - name: --max_n_links
+    type: integer
+    default: 50000
+  - name: --num_workers
+    type: integer
+    direction: input
+    default: 20
+  - name: --temp_dir
+    type: string
+    direction: input
+    default: output/temdir
+  - name: --layer
+    type: string
+    direction: input
+    default: X_norm
+  - name: --seed
+    type: integer
+    direction: input
+    default: 32
+  - name: --dataset_id
+    type: string
+    direction: input
+    required: false
+    default: op
+
+
+
+test_resources:
+  - type: python_script
+    path: /common/component_tests/run_and_check_output.py
+  - path: /resources_test/
+    dest: resources_test/

@@ -445,10 +445,18 @@ function ViashDockerfile {
     cat << 'VIASHDOCKER'
 FROM janursa/figr:19-08-2024
 ENTRYPOINT []
+RUN apt-get update && \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y procps git && \
+  rm -rf /var/lib/apt/lists/*
+
+RUN pip install --upgrade pip && \
+  pip install --upgrade --no-cache-dir "anndata~=0.10.0" "scanpy~=1.10.0" "pyyaml" "requests" "jsonschema" && \
+  pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
+
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods figr"
-LABEL org.opencontainers.image.created="2025-03-02T19:39:23Z"
+LABEL org.opencontainers.image.created="2025-03-03T20:12:33Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="1dd631a6d80ed7f772513e6d3a850b3dc3edd779"
+LABEL org.opencontainers.image.revision="8d87cd76b95bdfb18b9c8400ce0724a66e4972ef"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -610,13 +618,12 @@ function ViashHelp {
   echo "        type: string"
   echo "        default: op"
   echo ""
-  echo "    --is_test"
-  echo "        type: boolean"
-  echo "        default: false"
-  echo ""
   echo "    --cell_topic"
   echo "        type: file, required parameter, file must exist"
-  echo "        default: resources_test/grn_benchmark/prior/cell_topic.csv"
+  echo "        example: resources_test/grn_benchmark/prior/cell_topic.csv"
+  echo ""
+  echo "    --peak_gene"
+  echo "        type: file, output, file must exist"
   echo ""
   echo "    --n_topics"
   echo "        type: integer"
@@ -782,17 +789,6 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_DATASET_ID=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --is_test)
-            [ -n "$VIASH_PAR_IS_TEST" ] && ViashError Bad arguments for option \'--is_test\': \'$VIASH_PAR_IS_TEST\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_IS_TEST="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --is_test. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --is_test=*)
-            [ -n "$VIASH_PAR_IS_TEST" ] && ViashError Bad arguments for option \'--is_test=*\': \'$VIASH_PAR_IS_TEST\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_IS_TEST=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
         --cell_topic)
             [ -n "$VIASH_PAR_CELL_TOPIC" ] && ViashError Bad arguments for option \'--cell_topic\': \'$VIASH_PAR_CELL_TOPIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_CELL_TOPIC="$2"
@@ -802,6 +798,17 @@ while [[ $# -gt 0 ]]; do
         --cell_topic=*)
             [ -n "$VIASH_PAR_CELL_TOPIC" ] && ViashError Bad arguments for option \'--cell_topic=*\': \'$VIASH_PAR_CELL_TOPIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_CELL_TOPIC=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --peak_gene)
+            [ -n "$VIASH_PAR_PEAK_GENE" ] && ViashError Bad arguments for option \'--peak_gene\': \'$VIASH_PAR_PEAK_GENE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_PEAK_GENE="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --peak_gene. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --peak_gene=*)
+            [ -n "$VIASH_PAR_PEAK_GENE" ] && ViashError Bad arguments for option \'--peak_gene=*\': \'$VIASH_PAR_PEAK_GENE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_PEAK_GENE=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --n_topics)
@@ -1043,9 +1050,6 @@ fi
 if [ -z ${VIASH_PAR_DATASET_ID+x} ]; then
   VIASH_PAR_DATASET_ID="op"
 fi
-if [ -z ${VIASH_PAR_IS_TEST+x} ]; then
-  VIASH_PAR_IS_TEST="false"
-fi
 if [ -z ${VIASH_PAR_N_TOPICS+x} ]; then
   VIASH_PAR_N_TOPICS="48"
 fi
@@ -1084,12 +1088,6 @@ fi
 if [[ -n "$VIASH_PAR_SEED" ]]; then
   if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_IS_TEST" ]]; then
-  if ! [[ "$VIASH_PAR_IS_TEST" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--is_test' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1176,6 +1174,9 @@ fi
 if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -d "$(dirname "$VIASH_PAR_PREDICTION")" ]; then
   mkdir -p "$(dirname "$VIASH_PAR_PREDICTION")"
 fi
+if [ ! -z "$VIASH_PAR_PEAK_GENE" ] && [ ! -d "$(dirname "$VIASH_PAR_PEAK_GENE")" ]; then
+  mkdir -p "$(dirname "$VIASH_PAR_PEAK_GENE")"
+fi
 
 if  [ "$VIASH_ENGINE_ID" == "native" ]  ; then
   if [ "$VIASH_MODE" == "run" ]; then
@@ -1209,6 +1210,11 @@ fi
 if [ ! -z "$VIASH_PAR_CELL_TOPIC" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_CELL_TOPIC")" )
   VIASH_PAR_CELL_TOPIC=$(ViashDockerAutodetectMount "$VIASH_PAR_CELL_TOPIC")
+fi
+if [ ! -z "$VIASH_PAR_PEAK_GENE" ]; then
+  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_PEAK_GENE")" )
+  VIASH_PAR_PEAK_GENE=$(ViashDockerAutodetectMount "$VIASH_PAR_PEAK_GENE")
+  VIASH_CHOWN_VARS+=( "$VIASH_PAR_PEAK_GENE" )
 fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_META_RESOURCES_DIR")" )
@@ -1284,9 +1290,9 @@ library(doParallel)
 library(anndata)
 library(FigR)
 library(BSgenome.Hsapiens.UCSC.hg38)
-library(reticulate)
 library(SummarizedExperiment)
 # library(Seurat)
+# install.packages("bspm", repos="https://cran.r-project.org") #TOOD: check this
 
 ## VIASH START
 # The following code has been auto-generated by Viash.
@@ -1304,8 +1310,8 @@ par <- list(
   "layer" = $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_LAYER" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi ),
   "dataset_id" = $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_DATASET_ID" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "is_test" = $( if [ ! -z ${VIASH_PAR_IS_TEST+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_IS_TEST" | sed "s#['\\]#\\\\&#g"; echo "'))"; else echo NULL; fi ),
   "cell_topic" = $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_CELL_TOPIC" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
+  "peak_gene" = $( if [ ! -z ${VIASH_PAR_PEAK_GENE+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PEAK_GENE" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "n_topics" = $( if [ ! -z ${VIASH_PAR_N_TOPICS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_N_TOPICS" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi )
 )
 meta <- list(
@@ -1342,7 +1348,9 @@ dir.create(par\$temp_dir, recursive = TRUE, showWarnings = TRUE)
 
 # ---------------- create summary experiment for rna 
 adata <- anndata::read_h5ad(par\$rna)
-dataset_id = adata\$dataset_id
+dataset_id = adata\$uns\$dataset_id
+
+
 
 rna <- t(adata\$X)  # Transpose to match R's column-major order
 rna <- Matrix(rna)
@@ -1356,6 +1364,7 @@ counts <- t(adata\$X)  # Transpose to match R's column-major order
 rownames(counts) <- rownames(adata\$var)
 colnames(counts) <- rownames(adata\$obs)
 colData <- as.data.frame(adata\$obs)
+
 # rowData <- as.data.frame(adata\$var)
 atac <- SummarizedExperiment(
   assays = list(counts = Matrix(counts)),
@@ -1367,6 +1376,21 @@ atac <- SummarizedExperiment(
 
 rownames(atac) <- paste(as.character(seqnames(atac)), as.character(ranges(atac)), sep=':')
 
+test_flag = FALSE
+if (test_flag) {
+  common_cells <- intersect(colnames(rna), colnames(atac))
+  if (length(common_cells) > 2000) {
+    selected_cells <- sample(common_cells, 2000)
+  } else {
+    selected_cells <- common_cells  # Keep all if less than 2000
+  }
+  rna <- rna[, selected_cells]
+  atac <- atac[, selected_cells]
+  print(dim(rna))
+  print(dim(atac))
+
+
+}
 # ---------------- figr pipeline
 
 colnames(atac) <- gsub("-", "", colnames(atac))
@@ -1417,9 +1441,11 @@ dorc_genes_func <- function(par){
 
   cellkNN = cellkNN[common_cells,]
   dorcMat = dorcMat[,common_cells]
+  rna <- rna[, common_cells]
   cat('cellKNN dim:', dim(cellkNN), '\\n')
   cat('dorcMat dim:', dim(dorcMat), '\\n')
   cat('rna dim:', dim(rna), '\\n')
+  cellkNN[cellkNN > ncol(dorcMat)] <- 1  # this is for test purposes
   dorcMat.s <- smoothScoresNN(NNmat = cellkNN, mat = dorcMat, nCores = par\$num_workers) 
   cat('dorcMat.s completed')
   # Smooth RNA using cell KNNs
@@ -1443,6 +1469,12 @@ tf_gene_association_func <- function(par){
   RNAmat.s = readRDS(paste0(par\$temp_dir, "RNAmat.s.RDS"))
   dorcMat.s = readRDS(paste0(par\$temp_dir, "dorcMat.s.RDS"))
 
+  # - for test purposes
+  zero_var_rows <- which(apply(dorcMat.s, 1, var, na.rm = TRUE) == 0)
+  if (length(zero_var_rows) > 0) {
+    dorcMat.s <- dorcMat.s[-zero_var_rows, ]  # Remove zero-variance rows
+  }
+
   figR.d <- runFigRGRN(ATAC.se = atac, # Must be the same input as used in runGenePeakcorr()
                       dorcTab = cisCorr.filt, # Filtered peak-gene associations
                       genome = "hg38",
@@ -1455,7 +1487,7 @@ tf_gene_association_func <- function(par){
 
 extract_peak_gene_func <- function(par) {
   # Read the CSV file
-  peak_gene_figr <- read.csv(file.path(par\$temp_dir, "cisCorr.filt.csv"))
+  peak_gene_figr <- read.csv(paste0(par\$temp_dir, "cisCorr.filt.csv"))
   
   # Calculate the number of peak ranges for each gene
   peak_gene_figr_n <- aggregate(PeakRanges ~ Gene, data = peak_gene_figr, length)
@@ -1474,12 +1506,15 @@ extract_peak_gene_func <- function(par) {
   colnames(peak_gene_figr) <- c("peak", "target")
   
   # Write the result to a CSV file
-  write.csv(peak_gene_figr, file = par\$peak_gene, row.names = FALSE)
+  # if (par\$peak_gene != ""){
+  #   write.csv(peak_gene_figr, file = par\$peak_gene, row.names = FALSE)
+  # }
+  
 }
 
 filter_net <- function(par) {
   # Read the CSV file
-  net <- read.csv(file.path(par\$temp_dir, "figR.d.csv"))
+  net <- read.csv(paste0(par\$temp_dir, "figR.d.csv"))
 
   # Filter those that have a Score of 0
   net <- subset(net, Score != 0)
@@ -1509,7 +1544,6 @@ filter_net <- function(par) {
       stop("Error: 'net' is not a dataframe")
   }
 
-
   output <- AnnData(
     X = matrix(nrow = 0, ncol = 0),
     uns = list(
@@ -1520,9 +1554,10 @@ filter_net <- function(par) {
   )
 
   print(output)
-  # output\$write(par\$prediction)
   print(par\$prediction)
-  output\$write_h5ad(par\$prediction, compression = "gzip")
+  print(output\$uns\$dataset_id)
+  anndata::write_h5ad(output, par\$prediction)
+  # output\$write_h5ad(par\$prediction, compression = "gzip")
 }
 
 
@@ -1535,9 +1570,9 @@ print('2: peak_gene_func finished')
 dorc_genes_func(par)
 print('3: dorc_genes_func finished')
 tf_gene_association_func(par)
-print('3: tf_gene_association_func finished')
+print('4: tf_gene_association_func finished')
 extract_peak_gene_func(par)
-print('4: extract_peak_gene_func finished')
+print('5: extract_peak_gene_func finished')
 filter_net(par)
 VIASHMAIN
 Rscript "\$tempscript" &
@@ -1564,6 +1599,9 @@ if [[ "$VIASH_ENGINE_TYPE" == "docker" ]]; then
   if [ ! -z "$VIASH_PAR_CELL_TOPIC" ]; then
     VIASH_PAR_CELL_TOPIC=$(ViashDockerStripAutomount "$VIASH_PAR_CELL_TOPIC")
   fi
+  if [ ! -z "$VIASH_PAR_PEAK_GENE" ]; then
+    VIASH_PAR_PEAK_GENE=$(ViashDockerStripAutomount "$VIASH_PAR_PEAK_GENE")
+  fi
   if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
     VIASH_META_RESOURCES_DIR=$(ViashDockerStripAutomount "$VIASH_META_RESOURCES_DIR")
   fi
@@ -1582,6 +1620,10 @@ fi
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -e "$VIASH_PAR_PREDICTION" ]; then
   ViashError "Output file '$VIASH_PAR_PREDICTION' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_PEAK_GENE" ] && [ ! -e "$VIASH_PAR_PEAK_GENE" ]; then
+  ViashError "Output file '$VIASH_PAR_PEAK_GENE' does not exist."
   exit 1
 fi
 
