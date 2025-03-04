@@ -1,33 +1,65 @@
-# !pip install sctk anndata
-# !aws s3 cp s3://openproblems-bio/public/neurips-2023-competition/sc_counts.h5ad  ./resources_raw/ --no-sign-request
-
 import anndata as ad 
 import pandas as pd
 import numpy as np
 import sctk
 from scipy import sparse
 import scanpy as sc
-from scipy.sparse import csr_matrix
+
 import sys
 
-## VIASH START
-par = {
-    'op_perturbation_raw': 'resources/datasets_raw/op_perturbation_sc_counts.h5ad',
-    'op_perturbation_bulk': 'resources/grn_benchmark/evaluation_data/op_perturbation_bulk.h5ad',
-}
-## VIASH END
 
-try: 
-    sys.path.append(meta['resources_dir'])
-except:
-    meta = { 
-        'resources_dir': 'src/utils/'
-    }   
-    sys.path.append(meta['resources_dir'])
+def add_metadata(adata):
+    adata.uns['dataset_id'] = 'op'
+    adata.uns['dataset_name'] = 'OPSCA'
+    adata.uns['dataset_summary'] = 'scRNA-seq data with 146 (originally) perturbations with chemical compounds on PBMCs. Multiome data available for the control compound.'
+    adata.uns['dataset_organism'] = 'human'
+    adata.uns["dataset_description"] = "Novel single-cell perturbational dataset in human peripheral blood mononuclear cells (PBMCs). 144 compounds were selected from the Library of Integrated Network-Based Cellular Signatures (LINCS) Connectivity Map dataset (PMID: 29195078) and measured single-cell gene expression profiles after 24 hours of treatment. The experiment was repeated in three healthy human donors, and the compounds were selected based on diverse transcriptional signatures observed in CD34+ hematopoietic stem cells (data not released). This experiment was performed in human PBMCs because the cells are commercially available with pre-obtained consent for public release and PBMCs are a primary, disease-relevant tissue that contains multiple mature cell types (including T-cells, B-cells, myeloid cells, and NK cells) with established markers for annotation of cell types. To supplement this dataset, joint scRNA and single-cell chromatin accessibility measurements were measured from the baseline compound using the 10x Multiome assay. "
+    adata.uns["data_reference"] = "@article{slazata2024benchmark,\n\ttitle = {A benchmark for prediction of transcriptomic responses to chemical perturbations across cell types},\n\tauthor = {Artur Szałata and Andrew Benz and Robrecht Cannoodt and Mauricio Cortes and Jason Fong and Sunil Kuppasani and Richard Lieberman and Tianyu Liu and Javier A. Mas-Rosario and Rico Meinl and Jalil Nourisa and Jared Tumiel and Tin M. Tunjic and Mengbo Wang and Noah Weber and Hongyu Zhao and Benedict Anchang and Fabian J Theis and Malte D Luecken and Daniel B Burkhardt},\n\tbooktitle = {The Thirty-eight Conference on Neural Information Processing Systems Datasets and Benchmarks Track},\n\tyear = {2024},\n\turl = {https://openreview.net/forum?id=WTI4RJYSVm}\n}"
+    adata.uns["data_url"] = "https://trace.ncbi.nlm.nih.gov/Traces/?view=study&acc=SRP527159"
+    return adata
 
+def shorten_inference_data(par):
+    # - shorten rna 
+    adata_rna = ad.read_h5ad(par['op_rna'])
 
+    n_cells = 2000
+    n_peaks = 10000
+    mask = adata_rna.obs.donor_id=='donor_0'
+    adata_rna_s = adata_rna[mask]
+    # only one chr and n_cells 
+    if 'interval' not in adata_rna.var:
+        raise ValueError('location is not given in rna')
+    chr_mask = adata_rna_s.var.interval.str.split(':').str[0] == 'chr1'
+    adata_rna_s = adata_rna_s[:n_cells, chr_mask]
+   
+    # - shorten atac
+    adata_atac = ad.read_h5ad(par['op_atac'])
+    mask = adata_atac.obs.donor_id=='donor_0'
+    adata_atac_s = adata_atac[mask]
+    chr_mask = adata_atac_s.var.index.str.split(':').str[0] == 'chr1'
+    adata_atac_s = adata_atac_s[adata_rna_s.obs_names, chr_mask]
 
-from util import sum_by
+    total_counts = adata_atac_s.X.sum(axis=0).A1  # .A1 converts the sparse matrix to a dense array
+    peaks_df = pd.DataFrame({
+        'peak': adata_atac_s.var.index,
+        'total_counts': total_counts
+    })
+    top_peaks = peaks_df.nlargest(n_peaks, 'total_counts')['peak']
+    adata_atac_s = adata_atac_s[:, top_peaks]
+    adata_atac_s.var = adata_atac_s.var.loc[top_peaks]
+
+    print(adata_rna_s)
+    print(adata_atac_s)
+    assert adata_rna_s.shape[0] > 0, 'no cells in rna'
+    assert adata_atac_s.shape[0] > 0, 'no cells in atac'
+    assert adata_rna_s.shape[1] > 0, 'no genes in rna'
+    
+    adata_rna_s.write(par['op_rna_test'])
+    adata_atac_s.write(par['op_atac_test'])
+def shorten_evaluation_data(par):
+    evaluation_data = ad.read_h5ad(par['op_perturbation_bulk'])
+    evaluation_data = evaluation_data[evaluation_data.obs.sample(2000).index, evaluation_data.var.sample(2000).index]
+    evaluation_data.write(par['op_perturbation_bulk_test'])
 
 def preprocess_sc(par):
     # clean up
@@ -90,23 +122,7 @@ def preprocess_sc(par):
     del sc_counts.uns
     return sc_counts
 
-def pseudobulk_sum_func(sc_counts):
-    # pseudobulk
-    #group cell types per well
-    sc_counts.obs['plate_well_cell_type'] = sc_counts.obs['plate_name'].astype('str') \
-        + '_' + sc_counts.obs['well'].astype('str') \
-        + '_' + sc_counts.obs['cell_type'].astype('str')
-    sc_counts.obs['plate_well_cell_type'] = sc_counts.obs['plate_well_cell_type'].astype('category')
-    bulk_adata = sum_by(sc_counts, 'plate_well_cell_type')
-    bulk_adata.obs['cell_count'] = sc_counts.obs.groupby('plate_well_cell_type').size().values
-    bulk_adata.X = np.array(bulk_adata.X.todense())
 
-    print('ratio of missingness' , (bulk_adata.X==0).sum()/bulk_adata.X.size)
-    bulk_adata.var = bulk_adata.var.reset_index()
-    bulk_adata.var.set_index('index', inplace=True)
-
-    bulk_adata.X = np.nan_to_num(bulk_adata.X, nan=0)
-    return bulk_adata
 def pseudobulk_mean_func(bulk_adata):
     bulk_adata.layers['counts'] = bulk_adata.X.copy()
     rows_adj = []
@@ -172,33 +188,3 @@ def normalize_func(adata):
     adata.layers['lognorm'] = X_norm
     
     return adata
-
-if __name__ == '__main__':
-    
-    cell_counts_t = 10
-        
-    sc_counts_f = preprocess_sc(par)
-    bulk_adata = pseudobulk_sum_func(sc_counts_f)
-    bulk_adata = pseudobulk_mean_func(bulk_adata)
-    bulk_adata = filter_func(bulk_adata, cell_counts_t)
-
-
-    bulk_adata.obs = bulk_adata.obs.rename(columns={'sm_name':'perturbation'})
-
-    bulk_adata = normalize_func(bulk_adata)
-
-    del bulk_adata.layers['n_counts']
-
-    bulk_adata.X = csr_matrix(bulk_adata.X)
-    bulk_adata.layers['counts'] = csr_matrix(bulk_adata.layers['counts'])
-
-    bulk_adata.obs['is_control'] = bulk_adata.obs['perturbation'].isin(['Dimethyl Sulfoxide'])
-    bulk_adata.obs['is_positive_control'] = bulk_adata.obs['perturbation'].isin(['Dabrafenib', 'Belinostat'])
-
-    bulk_adata.uns['dataset_id'] = 'op'
-    bulk_adata.uns['dataset_name'] = 'OPSCA'
-    bulk_adata.uns['dataset_summary'] = 'RNA-seq data from the OPSCA dataset: perturbation data'
-    bulk_adata.uns['dataset_organism'] = 'human'
-    bulk_adata.uns['normalization_id'] = 'apr'
-
-    bulk_adata.write(par['op_perturbation_bulk'])

@@ -11,9 +11,6 @@ Benchmarking GRN inference methods
 Documentation: 
 [geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)
 
-Leaderboard: 
-[openproblems/grn_inference](https://add-grn--openproblems.netlify.app/results/grn_inference/)
-
 Repository:
 [openproblems-bio/task_grn_inference](https://github.com/openproblems-bio/task_grn_inference)
 
