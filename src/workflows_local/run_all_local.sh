@@ -15,27 +15,16 @@ set -e
 # - data preprocessing 
 
 # echo "Running opsc_perturbation ..."
-python src/process_data/opsca_multiomics/script.py 
-# python src/process_data/opsca_perturbation/script.py 
-
-
-
-# echo "Running pereggrn ..."
-# python src/process_data/pereggrn/_script.py
-# python src/process_data/replogle/script.py 
-# python src/process_data/nakatake/script.py 
-# python src/process_data/adamson/script.py 
-# python src/process_data/norman/script.py 
-
-# echo "Running replogle_k562_gwps ..." 
-# bash src/process_data/replogle_k562_gwps/run.sh # this gets single cell data for replogle
+python src/process_data/opsca/script.py 
+python src/process_data/pereggrn/_script.py
+python src/process_data/replogle/script.py 
+python src/process_data/nakatake/script.py 
+python src/process_data/adamson/script.py 
+python src/process_data/norman/script.py 
+python src/process_data/replogle_k562_gwps/script.py # this gets single cell data for replogle
 
 aws s3 sync  resources/grn_benchmark/ s3://openproblems-data/resources/grn/grn_benchmark/ --delete
-
-# echo "Running test_data ..."
-# python src/process_data/test_data/datasets/script.py
-
-# aws s3 sync  resources_test/grn_benchmark/ s3://openproblems-data/resources_test/grn/grn_benchmark/ --delete
+aws s3 sync  resources_test/grn_benchmark/ s3://openproblems-data/resources_test/grn/grn_benchmark/ --delete
 
 
 # - GRN inference and evaluation
