@@ -1,44 +1,31 @@
 
-name: adamon
+name: norman
 namespace: "process_data"
 info:
-  label: Process Adamson dataset
-  summary: "Process sourced Adamson data to generate inference and evaluation datasets"
+  label: Process Norman dataset
+  summary: "Process sourced Norman data to generate inference and evaluation datasets"
 
 arguments:
-  - name: --adamson_raw
+  - name: --norman_raw
     type: file 
     required: true
     direction: input
-  - name: --adamson_bulk
+  - name: --norman_bulk
     type: file
     required: false
     direction: output
-  - name: --adamson_test_sc
+  - name: --norman_test_sc
     type: file
     required: false
     direction: output
-  - name: --adamson_test_bulk
+  - name: --norman_test_bulk
     type: file
     required: false
     direction: output
-  - name: --adamson_train_sc
+  - name: --norman_train_sc
     type: file
     required: false
-    direction: output
-  - name: --adamson_train_sc_test
-    type: file
-    required: false
-    direction: output
-  - name: --adamson_test_bulk_test
-    type: file
-    required: false
-    direction: output
-  - name: --adamson_test_sc_test
-    type: file
-    required: false
-    direction: output
-  
+    direction: output   
 
 resources:
   - type: python_script

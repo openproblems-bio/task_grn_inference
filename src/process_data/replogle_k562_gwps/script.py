@@ -8,29 +8,46 @@ import scanpy as sc
 import gc
 
 ## VIASH START
-argparser = argparse.ArgumentParser()
-argparser.add_argument('--input', type=str, required=True)
-argparser.add_argument('--tf_all', type=str, required=True)
-argparser.add_argument('--adata_test_sc', type=str, required=True)
-argparser.add_argument('--adata_train_sc', type=str, required=True)
-argparser.add_argument('--adata_train_sc_subset', type=str, required=True)
-
-args = argparser.parse_args()
-par = vars(args)
-
-par_local = {
-    'test_perturbs': f'resources/grn_benchmark/prior/replogle_test_perturbs.csv',
-
+par =  {
+    'replogle_gwps': 'resources/datasets_raw/replogle_K562_gwps_raw_singlecell.h5ad',
+    'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
+    'replogle_gwps_test_sc': 'resources/grn_benchmark/evaluation_data/replogle_sc.h5ad',
+    'replogle_gwps_train_sc': 'resources/extended_data/replogle_train_sc.h5ad',
+    'replogle_gwps_train_sc_subset': 'resources/grn_benchmark/inference_data/replogle_rna_sc_subset.h5ad',
+    'replogle_test_perturbs': f'resources/grn_benchmark/prior/replogle_test_perturbs.csv',
 }
 ## VIASH END
+if False:
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument('--input', type=str, required=True)
+    argparser.add_argument('--tf_all', type=str, required=True)
+    argparser.add_argument('--adata_test_sc', type=str, required=True)
+    argparser.add_argument('--adata_train_sc', type=str, required=True)
+    argparser.add_argument('--adata_train_sc_subset', type=str, required=True)
 
-meta = {
-    'resources_dir': 'src/utils/'
-}
-sys.path.append(meta["resources_dir"])
+    args = argparser.parse_args()
+    par = vars(args)
+
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta = {
+        'resources_dir': 'src/utils/'
+    }
+    sys.path.append(meta["resources_dir"])
 
 from util import sum_by, fetch_gene_info
 
+def add_metadata(adata):
+    adata.uns['dataset_summary'] = 'Single cell RNA-seq data with 231 perturbations (activation) on K562 cells.'
+    adata.uns['dataset_description'] = 'A central goal of genetics is to define the relationships between genotypes and phenotypes. High-content phenotypic screens such as Perturb-seq (CRISPR-based screens with single-cell RNA-sequencing readouts) enable massively parallel functional genomic mapping but, to date, have been used at limited scales. Here, we perform genome-scale Perturb-seq targeting all expressed genes with CRISPR interference (CRISPRi) across >2.5 million human cells. We use transcriptional phenotypes to predict the function of poorly characterized genes, uncovering new regulators of ribosome biogenesis (including CCDC86, ZNF236, and SPATA5L1), transcription (C7orf26), and mitochondrial respiration (TMEM242). In addition to assigning gene function, single-cell transcriptional phenotypes allow for in-depth dissection of complex cellular phenomena-from RNA processing to differentiation. We leverage this ability to systematically identify genetic drivers and consequences of aneuploidy and to discover an unanticipated layer of stress-specific regulation of the mitochondrial genome. Our information-rich genotype-phenotype map reveals a multidimensional portrait of gene and cellular function.'
+    adata.uns['data_reference'] = "@article{replogle2022mapping,\n\ttitle={Mapping information-rich genotype-phenotype landscapes with genome-scale Perturb-seq}, \n\tauthor={Replogle, Joseph M and Saunders, Reuben A and Pogson, Angela N and Hussmann, Jeffrey A and Lenail, Alexander and Guna, Alina and Mascibroda, Lauren and Wagner, Eric J and Adelman, Karen and Lithwick-Yanai, Gila and others},\n\tjournal={Cell},  \n\tvolume={185}, \n\tnumber={14},\n\tpages={2559--2575},\n\tyear={2022},\n\tpublisher={Elsevier}\n\t}"
+    adata.uns['data_url'] = 'https://pubmed.ncbi.nlm.nih.gov/35688146/'
+    adata.uns['dataset_id'] = 'replogle'
+    adata.uns['dataset_name'] = 'Replogle'
+    adata.uns['dataset_organism'] = 'human'
+    adata.uns['normalization_id'] = 'original'
+    return adata
 
 def format_raw_data(adata: ad.AnnData) -> ad.AnnData:
     '''
@@ -56,7 +73,7 @@ def split_data(adata: ad.AnnData):
     unique_perts = adata.obs['perturbation'].unique()
     
     tf_all = adata.obs[adata.obs['is_tf']]['perturbation'].unique()
-    test_perturbs = np.loadtxt(par_local['test_perturbs'], dtype=str)
+    test_perturbs = np.loadtxt(par['replogle_test_perturbs'], dtype=str)
     test_tfs = np.intersect1d(tf_all, test_perturbs)
     train_pertubs = np.setdiff1d(unique_perts, test_perturbs)
 
@@ -90,7 +107,7 @@ def normalize_pearson(adata: ad.AnnData) -> ad.AnnData:
 
 
 def main(par):
-    adata = ad.read_h5ad(par['input'], backed='r') 
+    adata = ad.read_h5ad(par['replogle_gwps'], backed='r') 
     if False: # to test 
         tf_all = np.loadtxt(par['tf_all'], dtype=str)
         filter = adata.obs['gene'][adata.obs['gene'].isin(tf_all)].unique()[0:10]
@@ -106,7 +123,7 @@ def main(par):
     if False:
         adata_bulk = psedudobulk_fun(adata_sc)
         adata_bulk = normalize(adata_bulk)
-        adata_bulk.write(par['adata_bulk'])
+        adata_bulk.write(par['replogle_gwps_bulk'])
         del adata_bulk, adata_sc 
         gc.collect()
     # - data split
@@ -123,24 +140,18 @@ def main(par):
         adata_train_bulk = sum_by(adata_train_sc, col='perturbation', unique_mapping=True)
         adata_train_bulk = normalize_pearson(adata_train_bulk)
         adata_train_bulk.uns['dataset_id'] = 'replogle'
-        adata_train_bulk.write(par['adata_train_bulk'])
+        adata_train_bulk.write(par['replogle_gwps_train_bulk'])
         
         
         del adata_train_bulk
         gc.collect()
 
-    if False:
-        print('adata_train_bulk: ', adata_train_bulk.shape)
-        print('pertrbations in adata_train_bulk: ', adata_train_bulk.obs['perturbation'].nunique())
-        print('adata_train_sc: ', adata_train_sc.shape)
-        print('pertrbations in adata_train_sc: ', adata_train_sc.obs['perturbation'].nunique())
-    
-    adata_train_sc.uns['dataset_id'] = 'replogle'
-    adata_train_sc.write(par['adata_train_sc'])
+    adata_train_sc = add_metadata(adata_train_sc)
+    adata_train_sc.write(par['replogle_gwps_train_sc'])
 
     adata_train_sc_subset = adata_train_sc_subset.to_memory()
-    adata_train_sc_subset.uns['dataset_id'] = 'replogle'
-    adata_train_sc_subset.write(par['adata_train_sc_subset'])
+    adata_train_sc_subset = add_metadata(adata_train_sc_subset)
+    adata_train_sc_subset.write(par['replogle_gwps_train_sc_subset'])
     del adata_train_sc, adata_train_sc_subset
     gc.collect()
 
@@ -148,19 +159,16 @@ def main(par):
     print('Process test data...')
     adata_test_sc = adata_test_sc.to_memory()
     adata_test_sc = normalize(adata_test_sc)
-    adata_test_sc.uns['dataset_id'] = 'replogle'
-    adata_test_sc.uns['dataset_name'] = 'Replogle'
-    adata_test_sc.uns['dataset_summary'] = 'Perturbation RNA-seq data: sc data containing evaluation data'
-    adata_test_sc.uns['dataset_organism'] = 'human'
+    adata_test_sc = add_metadata(adata_test_sc)
     adata_test_sc.uns['normalization_id'] = 'sla'
 
-    adata_test_sc.write(par['adata_test_sc'])
+    adata_test_sc.write(par['replogle_gwps_test_sc'])
 
     if False:
         adata_test_bulk = sum_by(adata_test_sc, col='perturbation', unique_mapping=True)
         adata_test_bulk.uns['dataset_id'] = 'replogle'
         adata_test_bulk = normalize_pearson(adata_test_bulk)
-        adata_test_bulk.write(par['adata_test_bulk'])
+        adata_test_bulk.write(par['replogle_gwps_test_bulk'])
 
 
 if __name__ == '__main__':

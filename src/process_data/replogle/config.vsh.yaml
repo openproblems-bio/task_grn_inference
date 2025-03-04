@@ -1,44 +1,35 @@
 
-name: adamon
+name: reologle
 namespace: "process_data"
 info:
-  label: Process Adamson dataset
-  summary: "Process sourced Adamson data to generate inference and evaluation datasets"
+  label: Process reologle dataset
+  summary: "Process sourced reologle data to generate inference and evaluation datasets"
 
 arguments:
-  - name: --adamson_raw
+  - name: --replogle_raw
     type: file 
     required: true
     direction: input
-  - name: --adamson_bulk
+  - name: --tf_all
+    type: file
+    required: true
+    direction: input
+  - name: --replogle_bulk
     type: file
     required: false
     direction: output
-  - name: --adamson_test_sc
+  - name: --replogle_test_bulk
     type: file
     required: false
     direction: output
-  - name: --adamson_test_bulk
+  - name: --replogle_train_bulk
     type: file
     required: false
     direction: output
-  - name: --adamson_train_sc
+  - name: --replogle_test_perturbs
     type: file
-    required: false
-    direction: output
-  - name: --adamson_train_sc_test
-    type: file
-    required: false
-    direction: output
-  - name: --adamson_test_bulk_test
-    type: file
-    required: false
-    direction: output
-  - name: --adamson_test_sc_test
-    type: file
-    required: false
-    direction: output
-  
+    required: true
+    direction: input
 
 resources:
   - type: python_script

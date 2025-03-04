@@ -18,8 +18,10 @@ summary: |
   Documentation: 
   [geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)
 
-  Leaderboard: 
-  [openproblems/grn_inference](https://add-grn--openproblems.netlify.app/results/grn_inference/)
+  Article: [geneRNIB: a living benchmark for gene regulatory network inference](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1)
+
+  Documentation: 
+  [geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)
 
   Repository:
   [openproblems-bio/task_grn_inference](https://github.com/openproblems-bio/task_grn_inference)

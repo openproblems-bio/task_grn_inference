@@ -10,7 +10,7 @@ reg_type="ridge"
 label=${RUN_ID}
 
 
-dataset_ids=" op "
+dataset_ids=" op adamson "
 # method_ids="[pearson_corr,
 #             negative_control, 
 #             positive_control, 
@@ -35,8 +35,10 @@ method_ids="[pearson_corr,
             scenic, 
             scprint, 
             grnboost2,
-            scenicplus,
+
+            scenicplus, 
             scglue,
+            figr,
             celloracle
             ]"
 
@@ -119,7 +121,6 @@ HERE
     -with-trace \
     -c common/nextflow_helpers/labels_ci.config \
     -params-file ${param_local}
-    --num_workers $num_workers
   
 else
   cat >> "$param_file" << HERE
