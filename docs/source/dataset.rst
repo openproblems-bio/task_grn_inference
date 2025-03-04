@@ -13,7 +13,7 @@ Downloading the test datasets
 
 .. code-block:: bash
 
-   aws s3 sync s3://openproblems-data/resources_test/grn resources_test/--no-sign-request
+   aws s3 sync s3://openproblems-data/resources_test/grn resources_test/ --no-sign-request
 
 This command downloads the data to `resources_test/`. The content of this folder is needed for testing component integration.
 

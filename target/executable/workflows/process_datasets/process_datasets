@@ -530,8 +530,7 @@ fi
 
 
 # set dependency paths
-VIASH_DEP_PROCESS_DATA_OP_MULTIOME="$VIASH_META_RESOURCES_DIR/../../../nextflow/process_data/op_multiome/main.nf"
-VIASH_DEP_PROCESS_DATA_OP_PERTURBATION="$VIASH_META_RESOURCES_DIR/../../../nextflow/process_data/op_perturbation/main.nf"
+VIASH_DEP_PROCESS_DATA_OPSCA="$VIASH_META_RESOURCES_DIR/../../../nextflow/process_data/opsca/main.nf"
 
 ViashDebug "Running command: $(echo $VIASH_CMD)"
 cat << VIASHEOF | eval $VIASH_CMD

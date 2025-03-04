@@ -43,8 +43,7 @@ resources:
     entrypoint: run_wf
 
 dependencies:
-  - name: process_data/op_multiome 
-  - name: process_data/op_perturbation
+  - name: process_data/opsca 
 
 
 runners:

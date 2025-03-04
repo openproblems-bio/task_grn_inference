@@ -1,16 +1,16 @@
 #!/bin/bash
-run_local=true
+run_local=false
 num_workers=20
 metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
 
-RUN_ID="main_sub"
-resources_folder='resources'
+RUN_ID="test_sub"
+resources_folder='resources_test'
 
 reg_type="ridge"
 label=${RUN_ID}
 
 
-dataset_ids=" op norman adamson nakatake replogle"
+dataset_ids=" op adamson "
 # method_ids="[pearson_corr,
 #             negative_control, 
 #             positive_control, 
@@ -30,6 +30,16 @@ dataset_ids=" op norman adamson nakatake replogle"
 method_ids="[pearson_corr,
             negative_control, 
             positive_control,
+            portia, 
+            ppcor, 
+            scenic, 
+            scprint, 
+            grnboost2,
+
+            scenicplus, 
+            scglue,
+            figr,
+            celloracle
             ]"
 
 
@@ -111,7 +121,6 @@ HERE
     -with-trace \
     -c common/nextflow_helpers/labels_ci.config \
     -params-file ${param_local}
-    --num_workers $num_workers
   
 else
   cat >> "$param_file" << HERE

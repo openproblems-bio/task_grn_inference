@@ -1,0 +1,53 @@
+
+name: reologle
+namespace: "process_data"
+info:
+  label: Process reologle dataset
+  summary: "Process sourced reologle data to generate inference and evaluation datasets"
+
+arguments:
+  - name: --replogle_raw
+    type: file 
+    required: true
+    direction: input
+  - name: --tf_all
+    type: file
+    required: true
+    direction: input
+  - name: --replogle_bulk
+    type: file
+    required: false
+    direction: output
+  - name: --replogle_test_bulk
+    type: file
+    required: false
+    direction: output
+  - name: --replogle_train_bulk
+    type: file
+    required: false
+    direction: output
+  - name: --replogle_test_perturbs
+    type: file
+    required: true
+    direction: input
+
+resources:
+  - type: python_script
+    path: script.py
+  - path: /src/utils/util.py
+    dest: util.py
+
+
+engines:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    setup:
+      - type: python
+        packages: [ numpy==1.26.4 ]
+  - type: native
+
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [midtime, midmem, midcpu]

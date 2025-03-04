@@ -1,0 +1,49 @@
+
+name: norman
+namespace: "process_data"
+info:
+  label: Process Norman dataset
+  summary: "Process sourced Norman data to generate inference and evaluation datasets"
+
+arguments:
+  - name: --norman_raw
+    type: file 
+    required: true
+    direction: input
+  - name: --norman_bulk
+    type: file
+    required: false
+    direction: output
+  - name: --norman_test_sc
+    type: file
+    required: false
+    direction: output
+  - name: --norman_test_bulk
+    type: file
+    required: false
+    direction: output
+  - name: --norman_train_sc
+    type: file
+    required: false
+    direction: output   
+
+resources:
+  - type: python_script
+    path: script.py
+  - path: /src/utils/util.py
+    dest: util.py
+
+
+engines:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    setup:
+      - type: python
+        packages: [ numpy==1.26.4 ]
+  - type: native
+
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [midtime, midmem, midcpu]

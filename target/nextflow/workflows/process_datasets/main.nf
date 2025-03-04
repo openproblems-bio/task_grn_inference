@@ -3120,13 +3120,7 @@ meta = [
   },
   "dependencies" : [
     {
-      "name" : "process_data/op_multiome",
-      "repository" : {
-        "type" : "local"
-      }
-    },
-    {
-      "name" : "process_data/op_perturbation",
+      "name" : "process_data/opsca",
       "repository" : {
         "type" : "local"
       }
@@ -3198,14 +3192,14 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/process_datasets",
     "viash_version" : "0.9.1",
-    "git_commit" : "8d87cd76b95bdfb18b9c8400ce0724a66e4972ef",
+    "git_commit" : "1ef9e7bf77c699c2888156dcb76d63a0ab1aaf60",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
     "name" : "task_grn_inference",
     "version" : "build_main",
     "label" : "GRN Inference",
-    "summary" : "Benchmarking GRN inference methods\nDocumentation: \n[geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)\n\nLeaderboard: \n[openproblems/grn_inference](https://add-grn--openproblems.netlify.app/results/grn_inference/)\n\nRepository:\n[openproblems-bio/task_grn_inference](https://github.com/openproblems-bio/task_grn_inference)\n",
+    "summary" : "Benchmarking GRN inference methods\nDocumentation: \n[geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)\n\nArticle: [geneRNIB: a living benchmark for gene regulatory network inference](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1)\n\nDocumentation: \n[geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)\n\nRepository:\n[openproblems-bio/task_grn_inference](https://github.com/openproblems-bio/task_grn_inference)\n",
     "description" : "\ngeneRNIB is a living benchmark platform for GRN inference. This platform provides curated datasets for GRN inference and evaluation, standardized evaluation protocols and metrics, computational infrastructure, and a dynamically updated leaderboard to track state-of-the-art methods. It runs novel GRNs in the cloud, offers competition scores, and stores them for future comparisons, reflecting new developments over time.\n\nThe platform supports the integration of new inference methods, datasets and protocols. When a new feature is added, previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly. The aim is to evaluate both the accuracy and completeness of inferred GRNs. It is designed for both single-modality and multi-omics GRN inference. \n\nIn the current version, geneRNIB contains 10 inference methods including both single and multi-omics, 8 evalation metrics, and five datasets. \n\nSee our publication for the details of methods. \n",
     "info" : {
       "image" : "thumbnail.svg",
@@ -3298,8 +3292,7 @@ meta = [
 
 // resolve dependencies dependencies (if any)
 meta["root_dir"] = getRootDir()
-include { op_multiome } from "${meta.resources_dir}/../../../nextflow/process_data/op_multiome/main.nf"
-include { op_perturbation } from "${meta.resources_dir}/../../../nextflow/process_data/op_perturbation/main.nf"
+include { opsca } from "${meta.resources_dir}/../../../nextflow/process_data/opsca/main.nf"
 
 // inner workflow
 // user-provided Nextflow code

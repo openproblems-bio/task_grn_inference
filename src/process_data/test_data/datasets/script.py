@@ -19,50 +19,12 @@ par = {
     'atac_test': 'resources_test/grn_benchmark/inference_data//op_atac.h5ad',
     # - evaluation data
     'evaluation_data': 'resources/grn_benchmark/evaluation_data//op_bulk.h5ad',
-    'evaluation_data_test': 'resources_test/grn_benchmark/evaluation_data//op_bulk.h5ad',
+    'op_perturbation_test': 'resources_test/grn_benchmark/evaluation_data//op_bulk.h5ad',
     'evaluation_data_sc': 'resources/grn_benchmark/evaluation_data/norman_sc.h5ad',
     'evaluation_data_sc_test': 'resources_test/grn_benchmark/evaluation_data/norman_sc.h5ad'
 }
 ## VIASH END
 
-def shorten_inference_data(par):
-    # - shorten rna 
-    adata_rna = ad.read_h5ad(par['rna'])
-
-    n_cells = 2000
-    n_peaks = 10000
-    mask = adata_rna.obs.donor_id=='donor_0'
-    adata_rna_s = adata_rna[mask]
-    # only one chr and n_cells 
-    if 'interval' not in adata_rna.var:
-        raise ValueError('location is not given in rna')
-    chr_mask = adata_rna_s.var.interval.str.split(':').str[0] == 'chr1'
-    adata_rna_s = adata_rna_s[:n_cells, chr_mask]
-   
-    # - shorten atac
-    adata_atac = ad.read_h5ad(par['atac'])
-    mask = adata_atac.obs.donor_id=='donor_0'
-    adata_atac_s = adata_atac[mask]
-    chr_mask = adata_atac_s.var.index.str.split(':').str[0] == 'chr1'
-    adata_atac_s = adata_atac_s[adata_rna_s.obs_names, chr_mask]
-
-    total_counts = adata_atac_s.X.sum(axis=0).A1  # .A1 converts the sparse matrix to a dense array
-    peaks_df = pd.DataFrame({
-        'peak': adata_atac_s.var.index,
-        'total_counts': total_counts
-    })
-    top_peaks = peaks_df.nlargest(n_peaks, 'total_counts')['peak']
-    adata_atac_s = adata_atac_s[:, top_peaks]
-    adata_atac_s.var = adata_atac_s.var.loc[top_peaks]
-
-    print(adata_rna_s)
-    print(adata_atac_s)
-    adata_rna_s.write(par['rna_test'])
-    adata_atac_s.write(par['atac_test'])
-def shorten_evaluation_data(par):
-    evaluation_data = ad.read_h5ad(par['evaluation_data'])
-    evaluation_data = evaluation_data[evaluation_data.obs.sample(2000).index, evaluation_data.var.sample(2000).index]
-    evaluation_data.write(par['evaluation_data_test'])
 def shorten_evaluation_data_sc(par):
     evaluation_data_sc = ad.read_h5ad(par['evaluation_data_sc'])
     # - control 
