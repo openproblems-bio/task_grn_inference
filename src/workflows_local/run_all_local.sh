@@ -15,8 +15,7 @@ set -e
 # - data preprocessing 
 
 # echo "Running opsc_perturbation ..."
-python src/process_data/opsca/script.py 
-python src/process_data/pereggrn/_script.py
+# python src/process_data/opsca/script.py 
 python src/process_data/replogle/script.py 
 python src/process_data/nakatake/script.py 
 python src/process_data/adamson/script.py 

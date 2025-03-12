@@ -26,14 +26,23 @@ workflow run_wf {
     | map{ id, state ->
         [id, state + ["_meta": [join_id: id]]]
       }
-    | permute_grn.run(
+    | pseudobulk_rna.run(
       fromState: [
-        prediction: "prediction", degree: "degree", noise_type: "noise_type"
+        rna: "rna", granularity: "granularity"
       ],
       toState: [
-          prediction_n: "prediction_n"
+          rna_pseudobulked: "rna_pseudobulked"
         ]
     )
+    | pearson_corr.run(
+      fromState: [
+        rna: "rna_pseudobulked", tf_all: "tf_all"
+      ],
+      toState: [
+          prediction: "prediction"
+        ]
+    )
+    
 
     // run all metrics
     | runEach(
@@ -47,7 +56,7 @@ workflow run_wf {
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
         evaluation_data: "evaluation_data",
-        prediction: "prediction_n",
+        prediction: "prediction",
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
         tf_all: "tf_all"

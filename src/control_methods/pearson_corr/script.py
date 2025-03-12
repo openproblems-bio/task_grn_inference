@@ -19,24 +19,23 @@ par = {
     'normalize': True}
 ## VIASH END
 
-## LOCAL START
+if False:
+    parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
+    parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
+    parser.add_argument('--prediction', type=str, help='Path to the prediction file')
+    parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
+    parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
+    parser.add_argument('--num_workers', type=str, help='Number of cores')
+    parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
+    parser.add_argument('--dataset_id', type=str, help='Dataset id')
+    parser.add_argument('--normalize', action='store_true')
+    args = parser.parse_args()
 
-parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
-parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-parser.add_argument('--num_workers', type=str, help='Number of cores')
-parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
-parser.add_argument('--dataset_id', type=str, help='Dataset id')
-parser.add_argument('--normalize', action='store_true')
-args = parser.parse_args()
+    par_local = vars(args)
 
-par_local = vars(args)
-
-for key, value in par_local.items():
-    if value is not None:
-        par[key] = value
+    for key, value in par_local.items():
+        if value is not None:
+            par[key] = value
 
 ## LOCAL END
 

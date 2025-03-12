@@ -1,14 +1,14 @@
 #!/bin/bash
-# datasets="norman replogle op nakatake adamson"
-datasets=" op "
+datasets="norman replogle op nakatake adamson"
+# datasets=" op "
 
-run_local=true
+run_local=false
 num_workers=10
-metric_ids="[regression_1, regression_2]" #regression_1, regression_2, ws_distance
-RUN_ID="scores_op_skeleton"
+metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
+RUN_ID="scores_default"
 reg_type="ridge"
 label="scores_default"
-apply_skeleton=true
+apply_skeleton=false
 apply_tf=true
 
 grn_names=(
@@ -27,11 +27,6 @@ grn_names=(
     "scprint"
 )
 
-# grn_names=(
-
-#     "negative_control"
-# )
-
 if [ "$run_local" = true ]; then
   resources_dir="./resources/"
 else
@@ -40,7 +35,7 @@ fi
 
 
 files_dir="${resources_dir}/grn_benchmark"
-publish_dir="${resources_dir}/results/${RUN_ID}"
+publish_dir="${resources_dir}/results/scores/${RUN_ID}"
 echo "Publish dir: $publish_dir"
 grn_models_folder="${resources_dir}/grn_models/"
 grn_models_folder_local="./resources/grn_models/"
@@ -78,7 +73,6 @@ append_entry() {
     regulators_consensus: ${files_dir}/prior/regulators_consensus_${dataset}.json
     prediction: ${grn_models_folder}/${dataset}/${grn_name}.h5ad
     skeleton: ${files_dir}/prior/skeleton.csv
-    layer: 'X_norm'
     apply_skeleton: ${apply_skeleton}
     apply_tf: ${apply_tf}
 

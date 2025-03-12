@@ -1,54 +1,29 @@
 #!/bin/bash
-run_local=false
+# datasets="norman replogle op nakatake adamson"
+datasets=" op "
+
+run_local=true
 num_workers=20
 metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
-
-RUN_ID="test_sub"
-resources_folder='resources_test'
-
+RUN_ID="imputation_analysis"
 reg_type="ridge"
-label=${RUN_ID}
+label="imputation_analysis"
 
 
-dataset_ids=" op adamson "
-# method_ids="[pearson_corr,
-#             negative_control, 
-#             positive_control, 
-
-#             portia, 
-#             ppcor, 
-#             scenic, 
-#             scprint, 
-#             grnboost2,
-
-#             scenicplus, 
-#             scglue,
-#             granie,
-#             figr,
-#             celloracle]"
-
-method_ids="[pearson_corr,
-            negative_control, 
-            positive_control,
-            portia, 
-            ppcor, 
-            scenic, 
-            scprint, 
-            grnboost2,
-
-            scenicplus, 
-            scglue,
-            celloracle
-            ]"
+grn_names=(
+    "pearson_corr"
+)
 
 
-echo "Run ID: $RUN_ID"
-
-resources_dir="s3://openproblems-data/${resources_folder}/grn"
+if [ "$run_local" = true ]; then
+  resources_dir="./resources/"
+else
+  resources_dir="s3://openproblems-data/resources/grn"
+fi
 
 
 files_dir="${resources_dir}/grn_benchmark"
-publish_dir="${resources_dir}/results/${RUN_ID}"
+publish_dir="${resources_dir}/results/stability_analysis/${RUN_ID}"
 echo "Publish dir: $publish_dir"
 grn_models_folder="${resources_dir}/grn_models/"
 grn_models_folder_local="./resources/grn_models/"
@@ -60,8 +35,7 @@ param_local="${params_dir}/${RUN_ID}_param_local.yaml"
 param_aws="s3://openproblems-data/resources/grn/results/params/${RUN_ID}_param_local.yaml"
 
 # Print GRN names correctly
-echo $param_local
-echo "GRN models: ${method_ids[@]}"
+echo "GRN models: ${grn_names[@]}"
 
 # Ensure param_file is clean
 > "$param_local"
@@ -73,21 +47,26 @@ param_list:
 HERE
 fi
 
+imputation_types=("original" "knn" "magic")
+
 append_entry() {
-  local dataset="$1"
-  echo "Dataset: $dataset"
+  local grn_name="$1"
+  local dataset="$2"
+  local imputation="$3"
+  
   cat >> "$param_local" << HERE
-  - id: ${reg_type}_${grn_name}_${dataset}
-    metric_ids: $metric_ids
-    method_ids: $method_ids
+  - id: ${grn_name}_${dataset}_${imputation}
+    metric_ids: ${metric_ids}
     rna: ${files_dir}/inference_data/${dataset}_rna.h5ad
     evaluation_data: ${files_dir}/evaluation_data/${dataset}_bulk.h5ad
     tf_all: ${files_dir}/prior/tf_all.csv
     regulators_consensus: ${files_dir}/prior/regulators_consensus_${dataset}.json
-    layer: 'X_norm'
+    imputation: ${imputation}
     num_workers: $num_workers
 
 HERE
+
+  # Additional fields for specific datasets
   if [[ "$dataset" == "norman" || "$dataset" == "adamson" || "$dataset" == "replogle" ]]; then
     cat >> "$param_local" << HERE
     evaluation_data_sc: ${files_dir}/evaluation_data/${dataset}_sc.h5ad
@@ -95,17 +74,19 @@ HERE
     ws_distance_background: ${files_dir}/prior/ws_distance_background_${dataset}.csv
 HERE
   fi
-  if [[ "$dataset" == "op" ]]; then
-    cat >> "$param_local" << HERE
-    atac: ${files_dir}/inference_data/${dataset}_atac.h5ad
-HERE
-  fi
 }
 
 # Iterate over datasets and GRN models
-for dataset in $dataset_ids; do
-  append_entry "$dataset"
+for dataset in $datasets; do
+  for grn_name in "${grn_names[@]}"; do
+    for imputation in "${imputation_types[@]}"; do
+      if [[ -f "${grn_models_folder_local}/${dataset}/${grn_name}.h5ad" ]]; then
+        append_entry "$grn_name" "$dataset" "$imputation"
+      fi
+    done
+  done
 done
+
 
 # Append final fields
 if [ "$run_local" = true ]; then
@@ -114,13 +95,13 @@ output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
   viash ns build --parallel 
+  echo "Parameter file created: $param_local"
   nextflow run . \
-    -main-script  target/nextflow/workflows/run_benchmark/main.nf \
+    -main-script  target/nextflow/workflows/run_imputation_analysis/main.nf \
     -profile docker \
     -with-trace \
     -c common/nextflow_helpers/labels_ci.config \
     -params-file ${param_local}
-  
 else
   cat >> "$param_file" << HERE
 output_state: "state.yaml"
@@ -134,11 +115,10 @@ HERE
   tw launch https://github.com/openproblems-bio/task_grn_inference \
     --revision build/main \
     --pull-latest \
-    --main-script target/nextflow/workflows/run_benchmark/main.nf \
+    --main-script target/nextflow/workflows/run_imputation_analysis/main.nf \
     --workspace 53907369739130 \
     --compute-env 7gRyww9YNGb0c6BUBtLhDP \
     --params-file ${param_file} \
     --config common/nextflow_helpers/labels_tw.config \
     --labels ${label}
-fi
-
+fi 

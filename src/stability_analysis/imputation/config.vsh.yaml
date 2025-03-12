@@ -1,31 +1,29 @@
 
-name: permute_grn
+name: impute_rna
 namespace: "stability_analysis"
 info:
-  label: GRN permutation
-  summary: Permutation analysis for GRN stability
+  label: Imputation scRNA
+  summary: Imputation analysis of scRNA
   description: |
-    We add different intensities of permutation to the GRN to test the sensitivity of the evaluation metrics. 
-    The permutations are applied to TF-gene link, direction, sign, and weight.
+    We impute the missing values in scRNA data to test the sensitivity of the evaluation metrics.
 
 arguments:
-  - name: --prediction
+  - name: --rna
     type: file
     direction: input
     required: true
-    example: resources_test/grn_models/op/collectri.h5ad
-  - name: --prediction_n
+    example: resources_test/grn_benchmark/inference_data/op_rna.h5ad
+  - name: --rna_imputed
     type: file
     direction: output 
-  - name: --degree
-    type: integer
-    direction: input
-    default: 20
-    description: the degree of noise to add 
-  - name: --noise_type
+  - name: --imputation
     type: string
-    direction: input 
-    default: net
+    direction: input
+    default: knn
+  - name: --layer
+    type: string
+    direction: input
+    default: X_norm
 
 resources:
   - type: python_script
@@ -37,7 +35,7 @@ engines:
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages: []
+        packages: [magic-impute, numpy==1.23.5]
 runners:
   - type: executable
   - type: nextflow

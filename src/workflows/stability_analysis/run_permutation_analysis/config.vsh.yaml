@@ -1,76 +1,48 @@
 
-
-name: run_grn_evaluation
+name: run_permutation_analysis
 namespace: "workflows"
 info:
-  label: run_grn_evaluation
-  summary: "Evaluates GRNs and provides scores using regression analysis."
-
+  label: Permutation analysis
+  summary: "Permutes GRNs and evaluates the scores"
 argument_groups:
   - name: Inputs
     arguments:
       - name: --evaluation_data
         type: file
-        required: true
         direction: input
       - name: --prediction
         type: file
-        required: true
-        direction: input
-      - name: --tf_all
-        type: file
         direction: input
         required: true
-        example: resources_test/grn_benchmark/prior/tf_all.csv
       - name: --reg_type
         type: string
         direction: input
         default: ridge
-        description: name of regretion to use
-        multiple: false
-      - name: --subsample
-        type: integer
-        direction: input
-        default: -1
-        description: number of samples randomly drawn from perturbation data
       - name: --num_workers
         type: integer
         direction: input
-        default: 4
-      - name: --apply_tf
-        type: boolean 
-        required: false
-        default: true
-      - name: --apply_skeleton
-        type: boolean 
-        required: false
-        default: false
-      - name: --skeleton
-        type: file 
-        required: false
+        required: True
       - name: --regulators_consensus
         type: file
         direction: input
         must_exist: false
         required: true
         example: resources_test/grn_benchmark/prior/regulators_consensus_norman.json
-      - name: --ws_consensus
-        type: file
-        direction: input
-        must_exist: false
+      - name: --degree
+        type: integer
         required: false
-        example: resources_test/grn_benchmark/prior/ws_consensus_norman.csv 
-      - name: --ws_distance_background
-        type: file
         direction: input
-        must_exist: false
+        default: 20
+      - name: --noise_type
+        type: string
         required: false
-        example: resources_test/grn_benchmark/prior/ws_distance_background_norman.csv
-      - name: --evaluation_data_sc
+        direction: input
+        default: weight
+      - name: --tf_all
         type: file
         required: false
         direction: input
-        example: 'resources_test/datasets_raw/adamson_sc_counts.h5ad'
+      
       
   - name: Outputs
     arguments:
@@ -84,7 +56,6 @@ argument_groups:
         required: true
         direction: output
         default: metric_configs.yaml
-
   - name: Arguments
     arguments: 
       - name: "--metric_ids"
@@ -93,16 +64,17 @@ argument_groups:
         description: A list of metric ids to run. If not specified, all metric will be run.
   
 
+  
 resources:
   - type: nextflow_script
     path: main.nf
     entrypoint: run_wf
 
-
 dependencies:
-  - name: metrics/regression_2 
   - name: metrics/regression_1
+  - name: metrics/regression_2
   - name: metrics/ws_distance
+  - name: stability_analysis/permute_grn
   - name: utils/extract_uns_metadata
     repository: openproblems
 
