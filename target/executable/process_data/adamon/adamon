@@ -449,9 +449,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component process_data adamon"
-LABEL org.opencontainers.image.created="2025-03-04T18:37:22Z"
+LABEL org.opencontainers.image.created="2025-03-12T12:46:22Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="1ef9e7bf77c699c2888156dcb76d63a0ab1aaf60"
+LABEL org.opencontainers.image.revision="ea55270258c3b9282bdb3f4ffbe4ce83884006f5"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1219,7 +1219,7 @@ from util import sum_by
 def add_metadata(adata):
     adata.uns['dataset_summary'] = 'Single cell RNA-seq data with 82 perturbations (KD) on K562 cells.'
     adata.uns['dataset_description'] = 'Functional genomics efforts face tradeoffs between number of perturbations examined and complexity of phenotypes measured. We bridge this gap with Perturb-seq, which combines droplet-based single-cell RNA-seq with a strategy for barcoding CRISPR-mediated perturbations, allowing many perturbations to be profiled in pooled format. We applied Perturb-seq to dissect the mammalian unfolded protein response (UPR) using single and combinatorial CRISPR perturbations. Two genome-scale CRISPR interference (CRISPRi) screens identified genes whose repression perturbs ER homeostasis. Subjecting ∼100 hits to Perturb-seq enabled high-precision functional clustering of genes. Single-cell analyses decoupled the three UPR branches, revealed bifurcated UPR branch activation among cells subject to the same perturbation, and uncovered differential activation of the branches across hits, including an isolated feedback loop between the translocon and IRE1α. These studies provide insight into how the three sensors of ER homeostasis monitor distinct types of stress and highlight the ability of Perturb-seq to dissect complex cellular responses.'
-    adata.uns['data_reference'] = "@article{adamson2016multiplexed,\\n\\ttitle={A multiplexed single-cell CRISPR screening platform enables systematic dissection of the unfolded protein response},\\n\\tauthor={Adamson, Britt and Norman, Thomas M and Jost, Marco and Cho, Min Y and Nu{\\~n}ez, James K and Chen, Yuwen and Villalta, Jacqueline E and Gilbert, Luke A and Horlbeck, Max A and Hein, Marco Y and others},\\n\\tjournal={Cell},\\n\\tvolume={167},\\n\\tnumber={7},\\n\\tpages={1867--1882},\\n\\tyear={2016},\\n\\tpublisher={Elsevier}}"
+    adata.uns['data_reference'] = "@article{adamson2016multiplexed,\\n\\ttitle={A multiplexed single-cell CRISPR screening platform enables systematic dissection of the unfolded protein response},\\n\\tauthor={Adamson, Britt and Norman, Thomas M and Jost, Marco and Cho, Min Y and Nuez, James K and Chen, Yuwen and Villalta, Jacqueline E and Gilbert, Luke A and Horlbeck, Max A and Hein, Marco Y and others},\\n\\tjournal={Cell},\\n\\tvolume={167},\\n\\tnumber={7},\\n\\tpages={1867--1882},\\n\\tyear={2016},\\n\\tpublisher={Elsevier}}"
     adata.uns['data_url'] = 'https://pubmed.ncbi.nlm.nih.gov/27984733/'
     adata.uns['dataset_id'] = 'adamson'
     adata.uns['dataset_name'] = 'Adamson'

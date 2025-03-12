@@ -3313,19 +3313,6 @@ meta = [
         },
         {
           "type" : "file",
-          "name" : "--cell_topic",
-          "example" : [
-            "resources_test/grn_benchmark/prior/cell_topic.csv"
-          ],
-          "must_exist" : true,
-          "create_parent" : true,
-          "required" : true,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
           "name" : "--peak_gene",
           "must_exist" : true,
           "create_parent" : true,
@@ -3467,6 +3454,14 @@ meta = [
             "openproblems-bio/core#subdirectory=packages/python/openproblems"
           ],
           "upgrade" : true
+        },
+        {
+          "type" : "r",
+          "bioc" : [
+            "aws.s3"
+          ],
+          "bioc_force_install" : false,
+          "warnings_as_errors" : true
         }
       ]
     },
@@ -3481,7 +3476,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/figr",
     "viash_version" : "0.9.1",
-    "git_commit" : "1ef9e7bf77c699c2888156dcb76d63a0ab1aaf60",
+    "git_commit" : "ea55270258c3b9282bdb3f4ffbe4ce83884006f5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3596,6 +3591,11 @@ library(anndata)
 library(FigR)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(SummarizedExperiment)
+library(aws.s3)
+
+Sys.setenv("AWS_ACCESS_KEY_ID" = "",
+           "AWS_SECRET_ACCESS_KEY" = "",
+           "AWS_DEFAULT_REGION" = "us-west-2")  # Update to the correct region
 # library(Seurat)
 # install.packages("bspm", repos="https://cran.r-project.org") #TOOD: check this
 
@@ -3615,7 +3615,6 @@ par <- list(
   "layer" = $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_LAYER" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "dataset_id" = $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_DATASET_ID" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "cell_topic" = $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_CELL_TOPIC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "peak_gene" = $( if [ ! -z ${VIASH_PAR_PEAK_GENE+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PEAK_GENE" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "n_topics" = $( if [ ! -z ${VIASH_PAR_N_TOPICS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_N_TOPICS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi )
 )
@@ -3650,6 +3649,17 @@ rm(.viash_orig_warn)
 
 ## VIASH END
 dir.create(par\\$temp_dir, recursive = TRUE, showWarnings = TRUE)
+
+# - download cell_topic
+s3_path <- "s3://openproblems-data/resources/grn/grn_benchmark/prior/cell_topic.csv"
+par\\$cell_topic <-paste0(par\\$temp_dir, "cell_topic.csv")
+
+# Download the file
+save_object(object = s3_path, 
+            bucket = "openproblems-data",
+            file = par\\$cell_topic,
+            use_https = TRUE, 
+            check_region = FALSE)
 
 # ---------------- create summary experiment for rna 
 adata <- anndata::read_h5ad(par\\$rna)

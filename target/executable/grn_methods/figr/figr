@@ -453,10 +453,13 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata~=0.10.0" "scanpy~=1.10.0" "pyyaml" "requests" "jsonschema" && \
   pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
 
+RUN Rscript -e 'options(warn = 2); if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")' && \
+  Rscript -e 'options(warn = 2); if (!requireNamespace("aws.s3", quietly = TRUE)) BiocManager::install("aws.s3")'
+
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods figr"
-LABEL org.opencontainers.image.created="2025-03-04T18:37:22Z"
+LABEL org.opencontainers.image.created="2025-03-12T12:46:24Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="1ef9e7bf77c699c2888156dcb76d63a0ab1aaf60"
+LABEL org.opencontainers.image.revision="ea55270258c3b9282bdb3f4ffbe4ce83884006f5"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -617,10 +620,6 @@ function ViashHelp {
   echo "    --dataset_id"
   echo "        type: string"
   echo "        default: op"
-  echo ""
-  echo "    --cell_topic"
-  echo "        type: file, required parameter, file must exist"
-  echo "        example: resources_test/grn_benchmark/prior/cell_topic.csv"
   echo ""
   echo "    --peak_gene"
   echo "        type: file, output, file must exist"
@@ -787,17 +786,6 @@ while [[ $# -gt 0 ]]; do
         --dataset_id=*)
             [ -n "$VIASH_PAR_DATASET_ID" ] && ViashError Bad arguments for option \'--dataset_id=*\': \'$VIASH_PAR_DATASET_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_DATASET_ID=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --cell_topic)
-            [ -n "$VIASH_PAR_CELL_TOPIC" ] && ViashError Bad arguments for option \'--cell_topic\': \'$VIASH_PAR_CELL_TOPIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CELL_TOPIC="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --cell_topic. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --cell_topic=*)
-            [ -n "$VIASH_PAR_CELL_TOPIC" ] && ViashError Bad arguments for option \'--cell_topic=*\': \'$VIASH_PAR_CELL_TOPIC\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_CELL_TOPIC=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --peak_gene)
@@ -1002,10 +990,6 @@ if [ -z ${VIASH_PAR_TF_ALL+x} ]; then
   ViashError '--tf_all' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
 fi
-if [ -z ${VIASH_PAR_CELL_TOPIC+x} ]; then
-  ViashError '--cell_topic' is a required argument. Use "--help" to get more information on the parameters.
-  exit 1
-fi
 if [ -z ${VIASH_META_NAME+x} ]; then
   ViashError 'name' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
@@ -1065,10 +1049,6 @@ if [ ! -z "$VIASH_PAR_ATAC" ] && [ ! -e "$VIASH_PAR_ATAC" ]; then
 fi
 if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
   ViashError "Input file '$VIASH_PAR_TF_ALL' does not exist."
-  exit 1
-fi
-if [ ! -z "$VIASH_PAR_CELL_TOPIC" ] && [ ! -e "$VIASH_PAR_CELL_TOPIC" ]; then
-  ViashError "Input file '$VIASH_PAR_CELL_TOPIC' does not exist."
   exit 1
 fi
 
@@ -1207,10 +1187,6 @@ if [ ! -z "$VIASH_PAR_TF_ALL" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_TF_ALL")" )
   VIASH_PAR_TF_ALL=$(ViashDockerAutodetectMount "$VIASH_PAR_TF_ALL")
 fi
-if [ ! -z "$VIASH_PAR_CELL_TOPIC" ]; then
-  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_CELL_TOPIC")" )
-  VIASH_PAR_CELL_TOPIC=$(ViashDockerAutodetectMount "$VIASH_PAR_CELL_TOPIC")
-fi
 if [ ! -z "$VIASH_PAR_PEAK_GENE" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_PEAK_GENE")" )
   VIASH_PAR_PEAK_GENE=$(ViashDockerAutodetectMount "$VIASH_PAR_PEAK_GENE")
@@ -1291,6 +1267,11 @@ library(anndata)
 library(FigR)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(SummarizedExperiment)
+library(aws.s3)
+
+Sys.setenv("AWS_ACCESS_KEY_ID" = "",
+           "AWS_SECRET_ACCESS_KEY" = "",
+           "AWS_DEFAULT_REGION" = "us-west-2")  # Update to the correct region
 # library(Seurat)
 # install.packages("bspm", repos="https://cran.r-project.org") #TOOD: check this
 
@@ -1310,7 +1291,6 @@ par <- list(
   "layer" = $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_LAYER" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi ),
   "dataset_id" = $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_DATASET_ID" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "cell_topic" = $( if [ ! -z ${VIASH_PAR_CELL_TOPIC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_CELL_TOPIC" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "peak_gene" = $( if [ ! -z ${VIASH_PAR_PEAK_GENE+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PEAK_GENE" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "n_topics" = $( if [ ! -z ${VIASH_PAR_N_TOPICS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_N_TOPICS" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi )
 )
@@ -1345,6 +1325,17 @@ rm(.viash_orig_warn)
 
 ## VIASH END
 dir.create(par\$temp_dir, recursive = TRUE, showWarnings = TRUE)
+
+# - download cell_topic
+s3_path <- "s3://openproblems-data/resources/grn/grn_benchmark/prior/cell_topic.csv"
+par\$cell_topic <-paste0(par\$temp_dir, "cell_topic.csv")
+
+# Download the file
+save_object(object = s3_path, 
+            bucket = "openproblems-data",
+            file = par\$cell_topic,
+            use_https = TRUE, 
+            check_region = FALSE)
 
 # ---------------- create summary experiment for rna 
 adata <- anndata::read_h5ad(par\$rna)
@@ -1595,9 +1586,6 @@ if [[ "$VIASH_ENGINE_TYPE" == "docker" ]]; then
   fi
   if [ ! -z "$VIASH_PAR_TF_ALL" ]; then
     VIASH_PAR_TF_ALL=$(ViashDockerStripAutomount "$VIASH_PAR_TF_ALL")
-  fi
-  if [ ! -z "$VIASH_PAR_CELL_TOPIC" ]; then
-    VIASH_PAR_CELL_TOPIC=$(ViashDockerStripAutomount "$VIASH_PAR_CELL_TOPIC")
   fi
   if [ ! -z "$VIASH_PAR_PEAK_GENE" ]; then
     VIASH_PAR_PEAK_GENE=$(ViashDockerStripAutomount "$VIASH_PAR_PEAK_GENE")

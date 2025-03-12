@@ -202,6 +202,29 @@ def read_gmt(file_path:str) -> dict[str, list[str]]:
                 'genes': genes
             }
     return gene_sets
+
+def read_gene_annotation(annotation_file):
+    '''
+        Read the gene annotation file and extract TSS
+    '''
+
+    gtf_columns = ["chromosome", "source", "feature", "start", "end", "score", "strand", "frame", "attributes"]
+    gtf_df = pd.read_csv(
+        annotation_file, 
+        sep="\t", comment="#", names=gtf_columns, low_memory=False
+    )
+
+    gtf_df["gene_name"] = gtf_df["attributes"].str.extract(r'gene_name "([^"]+)"')
+
+    # Keep only gene-level annotations
+    annotation_df = gtf_df[gtf_df["feature"] == "gene"][["chromosome", "start", "end", "strand", "gene_name"]]
+
+    # Compute TSS
+    annotation_df["TSS"] = annotation_df.apply(lambda x: x["start"] if x["strand"] == "+" else x["end"], axis=1)
+
+    return annotation_df[["chromosome", "start", "end", "TSS", "strand", "gene_name"]]
+
+
 def sum_by(adata: ad.AnnData, col: str, unique_mapping: bool=True) -> ad.AnnData:
     """
     Adapted from this forum post: 

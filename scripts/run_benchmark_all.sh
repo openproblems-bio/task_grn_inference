@@ -38,7 +38,6 @@ method_ids="[pearson_corr,
 
             scenicplus, 
             scglue,
-            figr,
             celloracle
             ]"
 

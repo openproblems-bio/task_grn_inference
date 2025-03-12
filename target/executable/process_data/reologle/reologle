@@ -449,9 +449,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component process_data reologle"
-LABEL org.opencontainers.image.created="2025-03-04T18:37:22Z"
+LABEL org.opencontainers.image.created="2025-03-12T12:46:23Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="1ef9e7bf77c699c2888156dcb76d63a0ab1aaf60"
+LABEL org.opencontainers.image.revision="ea55270258c3b9282bdb3f4ffbe4ce83884006f5"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1178,7 +1178,7 @@ except:
 from util import sum_by
 
 def add_metadata(adata):
-    adata.uns['dataset_summary'] = 'Single cell RNA-seq data with 231 perturbations (activation) on K562 cells.'
+    adata.uns['dataset_summary'] = 'Single cell RNA-seq data with 9722 perturbations (KO) on K562 cells.'
     adata.uns['dataset_description'] = 'A central goal of genetics is to define the relationships between genotypes and phenotypes. High-content phenotypic screens such as Perturb-seq (CRISPR-based screens with single-cell RNA-sequencing readouts) enable massively parallel functional genomic mapping but, to date, have been used at limited scales. Here, we perform genome-scale Perturb-seq targeting all expressed genes with CRISPR interference (CRISPRi) across >2.5 million human cells. We use transcriptional phenotypes to predict the function of poorly characterized genes, uncovering new regulators of ribosome biogenesis (including CCDC86, ZNF236, and SPATA5L1), transcription (C7orf26), and mitochondrial respiration (TMEM242). In addition to assigning gene function, single-cell transcriptional phenotypes allow for in-depth dissection of complex cellular phenomena-from RNA processing to differentiation. We leverage this ability to systematically identify genetic drivers and consequences of aneuploidy and to discover an unanticipated layer of stress-specific regulation of the mitochondrial genome. Our information-rich genotype-phenotype map reveals a multidimensional portrait of gene and cellular function.'
     adata.uns['data_reference'] = "@article{replogle2022mapping,\\n\\ttitle={Mapping information-rich genotype-phenotype landscapes with genome-scale Perturb-seq}, \\n\\tauthor={Replogle, Joseph M and Saunders, Reuben A and Pogson, Angela N and Hussmann, Jeffrey A and Lenail, Alexander and Guna, Alina and Mascibroda, Lauren and Wagner, Eric J and Adelman, Karen and Lithwick-Yanai, Gila and others},\\n\\tjournal={Cell},  \\n\\tvolume={185}, \\n\\tnumber={14},\\n\\tpages={2559--2575},\\n\\tyear={2022},\\n\\tpublisher={Elsevier}\\n\\t}"
     adata.uns['data_url'] = 'https://pubmed.ncbi.nlm.nih.gov/35688146/'

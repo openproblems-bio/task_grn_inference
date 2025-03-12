@@ -1,41 +1,50 @@
-functionality:
-  name: noise_grn
-  namespace: "robustness_analysis"
-  info:
-    label: noise_grn
-    summary: Adds noise to the GRNs
-  arguments:
-    - name: --prediction
-      type: file
-      direction: input
-      example: resources_test/grn_models/op/collectri.csv
 
-    - name: --prediction_n
-      type: file
-      direction: output 
+name: permute_grn
+namespace: "stability_analysis"
+info:
+  label: GRN permutation
+  summary: Permutation analysis for GRN stability
+  description: |
+    We add different intensities of permutation to the GRN to test the sensitivity of the evaluation metrics. 
+    The permutations are applied to TF-gene link, direction, sign, and weight.
 
-    - name: --degree
-      type: integer
-      direction: input
-      default: 20
-      description: the degree of noise to add 
+arguments:
+  - name: --prediction
+    type: file
+    direction: input
+    required: true
+    example: resources_test/grn_models/op/collectri.h5ad
+  - name: --prediction_n
+    type: file
+    direction: output 
+  - name: --degree
+    type: integer
+    direction: input
+    default: 20
+    description: the degree of noise to add 
+  - name: --noise_type
+    type: string
+    direction: input 
+    default: net
 
-    - name: --noise_type
-      type: string
-      direction: input 
-      default: links
-      # options: links, weight
+resources:
+  - type: python_script
+    path: script.py
 
-
-  resources:
-    - type: python_script
-      path: script.py
-platforms:
+engines:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4
+    __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
         packages: []
+runners:
+  - type: executable
   - type: nextflow
     directives:
-      label: [ midtime, highmem, highcpu ]
+      label: [ midtime, midmem, midcpu ]
+test_resources:
+  - type: python_script
+    path: /common/component_tests/run_and_check_output.py
+  - path: /resources_test/
+    dest: resources_test/

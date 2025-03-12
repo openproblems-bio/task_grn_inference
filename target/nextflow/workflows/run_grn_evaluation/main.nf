@@ -3064,14 +3064,6 @@ meta = [
           "multiple_sep" : ";"
         },
         {
-          "type" : "string",
-          "name" : "--layer",
-          "required" : true,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
           "type" : "file",
           "name" : "--tf_all",
           "example" : [
@@ -3160,29 +3152,6 @@ meta = [
           "must_exist" : false,
           "create_parent" : true,
           "required" : true,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "boolean",
-          "name" : "--static_only",
-          "default" : [
-            true
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "boolean",
-          "name" : "--binarize",
-          "description" : "whether to binarize the weight",
-          "default" : [
-            true
-          ],
-          "required" : false,
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
@@ -3380,7 +3349,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.1",
-    "git_commit" : "1ef9e7bf77c699c2888156dcb76d63a0ab1aaf60",
+    "git_commit" : "ea55270258c3b9282bdb3f4ffbe4ce83884006f5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3515,6 +3484,7 @@ workflow run_wf {
     | map{ id, state ->
         [id, state + ["_meta": [join_id: id]]]
       }
+    
 
     // run all metrics
     | runEach(
@@ -3539,7 +3509,6 @@ workflow run_wf {
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",
-        layer: "layer",
         tf_all: "tf_all"
       ],
       // use 'toState' to publish that component's outputs to the overall state

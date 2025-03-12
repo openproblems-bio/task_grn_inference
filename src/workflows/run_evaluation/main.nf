@@ -26,6 +26,7 @@ workflow run_wf {
     | map{ id, state ->
         [id, state + ["_meta": [join_id: id]]]
       }
+    
 
     // run all metrics
     | runEach(
@@ -50,7 +51,6 @@ workflow run_wf {
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",
-        layer: "layer",
         tf_all: "tf_all"
       ],
       // use 'toState' to publish that component's outputs to the overall state
