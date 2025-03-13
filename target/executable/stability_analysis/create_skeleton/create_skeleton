@@ -448,9 +448,9 @@ ENTRYPOINT []
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component stability_analysis create_skeleton"
-LABEL org.opencontainers.image.created="2025-03-13T09:52:49Z"
+LABEL org.opencontainers.image.created="2025-03-13T12:40:15Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="9ea89d7f227b5afeff005b04221212e30b3a15bd"
+LABEL org.opencontainers.image.revision="c22c290b84c4a05f5e0aaf95d5e831ea098c19b5"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
