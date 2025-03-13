@@ -12,6 +12,7 @@ from ast import literal_eval
 import requests
 import torch
 
+## VIASH START
 par = {
         'atac': f"resources/grn_benchmark/inference_data/op_atac.h5ad",
         'rna': f"resources/grn_benchmark/inference_data/op_rna.h5ad",
@@ -19,9 +20,11 @@ par = {
         'temp_dir': 'output/skeleton',
         'extend_range': 150000,
         'flank_length': 1000,
-        'skeleton': 'output/skeleton/skeleton.csv'
+        'skeleton': 'resources/grn_benchmark/prior/skeleton.csv',
+        'motif_dataset_encode': 'resources/supp_data/databases/scglue/ENCODE-TF-ChIP-hg38.bed.gz',
+        'motif_dataset_jaspar': 'resources/supp_data/databases/scglue/JASPAR2022-hg38.bed.gz'
     }
-
+## VIASH END
 def preprocess(par):
     print('Reading input files', flush=True)
     rna = ad.read_h5ad(par['rna'])
@@ -155,7 +158,7 @@ if __name__ == '__main__':
 
     print('------- promotor based skeleton for different motif files ---------')
     names = ['encode', 'jaspar']
-    motif_files = ['output/db/ENCODE-TF-ChIP-hg38.bed.gz', 'output/db/JASPAR2022-hg38.bed.gz']
+    motif_files = [par['motif_dataset_jaspar'], par['motif_dataset_encode']]
     if True:
         for i, motif_file in enumerate(motif_files):
             par['skeleton_promotor_file'] = f"{par['temp_dir']}/skeleton_{names[i]}_promotor.csv"
@@ -200,7 +203,7 @@ if __name__ == '__main__':
         # - merge and save 
         skeleton = pd.concat([skeleton_promotor, skeleton_peak], axis=0).drop_duplicates()
         print(len(skeleton), skeleton.source.nunique(), skeleton.target.nunique())
-        skeleton.to_csv(f"{par['temp_dir']}/skeleton.csv")
+        skeleton.to_csv(par['skeleton'])
     
 
 

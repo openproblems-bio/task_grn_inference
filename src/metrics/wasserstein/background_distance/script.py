@@ -6,15 +6,6 @@ import numpy as np
 import multiprocessing as mp
 import os
 
-# Configuration parameters
-par = {
-    'evaluation_data_sc': 'resources/grn_benchmark/evaluation_data/replogle_sc.h5ad',
-    'background_distance': 'resources/grn_benchmark/prior/ws_distance_background_replogle.csv',
-    'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
-    'layer': 'X_norm',
-    'max_workers': 100
-}
-
 # Shared memory path for NumPy array
 shared_mem_path = "/tmp/adata_X.npy"
 
@@ -70,7 +61,14 @@ def process_tf(tf, adata_shape, gene_names, obs_perturbation, progress):
     net_all = pd.DataFrame({'source': tf, 'target': gene_names})
     return calculate_ws_distance(net_all, adata_shape, gene_names, obs_perturbation, progress)
 
-def main(par):
+def main(dataset):
+    par = {
+        'evaluation_data_sc': f'resources/grn_benchmark/evaluation_data/{dataset}_sc.h5ad',
+        'background_distance': f'resources/grn_benchmark/prior/ws_distance_background_{dataset}.csv',
+        'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
+        'layer': 'X_norm',
+        'max_workers': 100
+    }
     # Load AnnData once and store in shared memory
     adata = load_adata(par)
 
@@ -113,4 +111,5 @@ def main(par):
     os.remove(shared_mem_path)
 
 if __name__ == '__main__':
-    main(par)
+    for dataset in ['norman', 'adamson', 'replogle']:
+        main(dataset)

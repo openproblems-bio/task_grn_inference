@@ -4,15 +4,15 @@ from tqdm import tqdm
 import numpy as np
 import os
 
-# - determine consensus 
-par = {
-    'evaluation_data_sc': f'resources/grn_benchmark/evaluation_data/replogle_bulk.h5ad',
-    'ws_consensus': 'resources/grn_benchmark/prior/ws_consensus_replogle.csv',
-    'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
-    'models_dir': 'resources/grn_models/replogle',
-    'models': ['pearson_corr', 'grnboost2', 'portia', 'ppcor', 'scenic', 'scprint']
-}
-def main(par):
+def main(dataset):
+    print(f'--- Dataset {dataset}')
+    par = {
+        'evaluation_data_sc': f'resources/grn_benchmark/evaluation_data/{dataset}_bulk.h5ad',
+        'ws_consensus': f'resources/grn_benchmark/prior/ws_consensus_{dataset}.csv',
+        'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
+        'models_dir': f'resources/grn_models/{dataset}',
+        'models': ['pearson_corr', 'grnboost2', 'portia', 'ppcor', 'scenic', 'scprint']
+    }
 
     adata = ad.read_h5ad(par['evaluation_data_sc'])
     tf_all = np.loadtxt(par['tf_all'], dtype='str')
@@ -23,7 +23,7 @@ def main(par):
     for model in par['models']:
         prediction_file = f"{par['models_dir']}/{model}.h5ad"
         if not os.path.exists(prediction_file):
-            print(prediction_file, ' doesnt exists')
+            print('Warnings: ', prediction_file, ' doesnt exists')
             continue
         else:
             grn = ad.read_h5ad(prediction_file)
@@ -54,4 +54,5 @@ def main(par):
     return consensus
 
 if __name__ == '__main__':
-    main(par)
+    for dataset in ['replogle', 'norman', 'adamson']:
+        main(dataset)

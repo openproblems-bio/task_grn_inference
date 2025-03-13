@@ -1,35 +1,20 @@
 #!/bin/bash
-run_local=false
-num_workers=20
-metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
 
-RUN_ID="test_sub"
-resources_folder='resources_test'
-
+test=true
+RUN_ID="test_run"
+# - settings
+run_local=true
 reg_type="ridge"
-label=${RUN_ID}
-
-
-dataset_ids=" op adamson "
-# method_ids="[pearson_corr,
-#             negative_control, 
-#             positive_control, 
-
-#             portia, 
-#             ppcor, 
-#             scenic, 
-#             scprint, 
-#             grnboost2,
-
-#             scenicplus, 
-#             scglue,
-#             granie,
-#             figr,
-#             celloracle]"
-
+num_workers=20
+apply_tf_methods=True
+apply_skeleton=False
+# - specify inputs
+dataset_ids=" op adamson norman replogle nakatake" 
+metric_ids="[regression_1, regression_2, ws_distance]" 
 method_ids="[pearson_corr,
             negative_control, 
-            positive_control,
+            positive_control, 
+
             portia, 
             ppcor, 
             scenic, 
@@ -38,10 +23,18 @@ method_ids="[pearson_corr,
 
             scenicplus, 
             scglue,
-            celloracle
-            ]"
-
-
+            granie,
+            figr,
+            celloracle]"
+if [ "$test" = true ]; then
+  method_ids="[pearson_corr]"
+  dataset_ids="op"
+  RUN_ID="test_run"
+  resources_folder='resources_test'
+else
+  resources_folder='resources'
+fi
+label=${RUN_ID}
 echo "Run ID: $RUN_ID"
 
 resources_dir="s3://openproblems-data/${resources_folder}/grn"
@@ -86,6 +79,11 @@ append_entry() {
     regulators_consensus: ${files_dir}/prior/regulators_consensus_${dataset}.json
     layer: 'X_norm'
     num_workers: $num_workers
+    apply_tf_methods: $apply_tf_methods
+    apply_skeleton: $apply_skeleton
+    skeleton: ${files_dir}/prior/skeleton.csv
+    reg_type: $reg_type
+
 
 HERE
   if [[ "$dataset" == "norman" || "$dataset" == "adamson" || "$dataset" == "replogle" ]]; then
@@ -102,7 +100,7 @@ HERE
   fi
 }
 
-# Iterate over datasets and GRN models
+# Iterate over datasets 
 for dataset in $dataset_ids; do
   append_entry "$dataset"
 done

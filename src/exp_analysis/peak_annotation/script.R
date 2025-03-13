@@ -11,14 +11,14 @@ library(tibble)
 
 ## VIASH START
 par <- list(
-  multiomics_atac = "resources/grn_benchmark/inference_data/op_atac.h5ad",
-  annot_peak_database = "resources/grn_benchmark/prior/peak_annotation.csv"
+  atac = "resources/grn_benchmark/inference_data/op_atac.h5ad",
+  annot_peak_database = "resources/grn_benchmark/prior/op/peak_annotation.csv"
 )
 ## VIASH END
 
 print(par)
 
-adata_atac <- read_h5ad(par$multiomics_atac)
+adata_atac <- read_h5ad(par$atac)
 
 format_peak <- function(peaks) {
   formatted_peaks <- vector("character", length(peaks))
