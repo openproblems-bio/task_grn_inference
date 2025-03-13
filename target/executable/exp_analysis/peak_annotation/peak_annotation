@@ -450,9 +450,9 @@ RUN Rscript -e 'options(warn = 2); if (!requireNamespace("BiocManager", quietly 
   Rscript -e 'options(warn = 2); if (!requireNamespace("BiocGenerics", quietly = TRUE)) BiocManager::install("BiocGenerics")'
 
 LABEL org.opencontainers.image.description="Companion container for running component exp_analysis peak_annotation"
-LABEL org.opencontainers.image.created="2025-03-12T12:46:24Z"
+LABEL org.opencontainers.image.created="2025-03-13T09:52:49Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="ea55270258c3b9282bdb3f4ffbe4ce83884006f5"
+LABEL org.opencontainers.image.revision="9ea89d7f227b5afeff005b04221212e30b3a15bd"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1083,7 +1083,7 @@ rm(.viash_orig_warn)
 
 print(par)
 
-adata_atac <- read_h5ad(par\$multiomics_atac)
+adata_atac <- read_h5ad(par\$atac)
 
 format_peak <- function(peaks) {
   formatted_peaks <- vector("character", length(peaks))

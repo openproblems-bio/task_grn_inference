@@ -3312,6 +3312,17 @@ meta = [
           "multiple_sep" : ";"
         },
         {
+          "type" : "boolean",
+          "name" : "--apply_tf_methods",
+          "default" : [
+            true
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
           "type" : "string",
           "name" : "--normRNA",
           "description" : "Normalization method for RNA data.",
@@ -3661,7 +3672,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/granie",
     "viash_version" : "0.9.1",
-    "git_commit" : "ea55270258c3b9282bdb3f4ffbe4ce83884006f5",
+    "git_commit" : "9ea89d7f227b5afeff005b04221212e30b3a15bd",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3811,6 +3822,7 @@ par <- list(
   "layer" = $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_LAYER" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "dataset_id" = $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_DATASET_ID" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
+  "apply_tf_methods" = $( if [ ! -z ${VIASH_PAR_APPLY_TF_METHODS+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_APPLY_TF_METHODS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi ),
   "normRNA" = $( if [ ! -z ${VIASH_PAR_NORMRNA+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_NORMRNA" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "normATAC" = $( if [ ! -z ${VIASH_PAR_NORMATAC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_NORMATAC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "LSI_featureCutoff" = $( if [ ! -z ${VIASH_PAR_LSI_FEATURECUTOFF+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_LSI_FEATURECUTOFF" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),

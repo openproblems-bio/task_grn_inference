@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenic"
-LABEL org.opencontainers.image.created="2025-03-12T12:46:24Z"
+LABEL org.opencontainers.image.created="2025-03-13T09:52:48Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="ea55270258c3b9282bdb3f4ffbe4ce83884006f5"
+LABEL org.opencontainers.image.revision="9ea89d7f227b5afeff005b04221212e30b3a15bd"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -620,6 +620,10 @@ function ViashHelp {
   echo "    --dataset_id"
   echo "        type: string"
   echo "        default: op"
+  echo ""
+  echo "    --apply_tf_methods"
+  echo "        type: boolean"
+  echo "        default: true"
   echo ""
   echo "    --rank_threshold"
   echo "        type: integer"
@@ -791,6 +795,17 @@ while [[ $# -gt 0 ]]; do
         --dataset_id=*)
             [ -n "$VIASH_PAR_DATASET_ID" ] && ViashError Bad arguments for option \'--dataset_id=*\': \'$VIASH_PAR_DATASET_ID\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_DATASET_ID=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --apply_tf_methods)
+            [ -n "$VIASH_PAR_APPLY_TF_METHODS" ] && ViashError Bad arguments for option \'--apply_tf_methods\': \'$VIASH_PAR_APPLY_TF_METHODS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_APPLY_TF_METHODS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --apply_tf_methods. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --apply_tf_methods=*)
+            [ -n "$VIASH_PAR_APPLY_TF_METHODS" ] && ViashError Bad arguments for option \'--apply_tf_methods=*\': \'$VIASH_PAR_APPLY_TF_METHODS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_APPLY_TF_METHODS=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --rank_threshold)
@@ -1050,6 +1065,9 @@ fi
 if [ -z ${VIASH_PAR_DATASET_ID+x} ]; then
   VIASH_PAR_DATASET_ID="op"
 fi
+if [ -z ${VIASH_PAR_APPLY_TF_METHODS+x} ]; then
+  VIASH_PAR_APPLY_TF_METHODS="true"
+fi
 if [ -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then
   VIASH_PAR_RANK_THRESHOLD="5000"
 fi
@@ -1090,6 +1108,12 @@ fi
 if [[ -n "$VIASH_PAR_SEED" ]]; then
   if ! [[ "$VIASH_PAR_SEED" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--seed' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_APPLY_TF_METHODS" ]]; then
+  if ! [[ "$VIASH_PAR_APPLY_TF_METHODS" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--apply_tf_methods' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1316,6 +1340,7 @@ par = {
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'apply_tf_methods': $( if [ ! -z ${VIASH_PAR_APPLY_TF_METHODS+x} ]; then echo "r'${VIASH_PAR_APPLY_TF_METHODS//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'rank_threshold': $( if [ ! -z ${VIASH_PAR_RANK_THRESHOLD+x} ]; then echo "int(r'${VIASH_PAR_RANK_THRESHOLD//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'auc_threshold': $( if [ ! -z ${VIASH_PAR_AUC_THRESHOLD+x} ]; then echo "float(r'${VIASH_PAR_AUC_THRESHOLD//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'nes_threshold': $( if [ ! -z ${VIASH_PAR_NES_THRESHOLD+x} ]; then echo "float(r'${VIASH_PAR_NES_THRESHOLD//\'/\'\"\'\"r\'}')"; else echo None; fi )

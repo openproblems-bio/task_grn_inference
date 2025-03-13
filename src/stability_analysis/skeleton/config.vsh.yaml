@@ -1,0 +1,74 @@
+
+name: create_skeleton
+namespace: "stability_analysis"
+info:
+  label: Create skeleton
+  summary: Create skeleton of putative TF-gene edges based on scATAC-seq data and motif datasets
+
+arguments:
+  - name: --atac
+    __merge__: ../../api/file_atac_h5ad.yaml
+    required: true
+    direction: input 
+  - name: --rna
+    __merge__: ../../api/file_rna_h5ad.yaml
+    required: true
+    direction: input 
+  - name: --annotation_file
+    type: file
+    required: true
+    direction: input 
+  - name: --temp_dir
+    type: string
+    required: true
+    direction: input 
+  - name: --extend_range
+    type: integer
+    required: false
+    direction: input
+    default: 150000
+    description: extending range of promotors to connect to peak
+  - name: --flank_length
+    type: integer
+    required: false
+    direction: input
+    default: 1000
+    description: length of flanking region to consider
+  - name: --skeleton
+    type: file
+    required: true
+    direction: output
+    description: output skeleton file
+  - name: --motif_dataset_encode
+    type: file
+    required: true
+    direction: input
+    description: motif dataset from ENCODE
+  - name: --motif_dataset_jaspar
+    type: file
+    required: true
+    direction: input
+    description: motif dataset from JASPAR
+
+resources:
+  - type: python_script
+    path: script.py
+  - path: /src/utils/util.py
+    dest: util.py
+
+engines:
+  - type: docker
+    image: ghcr.io/openproblems-bio/task_grn_inference/grn_methods/scglue:dev
+    setup:
+      - type: python
+        packages: []
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [ midtime, midmem, midcpu ]
+test_resources:
+  - type: python_script
+    path: /common/component_tests/run_and_check_output.py
+  - path: /resources_test/
+    dest: resources_test/

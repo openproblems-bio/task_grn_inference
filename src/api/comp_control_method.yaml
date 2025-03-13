@@ -50,6 +50,10 @@ arguments:
     direction: input
     required: false
     default: op
+  - name: --apply_tf_methods
+    type: boolean 
+    required: false
+    default: true
 
 
 

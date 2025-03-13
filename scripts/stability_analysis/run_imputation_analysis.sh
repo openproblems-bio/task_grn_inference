@@ -2,8 +2,8 @@
 # datasets="norman replogle op nakatake adamson"
 datasets=" op "
 
-run_local=true
-num_workers=20
+run_local=true  
+num_workers=1
 metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
 RUN_ID="imputation_analysis"
 reg_type="ridge"
@@ -16,9 +16,9 @@ grn_names=(
 
 
 if [ "$run_local" = true ]; then
-  resources_dir="./resources/"
+  resources_dir="./resources_test/"
 else
-  resources_dir="s3://openproblems-data/resources/grn"
+  resources_dir="s3://openproblems-data/resources_test/grn"
 fi
 
 

@@ -2,7 +2,7 @@
 # datasets="norman replogle op nakatake adamson"
 datasets=" op "
 
-run_local=true
+run_local=false
 num_workers=20
 metric_ids="[regression_1, regression_2]" #regression_1, regression_2, ws_distance
 RUN_ID="permutation_analysis"

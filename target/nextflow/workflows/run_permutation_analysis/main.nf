@@ -3287,7 +3287,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_permutation_analysis",
     "viash_version" : "0.9.1",
-    "git_commit" : "ea55270258c3b9282bdb3f4ffbe4ce83884006f5",
+    "git_commit" : "9ea89d7f227b5afeff005b04221212e30b3a15bd",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

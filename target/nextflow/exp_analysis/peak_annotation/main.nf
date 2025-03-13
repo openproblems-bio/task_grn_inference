@@ -3221,7 +3221,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/exp_analysis/peak_annotation",
     "viash_version" : "0.9.1",
-    "git_commit" : "ea55270258c3b9282bdb3f4ffbe4ce83884006f5",
+    "git_commit" : "9ea89d7f227b5afeff005b04221212e30b3a15bd",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3381,7 +3381,7 @@ rm(.viash_orig_warn)
 
 print(par)
 
-adata_atac <- read_h5ad(par\\$multiomics_atac)
+adata_atac <- read_h5ad(par\\$atac)
 
 format_peak <- function(peaks) {
   formatted_peaks <- vector("character", length(peaks))

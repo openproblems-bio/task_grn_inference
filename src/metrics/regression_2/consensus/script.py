@@ -8,15 +8,13 @@ import sys
 import numpy as np
 
 
-## VIASH START
-par = {
-    'evaluation_data': 'resources/grn_benchmark/evaluation_data//replogle_bulk.h5ad',
-    'models_dir': 'resources/grn_models/replogle/',
-    'models': ['pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'scprint'],
-    'regulators_consensus': 'resources/grn_benchmark/prior/regulators_consensus_replogle.json'
-}
-## VIASH END
-def main(par):
+def main(dataset):
+    par = {
+        'evaluation_data': f'resources/grn_benchmark/evaluation_data//{dataset}_bulk.h5ad',
+        'models_dir': f'resources/grn_models/{dataset}/',
+        'models': ['pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'scprint', 'figr', 'celloracle', 'scenic+', 'granie', 'scglue'],
+        'regulators_consensus': f'resources/grn_benchmark/prior/regulators_consensus_{dataset}.json'
+    }
     print(par)
     # Load perturbation data
     adata_rna = anndata.read_h5ad(par['evaluation_data'])
@@ -66,4 +64,6 @@ def main(par):
 
 
 if __name__ == '__main__':
-    main(par)
+    for dataset in ['replogle', 'norman', 'adamson', 'nakatake', 'op']:
+        main(dataset)
+

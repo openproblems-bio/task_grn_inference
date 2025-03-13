@@ -76,11 +76,11 @@ def process_links(net, par):
     net = net[net['source'] != net['target']]
     # - limit the number of links
     if par['max_n_links'] != -1:
-        net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
+        net_sorted = net.reset_index(drop=True).reindex(net['weight'].abs().sort_values(ascending=False).index)
         net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
     return net
 
-def efficient_melting(net, gene_names, tf_all=None, symmetric=False):
+def efficient_melting(net, gene_names, tf_all=None, symmetric=True):
     '''Efficiently converts a network matrix into a DataFrame. If symmetric, only the upper triangle is considered.
     If not symmetric, all nonzero values are considered and rows are treated as source. 
     If tf_all is not None, only the interactions with source as TFs are kept.
@@ -110,11 +110,7 @@ def corr_net(par: dict) -> pd.DataFrame:
     # - read data
     adata = ad.read_h5ad(par["rna"])
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
-    
-    if 'X_norm' in adata.layers.keys():
-        X = adata.layers['X_norm']
-    else:
-        X = adata.X
+    X = adata.layers[par['layer']]
     if hasattr(X, 'todense'):
         X = X.todense().A
     # - remove genes with 0 standard deviation
@@ -124,20 +120,12 @@ def corr_net(par: dict) -> pd.DataFrame:
     gene_names = adata[:, nonzero_std_genes].var_names.to_numpy()
     # - calculate correlation
     net = np.corrcoef(X.T)
-  
     # - melt the matrix
-    tf_all = np.intersect1d(tf_all, gene_names)
-    # net = pd.DataFrame(net, columns=gene_names, index=gene_names)
-    # melted_net = net.reset_index().melt(id_vars='index', var_name='target', value_name='weight') #assuming that rows are source
-    # melted_net = melted_net.rename(columns={'index': 'source'})
-
     net = efficient_melting(net, gene_names, symmetric=True)
-
     # - subset to known TFs
-    
-    print('before', net.shape)
-    net = net[net['source'].isin(tf_all)]
-    print('after', net.shape)
+    if par['apply_tf_methods']:
+        tf_all = np.intersect1d(tf_all, gene_names)
+        net = net[net['source'].isin(tf_all)]
     # - process links: size control
     net = process_links(net, par)
     net = net.reset_index(drop=True)
