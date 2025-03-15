@@ -7,7 +7,7 @@ info:
   summary: "GRN inference using scPRINT"
   description: |
     GRN inference using scPRINT.
-  documentation_url: https://github.com/cantinilab/scPRINT/ 
+  documentation_url: https://github.com/cantinilab/scPRINT/
 arguments:
   - name: --filtration
     type: string
@@ -29,12 +29,19 @@ arguments:
     type: boolean
     direction: input
     default: false
-  - name: --model
+  - name: --model_name
     type: string
     direction: input
-    default: 'medium'
-  
-    
+    default: "v2-medium"
+  - name: --model
+    type: file
+    direction: input
+    default: null
+  - name: --how
+    type: string
+    direction: input
+    default: "most var within"
+
 resources:
   - type: python_script
     path: script.py
@@ -44,31 +51,22 @@ resources:
 engines:
   - type: docker
     image: openproblems/base_pytorch_nvidia:1.0.0
-    # __merge__: /src/api/base_requirements.yaml
     setup:
-
+      - type: python
+        pip:
+          - scprint==2.2.2
       - type: docker
-        run: |
-          apt install git && \
-          git clone https://github.com/cantinilab/scPRINT   && \
-          git clone https://github.com/jkobject/scDataLoader   && \
-          git clone https://github.com/cantinilab/GRnnData   && \
-          git clone https://github.com/jkobject/benGRN    && \
-          pip install -e scPRINT[dev]   && \
-          pip install -e scDataLoader[dev]   && \
-          pip install -e GRnnData[dev]   && \
-          pip install -e benGRN[dev]  
-      # - type: python
-        # packages:
-        #   - scprint~=2.1.0
-        # github:
-        #   - cantinilab/scPRINT
-          # - jkobject/scDataLoader#subdirectory=src
-          # - cantinilab/GRnnData#subdirectory=src
-          # - jkobject/benGRN#subdirectory=src
+        run: lamin init --storage ./main --name main --schema bionty
+      - type: docker
+        run: lamin load anonymous/main
+      - type: python
+        script: import bionty as bt; bt.core.sync_all_sources_to_latest()
+      - type: python
+        script: from scdataloader.utils import populate_my_ontology; populate_my_ontology()
   - type: native
 runners:
   - type: executable
+    docker_run_args: --gpus all
   - type: nextflow
     directives:
       label: [midtime, midmem, midcpu, biggpu]
