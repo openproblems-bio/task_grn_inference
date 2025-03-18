@@ -3,7 +3,7 @@
 test=true
 RUN_ID="test_run"
 # - settings
-run_local=true
+run_local=false
 reg_type="ridge"
 num_workers=20
 apply_tf_methods=True
@@ -27,9 +27,6 @@ method_ids="[pearson_corr,
             figr,
             celloracle]"
 if [ "$test" = true ]; then
-  method_ids="[pearson_corr]"
-  dataset_ids="op"
-  RUN_ID="test_run"
   resources_folder='resources_test'
 else
   resources_folder='resources'
