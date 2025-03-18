@@ -56,6 +56,6 @@ if __name__ == '__main__':
     net = corr_net(par)
 
     print('Output GRN')
-    net['weight'] = net['weight'].astype(str)
+    net = net.astype(str)
     output = ad.AnnData(X=None, uns={"method_id": 'positive_control', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])

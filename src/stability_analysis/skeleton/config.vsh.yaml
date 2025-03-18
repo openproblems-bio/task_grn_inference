@@ -58,7 +58,7 @@ resources:
 
 engines:
   - type: docker
-    image: ghcr.io/openproblems-bio/task_grn_inference/grn_methods/scglue:dev
+    image: janursa/scglue:13_03_2025
     setup:
       - type: python
         packages: []
