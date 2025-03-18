@@ -136,7 +136,7 @@ dependencies:
   - name: grn_methods/scglue
   - name: grn_methods/figr
   - name: grn_methods/scenicplus
-  # - name: grn_methods/granie
+  - name: grn_methods/granie
   # ---- baselines
   - name: control_methods/pearson_corr
   - name: control_methods/negative_control
