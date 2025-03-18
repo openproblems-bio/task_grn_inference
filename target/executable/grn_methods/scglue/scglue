@@ -443,20 +443,12 @@ function ViashDockerfile {
 
   if [[ "$engine_id" == "docker" ]]; then
     cat << 'VIASHDOCKER'
-FROM nvcr.io/nvidia/pytorch:24.06-py3
+FROM janursa/scglue:13_03_2025
 ENTRYPOINT []
-RUN pip install --upgrade pip && \
-  pip install --upgrade --no-cache-dir "scglue==0.3.2" "pyscenic==0.12.1" "numpy==1.23.4" "anndata==0.9.2" "scanpy" "networkx" "pyarrow" "cytoolz" "scikit-misc" "cuda-python" && \
-  pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
-
-RUN apt-get update && \
-  DEBIAN_FRONTEND=noninteractive apt-get install -y bedtools && \
-  rm -rf /var/lib/apt/lists/*
-
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scglue"
-LABEL org.opencontainers.image.created="2025-03-18T12:44:24Z"
+LABEL org.opencontainers.image.created="2025-03-18T14:05:03Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="a9647728b034d04022c1804801a2d79cf07acd8f"
+LABEL org.opencontainers.image.revision="803858eddae0005fe506c2b87f21a6fb916bec71"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

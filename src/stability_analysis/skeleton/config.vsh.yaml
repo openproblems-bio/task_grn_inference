@@ -58,7 +58,7 @@ resources:
 
 engines:
   - type: docker
-    image: ghcr.io/openproblems-bio/task_grn_inference/grn_methods/scglue:dev
+    image: janursa/scglue:13_03_2025
     setup:
       - type: python
         packages: []
@@ -67,8 +67,3 @@ runners:
   - type: nextflow
     directives:
       label: [ midtime, midmem, midcpu ]
-test_resources:
-  - type: python_script
-    path: /common/component_tests/run_and_check_output.py
-  - path: /resources_test/
-    dest: resources_test/

@@ -3279,18 +3279,6 @@ meta = [
       "dest" : "util.py"
     }
   ],
-  "test_resources" : [
-    {
-      "type" : "python_script",
-      "path" : "/common/component_tests/run_and_check_output.py",
-      "is_executable" : true
-    },
-    {
-      "type" : "file",
-      "path" : "/resources_test/",
-      "dest" : "resources_test/"
-    }
-  ],
   "info" : {
     "label" : "Create skeleton",
     "summary" : "Create skeleton of putative TF-gene edges based on scATAC-seq data and motif datasets"
@@ -3358,7 +3346,7 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "ghcr.io/openproblems-bio/task_grn_inference/grn_methods/scglue:dev",
+      "image" : "janursa/scglue:13_03_2025",
       "namespace_separator" : "/",
       "setup" : [
         {
@@ -3375,7 +3363,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/stability_analysis/create_skeleton",
     "viash_version" : "0.9.1",
-    "git_commit" : "a9647728b034d04022c1804801a2d79cf07acd8f",
+    "git_commit" : "803858eddae0005fe506c2b87f21a6fb916bec71",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

@@ -3504,7 +3504,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.9.1",
-    "git_commit" : "a9647728b034d04022c1804801a2d79cf07acd8f",
+    "git_commit" : "803858eddae0005fe506c2b87f21a6fb916bec71",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

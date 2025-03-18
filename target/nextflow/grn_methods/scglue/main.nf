@@ -3474,37 +3474,8 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "nvcr.io/nvidia/pytorch:24.06-py3",
-      "namespace_separator" : "/",
-      "setup" : [
-        {
-          "type" : "python",
-          "user" : false,
-          "packages" : [
-            "scglue==0.3.2",
-            "pyscenic==0.12.1",
-            "numpy==1.23.4",
-            "anndata==0.9.2",
-            "scanpy",
-            "networkx",
-            "pyarrow",
-            "cytoolz",
-            "scikit-misc",
-            "cuda-python"
-          ],
-          "github" : [
-            "openproblems-bio/core#subdirectory=packages/python/openproblems"
-          ],
-          "upgrade" : true
-        },
-        {
-          "type" : "apt",
-          "packages" : [
-            "bedtools"
-          ],
-          "interactive" : false
-        }
-      ]
+      "image" : "janursa/scglue:13_03_2025",
+      "namespace_separator" : "/"
     },
     {
       "type" : "native",
@@ -3517,7 +3488,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scglue",
     "viash_version" : "0.9.1",
-    "git_commit" : "a9647728b034d04022c1804801a2d79cf07acd8f",
+    "git_commit" : "803858eddae0005fe506c2b87f21a6fb916bec71",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

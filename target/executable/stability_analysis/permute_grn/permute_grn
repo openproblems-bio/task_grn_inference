@@ -456,9 +456,9 @@ RUN pip install --upgrade pip && \
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component stability_analysis permute_grn"
-LABEL org.opencontainers.image.created="2025-03-18T12:44:25Z"
+LABEL org.opencontainers.image.created="2025-03-18T14:05:04Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="a9647728b034d04022c1804801a2d79cf07acd8f"
+LABEL org.opencontainers.image.revision="803858eddae0005fe506c2b87f21a6fb916bec71"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -585,6 +585,7 @@ function ViashHelp {
   echo ""
   echo "    --prediction_n"
   echo "        type: file, output, file must exist"
+  echo "        example: resources_test/grn_models/op/collectri.h5ad"
   echo ""
   echo "    --degree"
   echo "        type: integer"

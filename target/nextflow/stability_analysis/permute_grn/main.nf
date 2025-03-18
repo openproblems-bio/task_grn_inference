@@ -3046,6 +3046,33 @@ meta = [
         {
           "type" : "file",
           "name" : "--prediction",
+          "label" : "GRN prediction",
+          "summary" : "File indicating the inferred GRN.",
+          "info" : {
+            "format" : {
+              "type" : "h5ad",
+              "uns" : [
+                {
+                  "type" : "string",
+                  "name" : "dataset_id",
+                  "description" : "A unique identifier for the dataset",
+                  "required" : true
+                },
+                {
+                  "type" : "string",
+                  "name" : "method_id",
+                  "description" : "A unique identifier for the inference method",
+                  "required" : true
+                },
+                {
+                  "type" : "object",
+                  "name" : "prediction",
+                  "description" : "Inferred GRNs in the format of source, target, weight",
+                  "required" : true
+                }
+              ]
+            }
+          },
           "example" : [
             "resources_test/grn_models/op/collectri.h5ad"
           ],
@@ -3059,6 +3086,36 @@ meta = [
         {
           "type" : "file",
           "name" : "--prediction_n",
+          "label" : "GRN prediction",
+          "summary" : "File indicating the inferred GRN.",
+          "info" : {
+            "format" : {
+              "type" : "h5ad",
+              "uns" : [
+                {
+                  "type" : "string",
+                  "name" : "dataset_id",
+                  "description" : "A unique identifier for the dataset",
+                  "required" : true
+                },
+                {
+                  "type" : "string",
+                  "name" : "method_id",
+                  "description" : "A unique identifier for the inference method",
+                  "required" : true
+                },
+                {
+                  "type" : "object",
+                  "name" : "prediction",
+                  "description" : "Inferred GRNs in the format of source, target, weight",
+                  "required" : true
+                }
+              ]
+            }
+          },
+          "example" : [
+            "resources_test/grn_models/op/collectri.h5ad"
+          ],
           "must_exist" : true,
           "create_parent" : true,
           "required" : false,
@@ -3219,7 +3276,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/stability_analysis/permute_grn",
     "viash_version" : "0.9.1",
-    "git_commit" : "a9647728b034d04022c1804801a2d79cf07acd8f",
+    "git_commit" : "803858eddae0005fe506c2b87f21a6fb916bec71",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

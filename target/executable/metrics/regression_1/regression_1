@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2025-03-18T12:44:24Z"
+LABEL org.opencontainers.image.created="2025-03-18T14:05:03Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="a9647728b034d04022c1804801a2d79cf07acd8f"
+LABEL org.opencontainers.image.revision="803858eddae0005fe506c2b87f21a6fb916bec71"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

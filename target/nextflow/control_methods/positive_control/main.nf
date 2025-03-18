@@ -3467,7 +3467,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/control_methods/positive_control",
     "viash_version" : "0.9.1",
-    "git_commit" : "a9647728b034d04022c1804801a2d79cf07acd8f",
+    "git_commit" : "803858eddae0005fe506c2b87f21a6fb916bec71",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3662,7 +3662,7 @@ if __name__ == '__main__':
     net = corr_net(par)
 
     print('Output GRN')
-    net['weight'] = net['weight'].astype(str)
+    net = net.astype(str)
     output = ad.AnnData(X=None, uns={"method_id": 'positive_control', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])
 VIASHMAIN
