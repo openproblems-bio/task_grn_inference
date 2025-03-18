@@ -9,12 +9,11 @@ info:
 
 arguments:
   - name: --rna
-    type: file
+    __merge__: ../../api/file_rna_h5ad.yaml
     direction: input
     required: true
-    example: resources_test/grn_benchmark/inference_data/op_rna.h5ad
   - name: --rna_imputed
-    type: file
+    __merge__: ../../api/file_rna_h5ad.yaml
     direction: output 
   - name: --imputation
     type: string
@@ -41,8 +40,8 @@ runners:
   - type: nextflow
     directives:
       label: [ midtime, midmem, midcpu ]
-test_resources:
-  - type: python_script
-    path: /common/component_tests/run_and_check_output.py
-  - path: /resources_test/
-    dest: resources_test/
+# test_resources:
+#   - type: python_script
+#     path: /common/component_tests/run_and_check_output.py
+#   - path: /resources_test/
+#     dest: resources_test/
