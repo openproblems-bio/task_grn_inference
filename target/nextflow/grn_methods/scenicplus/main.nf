@@ -3478,20 +3478,7 @@ meta = [
       "type" : "docker",
       "id" : "docker",
       "image" : "apassemi/scenicplus:1.0.4",
-      "namespace_separator" : "/",
-      "setup" : [
-        {
-          "type" : "python",
-          "user" : false,
-          "packages" : [
-            "polars-lts-cpu"
-          ],
-          "github" : [
-            "openproblems-bio/core#subdirectory=packages/python/openproblems"
-          ],
-          "upgrade" : true
-        }
-      ]
+      "namespace_separator" : "/"
     },
     {
       "type" : "native",
@@ -3504,7 +3491,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.9.1",
-    "git_commit" : "33ac47cf96a47ffad09ce96bfbc3185040c9f444",
+    "git_commit" : "e94ad2eadcb0a5e2e8f50fb9077da70ff7eb722f",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
