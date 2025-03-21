@@ -3481,7 +3481,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_benchmark",
     "viash_version" : "0.9.1",
-    "git_commit" : "e94ad2eadcb0a5e2e8f50fb9077da70ff7eb722f",
+    "git_commit" : "5700a2008772cb2b409bfe18601b1a0b105329c8",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

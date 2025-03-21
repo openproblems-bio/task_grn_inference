@@ -76,8 +76,8 @@ def process_links(net, par):
     net = net[net['source'] != net['target']]
     # - limit the number of links
     if par['max_n_links'] != -1:
-        net_sorted = net.reset_index(drop=True).reindex(net['weight'].abs().sort_values(ascending=False).index)
-        net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
+        net = net.sort_values('weight', ascending=False, key=abs).head(par['max_n_links'])
+    
     return net
 
 def efficient_melting(net, gene_names, tf_all=None, symmetric=True):
@@ -122,13 +122,16 @@ def corr_net(par: dict) -> pd.DataFrame:
     net = np.corrcoef(X.T)
     # - melt the matrix
     net = efficient_melting(net, gene_names, symmetric=True)
+    
     # - subset to known TFs
     if par['apply_tf_methods']:
         tf_all = np.intersect1d(tf_all, gene_names)
         net = net[net['source'].isin(tf_all)]
+    
     # - process links: size control
     net = process_links(net, par)
     net = net.reset_index(drop=True)
+    
     return net
 
 
@@ -254,6 +257,7 @@ def sum_by(adata: ad.AnnData, col: str, unique_mapping: bool=True) -> ad.AnnData
         one_to_one_mapped_obs_cols = obs_cols
 
     joining_df = adata.obs[[col] + one_to_one_mapped_obs_cols].drop_duplicates().set_index(col)
+
     assert (sum_adata.obs.index == sum_adata.obs.join(joining_df).index).all()
     sum_adata.obs = sum_adata.obs.join(joining_df)
     sum_adata.obs.index.name = col

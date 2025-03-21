@@ -450,9 +450,9 @@ RUN Rscript -e 'options(warn = 2); if (!requireNamespace("BiocManager", quietly 
   Rscript -e 'options(warn = 2); if (!requireNamespace("anndata", quietly = TRUE)) BiocManager::install("anndata")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods granie"
-LABEL org.opencontainers.image.created="2025-03-19T11:31:54Z"
+LABEL org.opencontainers.image.created="2025-03-21T01:04:54Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="e94ad2eadcb0a5e2e8f50fb9077da70ff7eb722f"
+LABEL org.opencontainers.image.revision="5700a2008772cb2b409bfe18601b1a0b105329c8"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

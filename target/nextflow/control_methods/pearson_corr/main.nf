@@ -3478,7 +3478,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/control_methods/pearson_corr",
     "viash_version" : "0.9.1",
-    "git_commit" : "e94ad2eadcb0a5e2e8f50fb9077da70ff7eb722f",
+    "git_commit" : "5700a2008772cb2b409bfe18601b1a0b105329c8",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3646,7 +3646,6 @@ if False:
     parser.add_argument('--num_workers', type=str, help='Number of cores')
     parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
     parser.add_argument('--dataset_id', type=str, help='Dataset id')
-    parser.add_argument('--normalize', action='store_true')
     args = parser.parse_args()
 
     par_local = vars(args)

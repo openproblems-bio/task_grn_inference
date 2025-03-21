@@ -12,15 +12,13 @@ from tqdm import tqdm
 from sklearn.multioutput import MultiOutputRegressor
 import os
 import warnings
-
-warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.simplefilter("ignore")
 
 ## VIASH START
 par = {
-  "evaluation_data": f"resources/grn_benchmark/evaluation_data/norman_bulk.h5ad",
+  "evaluation_data": f"resources/grn_benchmark/evaluation_data/op_bulk.h5ad",
   "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
-  "prediction": f"resources/grn_models/norman/scprint.h5ad",
-  "method_id": "scenic",
+  "prediction": "output/pearson_net.h5ad",
   "max_n_links": 50000,
   "apply_tf": True,
   'score': 'output/score.h5ad',
@@ -40,7 +38,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--run_local', action='store_true', help='Run locally')
 parser.add_argument('--evaluation_data', type=str, help='Path to the evaluation_data file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--method_id', type=str, help='Method id')
 parser.add_argument('--dataset_id', type=str, help='Dataset id')
 parser.add_argument('--score', type=str, help='score file')
 parser.add_argument('--reg_type', type=str)

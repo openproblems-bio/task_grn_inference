@@ -16,7 +16,10 @@ par = {
     'max_n_links': 50000,
     'prediction': 'output/pearson_net.h5ad',
     'apply_tf': True,
-    'normalize': True}
+    'layer': 'X_norm',
+    'apply_tf_methods': True
+
+    }
 ## VIASH END
 
 if False:
@@ -28,7 +31,6 @@ if False:
     parser.add_argument('--num_workers', type=str, help='Number of cores')
     parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
     parser.add_argument('--dataset_id', type=str, help='Dataset id')
-    parser.add_argument('--normalize', action='store_true')
     args = parser.parse_args()
 
     par_local = vars(args)
