@@ -1,35 +1,43 @@
 #!/bin/bash
 
-test=true
-RUN_ID="test_run"
+test=false
+RUN_ID="op_test_run"
 # - settings
 run_local=false
 reg_type="ridge"
 num_workers=20
-apply_tf_methods=True
-apply_skeleton=False
+apply_tf_methods=true
+apply_skeleton=false
 # - specify inputs
 dataset_ids=" op " 
 metric_ids="[regression_1, regression_2, ws_distance]" 
-method_ids="[pearson_corr,
+# method_ids="[pearson_corr,
+#             negative_control, 
+#             positive_control, 
+
+#             portia, 
+#             ppcor, 
+#             scenic, 
+#             scprint, 
+#             grnboost2,
+
+#             scenicplus, 
+#             scglue,
+#             granie,
+#             figr,
+#             celloracle]"
+method_ids="[
+            pearson_corr,
             negative_control, 
             positive_control, 
 
-            portia, 
-            ppcor, 
-            scenic, 
-            scprint, 
-            grnboost2,
-
-            scenicplus, 
-            scglue,
-            figr,
-            celloracle]"
+            ]"
 if [ "$test" = true ]; then
   resources_folder='resources_test'
 else
   resources_folder='resources'
 fi
+echo "Resources folder: $resources_folder"
 label=${RUN_ID}
 echo "Run ID: $RUN_ID"
 
@@ -130,9 +138,9 @@ HERE
     --pull-latest \
     --main-script target/nextflow/workflows/run_benchmark/main.nf \
     --workspace 53907369739130 \
-    --compute-env 6TJs9kM1T7ot4DbUY2huLF  \
+    --compute-env 7gRyww9YNGb0c6BUBtLhDP   \
     --params-file ${param_file} \
     --config common/nextflow_helpers/labels_tw.config \
     --labels ${label}
 fi
-#7gRyww9YNGb0c6BUBtLhDP
+#6TJs9kM1T7ot4DbUY2huLF
