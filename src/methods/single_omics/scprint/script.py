@@ -173,34 +173,26 @@ def main(par):
 if __name__ == '__main__':
     adata = ad.read_h5ad(par['rna'], backed='r')
     
-    if len(adata) == 2000: # for testing purposes, we will not run the whole pipeline, just keep the format
-         net = pd.DataFrame({
-            'source': ['A', 'B'],
-            'target': ['C', 'D'],
-            'weight': [0.1, 0.2],
-            'cell_type': ['T cells', 'B cells']})
-    else:
-        if par['populate_ontology']: 
-            populate_my_ontology( 
-                organisms= ["NCBITaxon:9606"]
-            )
-        par['checkpoint'] = par['temp_dir'] + '/scprint.ckpt'
-        if par['download_checkpoint']:
+    if par['populate_ontology']: 
+        populate_my_ontology( 
+        )
+    par['checkpoint'] = par['temp_dir'] + '/scprint.ckpt'
+    if par['download_checkpoint']:
 
-            os.makedirs(par['temp_dir'], exist_ok=True)
-            print(f"Downloading checkpoint")
-            checkpoint_link = f"https://huggingface.co/jkobject/scPRINT/resolve/main/{par['model']}.ckpt" #TODO: experiment with this
-            
-            response = requests.get(checkpoint_link, stream=True)
-            if response.status_code == 200:
-                with open(par['checkpoint'], 'wb') as f:
-                    for chunk in response.iter_content(chunk_size=1024):
-                        f.write(chunk)
-                print(f"Downloaded checkpoint to {par['checkpoint']}")
-            else:
-                print(f"Error: Failed to download checkpoint (status code {response.status_code})")
+        os.makedirs(par['temp_dir'], exist_ok=True)
+        print(f"Downloading checkpoint")
+        checkpoint_link = f"https://huggingface.co/jkobject/scPRINT/resolve/main/{par['model']}.ckpt" #TODO: experiment with this
+        
+        response = requests.get(checkpoint_link, stream=True)
+        if response.status_code == 200:
+            with open(par['checkpoint'], 'wb') as f:
+                for chunk in response.iter_content(chunk_size=1024):
+                    f.write(chunk)
+            print(f"Downloaded checkpoint to {par['checkpoint']}")
+        else:
+            print(f"Error: Failed to download checkpoint (status code {response.status_code})")
 
-        net = main(par)
+    net = main(par)
 
     print(f"Writing results to {par['prediction']}")
     dataset_id = adata.uns['dataset_id']
