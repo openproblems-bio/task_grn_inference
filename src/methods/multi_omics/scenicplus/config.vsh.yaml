@@ -54,4 +54,4 @@ runners:
   - type: executable
   - type: nextflow
     directives:
-      label: [onedaytime,veryhighmem,highcpu]
+      label: [twodaytime, veryhighmemory, highcpu]

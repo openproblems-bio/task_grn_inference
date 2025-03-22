@@ -3406,8 +3406,8 @@ meta = [
       "id" : "nextflow",
       "directives" : {
         "label" : [
-          "midtime",
-          "midmem",
+          "twodaytime",
+          "highmem",
           "midcpu"
         ],
         "tag" : "$id"
@@ -3423,13 +3423,15 @@ meta = [
           "lowmem" : "memory = 20.Gb",
           "midmem" : "memory = 50.Gb",
           "highmem" : "memory = 100.Gb",
+          "veryhighmemory" : "memory = 200.Gb",
           "lowcpu" : "cpus = 5",
           "midcpu" : "cpus = 15",
           "highcpu" : "cpus = 30",
           "lowtime" : "time = 1.h",
           "midtime" : "time = 4.h",
           "hightime" : "time = 8.h",
-          "veryhightime" : "time = 24.h"
+          "veryhightime" : "time = 24.h",
+          "twodaytime" : "time = 28.h"
         }
       },
       "debug" : false,
@@ -3487,7 +3489,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/figr",
     "viash_version" : "0.9.1",
-    "git_commit" : "5700a2008772cb2b409bfe18601b1a0b105329c8",
+    "git_commit" : "caab6e9cbd96676fa3a36ffbaae5dc3f758da764",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3519,7 +3521,7 @@ meta = [
     "source" : "src",
     "target" : "target",
     "config_mods" : [
-      ".runners[.type == \\"nextflow\\"].config.labels := { lowmem : \\"memory = 20.Gb\\", midmem : \\"memory = 50.Gb\\", highmem : \\"memory = 100.Gb\\", lowcpu : \\"cpus = 5\\", midcpu : \\"cpus = 15\\", highcpu : \\"cpus = 30\\", lowtime : \\"time = 1.h\\", midtime : \\"time = 4.h\\", hightime : \\"time = 8.h\\", veryhightime : \\"time = 24.h\\" }\n"
+      ".runners[.type == \\"nextflow\\"].config.labels := { lowmem : \\"memory = 20.Gb\\", midmem : \\"memory = 50.Gb\\", highmem : \\"memory = 100.Gb\\",  veryhighmemory : \\"memory = 200.Gb\\", lowcpu : \\"cpus = 5\\", midcpu : \\"cpus = 15\\", highcpu : \\"cpus = 30\\", lowtime : \\"time = 1.h\\", midtime : \\"time = 4.h\\", hightime : \\"time = 8.h\\", veryhightime : \\"time = 24.h\\", twodaytime : \\"time = 28.h\\" }\n"
     ],
     "authors" : [
       {
@@ -4265,8 +4267,8 @@ meta["defaults"] = [
     "tag" : "build_main"
   },
   "label" : [
-    "midtime",
-    "midmem",
+    "twodaytime",
+    "highmem",
     "midcpu"
   ],
   "tag" : "$id"

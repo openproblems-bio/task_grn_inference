@@ -55,14 +55,6 @@ from main import main
 if __name__ == '__main__':
     adata = ad.read_h5ad(par['rna'], backed='r')
     
-    # if len(adata) == 2000: # for testing purposes, we will not run the whole pipeline, just keep the format
-    #      net = pd.DataFrame({
-    #         'source': ['A', 'B'],
-    #         'target': ['C', 'D'],
-    #         'weight': [0.1, 0.2],
-    #         'cell_type': ['T cells', 'B cells']})
-    # else:
-    # get gene annotation
     print(par)
     net = main(par)
 

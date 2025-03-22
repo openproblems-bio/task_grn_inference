@@ -64,7 +64,7 @@ if (!dir.exists(par$temp_dir)) {
 # Downloading resources #
 #########################
 file_hocomoco_v12 = "https://s3.embl.de/zaugg-web/GRaNIE/TFBS/hg38/PWMScan_HOCOMOCOv12_H12INVIVO.tar.gz"
-destfile <- paste0(outputDir, "/PWMScan_HOCOMOCOv12_H12INVIVO.tar.gz")
+destfile <- paste0(par$temp_dir, "/PWMScan_HOCOMOCOv12_H12INVIVO.tar.gz")
 if (!file.exists(destfile)) {
   options(timeout = 1200)
   download.file(file_hocomoco_v12, destfile)

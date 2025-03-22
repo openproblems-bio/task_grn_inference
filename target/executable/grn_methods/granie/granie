@@ -450,9 +450,9 @@ RUN Rscript -e 'options(warn = 2); if (!requireNamespace("BiocManager", quietly 
   Rscript -e 'options(warn = 2); if (!requireNamespace("anndata", quietly = TRUE)) BiocManager::install("anndata")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods granie"
-LABEL org.opencontainers.image.created="2025-03-21T01:04:54Z"
+LABEL org.opencontainers.image.created="2025-03-22T21:55:25Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="5700a2008772cb2b409bfe18601b1a0b105329c8"
+LABEL org.opencontainers.image.revision="caab6e9cbd96676fa3a36ffbaae5dc3f758da764"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1785,7 +1785,7 @@ if (!dir.exists(par\$temp_dir)) {
 # Downloading resources #
 #########################
 file_hocomoco_v12 = "https://s3.embl.de/zaugg-web/GRaNIE/TFBS/hg38/PWMScan_HOCOMOCOv12_H12INVIVO.tar.gz"
-destfile <- paste0(outputDir, "/PWMScan_HOCOMOCOv12_H12INVIVO.tar.gz")
+destfile <- paste0(par\$temp_dir, "/PWMScan_HOCOMOCOv12_H12INVIVO.tar.gz")
 if (!file.exists(destfile)) {
   options(timeout = 1200)
   download.file(file_hocomoco_v12, destfile)

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test=false
-RUN_ID="op_test_run"
+RUN_ID="op_main_run"
 # - settings
 run_local=false
 reg_type="ridge"
@@ -11,27 +11,27 @@ apply_skeleton=false
 # - specify inputs
 dataset_ids=" op " 
 metric_ids="[regression_1, regression_2, ws_distance]" 
-# method_ids="[pearson_corr,
-#             negative_control, 
-#             positive_control, 
-
-#             portia, 
-#             ppcor, 
-#             scenic, 
-#             scprint, 
-#             grnboost2,
-
-#             scenicplus, 
-#             scglue,
-#             granie,
-#             figr,
-#             celloracle]"
-method_ids="[
-            pearson_corr,
+method_ids="[pearson_corr,
             negative_control, 
             positive_control, 
 
-            ]"
+            portia, 
+            ppcor, 
+            scenic, 
+            scprint, 
+            grnboost2,
+
+            scenicplus, 
+            scglue,
+            granie,
+            figr,
+            celloracle]"
+# method_ids="[
+#             pearson_corr,
+#             negative_control, 
+#             positive_control, 
+
+#             ]"
 if [ "$test" = true ]; then
   resources_folder='resources_test'
 else
@@ -138,9 +138,10 @@ HERE
     --pull-latest \
     --main-script target/nextflow/workflows/run_benchmark/main.nf \
     --workspace 53907369739130 \
-    --compute-env 7gRyww9YNGb0c6BUBtLhDP   \
+    --compute-env 6TJs9kM1T7ot4DbUY2huLF   \
     --params-file ${param_file} \
     --config common/nextflow_helpers/labels_tw.config \
     --labels ${label}
 fi
-#6TJs9kM1T7ot4DbUY2huLF
+#on demand 6TJs9kM1T7ot4DbUY2huLF   
+#7gRyww9YNGb0c6BUBtLhDP
