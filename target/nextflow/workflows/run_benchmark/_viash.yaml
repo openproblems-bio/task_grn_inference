@@ -42,7 +42,7 @@ authors:
     info:
       github: chrarnold
 config_mods: |
-  .runners[.type == "nextflow"].config.labels := { lowmem : "memory = 20.Gb", midmem : "memory = 50.Gb", highmem : "memory = 100.Gb",  veryhighmemory : "memory = 200.Gb", lowcpu : "cpus = 5", midcpu : "cpus = 15", highcpu : "cpus = 30", lowtime : "time = 1.h", midtime : "time = 4.h", hightime : "time = 8.h", veryhightime : "time = 24.h", twodaytime : "time = 28.h" }
+  .runners[.type == "nextflow"].config.labels := { lowmem : "memory = 20.Gb", midmem : "memory = 50.Gb", highmem : "memory = 100.Gb",  veryhighmemory : "memory = 200.Gb", veryveryhighmemory : "memory = 300.Gb", lowcpu : "cpus = 5", midcpu : "cpus = 15", highcpu : "cpus = 30", lowtime : "time = 1.h", midtime : "time = 4.h", hightime : "time = 8.h", veryhightime : "time = 24.h", twodaytime : "time = 28.h" }
 repositories:
   - name: openproblems
     type: github
