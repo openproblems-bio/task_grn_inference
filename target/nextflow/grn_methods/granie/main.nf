@@ -3674,7 +3674,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/granie",
     "viash_version" : "0.9.1",
-    "git_commit" : "caab6e9cbd96676fa3a36ffbaae5dc3f758da764",
+    "git_commit" : "c4dad37d7548f76d7dffe91d1eea3720c7a07936",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
