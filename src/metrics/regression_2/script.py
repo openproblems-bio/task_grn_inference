@@ -1,4 +1,32 @@
-e=str)
+import pandas as pd
+import anndata as ad
+import sys
+import numpy as np
+import argparse
+
+## VIASH START
+par = {
+    'layer': 'X_norm',
+    "max_n_links": 50000,
+    'reg_type': 'ridge',
+    'static_only': True,
+    'subsample': -1,
+    'num_workers': 4,
+    'apply_tf': True,
+    'clip_scores': True,
+    'method_id': 'grnboost',
+    'apply_skeleton': False,
+    'skeleton': 'resources/grn_benchmark/prior/skeleton.csv',
+    'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
+    'verbose': 2
+    
+}
+## VIASH END
+
+## LOCAL START
+parser = argparse.ArgumentParser()
+parser.add_argument('--run_local', action='store_true', help='Run locally')
+parser.add_argument('--evaluation_data', type=str)
 parser.add_argument('--regulators_consensus', type=str)
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--method_id', type=str, help='Method id')
