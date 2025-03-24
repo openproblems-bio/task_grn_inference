@@ -7,9 +7,9 @@ import requests
 par = {
   "rna": "resources/grn_benchmark/inference_data/op_rna.h5ad",
   "atac": "resources/grn_benchmark/inference_data/op_atac.h5ad",
-  "temp_dir": 'output/scglue/',
+  "temp_dir": 'output/scglue_new/',
   "num_workers": 20,
-  "prediction": "output/scglue.csv",
+  "prediction": "output/scglue_new/scglue.h5ad",
   "max_n_links": 50000,
   "nes_threshold": 0,
   "rank_threshold": 10000,

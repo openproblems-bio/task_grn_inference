@@ -39,7 +39,8 @@ resources:
 
 engines:
   - type: docker
-    image: janursa/scglue:13_03_2025
+    # image: janursa/scglue:13_03_2025
+    image: scglue:latest
     # image: nvcr.io/nvidia/pytorch:24.06-py3
     # setup:
     #   - type: python
