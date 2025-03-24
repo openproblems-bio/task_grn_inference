@@ -263,7 +263,7 @@ def prune_grn(par):
         "--expression_mtx_fname", f"{par['temp_dir']}/rna.loom",
         "--output", f"{par['temp_dir']}/pruned_grn.csv",
         "--top_n_targets", str(par['top_n_targets']),
-        "--rank_threshold", str(par['rank_threshold']),
+        # "--rank_threshold", str(par['rank_threshold']),
         "--auc_threshold", ".5",
         "--nes_threshold", "0", 
         "--min_genes", "1",
