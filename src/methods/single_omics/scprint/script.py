@@ -68,7 +68,6 @@ def main_sub(adata, model, par):
         max_cells=par["max_cells"],
         doplot=False,
         batch_size=16,
-        precision="32-mixed",
     )
 
     grn = grn_inferer(model, adata)
@@ -105,7 +104,7 @@ adata.obs["organism_ontology_term_id"] = "NCBITaxon:9606"
 
 print("\n>>> Preprocessing data...", flush=True)
 preprocessor = Preprocessor(
-    min_valid_genes_id=min(0.9 * adata.n_vars, 10000),  # 90% of features up to 10,000
+    min_valid_genes_id=min(0.7 * adata.n_vars, 10000),  # 90% of features up to 10,000
     # Turn off cell filtering to return results for all cells
     filter_cell_by_counts=400,
     min_nnz_genes=200,
@@ -154,8 +153,12 @@ else:
     )
 del m
 
-# if "cell_type" not in adata.obs:
-adata.obs["cell_type"] = "dummy_cell_type"
+if model.device.type == "cpu" and torch.cuda.is_available():
+    print("CUDA is available, moving model to GPU", flush=True)
+    model = model.to("cuda")
+
+if "cell_type" not in adata.obs:
+    adata.obs["cell_type"] = "dummy_cell_type"
 for i, cell_type in enumerate(adata.obs["cell_type"].unique()):
     print(cell_type)
     adata_cell_type = adata[adata.obs["cell_type"] == cell_type].copy()
