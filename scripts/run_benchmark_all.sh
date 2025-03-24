@@ -1,35 +1,20 @@
 #!/bin/bash
+
+test=false
+RUN_ID="op_main_run"
+# - settings
 run_local=false
-num_workers=20
-metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
-
-RUN_ID="test_sub"
-resources_folder='resources_test'
-
 reg_type="ridge"
-label=${RUN_ID}
-
-
-dataset_ids=" op adamson "
-# method_ids="[pearson_corr,
-#             negative_control, 
-#             positive_control, 
-
-#             portia, 
-#             ppcor, 
-#             scenic, 
-#             scprint, 
-#             grnboost2,
-
-#             scenicplus, 
-#             scglue,
-#             granie,
-#             figr,
-#             celloracle]"
-
+num_workers=20
+apply_tf_methods=true
+apply_skeleton=false
+# - specify inputs
+dataset_ids=" op " 
+metric_ids="[regression_1, regression_2, ws_distance]" 
 method_ids="[pearson_corr,
             negative_control, 
-            positive_control,
+            positive_control, 
+
             portia, 
             ppcor, 
             scenic, 
@@ -38,11 +23,22 @@ method_ids="[pearson_corr,
 
             scenicplus, 
             scglue,
+            granie,
             figr,
-            celloracle
-            ]"
+            celloracle]"
+# method_ids="[
+#             pearson_corr,
+#             negative_control, 
+#             positive_control, 
 
-
+#             ]"
+if [ "$test" = true ]; then
+  resources_folder='resources_test'
+else
+  resources_folder='resources'
+fi
+echo "Resources folder: $resources_folder"
+label=${RUN_ID}
 echo "Run ID: $RUN_ID"
 
 resources_dir="s3://openproblems-data/${resources_folder}/grn"
@@ -87,6 +83,11 @@ append_entry() {
     regulators_consensus: ${files_dir}/prior/regulators_consensus_${dataset}.json
     layer: 'X_norm'
     num_workers: $num_workers
+    apply_tf_methods: $apply_tf_methods
+    apply_skeleton: $apply_skeleton
+    skeleton: ${files_dir}/prior/skeleton.csv
+    reg_type: $reg_type
+
 
 HERE
   if [[ "$dataset" == "norman" || "$dataset" == "adamson" || "$dataset" == "replogle" ]]; then
@@ -103,7 +104,7 @@ HERE
   fi
 }
 
-# Iterate over datasets and GRN models
+# Iterate over datasets 
 for dataset in $dataset_ids; do
   append_entry "$dataset"
 done
@@ -137,9 +138,10 @@ HERE
     --pull-latest \
     --main-script target/nextflow/workflows/run_benchmark/main.nf \
     --workspace 53907369739130 \
-    --compute-env 7gRyww9YNGb0c6BUBtLhDP \
+    --compute-env 6TJs9kM1T7ot4DbUY2huLF   \
     --params-file ${param_file} \
     --config common/nextflow_helpers/labels_tw.config \
     --labels ${label}
 fi
-
+#on demand 6TJs9kM1T7ot4DbUY2huLF   
+#7gRyww9YNGb0c6BUBtLhDP

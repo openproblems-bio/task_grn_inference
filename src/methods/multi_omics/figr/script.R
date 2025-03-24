@@ -6,6 +6,11 @@ library(anndata)
 library(FigR)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(SummarizedExperiment)
+library(aws.s3)
+
+Sys.setenv("AWS_ACCESS_KEY_ID" = "",
+           "AWS_SECRET_ACCESS_KEY" = "",
+           "AWS_DEFAULT_REGION" = "us-west-2")  # Update to the correct region
 # library(Seurat)
 # install.packages("bspm", repos="https://cran.r-project.org") #TOOD: check this
 
@@ -14,7 +19,7 @@ par <- list(
   rna = "resources_test/grn_benchmark/inference_data/op_rna.h5ad",
   atac = "resources_test/grn_benchmark/inference_data/op_atac.h5ad",
   temp_dir =  "output/figr/",
-  cell_topic = "resources_test/grn_benchmark/prior/cell_topic.csv",
+  # cell_topic = "resources_test/grn_benchmark/prior/cell_topic.csv",
   num_workers = 5,
   n_topics = 48,
   peak_gene = "output/figr/peak_gene.csv",
@@ -22,6 +27,17 @@ par <- list(
 )
 ## VIASH END
 dir.create(par$temp_dir, recursive = TRUE, showWarnings = TRUE)
+
+# - download cell_topic
+s3_path <- "s3://openproblems-data/resources/grn/grn_benchmark/prior/cell_topic.csv"
+par$cell_topic <-paste0(par$temp_dir, "cell_topic.csv")
+
+# Download the file
+save_object(object = s3_path, 
+            bucket = "openproblems-data",
+            file = par$cell_topic,
+            use_https = TRUE, 
+            check_region = FALSE)
 
 # ---------------- create summary experiment for rna 
 adata <- anndata::read_h5ad(par$rna)

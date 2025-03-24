@@ -1,0 +1,47 @@
+
+name: impute_rna
+namespace: "stability_analysis"
+info:
+  label: Imputation scRNA
+  summary: Imputation analysis of scRNA
+  description: |
+    We impute the missing values in scRNA data to test the sensitivity of the evaluation metrics.
+
+arguments:
+  - name: --rna
+    __merge__: ../../api/file_rna_h5ad.yaml
+    direction: input
+    required: true
+  - name: --rna_imputed
+    __merge__: ../../api/file_rna_h5ad.yaml
+    direction: output 
+  - name: --imputation
+    type: string
+    direction: input
+    default: knn
+  - name: --layer
+    type: string
+    direction: input
+    default: X_norm
+
+resources:
+  - type: python_script
+    path: script.py
+
+engines:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    __merge__: /src/api/base_requirements.yaml
+    setup:
+      - type: python
+        packages: [magic-impute, numpy==1.23.5]
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [ midtime, midmem, midcpu ]
+# test_resources:
+#   - type: python_script
+#     path: /common/component_tests/run_and_check_output.py
+#   - path: /resources_test/
+#     dest: resources_test/

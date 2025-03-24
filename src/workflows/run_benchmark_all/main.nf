@@ -50,6 +50,7 @@ workflow run_wf {
           rna: state.rna,
           atac: state.atac,
           tf_all: state.tf_all,
+          apply_tf_methods: state.apply_tf_methods,
           num_workers: state.num_workers,
           output: 'predictions/$id.$key.output.h5ad',
           output_model: null
@@ -67,6 +68,8 @@ workflow run_wf {
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",
+        apply_skeleton: "apply_skeleton",
+        skeleton: "skeleton",
         layer: "layer",
         tf_all: "tf_all"
       ],

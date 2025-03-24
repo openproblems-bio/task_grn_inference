@@ -17,10 +17,6 @@ argument_groups:
         type: file
         required: true
         direction: input
-      - name: --layer
-        type: string
-        required: true
-        direction: input
       - name: --tf_all
         type: file
         direction: input
@@ -58,15 +54,6 @@ argument_groups:
         must_exist: false
         required: true
         example: resources_test/grn_benchmark/prior/regulators_consensus_norman.json
-      - name: --static_only
-        direction: input
-        type: boolean
-        default: true
-      - name: --binarize
-        type: boolean 
-        direction: input 
-        description: whether to binarize the weight
-        default: true
       - name: --ws_consensus
         type: file
         direction: input

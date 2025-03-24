@@ -10,11 +10,6 @@ info:
     GRN inference using figr.
   documentation_url: https://buenrostrolab.github.io/FigR/articles/FigR_shareseq.html
 arguments:
-  - name: --cell_topic
-    type: file
-    example: resources_test/grn_benchmark/prior/cell_topic.csv
-    required: true
-    direction: input
   - name: --peak_gene
     type: file
     required: false
@@ -30,7 +25,10 @@ engines:
   - type: docker
     image: janursa/figr:19-08-2024
     __merge__: /src/api/base_requirements.yaml
-    # setup:
+    setup:
+      - type: r
+        bioc: ["aws.s3"]
+      
     #   - type: python
     #     packages: [ anndata ]
     #     github:
@@ -40,4 +38,4 @@ runners:
   - type: executable
   - type: nextflow
     directives:
-      label: [midtime,midmem,midcpu]
+      label: [twodaytime, highmem, midcpu]

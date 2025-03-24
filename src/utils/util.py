@@ -76,11 +76,11 @@ def process_links(net, par):
     net = net[net['source'] != net['target']]
     # - limit the number of links
     if par['max_n_links'] != -1:
-        net_sorted = net.reindex(net['weight'].abs().sort_values(ascending=False).index)
-        net = net_sorted.head(par['max_n_links']).reset_index(drop=True)
+        net = net.sort_values('weight', ascending=False, key=abs).head(par['max_n_links'])
+    
     return net
 
-def efficient_melting(net, gene_names, tf_all=None, symmetric=False):
+def efficient_melting(net, gene_names, tf_all=None, symmetric=True):
     '''Efficiently converts a network matrix into a DataFrame. If symmetric, only the upper triangle is considered.
     If not symmetric, all nonzero values are considered and rows are treated as source. 
     If tf_all is not None, only the interactions with source as TFs are kept.
@@ -110,11 +110,7 @@ def corr_net(par: dict) -> pd.DataFrame:
     # - read data
     adata = ad.read_h5ad(par["rna"])
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
-    
-    if 'X_norm' in adata.layers.keys():
-        X = adata.layers['X_norm']
-    else:
-        X = adata.X
+    X = adata.layers[par['layer']]
     if hasattr(X, 'todense'):
         X = X.todense().A
     # - remove genes with 0 standard deviation
@@ -124,23 +120,18 @@ def corr_net(par: dict) -> pd.DataFrame:
     gene_names = adata[:, nonzero_std_genes].var_names.to_numpy()
     # - calculate correlation
     net = np.corrcoef(X.T)
-  
     # - melt the matrix
-    tf_all = np.intersect1d(tf_all, gene_names)
-    # net = pd.DataFrame(net, columns=gene_names, index=gene_names)
-    # melted_net = net.reset_index().melt(id_vars='index', var_name='target', value_name='weight') #assuming that rows are source
-    # melted_net = melted_net.rename(columns={'index': 'source'})
-
     net = efficient_melting(net, gene_names, symmetric=True)
-
-    # - subset to known TFs
     
-    print('before', net.shape)
-    net = net[net['source'].isin(tf_all)]
-    print('after', net.shape)
+    # - subset to known TFs
+    if par['apply_tf_methods']:
+        tf_all = np.intersect1d(tf_all, gene_names)
+        net = net[net['source'].isin(tf_all)]
+    
     # - process links: size control
     net = process_links(net, par)
     net = net.reset_index(drop=True)
+    
     return net
 
 
@@ -202,6 +193,29 @@ def read_gmt(file_path:str) -> dict[str, list[str]]:
                 'genes': genes
             }
     return gene_sets
+
+def read_gene_annotation(annotation_file):
+    '''
+        Read the gene annotation file and extract TSS
+    '''
+
+    gtf_columns = ["chromosome", "source", "feature", "start", "end", "score", "strand", "frame", "attributes"]
+    gtf_df = pd.read_csv(
+        annotation_file, 
+        sep="\t", comment="#", names=gtf_columns, low_memory=False
+    )
+
+    gtf_df["gene_name"] = gtf_df["attributes"].str.extract(r'gene_name "([^"]+)"')
+
+    # Keep only gene-level annotations
+    annotation_df = gtf_df[gtf_df["feature"] == "gene"][["chromosome", "start", "end", "strand", "gene_name"]]
+
+    # Compute TSS
+    annotation_df["TSS"] = annotation_df.apply(lambda x: x["start"] if x["strand"] == "+" else x["end"], axis=1)
+
+    return annotation_df[["chromosome", "start", "end", "TSS", "strand", "gene_name"]]
+
+
 def sum_by(adata: ad.AnnData, col: str, unique_mapping: bool=True) -> ad.AnnData:
     """
     Adapted from this forum post: 
@@ -243,6 +257,7 @@ def sum_by(adata: ad.AnnData, col: str, unique_mapping: bool=True) -> ad.AnnData
         one_to_one_mapped_obs_cols = obs_cols
 
     joining_df = adata.obs[[col] + one_to_one_mapped_obs_cols].drop_duplicates().set_index(col)
+
     assert (sum_adata.obs.index == sum_adata.obs.join(joining_df).index).all()
     sum_adata.obs = sum_adata.obs.join(joining_df)
     sum_adata.obs.index.name = col

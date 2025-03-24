@@ -12,11 +12,23 @@ from ast import literal_eval
 import requests
 import torch
 
-
+## VIASH START
+par = {
+        'atac': f"resources/grn_benchmark/inference_data/op_atac.h5ad",
+        'rna': f"resources/grn_benchmark/inference_data/op_rna.h5ad",
+        'annotation_file': f"resources/supp_data/gencode.v45.annotation.gtf.gz",
+        'temp_dir': 'output/skeleton',
+        'extend_range': 150000,
+        'flank_length': 1000,
+        'skeleton': 'resources/grn_benchmark/prior/skeleton.csv',
+        'motif_dataset_encode': 'resources/supp_data/databases/scglue/ENCODE-TF-ChIP-hg38.bed.gz',
+        'motif_dataset_jaspar': 'resources/supp_data/databases/scglue/JASPAR2022-hg38.bed.gz'
+    }
+## VIASH END
 def preprocess(par):
     print('Reading input files', flush=True)
-    rna = ad.read_h5ad(par['multiomics_rna'])
-    atac = ad.read_h5ad(par['multiomics_atac'])
+    rna = ad.read_h5ad(par['rna'])
+    atac = ad.read_h5ad(par['atac'])
 
     scglue.data.get_gene_annotation(
         rna, gtf=par['annotation_file'],
@@ -70,7 +82,7 @@ def preprocess(par):
     df.to_csv(par['peak2gene.csv'])
 
 def get_flank_bed(par):
-    rna = ad.read_h5ad(par['multiomics_rna'])
+    rna = ad.read_h5ad(par['rna'])
 
     scglue.data.get_gene_annotation(
         rna, gtf=par['annotation_file'],
@@ -105,7 +117,7 @@ def skeleton_peak(par):
     motif_bed = scglue.genomics.read_bed(par['motif_file']) 
 
     print("Generate TF cis-regulatory ranking bridged by ATAC peaks", flush=True)
-    skeleton_peak = scglue.genomics.Bed(atac.var)
+    peak_bed = scglue.genomics.Bed(atac.var)
     peak2tf = scglue.genomics.window_graph(peak_bed, motif_bed, 0, right_sorted=True)
     peak2tf = peak2tf.edge_subgraph(e for e in peak2tf.edges if e[1] in tfs)
 
@@ -122,21 +134,13 @@ def skeleton_peak(par):
     peak2gene = pd.read_csv('output/skeleton/peak2gene.csv', index_col=0)  
     peak2gene.columns = ['peak', 'target']
 
-    tf2gene = peak2gene.merge(peak2tf, on='peak', how='inner')[['source','target']].drop_duplicates()
+    tf2gene = peak2gene.merge(peak2tf, on='peak', how='inner')[['source','target']].drop_duplicates() #TODO: fix this by adding peak
 
 
     tf2gene.to_csv(par['skeleton_peak_file']) 
 
 if __name__ == '__main__':
-    par = {
-        'multiomics_atac': f"resources/grn_benchmark/inference_data/op_atac.h5ad",
-        'multiomics_rna': f"resources/grn_benchmark/inference_data/op_rna.h5ad",
-        'annotation_file': f"output/db/gencode.v45.annotation.gtf.gz",
-        'temp_dir': 'output/skeleton',
-        'extend_range': 150000,
-        'flank_length': 1000,
-        'skeleton': 'output/skeleton/skeleton.csv'
-    }
+    
     print(par)
     os.makedirs(par['temp_dir'], exist_ok=True)
     par['rna-emb'] = f"{par['temp_dir']}/rna-emb.h5ad"
@@ -154,7 +158,7 @@ if __name__ == '__main__':
 
     print('------- promotor based skeleton for different motif files ---------')
     names = ['encode', 'jaspar']
-    motif_files = ['output/db/ENCODE-TF-ChIP-hg38.bed.gz', 'output/db/JASPAR2022-hg38.bed.gz']
+    motif_files = [par['motif_dataset_jaspar'], par['motif_dataset_encode']]
     if True:
         for i, motif_file in enumerate(motif_files):
             par['skeleton_promotor_file'] = f"{par['temp_dir']}/skeleton_{names[i]}_promotor.csv"
@@ -199,7 +203,7 @@ if __name__ == '__main__':
         # - merge and save 
         skeleton = pd.concat([skeleton_promotor, skeleton_peak], axis=0).drop_duplicates()
         print(len(skeleton), skeleton.source.nunique(), skeleton.target.nunique())
-        skeleton.to_csv(f"{par['temp_dir']}/skeleton.csv")
+        skeleton.to_csv(par['skeleton'])
     
 
 

@@ -15,18 +15,18 @@ workflow run_wf {
   // construct list of metrics
   metrics = [
     regression_1,
-    regression_2
+    regression_2,
+    ws_distance
   ]
     
   /***************************
    * RUN METRICS *
    ***************************/
-  score_ch = input_ch
+  output_ch = input_ch
     | map{ id, state ->
         [id, state + ["_meta": [join_id: id]]]
       }
-    
-    | noise_grn.run(
+    | permute_grn.run(
       fromState: [
         prediction: "prediction", degree: "degree", noise_type: "noise_type"
       ],
@@ -38,35 +38,31 @@ workflow run_wf {
     // run all metrics
     | runEach(
       components: metrics,
+      filter: { id, state, comp ->
+        !state.metric_ids || state.metric_ids.contains(comp.config.name)
+      },
       id: { id, state, comp ->
-        id + "." + comp.config.functionality.name
+        id + "." + comp.config.name
       },
       // use 'fromState' to fetch the arguments the component requires from the overall state
       fromState: [
-        perturbation_data: "perturbation_data",
+        evaluation_data: "evaluation_data",
         prediction: "prediction_n",
-        layer: "layer",
-        subsample: "subsample",
-        reg_type: "reg_type",
-        method_id: "method_id",
         num_workers: "num_workers",
-        consensus: "consensus",
+        regulators_consensus: "regulators_consensus",
         tf_all: "tf_all"
-        
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->
         state + [
-          metric_id: comp.config.functionality.name,
+          metric_id: comp.config.name,
           metric_output: output.score
         ]
       }
     )
 
-  output_ch = score_ch
-
     // extract the scores
-    | extract_metadata.run(
+    | extract_uns_metadata.run(
       key: "extract_scores",
       fromState: [input: "metric_output"],
       toState: { id, output, state ->
@@ -84,8 +80,6 @@ workflow run_wf {
       def metric_configs_file = tempFile("metric_configs.yaml")
       metric_configs_file.write(metric_configs_yaml_blob)
 
-      def task_info_file = meta.resources_dir.resolve("task_info.yaml")
-
       // store the scores in a file
       def score_uns = states.collect{it.score_uns}
       def score_uns_yaml_blob = toYamlBlob(score_uns)
@@ -99,12 +93,6 @@ workflow run_wf {
       ]
 
       ["output", new_state]
-    }
-
-    // merge all of the output data 
-    | joinStates{ ids, states ->
-      def mergedStates = states.inject([:]) { acc, m -> acc + m }
-      [ids[0], mergedStates]
     }
 
   emit:
