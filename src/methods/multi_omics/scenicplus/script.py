@@ -82,7 +82,7 @@ def main(par):
     net = post_process(par)
     return net
 if __name__ == '__main__':
-    net = main(par)
+    # - subset to one donor for test
     if True: #TODO: remove this
         adata = ad.read(par['rna'])
         adata = adata[adata.obs['donor_id']=='donor_0']
@@ -97,7 +97,9 @@ if __name__ == '__main__':
         assert adata.shape[0]>0, 'no cell left after filtering'
         par['atac'] = f"{par['temp_dir']}/atac.h5ad"
         adata.write(par['atac'])
-        
+    # - main 
+    net = main(par)
+    
     dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
     output = ad.AnnData(X=None, uns={"method_id": 'scenicplus', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])

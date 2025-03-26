@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test=false
-RUN_ID="op_ppcor_run"
+RUN_ID="op_sub2_run"
 # - settings
 run_local=false
 reg_type="ridge"
@@ -27,7 +27,8 @@ metric_ids="[regression_1, regression_2, ws_distance]"
 #             figr,
 #             celloracle]"
 method_ids="[
-            ppcor
+            ppcor,
+            scenicplus,
 
             ]"
 if [ "$test" = true ]; then
@@ -136,7 +137,7 @@ HERE
     --pull-latest \
     --main-script target/nextflow/workflows/run_benchmark/main.nf \
     --workspace 53907369739130 \
-    --compute-env 7gRyww9YNGb0c6BUBtLhDP   \
+    --compute-env 6TJs9kM1T7ot4DbUY2huLF   \
     --params-file ${param_file} \
     --config common/nextflow_helpers/labels_tw.config \
     --labels ${label}
