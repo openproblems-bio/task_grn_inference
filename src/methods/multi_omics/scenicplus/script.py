@@ -83,6 +83,7 @@ def main(par):
     return net
 if __name__ == '__main__':
     # - subset to one donor for test
+    os.makedirs(par['temp_dir'], exist_ok=True)
     if True: #TODO: remove this
         adata = ad.read(par['rna'])
         adata = adata[adata.obs['donor_id']=='donor_0']

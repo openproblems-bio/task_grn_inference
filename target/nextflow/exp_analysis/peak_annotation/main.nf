@@ -3224,7 +3224,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/exp_analysis/peak_annotation",
     "viash_version" : "0.9.1",
-    "git_commit" : "fc39f6df0b31aecfe6b57906bc3f0a2195a938d5",
+    "git_commit" : "f0dff10e1ecf34d72ea37e00afd5d99319a7bab7",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

@@ -446,9 +446,9 @@ function ViashDockerfile {
 FROM apassemi/scenicplus:1.0.4
 ENTRYPOINT []
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenicplus"
-LABEL org.opencontainers.image.created="2025-03-26T09:51:12Z"
+LABEL org.opencontainers.image.created="2025-03-27T17:03:43Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="fc39f6df0b31aecfe6b57906bc3f0a2195a938d5"
+LABEL org.opencontainers.image.revision="f0dff10e1ecf34d72ea37e00afd5d99319a7bab7"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1448,6 +1448,7 @@ def main(par):
     return net
 if __name__ == '__main__':
     # - subset to one donor for test
+    os.makedirs(par['temp_dir'], exist_ok=True)
     if True: #TODO: remove this
         adata = ad.read(par['rna'])
         adata = adata[adata.obs['donor_id']=='donor_0']

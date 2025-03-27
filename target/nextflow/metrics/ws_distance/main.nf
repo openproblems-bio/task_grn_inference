@@ -3508,12 +3508,12 @@ meta = [
     }
   ],
   "build_info" : {
-    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/metrics/wasserstein/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/metrics/ws_distance/config.vsh.yaml",
     "runner" : "nextflow",
     "engine" : "docker",
     "output" : "target/nextflow/metrics/ws_distance",
     "viash_version" : "0.9.1",
-    "git_commit" : "fc39f6df0b31aecfe6b57906bc3f0a2195a938d5",
+    "git_commit" : "f0dff10e1ecf34d72ea37e00afd5d99319a7bab7",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
