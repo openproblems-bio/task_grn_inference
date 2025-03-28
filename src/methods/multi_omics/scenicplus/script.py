@@ -4,8 +4,8 @@ import os
 import anndata as ad
 ## VIASH START
 par = {
-  'rna': 'resources/grn_benchmark/inference_data/op_rna.h5ad',
-  'atac': 'resources/grn_benchmark/inference_data/op_atac.h5ad',
+  'rna': 'resources_test/grn_benchmark/inference_data/op_rna.h5ad',
+  'atac': 'resources_test/grn_benchmark/inference_data/op_atac.h5ad',
   'temp_dir': 'output/scenicplus_d0',
   'prediction': 'output/scenicplus_d0/prediction.h5ad',
   'qc': False,
@@ -84,7 +84,7 @@ def main(par):
 if __name__ == '__main__':
     # - subset to one donor for test
     os.makedirs(par['temp_dir'], exist_ok=True)
-    if True: #TODO: remove this
+    if False: #TODO: remove this
         adata = ad.read(par['rna'])
         adata = adata[adata.obs['donor_id']=='donor_0']
         adata.obs['donor_id'] = adata.obs['donor_id'].astype(str)

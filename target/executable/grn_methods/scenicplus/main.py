@@ -22,7 +22,7 @@ import os
 
 
 
-import flatbuffers
+# import flatbuffers
 import numpy as np
 import scanpy as sc
 import pandas as pd

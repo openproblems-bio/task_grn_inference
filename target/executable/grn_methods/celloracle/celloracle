@@ -454,9 +454,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods celloracle"
-LABEL org.opencontainers.image.created="2025-03-27T17:03:42Z"
+LABEL org.opencontainers.image.created="2025-03-28T23:58:16Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="f0dff10e1ecf34d72ea37e00afd5d99319a7bab7"
+LABEL org.opencontainers.image.revision="49a9011ea716d8012e8e60f5b402b6c8c3ac8f23"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

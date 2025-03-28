@@ -3480,7 +3480,7 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "apassemi/scenicplus:1.0.4",
+      "image" : "janursa/scenicplus:29_03_2025",
       "namespace_separator" : "/"
     },
     {
@@ -3494,7 +3494,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.9.1",
-    "git_commit" : "f0dff10e1ecf34d72ea37e00afd5d99319a7bab7",
+    "git_commit" : "49a9011ea716d8012e8e60f5b402b6c8c3ac8f23",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3718,7 +3718,7 @@ def main(par):
 if __name__ == '__main__':
     # - subset to one donor for test
     os.makedirs(par['temp_dir'], exist_ok=True)
-    if True: #TODO: remove this
+    if False: #TODO: remove this
         adata = ad.read(par['rna'])
         adata = adata[adata.obs['donor_id']=='donor_0']
         adata.obs['donor_id'] = adata.obs['donor_id'].astype(str)

@@ -3476,7 +3476,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.9.1",
-    "git_commit" : "f0dff10e1ecf34d72ea37e00afd5d99319a7bab7",
+    "git_commit" : "49a9011ea716d8012e8e60f5b402b6c8c3ac8f23",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
