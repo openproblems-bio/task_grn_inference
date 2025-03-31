@@ -31,7 +31,7 @@ arguments:
   - name: --num_workers
     type: integer
     direction: input
-    default: 20
+    default: 2
   - name: --temp_dir
     type: string
     direction: input

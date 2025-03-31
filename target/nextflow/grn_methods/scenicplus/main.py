@@ -413,7 +413,7 @@ def process_topics(par):
     )
 
     # 2D projections
-    run_umap(cistopic_obj, target='cell', scale=True)
+    # run_umap(cistopic_obj, target='cell', scale=True)
     run_tsne(cistopic_obj, target='cell', scale=True)
 
     # Topic binarization

@@ -4,15 +4,15 @@ import os
 import anndata as ad
 ## VIASH START
 par = {
-  'rna': 'resources_test/grn_benchmark/inference_data/op_rna.h5ad',
-  'atac': 'resources_test/grn_benchmark/inference_data/op_atac.h5ad',
-  'temp_dir': 'output/scenicplus_d0',
-  'prediction': 'output/scenicplus_d0/prediction.h5ad',
+  'rna': 'resources/grn_benchmark/inference_data/op_rna.h5ad',
+  'atac': 'resources/grn_benchmark/inference_data/op_atac.h5ad',
+  'temp_dir': 'output/sp_new',
+  'prediction': 'output/sp_new/prediction.h5ad',
   'qc': False,
   'num_workers': 20,
-  'scplus_mdata': 'output/scenicplus_d0/scplus_mdata.h5mu',
-  'cell_topic': 'output/scenicplus_d0/cell_topic.csv',
-  'grn_extended': 'output/scenicplus_d0/grn_extended.csv'
+  'scplus_mdata': 'output/sp_new/scplus_mdata.h5mu',
+  'cell_topic': 'output/sp_new/cell_topic.csv',
+  'grn_extended': 'output/sp_new/grn_extended.csv'
 }
 ## VIASH END
 
@@ -31,7 +31,7 @@ for key, value in vars(args).items():
     if value:
         par[key] = value
 
-print(par)
+# print(par)
 
 try:
     sys.path.append(meta["resources_dir"])
