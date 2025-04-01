@@ -41,28 +41,8 @@ resources:
 
 engines:
   - type: docker
-  # image: apassemi/scenicplus:1.0.4
-    # image: python:3.11.8-slim
     image: janursa/scenicplus:29_03_2025
-    # setup:
-    #   - type: python
-    #     packages: [ polars-lts-cpu ]
-    #   - type: docker
-    #     run: |
-    #       apt update && apt install -y git build-essential python3-dev libbz2-dev liblzma-dev libcurl4-openssl-dev libssl-dev libsqlite3-dev zlib1g-dev libncurses5-dev libncursesw5-dev libreadline-dev libffi-dev libgdbm-dev curl ca-certificates && rm -rf /var/lib/apt/lists/*  &&\
-    #       git clone https://github.com/samtools/htslib.git &&\
-    #       cd htslib &&\
-    #       git submodule update --init --recursive &&\
-    #       ./configure &&\
-    #       make &&\
-    #       make install &&\
-    #       git clone https://github.com/aertslab/scenicplus &&\
-    #       pip install -e scenicplus[dev]
 
-
-      
-
-    
     # setup:   
     #   - type: python
     #     packages: [ polars-lts-cpu ]
@@ -73,7 +53,7 @@ engines:
     #     packages: [ numba==0.56.4,  pynndescent==0.5.10 ]
     #     github:
     #       - openproblems-bio/core#subdirectory=packages/python/openproblems
-  - type: native   
+  # - type: native   
 runners:
   - type: executable
   - type: nextflow

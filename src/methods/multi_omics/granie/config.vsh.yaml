@@ -146,11 +146,25 @@ resources:
 
 engines:
   - type: docker
-    image: chrarnold84/granieverse:v1.3
-    setup:
-      - type: r
-        bioc: [reticulate, anndata]
-  - type: native
+    # image: chrarnold84/granieverse:v1.3
+    image: janursa/granie:01.04.2025
+
+    # image: openproblems/base_r:1.0.0
+    # setup:
+    #   - type: apt
+    #     packages: [python3-venv python3-pip python3-dev]
+    #   - type: r
+    #     bioc: [biovizBase, BSgenome.Hsapiens.UCSC.hg38, EnsDb.Hsapiens.v86, GRaNIE, reticulate, anndata]
+    #     cran: [qs, Seurat, Signac]
+    #   - type: python
+    #     packages: [anndata]
+        
+    #   - type: docker
+    #     run: |
+    #       Rscript -e 'reticulate::py_install("anndata", envname = "r-reticulate")'
+    #   - type: docker
+    #     run: |
+    #       Rscript -e 'remotes::install_gitlab("grp-zaugg/GRaNIEverse", host = "git.embl.de", dependencies = TRUE)'
 
 runners:
   - type: executable

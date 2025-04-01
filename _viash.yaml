@@ -15,8 +15,8 @@ links:
 label: GRN Inference
 summary: |
   Benchmarking GRN inference methods
-  Documentation: 
-  [geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)
+  Leaderboard: 
+  [Performance comparision](https://add-grn--openproblems.netlify.app/results/grn_inference/)
 
   Article: [geneRNIB: a living benchmark for gene regulatory network inference](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1)
 
