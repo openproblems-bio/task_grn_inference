@@ -228,7 +228,7 @@ GRN = runGRaNIE(
   peak_gene.fdr.threshold = par$GRaNIE_peak_gene_fdr_threshold,
   runTFClassification = FALSE,
   runNetworkAnalyses = FALSE,
-  nCores = par$num_workers,
+  nCores = 4,
   forceRerun = TRUE
 )
 

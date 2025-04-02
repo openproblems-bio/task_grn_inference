@@ -446,9 +446,9 @@ function ViashDockerfile {
 FROM janursa/granie:01.04.2025
 ENTRYPOINT []
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods granie"
-LABEL org.opencontainers.image.created="2025-04-01T15:04:35Z"
+LABEL org.opencontainers.image.created="2025-04-02T15:46:00Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="affb26800e558e625ff9fbc3021d50a287694a2f"
+LABEL org.opencontainers.image.revision="4b1b782b8204cbd5bed7e3e9105596ca2409db99"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1934,7 +1934,7 @@ GRN = runGRaNIE(
   peak_gene.fdr.threshold = par\$GRaNIE_peak_gene_fdr_threshold,
   runTFClassification = FALSE,
   runNetworkAnalyses = FALSE,
-  nCores = par\$num_workers,
+  nCores = 4,
   forceRerun = TRUE
 )
 

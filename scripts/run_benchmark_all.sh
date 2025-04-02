@@ -1,7 +1,7 @@
 #!/bin/bash
 
 test=false
-RUN_ID="op_sp_run"
+RUN_ID="op_co_run"
 # - settings
 run_local=false
 reg_type="ridge"
@@ -27,7 +27,7 @@ metric_ids="[regression_1, regression_2, ws_distance]"
 #             figr,
 #             celloracle]"
 method_ids="[
-            scenicplus,
+            celloracle,
 
             ]"
 if [ "$test" = true ]; then

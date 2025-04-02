@@ -48,11 +48,11 @@ engines:
     #     packages: [ polars-lts-cpu ]
     #     github:
     #       - openproblems-bio/core#subdirectory=packages/python/openproblems
-    # setup:   
-    #   - type: python
-    #     packages: [ numba==0.56.4,  pynndescent==0.5.10 ]
-    #     github:
-    #       - openproblems-bio/core#subdirectory=packages/python/openproblems
+    setup:   
+      - type: python
+        # packages: [ numba==0.56.4,  pynndescent==0.5.10 ]
+        github:
+          - openproblems-bio/core#subdirectory=packages/python/openproblems
   # - type: native   
 runners:
   - type: executable

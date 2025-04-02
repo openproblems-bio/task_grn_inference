@@ -3614,7 +3614,7 @@ meta = [
       "directives" : {
         "label" : [
           "midtime",
-          "midmem",
+          "highmem",
           "midcpu"
         ],
         "tag" : "$id"
@@ -3660,7 +3660,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/granie",
     "viash_version" : "0.9.1",
-    "git_commit" : "affb26800e558e625ff9fbc3021d50a287694a2f",
+    "git_commit" : "4b1b782b8204cbd5bed7e3e9105596ca2409db99",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -4043,7 +4043,7 @@ GRN = runGRaNIE(
   peak_gene.fdr.threshold = par\\$GRaNIE_peak_gene_fdr_threshold,
   runTFClassification = FALSE,
   runNetworkAnalyses = FALSE,
-  nCores = par\\$num_workers,
+  nCores = 4,
   forceRerun = TRUE
 )
 
@@ -4454,7 +4454,7 @@ meta["defaults"] = [
   },
   "label" : [
     "midtime",
-    "midmem",
+    "highmem",
     "midcpu"
   ],
   "tag" : "$id"
