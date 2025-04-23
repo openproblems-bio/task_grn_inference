@@ -41,15 +41,19 @@ resources:
 
 engines:
   - type: docker
-    image: apassemi/scenicplus:1.0.4
-    # image: vanallenlab/scenicplus_x86_64:initial
-    #image: aertslab/pyscenic:0.12.1
+    image: janursa/scenicplus:29_03_2025
+
     # setup:   
     #   - type: python
     #     packages: [ polars-lts-cpu ]
     #     github:
     #       - openproblems-bio/core#subdirectory=packages/python/openproblems
-  - type: native
+    setup:   
+      - type: python
+        # packages: [ numba==0.56.4,  pynndescent==0.5.10 ]
+        github:
+          - openproblems-bio/core#subdirectory=packages/python/openproblems
+  # - type: native   
 runners:
   - type: executable
   - type: nextflow

@@ -7,8 +7,6 @@ library(GRaNIE)
 suppressPackageStartupMessages(library(qs))
 suppressPackageStartupMessages(library(BSgenome.Hsapiens.UCSC.hg38))
 suppressPackageStartupMessages(library(EnsDb.Hsapiens.v86))
-suppressPackageStartupMessages(library(EnsDb.Mmusculus.v79))
-suppressPackageStartupMessages(library(BSgenome.Mmusculus.UCSC.mm39))
 suppressPackageStartupMessages(library(dplyr))
 suppressPackageStartupMessages(library(SummarizedExperiment))
 
@@ -16,10 +14,7 @@ suppressPackageStartupMessages(library(SummarizedExperiment))
 
 
 suppressPackageStartupMessages(library(reticulate))
-reticulate::install_miniconda()
-py_install("anndata")
-# install.packages("anndata")
-# anndata::install_anndata()
+# reticulate::install_miniconda()
 suppressPackageStartupMessages(library(anndata))
 # py_install("anndata")
 # anndata <- import("anndata")
@@ -233,7 +228,7 @@ GRN = runGRaNIE(
   peak_gene.fdr.threshold = par$GRaNIE_peak_gene_fdr_threshold,
   runTFClassification = FALSE,
   runNetworkAnalyses = FALSE,
-  nCores = par$num_workers,
+  nCores = 4,
   forceRerun = TRUE
 )
 

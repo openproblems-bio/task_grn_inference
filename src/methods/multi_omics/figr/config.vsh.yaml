@@ -28,14 +28,9 @@ engines:
     setup:
       - type: r
         bioc: ["aws.s3"]
-      
-    #   - type: python
-    #     packages: [ anndata ]
-    #     github:
-    #       - openproblems-bio/core#subdirectory=packages/python/openproblems
-  - type: native
+  # - type: native
 runners:
   - type: executable
   - type: nextflow
     directives:
-      label: [twodaytime, highmem, midcpu]
+      label: [twodaytime, veryveryhighmemory, midcpu]
