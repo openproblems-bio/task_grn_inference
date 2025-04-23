@@ -56,7 +56,7 @@ except:
 from util import efficient_melting
 
 
-def main_sub(adata, model, par):
+def main_sub(adata, model, par, cell_type):
     grn_inferer = GNInfer(
         how=par["how"],
         preprocess="softmax",
@@ -70,7 +70,7 @@ def main_sub(adata, model, par):
         batch_size=16,
     )
 
-    grn = grn_inferer(model, adata)
+    grn = grn_inferer(model, adata, cell_type=cell_type)
 
     net = grn.varp["GRN"]
     if hasattr(net, "todense"):  # Check if it's a sparse matrix
@@ -110,11 +110,16 @@ preprocessor = Preprocessor(
     min_nnz_genes=200,
     do_postp=False,
     is_symbol=True,
+    force_preprocess=True,
     # Skip ontology checks
     skip_validate=True,
 )
 
+if adata.raw is not None and adata.raw.X.shape[1] != adata.X.shape[1]:
+    del adata.raw
+
 dataset_id = adata.uns["dataset_id"] if "dataset_id" in adata.uns else par["dataset_id"]
+
 adata = preprocessor(adata)
 
 model_checkpoint_file = par["model"]
@@ -159,10 +164,10 @@ if model.device.type == "cpu" and torch.cuda.is_available():
 
 if "cell_type" not in adata.obs:
     adata.obs["cell_type"] = "dummy_cell_type"
+    par["how"] = "most var within"
 for i, cell_type in enumerate(adata.obs["cell_type"].unique()):
     print(cell_type)
-    adata_cell_type = adata[adata.obs["cell_type"] == cell_type].copy()
-    net = main_sub(adata_cell_type, model, par)
+    net = main_sub(adata, model, par, cell_type)
     net["cell_type"] = cell_type
     if i == 0:
         net_all = net

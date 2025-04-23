@@ -40,7 +40,7 @@ arguments:
   - name: --how
     type: string
     direction: input
-    default: "most var within"
+    default: "most var across"
 
 resources:
   - type: python_script
