@@ -1,0 +1,48 @@
+# __merge__: ../../../api/../comp_method.yaml
+
+name: cicero
+namespace: "grn_methods"
+info:
+  label: Cicero
+  summary: "Co-accessibility inference method"
+  description: |
+    Runs Cicero to obtain co-accessibility scores from peak data
+  # documentation_url: 
+
+resources:
+  - type: r_script
+    path: script.R
+
+
+engines:
+  - type: docker
+
+    image: openproblems/base_r:1.0.0
+    setup:
+      - type: apt
+        packages: [python3-venv python3-pip python3-dev]
+      - type: r
+        bioc: [cicero, biovizBase, BSgenome.Hsapiens.UCSC.hg38, EnsDb.Hsapiens.v86, reticulate, anndata]
+        cran: [qs, Seurat, Signac]
+      - type: docker
+        run: |
+          Rscript -e 'reticulate::py_install("anndata", envname = "r-reticulate")'
+      # - type: docker
+      #   run: |
+      #     Rscript -e 'remotes::install_github("satijalab/seurat-wrappers")'
+    
+    # image: satijalab/seurat-wrappers
+    # setup:
+    #   - type: apt
+    #     packages: [python3-venv python3-pip python3-dev]
+    #   - type: r
+    #     bioc: [cicero, biovizBase, BSgenome.Hsapiens.UCSC.hg38, EnsDb.Hsapiens.v86, reticulate, anndata]
+    #     cran: [qs, Signac]
+    #   - type: docker
+    #     run: |
+    #       Rscript -e 'reticulate::py_install("anndata", envname = "r-reticulate")'
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [midtime,highmem,midcpu]

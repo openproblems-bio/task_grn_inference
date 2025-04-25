@@ -48,6 +48,7 @@ workflow run_wf {
       methodFromState: { id, state, comp ->
         def new_args = [
           rna: state.rna,
+          rna_all: state.rna_all,
           atac: state.atac,
           tf_all: state.tf_all,
           apply_tf_methods: state.apply_tf_methods,
@@ -108,9 +109,6 @@ workflow run_wf {
   emit:
   output_ch
 }
-
-
-
 
 
 def run_benchmark_fun(args) {

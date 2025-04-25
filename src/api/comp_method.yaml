@@ -11,6 +11,11 @@ arguments:
     __merge__: file_rna_h5ad.yaml
     required: true
     direction: input
+  - name: --rna_all
+    type: file
+    required: false
+    summary: RNA expression data that contains all variability. Only used for positive control.
+    direction: input
   - name: --atac
     __merge__: file_atac_h5ad.yaml
     required: false
