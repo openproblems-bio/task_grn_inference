@@ -1,13 +1,13 @@
 #!/bin/bash
-datasets="norman replogle op nakatake adamson"
-# datasets=" op "
+# datasets="norman replogle op nakatake adamson"
+datasets=" op "
 
 run_local=false
 num_workers=10
 metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
-RUN_ID="scores_default"
+RUN_ID="scores_op"
 reg_type="ridge"
-label="scores_default"
+label=${RUN_ID}
 apply_skeleton=false
 apply_tf=true
 
@@ -34,11 +34,10 @@ else
 fi
 
 
-files_dir="${resources_dir}/grn_benchmark"
 publish_dir="${resources_dir}/results/scores/${RUN_ID}"
 echo "Publish dir: $publish_dir"
-grn_models_folder="${resources_dir}/grn_models/"
-grn_models_folder_local="./resources/grn_models/"
+grn_models_folder="${resources_dir}/results/all_main/"
+grn_models_folder_local="./resources/results/all_main/" # just to control the hetergenity of the models for different datasets
 
 
 params_dir="./params"
@@ -68,11 +67,11 @@ append_entry() {
   cat >> "$param_local" << HERE
   - id: ${reg_type}_${grn_name}_${dataset}
     metric_ids: ${metric_ids}
-    evaluation_data: ${files_dir}/evaluation_data/${dataset}_bulk.h5ad
-    tf_all: ${files_dir}/prior/tf_all.csv
-    regulators_consensus: ${files_dir}/prior/regulators_consensus_${dataset}.json
-    prediction: ${grn_models_folder}/${dataset}/${grn_name}.h5ad
-    skeleton: ${files_dir}/prior/skeleton.csv
+    evaluation_data: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad
+    tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
+    regulators_consensus: ${resources_dir}/grn_benchmark/prior/regulators_consensus_${dataset}.json
+    prediction: ${grn_models_folder}/${dataset}_ridge.${grn_name}.${grn_name}.prediction.h5ad
+    skeleton: ${resources_dir}/grn_benchmark/prior/skeleton.csv
     apply_skeleton: ${apply_skeleton}
     apply_tf: ${apply_tf}
 
@@ -81,9 +80,9 @@ HERE
   # Additional fields for specific datasets
   if [[ "$dataset" == "norman" || "$dataset" == "adamson" || "$dataset" == "replogle" ]]; then
     cat >> "$param_local" << HERE
-    evaluation_data_sc: ${files_dir}/evaluation_data/${dataset}_sc.h5ad
-    ws_consensus: ${files_dir}/prior/ws_consensus_${dataset}.csv
-    ws_distance_background: ${files_dir}/prior/ws_distance_background_${dataset}.csv
+    evaluation_data_sc: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_sc.h5ad
+    ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
+    ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv
 HERE
   fi
 }
@@ -91,8 +90,11 @@ HERE
 # Iterate over datasets and GRN models
 for dataset in $datasets; do
   for grn_name in "${grn_names[@]}"; do
-    if [[ -f "${grn_models_folder_local}/${dataset}/${grn_name}.h5ad" ]]; then
+    prediction_file="${grn_models_folder_local}/${dataset}_ridge.${grn_name}.${grn_name}.prediction.h5ad"
+    if [[ -f "${prediction_file}" ]]; then
       append_entry "$grn_name" "$dataset"
+    else
+      echo "File not found: ${prediction_file}"
     fi
   done
 done

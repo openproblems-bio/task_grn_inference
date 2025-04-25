@@ -3212,7 +3212,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/process_data/reologle_k562_gwps",
     "viash_version" : "0.9.1",
-    "git_commit" : "4b1b782b8204cbd5bed7e3e9105596ca2409db99",
+    "git_commit" : "5efb3625051f564c31ee6c1653cb54dc7d2a7458",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

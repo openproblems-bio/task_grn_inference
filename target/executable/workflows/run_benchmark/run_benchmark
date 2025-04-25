@@ -181,6 +181,9 @@ function ViashHelp {
   echo ""
   echo "Inputs:"
   echo "    --rna"
+  echo "        type: file, required parameter, file must exist"
+  echo ""
+  echo "    --rna_all"
   echo "        type: file, file must exist"
   echo ""
   echo "    --atac"
@@ -309,6 +312,17 @@ while [[ $# -gt 0 ]]; do
         --rna=*)
             [ -n "$VIASH_PAR_RNA" ] && ViashError Bad arguments for option \'--rna=*\': \'$VIASH_PAR_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_RNA=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --rna_all)
+            [ -n "$VIASH_PAR_RNA_ALL" ] && ViashError Bad arguments for option \'--rna_all\': \'$VIASH_PAR_RNA_ALL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_RNA_ALL="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --rna_all. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --rna_all=*)
+            [ -n "$VIASH_PAR_RNA_ALL" ] && ViashError Bad arguments for option \'--rna_all=*\': \'$VIASH_PAR_RNA_ALL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_RNA_ALL=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --atac)
@@ -646,6 +660,10 @@ fi
 
 
 # check whether required parameters exist
+if [ -z ${VIASH_PAR_RNA+x} ]; then
+  ViashError '--rna' is a required argument. Use "--help" to get more information on the parameters.
+  exit 1
+fi
 if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
   ViashError '--num_workers' is a required argument. Use "--help" to get more information on the parameters.
   exit 1
@@ -716,6 +734,10 @@ fi
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_RNA" ] && [ ! -e "$VIASH_PAR_RNA" ]; then
   ViashError "Input file '$VIASH_PAR_RNA' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_RNA_ALL" ] && [ ! -e "$VIASH_PAR_RNA_ALL" ]; then
+  ViashError "Input file '$VIASH_PAR_RNA_ALL' does not exist."
   exit 1
 fi
 if [ ! -z "$VIASH_PAR_ATAC" ] && [ ! -e "$VIASH_PAR_ATAC" ]; then
@@ -953,6 +975,7 @@ workflow run_wf {
       methodFromState: { id, state, comp ->
         def new_args = [
           rna: state.rna,
+          rna_all: state.rna_all,
           atac: state.atac,
           tf_all: state.tf_all,
           apply_tf_methods: state.apply_tf_methods,
@@ -1013,9 +1036,6 @@ workflow run_wf {
   emit:
   output_ch
 }
-
-
-
 
 
 def run_benchmark_fun(args) {

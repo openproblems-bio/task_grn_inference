@@ -3048,6 +3048,16 @@ meta = [
           "name" : "--rna",
           "must_exist" : true,
           "create_parent" : true,
+          "required" : true,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--rna_all",
+          "must_exist" : true,
+          "create_parent" : true,
           "required" : false,
           "direction" : "input",
           "multiple" : false,
@@ -3484,7 +3494,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_benchmark",
     "viash_version" : "0.9.1",
-    "git_commit" : "4b1b782b8204cbd5bed7e3e9105596ca2409db99",
+    "git_commit" : "5efb3625051f564c31ee6c1653cb54dc7d2a7458",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3654,6 +3664,7 @@ workflow run_wf {
       methodFromState: { id, state, comp ->
         def new_args = [
           rna: state.rna,
+          rna_all: state.rna_all,
           atac: state.atac,
           tf_all: state.tf_all,
           apply_tf_methods: state.apply_tf_methods,
@@ -3714,9 +3725,6 @@ workflow run_wf {
   emit:
   output_ch
 }
-
-
-
 
 
 def run_benchmark_fun(args) {

@@ -1,63 +1,36 @@
 #!/bin/bash
 
+# --------------------------
+# Dataset-specific availability:
+# ws_distance: only for [norman, adamson, replogle]
+# scprint: only for [opsca, replogle, norman] (uses different inference data)
+# scenicplus, scglue, granie, figr, celloracle: only for [opsca]
+# --------------------------
+
+# --- Settings ---
 test=false
-RUN_ID="op_co_run"
-# - settings
+RUN_ID="test_run"
 run_local=false
 reg_type="ridge"
 num_workers=10
 apply_tf_methods=true
 apply_skeleton=false
-# - specify inputs
-dataset_ids=" op " 
-metric_ids="[regression_1, regression_2, ws_distance]" 
-# method_ids="[pearson_corr,
-#             negative_control, 
-#             positive_control, 
 
-#             portia, 
-#             ppcor, 
-#             scenic, 
-#             scprint, 
-#             grnboost2,
-
-#             scenicplus, 
-#             scglue,
-#             granie,
-#             figr,
-#             celloracle]"
-method_ids="[
-            celloracle,
-
-            ]"
-if [ "$test" = true ]; then
-  resources_folder='resources_test'
-else
-  resources_folder='resources'
-fi
-echo "Resources folder: $resources_folder"
-label=${RUN_ID}
-echo "Run ID: $RUN_ID"
-
+# --- Directories ---
+resources_folder=$([ "$test" = true ] && echo "resources_test" || echo "resources")
 resources_dir="s3://openproblems-data/${resources_folder}/grn"
-
-
-files_dir="${resources_dir}/grn_benchmark"
 publish_dir="${resources_dir}/results/${RUN_ID}"
-echo "Publish dir: $publish_dir"
-grn_models_folder="${resources_dir}/grn_models/"
-grn_models_folder_local="./resources/grn_models/"
-
-
 params_dir="./params"
 param_file="${params_dir}/${RUN_ID}.yaml"
 param_local="${params_dir}/${RUN_ID}_param_local.yaml"
 param_aws="s3://openproblems-data/resources/grn/results/params/${RUN_ID}_param_local.yaml"
 
-# Print GRN names correctly
-echo $param_local
-echo "GRN models: ${method_ids[@]}"
+echo "Resources folder: $resources_folder"
+echo "Run ID: $RUN_ID"
+echo "Publish dir: $publish_dir"
+echo "Local param file: $param_local"
 
+# --- Prepare param files ---
 # Ensure param_file is clean
 > "$param_local"
 > "$param_file"
@@ -68,51 +41,76 @@ param_list:
 HERE
 fi
 
+# --- Function to append dataset block ---
 append_entry() {
   local dataset="$1"
-  echo "Dataset: $dataset"
+  local metrics="$2"
+  local methods="$3"
+  local extra_id="$4"
+
   cat >> "$param_local" << HERE
-  - id: ${reg_type}_${grn_name}_${dataset}
-    metric_ids: $metric_ids
-    method_ids: $method_ids
-    rna: ${files_dir}/inference_data/${dataset}_rna.h5ad
-    evaluation_data: ${files_dir}/evaluation_data/${dataset}_bulk.h5ad
-    tf_all: ${files_dir}/prior/tf_all.csv
-    regulators_consensus: ${files_dir}/prior/regulators_consensus_${dataset}.json
+  - id: ${dataset}_${extra_id}
+    metric_ids: $metrics
+    method_ids: $methods
+    rna: ${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad
+    rna_all: ${resources_dir}/extended_data/${dataset}_bulk.h5ad
+    evaluation_data: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad
+    tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
+    regulators_consensus: ${resources_dir}/grn_benchmark/prior/regulators_consensus_${dataset}.json
     layer: 'X_norm'
     num_workers: $num_workers
     apply_tf_methods: $apply_tf_methods
     apply_skeleton: $apply_skeleton
-    skeleton: ${files_dir}/prior/skeleton.csv
+    skeleton: ${resources_dir}/grn_benchmark/prior/skeleton.csv
     reg_type: $reg_type
-
-
 HERE
-  if [[ "$dataset" == "norman" || "$dataset" == "adamson" || "$dataset" == "replogle" ]]; then
+  if [ "$extra_id" = "special_case" ]; then # for scprint 
     cat >> "$param_local" << HERE
-    evaluation_data_sc: ${files_dir}/evaluation_data/${dataset}_sc.h5ad
-    ws_consensus: ${files_dir}/prior/ws_consensus_${dataset}.csv
-    ws_distance_background: ${files_dir}/prior/ws_distance_background_${dataset}.csv
+    rna: ${resources_dir}/grn_benchmark/inference_data/${dataset}_rna_sc_subset.h5ad
+HERE
+  else  # for rest 
+    cat >> "$param_local" << HERE
+    rna: ${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad
 HERE
   fi
-  if [[ "$dataset" == "op" ]]; then
+
+  # Extra fields for certain datasets
+  if [[ "$dataset" =~ ^(norman|adamson|replogle)$ ]]; then
     cat >> "$param_local" << HERE
-    atac: ${files_dir}/inference_data/${dataset}_atac.h5ad
+    evaluation_data_sc: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_sc.h5ad
+    ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
+    ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv
+HERE
+  fi
+
+  if [[ "$dataset" =~ ^(op|opsca)$ ]]; then
+    cat >> "$param_local" << HERE
+    atac: ${resources_dir}/grn_benchmark/inference_data/${dataset}_atac.h5ad
 HERE
   fi
 }
 
-# Iterate over datasets 
-for dataset in $dataset_ids; do
-  append_entry "$dataset"
-done
+# --------- COMBINATIONS TO ADD ----------
 
-# Append final fields
+# append_entry "op" "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
+#                                                                         portia, ppcor, scenic, scprint, grnboost2,
+#                                                                         scenicplus, scglue, granie, figr, celloracle]" 
+# append_entry "norman"  "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
+#                                                                         portia, ppcor, scenic, scprint, grnboost2]"
+# append_entry "adamson"  "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
+#                                                                         portia, ppcor, scenic, grnboost2]"
+# append_entry "nakatake"  "[regression_1,regression_2]" "[pearson_corr, negative_control, positive_control, 
+#                                                                         portia, ppcor, scenic, grnboost2]"
+# append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
+#                                                                         portia, ppcor, scenic, grnboost2]"
+append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "special_case"                                                
+# --- Final configuration ---
 if [ "$run_local" = true ]; then
   cat >> "$param_local" << HERE
 output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
+
   viash ns build --parallel 
   nextflow run . \
     -main-script  target/nextflow/workflows/run_benchmark/main.nf \
@@ -120,14 +118,13 @@ HERE
     -with-trace \
     -c common/nextflow_helpers/labels_ci.config \
     -params-file ${param_local}
-  
+
 else
   cat >> "$param_file" << HERE
 output_state: "state.yaml"
 publish_dir: "$publish_dir"
 param_list: "$param_aws"
 HERE
-  echo "Parameter file created: $param_file"
 
   aws s3 cp $param_local $param_aws
 
@@ -136,10 +133,11 @@ HERE
     --pull-latest \
     --main-script target/nextflow/workflows/run_benchmark/main.nf \
     --workspace 53907369739130 \
-    --compute-env 6TJs9kM1T7ot4DbUY2huLF   \
+    --compute-env 7gRyww9YNGb0c6BUBtLhDP \
     --params-file ${param_file} \
     --config common/nextflow_helpers/labels_tw.config \
-    --labels ${label}
+    --labels ${RUN_ID}
 fi
+
 #on demand 6TJs9kM1T7ot4DbUY2huLF   
 #7gRyww9YNGb0c6BUBtLhDP
