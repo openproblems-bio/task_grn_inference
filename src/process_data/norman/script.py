@@ -65,10 +65,10 @@ if __name__ == '__main__':
     sc.pp.filter_cells(adata, min_genes=100)
     sc.pp.filter_genes(adata, min_cells=10)
 
-    # - unique to norman
+    # - 
     adata.layers['X_norm'] = adata.X.copy()
 
-    # - split to inference and evaluation datasets: unique to norman 
+    # - split to inference and evaluation datasets
     ctr_pertb = adata[adata.obs['is_control']].obs['perturbation'].unique()
     non_ctr_pertubs =adata[~adata.obs['is_control']].obs['perturbation'].unique()
     train_perturbs, test_perturbs = train_test_split(non_ctr_pertubs, test_size=.5, random_state=32)
@@ -86,17 +86,14 @@ if __name__ == '__main__':
     sc.pp.filter_cells(adata_test_sc, min_genes=100)
     sc.pp.filter_genes(adata_test_sc, min_cells=10)
 
-    # - pseudo bulk: unique to norman 
+    # - pseudo bulk
     adata_bulk = sum_by(adata, unique_mapping=True, col='perturbation') 
     norman_test_bulk = sum_by(adata_test_sc, unique_mapping=True, col='perturbation') # summing over X_norm 
 
-
     # - normalize evaluation data
-    # sc.pp.normalize_total(norman_test_bulk)
     norman_test_bulk.layers['X_norm'] = norman_test_bulk.X.copy()
-
-    # - normalize adata_train_sc
     adata_train_sc.layers['X_norm'] = adata_train_sc.X.copy()
+    adata_bulk.layers['X_norm'] = adata_bulk.X.copy()
 
     # - add metadata
     adata_bulk = add_metadata(adata_bulk)
