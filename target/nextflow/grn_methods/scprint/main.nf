@@ -3581,7 +3581,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scprint",
     "viash_version" : "0.9.1",
-    "git_commit" : "5efb3625051f564c31ee6c1653cb54dc7d2a7458",
+    "git_commit" : "f29ea0e5242960f6ab5e2cff75c180800ead4372",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3834,9 +3834,11 @@ preprocessor = Preprocessor(
     is_symbol=True,
     # Skip ontology checks
     skip_validate=True,
+    use_raw=False
 )
 
 dataset_id = adata.uns["dataset_id"] if "dataset_id" in adata.uns else par["dataset_id"]
+
 adata = preprocessor(adata)
 
 model_checkpoint_file = par["model"]

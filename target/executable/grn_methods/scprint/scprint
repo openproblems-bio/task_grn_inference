@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   python -c 'from scdataloader.utils import populate_my_ontology; populate_my_ontology()'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-04-25T18:33:11Z"
+LABEL org.opencontainers.image.created="2025-04-27T08:54:18Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="5efb3625051f564c31ee6c1653cb54dc7d2a7458"
+LABEL org.opencontainers.image.revision="f29ea0e5242960f6ab5e2cff75c180800ead4372"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1577,9 +1577,11 @@ preprocessor = Preprocessor(
     is_symbol=True,
     # Skip ontology checks
     skip_validate=True,
+    use_raw=False
 )
 
 dataset_id = adata.uns["dataset_id"] if "dataset_id" in adata.uns else par["dataset_id"]
+
 adata = preprocessor(adata)
 
 model_checkpoint_file = par["model"]

@@ -22,7 +22,11 @@ def main(par):
         for tf in consensus_theta['source'].unique():
             if tf not in prediction['source'].unique(): # skip the evaluation if tf is not given in the predictions
                 continue
-            # - get the prior 
+
+            if tf not in background_distance['source'].unique():
+                print(f'TF {tf} not found in the background distance, skipping')
+                continue
+            # - get the background distance for the given tf
             background_distance_tf = background_distance[background_distance['source']==tf]
             n_edges = consensus_theta[consensus_theta['source'] == tf]['value'].values[0]
             # - subset the prediction to the given tf: choose the top edges based on n_edges

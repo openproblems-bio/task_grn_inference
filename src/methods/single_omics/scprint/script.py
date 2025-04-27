@@ -112,9 +112,11 @@ preprocessor = Preprocessor(
     is_symbol=True,
     # Skip ontology checks
     skip_validate=True,
+    use_raw=False
 )
 
 dataset_id = adata.uns["dataset_id"] if "dataset_id" in adata.uns else par["dataset_id"]
+
 adata = preprocessor(adata)
 
 model_checkpoint_file = par["model"]
