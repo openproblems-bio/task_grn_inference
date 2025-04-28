@@ -1,37 +1,35 @@
 #!/bin/bash
 
 test=false
-RUN_ID="op_main_run"
+RUN_ID="op_co_run"
 # - settings
 run_local=false
 reg_type="ridge"
-num_workers=20
+num_workers=10
 apply_tf_methods=true
 apply_skeleton=false
 # - specify inputs
 dataset_ids=" op " 
 metric_ids="[regression_1, regression_2, ws_distance]" 
-method_ids="[pearson_corr,
-            negative_control, 
-            positive_control, 
-
-            portia, 
-            ppcor, 
-            scenic, 
-            scprint, 
-            grnboost2,
-
-            scenicplus, 
-            scglue,
-            granie,
-            figr,
-            celloracle]"
-# method_ids="[
-#             pearson_corr,
+# method_ids="[pearson_corr,
 #             negative_control, 
 #             positive_control, 
 
-#             ]"
+#             portia, 
+#             ppcor, 
+#             scenic, 
+#             scprint, 
+#             grnboost2,
+
+#             scenicplus, 
+#             scglue,
+#             granie,
+#             figr,
+#             celloracle]"
+method_ids="[
+            celloracle,
+
+            ]"
 if [ "$test" = true ]; then
   resources_folder='resources_test'
 else

@@ -79,6 +79,8 @@ def process_links(net, par):
     else:
         net = net
     # - remove self loops
+    net["source"] = net["source"].astype(str)
+    net["target"] = net["target"].astype(str)
     net = net[net["source"] != net["target"]]
     # - limit the number of links
     if par["max_n_links"] != -1:

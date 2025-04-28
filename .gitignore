@@ -18,7 +18,8 @@ state*
 trace*
 tw*
 __init__*
-postprocess*
+postprocess.ipynb
+test.ipynb
 
 # related to python
 .ipynb_checkpoints

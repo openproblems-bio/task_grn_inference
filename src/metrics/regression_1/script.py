@@ -18,7 +18,7 @@ warnings.simplefilter("ignore")
 par = {
   "evaluation_data": f"resources/grn_benchmark/evaluation_data/op_bulk.h5ad",
   "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
-  "prediction": "output/pearson_net.h5ad",
+  "prediction": "output/sp_new/prediction.h5ad",
   "max_n_links": 50000,
   "apply_tf": True,
   'score': 'output/score.h5ad',
