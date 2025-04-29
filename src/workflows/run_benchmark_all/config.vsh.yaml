@@ -9,6 +9,10 @@ argument_groups:
       - name: --rna
         type: file
         direction: input
+        required: True
+      - name: --rna_all
+        type: file
+        direction: input
       - name: --atac
         type: file
         direction: input
