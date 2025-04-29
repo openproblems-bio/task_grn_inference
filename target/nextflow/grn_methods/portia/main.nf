@@ -3489,7 +3489,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/portia",
     "viash_version" : "0.9.1",
-    "git_commit" : "f29ea0e5242960f6ab5e2cff75c180800ead4372",
+    "git_commit" : "2eb910a1192d067365b1de481c1be9289b7ccfb6",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
