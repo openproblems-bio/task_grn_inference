@@ -8,6 +8,7 @@ import argparse
 from scprint import scPrint
 from scdataloader import Preprocessor
 from scprint.tasks import GNInfer
+from scipy.sparse import csr_matrix
 
 torch.set_float32_matmul_precision("medium")
 
@@ -25,7 +26,7 @@ par = {
     "model": None,
     "dataset_id": "op",
     "is_test": True,
-    "how": "most var within",
+    "how": "most var across",
 }
 ## VIASH END
 
@@ -56,22 +57,30 @@ except:
 from util import efficient_melting
 
 
-def main_sub(adata, model, par):
-    grn_inferer = GNInfer(
-        how=par["how"],
-        preprocess="softmax",
-        head_agg="mean",
-        forward_mode="none",
-        filtration=par["filtration"],
-        num_genes=par["num_genes"],
-        num_workers=par["num_workers"],
-        max_cells=par["max_cells"],
-        doplot=False,
-        batch_size=16,
-    )
+def main_sub(adata, model, par, cell_type):
+    try:
+        grn_inferer = GNInfer(
+            how=par["how"],
+            preprocess="softmax",
+            head_agg="mean",
+            forward_mode="none",
+            filtration=par["filtration"],
+            num_genes=par["num_genes"],
+            num_workers=par["num_workers"],
+            max_cells=par["max_cells"],
+            doplot=False,
+            batch_size=16,
+        )
 
-    grn = grn_inferer(model, adata)
-
+        grn = grn_inferer(model, adata, cell_type=cell_type)
+    except ValueError as e:
+        if "Extrapolation" in str(e):
+            print(f"WARNING: {cell_type} has poor quality expression data")
+            print("rerunning with most expressed genes only")
+            grn_inferer.how = "most expr"
+            grn = grn_inferer(model, adata, cell_type=cell_type)
+        else:
+            raise e
     net = grn.varp["GRN"]
     if hasattr(net, "todense"):  # Check if it's a sparse matrix
         net = net.todense().A.T
@@ -102,7 +111,6 @@ adata.obs["is_primary_data"] = True
 adata.obs["organism_ontology_term_id"] = "NCBITaxon:9606"
 # adata.var = adata.var.set_index("gene_ids")
 
-print("\n>>> Preprocessing data...", flush=True)
 preprocessor = Preprocessor(
     min_valid_genes_id=min(0.7 * adata.n_vars, 10000),  # 90% of features up to 10,000
     # Turn off cell filtering to return results for all cells
@@ -110,14 +118,29 @@ preprocessor = Preprocessor(
     min_nnz_genes=200,
     do_postp=False,
     is_symbol=True,
+    force_preprocess=True,
     # Skip ontology checks
     skip_validate=True,
     use_raw=False
 )
+if adata.raw is not None and adata.raw.X.shape[1] != adata.X.shape[1]:
+    print("removing raw")
+    del adata.raw
+if adata.layers is not None and "counts" in adata.layers:
+    adata.X = adata.layers["counts"]
+    del adata.layers["counts"]
+
 
 dataset_id = adata.uns["dataset_id"] if "dataset_id" in adata.uns else par["dataset_id"]
 
+print("\n>>> Preprocessing data...", flush=True)
 adata = preprocessor(adata)
+
+if adata[0].X.sum() != int(adata[0].X.sum()):
+    print("WARNING: you are not using count data")
+    print("reverting logp1")
+    adata.X = csr_matrix(np.power(adata.X.todense(), 2) - 1)
+
 
 model_checkpoint_file = par["model"]
 if model_checkpoint_file is None:
@@ -161,10 +184,10 @@ if model.device.type == "cpu" and torch.cuda.is_available():
 
 if "cell_type" not in adata.obs:
     adata.obs["cell_type"] = "dummy_cell_type"
+    par["how"] = "most var within"
 for i, cell_type in enumerate(adata.obs["cell_type"].unique()):
     print(cell_type)
-    adata_cell_type = adata[adata.obs["cell_type"] == cell_type].copy()
-    net = main_sub(adata_cell_type, model, par)
+    net = main_sub(adata, model, par, cell_type)
     net["cell_type"] = cell_type
     if i == 0:
         net_all = net
