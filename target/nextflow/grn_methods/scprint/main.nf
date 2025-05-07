@@ -3534,7 +3534,7 @@ meta = [
           "user" : false,
           "pip" : [
             "git+https://github.com/cantinilab/scPRINT.git@2bc6b94020624853325b7ba37df50cb43190ff34",
-            "git+https://github.com/jkobject/scDataLoader.git@4b8dd05ab88e3a8c494af32ffd0da1f91505e522"
+            "git+https://github.com/jkobject/scDataLoader.git@c5b185e76248e7f19d165a17812bfb546f7b96dc"
           ],
           "upgrade" : true
         },
@@ -3579,7 +3579,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scprint",
     "viash_version" : "0.9.1",
-    "git_commit" : "2eb910a1192d067365b1de481c1be9289b7ccfb6",
+    "git_commit" : "4003fb4ab9a4d9b1e2a24dfeb8b5a3429bb38fa1",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3597,7 +3597,7 @@ meta = [
           "dest" : "resources_test"
         }
       ],
-      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone --recursive git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started. \nHere, we download the test resources which are used for testing the framework. Refer to the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/) for downloading the actual datasets.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \n            --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad\n            --prediction output/net.h5ad \n            --tf_all resources_test/grn_benchmark/prior/tf_all.csv\n```\n\n## Evaluate a GRN prediction\nOnce got the prediction for a given dataset (e.g. op), use the following code to obtain evaluation scores. \n\n```bash\nscripts/test_grn_evaluation.sh output/net.h5ad op\n```\n\nThis outputs the scores into `output/test_run/scores.yaml`\n\n## Add a GRN inference method, evaluation metric, or dataset\n\nTo add a new component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n"
+      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone --recursive git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started. \nHere, we download the test resources which are used for testing the framework. Refer to the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/) for downloading the actual datasets.\n\n```bash\nscripts/download_resources.sh\n```\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \n            --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad\n            --prediction output/net.h5ad \n            --tf_all resources_test/grn_benchmark/prior/tf_all.csv\n```\n\n## Evaluate a GRN prediction\nOnce got the prediction for a given dataset (e.g. op), use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad op\n```\n\nThis outputs the scores into `output/test_run/scores.yaml`\n\n## Add a GRN inference method, evaluation metric, or dataset\n\nTo add a new component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n"
     },
     "repositories" : [
       {

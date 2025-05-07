@@ -446,9 +446,9 @@ function ViashDockerfile {
 FROM janursa/granie:01.04.2025
 ENTRYPOINT []
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods granie"
-LABEL org.opencontainers.image.created="2025-04-29T15:20:00Z"
+LABEL org.opencontainers.image.created="2025-05-07T15:15:48Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="2eb910a1192d067365b1de481c1be9289b7ccfb6"
+LABEL org.opencontainers.image.revision="4003fb4ab9a4d9b1e2a24dfeb8b5a3429bb38fa1"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

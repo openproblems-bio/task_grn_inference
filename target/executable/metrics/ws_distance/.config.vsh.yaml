@@ -352,7 +352,7 @@ build_info:
   output: "target/executable/metrics/ws_distance"
   executable: "target/executable/metrics/ws_distance/ws_distance"
   viash_version: "0.9.1"
-  git_commit: "2eb910a1192d067365b1de481c1be9289b7ccfb6"
+  git_commit: "4003fb4ab9a4d9b1e2a24dfeb8b5a3429bb38fa1"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
 package_config:
   name: "task_grn_inference"
@@ -396,10 +396,10 @@ package_config:
       \            --prediction output/net.h5ad \n            --tf_all resources_test/grn_benchmark/prior/tf_all.csv\n\
       ```\n\n## Evaluate a GRN prediction\nOnce got the prediction for a given dataset\
       \ (e.g. op), use the following code to obtain evaluation scores. \n\n```bash\n\
-      scripts/test_grn_evaluation.sh output/net.h5ad op\n```\n\nThis outputs the scores\
-      \ into `output/test_run/scores.yaml`\n\n## Add a GRN inference method, evaluation\
-      \ metric, or dataset\n\nTo add a new component to the repository, follow the\
-      \ [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n"
+      scripts/single_grn_evaluation.sh output/net.h5ad op\n```\n\nThis outputs the\
+      \ scores into `output/test_run/scores.yaml`\n\n## Add a GRN inference method,\
+      \ evaluation metric, or dataset\n\nTo add a new component to the repository,\
+      \ follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n"
   repositories:
   - type: "github"
     name: "openproblems"

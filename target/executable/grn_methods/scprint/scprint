@@ -446,7 +446,7 @@ function ViashDockerfile {
 FROM openproblems/base_pytorch_nvidia:1.0.0
 ENTRYPOINT []
 RUN pip install --upgrade pip && \
-  pip install --upgrade --no-cache-dir "git+https://github.com/cantinilab/scPRINT.git@2bc6b94020624853325b7ba37df50cb43190ff34" "git+https://github.com/jkobject/scDataLoader.git@4b8dd05ab88e3a8c494af32ffd0da1f91505e522"
+  pip install --upgrade --no-cache-dir "git+https://github.com/cantinilab/scPRINT.git@2bc6b94020624853325b7ba37df50cb43190ff34" "git+https://github.com/jkobject/scDataLoader.git@c5b185e76248e7f19d165a17812bfb546f7b96dc"
 
 RUN lamin init --storage ./main --name main --schema bionty
 RUN lamin load anonymous/main
@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   python -c 'from scdataloader.utils import populate_my_ontology; populate_my_ontology()'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-04-29T15:20:00Z"
+LABEL org.opencontainers.image.created="2025-05-07T15:15:47Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="2eb910a1192d067365b1de481c1be9289b7ccfb6"
+LABEL org.opencontainers.image.revision="4003fb4ab9a4d9b1e2a24dfeb8b5a3429bb38fa1"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
