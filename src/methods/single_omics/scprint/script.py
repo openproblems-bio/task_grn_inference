@@ -121,6 +121,7 @@ preprocessor = Preprocessor(
     force_preprocess=True,
     # Skip ontology checks
     skip_validate=True,
+    use_raw=False
 )
 if adata.raw is not None and adata.raw.X.shape[1] != adata.X.shape[1]:
     print("removing raw")

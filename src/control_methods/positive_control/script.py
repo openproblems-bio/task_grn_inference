@@ -12,7 +12,7 @@ import argparse
 
 ## VIASH START
 par = {
-    'rna': 'resources/grn-benchmark/rna.h5ad',
+    'rna_all': 'resources/grn-benchmark/rna.h5ad',
     'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
     'max_n_links': 50000,
     'prediction': 'resources/grn_models/positive_control.csv',
@@ -24,7 +24,7 @@ par = {
 ## LOCAL START
 
 parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
+parser.add_argument('--rna_all', type=str, help='Path to the multiomics RNA file')
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
 parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
 parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
@@ -52,7 +52,9 @@ except:
 from util import corr_net
 
 if __name__ == '__main__':
-    dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
+    dataset_id = ad.read_h5ad(par['rna_all'], backed='r').uns['dataset_id']
+
+    par['rna'] = par['rna_all']
     net = corr_net(par)
 
     print('Output GRN')

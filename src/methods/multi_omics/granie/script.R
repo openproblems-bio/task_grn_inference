@@ -264,7 +264,7 @@ if (!is.data.frame(net)) {
 output <- AnnData(
   X = matrix(nrow = 0, ncol = 0),
   uns = list(
-    method_id = "ppcor",
+    method_id = "granie",
     dataset_id = dataset_id,
     prediction = net[, c("source", "target", "weight")]
   )
