@@ -75,7 +75,7 @@ viash run src/control_methods/pearson_corr/config.vsh.yaml --
 Once got the prediction for a given dataset (e.g. op), use the following code to obtain evaluation scores. 
 
 ```bash
-scripts/test_grn_evaluation.sh output/net.h5ad op
+scripts/single_grn_evaluation.sh output/net.h5ad op
 ```
 
 This outputs the scores into `output/test_run/scores.yaml`
