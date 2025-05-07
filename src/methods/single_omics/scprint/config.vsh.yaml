@@ -55,7 +55,7 @@ engines:
       - type: python
         pip:
           - git+https://github.com/cantinilab/scPRINT.git@2bc6b94020624853325b7ba37df50cb43190ff34
-          - git+https://github.com/jkobject/scDataLoader.git@4b8dd05ab88e3a8c494af32ffd0da1f91505e522
+          - git+https://github.com/jkobject/scDataLoader.git@c5b185e76248e7f19d165a17812bfb546f7b96dc
       - type: docker
         run: lamin init --storage ./main --name main --schema bionty
       - type: docker
