@@ -149,7 +149,7 @@ engines:
     # image: chrarnold84/granieverse:v1.3
     image: janursa/granie:01.04.2025
 
-    # image: openproblems/base_r:1.0.0
+    # image: openproblems/base_r:1
     # setup:
     #   - type: apt
     #     packages: [python3-venv python3-pip python3-dev]

@@ -34,7 +34,7 @@ engines:
   #     - type: python
   #       packages: [ gdown ]
   - type: docker
-    image: openproblems/base_pytorch_nvidia:1.0.0
+    image: openproblems/base_pytorch_nvidia:1
     __merge__: /src/api/base_requirements.yaml
     # TODO: Try to find working installation of flash attention (flash-attn<1.0.5)
     setup:
