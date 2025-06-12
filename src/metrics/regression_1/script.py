@@ -18,13 +18,13 @@ warnings.simplefilter("ignore")
 par = {
   "evaluation_data": f"resources/grn_benchmark/evaluation_data/op_bulk.h5ad",
   "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
-  "prediction": "output/sp_new/prediction.h5ad",
+  "prediction": "resources/grn_models/op/grnboost2.h5ad",
   "max_n_links": 50000,
   "apply_tf": True,
   'score': 'output/score.h5ad',
   'reg_type': 'ridge',
   'layer': 'X_norm',
-  'num_workers': 4,
+  'num_workers': 1,
   'skeleton': 'resources/grn_benchmark/prior/skeleton.csv',
   'apply_skeleton': False,
   'verbose': 4,
@@ -106,6 +106,7 @@ def main(par):
     net = read_net(par)
     if par['apply_tf']:
         net = net[net.source.isin(tf_all)]
+    
     assert net.shape[0]>0, 'No links found in the network'
     assert all(column in net.columns for column in ['source', 'target', 'weight']), 'Columns in the network should be source, target, weight'
     
@@ -125,8 +126,6 @@ if __name__ == '__main__':
 
     # - run main function
     results = main(par) 
-
-
     # - formatize results  
     results = dict(r1_all=[results['r2score-aver-all']], r1_grn=[results['r2score-aver-grn']])
     results = pd.DataFrame(results)

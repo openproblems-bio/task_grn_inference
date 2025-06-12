@@ -49,7 +49,7 @@ to install the required dependencies.
 
 ## Download resources
 ```bash
-git clone git@github.com:openproblems-bio/task_grn_inference.git
+git clone --recursive git@github.com:openproblems-bio/task_grn_inference.git
 
 cd task_grn_inference
 ```
@@ -65,9 +65,9 @@ scripts/download_resources.sh
 To infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:
 
 ```bash
-viash run src/control_methods/pearson_corr/config.vsh.yaml -- 
-            --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad
-            --prediction output/net.h5ad 
+viash run src/control_methods/pearson_corr/config.vsh.yaml -- \
+            --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \
+            --prediction output/net.h5ad \
             --tf_all resources_test/grn_benchmark/prior/tf_all.csv
 ```
 
