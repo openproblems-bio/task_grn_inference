@@ -17,7 +17,7 @@ mkdir -p output
 
 RUN_ID="test_run"
 echo $RUN_ID
-resources_dir="./resources_test/" # change this to resources/ for the actual scores
+resources_dir="./resources/" # change this to resources/ for the actual scores
 publish_dir="./output/${RUN_ID}"
 
 num_workers=1

@@ -18,17 +18,17 @@ warnings.simplefilter("ignore")
 par = {
   "evaluation_data": f"resources/grn_benchmark/evaluation_data/op_bulk.h5ad",
   "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
-  "prediction": "resources/grn_models/op/grnboost2.h5ad",
+  "prediction": "output/pearson_net.h5ad",
   "max_n_links": 50000,
   "apply_tf": True,
   'score': 'output/score.h5ad',
   'reg_type': 'ridge',
   'layer': 'X_norm',
-  'num_workers': 1,
+  'num_workers': 10,
   'skeleton': 'resources/grn_benchmark/prior/skeleton.csv',
   'apply_skeleton': False,
   'verbose': 4,
-  'binarize': True
+  'binarize': False
 }
 ## VIASH END
 

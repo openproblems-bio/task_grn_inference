@@ -85,129 +85,132 @@ def process_net(net, gene_names):
     # subset 
     net = net[net.index.isin(gene_names)]
     return net
-# def cross_validation(net, prturb_adata, par:dict):
-#     np.random.seed(32)
-#     gene_names = prturb_adata.var_names
-#     net = process_net(net.copy(), gene_names)
-#     gene_names_grn = net.index.to_numpy()   
+def cross_validation_deprecated(net, prturb_adata, par:dict):
+    np.random.seed(32)
+    gene_names = prturb_adata.var_names
+    net = process_net(net.copy(), gene_names)
+    gene_names_grn = net.index.to_numpy()   
 
-#     # intersect 
+    # intersect 
+    gene_names = np.intersect1d(gene_names, prturb_adata.var_names)
+    # prturb_adata = prturb_adata[:, prturb_adata.var_names.isin(gene_names)]
+    prturb_adata = prturb_adata[:, ~prturb_adata.var_names.duplicated()]
 
-#     gene_names = np.intersect1d(gene_names, prturb_adata.var_names)
-#     # prturb_adata = prturb_adata[:, prturb_adata.var_names.isin(gene_names)]
-#     prturb_adata = prturb_adata[:, ~prturb_adata.var_names.duplicated()]
-
-#     # assert len(gene_names) == prturb_adata.n_vars
-#     # net = net.loc[gene_names, :]
+    # assert len(gene_names) == prturb_adata.n_vars
+    # net = net.loc[gene_names, :]
     
-#     # construct feature and target space
-#     n_tfs = net.shape[1]
-#     X_df = pd.DataFrame(np.zeros((len(gene_names), n_tfs)), index=gene_names)
+    # construct feature and target space
+    n_tfs = net.shape[1]
+    X_df = pd.DataFrame(np.zeros((len(gene_names), n_tfs)), index=gene_names)
 
 
-#     train_df = pd.DataFrame(
-#         prturb_adata.X.toarray() if scipy.sparse.issparse(prturb_adata.X) else prturb_adata.X, 
-#         columns=gene_names
-#     ).T
+    train_df = pd.DataFrame(
+        prturb_adata.X.toarray() if scipy.sparse.issparse(prturb_adata.X) else prturb_adata.X, 
+        columns=gene_names
+    ).T
 
-#     Y_df = train_df.loc[gene_names,:]
+    Y_df = train_df.loc[gene_names,:]
 
-#     mask_gene_net = X_df.index.isin(net.index)
+    mask_gene_net = X_df.index.isin(net.index)
     
-#     # fill the actual regulatory links
-#     X_df.loc[mask_gene_net, :] = net.values
-#     X = X_df.values.copy()
-#     # run cv 
-#     groups = cv_5(len(gene_names))
-#     # initialize y_pred with the mean of gene expressed across all samples
-#     y_pred = Y_df.copy()
-#     means = Y_df.mean(axis=0)
-#     y_pred[:] = means
-#     y_pred = y_pred.values
+    # fill the actual regulatory links
+    X_df.loc[mask_gene_net, :] = net.values
+    X = X_df.values.copy()
+    # run cv 
+    groups = cv_5(len(gene_names))
+    # initialize y_pred with the mean of gene expressed across all samples
+    y_pred = Y_df.copy()
+    means = Y_df.mean(axis=0)
+    y_pred[:] = means
+    y_pred = y_pred.values
 
-#     # initialize y_true
-#     Y = Y_df.values
-#     y_true = Y.copy()
+    # initialize y_true
+    Y = Y_df.values
+    y_true = Y.copy()
 
-#     # determine regressor 
-#     reg_type = par['reg_type']
-#     if reg_type=='ridge':
-#         regr =  Ridge(**dict(random_state=32))
-#     elif reg_type=='GB':
-#         params = dict(random_state=32, 
-#                     n_estimators=100, min_samples_leaf=2, min_child_samples=1, 
-#                     feature_fraction=0.05, verbosity=-1
-#         )
-#         regr = lightgbm_wrapper(params, max_workers=par['num_workers'])
-#     elif reg_type=='RF':
-#         params = dict(boosting_type='rf',random_state=32, n_estimators=100,  
-#         feature_fraction=0.05, verbosity=-1)
-#         regr = lightgbm_wrapper(params, max_workers=par['num_workers'])
-#     else:
-#         raise ValueError(f"{reg_type} is not defined.")  
-#     reg_models = []
+    # determine regressor 
+    reg_type = par['reg_type']
+    if reg_type=='ridge':
+        regr =  Ridge(**dict(random_state=32))
+    elif reg_type=='GB':
+        params = dict(random_state=32, 
+                    n_estimators=100, min_samples_leaf=2, min_child_samples=1, 
+                    feature_fraction=0.05, verbosity=-1
+        )
+        regr = lightgbm_wrapper(params, max_workers=par['num_workers'])
+    elif reg_type=='RF':
+        params = dict(boosting_type='rf',random_state=32, n_estimators=100,  
+        feature_fraction=0.05, verbosity=-1)
+        regr = lightgbm_wrapper(params, max_workers=par['num_workers'])
+    else:
+        raise ValueError(f"{reg_type} is not defined.")  
+    reg_models = []
 
-#     # initialize baselines
-#     n_baselines = 100
-#     unique_groups = np.unique(groups)
-#     y_pred_baselines = [y_pred.copy() for i in range(n_baselines)]
+    # initialize baselines
+    n_baselines = 100
+    unique_groups = np.unique(groups)
+    y_pred_baselines = [y_pred.copy() for i in range(n_baselines)]
     
-#     for group in tqdm(unique_groups, "Cross validation"):
-#         mask_va = groups == group
-#         mask_tr = ~mask_va
-#         X_tr = X[mask_tr & mask_gene_net, :]
-#         Y_tr = Y[mask_tr & mask_gene_net, :]
+    for group in tqdm(unique_groups, "Cross validation"):
+        mask_va = groups == group
+        mask_tr = ~mask_va
+        X_tr = X[mask_tr & mask_gene_net, :]
+        Y_tr = Y[mask_tr & mask_gene_net, :]
 
-#         X_va = X[mask_va & mask_gene_net, :]
+        X_va = X[mask_va & mask_gene_net, :]
 
-#         if X_tr.shape[0]<2:
-#             continue 
-#         regr.fit(X_tr, Y_tr)
-#         Y_pr = regr.predict(X_va)
+        if X_tr.shape[0]<2:
+            continue 
+        regr.fit(X_tr, Y_tr)
+        Y_pr = regr.predict(X_va)
 
-#         y_pred[mask_va & mask_gene_net, :] = Y_pr.copy()
+        y_pred[mask_va & mask_gene_net, :] = Y_pr.copy()
         
-#         # Shuffle each column independently and keep the same shape
-#         for i in range(n_baselines):
-#             for col in range(Y_pr.shape[1]):
-#                 np.random.shuffle(Y_pr[:, col])
-#             y_pred_baselines[i][mask_va & mask_gene_net, :] = Y_pr
-#         reg_models.append(regr)
-#     print('step1')
-#     # - normalized r2 score
-#     r2score = r2_score(y_true, y_pred, multioutput='variance_weighted')
-#     r2score_baselines = []
-#     for y_pred_baseline in y_pred_baselines:
-#         r2score_baselines.append(r2_score(y_true, y_pred_baseline, multioutput='variance_weighted'))
-#     r2score_n_all = r2score - np.mean(r2score_baselines)
-#     print('step2')
-#     # - normalized r2 score - S2
-#     r2score_grn = r2_score(y_true[mask_gene_net, :], y_pred[mask_gene_net, :], multioutput='variance_weighted')
-#     r2score_baselines = []
-#     for y_pred_baseline in y_pred_baselines:
-#         r2score_baselines.append(r2_score(y_true[mask_gene_net, :], y_pred_baseline[mask_gene_net, :], multioutput='variance_weighted'))
-#     r2score_n_grn = r2score_grn - np.mean(r2score_baselines)
+        # Shuffle each column independently and keep the same shape
+        for i in range(n_baselines):
+            for col in range(Y_pr.shape[1]):
+                np.random.shuffle(Y_pr[:, col])
+            y_pred_baselines[i][mask_va & mask_gene_net, :] = Y_pr
+        reg_models.append(regr)
+    print('step1')
+    # - normalized r2 score
+    r2score = r2_score(y_true, y_pred, multioutput='variance_weighted')
+    r2score_baselines = []
+    for y_pred_baseline in y_pred_baselines:
+        r2score_baselines.append(r2_score(y_true, y_pred_baseline, multioutput='variance_weighted'))
+    r2score_n_all = r2score - np.mean(r2score_baselines)
+    print('step2')
+    # - normalized r2 score - S2
+    r2score_grn = r2_score(y_true[mask_gene_net, :], y_pred[mask_gene_net, :], multioutput='variance_weighted')
+    r2score_baselines = []
+    for y_pred_baseline in y_pred_baselines:
+        r2score_baselines.append(r2_score(y_true[mask_gene_net, :], y_pred_baseline[mask_gene_net, :], multioutput='variance_weighted'))
+    r2score_n_grn = r2score_grn - np.mean(r2score_baselines)
     
-#     # - normalized r2 scores per sample
-#     print('step3')
-#     r2score_samples = []
-#     for i_sample in range(y_true.shape[1]):
-#         score_sample = r2_score(y_true[:, i_sample], y_pred[:, i_sample])
-#         r2score_baselines = []
-#         for y_pred_baseline in y_pred_baselines:
-#             r2score_baselines.append(r2_score(y_true[:, i_sample], y_pred_baseline[:, i_sample]))
-#         r2score_samples.append(score_sample - np.mean(r2score_baselines))
+    # - normalized r2 scores per sample
+    print('step3')
+    r2score_samples = []
+    for i_sample in range(y_true.shape[1]):
+        score_sample = r2_score(y_true[:, i_sample], y_pred[:, i_sample])
+        r2score_baselines = []
+        for y_pred_baseline in y_pred_baselines:
+            r2score_baselines.append(r2_score(y_true[:, i_sample], y_pred_baseline[:, i_sample]))
+        r2score_samples.append(score_sample - np.mean(r2score_baselines))
     
-#     results = {
-#         'r2score-aver-all': r2score_n_all,
-#         'r2score-aver-grn': r2score_n_grn,
-#         'r2scores': r2score_samples,
-#         'reg_models' : reg_models
-#     }
-#     print('step4')
+    results = {
+        'r2score-aver-all': r2score_n_all,
+        'r2score-aver-grn': r2score_n_grn,
+        'r2scores': r2score_samples,
+        'reg_models' : reg_models
+    }
+    print('step4')
     
-#     return results
-
+    return results
+def fast_r2(true, pred):
+        """Compute R² for each column (sample)"""
+        ss_res = np.sum((true - pred) ** 2, axis=0)
+        ss_tot = np.sum((true - np.mean(true, axis=0)) ** 2, axis=0)
+        return 1 - ss_res / ss_tot
 def cross_validation(net, prturb_adata, par: dict):
     import numpy as np
     from sklearn.linear_model import Ridge
@@ -292,7 +295,7 @@ def cross_validation(net, prturb_adata, par: dict):
             y_pred_baselines[i][va_idx] = shuffled
 
         reg_models.append(regr)
-
+    print('Calculating normalized R² scores...')
     # Normalized r2 scores
     r2_baselines_all = np.mean([
         r2_score(y_true, yb, multioutput='variance_weighted') for yb in y_pred_baselines
@@ -304,12 +307,6 @@ def cross_validation(net, prturb_adata, par: dict):
         for yb in y_pred_baselines
     ])
     r2score_n_grn = r2_score(y_true[mask_gene_net], y_pred[mask_gene_net], multioutput='variance_weighted') - r2_baselines_grn
-
-    def fast_r2(true, pred):
-        """Compute R² for each column (sample)"""
-        ss_res = np.sum((true - pred) ** 2, axis=0)
-        ss_tot = np.sum((true - np.mean(true, axis=0)) ** 2, axis=0)
-        return 1 - ss_res / ss_tot
     # Compute main prediction R² per sample
     r2_main = fast_r2(y_true, y_pred)
 
