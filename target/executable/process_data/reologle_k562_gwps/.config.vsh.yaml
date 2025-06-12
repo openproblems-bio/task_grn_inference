@@ -138,7 +138,7 @@ build_info:
   output: "target/executable/process_data/reologle_k562_gwps"
   executable: "target/executable/process_data/reologle_k562_gwps/reologle_k562_gwps"
   viash_version: "0.9.1"
-  git_commit: "4003fb4ab9a4d9b1e2a24dfeb8b5a3429bb38fa1"
+  git_commit: "959e5e8ee0668eee4061c0be7613e496c8fb528d"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
 package_config:
   name: "task_grn_inference"
@@ -178,8 +178,8 @@ package_config:
       \ for downloading the actual datasets.\n\n```bash\nscripts/download_resources.sh\n\
       ```\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset\
       \ (e.g. `op`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml\
-      \ -- \n            --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad\n\
-      \            --prediction output/net.h5ad \n            --tf_all resources_test/grn_benchmark/prior/tf_all.csv\n\
+      \ -- \\\n      --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad\
+      \ \\\n      --prediction output/net.h5ad \\\n      --tf_all resources_test/grn_benchmark/prior/tf_all.csv\n\
       ```\n\n## Evaluate a GRN prediction\nOnce got the prediction for a given dataset\
       \ (e.g. op), use the following code to obtain evaluation scores. \n\n```bash\n\
       scripts/single_grn_evaluation.sh output/net.h5ad op\n```\n\nThis outputs the\

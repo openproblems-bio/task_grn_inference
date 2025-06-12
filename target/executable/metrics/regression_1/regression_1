@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_1"
-LABEL org.opencontainers.image.created="2025-05-07T15:15:48Z"
+LABEL org.opencontainers.image.created="2025-06-12T14:28:54Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="4003fb4ab9a4d9b1e2a24dfeb8b5a3429bb38fa1"
+LABEL org.opencontainers.image.revision="959e5e8ee0668eee4061c0be7613e496c8fb528d"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1421,6 +1421,7 @@ def main(par):
     net = read_net(par)
     if par['apply_tf']:
         net = net[net.source.isin(tf_all)]
+    
     assert net.shape[0]>0, 'No links found in the network'
     assert all(column in net.columns for column in ['source', 'target', 'weight']), 'Columns in the network should be source, target, weight'
     
@@ -1440,8 +1441,6 @@ if __name__ == '__main__':
 
     # - run main function
     results = main(par) 
-
-
     # - formatize results  
     results = dict(r1_all=[results['r2score-aver-all']], r1_grn=[results['r2score-aver-grn']])
     results = pd.DataFrame(results)
