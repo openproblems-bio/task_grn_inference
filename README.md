@@ -13,7 +13,6 @@
 A living benchmark for gene regulatory network (GRN) inference.  
 Paper: [geneRNIB (bioRxiv)](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1) | [Leaderboard](https://genernib-documentation.readthedocs.io/en/latest/leaderboard.html) | [Full docs](https://genernib-documentation.readthedocs.io/en/latest/)
 
-Integrated GRN inference methods: GRNBoost2, scPRINT, GeneFormer, scGPT, Scenic/Scenic+, CellOracle, PPCOR, Portia, scGLUE, GRaNIE, FigR + Baseline correlation-based methods
 
 ## Agentic AI assistance
 
