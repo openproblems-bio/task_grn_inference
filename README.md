@@ -22,6 +22,8 @@ Repository:
 [openproblems-bio/task_grn_inference](https://github.com/openproblems-bio/task_grn_inference)
 
 If you use this framework, please cite it as
+
+```
   @article{nourisa2025genernib,
     title={geneRNIB: a living benchmark for gene regulatory network inference},
     author={Nourisa, Jalil and Passemiers, Antoine and Stock, Marco and Zeller-Plumhoff, Berit and Cannoodt, Robrecht and Arnold, Christian and Tong, Alexander and Hartford, Jason and Scialdone, Antonio and Moreau, Yves and others},
@@ -30,7 +32,7 @@ If you use this framework, please cite it as
     year={2025},
     publisher={Cold Spring Harbor Laboratory}
   }
-
+```
 ## Description
 
 geneRNIB is a living benchmark platform for GRN inference. This platform
