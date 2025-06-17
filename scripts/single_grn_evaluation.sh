@@ -18,7 +18,6 @@ for arg in "$@"; do
   fi
 done
 
-
 if [ -z "$prediction" ]; then
   echo "Error: prediction argument is missing (pass it as the first argument)"
   exit 1
@@ -34,7 +33,7 @@ mkdir -p output
 RUN_ID="single_evaluation"
 
 publish_dir="./output/${RUN_ID}"
-echo "Publish dir: $publish_dir"
+
 num_workers=1
 
 param_file="./output/${RUN_ID}.yaml"
@@ -62,6 +61,7 @@ if [ "$run_on_seqera" = true ]; then
   publish_dir="s3://openproblems-data/resources/grn/output/${RUN_ID}"
 fi
 
+echo "Publish dir: $publish_dir"
 
 append_entry() {
   cat >> $param_file << HERE
@@ -93,9 +93,7 @@ HERE
 
 echo "Generated parameter file: $param_file"
 # build the images: this can be skipped after the first run
-viash ns build --parallel --setup build -s src/metrics/
 
-viash ns build --parallel 
 
 if [ "$run_on_seqera" = true ]; then
   echo "Running on Seqera platform..."
@@ -110,6 +108,9 @@ if [ "$run_on_seqera" = true ]; then
       --config scripts/hpc_settings.config
 else
   echo "Running locally..."
+  viash ns build --parallel --setup build -s src/metrics/
+
+  viash ns build --parallel 
   nextflow run . \
   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
   -profile docker \

@@ -3232,7 +3232,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/process_data/adamon",
     "viash_version" : "0.9.1",
-    "git_commit" : "f6ee48f368f926313a9e64ef389e2fc52906fd08",
+    "git_commit" : "99ca759172687479405255cb7990b4292eefddbf",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
