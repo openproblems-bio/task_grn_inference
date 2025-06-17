@@ -15,16 +15,16 @@ grn_names=(
     "positive_control"
     "pearson_corr"
     "negative_control"
-    "scglue"
-    "scenicplus"
-    "celloracle"
-    "granie"
-    "figr"
-    "grnboost2"
-    "ppcor"
-    "portia"
-    "scenic"
-    "scprint"
+    # "scglue"
+    # "scenicplus"
+    # "celloracle"
+    # "granie"
+    # "figr"
+    # "grnboost2"
+    # "ppcor"
+    # "portia"
+    # "scenic"
+    # "scprint"
 )
 
 if [ "$run_local" = true ]; then
@@ -112,8 +112,8 @@ HERE
     -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
     -profile docker \
     -with-trace \
-    -c common/nextflow_helpers/labels_ci.config \
-    -params-file ${param_local}
+    -params-file ${param_local} \
+    # -c common/nextflow_helpers/labels_ci.config
 else
   cat >> "$param_file" << HERE
 output_state: "state.yaml"
@@ -128,9 +128,10 @@ HERE
     --revision build/main \
     --pull-latest \
     --main-script target/nextflow/workflows/run_grn_evaluation/main.nf \
-    --workspace 53907369739130 \
-    --compute-env 7gRyww9YNGb0c6BUBtLhDP \
+    --workspace 209741690280743 \
     --params-file ${param_file} \
-    --config common/nextflow_helpers/labels_tw.config \
     --labels ${label}
+    # --config scripts/hpc_settings.config \
+    
+    # --config common/nextflow_helpers/labels_tw.config
 fi 

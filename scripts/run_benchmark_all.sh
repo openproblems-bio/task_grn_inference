@@ -103,7 +103,7 @@ HERE
 #                                                                         portia, ppcor, scenic, grnboost2]"
 append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
                                                                         portia, ppcor, scenic, grnboost2]"
-append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "special_case"                                                
+# append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "special_case"                                                
 # --- Final configuration ---
 if [ "$run_local" = true ]; then
   cat >> "$param_local" << HERE
@@ -128,15 +128,23 @@ HERE
 
   aws s3 cp $param_local $param_aws
 
+  # tw launch https://github.com/openproblems-bio/task_grn_inference \
+  #   --revision build/main \
+  #   --pull-latest \
+  #   --main-script target/nextflow/workflows/run_benchmark/main.nf \
+  #   --workspace 53907369739130 \
+  #   --compute-env 7gRyww9YNGb0c6BUBtLhDP \
+  #   --params-file ${param_file} \
+  #   --config common/nextflow_helpers/labels_tw.config \
+  #   --labels ${RUN_ID}
   tw launch https://github.com/openproblems-bio/task_grn_inference \
     --revision build/main \
     --pull-latest \
     --main-script target/nextflow/workflows/run_benchmark/main.nf \
-    --workspace 53907369739130 \
-    --compute-env 7gRyww9YNGb0c6BUBtLhDP \
+    --workspace 209741690280743 \
     --params-file ${param_file} \
-    --config common/nextflow_helpers/labels_tw.config \
-    --labels ${RUN_ID}
+    --labels ${RUN_ID} \
+    --config scripts/hpc_settings.config
 fi
 
 #on demand 6TJs9kM1T7ot4DbUY2huLF   
