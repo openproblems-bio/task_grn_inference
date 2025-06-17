@@ -64,11 +64,13 @@ git clone --recursive git@github.com:openproblems-bio/task_grn_inference.git
 cd task_grn_inference
 ```
 To interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started. 
-Here, we download the test resources which are used for testing the framework. Refer to the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/) for downloading the actual datasets.
+Here, we download the **test resources** which are solely used for testing if the framework is installed successfully. 
 
 ```bash
 scripts/download_resources.sh
 ```
+
+Refer to the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/) for downloading the actual datasets. To reproduce the results, run `scripts/run_benchmark_all.sh`, which is a very resource intensive run.
 
 ## Run a GRN inference method 
 
@@ -80,15 +82,16 @@ viash run src/control_methods/pearson_corr/config.vsh.yaml -- \
             --prediction output/net.h5ad \
             --tf_all resources_test/grn_benchmark/prior/tf_all.csv
 ```
+Of note, we are using the `resources_test` datasets, which are small versions of the actual datasets for computational speed. Thus, the obtained predictions are not realistic. To obtain a realistic prediction, download the actual data and set the folder to `resources`.  
 
 ## Evaluate a GRN prediction
 Once got the prediction for a given dataset (e.g. op), use the following code to obtain evaluation scores. 
 
 ```bash
-scripts/single_grn_evaluation.sh output/net.h5ad op
+scripts/single_grn_evaluation.sh output/net.h5ad op --test_run
 ```
+**This** outputs the scores into `output/test_run/scores.yaml`. Of note, by passing `--test_run`, the evaluations are done on the test data. To use the actual data (`resources` folder), omit this flag.
 
-This outputs the scores into `output/test_run/scores.yaml`
 
 ## Add a GRN inference method, evaluation metric, or dataset
 
