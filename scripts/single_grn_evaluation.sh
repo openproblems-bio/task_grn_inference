@@ -2,24 +2,39 @@
 
 prediction=${1}
 dataset=${2}
+test_run=False
+# Parse --test_run flag
+for arg in "$@"; do
+  if [ "$arg" == "--test_run" ]; then
+    test_run=true
+  fi
+done
+
+run_on_seqera=false
+# Parse --run_on_seqera flag
+for arg in "$@"; do
+  if [ "$arg" == "--run_on_seqera" ]; then
+    run_on_seqera=true
+  fi
+done
+
 
 if [ -z "$prediction" ]; then
-  echo "Error: prediction argument is missing"
+  echo "Error: prediction argument is missing (pass it as the first argument)"
   exit 1
 fi
 
 if [ -z "$dataset" ]; then
-  echo "Error: dataset argument is missing"
+  echo "Error: dataset name is missing (pass it as the second argument)"
   exit 1
 fi
 
 mkdir -p output
 
-RUN_ID="test_run"
-echo $RUN_ID
-resources_dir="./resources_test/" # change this to resources/ for the actual scores
-publish_dir="./output/${RUN_ID}"
+RUN_ID="single_evaluation"
 
+publish_dir="./output/${RUN_ID}"
+echo "Publish dir: $publish_dir"
 num_workers=1
 
 param_file="./output/${RUN_ID}.yaml"
@@ -28,6 +43,25 @@ param_file="./output/${RUN_ID}.yaml"
 cat > $param_file << HERE
 param_list:
 HERE
+
+if [ "$test_run" = true ]; then
+  echo "Running on test data..."
+  resources_dir="./resources_test/" # change this to resources/ for the actual scores
+  num_workers=1
+else
+  echo "Running on actual data..."
+  resources_dir="./resources/" 
+fi
+
+if [ "$run_on_seqera" = true ]; then
+  prediction_aws="s3://openproblems-data/resources/grn/output/prediction_test.h5ad"
+  aws s3 cp $prediction $prediction_aws
+  prediction=$prediction_aws  
+
+  resources_dir="s3://openproblems-data/resources/grn"
+  publish_dir="s3://openproblems-data/resources/grn/output/${RUN_ID}"
+fi
+
 
 append_entry() {
   cat >> $param_file << HERE
@@ -63,9 +97,23 @@ viash ns build --parallel --setup build -s src/metrics/
 
 viash ns build --parallel 
 
-nextflow run . \
+if [ "$run_on_seqera" = true ]; then
+  echo "Running on Seqera platform..."
+
+  tw launch https://github.com/openproblems-bio/task_grn_inference \
+      --revision build/main \
+      --pull-latest \
+      --main-script target/nextflow/workflows/run_grn_evaluation/main.nf \
+      --workspace 209741690280743 \
+      --params-file ${param_file} \
+      --labels ${RUN_ID} \
+      --config scripts/hpc_settings.config
+else
+  echo "Running locally..."
+  nextflow run . \
   -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \
   -profile docker \
   -with-trace \
   -c common/nextflow_helpers/labels_ci.config \
   -params-file ${param_file}
+fi
