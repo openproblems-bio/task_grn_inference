@@ -8,7 +8,7 @@
 # --------------------------
 
 # --- Settings ---
-test=false
+test=true
 RUN_ID="replogle_run"
 run_local=false
 reg_type="ridge"
@@ -141,10 +141,11 @@ HERE
     --revision build/main \
     --pull-latest \
     --main-script target/nextflow/workflows/run_benchmark/main.nf \
-    --workspace 209741690280743 \
+    --workspace 53907369739130 \
     --params-file ${param_file} \
     --labels ${RUN_ID} \
-    --config scripts/hpc_settings.config
+    --config common/nextflow_helpers/labels_tw.config
+    # --config scripts/hpc_settings.config
 fi
 
 #on demand 6TJs9kM1T7ot4DbUY2huLF   

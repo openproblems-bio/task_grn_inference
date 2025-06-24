@@ -15,7 +15,6 @@ par = {
     'cell_type_specific': False,
     'max_n_links': 50000,
     'prediction': 'output/pearson_net.h5ad',
-    'apply_tf': True,
     'layer': 'X_norm',
     'apply_tf_methods': True
 
