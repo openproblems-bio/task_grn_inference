@@ -45,7 +45,7 @@ description: |
   
   See our publication for the details of methods. 
 info:
-  image: thumbnail.svg # todo: create a thumbnail
+  image: thumbnail.svg
   test_resources:
     - type: s3
       path: s3://openproblems-data/resources_test/grn
