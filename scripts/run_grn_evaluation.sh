@@ -128,9 +128,10 @@ HERE
     --revision build/main \
     --pull-latest \
     --main-script target/nextflow/workflows/run_grn_evaluation/main.nf \
-    --workspace 209741690280743 \
+    --workspace 53907369739130 \
     --params-file ${param_file} \
-    --labels ${label}
+    --labels ${label} \
+    --config common/nextflow_helpers/labels_tw.config
     # --config scripts/hpc_settings.config \
     
     # --config common/nextflow_helpers/labels_tw.config
