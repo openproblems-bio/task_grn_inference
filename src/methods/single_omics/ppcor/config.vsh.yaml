@@ -18,12 +18,12 @@ resources:
 
 engines:
   - type: docker
-    # image:  openproblems/base_r:1
-    # __merge__: /src/api/base_requirements.yaml
-    # setup:
-    #   - type: r
-    #     packages: [ppcor, anndata, dplyr]
-    image: janursa/ppcor-25-07-2025
+    image:  openproblems/base_r:1
+    __merge__: /src/api/base_requirements.yaml
+    setup:
+      - type: r
+        packages: [ppcor, anndata, dplyr]
+    # image: janursa/ppcor-25-07-2025
   - type: native
 runners:
   - type: executable
