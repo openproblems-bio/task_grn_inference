@@ -5,8 +5,6 @@ import os
 import scanpy as sc 
 import sys
 import numpy as np
-import argparse
-
 
 ## VIASH START
 par = {
@@ -17,46 +15,30 @@ par = {
     'prediction': 'output/pearson_net.h5ad',
     'layer': 'X_norm',
     'apply_tf_methods': True
-
-    }
+}
+meta = {
+    "resources_dir": 'src/utils'
+}
 ## VIASH END
 
-if False:
-    parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-    parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
-    parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-    parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
-    parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-    parser.add_argument('--num_workers', type=str, help='Number of cores')
-    parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
-    parser.add_argument('--dataset_id', type=str, help='Dataset id')
-    args = parser.parse_args()
-
-    par_local = vars(args)
-
-    for key, value in par_local.items():
-        if value is not None:
-            par[key] = value
-
-## LOCAL END
-
-try:
-    sys.path.append(meta["resources_dir"])
-except:
-    meta = {
-        "resources_dir": 'src/utils'
-    }
-    sys.path.append(meta["resources_dir"])
+sys.path.append(meta["resources_dir"])
 from util import corr_net
 
+adata = ad.read_h5ad(par["rna"])
+tf_all = np.loadtxt(par["tf_all"], dtype=str)
+dataset_id = adata.uns['dataset_id']
+net = corr_net(adata, tf_all, par)
 
-if __name__ == '__main__':
-    dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
-    net = corr_net(par)
-
-    print('Output GRN')
-    print('Shape of the network:', net.shape)
-    print(net.sort_values('weight', ascending=False, key=abs).head(10))
-    net = net.astype(str)
-    output = ad.AnnData(X=None, uns={"method_id": 'pearson_corr', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
-    output.write(par['prediction'])
+print('Output GRN')
+print('Shape of the network:', net.shape)
+print(net.sort_values('weight', ascending=False, key=abs).head(10))
+net = net.astype(str)
+output = ad.AnnData(
+    X=None,
+    uns={
+        "method_id": meta['name'],
+        "dataset_id": adata.uns['dataset_id'],
+        "prediction": net[["source", "target", "weight"]]
+    }
+)
+output.write_h5ad(par['prediction'])

@@ -16,6 +16,12 @@ arguments:
     __merge__: file_rna_h5ad.yaml
     required: true
     direction: input
+  - name: --rna_all
+    type: file
+    required: false
+    summary: RNA expression data that contains all variability. Only used for positive control.
+    direction: input
+    example: resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad
   - name: --prediction
     __merge__: file_prediction_h5ad.yaml
     required: false
@@ -54,8 +60,6 @@ arguments:
     type: boolean 
     required: false
     default: true
-
-
 
 test_resources:
   - type: python_script
