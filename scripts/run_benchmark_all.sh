@@ -9,7 +9,7 @@
 
 # --- Settings ---
 test=true
-RUN_ID="replogle_run"
+RUN_ID="op_run_test"
 run_local=false
 reg_type="ridge"
 num_workers=10
@@ -92,17 +92,16 @@ HERE
 
 # --------- COMBINATIONS TO ADD ----------
 
-# append_entry "op" "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
-#                                                                         portia, ppcor, scenic, scprint, grnboost2,
-#                                                                         scenicplus, scglue, granie, figr, celloracle]" 
+append_entry "op" "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
+                                                                        portia, ppcor, scenic, scprint, grnboost2,
+                                                                        scenicplus, scglue, granie, figr, celloracle]" 
 # append_entry "norman"  "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, scprint, grnboost2]"
 # append_entry "adamson"  "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, grnboost2]"
 # append_entry "nakatake"  "[regression_1,regression_2]" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, grnboost2]"
-append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
-                                                                        portia, ppcor, scenic, grnboost2]"
+# append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, portia, ppcor, scenic, grnboost2]"
 # append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "special_case"                                                
 # --- Final configuration ---
 if [ "$run_local" = true ]; then

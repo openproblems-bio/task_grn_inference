@@ -79,7 +79,7 @@ def pivot_grn(net):
 def process_net(net, gene_names):
     # Remove self-regulations
     net = net.drop_duplicates()
-    net = net[net['source'] != net['target']]
+    net = net[net['source'].astype(str) != net['target'].astype(str)]
     # pivot
     net = pivot_grn(net)
     # subset 
