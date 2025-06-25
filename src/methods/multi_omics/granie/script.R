@@ -271,7 +271,5 @@ output <- AnnData(
 )
 
 print(output)
-# output$write(par$prediction)
-print(par$prediction)
 output$write_h5ad(par$prediction, compression = "gzip")
 

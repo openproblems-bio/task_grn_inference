@@ -2,6 +2,8 @@
 import anndata as ad 
 import pandas as pd
 import os
+import numba
+numba.config.CACHE = False
 import scanpy as sc 
 import sys
 import numpy as np
