@@ -3119,17 +3119,6 @@ meta = [
         },
         {
           "type" : "file",
-          "name" : "--rna_all",
-          "summary" : "RNA expression data that contains all variability. Only used for positive control.",
-          "must_exist" : true,
-          "create_parent" : true,
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
           "name" : "--atac",
           "label" : "chromatin accessibility data",
           "summary" : "Chromatin accessibility data",
@@ -3481,7 +3470,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.9.4",
-    "git_commit" : "f1df211556ca3b0464498b1e04668ee930ddb9ee",
+    "git_commit" : "3d3c65a1d537ffb22a1f91b96ca63aa6aa5d966e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3599,7 +3588,6 @@ library(dplyr)
 
 par <- list(
   "rna" = $( if [ ! -z ${VIASH_PAR_RNA+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_RNA" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "rna_all" = $( if [ ! -z ${VIASH_PAR_RNA_ALL+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_RNA_ALL" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "atac" = $( if [ ! -z ${VIASH_PAR_ATAC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_ATAC" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "prediction" = $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PREDICTION" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "tf_all" = $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TF_ALL" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),

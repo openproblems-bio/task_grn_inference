@@ -1,8 +1,6 @@
-__merge__: ../../api/comp_method.yaml
-
+__merge__: ../../api/comp_control_method.yaml
 
 name: positive_control
-namespace: control_methods
 info:
   label: positive_control
   summary: "Baseline based on correlation"

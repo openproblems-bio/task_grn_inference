@@ -1,7 +1,6 @@
-__merge__: ../../api/comp_method.yaml
+__merge__: ../../api/comp_control_method.yaml
 
 name: negative_control
-namespace: control_methods
 info:
   label: Negative control
   summary: Source-target links based on random assignment
@@ -11,7 +10,6 @@ info:
 resources:
   - type: python_script
     path: script.py
-  - path: main.py
 engines:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4

@@ -118,11 +118,9 @@ def efficient_melting(net, gene_names, tf_all=None, symmetric=True):
     return net_df
 
 
-def corr_net(par: dict) -> pd.DataFrame:
+def corr_net(adata, tf_all, par) -> pd.DataFrame:
     # - read data
-    adata = ad.read_h5ad(par["rna"])
-    tf_all = np.loadtxt(par["tf_all"], dtype=str)
-    X = adata.layers[par["layer"]]
+    X = adata.layers[par['layer']]
     if hasattr(X, "todense"):
         X = X.todense().A
     # - remove genes with 0 standard deviation

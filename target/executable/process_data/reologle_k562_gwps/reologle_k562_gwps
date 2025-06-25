@@ -449,9 +449,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component process_data reologle_k562_gwps"
-LABEL org.opencontainers.image.created="2025-06-24T07:16:25Z"
+LABEL org.opencontainers.image.created="2025-06-25T06:19:07Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="f1df211556ca3b0464498b1e04668ee930ddb9ee"
+LABEL org.opencontainers.image.revision="3d3c65a1d537ffb22a1f91b96ca63aa6aa5d966e"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

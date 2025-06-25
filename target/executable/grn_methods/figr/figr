@@ -457,9 +457,9 @@ RUN Rscript -e 'options(warn = 2); if (!requireNamespace("BiocManager", quietly 
   Rscript -e 'options(warn = 2); if (!requireNamespace("aws.s3", quietly = TRUE)) BiocManager::install("aws.s3")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods figr"
-LABEL org.opencontainers.image.created="2025-06-24T07:16:25Z"
+LABEL org.opencontainers.image.created="2025-06-25T06:19:06Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="f1df211556ca3b0464498b1e04668ee930ddb9ee"
+LABEL org.opencontainers.image.revision="3d3c65a1d537ffb22a1f91b96ca63aa6aa5d966e"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -584,9 +584,6 @@ function ViashHelp {
   echo "        type: file, required parameter, file must exist"
   echo "        example: resources_test/grn_benchmark/inference_data/op_rna.h5ad"
   echo ""
-  echo "    --rna_all"
-  echo "        type: file, file must exist"
-  echo ""
   echo "    --atac"
   echo "        type: file, file must exist"
   echo "        example: resources_test/grn_benchmark/inference_data/op_atac.h5ad"
@@ -694,17 +691,6 @@ while [[ $# -gt 0 ]]; do
         --rna=*)
             [ -n "$VIASH_PAR_RNA" ] && ViashError Bad arguments for option \'--rna=*\': \'$VIASH_PAR_RNA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_RNA=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --rna_all)
-            [ -n "$VIASH_PAR_RNA_ALL" ] && ViashError Bad arguments for option \'--rna_all\': \'$VIASH_PAR_RNA_ALL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_RNA_ALL="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --rna_all. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --rna_all=*)
-            [ -n "$VIASH_PAR_RNA_ALL" ] && ViashError Bad arguments for option \'--rna_all=*\': \'$VIASH_PAR_RNA_ALL\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_RNA_ALL=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --atac)
@@ -1073,10 +1059,6 @@ if [ ! -z "$VIASH_PAR_RNA" ] && [ ! -e "$VIASH_PAR_RNA" ]; then
   ViashError "Input file '$VIASH_PAR_RNA' does not exist."
   exit 1
 fi
-if [ ! -z "$VIASH_PAR_RNA_ALL" ] && [ ! -e "$VIASH_PAR_RNA_ALL" ]; then
-  ViashError "Input file '$VIASH_PAR_RNA_ALL' does not exist."
-  exit 1
-fi
 if [ ! -z "$VIASH_PAR_ATAC" ] && [ ! -e "$VIASH_PAR_ATAC" ]; then
   ViashError "Input file '$VIASH_PAR_ATAC' does not exist."
   exit 1
@@ -1205,10 +1187,6 @@ if [ ! -z "$VIASH_PAR_RNA" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_RNA")" )
   VIASH_PAR_RNA=$(ViashDockerAutodetectMount "$VIASH_PAR_RNA")
 fi
-if [ ! -z "$VIASH_PAR_RNA_ALL" ]; then
-  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_RNA_ALL")" )
-  VIASH_PAR_RNA_ALL=$(ViashDockerAutodetectMount "$VIASH_PAR_RNA_ALL")
-fi
 if [ ! -z "$VIASH_PAR_ATAC" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_ATAC")" )
   VIASH_PAR_ATAC=$(ViashDockerAutodetectMount "$VIASH_PAR_ATAC")
@@ -1317,7 +1295,6 @@ Sys.setenv("AWS_ACCESS_KEY_ID" = "",
 
 par <- list(
   "rna" = $( if [ ! -z ${VIASH_PAR_RNA+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_RNA" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "rna_all" = $( if [ ! -z ${VIASH_PAR_RNA_ALL+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_RNA_ALL" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "atac" = $( if [ ! -z ${VIASH_PAR_ATAC+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_ATAC" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "prediction" = $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PREDICTION" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "tf_all" = $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_TF_ALL" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
@@ -1614,9 +1591,6 @@ if [[ "$VIASH_ENGINE_TYPE" == "docker" ]]; then
   
   if [ ! -z "$VIASH_PAR_RNA" ]; then
     VIASH_PAR_RNA=$(ViashDockerStripAutomount "$VIASH_PAR_RNA")
-  fi
-  if [ ! -z "$VIASH_PAR_RNA_ALL" ]; then
-    VIASH_PAR_RNA_ALL=$(ViashDockerStripAutomount "$VIASH_PAR_RNA_ALL")
   fi
   if [ ! -z "$VIASH_PAR_ATAC" ]; then
     VIASH_PAR_ATAC=$(ViashDockerStripAutomount "$VIASH_PAR_ATAC")
