@@ -443,23 +443,12 @@ function ViashDockerfile {
 
   if [[ "$engine_id" == "docker" ]]; then
     cat << 'VIASHDOCKER'
-FROM janursa/figr:19-08-2024
+FROM janursa/ppcor-25-07-2025:latest
 ENTRYPOINT []
-RUN apt-get update && \
-  DEBIAN_FRONTEND=noninteractive apt-get install -y procps git && \
-  rm -rf /var/lib/apt/lists/*
-
-RUN pip install --upgrade pip && \
-  pip install --upgrade --no-cache-dir "anndata~=0.10.0" "scanpy~=1.10.0" "pyyaml" "requests" "jsonschema" && \
-  pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
-
-RUN Rscript -e 'options(warn = 2); if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")' && \
-  Rscript -e 'options(warn = 2); remotes::install_cran(c("ppcor", "anndata", "dplyr"), repos = "https://cran.rstudio.com")'
-
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods ppcor"
-LABEL org.opencontainers.image.created="2025-06-25T06:19:05Z"
+LABEL org.opencontainers.image.created="2025-06-25T11:56:27Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="3d3c65a1d537ffb22a1f91b96ca63aa6aa5d966e"
+LABEL org.opencontainers.image.revision="377870e99e6b596d7091c96687ede67b2eeac832"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1291,8 +1280,7 @@ rm(.viash_orig_warn)
 ## VIASH END
 args <- commandArgs(trailingOnly = TRUE)
 
-# print(length(args))
-# aa
+print(args)
 i <- 1
 while (i <= length(args)) {
   if (args[i] == "--rna") {
@@ -1371,11 +1359,7 @@ output <- AnnData(
 )
 
 print(output)
-# output\$write(par\$prediction)
-print(par\$prediction)
 output\$write_h5ad(par\$prediction, compression = "gzip")
-# write.table(net, 'output/ne', sep = ",", quote = FALSE, row.names = FALSE)
-
 print("Finished.")
 VIASHMAIN
 Rscript "\$tempscript" &

@@ -3421,43 +3421,8 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "janursa/figr:19-08-2024",
-      "namespace_separator" : "/",
-      "setup" : [
-        {
-          "type" : "apt",
-          "packages" : [
-            "procps",
-            "git"
-          ],
-          "interactive" : false
-        },
-        {
-          "type" : "python",
-          "user" : false,
-          "packages" : [
-            "anndata~=0.10.0",
-            "scanpy~=1.10.0",
-            "pyyaml",
-            "requests",
-            "jsonschema"
-          ],
-          "github" : [
-            "openproblems-bio/core#subdirectory=packages/python/openproblems"
-          ],
-          "upgrade" : true
-        },
-        {
-          "type" : "r",
-          "packages" : [
-            "ppcor",
-            "anndata",
-            "dplyr"
-          ],
-          "bioc_force_install" : false,
-          "warnings_as_errors" : true
-        }
-      ]
+      "image" : "janursa/ppcor-25-07-2025",
+      "namespace_separator" : "/"
     },
     {
       "type" : "native",
@@ -3470,7 +3435,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.9.4",
-    "git_commit" : "3d3c65a1d537ffb22a1f91b96ca63aa6aa5d966e",
+    "git_commit" : "377870e99e6b596d7091c96687ede67b2eeac832",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3631,8 +3596,7 @@ rm(.viash_orig_warn)
 ## VIASH END
 args <- commandArgs(trailingOnly = TRUE)
 
-# print(length(args))
-# aa
+print(args)
 i <- 1
 while (i <= length(args)) {
   if (args[i] == "--rna") {
@@ -3711,11 +3675,7 @@ output <- AnnData(
 )
 
 print(output)
-# output\\$write(par\\$prediction)
-print(par\\$prediction)
 output\\$write_h5ad(par\\$prediction, compression = "gzip")
-# write.table(net, 'output/ne', sep = ",", quote = FALSE, row.names = FALSE)
-
 print("Finished.")
 VIASHMAIN
 Rscript "$tempscript"
