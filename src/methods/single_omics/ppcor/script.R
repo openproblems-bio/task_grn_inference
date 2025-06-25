@@ -12,8 +12,7 @@ par <- list(
 ## VIASH END
 args <- commandArgs(trailingOnly = TRUE)
 
-# print(length(args))
-# aa
+print(args)
 i <- 1
 while (i <= length(args)) {
   if (args[i] == "--rna") {
@@ -92,9 +91,5 @@ output <- AnnData(
 )
 
 print(output)
-# output$write(par$prediction)
-print(par$prediction)
 output$write_h5ad(par$prediction, compression = "gzip")
-# write.table(net, 'output/ne', sep = ",", quote = FALSE, row.names = FALSE)
-
 print("Finished.")
