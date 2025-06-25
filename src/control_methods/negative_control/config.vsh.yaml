@@ -10,7 +10,6 @@ info:
 resources:
   - type: python_script
     path: script.py
-  - path: main.py
 engines:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4
