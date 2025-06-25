@@ -1,8 +1,7 @@
-__merge__: ../../api/comp_method.yaml
+__merge__: ../../api/comp_control_method.yaml
 
 
 name: pearson_corr
-namespace: control_methods
 info:
   label: pearson_corr
   summary: "Baseline based on correlation"
