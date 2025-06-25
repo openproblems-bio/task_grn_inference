@@ -3421,8 +3421,43 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "janursa/ppcor-25-07-2025",
-      "namespace_separator" : "/"
+      "image" : "openproblems/base_r:1",
+      "namespace_separator" : "/",
+      "setup" : [
+        {
+          "type" : "apt",
+          "packages" : [
+            "procps",
+            "git"
+          ],
+          "interactive" : false
+        },
+        {
+          "type" : "python",
+          "user" : false,
+          "packages" : [
+            "anndata~=0.10.0",
+            "scanpy~=1.10.0",
+            "pyyaml",
+            "requests",
+            "jsonschema"
+          ],
+          "github" : [
+            "openproblems-bio/core#subdirectory=packages/python/openproblems"
+          ],
+          "upgrade" : true
+        },
+        {
+          "type" : "r",
+          "packages" : [
+            "ppcor",
+            "anndata",
+            "dplyr"
+          ],
+          "bioc_force_install" : false,
+          "warnings_as_errors" : true
+        }
+      ]
     },
     {
       "type" : "native",
@@ -3435,7 +3470,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.9.4",
-    "git_commit" : "377870e99e6b596d7091c96687ede67b2eeac832",
+    "git_commit" : "d35d757d311207f33d0d71739d946167f447a8ae",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

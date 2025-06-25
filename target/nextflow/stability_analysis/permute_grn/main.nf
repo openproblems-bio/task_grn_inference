@@ -3273,7 +3273,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/stability_analysis/permute_grn",
     "viash_version" : "0.9.4",
-    "git_commit" : "377870e99e6b596d7091c96687ede67b2eeac832",
+    "git_commit" : "d35d757d311207f33d0d71739d946167f447a8ae",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
