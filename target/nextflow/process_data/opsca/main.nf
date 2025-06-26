@@ -3234,7 +3234,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/process_data/opsca",
     "viash_version" : "0.9.4",
-    "git_commit" : "d35d757d311207f33d0d71739d946167f447a8ae",
+    "git_commit" : "e75f19a1d4059fe10339c29aa170eccf4dad48e3",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
