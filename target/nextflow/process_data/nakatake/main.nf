@@ -3186,7 +3186,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/process_data/nakatake",
     "viash_version" : "0.9.4",
-    "git_commit" : "e75f19a1d4059fe10339c29aa170eccf4dad48e3",
+    "git_commit" : "738ce330a14017020aeaca5c36ea49e42e17c598",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3403,6 +3403,12 @@ def main(par):
 
     sc.pp.filter_cells(nakatake_test_bulk, min_genes=100)
     sc.pp.filter_genes(nakatake_test_bulk, min_cells=10)
+
+    # - TODO: get rid of this
+    if False:
+        sampled_cells = nakatake_train_bulk.obs.sample(n=400, random_state=0).index
+        sampled_genes = nakatake_train_bulk.var.sample(n=15000, random_state=0).index
+        nakatake_train_bulk = nakatake_train_bulk[sampled_cells, sampled_genes].copy()
 
 
     # - normalize 
