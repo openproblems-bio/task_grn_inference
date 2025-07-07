@@ -3454,7 +3454,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/grnboost2",
     "viash_version" : "0.9.4",
-    "git_commit" : "738ce330a14017020aeaca5c36ea49e42e17c598",
+    "git_commit" : "f1260ca51cc4fde26036270ab06497f414b00f16",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3662,7 +3662,7 @@ def main(par: dict) -> pd.DataFrame:
     tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
 
     # GRN inference
-    print(help(LocalCluster))
+    # print(help(LocalCluster))
     local_cluster = LocalCluster(n_workers=par['num_workers'],
                                  threads_per_worker=1,
                                  memory_limit=8e9)

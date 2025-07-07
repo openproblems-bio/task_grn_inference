@@ -449,9 +449,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "sctk==0.2.2"
 
 LABEL org.opencontainers.image.description="Companion container for running component process_data opsca"
-LABEL org.opencontainers.image.created="2025-07-07T07:32:17Z"
+LABEL org.opencontainers.image.created="2025-07-07T09:52:47Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="738ce330a14017020aeaca5c36ea49e42e17c598"
+LABEL org.opencontainers.image.revision="f1260ca51cc4fde26036270ab06497f414b00f16"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

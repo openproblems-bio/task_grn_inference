@@ -452,9 +452,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods grnboost2"
-LABEL org.opencontainers.image.created="2025-07-07T07:32:17Z"
+LABEL org.opencontainers.image.created="2025-07-07T09:52:48Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="738ce330a14017020aeaca5c36ea49e42e17c598"
+LABEL org.opencontainers.image.revision="f1260ca51cc4fde26036270ab06497f414b00f16"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1333,7 +1333,7 @@ def main(par: dict) -> pd.DataFrame:
     tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
 
     # GRN inference
-    print(help(LocalCluster))
+    # print(help(LocalCluster))
     local_cluster = LocalCluster(n_workers=par['num_workers'],
                                  threads_per_worker=1,
                                  memory_limit=8e9)
