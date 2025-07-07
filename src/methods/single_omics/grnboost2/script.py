@@ -9,12 +9,13 @@ import argparse
 
 ## VIASH START
 par = {
-  'rna': 'resources/grn-benchmark/rna_d0_hvg.h5ad',
+  'rna': 'resources_test/grn_benchmark/inference_data/op_rna.h5ad',
   "tf_all": 'resources/grn_benchmark/prior/tf_all.csv',
   'prediction': 'output/grnboost2_donor_0_hvg.csv',
   'max_n_links': 50000,
   'cell_type_specific': False,
   'normalize': False,
+  'num_workers': 10,
   'qc': False,
   'layer': 'X_norm'
 }
@@ -71,11 +72,15 @@ def main(par: dict) -> pd.DataFrame:
     tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
 
     # GRN inference
-    client = Client(processes=False)
-
     print("Infer grn", flush=True)
-  
-    network = grnboost2(X, client_or_address=client, gene_names=gene_names, tf_names=tf_names)
+    if False:
+        local_cluster = LocalCluster(n_workers=par['num_workers'],
+                                    threads_per_worker=1,
+                                    memory_limit=8e9)
+        client = Client(local_cluster)  
+        network = grnboost2(X, client_or_address=client, gene_names=gene_names, tf_names=tf_names)
+    else:
+        network = grnboost2(X, gene_names=gene_names, tf_names=tf_names)
     network.rename(columns={'TF': 'source', 'target': 'target', 'importance': 'weight'}, inplace=True)
     network.reset_index(drop=True, inplace=True)
     network = process_links(network, par)  
