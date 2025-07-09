@@ -3186,7 +3186,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/process_data/nakatake",
     "viash_version" : "0.9.4",
-    "git_commit" : "75928b3d1507202ccf3bbb6985175878bb4fc2c9",
+    "git_commit" : "764dea454b698f01705b18530bca486e8cecf32a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

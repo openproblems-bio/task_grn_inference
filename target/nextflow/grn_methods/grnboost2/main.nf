@@ -3421,23 +3421,37 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "continuumio/anaconda3:2024.02-1",
+      "image" : "aertslab/pyscenic:0.12.1",
       "namespace_separator" : "/",
       "setup" : [
         {
-          "type" : "docker",
-          "run" : [
-            "conda install -y -c bioconda arboreto pandas\n"
-          ]
+          "type" : "apt",
+          "packages" : [
+            "procps",
+            "git"
+          ],
+          "interactive" : false
+        },
+        {
+          "type" : "python",
+          "user" : false,
+          "packages" : [
+            "anndata~=0.10.0",
+            "scanpy~=1.10.0",
+            "pyyaml",
+            "requests",
+            "jsonschema"
+          ],
+          "github" : [
+            "openproblems-bio/core#subdirectory=packages/python/openproblems"
+          ],
+          "upgrade" : true
         },
         {
           "type" : "python",
           "user" : false,
           "packages" : [
             "anndata"
-          ],
-          "github" : [
-            "openproblems-bio/core#subdirectory=packages/python/openproblems"
           ],
           "upgrade" : true
         }
@@ -3454,7 +3468,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/grnboost2",
     "viash_version" : "0.9.4",
-    "git_commit" : "75928b3d1507202ccf3bbb6985175878bb4fc2c9",
+    "git_commit" : "764dea454b698f01705b18530bca486e8cecf32a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3561,11 +3575,22 @@ def innerWorkflowFactory(args) {
   def rawScript = '''set -e
 tempscript=".viash_script.py"
 cat > "$tempscript" << VIASHMAIN
+# import numpy as np
+# import pandas as pd
+# from arboreto.algo import grnboost2
+# from distributed import Client, LocalCluster
+# from tqdm import tqdm
+# import sys
+# import anndata as ad
+# import argparse
+import os
+import anndata
 import numpy as np
 import pandas as pd
-from arboreto.algo import grnboost2
-from distributed import Client, LocalCluster
-from tqdm import tqdm
+import subprocess
+import ast
+import requests
+import scipy.sparse as sp
 import sys
 import anndata as ad
 import argparse
@@ -3639,38 +3664,71 @@ except:
     }
     sys.path.append(meta["resources_dir"])
 
-from util import process_links, basic_qc
+from util import process_links
 
-def main(par: dict) -> pd.DataFrame:
-    \'\'\'
-        Main function to infer GRN
-    \'\'\'
-    print('Reading data')
-    adata_rna = ad.read_h5ad(par['rna'])
-    if 'qc' in par:
-        if par['qc']:
-            print('Shape before QC: ', adata_rna.shape)
-            adata_rna = basic_qc(adata_rna)
-            print('Shape after QC: ', adata_rna.shape)
-
+def run_grn(par):
+    print('Run grn')
+    command = [
+        "pyscenic", "grn",
+        "--num_workers", str(par['num_workers']),
+        "--seed", str(par['seed']),
+        "-o", str(par['expr_mat_adjacencies']),
+        "--method", "grnboost2", 
+        str(par['expression_data']),
+        par['tf_all']
+    ]
+    subprocess.run(command, check=True)
+def format_data(par):
+    print('Read data')
+    adata_rna = ad.read_h5ad(par['rna'])  
     gene_names = adata_rna.var_names
-
-    X = adata_rna.layers[par['layer']] 
-
-    # Load list of putative TFs
-    tfs = np.loadtxt(par["tf_all"], dtype=str)
-    tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
-
-    # GRN inference
-    client = Client(processes=False)
-
-    print("Infer grn", flush=True)
+    if sp.issparse(adata_rna.X):
+        adata_rna.X = adata_rna.X.toarray()
+    pd.DataFrame(adata_rna.X, columns=gene_names).to_csv(par['expression_data'], sep='\\\\t', index=False)
   
-    network = grnboost2(X, client_or_address=client, gene_names=gene_names, tf_names=tf_names)
-    network.rename(columns={'TF': 'source', 'target': 'target', 'importance': 'weight'}, inplace=True)
+
+def main(par):
+    par['expr_mat_adjacencies'] =  os.path.join(par['temp_dir'], "expr_mat_adjacencies.tsv")
+    par['expression_data'] = os.path.join(par['temp_dir'], "expression_data.tsv")
+
+    format_data(par)
+    run_grn(par)
+    network = pd.read_csv(par['expr_mat_adjacencies'], sep='\\\\t') 
+    network.rename(columns={'TF': 'source', 'importance': 'weight'}, inplace=True)
     network.reset_index(drop=True, inplace=True)
-    network = process_links(network, par)  
-    return network  
+    network = process_links(network, par)
+    return network
+
+# def _main(par: dict) -> pd.DataFrame:
+#     \'\'\'
+#         Main function to infer GRN
+#     \'\'\'
+#     print('Reading data')
+#     adata_rna = ad.read_h5ad(par['rna'])
+#     if 'qc' in par:
+#         if par['qc']:
+#             print('Shape before QC: ', adata_rna.shape)
+#             adata_rna = basic_qc(adata_rna)
+#             print('Shape after QC: ', adata_rna.shape)
+
+#     gene_names = adata_rna.var_names
+
+#     X = adata_rna.layers[par['layer']] 
+
+#     # Load list of putative TFs
+#     tfs = np.loadtxt(par["tf_all"], dtype=str)
+#     tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
+
+#     # GRN inference
+#     client = Client(processes=False)
+
+#     print("Infer grn", flush=True)
+  
+#     network = grnboost2(X, client_or_address=client, gene_names=gene_names, tf_names=tf_names)
+#     network.rename(columns={'TF': 'source', 'target': 'target', 'importance': 'weight'}, inplace=True)
+#     network.reset_index(drop=True, inplace=True)
+#     network = process_links(network, par)  
+#     return network  
 
 if __name__ == '__main__':
     dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
