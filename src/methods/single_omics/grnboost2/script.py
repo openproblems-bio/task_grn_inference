@@ -79,6 +79,7 @@ def main(par: dict) -> pd.DataFrame:
     network.rename(columns={'TF': 'source', 'target': 'target', 'importance': 'weight'}, inplace=True)
     network.reset_index(drop=True, inplace=True)
     network = process_links(network, par)  
+    client.close()
     return network  
 
 if __name__ == '__main__':
