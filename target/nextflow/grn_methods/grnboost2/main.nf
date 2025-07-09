@@ -3454,7 +3454,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/grnboost2",
     "viash_version" : "0.9.4",
-    "git_commit" : "87e376ea197f2ec0d92f4a20f6b0aa24f580b4b3",
+    "git_commit" : "75928b3d1507202ccf3bbb6985175878bb4fc2c9",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3662,15 +3662,11 @@ def main(par: dict) -> pd.DataFrame:
     tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
 
     # GRN inference
+    client = Client(processes=False)
+
     print("Infer grn", flush=True)
-    if False:
-        local_cluster = LocalCluster(n_workers=par['num_workers'],
-                                    threads_per_worker=1,
-                                    memory_limit=8e9)
-        client = Client(local_cluster)  
-        network = grnboost2(X, client_or_address=client, gene_names=gene_names, tf_names=tf_names)
-    else:
-        network = grnboost2(X, gene_names=gene_names, tf_names=tf_names)
+  
+    network = grnboost2(X, client_or_address=client, gene_names=gene_names, tf_names=tf_names)
     network.rename(columns={'TF': 'source', 'target': 'target', 'importance': 'weight'}, inplace=True)
     network.reset_index(drop=True, inplace=True)
     network = process_links(network, par)  

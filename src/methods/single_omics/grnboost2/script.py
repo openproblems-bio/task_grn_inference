@@ -72,15 +72,11 @@ def main(par: dict) -> pd.DataFrame:
     tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
 
     # GRN inference
+    client = Client(processes=False)
+
     print("Infer grn", flush=True)
-    if False:
-        local_cluster = LocalCluster(n_workers=par['num_workers'],
-                                    threads_per_worker=1,
-                                    memory_limit=8e9)
-        client = Client(local_cluster)  
-        network = grnboost2(X, client_or_address=client, gene_names=gene_names, tf_names=tf_names)
-    else:
-        network = grnboost2(X, gene_names=gene_names, tf_names=tf_names)
+  
+    network = grnboost2(X, client_or_address=client, gene_names=gene_names, tf_names=tf_names)
     network.rename(columns={'TF': 'source', 'target': 'target', 'importance': 'weight'}, inplace=True)
     network.reset_index(drop=True, inplace=True)
     network = process_links(network, par)  
