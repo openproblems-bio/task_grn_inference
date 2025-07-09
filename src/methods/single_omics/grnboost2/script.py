@@ -27,7 +27,7 @@ par = {
   'cell_type_specific': False,
   'normalize': False,
   'num_workers': 10,
-  'temp_dir': 'output/temp/',
+  'temp_dir': 'output/temdir/',
   'seed': 42,
   'qc': False,
   'layer': 'X_norm'
@@ -86,6 +86,7 @@ def format_data(par):
   
 
 def main(par):
+    os.makedirs(par['temp_dir'], exist_ok=True)
     par['expr_mat_adjacencies'] =  os.path.join(par['temp_dir'], "expr_mat_adjacencies.tsv")
     par['expression_data'] = os.path.join(par['temp_dir'], "expression_data.tsv")
 
