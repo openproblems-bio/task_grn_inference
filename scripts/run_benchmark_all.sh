@@ -8,8 +8,8 @@
 # --------------------------
 
 # --- Settings ---
-test=true
-RUN_ID="op_run_test"
+test=false
+RUN_ID="nakatake_run_grnboost"
 run_local=false
 reg_type="ridge"
 num_workers=10
@@ -92,15 +92,16 @@ HERE
 
 # --------- COMBINATIONS TO ADD ----------
 
-append_entry "op" "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
-                                                                        portia, ppcor, scenic, scprint, grnboost2,
-                                                                        scenicplus, scglue, granie, figr, celloracle]" 
+# append_entry "op" "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
+#                                                                         portia, ppcor, scenic, scprint, grnboost2,
+#                                                                         scenicplus, scglue, granie, figr, celloracle]" 
 # append_entry "norman"  "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, scprint, grnboost2]"
 # append_entry "adamson"  "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, grnboost2]"
 # append_entry "nakatake"  "[regression_1,regression_2]" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, grnboost2]"
+append_entry "nakatake"  "[regression_1, regression_2]" "[grnboost2]"
 # append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, portia, ppcor, scenic, grnboost2]"
 # append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "special_case"                                                
 # --- Final configuration ---
@@ -141,6 +142,7 @@ HERE
     --pull-latest \
     --main-script target/nextflow/workflows/run_benchmark/main.nf \
     --workspace 53907369739130 \
+    --compute-env 6TJs9kM1T7ot4DbUY2huLF \
     --params-file ${param_file} \
     --labels ${RUN_ID} \
     --config common/nextflow_helpers/labels_tw.config

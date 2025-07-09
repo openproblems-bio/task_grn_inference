@@ -10,6 +10,7 @@ for arg in "$@"; do
   fi
 done
 
+
 run_on_seqera=false
 # Parse --run_on_seqera flag
 for arg in "$@"; do
@@ -106,6 +107,15 @@ if [ "$run_on_seqera" = true ]; then
       --params-file ${param_file} \
       --labels ${RUN_ID} \
       --config scripts/hpc_settings.config
+  # tw launch https://github.com/openproblems-bio/task_grn_inference \
+  #   --revision build/main \
+  #   --pull-latest \
+  #   --main-script target/nextflow/workflows/run_grn_evaluation/main.nf \
+  #   --workspace 53907369739130 \
+  #   --compute-env 7gRyww9YNGb0c6BUBtLhDP \
+  #   --params-file ${param_file} \
+  #   --labels ${RUN_ID} \
+  #   --config common/nextflow_helpers/labels_tw.config
 else
   echo "Running locally..."
   viash ns build --parallel --setup build -s src/metrics/
