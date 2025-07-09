@@ -3507,7 +3507,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/ws_distance",
     "viash_version" : "0.9.4",
-    "git_commit" : "aa76c6adba9fd4c1da219ebb6982d14dab536cb6",
+    "git_commit" : "f679340c217be5fcfc34635c85994dcabfc50a25",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

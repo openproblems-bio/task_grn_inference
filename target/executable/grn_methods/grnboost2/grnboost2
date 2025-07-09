@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods grnboost2"
-LABEL org.opencontainers.image.created="2025-07-09T12:50:50Z"
+LABEL org.opencontainers.image.created="2025-07-09T16:01:35Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="aa76c6adba9fd4c1da219ebb6982d14dab536cb6"
+LABEL org.opencontainers.image.revision="f679340c217be5fcfc34635c85994dcabfc50a25"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -646,7 +646,7 @@ function ViashHelp {
   echo ""
   echo "Viash built in Engines:"
   echo "    ---engine=ENGINE_ID"
-  echo "        Specify the engine to use. Options are: docker, native."
+  echo "        Specify the engine to use. Options are: docker."
   echo "        Default: docker"
 }
 
@@ -869,12 +869,10 @@ done
 eval set -- $VIASH_POSITIONAL_ARGS
 
 
-if   [ "$VIASH_ENGINE_ID" == "native" ]  ; then
-  VIASH_ENGINE_TYPE='native'
-elif   [ "$VIASH_ENGINE_ID" == "docker" ]  ; then
+if   [ "$VIASH_ENGINE_ID" == "docker" ]  ; then
   VIASH_ENGINE_TYPE='docker'
 else
-  ViashError "Engine '$VIASH_ENGINE_ID' is not recognized. Options are: docker, native."
+  ViashError "Engine '$VIASH_ENGINE_ID' is not recognized. Options are: docker."
   exit 1
 fi
 
@@ -1139,15 +1137,6 @@ fi
 # create parent directories of output files, if so desired
 if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -d "$(dirname "$VIASH_PAR_PREDICTION")" ]; then
   mkdir -p "$(dirname "$VIASH_PAR_PREDICTION")"
-fi
-
-if  [ "$VIASH_ENGINE_ID" == "native" ]  ; then
-  if [ "$VIASH_MODE" == "run" ]; then
-    VIASH_CMD="bash"
-  else
-    ViashError "Engine '$VIASH_ENGINE_ID' does not support mode '$VIASH_MODE'."
-    exit 1
-  fi
 fi
 
 if [[ "$VIASH_ENGINE_TYPE" == "docker" ]]; then
