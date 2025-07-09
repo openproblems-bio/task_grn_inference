@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenic"
-LABEL org.opencontainers.image.created="2025-07-09T11:47:13Z"
+LABEL org.opencontainers.image.created="2025-07-09T12:50:51Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="764dea454b698f01705b18530bca486e8cecf32a"
+LABEL org.opencontainers.image.revision="aa76c6adba9fd4c1da219ebb6982d14dab536cb6"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1473,6 +1473,7 @@ def format_grn(par):
 def main(par):
   databases = f"{par['temp_dir']}/databases/"
   os.makedirs(databases, exist_ok=True)
+  os.makedirs(par['temp_dir'], exist_ok=True)
 
   par['motif_annotation'] = f'{databases}/motifs-v10nr_clust-nr.hgnc-m0.001-o0.0.tbl'
   par['genes_vs_motifs_10k'] = f'{databases}/hg38_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather'

@@ -3468,7 +3468,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/grnboost2",
     "viash_version" : "0.9.4",
-    "git_commit" : "764dea454b698f01705b18530bca486e8cecf32a",
+    "git_commit" : "aa76c6adba9fd4c1da219ebb6982d14dab536cb6",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3575,14 +3575,6 @@ def innerWorkflowFactory(args) {
   def rawScript = '''set -e
 tempscript=".viash_script.py"
 cat > "$tempscript" << VIASHMAIN
-# import numpy as np
-# import pandas as pd
-# from arboreto.algo import grnboost2
-# from distributed import Client, LocalCluster
-# from tqdm import tqdm
-# import sys
-# import anndata as ad
-# import argparse
 import os
 import anndata
 import numpy as np
@@ -3688,6 +3680,7 @@ def format_data(par):
   
 
 def main(par):
+    os.makedirs(par['temp_dir'], exist_ok=True)
     par['expr_mat_adjacencies'] =  os.path.join(par['temp_dir'], "expr_mat_adjacencies.tsv")
     par['expression_data'] = os.path.join(par['temp_dir'], "expression_data.tsv")
 
@@ -3699,36 +3692,6 @@ def main(par):
     network = process_links(network, par)
     return network
 
-# def _main(par: dict) -> pd.DataFrame:
-#     \'\'\'
-#         Main function to infer GRN
-#     \'\'\'
-#     print('Reading data')
-#     adata_rna = ad.read_h5ad(par['rna'])
-#     if 'qc' in par:
-#         if par['qc']:
-#             print('Shape before QC: ', adata_rna.shape)
-#             adata_rna = basic_qc(adata_rna)
-#             print('Shape after QC: ', adata_rna.shape)
-
-#     gene_names = adata_rna.var_names
-
-#     X = adata_rna.layers[par['layer']] 
-
-#     # Load list of putative TFs
-#     tfs = np.loadtxt(par["tf_all"], dtype=str)
-#     tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]
-
-#     # GRN inference
-#     client = Client(processes=False)
-
-#     print("Infer grn", flush=True)
-  
-#     network = grnboost2(X, client_or_address=client, gene_names=gene_names, tf_names=tf_names)
-#     network.rename(columns={'TF': 'source', 'target': 'target', 'importance': 'weight'}, inplace=True)
-#     network.reset_index(drop=True, inplace=True)
-#     network = process_links(network, par)  
-#     return network  
 
 if __name__ == '__main__':
     dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']

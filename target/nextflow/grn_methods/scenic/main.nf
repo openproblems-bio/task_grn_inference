@@ -3500,7 +3500,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scenic",
     "viash_version" : "0.9.4",
-    "git_commit" : "764dea454b698f01705b18530bca486e8cecf32a",
+    "git_commit" : "aa76c6adba9fd4c1da219ebb6982d14dab536cb6",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3771,6 +3771,7 @@ def format_grn(par):
 def main(par):
   databases = f"{par['temp_dir']}/databases/"
   os.makedirs(databases, exist_ok=True)
+  os.makedirs(par['temp_dir'], exist_ok=True)
 
   par['motif_annotation'] = f'{databases}/motifs-v10nr_clust-nr.hgnc-m0.001-o0.0.tbl'
   par['genes_vs_motifs_10k'] = f'{databases}/hg38_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather'

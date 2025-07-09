@@ -134,6 +134,7 @@ def format_grn(par):
 def main(par):
   databases = f"{par['temp_dir']}/databases/"
   os.makedirs(databases, exist_ok=True)
+  os.makedirs(par['temp_dir'], exist_ok=True)
 
   par['motif_annotation'] = f'{databases}/motifs-v10nr_clust-nr.hgnc-m0.001-o0.0.tbl'
   par['genes_vs_motifs_10k'] = f'{databases}/hg38_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather'
