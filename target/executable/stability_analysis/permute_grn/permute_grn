@@ -456,9 +456,9 @@ RUN pip install --upgrade pip && \
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component stability_analysis permute_grn"
-LABEL org.opencontainers.image.created="2025-07-09T16:01:34Z"
+LABEL org.opencontainers.image.created="2025-07-10T06:43:04Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="f679340c217be5fcfc34635c85994dcabfc50a25"
+LABEL org.opencontainers.image.revision="edd826471ae819c32bd882be82deb42f691d5d6b"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

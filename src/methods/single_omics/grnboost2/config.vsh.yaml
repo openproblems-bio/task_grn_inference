@@ -10,11 +10,14 @@ info:
     GRN inference using GRNBoost2.
   documentation_url: https://arboreto.readthedocs.io/en/latest/algorithms.html#grnboost2
 
+
+    
 resources:
   - type: python_script
     path: script.py
   - path: /src/utils/util.py
     dest: util.py
+    
 
 engines:
   # - type: docker
