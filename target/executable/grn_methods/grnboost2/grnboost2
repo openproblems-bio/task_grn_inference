@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods grnboost2"
-LABEL org.opencontainers.image.created="2025-07-10T06:43:06Z"
+LABEL org.opencontainers.image.created="2025-07-10T11:40:35Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="edd826471ae819c32bd882be82deb42f691d5d6b"
+LABEL org.opencontainers.image.revision="a93883c02aca8693013d57da530f8fe07c1173e0"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -646,7 +646,7 @@ function ViashHelp {
   echo ""
   echo "Viash built in Engines:"
   echo "    ---engine=ENGINE_ID"
-  echo "        Specify the engine to use. Options are: docker."
+  echo "        Specify the engine to use. Options are: docker, native."
   echo "        Default: docker"
 }
 
@@ -869,10 +869,12 @@ done
 eval set -- $VIASH_POSITIONAL_ARGS
 
 
-if   [ "$VIASH_ENGINE_ID" == "docker" ]  ; then
+if   [ "$VIASH_ENGINE_ID" == "native" ]  ; then
+  VIASH_ENGINE_TYPE='native'
+elif   [ "$VIASH_ENGINE_ID" == "docker" ]  ; then
   VIASH_ENGINE_TYPE='docker'
 else
-  ViashError "Engine '$VIASH_ENGINE_ID' is not recognized. Options are: docker."
+  ViashError "Engine '$VIASH_ENGINE_ID' is not recognized. Options are: docker, native."
   exit 1
 fi
 
@@ -1139,6 +1141,15 @@ if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -d "$(dirname "$VIASH_PAR_PREDICTION"
   mkdir -p "$(dirname "$VIASH_PAR_PREDICTION")"
 fi
 
+if  [ "$VIASH_ENGINE_ID" == "native" ]  ; then
+  if [ "$VIASH_MODE" == "run" ]; then
+    VIASH_CMD="bash"
+  else
+    ViashError "Engine '$VIASH_ENGINE_ID' does not support mode '$VIASH_MODE'."
+    exit 1
+  fi
+fi
+
 if [[ "$VIASH_ENGINE_TYPE" == "docker" ]]; then
   # detect volumes from file arguments
   VIASH_CHOWN_VARS=()
@@ -1306,7 +1317,6 @@ except:
     'resources_dir': 'src/utils'
     }
     sys.path.append(meta["resources_dir"])
-
 from util import process_links
 
 def format_data(par):
@@ -1347,7 +1357,7 @@ def main(par):
 if __name__=='__main__':
   dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
   net = main(par)
-
+  
   net['weight'] = net['weight'].astype(str)
   output = ad.AnnData(X=None, uns={"method_id": "grnboost2", "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
   output.write(par['prediction'])

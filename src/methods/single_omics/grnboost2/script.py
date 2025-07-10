@@ -13,13 +13,15 @@ import argparse
 
 ## VIASH START
 par = {
-
   'rna': 'resources/grn_benchmark/inference_data/op_rna.h5ad',
   "tf_all": 'resources/grn_benchmark/prior/tf_all.csv',
   'prediction': 'output/scenic_test.h5ad',
   'temp_dir': 'output/scenic',
   'num_workers': 20,
   'max_n_links': 50000,
+  'rank_threshold': 10000,
+  'auc_threshold': 0.05,
+  'nes_threshold': 3.0,
   'seed': "32",
   'normalize': False
 }
@@ -51,7 +53,6 @@ except:
     'resources_dir': 'src/utils'
     }
     sys.path.append(meta["resources_dir"])
-
 from util import process_links
 
 def format_data(par):
@@ -92,11 +93,10 @@ def main(par):
 if __name__=='__main__':
   dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
   net = main(par)
-
+  
   net['weight'] = net['weight'].astype(str)
   output = ad.AnnData(X=None, uns={"method_id": "grnboost2", "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
   output.write(par['prediction'])
-
 
 
 

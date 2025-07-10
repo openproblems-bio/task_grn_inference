@@ -3456,15 +3456,19 @@ meta = [
           "upgrade" : true
         }
       ]
+    },
+    {
+      "type" : "native",
+      "id" : "native"
     }
   ],
   "build_info" : {
     "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/grnboost2/config.vsh.yaml",
     "runner" : "nextflow",
-    "engine" : "docker",
+    "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/grnboost2",
     "viash_version" : "0.9.4",
-    "git_commit" : "edd826471ae819c32bd882be82deb42f691d5d6b",
+    "git_commit" : "a93883c02aca8693013d57da530f8fe07c1173e0",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3651,7 +3655,6 @@ except:
     'resources_dir': 'src/utils'
     }
     sys.path.append(meta["resources_dir"])
-
 from util import process_links
 
 def format_data(par):
@@ -3692,7 +3695,7 @@ def main(par):
 if __name__=='__main__':
   dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
   net = main(par)
-
+  
   net['weight'] = net['weight'].astype(str)
   output = ad.AnnData(X=None, uns={"method_id": "grnboost2", "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
   output.write(par['prediction'])
