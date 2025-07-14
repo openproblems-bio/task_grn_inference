@@ -130,8 +130,7 @@ dependencies:
     repository: openproblems
   # ---- single omics
   - name: grn_methods/portia
-  - name: grn_methods/grnboost2
-  - name: grn_methods/grnboost2_dup
+  - name: grn_methods/grnboost
   - name: grn_methods/scenic
   - name: grn_methods/ppcor 
   - name: grn_methods/scprint 

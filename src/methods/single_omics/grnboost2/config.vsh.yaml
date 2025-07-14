@@ -1,10 +1,10 @@
 __merge__: ../../../api/comp_method.yaml
 
 
-name: grnboost2
+name: grnboost
 namespace: "grn_methods"
 info:
-  label: grnboost2
+  label: grnboost
   summary: "GRN inference using GRNBoost2"
   description: |
     GRN inference using GRNBoost2.
@@ -24,8 +24,6 @@ engines:
     setup:
       - type: python
         packages: [ anndata ]
-  - type: native
- 
 
 
 runners:
