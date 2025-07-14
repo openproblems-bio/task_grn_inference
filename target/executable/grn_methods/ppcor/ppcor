@@ -457,9 +457,9 @@ RUN Rscript -e 'options(warn = 2); if (!requireNamespace("remotes", quietly = TR
   Rscript -e 'options(warn = 2); remotes::install_cran(c("ppcor", "anndata", "dplyr"), repos = "https://cran.rstudio.com")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods ppcor"
-LABEL org.opencontainers.image.created="2025-07-14T13:00:10Z"
+LABEL org.opencontainers.image.created="2025-07-14T13:20:14Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="f037c463a87134b79823226820cedd616accfc76"
+LABEL org.opencontainers.image.revision="3c9c534715f82a1b31f8ba4f09cce2d63b3da04e"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

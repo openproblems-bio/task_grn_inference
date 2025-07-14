@@ -893,8 +893,7 @@ VIASH_DEP_METRICS_REGRESSION_2="$VIASH_META_RESOURCES_DIR/../../../nextflow/metr
 VIASH_DEP_METRICS_REGRESSION_1="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/regression_1/main.nf"
 VIASH_DEP_METRICS_WS_DISTANCE="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/ws_distance/main.nf"
 VIASH_DEP_GRN_METHODS_PORTIA="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/portia/main.nf"
-VIASH_DEP_GRN_METHODS_GRNBOOST2="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/grnboost2/main.nf"
-VIASH_DEP_GRN_METHODS_GRNBOOST2_DUP="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/grnboost2_dup/main.nf"
+VIASH_DEP_GRN_METHODS_GRNBOOST="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/grnboost/main.nf"
 VIASH_DEP_GRN_METHODS_SCENIC="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/scenic/main.nf"
 VIASH_DEP_GRN_METHODS_PPCOR="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/ppcor/main.nf"
 VIASH_DEP_GRN_METHODS_SCPRINT="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/scprint/main.nf"
@@ -936,8 +935,7 @@ methods = [
   scenic, 
   scenicplus, 
   scprint, 
-  grnboost2,
-  grnboost2_dup,
+  grnboost,
   scglue,
   granie,
   figr,

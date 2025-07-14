@@ -253,10 +253,7 @@ dependencies:
 - name: "grn_methods/portia"
   repository:
     type: "local"
-- name: "grn_methods/grnboost2"
-  repository:
-    type: "local"
-- name: "grn_methods/grnboost2_dup"
+- name: "grn_methods/grnboost"
   repository:
     type: "local"
 - name: "grn_methods/scenic"
@@ -341,7 +338,7 @@ build_info:
   output: "target/nextflow/workflows/run_benchmark"
   executable: "target/nextflow/workflows/run_benchmark/main.nf"
   viash_version: "0.9.4"
-  git_commit: "f037c463a87134b79823226820cedd616accfc76"
+  git_commit: "3c9c534715f82a1b31f8ba4f09cce2d63b3da04e"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
   dependencies:
   - "target/nextflow/metrics/regression_2"
@@ -349,8 +346,7 @@ build_info:
   - "target/nextflow/metrics/ws_distance"
   - "target/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata"
   - "target/nextflow/grn_methods/portia"
-  - "target/nextflow/grn_methods/grnboost2"
-  - "target/nextflow/grn_methods/grnboost2_dup"
+  - "target/nextflow/grn_methods/grnboost"
   - "target/nextflow/grn_methods/scenic"
   - "target/nextflow/grn_methods/ppcor"
   - "target/nextflow/grn_methods/scprint"

@@ -3206,7 +3206,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/process_data/reologle",
     "viash_version" : "0.9.4",
-    "git_commit" : "f037c463a87134b79823226820cedd616accfc76",
+    "git_commit" : "3c9c534715f82a1b31f8ba4f09cce2d63b3da04e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

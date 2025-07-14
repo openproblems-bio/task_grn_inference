@@ -449,9 +449,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component process_data norman"
-LABEL org.opencontainers.image.created="2025-07-14T13:00:12Z"
+LABEL org.opencontainers.image.created="2025-07-14T13:20:16Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="f037c463a87134b79823226820cedd616accfc76"
+LABEL org.opencontainers.image.revision="3c9c534715f82a1b31f8ba4f09cce2d63b3da04e"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
