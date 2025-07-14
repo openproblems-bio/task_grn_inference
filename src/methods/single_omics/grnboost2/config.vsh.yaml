@@ -24,6 +24,8 @@ engines:
     setup:
       - type: python
         packages: [ anndata ]
+  - type: native
+ 
 
 
 runners:
