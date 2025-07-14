@@ -9,6 +9,7 @@ methods = [
   scenicplus, 
   scprint, 
   grnboost2,
+  grnboost2_dup,
   scglue,
   granie,
   figr,

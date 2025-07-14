@@ -3494,7 +3494,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_benchmark",
     "viash_version" : "0.9.4",
-    "git_commit" : "1d63a19379bb36fdbc9677e41d586aea4185d1d3",
+    "git_commit" : "f037c463a87134b79823226820cedd616accfc76",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3626,6 +3626,7 @@ methods = [
   scenicplus, 
   scprint, 
   grnboost2,
+  grnboost2_dup,
   scglue,
   granie,
   figr,

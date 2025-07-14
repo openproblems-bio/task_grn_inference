@@ -101,7 +101,7 @@ HERE
 #                                                                         portia, ppcor, scenic, grnboost2]"
 # append_entry "nakatake"  "[regression_1,regression_2]" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, grnboost2]"
-append_entry "nakatake"  "[regression_1, regression_2]" "[grnboost2]"
+append_entry "nakatake"  "[regression_1, regression_2]" "[grnboost2_dup]"
 # append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, portia, ppcor, scenic, grnboost2]"
 # append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "special_case"                                                
 # --- Final configuration ---
