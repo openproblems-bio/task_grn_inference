@@ -40,13 +40,8 @@ engines:
     image: aertslab/pyscenic:0.12.1
     __merge__: /src/api/base_requirements.yaml
     setup:
-    #   - type: docker
-    #     run: |
-    #       conda install -y -c bioconda arboreto pandas
       - type: python
-        packages: [ anndata ]
-  - type: native
- 
+        packages: [ anndata ] 
 
 runners:
   - type: executable

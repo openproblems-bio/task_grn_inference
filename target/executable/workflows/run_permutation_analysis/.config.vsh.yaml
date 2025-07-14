@@ -187,7 +187,7 @@ build_info:
   output: "target/executable/workflows/run_permutation_analysis"
   executable: "target/executable/workflows/run_permutation_analysis/run_permutation_analysis"
   viash_version: "0.9.4"
-  git_commit: "a93883c02aca8693013d57da530f8fe07c1173e0"
+  git_commit: "1d63a19379bb36fdbc9677e41d586aea4185d1d3"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
   dependencies:
   - "target/nextflow/metrics/regression_1"

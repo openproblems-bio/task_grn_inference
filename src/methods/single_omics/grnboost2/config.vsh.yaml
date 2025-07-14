@@ -17,7 +17,6 @@ resources:
   - path: /src/utils/util.py
     dest: util.py
     
-
 engines:
   - type: docker
     image: aertslab/pyscenic:0.12.1
@@ -27,6 +26,7 @@ engines:
         packages: [ anndata ]
   - type: native
  
+
 
 runners:
   - type: executable

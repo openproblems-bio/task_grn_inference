@@ -3355,6 +3355,12 @@ meta = [
       }
     },
     {
+      "name" : "grn_methods/grnboost2_dup",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
       "name" : "grn_methods/scenic",
       "repository" : {
         "type" : "local"
@@ -3488,7 +3494,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_benchmark",
     "viash_version" : "0.9.4",
-    "git_commit" : "a93883c02aca8693013d57da530f8fe07c1173e0",
+    "git_commit" : "1d63a19379bb36fdbc9677e41d586aea4185d1d3",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3594,6 +3600,7 @@ include { ws_distance } from "${meta.resources_dir}/../../../nextflow/metrics/ws
 include { extract_uns_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
 include { portia } from "${meta.resources_dir}/../../../nextflow/grn_methods/portia/main.nf"
 include { grnboost2 } from "${meta.resources_dir}/../../../nextflow/grn_methods/grnboost2/main.nf"
+include { grnboost2_dup } from "${meta.resources_dir}/../../../nextflow/grn_methods/grnboost2_dup/main.nf"
 include { scenic } from "${meta.resources_dir}/../../../nextflow/grn_methods/scenic/main.nf"
 include { ppcor } from "${meta.resources_dir}/../../../nextflow/grn_methods/ppcor/main.nf"
 include { scprint } from "${meta.resources_dir}/../../../nextflow/grn_methods/scprint/main.nf"
