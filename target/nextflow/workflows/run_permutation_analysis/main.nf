@@ -3256,8 +3256,8 @@ meta = [
           "lowmem" : "memory = 20.Gb",
           "midmem" : "memory = 50.Gb",
           "highmem" : "memory = 100.Gb",
-          "veryhighmemory" : "memory = 200.Gb",
-          "veryveryhighmemory" : "memory = 300.Gb",
+          "veryhighmem" : "memory = 200.Gb",
+          "veryveryhighmem" : "memory = 300.Gb",
           "lowcpu" : "cpus = 5",
           "midcpu" : "cpus = 15",
           "highcpu" : "cpus = 30",
@@ -3284,7 +3284,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_permutation_analysis",
     "viash_version" : "0.9.4",
-    "git_commit" : "3c9c534715f82a1b31f8ba4f09cce2d63b3da04e",
+    "git_commit" : "77fc46211c6c2a7cd7bc0e83036414c99c8f7763",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3316,7 +3316,7 @@ meta = [
     "source" : "src",
     "target" : "target",
     "config_mods" : [
-      ".runners[.type == \\"nextflow\\"].config.labels := { lowmem : \\"memory = 20.Gb\\", midmem : \\"memory = 50.Gb\\", highmem : \\"memory = 100.Gb\\",  veryhighmemory : \\"memory = 200.Gb\\", veryveryhighmemory : \\"memory = 300.Gb\\", lowcpu : \\"cpus = 5\\", midcpu : \\"cpus = 15\\", highcpu : \\"cpus = 30\\", lowtime : \\"time = 1.h\\", midtime : \\"time = 4.h\\", hightime : \\"time = 8.h\\", veryhightime : \\"time = 24.h\\", twodaytime : \\"time = 28.h\\" }\n"
+      ".runners[.type == \\"nextflow\\"].config.labels := { lowmem : \\"memory = 20.Gb\\", midmem : \\"memory = 50.Gb\\", highmem : \\"memory = 100.Gb\\",  veryhighmem : \\"memory = 200.Gb\\", veryveryhighmem : \\"memory = 300.Gb\\", lowcpu : \\"cpus = 5\\", midcpu : \\"cpus = 15\\", highcpu : \\"cpus = 30\\", lowtime : \\"time = 1.h\\", midtime : \\"time = 4.h\\", hightime : \\"time = 8.h\\", veryhightime : \\"time = 24.h\\", twodaytime : \\"time = 28.h\\" }\n"
     ],
     "authors" : [
       {
