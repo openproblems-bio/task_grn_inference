@@ -33,4 +33,4 @@ runners:
   - type: executable
   - type: nextflow
     directives:
-      label: [twodaytime, veryveryhighmemory, midcpu]
+      label: [twodaytime, veryveryhighmem, midcpu]
