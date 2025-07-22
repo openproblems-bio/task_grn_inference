@@ -3154,7 +3154,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/cicero",
     "viash_version" : "0.9.4",
-    "git_commit" : "77fc46211c6c2a7cd7bc0e83036414c99c8f7763",
+    "git_commit" : "b4407dd2aa3841696a9554e5629bf49c14d479d5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

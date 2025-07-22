@@ -23,7 +23,7 @@ engines:
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages: [ anndata ]
+        packages: [ anndata==0.11.4 ]
 
 
 runners:
