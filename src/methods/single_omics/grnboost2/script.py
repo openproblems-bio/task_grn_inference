@@ -91,7 +91,7 @@ if __name__=='__main__':
   net = main(par)
   
   net['weight'] = net['weight'].astype(str)
-  output = ad.AnnData(X=None, uns={"method_id": "grnboost2", "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
+  output = ad.AnnData(X=None, uns={"method_id": "grnboost", "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
   output.write(par['prediction'])
 
 

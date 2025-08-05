@@ -2,7 +2,7 @@ __merge__: ../../api/comp_control_method.yaml
 
 name: positive_control
 info:
-  label: positive_control
+  label: Positive control
   summary: "Baseline based on correlation"
   description: |
     Baseline model based on Pearson correlation that uses both inference and evaluation dataset to infer the GRN.

@@ -9,7 +9,7 @@
 
 # --- Settings ---
 test=false
-RUN_ID="nakatake_run_portia"
+RUN_ID="nakatake_run"
 run_local=false
 reg_type="ridge"
 num_workers=10
@@ -49,7 +49,7 @@ append_entry() {
   local extra_id="$4"
 
   cat >> "$param_local" << HERE
-  - id: ${dataset}_${extra_id}
+  - id="${dataset}${extra_id:+_$extra_id}"
     metric_ids: $metrics
     method_ids: $methods
     rna: ${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad
@@ -99,9 +99,8 @@ HERE
 #                                                                         portia, ppcor, scenic, scprint, grnboost]"
 # append_entry "adamson"  "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, grnboost]"
-# append_entry "nakatake"  "[regression_1,regression_2]" "[pearson_corr, negative_control, positive_control, 
-                                                                        # portia, scenic, grnboost]"
-append_entry "nakatake"  "[regression_1,regression_2]" "[portia]"                                                                       
+append_entry "nakatake"  "[regression_1,regression_2]" "[pearson_corr, negative_control, positive_control, 
+                                                                        portia, scenic, grnboost]"
 # append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, portia, ppcor, scenic, grnboost]"
 # append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "special_case"                                                
 # --- Final configuration ---
