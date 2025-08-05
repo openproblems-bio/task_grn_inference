@@ -48,7 +48,7 @@ colnames(inputExpr) <- c(geneNames)
 X <- as.matrix(inputExpr)
 
 # Run GRN inference method
-pcorResults = pcor(x = X, method = "pearson")
+pcorResults = pcor(x = X, method="pearson")
 
 # Save results
 df = data.frame(

@@ -8,7 +8,7 @@ methods = [
   scenic, 
   scenicplus, 
   scprint, 
-  grnboost2,
+  grnboost,
   scglue,
   granie,
   figr,

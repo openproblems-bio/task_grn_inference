@@ -23,7 +23,7 @@ engines:
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages: [ anndata, numpy, scipy, scikit-learn, portia-grn ]
+        packages: [ anndata==0.11.0, numpy==1.26.4, scipy==1.16.0, scikit-learn==1.7.1, portia-grn==0.0.21 ]
   - type: native
 runners:
   - type: executable

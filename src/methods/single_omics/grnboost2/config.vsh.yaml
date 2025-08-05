@@ -1,42 +1,33 @@
 __merge__: ../../../api/comp_method.yaml
 
 
-name: grnboost2
+name: grnboost
 namespace: "grn_methods"
 info:
-  label: grnboost2
+  label: grnboost
   summary: "GRN inference using GRNBoost2"
   description: |
     GRN inference using GRNBoost2.
   documentation_url: https://arboreto.readthedocs.io/en/latest/algorithms.html#grnboost2
+
 
 resources:
   - type: python_script
     path: script.py
   - path: /src/utils/util.py
     dest: util.py
-
+    
 engines:
-  # - type: docker
-  #   image: continuumio/anaconda3:2024.02-1 
-  #   setup:
-  #     - type: docker
-  #       run: |
-  #         conda install -y -c bioconda arboreto pandas
-  #     - type: python
-  #       packages: [ anndata ]
-  #       github:
-  #         - openproblems-bio/core#subdirectory=packages/python/openproblems
   - type: docker
     image: aertslab/pyscenic:0.12.1
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages: [ anndata ]
-  
-  - type: native
+        packages: [ anndata==0.11.4 ]
+
+
 runners:
   - type: executable
   - type: nextflow
     directives:
-      label: [onedaytime, midmem, midcpu]
+      label: [onedaytime, veryhighmem, midcpu]
