@@ -67,8 +67,8 @@ def main_perturbation(par):
     bulk_adata = add_metadata(bulk_adata)
     bulk_adata.uns['normalization_id'] = 'logorm'
     print('writing op_perturbation_bulk')
-    print(bulk_adata)
-    bulk_adata.write(par['op_perturbation_bulk'])
+    
+    return bulk_adata
 def main_multiome(par):
     multiomics = ad.read_h5ad(par['op_multiome'])
     multiomics.X = multiomics.layers['counts']
@@ -97,9 +97,6 @@ def main_multiome(par):
     rna = rna[common_obs, :]
     atac = atac[common_obs, :]
 
-    print(rna)
-    print(atac)
-
     # change donor names
     unique_donors = rna.obs.donor_id.unique()
     donor_map = {donor_id: f'donor_{i}' for i, donor_id in enumerate(unique_donors)}
@@ -124,18 +121,37 @@ def main_multiome(par):
 
     atac = atac[:, atac.var['seqname'].str.startswith('chr')]
 
-    rna.write(par['op_rna'])
-    atac.write(par['op_atac'])
+    
+    return rna, atac
 
 def main_test_data(par):
     shorten_evaluation_data(par)
     shorten_inference_data(par)
 
 if __name__ == '__main__':
-    print('Processing perturbation data ...')
-    main_perturbation(par)
-    print('Processing multiome data ...')
-    main_multiome(par)
-    print('Processing test data ...')
+    print('Processing perturbation data ...', flush=True)
+    evaluation_data = main_perturbation(par)
+    
+    print('Processing multiome data ...', flush=True)
+    rna, atac = main_multiome(par)
+    
+    print('Standardize feature space:', flush=True)
+    evaluation_genes = evaluation_data.var_names.tolist()
+    inference_genes = rna.var_names.tolist()
+    common_genes = set(evaluation_genes).intersection(set(inference_genes))
+    print('Common genes:', len(common_genes), flush=True)
+
+    evaluation_data = evaluation_data[:, evaluation_data.var_names.isin(common_genes)]
+    rna = rna[:, rna.var_names.isin(common_genes)]
+
+    print(rna)
+    print(atac)
+    print('evaluation_data', evaluation_data)
+
+    evaluation_data.write(par['op_perturbation_bulk'])
+    rna.write(par['op_rna'])
+    atac.write(par['op_atac'])
+    
+    print('Processing test data ...', flush=True)
     main_test_data(par)
     

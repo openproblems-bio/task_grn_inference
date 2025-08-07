@@ -78,5 +78,5 @@ for ref_cell_type in ref_cell_types:
 
     # - 
     wrapper_large_perturbation_data(adata, save_name=f'xaira_{ref_cell_type}', 
-                    add_metadata=add_metadata(ref_cell_type), covariates=['is_control', 'perturbation', 'sample'], cell_count_t=cell_count_t)
+                    add_metadata=add_metadata(ref_cell_type), covariates=['perturbation'], cell_count_t=cell_count_t)
     

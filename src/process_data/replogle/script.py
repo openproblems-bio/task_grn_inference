@@ -75,8 +75,6 @@ def main(par):
     print('Formatting raw data...')
     adata = format_raw_data(adata)
 
-    print(adata.obs)
-
     wrapper_large_perturbation_data(adata, 
         covariates=['perturbation'], 
         add_metadata=add_metadata,

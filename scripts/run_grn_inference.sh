@@ -11,10 +11,8 @@
 test=false
 RUN_ID="test_run"
 run_local=true
-reg_type="ridge"
 num_workers=10
 apply_tf_methods=true
-apply_skeleton=false
 
 # --- Directories ---
 resources_folder=$([ "$test" = true ] && echo "resources_test" || echo "resources")
@@ -96,6 +94,8 @@ HERE
 # append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "special_case" 
 
 append_entry "xaira_HCT116" "[pearson_corr, negative_control, positive_control]"
+append_entry "xaira_HEK293T" "[pearson_corr, negative_control, positive_control]" 
+append_entry "replogle" "[pearson_corr, negative_control, positive_control]" 
 
 # --- Final configuration ---
 if [ "$run_local" = true ]; then
