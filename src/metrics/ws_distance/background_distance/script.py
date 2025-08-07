@@ -61,14 +61,20 @@ def process_tf(tf, adata_shape, gene_names, obs_perturbation, progress):
     net_all = pd.DataFrame({'source': tf, 'target': gene_names})
     return calculate_ws_distance(net_all, adata_shape, gene_names, obs_perturbation, progress)
 
-def main(dataset):
-    par = {
-        'evaluation_data_sc': f'resources/grn_benchmark/evaluation_data/{dataset}_sc.h5ad',
-        'background_distance': f'resources/grn_benchmark/prior/ws_distance_background_{dataset}.csv',
-        'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
-        'layer': 'X_norm',
-        'max_workers': 100
-    }
+import argparse
+arg = argparse.ArgumentParser(description='Compute Wasserstein distance for background GRN inference')
+arg.add_argument('--dataset', type=str, help='Dataset to use for the analysis')
+arg.add_argument('--evaluation_data_sc', type=str, help='Path to the evaluation data in single-cell format')
+arg.add_argument('--background_distance', type=str, help='Path to save the background distance results')
+arg.add_argument('--tf_all', type=str, help='Path to the file containing all transcription factors')
+arg.add_argument('--layer', type=str, default='X_norm', help='Layer to use for the analysis')
+arg.add_argument('--max_workers', type=int, default=100, help='Maximum number of workers for multiprocessing')
+args = arg.parse_args()
+par = args.__dict__
+
+
+def main(par):
+    
     # Load AnnData once and store in shared memory
     adata = load_adata(par)
 
@@ -111,5 +117,4 @@ def main(dataset):
     os.remove(shared_mem_path)
 
 if __name__ == '__main__':
-    for dataset in ['norman', 'adamson', 'replogle']:
-        main(dataset)
+    main(par)

@@ -21,63 +21,51 @@ par = {
 }
 ## VIASH END
 
-try: 
-    sys.path.append(meta['resources_dir'])
-except:
-    meta = { 
-        'util_dir': 'src/utils/',
-        'helper_dir': './'
-    }   
-    sys.path.append(meta['util_dir'])
-    sys.path.append(meta['helper_dir'])
+
+meta = { 
+    'util_dir': 'src/process_data/',
+    'helper_dir': './'
+}   
+sys.path.append(meta['util_dir'])
+sys.path.append(meta['helper_dir'])
 
 
-from util import sum_by
-from helper import preprocess_sc, pseudobulk_mean_func, filter_func, normalize_func, add_metadata
+from helper_data import normalize_func, pseudobulk_sum_func
+from helper import preprocess_sc, filter_func, add_metadata
 from helper import shorten_evaluation_data, shorten_inference_data
 
 
-def pseudobulk_sum_func(sc_counts):
+def wrapper_pseudobulk(sc_counts):
     # pseudobulk
     #group cell types per well
     sc_counts.obs['plate_well_cell_type'] = sc_counts.obs['plate_name'].astype('str') \
         + '_' + sc_counts.obs['well'].astype('str') \
         + '_' + sc_counts.obs['cell_type'].astype('str')
-    sc_counts.obs['plate_well_cell_type'] = sc_counts.obs['plate_well_cell_type'].astype('category')
-    bulk_adata = sum_by(sc_counts, 'plate_well_cell_type')
-    bulk_adata.obs['cell_count'] = sc_counts.obs.groupby('plate_well_cell_type').size().values
-    bulk_adata.X = np.array(bulk_adata.X.todense())
+    bulk_adata = pseudobulk_sum_func(sc_counts, 'plate_well_cell_type')
 
     print('ratio of missingness' , (bulk_adata.X==0).sum()/bulk_adata.X.size)
     bulk_adata.var = bulk_adata.var.reset_index()
     bulk_adata.var.set_index('index', inplace=True)
 
-    bulk_adata.X = np.nan_to_num(bulk_adata.X, nan=0)
     return bulk_adata
 
 def main_perturbation(par):
     cell_counts_t = 10
         
     sc_counts_f = preprocess_sc(par)
-    bulk_adata = pseudobulk_sum_func(sc_counts_f)
-    bulk_adata = pseudobulk_mean_func(bulk_adata)
+    bulk_adata = wrapper_pseudobulk(sc_counts_f)
+    # bulk_adata = pseudobulk_mean_func(bulk_adata)
     bulk_adata = filter_func(bulk_adata, cell_counts_t)
-
 
     bulk_adata.obs = bulk_adata.obs.rename(columns={'sm_name':'perturbation'})
 
     bulk_adata = normalize_func(bulk_adata)
 
-    del bulk_adata.layers['n_counts']
-
-    bulk_adata.X = csr_matrix(bulk_adata.X)
-    bulk_adata.layers['counts'] = csr_matrix(bulk_adata.layers['counts'])
-
     bulk_adata.obs['is_control'] = bulk_adata.obs['perturbation'].isin(['Dimethyl Sulfoxide'])
     bulk_adata.obs['is_positive_control'] = bulk_adata.obs['perturbation'].isin(['Dabrafenib', 'Belinostat'])
 
     bulk_adata = add_metadata(bulk_adata)
-    bulk_adata.uns['normalization_id'] = 'apr'
+    bulk_adata.uns['normalization_id'] = 'logorm'
     print('writing op_perturbation_bulk')
     print(bulk_adata)
     bulk_adata.write(par['op_perturbation_bulk'])
@@ -125,8 +113,8 @@ def main_multiome(par):
     rna = add_metadata(rna)
     atac = add_metadata(atac)
 
-    rna.uns['normalization_id'] = 'sla'
-    atac.uns['normalization_id'] = 'sla'
+    rna.uns['normalization_id'] = 'lognorm'
+    atac.uns['normalization_id'] = 'lognorm'
 
     # - needed for some R packages
     annotation_peak = atac.var.reset_index().location.str.split(':', expand=True)

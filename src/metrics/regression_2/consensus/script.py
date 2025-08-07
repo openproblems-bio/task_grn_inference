@@ -6,15 +6,22 @@ import pandas as pd
 import anndata as ad
 import sys
 import numpy as np
+import argparse
 
+naming_convention = lambda dataset, method: f'{dataset}.{method}.{method}.prediction.h5ad'
 
-def main(dataset):
-    par = {
-        'evaluation_data': f'resources/grn_benchmark/evaluation_data//{dataset}_bulk.h5ad',
-        'models_dir': f'resources/grn_models/{dataset}/',
-        'models': ['pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'scprint', 'figr', 'celloracle', 'scenic+', 'granie', 'scglue'],
-        'regulators_consensus': f'resources/grn_benchmark/prior/regulators_consensus_{dataset}.json'
-    }
+arg = argparse.ArgumentParser(description='Compute consensus number of putative regulators for each gene')
+arg.add_argument('--dataset', type=str, help='Dataset to use for the analysis')
+arg.add_argument('--models_dir', type=str, help='Directory containing the GRN models')
+arg.add_argument('--evaluation_data', type=str, help='Path to the evaluation data')
+arg.add_argument('--regulators_consensus', type=str, help='Path to save the consensus regulators')
+arg.add_argument('--models', nargs='+', help='List of models to use for the analysis')
+args = arg.parse_args()
+
+par = args.__dict__
+
+def main(par):
+    
     print(par)
     # Load perturbation data
     adata_rna = anndata.read_h5ad(par['evaluation_data'])
@@ -25,7 +32,7 @@ def main(dataset):
     # Load inferred GRNs
     grns = []
     for model in par['models']:
-        filepath = os.path.join(par['models_dir'], f'{model}.h5ad')
+        filepath = os.path.join(par['models_dir'], naming_convention(par['dataset'], model))
         if not os.path.exists(filepath):
             print(f"{filepath} didnt exist. Skipped.")
             continue 
@@ -47,6 +54,8 @@ def main(dataset):
         grns.append(A)
     grns = np.asarray(grns)
 
+    assert len(grns) > 0, "No GRNs were loaded. Check the models directory and the models specified."
+
     # Compute consensus number of putative regulators for each gene (and for each theta value)
     thetas = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
     n_tfs = {}
@@ -64,6 +73,5 @@ def main(dataset):
 
 
 if __name__ == '__main__':
-    for dataset in ['replogle', 'norman', 'adamson', 'nakatake', 'op']:
-        main(dataset)
+    main(par)
 

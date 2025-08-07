@@ -49,25 +49,20 @@ fi
 # --- Function to append dataset block ---
 append_entry() {
   local dataset="$1"
-  local metrics="$2"
-  local methods="$3"
-  local extra_id="$4"
+  local methods="$2"
+  local extra_id="$3"
 
   cat >> "$param_local" << HERE
   - id: ${dataset}${extra_id:+_$extra_id}
-    metric_ids: $metrics
     method_ids: $methods
     rna: ${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad
     rna_all: ${resources_dir}/extended_data/${dataset}_bulk.h5ad
-    evaluation_data: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad
     tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
-    regulators_consensus: ${resources_dir}/grn_benchmark/prior/regulators_consensus_${dataset}.json
     layer: 'X_norm'
     num_workers: $num_workers
     apply_tf_methods: $apply_tf_methods
     apply_skeleton: $apply_skeleton
     skeleton: ${resources_dir}/grn_benchmark/prior/skeleton.csv
-    reg_type: $reg_type
 HERE
   if [ "$extra_id" = "special_case" ]; then # for scprint 
     cat >> "$param_local" << HERE
@@ -76,15 +71,6 @@ HERE
   else  # for rest 
     cat >> "$param_local" << HERE
     rna: ${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad
-HERE
-  fi
-
-  # Extra fields for certain datasets
-  if [[ "$dataset" =~ ^(norman|adamson|replogle)$ ]]; then
-    cat >> "$param_local" << HERE
-    evaluation_data_sc: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_sc.h5ad
-    ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
-    ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv
 HERE
   fi
 
@@ -109,7 +95,7 @@ HERE
 # append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, portia, ppcor, scenic, grnboost]"
 # append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "special_case" 
 
-append_entry "xaira_HCT116"  "[regression_1, regression_2]" "[pearson_corr, negative_control, positive_control]"
+append_entry "xaira_HCT116" "[pearson_corr, negative_control, positive_control]"
 
 # --- Final configuration ---
 if [ "$run_local" = true ]; then
@@ -120,7 +106,7 @@ HERE
 
   viash ns build --parallel 
   nextflow run . \
-    -main-script  target/nextflow/workflows/run_benchmark/main.nf \
+    -main-script  target/nextflow/workflows/run_grn_inference/main.nf \
     -profile docker \
     -with-trace \
     -c common/nextflow_helpers/labels_ci.config \
@@ -140,7 +126,7 @@ HERE
   # tw launch https://github.com/openproblems-bio/task_grn_inference \
   #     --revision build/main \
   #     --pull-latest \
-  #     --main-script target/nextflow/workflows/run_benchmark/main.nf \
+  #     --main-script target/nextflow/workflows/run_grn_inference/main.nf \
   #     --workspace 209741690280743 \
   #     --params-file ${param_file} \
   #     --labels ${RUN_ID} \
@@ -149,7 +135,7 @@ HERE
   tw launch https://github.com/openproblems-bio/task_grn_inference \
     --revision build/main \
     --pull-latest \
-    --main-script target/nextflow/workflows/run_benchmark/main.nf \
+    --main-script target/nextflow/workflows/run_grn_inference/main.nf \
     --workspace 53907369739130 \
     --compute-env 6TJs9kM1T7ot4DbUY2huLF \
     --params-file ${param_file} \
