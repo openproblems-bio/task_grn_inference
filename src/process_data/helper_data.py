@@ -161,7 +161,7 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     train_perturbs, test_perturbs = split_func(adata, train_share)
     
     # - adata train sc
-    print('Processing adata train sc ...')
+    print('Processing adata train sc ...', flush=True)
     adata_train_sc = adata[adata.obs['perturbation'].isin(train_perturbs)].copy()
     assert adata_train_sc.obs['is_control'].sum()> 0, "No control data found in training set"
     assert adata_train_sc.shape[0] > 0, "No training data found after splitting"
@@ -171,7 +171,7 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     del adata_train_sc
     gc.collect()
 
-    print('Processing adata test sc ...')
+    print('Processing adata test sc ...', flush=True)
     adata_test_sc = adata[adata.obs['perturbation'].isin(test_perturbs)].copy()
     assert adata_test_sc.obs['is_control'].sum()> 0, "No control data found in test set"
     adata_test_sc = normalize_func(adata_test_sc, pearson_residual=False)
@@ -181,14 +181,14 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     del adata_test_sc
     gc.collect()
 
-    print('Processing adata sc ...')
+    print('Processing adata sc ...', flush=True)
     adata = normalize_func(adata, pearson_residual=False)
     adata = add_metadata(adata)
     adata.write(f'resources/extended_data/{save_name}_sc.h5ad', compression='gzip')
     del adata
     gc.collect()
 
-    print('Processing adata bulk ...')
+    print('Processing adata bulk ...', flush=True)
     adata_test_bulk = adata_bulk[adata_bulk.obs['perturbation'].isin(test_perturbs)].copy()
     adata_train_bulk = adata_bulk[adata_bulk.obs['perturbation'].isin(train_perturbs)].copy()
     assert adata_test_bulk.shape[0] > 0, "No test data found after splitting"

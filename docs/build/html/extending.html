@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Adding GRN inference methods, metrics, and datasets &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
@@ -122,9 +122,9 @@ with a <cite>script.py</cite>. Additionally, the method can have extra files to 
 <p>Your <cite>script.py</cite> should have the following structure:</p>
 <div class="literal-block-wrapper docutils container" id="id2">
 <div class="code-block-caption"><span class="caption-text">Example of a <cite>script.py</cite> file</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">anndata</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ad</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">anndata</span> <span class="k">as</span> <span class="nn">ad</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="o">...</span> <span class="c1"># import necessary libraries</span>
 
  <span class="c1">## VIASH START  -&gt; this is necessary for the viash to work. It essentially replaces this with the parameters passed to the config.vsh file</span>
@@ -160,7 +160,7 @@ with a <cite>script.py</cite>. Additionally, the method can have extra files to 
 <p>Once you have added your method, you can test it by running the following command. For this, download and place the test datasets in <cite>resources_test/grn_benchmark</cite>.</p>
 <div class="literal-block-wrapper docutils container" id="id3">
 <div class="code-block-caption"><span class="caption-text">Download test data</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>aws<span class="w"> </span>s3<span class="w"> </span>cp<span class="w"> </span>s3://openproblems-data/resources_test/grn/grn_benchmark<span class="w"> </span>resources_test/grn_benchmark<span class="w"> </span>--no-sign-request
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>aws<span class="w"> </span>s3<span class="w"> </span>sync<span class="w"> </span>s3://openproblems-data/resources_test/grn/grn_benchmark<span class="w"> </span>resources_test/grn_benchmark<span class="w"> </span>--no-sign-request
 </pre></div>
 </div>
 </div>
