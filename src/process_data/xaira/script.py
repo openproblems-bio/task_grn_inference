@@ -15,7 +15,7 @@ meta = {
 }
 sys.path.append(meta["resources_dir"])
 
-from helper_data import wrapper_large_perturbation_data
+from helper_data import wrapper_large_perturbation_data, split_data_gene_perturbation
 
 par = {
     'run_test': args.run_test    
@@ -24,7 +24,7 @@ par = {
 
 raw_dir = '/vol/projects/CIIM/PerturbationDataset/Perturb_seq_dataset_Xiara'
 
-ref_cell_types = ['HCT116', 'HEK293T'] #'HEK293T', 'HCT116' #Human Embryonic Kidney 293T cells, Human Colorectal Carcinoma Cell Line 116
+ref_cell_types = ['HEK293T', 'HCT116'] #'HEK293T', 'HCT116' #Human Embryonic Kidney 293T cells, Human Colorectal Carcinoma Cell Line 116
 
     
 def add_metadata(cell_type):     
@@ -77,6 +77,6 @@ for ref_cell_type in ref_cell_types:
     adata.obs = adata.obs.rename({'gene_target':'perturbation'}, axis=1)[['perturbation', 'is_control', 'perturbation_type', 'sample']]
 
     # - 
-    wrapper_large_perturbation_data(adata, save_name=f'xaira_{ref_cell_type}', 
+    wrapper_large_perturbation_data(adata, split_func=split_data_gene_perturbation, save_name=f'xaira_{ref_cell_type}', 
                     add_metadata=add_metadata(ref_cell_type), covariates=['perturbation'], cell_count_t=cell_count_t)
     

@@ -28,7 +28,6 @@ argument_groups:
         type: string
         required: false
         direction: input
-        default: X_norm
       - name: --apply_tf_methods
         type: boolean
         required: false

@@ -49,6 +49,7 @@ workflow run_wf {
           rna_all: state.rna_all,
           atac: state.atac,
           tf_all: state.tf_all,
+          layer:state.layer,
           apply_tf_methods: state.apply_tf_methods,
           num_workers: state.num_workers,
           output: 'predictions/$id.$key.output.h5ad',

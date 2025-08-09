@@ -27,7 +27,7 @@ meta = {
 }
 sys.path.append(meta["resources_dir"])
 
-from helper_data import wrapper_large_perturbation_data
+from helper_data import wrapper_large_perturbation_data, split_data_gene_perturbation
 
 def add_metadata(adata):
     adata.uns['dataset_summary'] = 'Single cell RNA-seq data with 231 perturbations (activation) on K562 cells.'
@@ -56,7 +56,7 @@ def format_raw_data(adata: ad.AnnData) -> ad.AnnData:
     
     return adata
 
-
+ 
 
 def main(par):
     print('Loading single cell data...')
@@ -75,7 +75,7 @@ def main(par):
     print('Formatting raw data...')
     adata = format_raw_data(adata)
 
-    wrapper_large_perturbation_data(adata, 
+    wrapper_large_perturbation_data(adata, split_func=split_data_gene_perturbation,
         covariates=['perturbation'], 
         add_metadata=add_metadata,
         save_name='replogle')

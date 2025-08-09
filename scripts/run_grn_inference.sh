@@ -6,13 +6,14 @@
 # scprint: only for [opsca, replogle, norman] (uses different inference data)
 # scenicplus, scglue, granie, figr, celloracle: only for [opsca]
 # --------------------------
-
+set -e 
 # --- Settings ---
 test=false
 RUN_ID="test_run"
 run_local=true
 num_workers=10
 apply_tf_methods=true
+layer='lognorm'
 
 # --- Directories ---
 resources_folder=$([ "$test" = true ] && echo "resources_test" || echo "resources")
@@ -50,21 +51,27 @@ append_entry() {
   local methods="$2"
   local extra_id="$3"
 
+  if [[ "$dataset" =~ ^(norman|nakatake|adamson)$ ]]; then
+    layer_='X_norm'
+  else
+      layer_=$layer
+  fi
+  
   cat >> "$param_local" << HERE
   - id: ${dataset}${extra_id:+_$extra_id}
     method_ids: $methods
     rna: ${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad
     rna_all: ${resources_dir}/extended_data/${dataset}_bulk.h5ad
     tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
-    layer: 'X_norm'
+    layer: $layer_
     num_workers: $num_workers
     apply_tf_methods: $apply_tf_methods
     apply_skeleton: $apply_skeleton
     skeleton: ${resources_dir}/grn_benchmark/prior/skeleton.csv
 HERE
-  if [ "$extra_id" = "special_case" ]; then # for scprint 
+  if [ "$extra_id" = "use_train_sc" ]; then # for scprint 
     cat >> "$param_local" << HERE
-    rna: ${resources_dir}/grn_benchmark/inference_data/${dataset}_rna_sc_subset.h5ad
+    rna: ${resources_dir}/extended_data/${dataset}_train_sc.h5ad
 HERE
   else  # for rest 
     cat >> "$param_local" << HERE
@@ -91,11 +98,13 @@ HERE
 # append_entry "nakatake"  "[regression_1,regression_2]" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, scenic, grnboost]"
 # append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, portia, ppcor, scenic, grnboost]"
-# append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "special_case" 
+# append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "use_train_sc" 
 
-append_entry "xaira_HCT116" "[pearson_corr, negative_control, positive_control]"
-append_entry "xaira_HEK293T" "[pearson_corr, negative_control, positive_control]" 
 append_entry "replogle" "[pearson_corr, negative_control, positive_control]" 
+append_entry "xaira_HEK293T" "[pearson_corr, negative_control, positive_control]" 
+append_entry "xaira_HCT116" "[pearson_corr, negative_control, positive_control]"
+append_entry "parsebioscience" "[pearson_corr, negative_control, positive_control]"
+
 
 # --- Final configuration ---
 if [ "$run_local" = true ]; then

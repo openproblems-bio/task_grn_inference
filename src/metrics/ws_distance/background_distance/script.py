@@ -12,7 +12,15 @@ shared_mem_path = "/tmp/adata_X.npy"
 def load_adata(par):
     """Load AnnData and store X in a shared memory-mapped NumPy array."""
     adata = ad.read_h5ad(par['evaluation_data_sc'])
-    adata.X = adata.layers[par['layer']]
+    if 'X_norm' in adata.layers:
+        layer = 'X_norm'
+    elif 'lognorm' in adata.layers:
+        layer = 'lognorm'
+    elif 'pearson_residual' in adata.layers:
+        layer = 'pearson_residual'
+    else:
+        raise ValueError("No suitable layer found in AnnData. Please provide a valid layer.")
+    adata.X = adata.layers[layer]
 
     if 'is_control' not in adata.obs.columns:
         adata.obs['is_control'] = adata.obs['perturbation'] == 'non-targeting'
@@ -21,7 +29,7 @@ def load_adata(par):
     np.save(shared_mem_path, adata.X.toarray())  # Save sparse matrix as dense NumPy
     return adata
 
-def calculate_ws_distance(net, adata_shape, gene_names, obs_perturbation, progress):
+def calculate_ws_distance(net, gene_names, obs_perturbation, progress):
     """
     Compute Wasserstein distance for gene pairs in `net`.
     Each worker loads the shared memory-mapped array instead of the full `adata`.
@@ -56,10 +64,10 @@ def calculate_ws_distance(net, adata_shape, gene_names, obs_perturbation, progre
 
     return net
 
-def process_tf(tf, adata_shape, gene_names, obs_perturbation, progress):
+def process_tf(tf, gene_names, obs_perturbation, progress):
     """Compute Wasserstein distance for all genes targeted by a TF."""
     net_all = pd.DataFrame({'source': tf, 'target': gene_names})
-    return calculate_ws_distance(net_all, adata_shape, gene_names, obs_perturbation, progress)
+    return calculate_ws_distance(net_all, gene_names, obs_perturbation, progress)
 
 import argparse
 arg = argparse.ArgumentParser(description='Compute Wasserstein distance for background GRN inference')
@@ -104,7 +112,7 @@ def main(par):
             with tqdm(total=len(available_tfs), desc="Processing TFs", position=0) as pbar:
                 for result in pool.starmap_async(
                     process_tf,
-                    [(tf, adata_shape, gene_names, obs_perturbation, progress) for tf in available_tfs]
+                    [(tf, gene_names, obs_perturbation, progress) for tf in available_tfs]
                 ).get():
                     results.append(result)
                     pbar.update(1)  # Update tqdm after each job completes
