@@ -1,6 +1,6 @@
 #!/bin/bash
 # datasets="norman replogle op nakatake adamson"
-datasets=" xaira_HCT116 xaira_HEK293T parsebioscience replogle" 
+datasets=" xaira_HCT116 xaira_HEK293T parsebioscience" #xaira_HCT116 xaira_HEK293T parsebioscience replogle
 
 run_local=true
 num_workers=10
@@ -11,6 +11,7 @@ reg_type="ridge"
 label=${RUN_ID}
 apply_skeleton=false
 apply_tf=true
+layer='lognorm'
 
 grn_names=(
     "positive_control"
@@ -64,7 +65,11 @@ fi
 append_entry() {
   local grn_name="$1"
   local dataset="$2"
-  
+  if [[ "$dataset" =~ ^(norman|nakatake|adamson)$ ]]; then
+    layer_='X_norm'
+  else
+      layer_=$layer
+  fi
   cat >> "$param_local" << HERE
   - id: ${reg_type}_${grn_name}_${dataset}
     metric_ids: ${metric_ids}
@@ -75,11 +80,12 @@ append_entry() {
     skeleton: ${resources_dir}/grn_benchmark/prior/skeleton.csv
     apply_skeleton: ${apply_skeleton}
     apply_tf: ${apply_tf}
+    layer: $layer_
 
 HERE
 
   # Additional fields for specific datasets
-  if [[ "$dataset" =~ ^(norman|replogle|adamson|xaira_HCT116|xaira_HEK293T|parsebioscience)$ ]]; then
+  if [[ "$dataset" =~ ^(norman|replogle|adamson|xaira_HCT116|xaira_HEK293T)$ ]]; then
     cat >> "$param_local" << HERE
     evaluation_data_sc: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_sc.h5ad
     ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv

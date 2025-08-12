@@ -8,7 +8,12 @@ import os
 
 ## VIASH START
 par = {
-    'layer': 'X_norm'
+    'layer': 'lognorm',
+    'prediction': f'resources/results/test_run/xaira_HEK293T.pearson_corr.pearson_corr.prediction.h5ad',
+    'evaluation_data_sc': f'resources/grn_benchmark/evaluation_data/xaira_HEK293T_sc.h5ad',
+    'ws_consensus': f'resources/grn_benchmark/prior/ws_consensus_xaira_HEK293T.csv',
+    'ws_distance_background': f'resources/grn_benchmark/prior/ws_distance_background_xaira_HEK293T.csv',
+    'silent_missing_dependencies': False
 }
 ## VIASH END
 
@@ -19,8 +24,6 @@ parser.add_argument('--evaluation_data_sc', type=str)
 parser.add_argument('--ws_consensus', type=str)
 parser.add_argument('--ws_distance_background', type=str)
 parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--method_id', type=str, help='Method id')
-parser.add_argument('--dataset_id', type=str, help='Dataset id')
 parser.add_argument('--score', type=str, help='score file')
 
 args = parser.parse_args()

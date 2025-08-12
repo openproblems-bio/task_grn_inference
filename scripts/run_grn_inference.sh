@@ -69,7 +69,7 @@ append_entry() {
     apply_skeleton: $apply_skeleton
     skeleton: ${resources_dir}/grn_benchmark/prior/skeleton.csv
 HERE
-  if [ "$extra_id" = "use_train_sc" ]; then # for scprint 
+  if [ "$extra_id" = "use_train_sc" ]; then # #TODO: fix this
     cat >> "$param_local" << HERE
     rna: ${resources_dir}/extended_data/${dataset}_train_sc.h5ad
 HERE

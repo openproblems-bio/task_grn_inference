@@ -7,7 +7,7 @@ import multiprocessing as mp
 import os
 
 # Shared memory path for NumPy array
-shared_mem_path = "/tmp/adata_X.npy"
+shared_mem_path = "/home/jnourisa/projs/ongoing/ciim/output/adata_X.npy"
 
 def load_adata(par):
     """Load AnnData and store X in a shared memory-mapped NumPy array."""
@@ -116,6 +116,7 @@ def main(par):
                 ).get():
                     results.append(result)
                     pbar.update(1)  # Update tqdm after each job completes
+                    pbar.refresh()
 
     # Save results
     net_all_ws_distance = pd.concat(results, ignore_index=True)

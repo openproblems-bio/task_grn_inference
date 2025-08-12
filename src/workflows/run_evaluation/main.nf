@@ -51,7 +51,8 @@ workflow run_wf {
         num_workers: "num_workers",
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",
-        tf_all: "tf_all"
+        tf_all: "tf_all",
+        layer: "layer"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->
