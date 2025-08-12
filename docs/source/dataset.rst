@@ -32,7 +32,10 @@ Additionally, you will find the `resources/grn_benchmark/prior/` folder, which c
 Downloading the extended datasets
 -----------------------------
 
-Beyond the core datasets, extended datasets include the Replogle dataset in single-cell format (`replogle_train_sc.h5ad`). The previous version was pseudobulked for computational efficiency. Additionally, pseudobulked versions of all other datasets are available, representing the combined inference and evaluation datasets. These files are used for the `positive control` method, which incorporates all variations within a dataset.
+Beyond the core datasets, extended datasets include single cell data of large perturbation datasets such as Replogle, Xaira, and Parse bioscience.
+The previous version was pseudobulked for computational efficiency. 
+Additionally, pseudobulked versions of all other datasets are available, representing the combined inference and evaluation datasets. 
+These files are used for the `positive control` method, which incorporates all variations within a dataset.
 
 To download the extended datasets, use:
 

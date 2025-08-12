@@ -10,9 +10,10 @@ def main(par):
     assert prediction.shape[0]>0, 'No links found in the network'
     assert all(column in prediction.columns for column in ['source', 'target', 'weight']), 'Columns in the network should be source, target, weight'
     
-    consensus = pd.read_csv(par['ws_consensus'])
-    background_distance = pd.read_csv(par['ws_distance_background'])
-    evaluation_data = ad.read_h5ad(par['evaluation_data_sc'])
+    consensus = pd.read_csv(par['ws_consensus']) #  ['source', 'theta', 'value']
+    background_distance = pd.read_csv(par['ws_distance_background']) # ['source', 'target', 'ws_distance']
+    background_tfs = background_distance['source'].unique()
+    evaluation_data = ad.read_h5ad(par['evaluation_data_sc']) 
     evaluation_data.X = evaluation_data.layers[par['layer']]
 
     # - for each theta, and each tf: 
@@ -23,9 +24,8 @@ def main(par):
             if tf not in prediction['source'].unique(): # skip the evaluation if tf is not given in the predictions
                 continue
 
-            if tf not in background_distance['source'].unique():
-                print(f'TF {tf} not found in the background distance, skipping')
-                continue
+            if tf not in background_tfs:
+                assert False, f'TF {tf} not found in the background distance. All tfs in consensus should be in background.'
             # - get the background distance for the given tf
             background_distance_tf = background_distance[background_distance['source']==tf]
             n_edges = consensus_theta[consensus_theta['source'] == tf]['value'].values[0]

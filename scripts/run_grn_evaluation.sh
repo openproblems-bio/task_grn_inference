@@ -1,15 +1,17 @@
 #!/bin/bash
 # datasets="norman replogle op nakatake adamson"
-datasets=" op "
+datasets=" xaira_HCT116 xaira_HEK293T parsebioscience" #xaira_HCT116 xaira_HEK293T parsebioscience replogle
 
-run_local=false
+run_local=true
 num_workers=10
 metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
-RUN_ID="scores_op"
+RUN_ID="test_run"
+models_folder="test_run/"
 reg_type="ridge"
 label=${RUN_ID}
 apply_skeleton=false
 apply_tf=true
+layer='lognorm'
 
 grn_names=(
     "positive_control"
@@ -34,10 +36,10 @@ else
 fi
 
 
-publish_dir="${resources_dir}/results/scores/${RUN_ID}"
+publish_dir="${resources_dir}/results/${models_folder}"
 echo "Publish dir: $publish_dir"
-grn_models_folder="${resources_dir}/results/all_main/"
-grn_models_folder_local="./resources/results/all_main/" # just to control the hetergenity of the models for different datasets
+grn_models_folder="${resources_dir}/results/${models_folder}/"
+grn_models_folder_local="./resources/results/${models_folder}/" # just to control the hetergenity of the models for different datasets
 
 
 params_dir="./params"
@@ -63,22 +65,27 @@ fi
 append_entry() {
   local grn_name="$1"
   local dataset="$2"
-  
+  if [[ "$dataset" =~ ^(norman|nakatake|adamson)$ ]]; then
+    layer_='X_norm'
+  else
+      layer_=$layer
+  fi
   cat >> "$param_local" << HERE
   - id: ${reg_type}_${grn_name}_${dataset}
     metric_ids: ${metric_ids}
     evaluation_data: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad
     tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
     regulators_consensus: ${resources_dir}/grn_benchmark/prior/regulators_consensus_${dataset}.json
-    prediction: ${grn_models_folder}/${dataset}_ridge.${grn_name}.${grn_name}.prediction.h5ad
+    prediction: ${grn_models_folder}/${dataset}.${grn_name}.${grn_name}.prediction.h5ad
     skeleton: ${resources_dir}/grn_benchmark/prior/skeleton.csv
     apply_skeleton: ${apply_skeleton}
     apply_tf: ${apply_tf}
+    layer: $layer_
 
 HERE
 
   # Additional fields for specific datasets
-  if [[ "$dataset" == "norman" || "$dataset" == "adamson" || "$dataset" == "replogle" ]]; then
+  if [[ "$dataset" =~ ^(norman|replogle|adamson|xaira_HCT116|xaira_HEK293T)$ ]]; then
     cat >> "$param_local" << HERE
     evaluation_data_sc: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_sc.h5ad
     ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
@@ -90,7 +97,7 @@ HERE
 # Iterate over datasets and GRN models
 for dataset in $datasets; do
   for grn_name in "${grn_names[@]}"; do
-    prediction_file="${grn_models_folder_local}/${dataset}_ridge.${grn_name}.${grn_name}.prediction.h5ad"
+    prediction_file="${grn_models_folder_local}/${dataset}.${grn_name}.${grn_name}.prediction.h5ad"
     if [[ -f "${prediction_file}" ]]; then
       append_entry "$grn_name" "$dataset"
     else

@@ -7,12 +7,20 @@ import multiprocessing as mp
 import os
 
 # Shared memory path for NumPy array
-shared_mem_path = "/tmp/adata_X.npy"
+shared_mem_path = "/home/jnourisa/projs/ongoing/ciim/output/adata_X.npy"
 
 def load_adata(par):
     """Load AnnData and store X in a shared memory-mapped NumPy array."""
     adata = ad.read_h5ad(par['evaluation_data_sc'])
-    adata.X = adata.layers[par['layer']]
+    if 'X_norm' in adata.layers:
+        layer = 'X_norm'
+    elif 'lognorm' in adata.layers:
+        layer = 'lognorm'
+    elif 'pearson_residual' in adata.layers:
+        layer = 'pearson_residual'
+    else:
+        raise ValueError("No suitable layer found in AnnData. Please provide a valid layer.")
+    adata.X = adata.layers[layer]
 
     if 'is_control' not in adata.obs.columns:
         adata.obs['is_control'] = adata.obs['perturbation'] == 'non-targeting'
@@ -21,7 +29,7 @@ def load_adata(par):
     np.save(shared_mem_path, adata.X.toarray())  # Save sparse matrix as dense NumPy
     return adata
 
-def calculate_ws_distance(net, adata_shape, gene_names, obs_perturbation, progress):
+def calculate_ws_distance(net, gene_names, obs_perturbation, progress):
     """
     Compute Wasserstein distance for gene pairs in `net`.
     Each worker loads the shared memory-mapped array instead of the full `adata`.
@@ -56,19 +64,25 @@ def calculate_ws_distance(net, adata_shape, gene_names, obs_perturbation, progre
 
     return net
 
-def process_tf(tf, adata_shape, gene_names, obs_perturbation, progress):
+def process_tf(tf, gene_names, obs_perturbation, progress):
     """Compute Wasserstein distance for all genes targeted by a TF."""
     net_all = pd.DataFrame({'source': tf, 'target': gene_names})
-    return calculate_ws_distance(net_all, adata_shape, gene_names, obs_perturbation, progress)
+    return calculate_ws_distance(net_all, gene_names, obs_perturbation, progress)
 
-def main(dataset):
-    par = {
-        'evaluation_data_sc': f'resources/grn_benchmark/evaluation_data/{dataset}_sc.h5ad',
-        'background_distance': f'resources/grn_benchmark/prior/ws_distance_background_{dataset}.csv',
-        'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
-        'layer': 'X_norm',
-        'max_workers': 100
-    }
+import argparse
+arg = argparse.ArgumentParser(description='Compute Wasserstein distance for background GRN inference')
+arg.add_argument('--dataset', type=str, help='Dataset to use for the analysis')
+arg.add_argument('--evaluation_data_sc', type=str, help='Path to the evaluation data in single-cell format')
+arg.add_argument('--background_distance', type=str, help='Path to save the background distance results')
+arg.add_argument('--tf_all', type=str, help='Path to the file containing all transcription factors')
+arg.add_argument('--layer', type=str, default='X_norm', help='Layer to use for the analysis')
+arg.add_argument('--max_workers', type=int, default=100, help='Maximum number of workers for multiprocessing')
+args = arg.parse_args()
+par = args.__dict__
+
+
+def main(par):
+    
     # Load AnnData once and store in shared memory
     adata = load_adata(par)
 
@@ -98,10 +112,11 @@ def main(dataset):
             with tqdm(total=len(available_tfs), desc="Processing TFs", position=0) as pbar:
                 for result in pool.starmap_async(
                     process_tf,
-                    [(tf, adata_shape, gene_names, obs_perturbation, progress) for tf in available_tfs]
+                    [(tf, gene_names, obs_perturbation, progress) for tf in available_tfs]
                 ).get():
                     results.append(result)
                     pbar.update(1)  # Update tqdm after each job completes
+                    pbar.refresh()
 
     # Save results
     net_all_ws_distance = pd.concat(results, ignore_index=True)
@@ -111,5 +126,4 @@ def main(dataset):
     os.remove(shared_mem_path)
 
 if __name__ == '__main__':
-    for dataset in ['norman', 'adamson', 'replogle']:
-        main(dataset)
+    main(par)

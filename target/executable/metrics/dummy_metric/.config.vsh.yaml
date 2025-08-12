@@ -1,0 +1,230 @@
+name: "dummy_metric"
+namespace: "metrics"
+version: "build_main"
+argument_groups:
+- name: "Arguments"
+  arguments:
+  - type: "string"
+    name: "--layer"
+    info: null
+    default:
+    - "X_norm"
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--score"
+    info: null
+    must_exist: true
+    create_parent: true
+    required: true
+    direction: "output"
+    multiple: false
+    multiple_sep: ";"
+resources:
+- type: "python_script"
+  path: "script.py"
+  is_executable: true
+- type: "file"
+  path: "util.py"
+  dest: "util.py"
+info:
+  label: "dummy_metric"
+  summary: "Place holder"
+status: "enabled"
+scope:
+  image: "public"
+  target: "public"
+repositories:
+- type: "github"
+  name: "openproblems"
+  repo: "openproblems-bio/openproblems"
+  tag: "build/main"
+license: "MIT"
+links:
+  repository: "https://github.com/openproblems-bio/task_grn_inference"
+  docker_registry: "ghcr.io"
+runners:
+- type: "executable"
+  id: "executable"
+  docker_setup_strategy: "ifneedbepullelsecachedbuild"
+- type: "nextflow"
+  id: "nextflow"
+  directives:
+    label:
+    - "midtime"
+    - "highmem"
+    - "highcpu"
+    tag: "$id"
+  auto:
+    simplifyInput: true
+    simplifyOutput: false
+    transcript: false
+    publish: false
+  config:
+    labels:
+      lowmem: "memory = 20.Gb"
+      midmem: "memory = 50.Gb"
+      highmem: "memory = 100.Gb"
+      veryhighmem: "memory = 200.Gb"
+      veryveryhighmem: "memory = 300.Gb"
+      lowcpu: "cpus = 5"
+      midcpu: "cpus = 15"
+      highcpu: "cpus = 30"
+      lowtime: "time = 1.h"
+      midtime: "time = 4.h"
+      hightime: "time = 8.h"
+      veryhightime: "time = 24.h"
+      twodaytime: "time = 28.h"
+  debug: false
+  container: "docker"
+engines:
+- type: "docker"
+  id: "docker"
+  image: "ghcr.io/openproblems-bio/base_python:1.0.4"
+  namespace_separator: "/"
+  setup:
+  - type: "apt"
+    packages:
+    - "procps"
+    - "git"
+    interactive: false
+  - type: "python"
+    user: false
+    packages:
+    - "anndata~=0.10.0"
+    - "scanpy~=1.10.0"
+    - "pyyaml"
+    - "requests"
+    - "jsonschema"
+    github:
+    - "openproblems-bio/core#subdirectory=packages/python/openproblems"
+    upgrade: true
+  - type: "python"
+    user: false
+    packages:
+    - "lightgbm==4.3.0"
+    - "numpy==1.26.4"
+    upgrade: true
+  entrypoint: []
+  cmd: null
+build_info:
+  config: "src/metrics/dummy/config.vsh.yaml"
+  runner: "executable"
+  engine: "docker"
+  output: "target/executable/metrics/dummy_metric"
+  executable: "target/executable/metrics/dummy_metric/dummy_metric"
+  viash_version: "0.9.4"
+  git_commit: "fe7b34cab02383876fca4d7f27d718ff50034e5c"
+  git_remote: "https://github.com/openproblems-bio/task_grn_inference"
+package_config:
+  name: "task_grn_inference"
+  version: "build_main"
+  label: "GRN Inference"
+  summary: "Benchmarking GRN inference methods\nLeaderboard: \n[Performance comparision](https://add-grn--openproblems.netlify.app/results/grn_inference/)\n\
+    \nArticle: [geneRNIB: a living benchmark for gene regulatory network inference](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1)\n\
+    \nDocumentation: \n[geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)\n\
+    \nRepository:\n[openproblems-bio/task_grn_inference](https://github.com/openproblems-bio/task_grn_inference)\n\
+    \nIf you use this framework, please cite it as\n@article{nourisa2025genernib,\n\
+    \  title={geneRNIB: a living benchmark for gene regulatory network inference},\n\
+    \  author={Nourisa, Jalil and Passemiers, Antoine and Stock, Marco and Zeller-Plumhoff,\
+    \ Berit and Cannoodt, Robrecht and Arnold, Christian and Tong, Alexander and Hartford,\
+    \ Jason and Scialdone, Antonio and Moreau, Yves and others},\n  journal={bioRxiv},\n\
+    \  pages={2025--02},\n  year={2025},\n  publisher={Cold Spring Harbor Laboratory}\n\
+    }\n"
+  description: "\ngeneRNIB is a living benchmark platform for GRN inference. This\
+    \ platform provides curated datasets for GRN inference and evaluation, standardized\
+    \ evaluation protocols and metrics, computational infrastructure, and a dynamically\
+    \ updated leaderboard to track state-of-the-art methods. It runs novel GRNs in\
+    \ the cloud, offers competition scores, and stores them for future comparisons,\
+    \ reflecting new developments over time.\n\nThe platform supports the integration\
+    \ of new inference methods, datasets and protocols. When a new feature is added,\
+    \ previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly.\
+    \ The aim is to evaluate both the accuracy and completeness of inferred GRNs.\
+    \ It is designed for both single-modality and multi-omics GRN inference. \n\n\
+    In the current version, geneRNIB contains 10 inference methods including both\
+    \ single and multi-omics, 8 evalation metrics, and five datasets. \n\nSee our\
+    \ publication for the details of methods. \n"
+  info:
+    image: "thumbnail.svg"
+    test_resources:
+    - type: "s3"
+      path: "s3://openproblems-data/resources_test/grn"
+      dest: "resources_test"
+    readme: "## Installation\n\nYou need to have Docker, Java, and Viash installed.\
+      \ Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\n\
+      to install the required dependencies. \n\n## Download resources\n```bash\ngit\
+      \ clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n\
+      ```\nTo interact with the framework, you should download the resources containing\
+      \ necessary inferene and evaluation datasets to get started. \nHere, we download\
+      \ the **test resources** which are solely used for testing if the framework\
+      \ is installed successfully. \n\n```bash\nscripts/download_resources.sh\n```\n\
+      \nRefer to the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/)\
+      \ for downloading the actual datasets. To reproduce the results, run `scripts/run_benchmark_all.sh`,\
+      \ which is a very resource intensive run.\n\n## Run a GRN inference method \n\
+      \nTo infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:\n\
+      \n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\n\
+      \      --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \\\n  \
+      \    --prediction output/net.h5ad \\\n      --tf_all resources_test/grn_benchmark/prior/tf_all.csv\n\
+      ```\nIt should be noted that this is using the `resources_test` datasets, which\
+      \ are small versions of the actual datasets. Thus, the obtained predictions\
+      \ are not realistic. To obtain a realistic prediction, download the actual data\
+      \ and set the folder to `resources`.  \n\n## Evaluate a GRN prediction\nOnce\
+      \ got the prediction for a given dataset (e.g. op), use the following code to\
+      \ obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad\
+      \ op\n```\n\nThis outputs the scores into `output/test_run/scores.yaml`\n\n\
+      ## Add a GRN inference method, evaluation metric, or dataset\n\nTo add a new\
+      \ component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n"
+  repositories:
+  - type: "github"
+    name: "openproblems"
+    repo: "openproblems-bio/openproblems"
+    tag: "build/main"
+  viash_version: "0.9.4"
+  source: "src"
+  target: "target"
+  config_mods:
+  - ".runners[.type == \"nextflow\"].config.labels := { lowmem : \"memory = 20.Gb\"\
+    , midmem : \"memory = 50.Gb\", highmem : \"memory = 100.Gb\",  veryhighmem : \"\
+    memory = 200.Gb\", veryveryhighmem : \"memory = 300.Gb\", lowcpu : \"cpus = 5\"\
+    , midcpu : \"cpus = 15\", highcpu : \"cpus = 30\", lowtime : \"time = 1.h\", midtime\
+    \ : \"time = 4.h\", hightime : \"time = 8.h\", veryhightime : \"time = 24.h\"\
+    , twodaytime : \"time = 28.h\" }\n"
+  authors:
+  - name: "Jalil Nourisa"
+    roles:
+    - "author"
+    info:
+      github: "janursa"
+      orcid: "0000-0002-7539-4396"
+  - name: "Robrecht Cannoodt"
+    roles:
+    - "author"
+    info:
+      github: "rcannood"
+      orcid: "0000-0003-3641-729X"
+  - name: "Antoine Passimier"
+    roles:
+    - "contributor"
+    info:
+      github: "AntoinePassemiers"
+  - name: "Marco Stock"
+    roles:
+    - "contributor"
+    info:
+      github: "stkmrc"
+  - name: "Christian Arnold"
+    roles:
+    - "contributor"
+    info:
+      github: "chrarnold"
+  keywords:
+  - "gene regulatory network"
+  - "network inference"
+  license: "MIT"
+  organization: "openproblems-bio"
+  links:
+    repository: "https://github.com/openproblems-bio/task_grn_inference"
+    docker_registry: "ghcr.io"
+    issue_tracker: "https://github.com/openproblems-bio/task_grn_inference/issues"

@@ -42,7 +42,7 @@ def add_metadata(adata):
     adata.uns['dataset_id'] = 'adamson'
     adata.uns['dataset_name'] = 'Adamson'
     adata.uns['dataset_organism'] = 'human'
-    adata.uns['normalization_id'] = 'original'
+    adata.uns['normalization_id'] = 'lognorm'
     return adata
 
 def main(par):
@@ -105,8 +105,6 @@ def main(par):
     adata_train_sc.layers['X_norm'] = adata_train_sc.X.copy()
 
     # - add metadata
-    
-
     adata_test_sc = add_metadata(adata_test_sc)
     adata_test_bulk = add_metadata(adata_test_bulk)
     adata_train_sc = add_metadata(adata_train_sc)

@@ -88,7 +88,7 @@ Once you have added your method, you can test it by running the following comman
 .. code-block:: bash
     :caption: Download test data
 
-    aws s3 cp s3://openproblems-data/resources_test/grn/grn_benchmark resources_test/grn_benchmark --no-sign-request 
+    aws s3 sync s3://openproblems-data/resources_test/grn/grn_benchmark resources_test/grn_benchmark --no-sign-request 
 
 
 .. code-block:: bash

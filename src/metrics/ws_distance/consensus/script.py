@@ -4,16 +4,23 @@ from tqdm import tqdm
 import numpy as np
 import os
 
-def main(dataset):
-    print(f'--- Dataset {dataset}')
-    par = {
-        'evaluation_data_sc': f'resources/grn_benchmark/evaluation_data/{dataset}_bulk.h5ad',
-        'ws_consensus': f'resources/grn_benchmark/prior/ws_consensus_{dataset}.csv',
-        'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
-        'models_dir': f'resources/grn_models/{dataset}',
-        'models': ['pearson_corr', 'grnboost2', 'portia', 'ppcor', 'scenic', 'scprint']
-    }
 
+import argparse
+
+naming_convention = lambda dataset, method: f'{dataset}.{method}.{method}.prediction.h5ad'
+
+arg = argparse.ArgumentParser(description='Compute consensus number of putative regulators for each gene')
+arg.add_argument('--dataset', type=str, help='Dataset to use for the analysis')
+arg.add_argument('--models_dir', type=str, help='Directory containing the GRN models')
+arg.add_argument('--evaluation_data_sc', type=str, help='Path to the evaluation data')
+arg.add_argument('--ws_consensus', type=str, help='Path to save the consensus regulators')
+arg.add_argument('--tf_all', type=str, help='Path to the file containing all transcription factors')
+arg.add_argument('--models', nargs='+', help='List of models to use for the analysis')
+args = arg.parse_args()
+
+par = args.__dict__
+
+def main(par):
     adata = ad.read_h5ad(par['evaluation_data_sc'])
     tf_all = np.loadtxt(par['tf_all'], dtype='str')
     available_tfs = np.intersect1d(adata.obs['perturbation'].unique(), tf_all)
@@ -21,7 +28,7 @@ def main(dataset):
     # - read all models
     grn_store = []
     for model in par['models']:
-        prediction_file = f"{par['models_dir']}/{model}.h5ad"
+        prediction_file = f"{par['models_dir']}/{naming_convention(par['dataset'], model)}"
         if not os.path.exists(prediction_file):
             print('Warnings: ', prediction_file, ' doesnt exists')
             continue
@@ -32,8 +39,8 @@ def main(dataset):
         grn['model'] = model
         grn_store.append(grn)
     grn_all = pd.concat(grn_store).reset_index(drop=True)
-    # print(grn_all)
 
+    assert len(grn_all) > 0, 'No GRN predictions found in the models'
     # - subset to available TFs
     grn_all = grn_all[grn_all['source'].isin(available_tfs)]
 
@@ -54,5 +61,4 @@ def main(dataset):
     return consensus
 
 if __name__ == '__main__':
-    for dataset in ['replogle', 'norman', 'adamson']:
-        main(dataset)
+    main(par)

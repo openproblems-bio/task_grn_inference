@@ -7,7 +7,7 @@
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Datasets &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
   
@@ -19,7 +19,7 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="GRN inference and evaluation" href="evaluation.html" />
+    <link rel="next" title="GRN evaluation" href="evaluation.html" />
     <link rel="prev" title="Documentation for Gene Regulatory Network Inference Benchmark (geneRNIB)" href="index.html" /> 
 </head>
 
@@ -52,7 +52,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#downloading-the-results">Downloading the results</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="evaluation.html">GRN inference and evaluation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="evaluation.html">GRN evaluation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extending.html">Adding GRN inference methods, metrics, and datasets</a></li>
 </ul>
 
@@ -89,7 +89,7 @@ You need <cite>awscli</cite> to download the datasets. If you don’t have it in
 <hr class="docutils" />
 <section id="downloading-the-test-datasets">
 <h2>Downloading the test datasets<a class="headerlink" href="#downloading-the-test-datasets" title="Link to this heading"></a></h2>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>aws<span class="w"> </span>s3<span class="w"> </span>sync<span class="w"> </span>s3://openproblems-data/resources_test/grn<span class="w"> </span>resources_test/--no-sign-request
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>aws<span class="w"> </span>s3<span class="w"> </span>sync<span class="w"> </span>s3://openproblems-data/resources_test/grn<span class="w"> </span>resources_test/<span class="w"> </span>--no-sign-request
 </pre></div>
 </div>
 <p>This command downloads the data to <cite>resources_test/</cite>. The content of this folder is needed for testing component integration.</p>
@@ -104,7 +104,10 @@ You need <cite>awscli</cite> to download the datasets. If you don’t have it in
 </section>
 <section id="downloading-the-extended-datasets">
 <h2>Downloading the extended datasets<a class="headerlink" href="#downloading-the-extended-datasets" title="Link to this heading"></a></h2>
-<p>Beyond the core datasets, extended datasets include the Replogle dataset in single-cell format (<cite>replogle_train_sc.h5ad</cite>). The previous version was pseudobulked for computational efficiency. Additionally, pseudobulked versions of all other datasets are available, representing the combined inference and evaluation datasets. These files are used for the <cite>positive control</cite> method, which incorporates all variations within a dataset.</p>
+<p>Beyond the core datasets, extended datasets include single cell data of large perturbation datasets such as Replogle, Xaira, and Parse bioscience.
+The previous version was pseudobulked for computational efficiency.
+Additionally, pseudobulked versions of all other datasets are available, representing the combined inference and evaluation datasets.
+These files are used for the <cite>positive control</cite> method, which incorporates all variations within a dataset.</p>
 <p>To download the extended datasets, use:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>aws<span class="w"> </span>s3<span class="w"> </span>sync<span class="w"> </span>s3://openproblems-data/resources/grn/extended_data/<span class="w"> </span>resources/extended_data/<span class="w"> </span>--no-sign-request
 </pre></div>
@@ -138,7 +141,7 @@ You need <cite>awscli</cite> to download the datasets. If you don’t have it in
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="index.html" class="btn btn-neutral float-left" title="Documentation for Gene Regulatory Network Inference Benchmark (geneRNIB)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="evaluation.html" class="btn btn-neutral float-right" title="GRN inference and evaluation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="evaluation.html" class="btn btn-neutral float-right" title="GRN evaluation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

@@ -123,16 +123,16 @@ def preprocess_sc(par):
     return sc_counts
 
 
-def pseudobulk_mean_func(bulk_adata):
-    bulk_adata.layers['counts'] = bulk_adata.X.copy()
-    rows_adj = []
-    for i, row in enumerate(bulk_adata.X):
-        count = bulk_adata.obs.cell_count[i]
-        rows_adj.append(row/count)
+# def pseudobulk_mean_func(bulk_adata):
+#     bulk_adata.layers['counts'] = bulk_adata.X.copy()
+#     rows_adj = []
+#     for i, row in enumerate(bulk_adata.X):
+#         count = bulk_adata.obs.cell_count[i]
+#         rows_adj.append(row/count)
 
-    bulk_adata.layers['n_counts'] = np.asarray(rows_adj)
+#     bulk_adata.layers['n_counts'] = np.asarray(rows_adj)
 
-    return bulk_adata
+#     return bulk_adata
 def filter_func(bulk_adata, cell_counts_t):
     '''Filters pseudobulked data by removing outliers compound, 
     samples with low cell counts, and genes with low coverage
@@ -178,13 +178,3 @@ def filter_func(bulk_adata, cell_counts_t):
     for key in ['cell_type','plate_name']:
         bulk_adata_filtered.obs[key] = bulk_adata_filtered.obs[key].astype(str)
     return bulk_adata_filtered
-def normalize_func(adata):
-    # sc.pp.normalize_total(bulk_adata_c)
-    # sc.pp.log1p(bulk_adata_c)
-
-    adata.layers['X_norm'] = sc.experimental.pp.normalize_pearson_residuals(adata, layer='counts', inplace=False)['X']
-    X_norm = sc.pp.normalize_total(adata, layer='counts',inplace=False)['X']
-    X_norm = sc.pp.log1p(X_norm, copy=False)
-    adata.layers['lognorm'] = X_norm
-    
-    return adata

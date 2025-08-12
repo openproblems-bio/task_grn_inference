@@ -16,9 +16,9 @@ warnings.simplefilter("ignore")
 
 ## VIASH START
 par = {
-  "evaluation_data": f"resources/grn_benchmark/evaluation_data/replogle_bulk.h5ad",
+  "evaluation_data": f"resources/grn_benchmark/evaluation_data/nakatake_bulk.h5ad",
   "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
-  "prediction": "resources/results/replogle_run_test/replogle_.negative_control.negative_control.prediction.h5ad",
+  "prediction": "output/nakatake_.portia.portia.prediction.h5ad",
   "max_n_links": 50000,
   "apply_tf": True,
   'score': 'output/score.h5ad',

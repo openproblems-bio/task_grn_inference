@@ -48,6 +48,9 @@ argument_groups:
       - name: --skeleton
         type: file 
         required: false
+      - name: --layer
+        type: string
+        direction: input
       - name: --regulators_consensus
         type: file
         direction: input

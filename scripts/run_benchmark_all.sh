@@ -9,8 +9,8 @@
 
 # --- Settings ---
 test=false
-RUN_ID="nakatake_run_portia"
-run_local=false
+RUN_ID="test_run"
+run_local=true
 reg_type="ridge"
 num_workers=10
 apply_tf_methods=true
@@ -18,7 +18,12 @@ apply_skeleton=false
 
 # --- Directories ---
 resources_folder=$([ "$test" = true ] && echo "resources_test" || echo "resources")
-resources_dir="s3://openproblems-data/${resources_folder}/grn"
+if [ "$run_local" = true ]; then
+  resources_dir="./${resources_folder}/"
+else
+  resources_dir="s3://openproblems-data/${resources_folder}/grn"
+fi
+
 publish_dir="${resources_dir}/results/${RUN_ID}"
 params_dir="./params"
 param_file="${params_dir}/${RUN_ID}.yaml"
@@ -49,7 +54,7 @@ append_entry() {
   local extra_id="$4"
 
   cat >> "$param_local" << HERE
-  - id: ${dataset}_${extra_id}
+  - id: ${dataset}${extra_id:+_$extra_id}
     metric_ids: $metrics
     method_ids: $methods
     rna: ${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad
@@ -100,10 +105,12 @@ HERE
 # append_entry "adamson"  "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, grnboost]"
 # append_entry "nakatake"  "[regression_1,regression_2]" "[pearson_corr, negative_control, positive_control, 
-                                                                        # portia, scenic, grnboost]"
-append_entry "nakatake"  "[regression_1,regression_2]" "[portia]"                                                                       
+#                                                                         portia, scenic, grnboost]"
 # append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, portia, ppcor, scenic, grnboost]"
-# append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "special_case"                                                
+# append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "special_case" 
+
+append_entry "xaira_HCT116"  "[regression_1, regression_2]" "[pearson_corr, negative_control, positive_control]"
+
 # --- Final configuration ---
 if [ "$run_local" = true ]; then
   cat >> "$param_local" << HERE
@@ -128,15 +135,17 @@ HERE
 
   aws s3 cp $param_local $param_aws
 
+  
+  
   # tw launch https://github.com/openproblems-bio/task_grn_inference \
-  #   --revision build/main \
-  #   --pull-latest \
-  #   --main-script target/nextflow/workflows/run_benchmark/main.nf \
-  #   --workspace 53907369739130 \
-  #   --compute-env 7gRyww9YNGb0c6BUBtLhDP \
-  #   --params-file ${param_file} \
-  #   --config common/nextflow_helpers/labels_tw.config \
-  #   --labels ${RUN_ID}
+  #     --revision build/main \
+  #     --pull-latest \
+  #     --main-script target/nextflow/workflows/run_benchmark/main.nf \
+  #     --workspace 209741690280743 \
+  #     --params-file ${param_file} \
+  #     --labels ${RUN_ID} \
+  #     --config scripts/hpc_settings.config
+
   tw launch https://github.com/openproblems-bio/task_grn_inference \
     --revision build/main \
     --pull-latest \
