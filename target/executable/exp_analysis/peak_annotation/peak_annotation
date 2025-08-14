@@ -450,9 +450,9 @@ RUN Rscript -e 'options(warn = 2); if (!requireNamespace("BiocManager", quietly 
   Rscript -e 'options(warn = 2); if (!requireNamespace("BiocGenerics", quietly = TRUE)) BiocManager::install("BiocGenerics")'
 
 LABEL org.opencontainers.image.description="Companion container for running component exp_analysis peak_annotation"
-LABEL org.opencontainers.image.created="2025-08-12T20:31:34Z"
+LABEL org.opencontainers.image.created="2025-08-14T22:56:46Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="fe7b34cab02383876fca4d7f27d718ff50034e5c"
+LABEL org.opencontainers.image.revision="4e3794270915d3e22b97f5e6f3751b646c0e0fdb"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

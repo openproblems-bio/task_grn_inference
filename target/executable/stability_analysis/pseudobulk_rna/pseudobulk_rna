@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "igraph" "leidenalg"
 
 LABEL org.opencontainers.image.description="Companion container for running component stability_analysis pseudobulk_rna"
-LABEL org.opencontainers.image.created="2025-08-12T20:31:32Z"
+LABEL org.opencontainers.image.created="2025-08-14T22:56:45Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="fe7b34cab02383876fca4d7f27d718ff50034e5c"
+LABEL org.opencontainers.image.revision="4e3794270915d3e22b97f5e6f3751b646c0e0fdb"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
