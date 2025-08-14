@@ -9,8 +9,8 @@
 set -e 
 # --- Settings ---
 test=false
-RUN_ID="test_run"
-run_local=true
+RUN_ID="replogle_run"
+run_local=false
 num_workers=10
 apply_tf_methods=true
 layer='lognorm'
@@ -49,7 +49,6 @@ fi
 append_entry() {
   local dataset="$1"
   local methods="$2"
-  local extra_id="$3"
 
   if [[ "$dataset" =~ ^(norman|nakatake|adamson)$ ]]; then
     layer_='X_norm'
@@ -58,7 +57,7 @@ append_entry() {
   fi
   
   cat >> "$param_local" << HERE
-  - id: ${dataset}${extra_id:+_$extra_id}
+  - id: ${dataset}
     method_ids: $methods
     rna: ${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad
     rna_all: ${resources_dir}/extended_data/${dataset}_bulk.h5ad
@@ -66,18 +65,7 @@ append_entry() {
     layer: $layer_
     num_workers: $num_workers
     apply_tf_methods: $apply_tf_methods
-    apply_skeleton: $apply_skeleton
-    skeleton: ${resources_dir}/grn_benchmark/prior/skeleton.csv
 HERE
-  if [ "$extra_id" = "use_train_sc" ]; then # #TODO: fix this
-    cat >> "$param_local" << HERE
-    rna: ${resources_dir}/extended_data/${dataset}_train_sc.h5ad
-HERE
-  else  # for rest 
-    cat >> "$param_local" << HERE
-    rna: ${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad
-HERE
-  fi
 
   if [[ "$dataset" =~ ^(op|opsca)$ ]]; then
     cat >> "$param_local" << HERE
@@ -88,22 +76,21 @@ HERE
 
 # --------- COMBINATIONS TO ADD ----------
 
-# append_entry "op" "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
+# append_entry "op" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, scprint, grnboost,
 #                                                                         scenicplus, scglue, granie, figr, celloracle]" 
-# append_entry "norman"  "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
+# append_entry "norman"  "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, scprint, grnboost]"
-# append_entry "adamson"  "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
+# append_entry "adamson" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, grnboost]"
-# append_entry "nakatake"  "[regression_1,regression_2]" "[pearson_corr, negative_control, positive_control, 
+# append_entry "nakatake"  "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, scenic, grnboost]"
-# append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, portia, ppcor, scenic, grnboost]"
-# append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "use_train_sc" 
+# append_entry "replogle" "[pearson_corr, negative_control, positive_control, portia, ppcor, scenic, grnboost, scprint]"
 
-append_entry "replogle" "[pearson_corr, negative_control, positive_control]" 
-append_entry "xaira_HEK293T" "[pearson_corr, negative_control, positive_control]" 
-append_entry "xaira_HCT116" "[pearson_corr, negative_control, positive_control]"
-append_entry "parsebioscience" "[pearson_corr, negative_control, positive_control]"
+append_entry "replogle" "[pearson_corr, negative_control, positive_control, scprint]" 
+# append_entry "xaira_HEK293T" "[pearson_corr, negative_control, positive_control]" 
+# append_entry "xaira_HCT116" "[pearson_corr, negative_control, positive_control]"
+# append_entry "parsebioscience" "[pearson_corr, negative_control, positive_control]"
 
 
 # --- Final configuration ---

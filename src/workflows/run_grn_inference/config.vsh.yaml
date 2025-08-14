@@ -33,16 +33,6 @@ argument_groups:
         required: false
         direction: input
         default: true
-      - name: --apply_skeleton
-        type: boolean
-        required: false
-        direction: input
-        default: false
-      - name: --skeleton
-        type: file
-        direction: input
-        required: false
-        example: resources_test/grn_benchmark/prior/skeleton.csv
   - name: Arguments
     arguments: 
       - name: "--method_ids"

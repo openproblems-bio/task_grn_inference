@@ -152,15 +152,23 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     print('Cell count threshold:', cell_count_t, flush=True)
     print('Covariates:', covariates, flush=True)
 
-    adata_bulk = bulkify_main(adata, cell_count_t=cell_count_t, covariates=covariates)
-    adata_bulk = adata_bulk.copy()
-    
-    assert adata_bulk.shape[0] > 0, "No bulk data found after pseudobulking"
-    assert 'perturbation' in adata_bulk.obs.columns, "Expected 'perturbation' column not found in adata_bulk.obs"
+    print('QC on single cell number of perturbation ...', flush=True)
+    single_cell_counts = adata.obs.groupby('perturbation').size().sort_values(ascending=False)
+    passed_perturbations = single_cell_counts[single_cell_counts >= cell_count_t].index.tolist()
+    adata = adata[adata.obs['perturbation'].isin(passed_perturbations)]
+
+    print(f'Number of perturbations after QC: {len(passed_perturbations)}', flush=True)
+    assert adata.shape[0] > 0, "No data found after QC"
+
+    print('QC on number of genes and cells ...', flush=True)
+    sc.pp.filter_genes(adata, min_cells=10)
+    sc.pp.filter_cells(adata, min_genes=100)
+    print(f'Shape of adata after QC: {adata.shape}', flush=True)
+
     print('Splitting data...', flush=True)
     train_perturbs, test_perturbs = split_func(adata, train_share)
     
-    # - adata train sc
+    # - adata train sc full
     print('Processing adata train sc ...', flush=True)
     adata_train_sc = adata[adata.obs['perturbation'].isin(train_perturbs)].copy()
     assert adata_train_sc.obs['is_control'].sum()> 0, "No control data found in training set"
@@ -168,6 +176,19 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     adata_train_sc = normalize_func(adata_train_sc, pearson_residual=False)
     adata_train_sc = add_metadata(adata_train_sc)
     adata_train_sc.write(f'resources/extended_data/{save_name}_train_sc.h5ad', compression='gzip')
+
+    # - adata train sc subset
+    print('Processing adata train sc subset (main inference data)...', flush=True)
+    if save_name == 'parsebioscience':
+        shortlisted_perts = train_perturbs[:10]
+    else:
+        tf_all = np.loadtxt('resources/grn_benchmark/prior/tf_all.csv', dtype=str)
+        shortlisted_perts = np.intersect1d(tf_all, train_perturbs)
+    
+    adata_train_sc_subset = adata_train_sc[adata_train_sc.obs['perturbation'].isin(shortlisted_perts), :]
+    adata_train_sc_subset.write(f'resources/grn_benchmark/inference_data/{save_name}_rna.h5ad', compression='gzip')
+    
+
     del adata_train_sc
     gc.collect()
 
@@ -184,25 +205,33 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     print('Processing adata sc ...', flush=True)
     adata = normalize_func(adata, pearson_residual=False)
     adata = add_metadata(adata)
-    adata.write(f'resources/extended_data/{save_name}_sc.h5ad', compression='gzip')
+    adata.write(f'resources/processed_data/{save_name}_sc.h5ad', compression='gzip')
+    
+
+    print('Process adata bulk ...', flush=True)
+    adata_bulk = bulkify_main(adata, cell_count_t=cell_count_t, covariates=covariates)
+    adata_bulk = adata_bulk.copy()
     del adata
     gc.collect()
-
-    print('Processing adata bulk ...', flush=True)
-    adata_test_bulk = adata_bulk[adata_bulk.obs['perturbation'].isin(test_perturbs)].copy()
-    adata_train_bulk = adata_bulk[adata_bulk.obs['perturbation'].isin(train_perturbs)].copy()
-    assert adata_test_bulk.shape[0] > 0, "No test data found after splitting"
-    assert adata_train_bulk.shape[0] > 0, "No training bulk data found after splitting"
-
-    adata_bulk = normalize_func(adata_bulk, pearson_residual=False)
-    adata_test_bulk = normalize_func(adata_test_bulk, pearson_residual=False)
-    adata_train_bulk = normalize_func(adata_train_bulk, pearson_residual=False)
-   
-    adata_bulk = add_metadata(adata_bulk)
-    adata_test_bulk = add_metadata(adata_test_bulk)
-    adata_train_bulk = add_metadata(adata_train_bulk)
     
+    assert adata_bulk.shape[0] > 0, "No bulk data found after pseudobulking"
+    assert 'perturbation' in adata_bulk.obs.columns, "Expected 'perturbation' column not found in adata_bulk.obs"
+    adata_bulk = normalize_func(adata_bulk, pearson_residual=False)
+    adata_bulk = add_metadata(adata_bulk)
     adata_bulk.write(f'resources/extended_data/{save_name}_bulk.h5ad', compression='gzip')
-    adata_train_bulk.write(f'resources/grn_benchmark/inference_data/{save_name}_rna.h5ad', compression='gzip')
+
+    print('Process adata bulk test...', flush=True)
+    adata_test_bulk = adata_bulk[adata_bulk.obs['perturbation'].isin(test_perturbs)].copy()
+    assert adata_test_bulk.shape[0] > 0, "No test data found after splitting"
+    adata_test_bulk = normalize_func(adata_test_bulk, pearson_residual=False)
+    adata_test_bulk = add_metadata(adata_test_bulk)
     adata_test_bulk.write(f'resources/grn_benchmark/evaluation_data/{save_name}_bulk.h5ad', compression='gzip')
+    
+    print('Process adata bulk train...', flush=True)
+    adata_train_bulk = adata_bulk[adata_bulk.obs['perturbation'].isin(train_perturbs)].copy()
+    assert adata_train_bulk.shape[0] > 0, "No training bulk data found after splitting"
+    adata_train_bulk = normalize_func(adata_train_bulk, pearson_residual=False)
+    adata_train_bulk = add_metadata(adata_train_bulk)
+    adata_train_bulk.write(f'resources/extended_data/{save_name}_train_bulk.h5ad', compression='gzip')
+    
     
