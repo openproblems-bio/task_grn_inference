@@ -202,14 +202,6 @@ function ViashHelp {
   echo "        type: boolean"
   echo "        default: true"
   echo ""
-  echo "    --apply_skeleton"
-  echo "        type: boolean"
-  echo "        default: false"
-  echo ""
-  echo "    --skeleton"
-  echo "        type: file, file must exist"
-  echo "        example: resources_test/grn_benchmark/prior/skeleton.csv"
-  echo ""
   echo "Arguments:"
   echo "    --method_ids"
   echo "        type: string, multiple values allowed"
@@ -353,28 +345,6 @@ while [[ $# -gt 0 ]]; do
         --apply_tf_methods=*)
             [ -n "$VIASH_PAR_APPLY_TF_METHODS" ] && ViashError Bad arguments for option \'--apply_tf_methods=*\': \'$VIASH_PAR_APPLY_TF_METHODS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_APPLY_TF_METHODS=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --apply_skeleton)
-            [ -n "$VIASH_PAR_APPLY_SKELETON" ] && ViashError Bad arguments for option \'--apply_skeleton\': \'$VIASH_PAR_APPLY_SKELETON\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_APPLY_SKELETON="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --apply_skeleton. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --apply_skeleton=*)
-            [ -n "$VIASH_PAR_APPLY_SKELETON" ] && ViashError Bad arguments for option \'--apply_skeleton=*\': \'$VIASH_PAR_APPLY_SKELETON\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_APPLY_SKELETON=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --skeleton)
-            [ -n "$VIASH_PAR_SKELETON" ] && ViashError Bad arguments for option \'--skeleton\': \'$VIASH_PAR_SKELETON\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_SKELETON="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --skeleton. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --skeleton=*)
-            [ -n "$VIASH_PAR_SKELETON" ] && ViashError Bad arguments for option \'--skeleton=*\': \'$VIASH_PAR_SKELETON\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_SKELETON=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --method_ids)
@@ -626,9 +596,6 @@ fi
 if [ -z ${VIASH_PAR_APPLY_TF_METHODS+x} ]; then
   VIASH_PAR_APPLY_TF_METHODS="true"
 fi
-if [ -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then
-  VIASH_PAR_APPLY_SKELETON="false"
-fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_RNA" ] && [ ! -e "$VIASH_PAR_RNA" ]; then
@@ -647,10 +614,6 @@ if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
   ViashError "Input file '$VIASH_PAR_TF_ALL' does not exist."
   exit 1
 fi
-if [ ! -z "$VIASH_PAR_SKELETON" ] && [ ! -e "$VIASH_PAR_SKELETON" ]; then
-  ViashError "Input file '$VIASH_PAR_SKELETON' does not exist."
-  exit 1
-fi
 
 # check whether parameters values are of the right type
 if [[ -n "$VIASH_PAR_NUM_WORKERS" ]]; then
@@ -662,12 +625,6 @@ fi
 if [[ -n "$VIASH_PAR_APPLY_TF_METHODS" ]]; then
   if ! [[ "$VIASH_PAR_APPLY_TF_METHODS" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--apply_tf_methods' has to be a boolean. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_APPLY_SKELETON" ]]; then
-  if ! [[ "$VIASH_PAR_APPLY_SKELETON" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--apply_skeleton' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi

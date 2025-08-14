@@ -446,9 +446,9 @@ function ViashDockerfile {
 FROM janursa/scglue:13_03_2025
 ENTRYPOINT []
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scglue"
-LABEL org.opencontainers.image.created="2025-08-14T22:56:45Z"
+LABEL org.opencontainers.image.created="2025-08-14T22:59:48Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="4e3794270915d3e22b97f5e6f3751b646c0e0fdb"
+LABEL org.opencontainers.image.revision="93aad89a66124148d72325af0b5af3e303a9ea6b"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

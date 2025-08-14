@@ -4,6 +4,7 @@
 
 
 # related to files
+src/metrics/greta/*
 # runs.ipynb
 .pybiomart.sqlite
 logs/

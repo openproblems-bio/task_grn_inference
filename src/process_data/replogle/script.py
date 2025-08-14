@@ -65,7 +65,7 @@ def main(par):
         print('Running in test mode...')
         tf_all = np.loadtxt(par['tf_all'], dtype=str)
         filter = adata.obs['gene'][adata.obs['gene'].isin(tf_all)].unique()[0:100]
-        adata = adata[adata.obs['gene'].isin(filter)].to_memory()  
+        adata = adata[(adata.obs['gene'].isin(filter)) | (adata.obs['gene']=='non-targeting')].to_memory()  
     else:
         print('Running in full mode...')
         adata = adata.to_memory()
