@@ -1,14 +1,16 @@
+import argparse
 import sys
-from huggingface_hub import hf_hub_download
-import numpy as np
+
 import anndata as ad
+import numpy as np
 import pandas as pd
 import torch
-import argparse
-from scprint import scPrint
+from huggingface_hub import hf_hub_download
 from scdataloader import Preprocessor
-from scprint.tasks import GNInfer
+from scdataloader.utils import load_genes
 from scipy.sparse import csr_matrix
+from scprint import scPrint
+from scprint.tasks import GNInfer
 
 torch.set_float32_matmul_precision("medium")
 
@@ -54,7 +56,99 @@ try:
 except:
     meta = {"resources_dir": "src/utils"}
     sys.path.append(meta["resources_dir"])
+
 from util import efficient_melting
+
+adata = ad.read_h5ad(par["rna"])
+adata.obs["is_primary_data"] = True
+adata.obs["organism_ontology_term_id"] = "NCBITaxon:9606"
+# adata.var = adata.var.set_index("gene_ids")
+
+preprocessor = Preprocessor(
+    min_valid_genes_id=min(0.7 * adata.n_vars, 10000),  # 90% of features up to 10,000
+    # Turn off cell filtering to return results for all cells
+    filter_cell_by_counts=400,
+    min_nnz_genes=200,
+    do_postp=False,
+    is_symbol=True,
+    force_preprocess=True,
+    # Skip ontology checks
+    skip_validate=True,
+    use_raw=False,
+)
+if adata.raw is not None and adata.raw.X.shape[1] != adata.X.shape[1]:
+    print("removing raw")
+    del adata.raw
+if adata.layers is not None and "counts" in adata.layers:
+    adata.X = adata.layers["counts"]
+    del adata.layers["counts"]
+
+
+dataset_id = adata.uns["dataset_id"] if "dataset_id" in adata.uns else par["dataset_id"]
+
+print("\n>>> Preprocessing data...", flush=True)
+adata = preprocessor(adata)
+
+if adata[0].X.sum() != int(adata[0].X.sum()):
+    print("WARNING: you are not using count data")
+    print("reverting logp1")
+    adata.X = csr_matrix(np.power(adata.X.todense(), 2) - 1)
+
+
+model_checkpoint_file = par["model"]
+if model_checkpoint_file is None:
+    print(f"\n>>> Downloading '{par['model_name']}' model...", flush=True)
+    model_checkpoint_file = hf_hub_download(
+        repo_id="jkobject/scPRINT", filename=f"{par['model_name']}.ckpt"
+    )
+
+if torch.cuda.is_available():
+    print("CUDA is available, using GPU", flush=True)
+    dtype = torch.float16
+    transformer = "flash"
+else:
+    print("CUDA is not available, using CPU", flush=True)
+    dtype = torch.float32
+    transformer = "normal"
+
+print(f"Model checkpoint file: '{model_checkpoint_file}'", flush=True)
+
+# make sure that you check if you have a GPU with flashattention or not (see README)
+try:
+    m = torch.load(model_checkpoint_file)
+# if not use this instead since the model weights are by default mapped to GPU types
+except RuntimeError:
+    m = torch.load(model_checkpoint_file, map_location=torch.device("cpu"))
+
+if "prenorm" in m["hyper_parameters"]:
+    m["hyper_parameters"].pop("prenorm")
+    torch.save(m, model_checkpoint_file)
+
+if "label_counts" in m["hyper_parameters"]:
+    model = scPrint.load_from_checkpoint(
+        model_checkpoint_file,
+        transformer=transformer,  # Don't use this for GPUs with flashattention
+        precpt_gene_emb=None,
+        classes=m["hyper_parameters"]["label_counts"],
+    )
+else:
+    model = scPrint.load_from_checkpoint(
+        model_checkpoint_file,
+        transformer=transformer,  # Don't use this for GPUs with flashattention
+        precpt_gene_emb=None,
+    )
+del m
+
+missing = set(model.genes) - set(load_genes(model.organisms).index)
+if len(missing) > 0:
+    print(
+        "Warning: some genes missmatch exist between model and ontology: solving...",
+    )
+    model._rm_genes(missing)
+
+if model.device.type == "cpu" and torch.cuda.is_available():
+    print("CUDA is available, moving model to GPU", flush=True)
+    model = model.to("cuda")
 
 
 def main_sub(adata, model, par, cell_type):
@@ -70,6 +164,7 @@ def main_sub(adata, model, par, cell_type):
             max_cells=par["max_cells"],
             doplot=False,
             batch_size=16,
+            dtype=dtype,
         )
 
         grn = grn_inferer(model, adata, cell_type=cell_type)
@@ -105,82 +200,6 @@ def main_sub(adata, model, par, cell_type):
 
     return net
 
-
-adata = ad.read_h5ad(par["rna"])
-adata.obs["is_primary_data"] = True
-adata.obs["organism_ontology_term_id"] = "NCBITaxon:9606"
-# adata.var = adata.var.set_index("gene_ids")
-
-preprocessor = Preprocessor(
-    min_valid_genes_id=min(0.7 * adata.n_vars, 10000),  # 90% of features up to 10,000
-    # Turn off cell filtering to return results for all cells
-    filter_cell_by_counts=400,
-    min_nnz_genes=200,
-    do_postp=False,
-    is_symbol=True,
-    force_preprocess=True,
-    # Skip ontology checks
-    skip_validate=True,
-    use_raw=False
-)
-if adata.raw is not None and adata.raw.X.shape[1] != adata.X.shape[1]:
-    print("removing raw")
-    del adata.raw
-if adata.layers is not None and "counts" in adata.layers:
-    adata.X = adata.layers["counts"]
-    del adata.layers["counts"]
-
-
-dataset_id = adata.uns["dataset_id"] if "dataset_id" in adata.uns else par["dataset_id"]
-
-print("\n>>> Preprocessing data...", flush=True)
-adata = preprocessor(adata)
-
-if adata[0].X.sum() != int(adata[0].X.sum()):
-    print("WARNING: you are not using count data")
-    print("reverting logp1")
-    adata.X = csr_matrix(np.power(adata.X.todense(), 2) - 1)
-
-
-model_checkpoint_file = par["model"]
-if model_checkpoint_file is None:
-    print(f"\n>>> Downloading '{par['model_name']}' model...", flush=True)
-    model_checkpoint_file = hf_hub_download(
-        repo_id="jkobject/scPRINT", filename=f"{par['model_name']}.ckpt"
-    )
-
-if torch.cuda.is_available():
-    print("CUDA is available, using GPU", flush=True)
-    precision = "16"
-    dtype = torch.float16
-    transformer = "flash"
-else:
-    print("CUDA is not available, using CPU", flush=True)
-    precision = "32"
-    dtype = torch.float32
-    transformer = "normal"
-
-print(f"Model checkpoint file: '{model_checkpoint_file}'", flush=True)
-
-m = torch.load(model_checkpoint_file, map_location=torch.device("cpu"))
-if "label_counts" in m["hyper_parameters"]:
-    model = scPrint.load_from_checkpoint(
-        model_checkpoint_file,
-        transformer=transformer,  # Don't use this for GPUs with flashattention
-        precpt_gene_emb=None,
-        classes=m["hyper_parameters"]["label_counts"],
-    )
-else:
-    model = scPrint.load_from_checkpoint(
-        model_checkpoint_file,
-        transformer=transformer,  # Don't use this for GPUs with flashattention
-        precpt_gene_emb=None,
-    )
-del m
-
-if model.device.type == "cpu" and torch.cuda.is_available():
-    print("CUDA is available, moving model to GPU", flush=True)
-    model = model.to("cuda")
 
 if "cell_type" not in adata.obs:
     adata.obs["cell_type"] = "dummy_cell_type"
