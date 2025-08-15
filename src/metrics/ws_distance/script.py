@@ -10,10 +10,10 @@ import os
 ## VIASH START
 par = {
     'layer': 'lognorm',
-    'prediction': f'resources/results/test_run/xaira_HEK293T.pearson_corr.pearson_corr.prediction.h5ad',
-    'evaluation_data_sc': f'resources/grn_benchmark/evaluation_data/xaira_HEK293T_sc.h5ad',
-    'ws_consensus': f'resources/grn_benchmark/prior/ws_consensus_xaira_HEK293T.csv',
-    'ws_distance_background': f'resources/grn_benchmark/prior/ws_distance_background_xaira_HEK293T.csv',
+    'prediction': f'resources/results/replogle/replogle.negative_control.negative_control.prediction.h5ad',
+    # 'evaluation_data_sc': f'resources/grn_benchmark/evaluation_data/replogle_sc.h5ad',
+    'ws_consensus': f'resources/grn_benchmark/prior/ws_consensus_replogle.csv',
+    'ws_distance_background': f'resources/grn_benchmark/prior/ws_distance_background_replogle.csv',
     'silent_missing_dependencies': False
 }
 ## VIASH END
@@ -21,11 +21,6 @@ par = {
 ## LOCAL START
 parser = argparse.ArgumentParser()
 parser.add_argument('--run_local', action='store_true', help='Run locally')
-parser.add_argument('--evaluation_data_sc', type=str)
-parser.add_argument('--ws_consensus', type=str)
-parser.add_argument('--ws_distance_background', type=str)
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--score', type=str, help='score file')
 
 args = parser.parse_args()
 var_local = vars(args)
@@ -33,9 +28,6 @@ var_local = vars(args)
 ## LOCAL END
 
 if args.run_local:
-    for key in var_local:
-        if var_local[key] is not None:
-            par[key] = var_local[key]
     meta = {
       "resources_dir":'src/metrics/wasserstein/',
       "util_dir":'src/utils'
@@ -62,7 +54,19 @@ if __name__ == '__main__':
             raise FileNotFoundError(f"Dependencies missing {par['ws_consensus']}. Please check the paths of the dependencies")
     else:
         method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-        dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
+        # dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
+        if 'replogle' in par['ws_consensus']:
+            dataset_id = 'replogle'
+        elif 'adamson' in par['ws_consensus']:
+            dataset_id = 'adamson'
+        elif 'norman' in par['ws_consensus']:
+            dataset_id = 'norman'
+        elif 'xaira_HCT116' in par['ws_consensus']:
+            dataset_id = 'xaira_HCT116'
+        elif 'xaira_HEK293T' in par['ws_consensus']:
+            dataset_id = 'xaira_HEK293T'
+        else:
+            raise ValueError(f"Dataset name did not match expected datasets")
         print(f"Method id: {method_id}, Dataset id: {dataset_id}")
         # - main function
         _, mean_scores = main(par)
