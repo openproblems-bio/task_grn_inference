@@ -234,4 +234,5 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     adata_train_bulk = add_metadata(adata_train_bulk)
     adata_train_bulk.write(f'resources/extended_data/{save_name}_train_bulk.h5ad', compression='gzip')
     
+    print('Data processing completed successfully!', flush=True)
     

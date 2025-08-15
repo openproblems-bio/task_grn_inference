@@ -3520,7 +3520,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression_2",
     "viash_version" : "0.9.4",
-    "git_commit" : "93aad89a66124148d72325af0b5af3e303a9ea6b",
+    "git_commit" : "c6e523ebacb2f9a84356821f06b0d2e0142ce898",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3680,14 +3680,6 @@ dep = {
 ## LOCAL START
 parser = argparse.ArgumentParser()
 parser.add_argument('--run_local', action='store_true', help='Run locally')
-parser.add_argument('--evaluation_data', type=str)
-parser.add_argument('--regulators_consensus', type=str)
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--method_id', type=str, help='Method id')
-parser.add_argument('--dataset_id', type=str, help='Dataset id')
-parser.add_argument('--score', type=str, help='score file')
-parser.add_argument('--reg_type', type=str)
-parser.add_argument('--apply_skeleton', action='store_true')
 
 args = parser.parse_args()
 var_local = vars(args)
@@ -3695,9 +3687,6 @@ var_local = vars(args)
 ## LOCAL END
 
 if args.run_local:
-    for key in var_local:
-        if var_local[key] is not None:
-            par[key] = var_local[key]
     meta = {
       "resources_dir":'src/metrics/regression_2/',
       "util_dir":'src/utils'

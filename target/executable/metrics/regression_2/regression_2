@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression_2"
-LABEL org.opencontainers.image.created="2025-08-14T22:59:49Z"
+LABEL org.opencontainers.image.created="2025-08-15T14:02:16Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="93aad89a66124148d72325af0b5af3e303a9ea6b"
+LABEL org.opencontainers.image.revision="c6e523ebacb2f9a84356821f06b0d2e0142ce898"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1363,14 +1363,6 @@ dep = {
 ## LOCAL START
 parser = argparse.ArgumentParser()
 parser.add_argument('--run_local', action='store_true', help='Run locally')
-parser.add_argument('--evaluation_data', type=str)
-parser.add_argument('--regulators_consensus', type=str)
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--method_id', type=str, help='Method id')
-parser.add_argument('--dataset_id', type=str, help='Dataset id')
-parser.add_argument('--score', type=str, help='score file')
-parser.add_argument('--reg_type', type=str)
-parser.add_argument('--apply_skeleton', action='store_true')
 
 args = parser.parse_args()
 var_local = vars(args)
@@ -1378,9 +1370,6 @@ var_local = vars(args)
 ## LOCAL END
 
 if args.run_local:
-    for key in var_local:
-        if var_local[key] is not None:
-            par[key] = var_local[key]
     meta = {
       "resources_dir":'src/metrics/regression_2/',
       "util_dir":'src/utils'

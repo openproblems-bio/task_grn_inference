@@ -13,16 +13,15 @@
 
 set -e
 
-models_dir="resources/results/test_run/"
+DATASET="${1:-replogle}"
+models_dir="resources/results/$DATASET/"
 
 echo "Running consensus for regression 2"
-models=("pearson_corr" "negative_control" "positive_control" "portia" "ppcor" "scenic" "scprint" "grnboost2" "scenicplus" "scglue" "granie" "figr" "celloracle")
+models=("pearson_corr" "positive_control" "portia" "ppcor" "scenic" "scprint" "grnboost2" "scenicplus" "scglue" "granie" "figr" "celloracle")
 
-# datasets=("op" "norman" "adamson" "nakatake" "replogle" "xaira_HCT116" "xaira_HCT116" "xaira_HEK293T" "parsebioscience")
-
-datasets=("parsebioscience")
+datasets=(${DATASET})
 for dataset in "${datasets[@]}"; do
-    echo "Running consensus for dataset: $dataset"
+    echo "Running reg2 consensus for dataset: $dataset"
     
     python src/metrics/regression_2/consensus/script.py \
         --dataset "$dataset" \
@@ -33,18 +32,29 @@ for dataset in "${datasets[@]}"; do
 done
 
 
-# echo "Running consensus for ws distance"
-# # datasets=("op" "norman" "adamson" "nakatake" "replogle" "xaira_HEK293T" "xaira_HCT116" )
-# datasets=("xaira_HEK293T" "xaira_HCT116" )
-# for dataset in "${datasets[@]}"; do
-#     echo "Running consensus for dataset: $dataset"
-    
-#     python src/metrics/ws_distance/consensus/script.py \
-#         --dataset "$dataset" \
-#         --models_dir "$models_dir" \
-#         --ws_consensus "resources/grn_benchmark/prior/ws_consensus_${dataset}.csv" \
-#         --tf_all "resources/grn_benchmark/prior/tf_all.csv" \
-#         --evaluation_data_sc "resources/grn_benchmark/evaluation_data/${dataset}_sc.h5ad" \
-#         --models "${models[@]}"
-# done
+echo "Running consensus for ws distance"
+applicable_datasets=("norman" "adamson" "replogle" "xaira_HEK293T" "xaira_HCT116" )
+for dataset in "${datasets[@]}"; do
+    skip=true
+    for d in "${applicable_datasets[@]}"; do
+        if [[ "$dataset" == "$d" ]]; then
+            skip=false
+            break
+        fi
+    done
+
+    if $skip; then
+        echo "Skipping dataset: $dataset"
+        continue
+    fi
+
+    echo "Running ws distance consensus for dataset: $dataset"
+    python src/metrics/ws_distance/consensus/script.py \
+        --dataset "$dataset" \
+        --models_dir "$models_dir" \
+        --ws_consensus "resources/grn_benchmark/prior/ws_consensus_${dataset}.csv" \
+        --tf_all "resources/grn_benchmark/prior/tf_all.csv" \
+        --evaluation_data_sc "resources/grn_benchmark/evaluation_data/${dataset}_sc.h5ad" \
+        --models "${models[@]}"
+done
 

@@ -9,8 +9,10 @@
 set -e 
 # --- Settings ---
 test=false
-RUN_ID="replogle_run"
-run_local=false
+DATASET="${1:-replogle}"
+echo "DATASET is: $DATASET"
+RUN_ID=${DATASET}
+run_local="${2:-false}"
 num_workers=10
 apply_tf_methods=true
 layer='lognorm'
@@ -23,7 +25,7 @@ else
   resources_dir="s3://openproblems-data/${resources_folder}/grn"
 fi
 
-publish_dir="${resources_dir}/results/${RUN_ID}"
+publish_dir="${resources_dir}/results/${DATASET}"
 params_dir="./params"
 param_file="${params_dir}/${RUN_ID}.yaml"
 param_local="${params_dir}/${RUN_ID}_param_local.yaml"
@@ -75,23 +77,13 @@ HERE
 }
 
 # --------- COMBINATIONS TO ADD ----------
+if [[ "$DATASET" == "op" ]]; then
+  methods="[pearson_corr, negative_control, positive_control, portia, ppcor, scenic, scprint, grnboost, scenicplus, scglue, granie, figr, celloracle]"
+else
+  methods="[pearson_corr, negative_control, positive_control, scprint]"
+fi
 
-# append_entry "op" "[pearson_corr, negative_control, positive_control, 
-#                                                                         portia, ppcor, scenic, scprint, grnboost,
-#                                                                         scenicplus, scglue, granie, figr, celloracle]" 
-# append_entry "norman"  "[pearson_corr, negative_control, positive_control, 
-#                                                                         portia, ppcor, scenic, scprint, grnboost]"
-# append_entry "adamson" "[pearson_corr, negative_control, positive_control, 
-#                                                                         portia, ppcor, scenic, grnboost]"
-# append_entry "nakatake"  "[pearson_corr, negative_control, positive_control, 
-#                                                                         portia, scenic, grnboost]"
-# append_entry "replogle" "[pearson_corr, negative_control, positive_control, portia, ppcor, scenic, grnboost, scprint]"
-
-append_entry "replogle" "[pearson_corr, negative_control, positive_control, scprint]" 
-# append_entry "xaira_HEK293T" "[pearson_corr, negative_control, positive_control]" 
-# append_entry "xaira_HCT116" "[pearson_corr, negative_control, positive_control]"
-# append_entry "parsebioscience" "[pearson_corr, negative_control, positive_control]"
-
+append_entry "$DATASET" "$methods"
 
 # --- Final configuration ---
 if [ "$run_local" = true ]; then

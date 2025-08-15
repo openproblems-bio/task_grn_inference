@@ -6,7 +6,10 @@ import argparse
 
 ## VIASH START
 par = {
-    'layer': 'X_norm',
+    'prediction': 'resources/results/replogle/replogle.negative_control.negative_control.prediction.h5ad',
+    'evaluation_data': 'resources/grn_benchmark/evaluation_data/replogle_bulk.h5ad',
+    'regulators_consensus': 'resources/grn_benchmark/prior/regulators_consensus_replogle.json',
+    'layer': 'lognorm',
     "max_n_links": 50000,
     'reg_type': 'ridge',
     'static_only': True,
@@ -14,7 +17,6 @@ par = {
     'num_workers': 4,
     'apply_tf': True,
     'clip_scores': True,
-    'method_id': 'grnboost',
     'apply_skeleton': False,
     'skeleton': 'resources/grn_benchmark/prior/skeleton.csv',
     'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',
@@ -26,14 +28,6 @@ par = {
 ## LOCAL START
 parser = argparse.ArgumentParser()
 parser.add_argument('--run_local', action='store_true', help='Run locally')
-parser.add_argument('--evaluation_data', type=str)
-parser.add_argument('--regulators_consensus', type=str)
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--method_id', type=str, help='Method id')
-parser.add_argument('--dataset_id', type=str, help='Dataset id')
-parser.add_argument('--score', type=str, help='score file')
-parser.add_argument('--reg_type', type=str)
-parser.add_argument('--apply_skeleton', action='store_true')
 
 args = parser.parse_args()
 var_local = vars(args)
@@ -41,9 +35,6 @@ var_local = vars(args)
 ## LOCAL END
 
 if args.run_local:
-    for key in var_local:
-        if var_local[key] is not None:
-            par[key] = var_local[key]
     meta = {
       "resources_dir":'src/metrics/regression_2/',
       "util_dir":'src/utils'

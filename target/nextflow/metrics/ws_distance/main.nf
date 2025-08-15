@@ -3507,7 +3507,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/ws_distance",
     "viash_version" : "0.9.4",
-    "git_commit" : "93aad89a66124148d72325af0b5af3e303a9ea6b",
+    "git_commit" : "c6e523ebacb2f9a84356821f06b0d2e0142ce898",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3669,11 +3669,6 @@ dep = {
 ## LOCAL START
 parser = argparse.ArgumentParser()
 parser.add_argument('--run_local', action='store_true', help='Run locally')
-parser.add_argument('--evaluation_data_sc', type=str)
-parser.add_argument('--ws_consensus', type=str)
-parser.add_argument('--ws_distance_background', type=str)
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--score', type=str, help='score file')
 
 args = parser.parse_args()
 var_local = vars(args)
@@ -3681,9 +3676,6 @@ var_local = vars(args)
 ## LOCAL END
 
 if args.run_local:
-    for key in var_local:
-        if var_local[key] is not None:
-            par[key] = var_local[key]
     meta = {
       "resources_dir":'src/metrics/wasserstein/',
       "util_dir":'src/utils'
@@ -3710,7 +3702,19 @@ if __name__ == '__main__':
             raise FileNotFoundError(f"Dependencies missing {par['ws_consensus']}. Please check the paths of the dependencies")
     else:
         method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-        dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
+        # dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
+        if 'replogle' in par['ws_consensus']:
+            dataset_id = 'replogle'
+        elif 'adamson' in par['ws_consensus']:
+            dataset_id = 'adamson'
+        elif 'norman' in par['ws_consensus']:
+            dataset_id = 'norman'
+        elif 'xaira_HCT116' in par['ws_consensus']:
+            dataset_id = 'xaira_HCT116'
+        elif 'xaira_HEK293T' in par['ws_consensus']:
+            dataset_id = 'xaira_HEK293T'
+        else:
+            raise ValueError(f"Dataset name did not match expected datasets")
         print(f"Method id: {method_id}, Dataset id: {dataset_id}")
         # - main function
         _, mean_scores = main(par)

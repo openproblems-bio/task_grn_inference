@@ -1,14 +1,15 @@
 #!/bin/bash
-# datasets="norman replogle op nakatake adamson"
-datasets=" xaira_HCT116 xaira_HEK293T parsebioscience" #xaira_HCT116 xaira_HEK293T parsebioscience replogle
+DATASET="${1:-replogle}" # Default dataset if not provided
+run_local="${2:-false}" 
 
-run_local=true
+# datasets="norman replogle op nakatake adamson"
+datasets="$DATASET" #xaira_HCT116 xaira_HEK293T parsebioscience replogle
+
 num_workers=10
 metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
-RUN_ID="test_run"
-models_folder="test_run/"
+RUN_ID=$DATASET
+models_folder="${DATASET}/"
 reg_type="ridge"
-label=${RUN_ID}
 apply_skeleton=false
 apply_tf=true
 layer='lognorm'
@@ -17,16 +18,16 @@ grn_names=(
     "positive_control"
     "pearson_corr"
     "negative_control"
-    # "scglue"
-    # "scenicplus"
-    # "celloracle"
-    # "granie"
-    # "figr"
-    # "grnboost2"
-    # "ppcor"
-    # "portia"
-    # "scenic"
-    # "scprint"
+    "scglue"
+    "scenicplus"
+    "celloracle"
+    "granie"
+    "figr"
+    "grnboost2"
+    "ppcor"
+    "portia"
+    "scenic"
+    "scprint"
 )
 
 if [ "$run_local" = true ]; then
@@ -137,7 +138,7 @@ HERE
     --main-script target/nextflow/workflows/run_grn_evaluation/main.nf \
     --workspace 53907369739130 \
     --params-file ${param_file} \
-    --labels ${label} \
+    --labels ${RUN_ID} \
     --config common/nextflow_helpers/labels_tw.config
     # --config scripts/hpc_settings.config \
     
