@@ -25,11 +25,10 @@ engines:
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        # packages: [ magic-impute ]
         packages: [  ]
   - type: native
 runners:
   - type: executable
   - type: nextflow
     directives:
-      label: [midtime, midmem, midcpu]
+      label: [midtime, veryhighmem, midcpu]

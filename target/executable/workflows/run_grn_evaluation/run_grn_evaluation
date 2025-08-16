@@ -239,7 +239,7 @@ function ViashHelp {
   echo "Outputs:"
   echo "    --scores"
   echo "        type: file, required parameter, output, file must exist"
-  echo "        default: scores.yaml"
+  echo "        default: score_uns.yaml"
   echo ""
   echo "    --metric_configs"
   echo "        type: file, required parameter, output, file must exist"

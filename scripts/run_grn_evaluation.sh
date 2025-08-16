@@ -6,8 +6,8 @@ run_local="${2:-false}"
 datasets="$DATASET" #xaira_HCT116 xaira_HEK293T parsebioscience replogle
 
 num_workers=10
-metric_ids="[regression_1, regression_2, ws_distance]" #regression_1, regression_2, ws_distance
-RUN_ID=$DATASET
+metric_ids="[regression_2, ws_distance]" #regression_1, regression_2, ws_distance
+RUN_ID="${DATASET}_evaluation"
 models_folder="${DATASET}/"
 reg_type="ridge"
 apply_skeleton=false
@@ -88,7 +88,6 @@ HERE
   # Additional fields for specific datasets
   if [[ "$dataset" =~ ^(norman|replogle|adamson|xaira_HCT116|xaira_HEK293T)$ ]]; then
     cat >> "$param_local" << HERE
-    evaluation_data_sc: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_sc.h5ad
     ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
     ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv
 HERE
@@ -96,15 +95,20 @@ HERE
 }
 
 # Iterate over datasets and GRN models
+
 for dataset in $datasets; do
+  available_methods=()
   for grn_name in "${grn_names[@]}"; do
     prediction_file="${grn_models_folder_local}/${dataset}.${grn_name}.${grn_name}.prediction.h5ad"
     if [[ -f "${prediction_file}" ]]; then
       append_entry "$grn_name" "$dataset"
+      available_methods+=("$grn_name")
     else
       echo "File not found: ${prediction_file}"
     fi
   done
+  echo "Available methods:"
+  printf '%s\n' "${available_methods[@]}" | sort -u
 done
 
 
@@ -131,7 +135,7 @@ HERE
   echo "Parameter file created: $param_file"
 
   aws s3 cp $param_local $param_aws
-
+  # echo "Launching task_grn_inference on aws compute..."
   tw launch https://github.com/openproblems-bio/task_grn_inference \
     --revision build/main \
     --pull-latest \
@@ -140,7 +144,4 @@ HERE
     --params-file ${param_file} \
     --labels ${RUN_ID} \
     --config common/nextflow_helpers/labels_tw.config
-    # --config scripts/hpc_settings.config \
-    
-    # --config common/nextflow_helpers/labels_tw.config
 fi 
