@@ -92,7 +92,7 @@ info:
       scripts/single_grn_evaluation.sh output/net.h5ad op
       ```
 
-      This outputs the scores into `output/test_run/scores.yaml`
+      This outputs the scores into `output/test_run/score_uns.yaml`
 
       ## Add a GRN inference method, evaluation metric, or dataset
 

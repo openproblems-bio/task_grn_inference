@@ -11,7 +11,7 @@ set -e
 test=false
 DATASET="${1:-replogle}"
 echo "DATASET is: $DATASET"
-RUN_ID=${DATASET}
+RUN_ID="${DATASET}_inference"
 run_local="${2:-false}"
 num_workers=10
 apply_tf_methods=true
@@ -108,9 +108,7 @@ param_list: "$param_aws"
 HERE
 
   aws s3 cp $param_local $param_aws
-
-  
-  
+  # echo "Launching task_grn_inference on hpc compute..."
   # tw launch https://github.com/openproblems-bio/task_grn_inference \
   #     --revision build/main \
   #     --pull-latest \
@@ -120,6 +118,7 @@ HERE
   #     --labels ${RUN_ID} \
   #     --config scripts/hpc_settings.config
 
+  echo "Launching task_grn_inference on aws compute..."
   tw launch https://github.com/openproblems-bio/task_grn_inference \
     --revision build/main \
     --pull-latest \

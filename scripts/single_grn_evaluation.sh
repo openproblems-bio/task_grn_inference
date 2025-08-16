@@ -29,6 +29,8 @@ if [ -z "$dataset" ]; then
   exit 1
 fi
 
+metric_ids="[regression_2, ws_distance]" 
+layer='lognorm'
 mkdir -p output
 
 RUN_ID="single_evaluation"
@@ -65,19 +67,26 @@ fi
 echo "Publish dir: $publish_dir"
 
 append_entry() {
+  if [[ "$dataset" =~ ^(norman|nakatake|adamson)$ ]]; then
+    layer_='X_norm'
+  else
+      layer_=$layer
+  fi
+
   cat >> $param_file << HERE
   - id: ${reg_type}
+    metric_ids: ${metric_ids}
     evaluation_data: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad
     reg_type: "ridge"
     num_workers: $num_workers
     tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
     regulators_consensus: ${resources_dir}/grn_benchmark/prior/regulators_consensus_${dataset}.json
     prediction: $prediction
+    layer: $layer_
 HERE
   # Additional fields for specific datasets
-  if [[ "$dataset" == "norman" || "$dataset" == "adamson" || "$dataset" == "replogle" ]]; then
-    cat >> "$param_file" << HERE
-    evaluation_data_sc: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_sc.h5ad
+  if [[ "$dataset" =~ ^(norman|replogle|adamson|xaira_HCT116|xaira_HEK293T)$ ]]; then
+    cat >> "$param_local" << HERE
     ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
     ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv
 HERE
