@@ -92,7 +92,7 @@ Once got the prediction for a given dataset (e.g. op), use the following code to
 ```bash
 scripts/single_grn_evaluation.sh output/net.h5ad op --test_run
 ```
-**This** outputs the scores into `output/test_run/scores.yaml`. Of note, by passing `--test_run`, the evaluations are done on the test data. To use the actual data (`resources` folder), omit this flag.
+**This** outputs the scores into `output/test_run/score_uns.yaml`. Of note, by passing `--test_run`, the evaluations are done on the test data. To use the actual data (`resources` folder), omit this flag.
 
 
 ## Add a GRN inference method, evaluation metric, or dataset

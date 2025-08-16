@@ -198,7 +198,7 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     adata_test_sc = normalize_func(adata_test_sc, pearson_residual=False)
     assert adata_test_sc.shape[0] > 0, "No test data found after splitting"
     adata_test_sc = add_metadata(adata_test_sc)
-    adata_test_sc.write( f'resources/grn_benchmark/evaluation_data/{save_name}_sc.h5ad', compression='gzip')
+    adata_test_sc.write( f'resources/processed_data/{save_name}_evaluation_sc.h5ad', compression='gzip')
     del adata_test_sc
     gc.collect()
 
