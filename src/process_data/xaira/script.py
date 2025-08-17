@@ -45,7 +45,8 @@ for ref_cell_type in ref_cell_types:
     
     adata = ad.read_h5ad(f'{raw_dir}/{ref_cell_type}_filtered_dual_guide_cells.h5ad', backed='r')
     
-
+    adata.obs['is_control'] =  adata.obs['gene_target'] == 'Non-Targeting'
+    adata.obs['perturbation_type'] = 'knockdown'
     if par['run_test']: # test
         print('Running in test mode', flush=True)
         test_targets = adata.obs['gene_target'].unique()[:20]
@@ -58,6 +59,11 @@ for ref_cell_type in ref_cell_types:
             sampled_cells = np.random.choice(gene_cells, size=n_sample, replace=False)
             mask.loc[sampled_cells] = True
 
+        # Sample 1000 control cells
+        control_cells = adata.obs.index[adata.obs['is_control']]
+        n_control = min(1000, len(control_cells))
+        sampled_controls = np.random.choice(control_cells, size=n_control, replace=False)
+        mask.loc[sampled_controls] = True
         adata = adata[mask].to_memory()
         cell_count_t = 1
     else:
@@ -72,8 +78,7 @@ for ref_cell_type in ref_cell_types:
         cell_count_t = 10
 
     # - process single cell data and save it
-    adata.obs['is_control'] =  adata.obs['gene_target'] == 'Non-Targeting'
-    adata.obs['perturbation_type'] = 'knockdown'
+    
     adata.obs = adata.obs.rename({'gene_target':'perturbation'}, axis=1)[['perturbation', 'is_control', 'perturbation_type', 'sample']]
 
     # - 

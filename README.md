@@ -90,9 +90,10 @@ Of note, we are using the `resources_test` datasets, which are small versions of
 Once got the prediction for a given dataset (e.g. op), use the following code to obtain evaluation scores. 
 
 ```bash
-scripts/single_grn_evaluation.sh output/net.h5ad op --test_run
+bash scripts/run_grn_evaluation.sh --prediction=output/net.h5ad --save_dir=output/ --dataset=op --build_images=true --test_run=true
 ```
-**This** outputs the scores into `output/test_run/score_uns.yaml`. Of note, by passing `--test_run`, the evaluations are done on the test data. To use the actual data (`resources` folder), omit this flag.
+
+**This** outputs the scores into `output/score_uns.yaml`. Of note, by passing `--test_run`, the evaluations are done on the test data. To use the actual data (`resources` folder), omit this flag.
 
 
 ## Add a GRN inference method, evaluation metric, or dataset
@@ -109,6 +110,7 @@ To add a new component to the repository, follow the [Documentation](https://gen
 | Antoine Passimier | contributor |
 | Marco Stock       | contributor |
 | Christian Arnold  | contributor |
+| Jérémie Kalfon    | contributor |
 
 ## API
 
