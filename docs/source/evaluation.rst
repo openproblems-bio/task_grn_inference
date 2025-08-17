@@ -32,7 +32,16 @@ The inferred network should have a tabular format with the following columns:
 See `resources_test/grn_models/op/collectri.h5ad` for an example of the expected format.
 
 For the regression based approaches, we used the pseudobulk version of the perturbation data while for the Wasserstein distance, the single cell data are used.
-See 'scripts/single_grn_evaluation.sh' for an example of how to run the evaluation.
 
 It should be noted that for Wasserstein distance, we have already computed all possible combination of TF-gene pairs and stored it in the `resources/grn_benchmark/prior/` folder.
 This substantially reduces the computation time during evaluation.
+
+To run the evalution for a given GRN and dataset, use the following command:
+```bash
+bash scripts/run_grn_evaluation.sh --prediction=<inferred GRN (e.g.collectri.h5ad)> --save_dir=<e.g.output/> --dataset=<e.g. replogle> --build_images=<true or false. true for the first time running> --run_test=<true or false. true to run on test data>
+```
+
+example command:
+```bash
+bash scripts/run_grn_evaluation.sh --prediction=resources/grn_models/op/collectri.h5ad --save_dir=output/ --dataset=op --build_images=true --test_run=false
+```

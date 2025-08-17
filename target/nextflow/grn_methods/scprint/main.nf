@@ -3472,7 +3472,7 @@ meta = [
       "directives" : {
         "label" : [
           "midtime",
-          "midmem",
+          "highmem",
           "midcpu",
           "biggpu"
         ],
@@ -3561,7 +3561,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scprint",
     "viash_version" : "0.9.4",
-    "git_commit" : "a03da55968fd2c202fbb49ebb07eb515e9e13e50",
+    "git_commit" : "1eacd3bb46a6e7fa641fbfb3951408af066ef373",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -4312,7 +4312,7 @@ meta["defaults"] = [
   },
   "label" : [
     "midtime",
-    "midmem",
+    "highmem",
     "midcpu",
     "biggpu"
   ],
