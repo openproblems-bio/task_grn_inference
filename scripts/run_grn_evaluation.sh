@@ -1,61 +1,98 @@
-#!/bin/bash
-DATASET="${1:-replogle}" # Default dataset if not provided
-run_local="${2:-false}" 
+# to run a single GRN evaluation, use the following command:
+# bash scripts/run_grn_evaluation.sh --prediction=<prediction file (e.g. prediction.h5ad)> --save_dir=<save dir> --dataset=<dataset (replogle)> --build_images=<true/false (building docker images-only needed one time)> --test_run=<true/false (to use test data)> --run_local=true>
 
-# datasets="norman replogle op nakatake adamson"
-datasets="$DATASET" #xaira_HCT116 xaira_HEK293T parsebioscience replogle
+
+
+#!/bin/bash
+set -e
+
+RUN_LOCAL="true"
+RUN_TEST=false
+PREDICTION="none"
+SAVE_DIR="none"
+BUILD_IMAGES=true
+
+# Parse arguments
+for arg in "$@"; do
+    case $arg in
+        --dataset=*)
+            DATASET="${arg#*=}"
+            shift
+            ;;
+        --prediction=*)
+            PREDICTION="${arg#*=}"
+            shift
+            ;;
+        --test_run=*)
+            RUN_TEST="${arg#*=}"
+            shift
+            ;;
+        --save_dir=*)
+            SAVE_DIR="${arg#*=}"
+            shift
+            ;;
+        --build_images=*)
+            BUILD_IMAGES="${arg#*=}"
+            shift
+            ;;
+        --run_local=*)
+            RUN_LOCAL="${arg#*=}"
+            shift
+            ;;
+        *)
+            echo "Unknown argument: $arg"
+            exit 1
+            ;;
+    esac
+done
+
+if [ -z "${DATASET:-}" ]; then
+    echo "Error: DATASET must be provided. Use --dataset=<dataset_name>."
+    exit 1
+fi
 
 num_workers=10
 metric_ids="[regression_2, ws_distance]" #regression_1, regression_2, ws_distance
 RUN_ID="${DATASET}_evaluation"
+
 models_folder="${DATASET}/"
 reg_type="ridge"
 apply_skeleton=false
 apply_tf=true
 layer='lognorm'
-
-grn_names=(
-    "positive_control"
-    "pearson_corr"
-    "negative_control"
-    "scglue"
-    "scenicplus"
-    "celloracle"
-    "granie"
-    "figr"
-    "grnboost2"
-    "ppcor"
-    "portia"
-    "scenic"
-    "scprint"
-)
-
-if [ "$run_local" = true ]; then
-  resources_dir="./resources/"
+if [ "$RUN_TEST" = "false" ]; then
+    resource_folder="resources/"
 else
-  resources_dir="s3://openproblems-data/resources/grn"
+    resource_folder="resources_test/"
 fi
 
+if [ "$RUN_LOCAL" = true ]; then
+  resources_dir="./${resource_folder}"
+else
+  resources_dir="s3://openproblems-data/${resource_folder}/grn"
+fi
 
-publish_dir="${resources_dir}/results/${models_folder}"
+if [ "$SAVE_DIR" != "none" ]; then
+  publish_dir="${SAVE_DIR}"
+else
+  publish_dir="${resources_dir}/results/${models_folder}"
+fi
+
+mkdir -p "$publish_dir"
 echo "Publish dir: $publish_dir"
-grn_models_folder="${resources_dir}/results/${models_folder}/"
-grn_models_folder_local="./resources/results/${models_folder}/" # just to control the hetergenity of the models for different datasets
 
 
 params_dir="./params"
+mkdir -p "$params_dir"
 param_file="${params_dir}/${RUN_ID}.yaml"
 param_local="${params_dir}/${RUN_ID}_param_local.yaml"
 param_aws="s3://openproblems-data/resources/grn/results/params/${RUN_ID}_param_local.yaml"
-
-# Print GRN names correctly
-echo "GRN models: ${grn_names[@]}"
 
 # Ensure param_file is clean
 > "$param_local"
 > "$param_file"
 
-if [ "$run_local" = true ]; then
+if [ "$RUN_LOCAL" = true ]; then
   cat >> "$param_local" << HERE
 param_list:
 HERE
@@ -65,7 +102,8 @@ fi
 
 append_entry() {
   local grn_name="$1"
-  local dataset="$2"
+  local prediction="$2"
+  local dataset="$3"
   if [[ "$dataset" =~ ^(norman|nakatake|adamson)$ ]]; then
     layer_='X_norm'
   else
@@ -77,7 +115,7 @@ append_entry() {
     evaluation_data: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad
     tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
     regulators_consensus: ${resources_dir}/grn_benchmark/prior/regulators_consensus_${dataset}.json
-    prediction: ${grn_models_folder}/${dataset}.${grn_name}.${grn_name}.prediction.h5ad
+    prediction: ${prediction}
     skeleton: ${resources_dir}/grn_benchmark/prior/skeleton.csv
     apply_skeleton: ${apply_skeleton}
     apply_tf: ${apply_tf}
@@ -94,31 +132,55 @@ HERE
   fi
 }
 
-# Iterate over datasets and GRN models
+if [ "$PREDICTION" != "none" ]; then
+  append_entry "single_run" $PREDICTION "$DATASET"
+else
+  grn_names=(
+      "positive_control"
+      "pearson_corr"
+      "negative_control"
+      "scglue"
+      "scenicplus"
+      "celloracle"
+      "granie"
+      "figr"
+      "grnboost2"
+      "ppcor"
+      "portia"
+      "scenic"
+      "scprint"
+  )
+  grn_models_folder="${resources_dir}/results/${models_folder}/"
+  grn_models_folder_local="./resources/results/${models_folder}/" # just to control the hetergenity of the models for different datasets
 
-for dataset in $datasets; do
+  # Iterate over GRN models
   available_methods=()
   for grn_name in "${grn_names[@]}"; do
-    prediction_file="${grn_models_folder_local}/${dataset}.${grn_name}.${grn_name}.prediction.h5ad"
+    prediction_file="${grn_models_folder_local}/${DATASET}.${grn_name}.${grn_name}.prediction.h5ad"
     if [[ -f "${prediction_file}" ]]; then
-      append_entry "$grn_name" "$dataset"
+      prediction_file=${grn_models_folder}/${DATASET}.${grn_name}.${grn_name}.prediction.h5ad
+      append_entry "$grn_name" $prediction_file "$DATASET"
       available_methods+=("$grn_name")
-    else
-      echo "File not found: ${prediction_file}"
     fi
   done
   echo "Available methods:"
   printf '%s\n' "${available_methods[@]}" | sort -u
-done
+
+fi
 
 
 # Append final fields
-if [ "$run_local" = true ]; then
+if [ "$RUN_LOCAL" = true ]; then
   cat >> "$param_local" << HERE
 output_state: "state.yaml"
 publish_dir: "$publish_dir"
 HERE
-  viash ns build --parallel 
+  if [ "$BUILD_IMAGES" = true ]; then
+    echo "Building Docker images..."
+    viash ns build --parallel --setup build -s src/metrics/
+  else
+    viash ns build --parallel 
+  fi
   echo "Parameter file created: $param_local"
   nextflow run . \
     -main-script  target/nextflow/workflows/run_grn_evaluation/main.nf \

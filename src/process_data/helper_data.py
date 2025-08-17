@@ -134,6 +134,122 @@ def split_data_gene_perturbation(adata: ad.AnnData, train_share):
     print(f"Train total: {len(train_perturbs)}, Test total: {len(test_perturbs)}")
 
     return train_perturbs.astype(str), test_perturbs.astype(str)
+
+import numpy as np
+from scipy.stats import ttest_ind
+from tqdm import tqdm
+
+def compare_perturbed_to_control_sc(adata, gene):
+    from scipy.sparse import issparse
+    if gene not in adata.var_names:
+        raise ValueError(f"Gene '{gene}' not found in the dataset.")
+    
+    mask_gene = adata.var_names == gene
+    control = adata[adata.obs['is_control']]
+    perturbed = adata[~adata.obs['is_control']]
+    assert len(control) > 0, "No control samples found in the data."
+    assert len(perturbed) > 0, "No perturbed samples found in the data."
+    
+    # Assuming control[:, mask_gene].X is sparse
+    control_exprs = control[:, mask_gene].X
+    if hasattr(control_exprs, "toarray"):
+        control_exprs = control_exprs.toarray().ravel()
+    else:
+        control_exprs = np.ravel(control_exprs)
+
+    perturbed_exprs = perturbed[:, mask_gene].X
+    if hasattr(perturbed_exprs, "toarray"):
+        perturbed_exprs = perturbed_exprs.toarray().ravel()
+    else:
+        perturbed_exprs = np.ravel(perturbed_exprs)
+
+    eps = 1e-8
+    if np.all(np.abs(control_exprs) < eps):
+        print(f"All control expressions are zero for {gene}.")
+    
+    # Compute log2 fold change of means
+    mean_control = np.mean(control_exprs)
+    mean_perturbed = np.mean(perturbed_exprs)
+    logf2c = np.log2((mean_perturbed + eps) / (mean_control + eps))
+    
+    # Statistical significance: t-test
+    if (np.all(np.abs(control_exprs) < eps))& (np.all(np.abs(perturbed_exprs) < eps)):
+        p_val = 1.0  # No variation, no significance
+    else:
+        t_stat, p_val = ttest_ind(perturbed_exprs, control_exprs, equal_var=False)
+    if p_val < 0:
+        print("P value is not valid: ", p_val)
+        print(control_exprs)
+        print(perturbed_exprs)
+        raise ValueError("P value is not valid, check the data.")
+    return {
+        "logf2c": logf2c,
+        "mean_control": float(mean_control),
+        "mean_perturbed": float(mean_perturbed),
+        "p_val": float(p_val)
+    }
+def qc_perturbation_effect(adata):
+    from tqdm import tqdm
+    p_val_t=0.05
+
+    perturbation_type = adata.obs['perturbation_type'].unique()[0]
+    if perturbation_type=='knockout':
+        logf2c_t = -0.54
+    elif perturbation_type=='knockdown':
+        logf2c_t = -0.54
+    elif perturbation_type=='overexpression':
+        raise ValueError("Overexpression perturbation type is not supported for this analysis.")
+    elif perturbation_type=='activation':
+        raise ValueError("Activation perturbation type is not supported for this analysis.")
+    elif perturbation_type=='cytokine':
+        print('Cytokine perturbation type detected, no filtering for qc pertubration effect.')
+        return adata
+
+    # Collect results
+    results = {}
+    if 'lognorm' in adata.layers:
+        adata.X = adata.layers['lognorm']
+    elif 'X_norm' in adata.layers:
+        adata.X = adata.layers['X_norm']
+    else:
+        raise ValueError("No suitable normalized layer found in adata.layers. Expected 'lognorm' or 'X_norm'.")
+
+    for perturbation in tqdm(adata.obs['perturbation'].unique(), desc='Processing perturbations'):
+        if perturbation not in adata.var_names:
+            continue
+        if perturbation != 'control':
+            perturbed_gene = perturbation
+            rr = compare_perturbed_to_control_sc(
+                adata[(adata.obs['perturbation'] == perturbation) | adata.obs['is_control']], 
+                perturbed_gene
+            )
+            results[perturbation] = rr
+
+    # Create DataFrame
+    df_results = pd.DataFrame.from_dict(results, orient="index")
+    
+    df_results.index.name = "perturbation"
+    df_results = df_results.reset_index()
+
+    # - Filter results based on significance and fold change
+    from statsmodels.stats.multitest import multipletests
+    reject, pvals_corrected, _, _ = multipletests(df_results["p_val"].values, method="fdr_bh")
+    df_results["p_adj"] = pvals_corrected
+    print(df_results)
+    aaa
+    df_filtered = df_results[(df_results['logf2c']<logf2c_t)&(df_results['p_adj']<p_val_t)]
+    perturbations_qc_passed = df_filtered['perturbation'].tolist()
+
+    print(f'Number of perturbations after QC: {len(perturbations_qc_passed)}', flush=True)
+
+    if len(perturbations_qc_passed) == 0:
+        raise ValueError("No perturbations passed the QC criteria. Please adjust the thresholds or check the data.")
+    # - Update adata with passed perturbations
+    adata = adata[(adata.obs['perturbation'].isin(perturbations_qc_passed)) | adata.obs['is_control']]
+
+    return adata
+
+
 def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, split_func, train_share=.5, cell_count_t=10):
 
     del adata.obsp 
@@ -151,6 +267,10 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     print('Pseudobulking data...', flush=True)
     print('Cell count threshold:', cell_count_t, flush=True)
     print('Covariates:', covariates, flush=True)
+
+    print('QC on perturbation effect ...', flush=True)
+    adata = normalize_func(adata, pearson_residual=False)
+    adata = qc_perturbation_effect(adata)
 
     print('QC on single cell number of perturbation ...', flush=True)
     single_cell_counts = adata.obs.groupby('perturbation').size().sort_values(ascending=False)
@@ -173,7 +293,7 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     adata_train_sc = adata[adata.obs['perturbation'].isin(train_perturbs)].copy()
     assert adata_train_sc.obs['is_control'].sum()> 0, "No control data found in training set"
     assert adata_train_sc.shape[0] > 0, "No training data found after splitting"
-    adata_train_sc = normalize_func(adata_train_sc, pearson_residual=False)
+    # adata_train_sc = normalize_func(adata_train_sc, pearson_residual=False)
     adata_train_sc = add_metadata(adata_train_sc)
     adata_train_sc.write(f'resources/extended_data/{save_name}_train_sc.h5ad', compression='gzip')
 
@@ -195,7 +315,7 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     print('Processing adata test sc ...', flush=True)
     adata_test_sc = adata[adata.obs['perturbation'].isin(test_perturbs)].copy()
     assert adata_test_sc.obs['is_control'].sum()> 0, "No control data found in test set"
-    adata_test_sc = normalize_func(adata_test_sc, pearson_residual=False)
+    # adata_test_sc = normalize_func(adata_test_sc, pearson_residual=False)
     assert adata_test_sc.shape[0] > 0, "No test data found after splitting"
     adata_test_sc = add_metadata(adata_test_sc)
     adata_test_sc.write( f'resources/processed_data/{save_name}_evaluation_sc.h5ad', compression='gzip')
@@ -203,7 +323,6 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     gc.collect()
 
     print('Processing adata sc ...', flush=True)
-    adata = normalize_func(adata, pearson_residual=False)
     adata = add_metadata(adata)
     adata.write(f'resources/processed_data/{save_name}_sc.h5ad', compression='gzip')
     
@@ -223,14 +342,14 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     print('Process adata bulk test...', flush=True)
     adata_test_bulk = adata_bulk[adata_bulk.obs['perturbation'].isin(test_perturbs)].copy()
     assert adata_test_bulk.shape[0] > 0, "No test data found after splitting"
-    adata_test_bulk = normalize_func(adata_test_bulk, pearson_residual=False)
+    # adata_test_bulk = normalize_func(adata_test_bulk, pearson_residual=False)
     adata_test_bulk = add_metadata(adata_test_bulk)
     adata_test_bulk.write(f'resources/grn_benchmark/evaluation_data/{save_name}_bulk.h5ad', compression='gzip')
     
     print('Process adata bulk train...', flush=True)
     adata_train_bulk = adata_bulk[adata_bulk.obs['perturbation'].isin(train_perturbs)].copy()
     assert adata_train_bulk.shape[0] > 0, "No training bulk data found after splitting"
-    adata_train_bulk = normalize_func(adata_train_bulk, pearson_residual=False)
+    # adata_train_bulk = normalize_func(adata_train_bulk, pearson_residual=False)
     adata_train_bulk = add_metadata(adata_train_bulk)
     adata_train_bulk.write(f'resources/extended_data/{save_name}_train_bulk.h5ad', compression='gzip')
     
