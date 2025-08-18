@@ -12,6 +12,7 @@ PREDICTION="none"
 SAVE_DIR="none"
 BUILD_IMAGES=true
 
+
 # Parse arguments
 for arg in "$@"; do
     case $arg in
