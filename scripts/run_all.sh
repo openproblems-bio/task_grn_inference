@@ -1,13 +1,15 @@
 set -e
 
 datasets=('replogle') #'replogle' 'op' 'nakatake' 'adamson' 'norman' 
-run_local=false # set to true to run locally, false to run on AWS
+run_local=true # set to true to run locally, false to run on AWS
 
-run_grn_inference=true
-run_grn_evaluation=false
+run_grn_inference=false
+run_grn_evaluation=true
 run_download=false
 
+
 for dataset in "${datasets[@]}"; do
+
     if [ "$run_grn_inference" = true ]; then
         echo "Running GRN inference for dataset: $dataset"
         if [ "$run_local" = true ]; then
@@ -15,7 +17,7 @@ for dataset in "${datasets[@]}"; do
         else
             echo "Running on AWS"
         fi
-        bash scripts/run_grn_inference.sh $dataset $run_local
+        bash scripts/run_grn_inference.sh --dataset=$dataset --run_local=$run_local
         
     fi
 
@@ -33,7 +35,7 @@ for dataset in "${datasets[@]}"; do
         fi
 
         echo "Running GRN evaluation for dataset: $dataset"
-        bash scripts/run_grn_evaluation.sh --dataset=$dataset --run_local=$run_local --build_images=false
+        bash scripts/run_grn_evaluation.sh --dataset=$dataset --run_local=$run_local --build_images=false 
     fi
 
     if [ "$run_download" = true ]; then

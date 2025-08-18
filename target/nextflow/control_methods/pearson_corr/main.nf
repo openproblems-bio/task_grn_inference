@@ -3343,7 +3343,7 @@ meta = [
       "directives" : {
         "label" : [
           "midtime",
-          "veryhighmem",
+          "midmem",
           "midcpu"
         ],
         "tag" : "$id"
@@ -3423,7 +3423,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/control_methods/pearson_corr",
     "viash_version" : "0.9.4",
-    "git_commit" : "1eacd3bb46a6e7fa641fbfb3951408af066ef373",
+    "git_commit" : "c1ec04444449e7e8c2a0b3501f39b5d6e5c188bf",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3582,27 +3582,39 @@ dep = {
 
 ## VIASH END
 
-sys.path.append(meta["resources_dir"])
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta = {
+        "resources_dir": 'src/utils',
+        "name": "pearson_corr"
+    }
+    sys.path.append(meta["resources_dir"])
 from util import corr_net
 
-adata = ad.read_h5ad(par["rna"])
-tf_all = np.loadtxt(par["tf_all"], dtype=str)
-dataset_id = adata.uns['dataset_id']
-net = corr_net(adata, tf_all, par)
+def main(par):
+    adata = ad.read_h5ad(par["rna"])
+    tf_all = np.loadtxt(par["tf_all"], dtype=str)
+    dataset_id = adata.uns['dataset_id']
+    net = corr_net(adata, tf_all, par)
 
-print('Output GRN')
-print('Shape of the network:', net.shape)
-print(net.sort_values('weight', ascending=False, key=abs).head(10))
-net = net.astype(str)
-output = ad.AnnData(
-    X=None,
-    uns={
-        "method_id": meta['name'],
-        "dataset_id": adata.uns['dataset_id'],
-        "prediction": net[["source", "target", "weight"]]
-    }
-)
-output.write_h5ad(par['prediction'])
+    print('Output GRN')
+    print('Shape of the network:', net.shape)
+    print(net.sort_values('weight', ascending=False, key=abs).head(10))
+    net = net.astype(str)
+    output = ad.AnnData(
+        X=None,
+        uns={
+            "method_id": meta['name'],
+            "dataset_id": adata.uns['dataset_id'],
+            "prediction": net[["source", "target", "weight"]]
+        }
+    )
+    return output
+
+if __name__ == '__main__':
+    output = main(par)
+    output.write_h5ad(par['prediction'])
 VIASHMAIN
 python -B "$tempscript"
 '''
@@ -3989,7 +4001,7 @@ meta["defaults"] = [
   },
   "label" : [
     "midtime",
-    "veryhighmem",
+    "midmem",
     "midcpu"
   ],
   "tag" : "$id"

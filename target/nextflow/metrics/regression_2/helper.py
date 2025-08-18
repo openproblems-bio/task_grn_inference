@@ -20,7 +20,6 @@ N_POINTS_TO_ESTIMATE_BACKGROUND = 20
 def net_to_matrix(net, gene_names: np.ndarray, par: Dict[str, Any]) -> np.ndarray:
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
     if 'cell_type' in net.columns:
-        verbose_print(par['verbose'], 'Taking mean of cell type specific grns', 3)
         net.drop(columns=['cell_type'], inplace=True)
         net = net.groupby(['source', 'target']).mean().reset_index()
     if par['apply_skeleton']: #apply skeleton
@@ -34,7 +33,7 @@ def net_to_matrix(net, gene_names: np.ndarray, par: Dict[str, Any]) -> np.ndarra
         print('After filtering with skeleton:', net.shape)
     # keep only top n links
     if net.shape[0] > par['max_n_links']:
-        verbose_print(par['verbose'], f"Reducing number of links to {par['max_n_links']}", 3)
+        print(f"Reducing number of links to {par['max_n_links']}")
         net = process_links(net, par)
     # convert to matrix
     A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
@@ -261,8 +260,6 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     np.random.seed(random_state)
     random.seed(random_state)
     lightgbm.LGBMRegressor().set_params(random_state=random_state)
-
-    verbose_print(par['verbose'], "Reading input files", 3)
     
     # Load perturbation data
     prturb_adata = ad.read_h5ad(par['evaluation_data'])
@@ -315,13 +312,10 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         tf_names = gene_names
 
     # Evaluate GRN
-    verbose_print(par['verbose'], f'Compute metrics for layer: {layer}', 3)
-    verbose_print(par['verbose'], f'Static approach (theta=0):', 3)
     if (n_features_theta_min!=0).any()==False:
         score_static_min = np.nan
     else:
         score_static_min = static_approach(net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
-    verbose_print(par['verbose'], f'Static approach (theta=0.5):', 3)
     score_static_median = static_approach(net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
     print(f'Static approach (theta=1):', flush=True)
     score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])

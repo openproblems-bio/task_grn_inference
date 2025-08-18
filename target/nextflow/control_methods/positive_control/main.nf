@@ -3332,7 +3332,7 @@ meta = [
       "directives" : {
         "label" : [
           "midtime",
-          "veryhighmem",
+          "midmem",
           "midcpu"
         ],
         "tag" : "$id"
@@ -3412,7 +3412,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/control_methods/positive_control",
     "viash_version" : "0.9.4",
-    "git_commit" : "1eacd3bb46a6e7fa641fbfb3951408af066ef373",
+    "git_commit" : "c1ec04444449e7e8c2a0b3501f39b5d6e5c188bf",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3976,7 +3976,7 @@ meta["defaults"] = [
   },
   "label" : [
     "midtime",
-    "veryhighmem",
+    "midmem",
     "midcpu"
   ],
   "tag" : "$id"

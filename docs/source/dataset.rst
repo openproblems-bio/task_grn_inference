@@ -1,7 +1,7 @@
 Datasets
 ========
-In this section, we explain how to access datasets without installing geneRNIB. The available datasets include **OPSCA, Nakatake, Replogle, Adamson, Norman, Xaira_HCT116, Xaira_HEK293T** and **ParseBioscience**. 
-It should be noted that three datasets of **Xaira_HCT116, Xaira_HEK293T** and **ParseBioscience** are not added to the manuscript yet.
+Here, we explain how to access datasets without installing geneRNIB. The available datasets include **OPSCA, Nakatake, Replogle, Adamson, Norman, Xaira_HCT116, Xaira_HEK293T** and **ParseBioscience**. 
+It should be noted that three datasets of **Xaira_HCT116, Xaira_HEK293T** and **ParseBioscience** are not added to the initial manuscript yet.
 All datasets provide RNA data, while the `OPSCA` dataset also includes ATAC data. 
 The perturbation signature of these datasets are given below. 
 You need `awscli` to download the datasets. If you don't have it installed, you can download it from [here](https://aws.amazon.com/cli/). You do not need to sign in to download the datasets.
@@ -36,8 +36,8 @@ Downloading the extended datasets
 -----------------------------
 
 Beyond the core datasets, extended datasets include single cell data of large perturbation datasets such as Replogle, Xaira, and Parse bioscience.
-The previous version was subsetted to smaller number of perturbations for computational efficiency. 
-Additionally, pseudobulked versions of all other datasets are available, representing the combined inference and evaluation datasets. 
+The previous version were pseudobulked for computational efficiency. 
+Additionally, full pseudobulked versions of all other datasets are available, representing the combined inference and evaluation datasets. 
 These files are used for the `positive control` method, which incorporates all variations within a dataset.
 
 To download the extended datasets, use:
@@ -59,7 +59,7 @@ We have not provided raw data for a few recent datasets due to very large file s
 
 Downloading the GRN models
 ---------------------------------------------
-To download the GRN models used in geneRNIB so far, run:
+To download the GRN models used in geneRNIB, run:
 
 .. code-block:: bash
 

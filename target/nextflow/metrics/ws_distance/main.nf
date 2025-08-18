@@ -3343,7 +3343,7 @@ meta = [
     },
     {
       "type" : "file",
-      "path" : "main.py"
+      "path" : "helper.py"
     }
   ],
   "test_resources" : [
@@ -3507,7 +3507,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/ws_distance",
     "viash_version" : "0.9.4",
-    "git_commit" : "1eacd3bb46a6e7fa641fbfb3951408af066ef373",
+    "git_commit" : "c1ec04444449e7e8c2a0b3501f39b5d6e5c188bf",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3675,19 +3675,17 @@ var_local = vars(args)
 
 ## LOCAL END
 
-if args.run_local:
+try:
+    sys.path.append(meta["resources_dir"])
+except:
     meta = {
-      "resources_dir":'src/metrics/wasserstein/',
-      "util_dir":'src/utils'
+        "resources_dir":'src/metrics/wasserstein/',
+        "util_dir":'src/utils'
     }
     sys.path.append(meta["resources_dir"])
     sys.path.append(meta["util_dir"])
 
-else:
-  sys.path.append(meta["resources_dir"])
-
-
-from main import main 
+from helper import main 
 
 if __name__ == '__main__':
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']

@@ -3561,7 +3561,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scprint",
     "viash_version" : "0.9.4",
-    "git_commit" : "1eacd3bb46a6e7fa641fbfb3951408af066ef373",
+    "git_commit" : "c1ec04444449e7e8c2a0b3501f39b5d6e5c188bf",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3733,25 +3733,6 @@ dep = {
 
 ## VIASH END
 
-## LOCAL START
-parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument("--rna", type=str, help="Path to the multiomics RNA file")
-parser.add_argument("--prediction", type=str, help="Path to the prediction file")
-parser.add_argument("--resources_dir", type=str, help="Path to the prediction file")
-parser.add_argument("--tf_all", type=str, help="Path to the tf_all")
-parser.add_argument("--num_workers", type=int, help="Number of cores")
-parser.add_argument("--max_n_links", type=int, help="Number of top links to retain")
-parser.add_argument("--dataset_id", type=str, help="Dataset id")
-args = parser.parse_args()
-
-par_local = vars(args)
-
-for key, value in par_local.items():
-    if value is not None:
-        par[key] = value
-
-## LOCAL END
-
 try:
     sys.path.append(meta["resources_dir"])
 except:
@@ -3760,7 +3741,16 @@ except:
 
 from util import efficient_melting
 
-adata = ad.read_h5ad(par["rna"])
+adata = ad.read_h5ad(par["rna"], backed="r")
+train_perturbs = adata.obs['perturbation'].unique()
+if adata.uns['dataset_id'] in ['replogle', 'xaira_HCT116', 'xaira_HEK293T']:
+    tf_all = np.loadtxt(par['tf_all'], dtype=str)
+    train_perturbs = np.intersect1d(tf_all, train_perturbs)  
+elif adata.uns['dataset_id'] in ['parsebioscience']:
+    train_perturbs = train_perturbs[:10]
+mask = adata.obs['perturbation'].isin(train_perturbs)
+adata = adata[mask].to_memory()
+    
 adata.obs["is_primary_data"] = True
 adata.obs["organism_ontology_term_id"] = "NCBITaxon:9606"
 # adata.var = adata.var.set_index("gene_ids")
