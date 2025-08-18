@@ -166,6 +166,34 @@ def compare_perturbed_to_control_sc(adata, gene):
     eps = 1e-8
     if np.all(np.abs(control_exprs) < eps):
         print(f"All control expressions are zero for {gene}.")
+
+        # Guard 1: check for nans / infs
+    if (np.any(~np.isfinite(control_exprs)) or np.any(~np.isfinite(perturbed_exprs))):
+        raise ValueError(f"Non-finite values found in expressions for {gene}.")
+
+    # Guard 2: too few samples
+    if len(control_exprs) < 3 or len(perturbed_exprs) < 3:
+        print(f"Not enough samples to perform statistical test for {gene}. ")
+        return {
+            "logf2c": 0,
+            "mean_control": 0,
+            "mean_perturbed": 0,
+            "p_val": 1
+
+        }
+    # Guard 3: zero variance in both groups
+    elif np.std(control_exprs) < eps and np.std(perturbed_exprs) < eps:
+        return {
+            "logf2c": 0,
+            "mean_control": 0,
+            "mean_perturbed": 0,
+            "p_val": 1
+
+        }
+    else:
+        t_stat, p_val = ttest_ind(perturbed_exprs, control_exprs, equal_var=False)
+        if not np.isfinite(p_val):
+            p_val = 1.0
     
     # Compute log2 fold change of means
     mean_control = np.mean(control_exprs)
@@ -177,7 +205,7 @@ def compare_perturbed_to_control_sc(adata, gene):
         p_val = 1.0  # No variation, no significance
     else:
         t_stat, p_val = ttest_ind(perturbed_exprs, control_exprs, equal_var=False)
-    if p_val < 0:
+    if np.isnan(p_val):
         print("P value is not valid: ", p_val)
         print(control_exprs)
         print(perturbed_exprs)
@@ -234,9 +262,9 @@ def qc_perturbation_effect(adata):
     # - Filter results based on significance and fold change
     from statsmodels.stats.multitest import multipletests
     reject, pvals_corrected, _, _ = multipletests(df_results["p_val"].values, method="fdr_bh")
-    df_results["p_adj"] = pvals_corrected
+    df_results['p_adj'] = pvals_corrected
     print(df_results)
-    aaa
+
     df_filtered = df_results[(df_results['logf2c']<logf2c_t)&(df_results['p_adj']<p_val_t)]
     perturbations_qc_passed = df_filtered['perturbation'].tolist()
 
@@ -284,6 +312,7 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     sc.pp.filter_genes(adata, min_cells=10)
     sc.pp.filter_cells(adata, min_genes=100)
     print(f'Shape of adata after QC: {adata.shape}', flush=True)
+    adata.write(f'resources/processed_data/{save_name}_sc.h5ad', compression='gzip')
 
     print('Splitting data...', flush=True)
     train_perturbs, test_perturbs = split_func(adata, train_share)
@@ -297,16 +326,16 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     adata_train_sc = add_metadata(adata_train_sc)
     adata_train_sc.write(f'resources/extended_data/{save_name}_train_sc.h5ad', compression='gzip')
 
-    # - adata train sc subset
-    print('Processing adata train sc subset (main inference data)...', flush=True)
-    if save_name == 'parsebioscience':
-        shortlisted_perts = train_perturbs[:10]
-    else:
-        tf_all = np.loadtxt('resources/grn_benchmark/prior/tf_all.csv', dtype=str)
-        shortlisted_perts = np.intersect1d(tf_all, train_perturbs)
+    # # - adata train sc subset
+    # print('Processing adata train sc subset (main inference data)...', flush=True)
+    # if save_name == 'parsebioscience':
+    #     shortlisted_perts = train_perturbs[:10]
+    # else:
+    #     tf_all = np.loadtxt('resources/grn_benchmark/prior/tf_all.csv', dtype=str)
+    #     shortlisted_perts = np.intersect1d(tf_all, train_perturbs)
     
-    adata_train_sc_subset = adata_train_sc[adata_train_sc.obs['perturbation'].isin(shortlisted_perts), :]
-    adata_train_sc_subset.write(f'resources/grn_benchmark/inference_data/{save_name}_rna.h5ad', compression='gzip')
+    # adata_train_sc_subset = adata_train_sc[adata_train_sc.obs['perturbation'].isin(shortlisted_perts), :]
+    # adata_train_sc_subset.write(f'resources/grn_benchmark/inference_data/{save_name}_rna.h5ad', compression='gzip')
     
 
     del adata_train_sc
@@ -351,7 +380,7 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     assert adata_train_bulk.shape[0] > 0, "No training bulk data found after splitting"
     # adata_train_bulk = normalize_func(adata_train_bulk, pearson_residual=False)
     adata_train_bulk = add_metadata(adata_train_bulk)
-    adata_train_bulk.write(f'resources/extended_data/{save_name}_train_bulk.h5ad', compression='gzip')
+    adata_train_bulk.write(f'resources/grn_benchmark/inference_data/{save_name}_rna.h5ad', compression='gzip')
     
     print('Data processing completed successfully!', flush=True)
     

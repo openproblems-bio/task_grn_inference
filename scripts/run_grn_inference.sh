@@ -1,31 +1,54 @@
 #!/bin/bash
 
-# --------------------------
-# Dataset-specific availability:
-# ws_distance: only for [norman, adamson, replogle]
-# scprint: only for [opsca, replogle, norman] (uses different inference data)
-# scenicplus, scglue, granie, figr, celloracle: only for [opsca]
-# --------------------------
 set -e 
+
 # --- Settings ---
-test=false
-DATASET="${1:-replogle}"
-echo "DATASET is: $DATASET"
-RUN_ID="${DATASET}_inference"
-run_local="${2:-false}"
+RUN_TEST=false
 num_workers=10
 apply_tf_methods=true
 layer='lognorm'
+RUN_LOCAL=false
+# Parse arguments
+for arg in "$@"; do
+    case $arg in
+        --dataset=*)
+            DATASET="${arg#*=}"
+            shift
+            ;;
+        --test_run=*)
+            RUN_TEST="${arg#*=}"
+            shift
+            ;;
+        --run_local=*)
+            RUN_LOCAL="${arg#*=}"
+            shift
+            ;;
+        *)
+            echo "Unknown argument: $arg"
+            exit 1
+            ;;
+    esac
+done
+if [ -z "${DATASET:-}" ]; then
+    echo "Error: DATASET must be provided. Use --dataset=<dataset_name>."
+    exit 1
+fi
+
+
+echo "DATASET is: $DATASET"
+RUN_ID="${DATASET}_inference"
 
 # --- Directories ---
-resources_folder=$([ "$test" = true ] && echo "resources_test" || echo "resources")
-if [ "$run_local" = true ]; then
+resources_folder=$([ "$RUN_TEST" = true ] && echo "resources_test" || echo "resources")
+if [ "$RUN_LOCAL" = true ]; then
   resources_dir="./${resources_folder}/"
 else
   resources_dir="s3://openproblems-data/${resources_folder}/grn"
 fi
 
 publish_dir="${resources_dir}/results/${DATASET}"
+
+
 params_dir="./params"
 param_file="${params_dir}/${RUN_ID}.yaml"
 param_local="${params_dir}/${RUN_ID}_param_local.yaml"
@@ -41,7 +64,7 @@ echo "Local param file: $param_local"
 > "$param_local"
 > "$param_file"
 
-if [ "$run_local" = true ]; then
+if [ "$RUN_LOCAL" = true ]; then
   cat >> "$param_local" << HERE
 param_list:
 HERE
@@ -51,17 +74,31 @@ fi
 append_entry() {
   local dataset="$1"
   local methods="$2"
+  local use_train_sc=false
+
+  # check if third argument is non-empty (or truthy)
+  if [ -n "$3" ]; then
+      use_train_sc=true
+  fi
 
   if [[ "$dataset" =~ ^(norman|nakatake|adamson)$ ]]; then
     layer_='X_norm'
   else
-      layer_=$layer
+    layer_="$layer"
   fi
-  
+
+  if [ "$use_train_sc" = true ]; then
+    rna_file="${resources_dir}/extended_data/${dataset}_train_sc.h5ad"
+    group_id="${dataset}_sc_train"
+  else
+    rna_file="${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad"
+    group_id="${dataset}"
+  fi
+
   cat >> "$param_local" << HERE
-  - id: ${dataset}
+  - id: ${group_id}
     method_ids: $methods
-    rna: ${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad
+    rna: $rna_file
     rna_all: ${resources_dir}/extended_data/${dataset}_bulk.h5ad
     tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
     layer: $layer_
@@ -76,17 +113,12 @@ HERE
   fi
 }
 
-# --------- COMBINATIONS TO ADD ----------
-if [[ "$DATASET" == "op" ]]; then
-  methods="[pearson_corr, negative_control, positive_control, portia, ppcor, scenic, scprint, grnboost, scenicplus, scglue, granie, figr, celloracle]"
-else
-  methods="[pearson_corr, negative_control, positive_control, scprint]"
-fi
-
-append_entry "$DATASET" "$methods"
+# Example usage:
+append_entry "$DATASET" "[pearson_corr, negative_control, positive_control]"
+# append_entry "$DATASET" "[scprint]" "true"
 
 # --- Final configuration ---
-if [ "$run_local" = true ]; then
+if [ "$RUN_LOCAL" = true ]; then
   cat >> "$param_local" << HERE
 output_state: "state.yaml"
 publish_dir: "$publish_dir"

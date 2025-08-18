@@ -19,5 +19,5 @@ set -e
 
 # python src/process_data/opsca/script.py 
 # python src/process_data/replogle/script.py  #--run_test  #--run_test
-python src/process_data/xaira/script.py   #--run_test
+python src/process_data/xaira/script.py    #--run_test
 # python src/process_data/parse_bioscience/script.py  #--run_test

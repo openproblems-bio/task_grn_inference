@@ -27,19 +27,17 @@ var_local = vars(args)
 
 ## LOCAL END
 
-if args.run_local:
+try:
+    sys.path.append(meta["resources_dir"])
+except:
     meta = {
-      "resources_dir":'src/metrics/wasserstein/',
-      "util_dir":'src/utils'
+        "resources_dir":'src/metrics/wasserstein/',
+        "util_dir":'src/utils'
     }
     sys.path.append(meta["resources_dir"])
     sys.path.append(meta["util_dir"])
 
-else:
-  sys.path.append(meta["resources_dir"])
-
-
-from main import main 
+from helper import main 
 
 if __name__ == '__main__':
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']

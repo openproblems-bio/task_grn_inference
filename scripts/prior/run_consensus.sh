@@ -54,7 +54,7 @@ for dataset in "${datasets[@]}"; do
         --models_dir "$models_dir" \
         --ws_consensus "resources/grn_benchmark/prior/ws_consensus_${dataset}.csv" \
         --tf_all "resources/grn_benchmark/prior/tf_all.csv" \
-        --evaluation_data_sc "resources/grn_benchmark/evaluation_data/${dataset}_sc.h5ad" \
+        --evaluation_data_sc "resources/processed_data/${dataset}_evaluation_sc.h5ad" \
         --models "${models[@]}"
 done
 
