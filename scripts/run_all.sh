@@ -1,6 +1,6 @@
 set -e
 
-datasets=('replogle') #'replogle' 'op' 'nakatake' 'adamson' 'norman'  xaira_HEK293T xaira_HEK293T parsescience
+datasets=('xaira_HEK293T') #'replogle' 'op' 'nakatake' 'adamson' 'norman'  'xaira_HEK293T' 'parsescience'
 run_local=true # set to true to run locally, false to run on AWS
 
 run_grn_inference=true

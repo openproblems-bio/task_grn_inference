@@ -7,10 +7,12 @@ import sys
 
 meta = {
     "resources_dir": './',
+    "util_dir": 'src/utils'
 }
 sys.path.append(meta["resources_dir"])
+sys.path.append(meta["util_dir"])
 
-from src.control_methods.pearson_corr.script import main as main_inference
+# from src.control_methods.pearson_corr.script import main as main_inference
 from src.metrics.regression_2.helper import main as main_reg2
 from src.metrics.ws_distance.helper import main as main_ws_distance
 from src.metrics.ws_distance.consensus.helper import main as main_consensus_ws_distance
@@ -36,23 +38,45 @@ def def_par(dataset):
 def prediction_file_name(dataset, data_type):
     return f'{results_dir}/{dataset}.prediction_{data_type}.h5ad'
 
+def infer_grn(par, dataset):
+    from util import corr_net
+    adata = ad.read_h5ad(par["rna"], backed='r')
+    tf_all = np.loadtxt(par["tf_all"], dtype=str)
+
+    if dataset == 'parsebioscience':
+        perturbs = sorted(adata.obs['perturbation'].unique())[:20]
+    else:
+        perturbs = tf_all
+    adata = adata[adata.obs['perturbation'].isin(perturbs)].to_memory()
+
+    net = corr_net(adata, tf_all, par)
+    net = net.astype(str)
+    net = ad.AnnData(
+        X=None,
+        uns={
+            "method_id": 'pearson_corr',
+            "dataset_id": adata.uns['dataset_id'],
+            "prediction": net[["source", "target", "weight"]]
+        }
+    )
+    return net
 
 if __name__ == '__main__':
     results_dir = 'resources/results/experiment/bulk_vs_sc'
     os.makedirs(results_dir, exist_ok=True)
-    datasets = ['xaira_HEK293T'] #'replogle', 'xaira_HEK293T', 'xaira_HEK293T', 'parsescience'
+    datasets = ['replogle', 'xaira_HEK293T', 'parsebioscience', 'xaira_HCT116'] #'replogle', 'xaira_HEK293T', 'parsebioscience' 'xaira_HCT116'
 
     metrics_all = []
     for dataset in datasets:
         par = def_par(dataset)
         # - infer GRNs
         for data_type in ['bulk', 'sc']:
-            print(f"Inferring GRNs for {data_type} data...")
+            print(f"Inferring GRNs for {data_type} data...", flush=True)
             if data_type == 'bulk':
                 par['rna'] = f'resources/grn_benchmark/inference_data/{dataset}_rna.h5ad'
             else:
                 par['rna'] = f'resources/extended_data/{dataset}_train_sc.h5ad'
-            net = main_inference(par)
+            net = infer_grn(par, dataset)
 
             par['prediction'] = prediction_file_name(dataset, data_type)
             net.write_h5ad(par['prediction'])
@@ -74,7 +98,7 @@ if __name__ == '__main__':
         # - grn evaluation
         rr_all_store = []
         for data_type in ['bulk', 'sc']:
-            print(f"Calculating metrics for {data_type} data...")
+            print(f"Calculating metrics for {data_type} data...", flush=True)
             par['prediction'] = prediction_file_name(dataset, data_type)
             metric_reg2 = main_reg2(par)
             _, metric_ws = main_ws_distance(par)
