@@ -3329,6 +3329,10 @@ meta = [
       "type" : "file",
       "path" : "/src/utils/util.py",
       "dest" : "util.py"
+    },
+    {
+      "type" : "file",
+      "path" : "helper.py"
     }
   ],
   "test_resources" : [
@@ -3384,7 +3388,7 @@ meta = [
       "id" : "nextflow",
       "directives" : {
         "label" : [
-          "onedaytime",
+          "veryhightime",
           "highmem",
           "midcpu"
         ],
@@ -3464,7 +3468,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/grnboost",
     "viash_version" : "0.9.4",
-    "git_commit" : "c1ec04444449e7e8c2a0b3501f39b5d6e5c188bf",
+    "git_commit" : "194f4a7ad27c5d2a2e8e28ecdcc8007fc18141c8",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3624,55 +3628,19 @@ dep = {
 }
 
 ## VIASH END
-## LOCAL START
-parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
-parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-parser.add_argument('--num_workers', type=str, help='Number of cores')
-parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
-parser.add_argument('--dataset_id', type=str, help='Dataset id')
-parser.add_argument('--normalize', action='store_true')
-args = parser.parse_args()
-
-par_local = vars(args)
-
-for key, value in par_local.items():
-    if value is not None:
-        par[key] = value
-
-## LOCAL END
 
 try:
     sys.path.append(meta["resources_dir"])
 except:
     meta = {
-    'resources_dir': 'src/utils'
+      'util_dir': 'src/utils',
+      'helper_dir': 'src/methods/single_omics/grnboost2',
     }
-    sys.path.append(meta["resources_dir"])
+    sys.path.append(meta["util_dir"])
+    sys.path.append(meta["helper_dir"])
 from util import process_links
+from helper import format_data, run_grn
 
-def format_data(par):
-  print('Read data')
-  adata_rna = anndata.read_h5ad(par['rna'])  
-  gene_names = adata_rna.var_names
-  if sp.issparse(adata_rna.X):
-    adata_rna.X = adata_rna.X.toarray()
-  pd.DataFrame(adata_rna.X, columns=gene_names).to_csv(par['expression_data'], sep='\\\\t', index=False)
-  
-def run_grn(par):
-  print('Run grn')
-  command = [
-      "pyscenic", "grn",
-      "--num_workers", str(par['num_workers']),
-      "--seed", str(par['seed']),
-      "-o", str(par['expr_mat_adjacencies']),
-      "--method", "grnboost2", 
-      str(par['expression_data']),
-      par['tf_all']
-  ]
-  subprocess.run(command, check=True)
 
 def main(par):
   os.makedirs(par['temp_dir'], exist_ok=True)
@@ -4080,7 +4048,7 @@ meta["defaults"] = [
     "tag" : "build_main"
   },
   "label" : [
-    "onedaytime",
+    "veryhightime",
     "highmem",
     "midcpu"
   ],

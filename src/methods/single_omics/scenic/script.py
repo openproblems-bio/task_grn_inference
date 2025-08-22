@@ -31,34 +31,18 @@ par = {
   'normalize': False
 }
 ## VIASH END
-## LOCAL START
-parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
-parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-parser.add_argument('--num_workers', type=str, help='Number of cores')
-parser.add_argument('--max_n_links', type=str, help='Number of top links to retain')
-parser.add_argument('--dataset_id', type=str, help='Dataset id')
-parser.add_argument('--normalize', action='store_true')
-args = parser.parse_args()
-
-par_local = vars(args)
-
-for key, value in par_local.items():
-    if value is not None:
-        par[key] = value
-
-## LOCAL END
-
 try:
     sys.path.append(meta["resources_dir"])
 except:
     meta = {
-    'resources_dir': 'src/utils'
+      'utils_dir': 'src/utils',
+      'grnboost_dir': 'src/methods/single_omics/grnboost2'
     }
-    sys.path.append(meta["resources_dir"])
+    sys.path.append(meta["utils_dir"])
+    sys.path.append(meta["grnboost_dir"])
+
 from util import process_links
+from helper import format_data, run_grn
 
 def download_prior(par):
   if not (os.path.exists(par['motif_annotation'])):
@@ -77,26 +61,6 @@ def download_prior(par):
     with open(par['genes_vs_motifs_500'], "wb") as file:
         file.write(response.content)
 
-def format_data(par):
-  print('Read data')
-  adata_rna = anndata.read_h5ad(par['rna'])  
-  gene_names = adata_rna.var_names
-  if sp.issparse(adata_rna.X):
-    adata_rna.X = adata_rna.X.toarray()
-  pd.DataFrame(adata_rna.X, columns=gene_names).to_csv(par['expression_data'], sep='\t', index=False)
-  
-def run_grn(par):
-  print('Run grn')
-  command = [
-      "pyscenic", "grn",
-      "--num_workers", str(par['num_workers']),
-      "--seed", str(par['seed']),
-      "-o", str(par['expr_mat_adjacencies']),
-      "--method", "grnboost2", 
-      str(par['expression_data']),
-      par['tf_all']
-  ]
-  subprocess.run(command, check=True)
 
 def prune_grn(par):
   print('Run prune')

@@ -105,7 +105,7 @@ def main_multiome(par):
 
     # normalize rna 
     X_norm = sc.pp.normalize_total(rna, inplace=False)['X']
-    rna.layers['X_norm'] = sc.pp.log1p(X_norm, copy=True)
+    rna.layers['lognorm'] = sc.pp.log1p(X_norm, copy=True)
 
     rna = add_metadata(rna)
     atac = add_metadata(atac)

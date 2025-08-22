@@ -3561,7 +3561,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/scprint",
     "viash_version" : "0.9.4",
-    "git_commit" : "c1ec04444449e7e8c2a0b3501f39b5d6e5c188bf",
+    "git_commit" : "194f4a7ad27c5d2a2e8e28ecdcc8007fc18141c8",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3745,7 +3745,8 @@ adata = ad.read_h5ad(par["rna"], backed="r")
 train_perturbs = adata.obs['perturbation'].unique()
 if adata.uns['dataset_id'] in ['replogle', 'xaira_HCT116', 'xaira_HEK293T']:
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
-    train_perturbs = np.intersect1d(tf_all, train_perturbs)  
+    train_perturbs = np.intersect1d(tf_all, train_perturbs) 
+    train_perturbs = train_perturbs[:100]  # limit to 100 perturbations
 elif adata.uns['dataset_id'] in ['parsebioscience']:
     train_perturbs = train_perturbs[:10]
 mask = adata.obs['perturbation'].isin(train_perturbs)

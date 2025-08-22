@@ -3384,7 +3384,7 @@ meta = [
       "id" : "nextflow",
       "directives" : {
         "label" : [
-          "twodaytime",
+          "hightime",
           "highmem",
           "midcpu"
         ],
@@ -3470,7 +3470,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.9.4",
-    "git_commit" : "c1ec04444449e7e8c2a0b3501f39b5d6e5c188bf",
+    "git_commit" : "194f4a7ad27c5d2a2e8e28ecdcc8007fc18141c8",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -4097,7 +4097,7 @@ meta["defaults"] = [
     "tag" : "build_main"
   },
   "label" : [
-    "twodaytime",
+    "hightime",
     "highmem",
     "midcpu"
   ],

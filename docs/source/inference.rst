@@ -13,10 +13,7 @@ The inference datasets can be downloaded and stored in the `resources/grn_benchm
 
    aws s3 sync s3://openproblems-data/resources/grn/grn_benchmark/inference_data resources/grn_benchmark/inference_data --no-sign-request
 
-### 2. Available Datasets  
-The available datasets include **op, nakatake, replogle, adamson,** and **norman**. Each dataset provides RNA data. Additionally, the `op` dataset includes paired multiome ATAC and RNA data.
-
-### 3. GRN Inference Guidelines  
+### 2. GRN Inference Guidelines  
 When performing GRN inference, please consider the following:  
 
 - We evaluate only the **top TF-gene pairs**, currently limited to **50,000 edges**, ranked by their assigned weight.  
@@ -27,7 +24,7 @@ When performing GRN inference, please consider the following:
   - `target`: Target gene  
   - `weight`: Regulatory importance/likelihood score  
 
-### 4. Saving the Inferred Network  
+### 3. Saving the Inferred Network  
 Since geneRNIB works with **AnnData**, your inferred network should be saved in this format.
 
 #### **Python Example: Saving a Network with AnnData**  
@@ -72,7 +69,3 @@ For R, use the following approach:
 
 ### Next Steps  
 Once you have inferred GRNs for one or more datasets, proceed to the next section to run the evaluation.
-
----
-
-This version improves readability, corrects typos, enhances formatting, and ensures consistency in terminology. Let me know if you need further refinements! 🚀
