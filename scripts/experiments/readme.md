@@ -1,0 +1,1 @@
+- run_sc_bulk: aim is to evaluate if sc format of data outperformed pseudobulked versions. Thus, it runs grn benchmark for two versions of data: sc vs pseudobulked. it only uses pearson correlation as inference metric. 

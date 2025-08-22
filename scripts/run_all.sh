@@ -1,10 +1,10 @@
 set -e
 
-datasets=('replogle') #'replogle' 'op' 'nakatake' 'adamson' 'norman' 
+datasets=('replogle') #'replogle' 'op' 'nakatake' 'adamson' 'norman'  xaira_HEK293T xaira_HEK293T parsescience
 run_local=true # set to true to run locally, false to run on AWS
 
-run_grn_inference=false
-run_grn_evaluation=true
+run_grn_inference=true
+run_grn_evaluation=false
 run_download=false
 
 
@@ -14,6 +14,16 @@ for dataset in "${datasets[@]}"; do
         echo "Running GRN inference for dataset: $dataset"
         if [ "$run_local" = true ]; then
             echo "Running locally"
+            
+            file="resources/results/$dataset/trace.txt"
+
+            if [ -f "$file" ]; then
+                
+                dir=$(dirname "$file")
+                base=$(basename "$file" .txt)
+                today=$(date +%Y-%m-%d)
+                cp "$file" "${dir}/${base}_${today}.txt"
+            fi
         else
             echo "Running on AWS"
         fi
@@ -23,6 +33,17 @@ for dataset in "${datasets[@]}"; do
 
     if [ "$run_grn_evaluation" = true ]; then
         if [ "$run_local" = false ]; then
+            
+            file="resources/results/$dataset/trace.txt"
+
+            if [ -f "$file" ]; then
+                echo "Making a copy of previous trace file"
+                dir=$(dirname "$file")
+                base=$(basename "$file" .txt)
+                today=$(date +%Y-%m-%d)
+                cp "$file" "${dir}/${base}_${today}.txt"
+            fi
+
             echo "Downloading inference results from AWS"
             aws s3 sync  s3://openproblems-data/resources/grn/results/$dataset resources/results/$dataset 
         fi 

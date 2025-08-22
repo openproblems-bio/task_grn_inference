@@ -21,13 +21,14 @@ For information on evaluation metrics, refer to the :doc:`evaluation` section.
 
 To integrate your GRN inference method, metric, or dataset, follow the instructions in the :doc:`extending` section. 
 
-
-Currently, 5 multi-omics GRN inference and 5 transcriptomics-based methods are integrated into geneRNIB. You can find the latest integrated GRN inference methods on that page.
+To see the comparitive performance of the integrated GRN inference methods, refer to the :doc:`leaderboard` section.
 
 .. image:: images/grn_models.png
    :width: 70%
    :align: center
 ----
+
+Pls see the GitHub page for the list of currently integrated methods. The methods are implemented in Python and R, and they can be used to infer GRNs from the datasets provided by geneRNIB.
 
 In addition, three baseline methods are integrated into geneRNIB. These methods are used to evaluate the performance of new methods. The baseline methods are:
 
@@ -64,5 +65,6 @@ Contents
    dataset
    evaluation
    extending
+   leaderboard
   
    

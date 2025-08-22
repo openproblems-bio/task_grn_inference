@@ -33,6 +33,8 @@ resources:
   # - path: main.py
   - path: /src/utils/util.py
     dest: util.py
+  - path: /src/methods/single_omics/grnboost2/helper.py
+    dest: helper.py
     
 
 engines:
@@ -47,4 +49,4 @@ runners:
   - type: executable
   - type: nextflow
     directives:
-      label: [onedaytime, highmem, midcpu]
+      label: [veryhightime, highmem, midcpu]

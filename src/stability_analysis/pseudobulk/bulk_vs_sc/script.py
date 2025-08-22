@@ -38,17 +38,20 @@ def prediction_file_name(dataset, data_type):
 
 
 if __name__ == '__main__':
-    results_dir = 'output/experiment/'
+    results_dir = 'resources/results/experiment/bulk_vs_sc'
     os.makedirs(results_dir, exist_ok=True)
-    datasets = ['replogle']
+    datasets = ['xaira_HEK293T'] #'replogle', 'xaira_HEK293T', 'xaira_HEK293T', 'parsescience'
 
-
+    metrics_all = []
     for dataset in datasets:
         par = def_par(dataset)
         # - infer GRNs
         for data_type in ['bulk', 'sc']:
             print(f"Inferring GRNs for {data_type} data...")
-            par['rna'] = f'resources/extended_data/{dataset}_train_{data_type}.h5ad'
+            if data_type == 'bulk':
+                par['rna'] = f'resources/grn_benchmark/inference_data/{dataset}_rna.h5ad'
+            else:
+                par['rna'] = f'resources/extended_data/{dataset}_train_sc.h5ad'
             net = main_inference(par)
 
             par['prediction'] = prediction_file_name(dataset, data_type)
@@ -85,4 +88,7 @@ if __name__ == '__main__':
         rr_all = pd.concat(rr_all_store, axis=0)
         rr_all['dataset'] = dataset
         rr_all.to_csv(f'{results_dir}/metrics_{dataset}.csv', index=False)
+        metrics_all.append(rr_all)
+    metrics_all = pd.concat(metrics_all, axis=0)
+    metrics_all.to_csv(f'{results_dir}/metrics_all.csv', index=False)
         

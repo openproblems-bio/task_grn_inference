@@ -46,6 +46,7 @@ def split_data_perturbation(adata: ad.AnnData, train_share):
     print(f"Train total: {len(train_perturbs)}, Test total: {len(test_perturbs)}")
 
     return train_perturbs.astype(str), test_perturbs.astype(str)
+    
 def add_metadata(adata):
     adata.uns['dataset_summary'] = '10 Million Human PBMCs in a Single Experiment'
     adata.uns['dataset_description'] = """Cryopreserved PBMCs from twelve healthy donors were purchased from a commercial vendor. Samples were thawed in a 37༠C water bath, transferred to a 50 mL centrifuge tube, diluted dropwise with warm FBS media, centrifuged, and washed with cold FBS. All samples had a viability >90% after thawing.

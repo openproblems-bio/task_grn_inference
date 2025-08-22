@@ -58,7 +58,7 @@ def sum_by(adata: ad.AnnData, col: str, unique_mapping: bool = True) -> ad.AnnDa
     return sum_adata
 
 
-def normalize_func(adata, log_norm=True, pearson_residual=True):
+def normalize_func(adata, log_norm=True, pearson_residual=False):
     import scanpy as sc
 
     # sc.pp.filter_cells(adata, min_genes=100)
@@ -67,7 +67,8 @@ def normalize_func(adata, log_norm=True, pearson_residual=True):
     if 'counts' not in adata.layers:
         adata.layers['counts'] = adata.X.copy()
     if pearson_residual:
-        adata.layers['pearson_residual'] = sc.experimental.pp.normalize_pearson_residuals(adata)['X']
+        sc.experimental.pp.normalize_pearson_residuals(adata)
+        adata.layers['pearson_residual'] = adata.X.copy()
     if log_norm:
         X_norm = sc.pp.normalize_total(adata, layer='counts',inplace=False)['X']
         X_norm = sc.pp.log1p(X_norm, copy=False)
