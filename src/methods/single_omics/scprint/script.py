@@ -44,7 +44,8 @@ adata = ad.read_h5ad(par["rna"], backed="r")
 train_perturbs = adata.obs['perturbation'].unique()
 if adata.uns['dataset_id'] in ['replogle', 'xaira_HCT116', 'xaira_HEK293T']:
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
-    train_perturbs = np.intersect1d(tf_all, train_perturbs)  
+    train_perturbs = np.intersect1d(tf_all, train_perturbs) 
+    train_perturbs = train_perturbs[:100]  # limit to 100 perturbations
 elif adata.uns['dataset_id'] in ['parsebioscience']:
     train_perturbs = train_perturbs[:10]
 mask = adata.obs['perturbation'].isin(train_perturbs)
