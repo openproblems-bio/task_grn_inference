@@ -316,7 +316,9 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     if (n_features_theta_min!=0).any()==False:
         score_static_min = np.nan
     else:
+        print(f'Static approach (theta=0):', flush=True)
         score_static_min = static_approach(net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
+    print(f'Static approach (theta=.5):', flush=True)
     score_static_median = static_approach(net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
     print(f'Static approach (theta=1):', flush=True)
     score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])

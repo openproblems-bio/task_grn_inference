@@ -39,24 +39,25 @@ arguments:
       downloaded.
     required: false
 
-# resources:
-#   - type: python_script
-#     path: script.py
-  # - path: /src/utils/read_anndata_partial.py
-  # - path: /src/utils/exit_codes.py
+resources:
+  - type: python_script
+    path: script.py
+  - path: /src/utils/util.py
+    dest: util.py
 
 engines:
   - type: docker
-    image: openproblems/base_pytorch_nvidia:1
+    # image: openproblems/base_pytorch_nvidia:1
+    image: ajpennacchio/scgpt:0.2.1
     # TODO: Try to find working installation of flash attention (flash-attn<1.0.5)
     setup:
       - type: python
         pypi:
           - gdown
-          - scgpt # Install from PyPI to get dependencies
-      - type: docker
-        # Force re-installing from GitHub to get bug fixes
-        run: pip install --upgrade --no-deps --force-reinstall git+https://github.com/bowang-lab/scGPT.git
+          # - scgpt # Install from PyPI to get dependencies
+      # - type: docker
+      #   # Force re-installing from GitHub to get bug fixes
+      #   run: pip install --upgrade --no-deps --force-reinstall git+https://github.com/bowang-lab/scGPT.git
 
 runners:
   - type: executable
