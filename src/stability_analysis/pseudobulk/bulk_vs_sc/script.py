@@ -66,13 +66,13 @@ def infer_grn(par, dataset):
 if __name__ == '__main__':
     results_dir = 'resources/results/experiment/bulk_vs_sc'
     os.makedirs(results_dir, exist_ok=True)
-    datasets = ['parsebioscience'] #'replogle', 'xaira_HEK293T', 'parsebioscience' 'xaira_HCT116'
+    datasets = ['replogle', 'parsebioscience', 'xaira_HEK293T', 'xaira_HCT116'] #'replogle', 'xaira_HEK293T', 'xaira_HCT116' , 'parsebioscience' #RUN per dataset seperately
 
     metrics_all = []
     for dataset in datasets:
         par = def_par(dataset)
         print('Processing dataset:', dataset, flush=True)
-        if True:
+        if False:
             # - infer GRNs
             for data_type in ['sc', 'bulk']: 
                 print(f"Inferring GRNs for {data_type} data...", flush=True)
@@ -101,14 +101,15 @@ if __name__ == '__main__':
 
         # - grn evaluation
         rr_all_store = []
-        for data_type in ['sc']:
+        for data_type in ['sc', 'bulk']:
             print(f"Calculating metrics for {data_type} data...", flush=True)
             par['prediction'] = prediction_file_name(dataset, data_type)
             rr_store = []
             metric_reg2 = main_reg2(par)
             rr_store.append(metric_reg2)
-            _, metric_ws = main_ws_distance(par)
-            rr_store.append(metric_ws)
+            if dataset != 'parsebioscience':
+                _, metric_ws = main_ws_distance(par)
+                rr_store.append(metric_ws)
             rr = pd.concat(rr_store, axis=1)
             rr['data_type'] = data_type
             rr_all_store.append(rr)

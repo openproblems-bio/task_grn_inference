@@ -4,7 +4,7 @@ set -e
 
 # --- Settings ---
 RUN_TEST=false
-num_workers=10
+num_workers=50
 apply_tf_methods=true
 layer='lognorm'
 RUN_LOCAL=false
@@ -115,8 +115,7 @@ HERE
 
 if [[ "$DATASET" =~ ^(replogle|parsescience|xaira_HEK293T)$ ]]; then
   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic]"
-  # append_entry "$DATASET" "[scprint]" "true"
-  # append_entry "$DATASET" "[grnboost]"
+  append_entry "$DATASET" "[scprint]" "true"
 elif [ "$DATASET" = "op" ]; then
   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint, figr, scenicplus, celloracle, granie, scglue]"
 else
