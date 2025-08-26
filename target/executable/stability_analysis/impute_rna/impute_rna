@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "magic-impute" "numpy==1.23.5"
 
 LABEL org.opencontainers.image.description="Companion container for running component stability_analysis impute_rna"
-LABEL org.opencontainers.image.created="2025-08-22T08:23:10Z"
+LABEL org.opencontainers.image.created="2025-08-26T18:24:43Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="194f4a7ad27c5d2a2e8e28ecdcc8007fc18141c8"
+LABEL org.opencontainers.image.revision="2879eaed82339336a86be2c13eb60dba6a23f718"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

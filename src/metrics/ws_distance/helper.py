@@ -2,6 +2,7 @@ import pandas as pd
 import anndata as ad
 import sys
 import numpy as np
+from tqdm import tqdm
 
 # For reproducibility
 seed = 42
@@ -29,8 +30,9 @@ def main(par):
     # - for each theta, and each tf: 
     scores_model = []
     for theta in consensus['theta'].unique():
+        print('Processing theta:', theta, flush=True)
         consensus_theta = consensus[consensus['theta'] == theta]
-        for tf in consensus_tfs_common:
+        for tf in tqdm(consensus_tfs_common, desc='Processing tfs', leave=False):
             # - get the background distance for the given tf
             background_distance_tf = background_distance[background_distance['source']==tf]
             n_edges = consensus_theta[consensus_theta['source'] == tf]['value'].values[0]

@@ -3473,19 +3473,15 @@ meta = [
       "id" : "docker",
       "image" : "janursa/scglue:13_03_2025",
       "namespace_separator" : "/"
-    },
-    {
-      "type" : "native",
-      "id" : "native"
     }
   ],
   "build_info" : {
     "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/multi_omics/scglue/config.vsh.yaml",
     "runner" : "nextflow",
-    "engine" : "docker|native",
+    "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scglue",
     "viash_version" : "0.9.4",
-    "git_commit" : "194f4a7ad27c5d2a2e8e28ecdcc8007fc18141c8",
+    "git_commit" : "2879eaed82339336a86be2c13eb60dba6a23f718",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

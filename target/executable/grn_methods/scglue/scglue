@@ -446,9 +446,9 @@ function ViashDockerfile {
 FROM janursa/scglue:13_03_2025
 ENTRYPOINT []
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scglue"
-LABEL org.opencontainers.image.created="2025-08-22T08:23:10Z"
+LABEL org.opencontainers.image.created="2025-08-26T18:24:42Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="194f4a7ad27c5d2a2e8e28ecdcc8007fc18141c8"
+LABEL org.opencontainers.image.revision="2879eaed82339336a86be2c13eb60dba6a23f718"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -652,7 +652,7 @@ function ViashHelp {
   echo ""
   echo "Viash built in Engines:"
   echo "    ---engine=ENGINE_ID"
-  echo "        Specify the engine to use. Options are: docker, native."
+  echo "        Specify the engine to use. Options are: docker."
   echo "        Default: docker"
 }
 
@@ -919,12 +919,10 @@ done
 eval set -- $VIASH_POSITIONAL_ARGS
 
 
-if   [ "$VIASH_ENGINE_ID" == "native" ]  ; then
-  VIASH_ENGINE_TYPE='native'
-elif   [ "$VIASH_ENGINE_ID" == "docker" ]  ; then
+if   [ "$VIASH_ENGINE_ID" == "docker" ]  ; then
   VIASH_ENGINE_TYPE='docker'
 else
-  ViashError "Engine '$VIASH_ENGINE_ID' is not recognized. Options are: docker, native."
+  ViashError "Engine '$VIASH_ENGINE_ID' is not recognized. Options are: docker."
   exit 1
 fi
 
@@ -1207,15 +1205,6 @@ fi
 # create parent directories of output files, if so desired
 if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -d "$(dirname "$VIASH_PAR_PREDICTION")" ]; then
   mkdir -p "$(dirname "$VIASH_PAR_PREDICTION")"
-fi
-
-if  [ "$VIASH_ENGINE_ID" == "native" ]  ; then
-  if [ "$VIASH_MODE" == "run" ]; then
-    VIASH_CMD="bash"
-  else
-    ViashError "Engine '$VIASH_ENGINE_ID' does not support mode '$VIASH_MODE'."
-    exit 1
-  fi
 fi
 
 if [[ "$VIASH_ENGINE_TYPE" == "docker" ]]; then

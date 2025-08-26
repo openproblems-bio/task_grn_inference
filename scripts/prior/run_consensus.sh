@@ -17,7 +17,7 @@ DATASET="${1:-replogle}"
 models_dir="resources/results/$DATASET/"
 
 echo "Running consensus for regression 2"
-models=("pearson_corr" "positive_control" "portia" "ppcor" "scenic" "scprint" "grnboost2" "scenicplus" "scglue" "granie" "figr" "celloracle")
+models=("pearson_corr" "positive_control" "portia" "ppcor" "scenic" "scprint" "grnboost" "scenicplus" "scglue" "granie" "figr" "celloracle")
 
 datasets=(${DATASET})
 for dataset in "${datasets[@]}"; do

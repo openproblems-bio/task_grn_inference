@@ -57,20 +57,14 @@ def sum_by(adata: ad.AnnData, col: str, unique_mapping: bool = True) -> ad.AnnDa
 
     return sum_adata
 
-
 def normalize_func(adata, log_norm=True, pearson_residual=False):
     import scanpy as sc
-
-    # sc.pp.filter_cells(adata, min_genes=100)
-    # sc.pp.filter_genes(adata, min_cells=10)
-
     if 'counts' not in adata.layers:
         adata.layers['counts'] = adata.X.copy()
     if pearson_residual:
-        sc.experimental.pp.normalize_pearson_residuals(adata)
-        adata.layers['pearson_residual'] = adata.X.copy()
+        adata.layers['pearson_residual'] = sc.experimental.pp.normalize_pearson_residuals(adata)['X']
     if log_norm:
-        X_norm = sc.pp.normalize_total(adata, layer='counts',inplace=False)['X']
+        X_norm = sc.pp.normalize_total(adata, layer='counts', inplace=False)['X']
         X_norm = sc.pp.log1p(X_norm, copy=False)
         adata.layers['lognorm'] = X_norm
     adata.X = adata.layers['counts']
@@ -140,8 +134,9 @@ import numpy as np
 from scipy.stats import ttest_ind
 from tqdm import tqdm
 
-def compare_perturbed_to_control_sc(adata, gene):
+def compare_perturbed_to_control_sc(adata, gene, layer):
     from scipy.sparse import issparse
+    adata.X = adata.layers[layer]
     if gene not in adata.var_names:
         raise ValueError(f"Gene '{gene}' not found in the dataset.")
     
@@ -217,63 +212,133 @@ def compare_perturbed_to_control_sc(adata, gene):
         "mean_perturbed": float(mean_perturbed),
         "p_val": float(p_val)
     }
-def qc_perturbation_effect(adata):
+
+
+def qc_perturbation(
+    adata, 
+    col='perturbation', 
+    min_cells_per_pert=10, 
+    min_cells_per_gene=10, 
+    min_genes_per_cell=200
+):
+    """
+    Filter AnnData object:
+      1. Remove perturbations with too few cells.
+      2. Remove genes with too few cells per condition.
+      3. Remove cells with too few genes.
+    """
+    import scipy.sparse as sp
+    
+    adata = adata.copy()
+    # 1. Remove perturbations with too few cells
+    pert_counts = adata.obs[col].value_counts()
+    keep_perts = pert_counts[pert_counts >= min_cells_per_pert].index
+    adata = adata[adata.obs[col].isin(keep_perts)].copy()
+    print(f"Kept {len(keep_perts)} perturbations (>= {min_cells_per_pert} cells each) out of {len(pert_counts)} total")
+
+    # 2. Remove genes with too few cells in total (not per condition)
+    if sp.issparse(adata.X):
+        cell_counts = np.array((adata.X > 0).sum(axis=0)).flatten()
+    else:
+        cell_counts = (adata.X > 0).sum(axis=0)
+
+    gene_mask = cell_counts >= min_cells_per_gene
+    adata = adata[:, gene_mask].copy()
+    print(f"Kept {gene_mask.sum()} genes (>= {min_cells_per_gene} cells total) out of {len(gene_mask)} total")
+    # 3. Remove cells with too few expressed genes
+    if sp.issparse(adata.X):
+        gene_counts = np.array((adata.X > 0).sum(axis=1)).flatten()
+    else:
+        gene_counts = (adata.X > 0).sum(axis=1)
+    keep_cells = gene_counts >= min_genes_per_cell
+    adata = adata[keep_cells].copy()
+    print(f"Kept {keep_cells.sum()} cells (>= {min_genes_per_cell} genes per cell) out of {len(keep_cells)} total")
+
+    return adata
+
+
+def qc_perturbation_effect(adata, n_jobs=-1):
+    """
+    Perform QC on perturbation effects with parallel processing.
+    
+    Parameters
+    ----------
+    adata : AnnData
+        AnnData object with 'perturbation', 'perturbation_type', 'is_control' in .obs
+    n_jobs : int
+        Number of parallel jobs (-1 = use all cores)
+        
+    Returns
+    -------
+    adata : AnnData
+        Subsetted AnnData with only QC-passed perturbations and control cells
+    """
+    from joblib import Parallel, delayed
+    import pandas as pd
+    from statsmodels.stats.multitest import multipletests
     from tqdm import tqdm
-    p_val_t=0.05
+    p_val_t = 0.05
 
     perturbation_type = adata.obs['perturbation_type'].unique()[0]
-    if perturbation_type=='knockout':
+    if perturbation_type in ['knockout', 'knockdown']:
         logf2c_t = -0.54
-    elif perturbation_type=='knockdown':
-        logf2c_t = -0.54
-    elif perturbation_type=='overexpression':
-        raise ValueError("Overexpression perturbation type is not supported for this analysis.")
-    elif perturbation_type=='activation':
-        raise ValueError("Activation perturbation type is not supported for this analysis.")
-    elif perturbation_type=='cytokine':
-        print('Cytokine perturbation type detected, no filtering for qc pertubration effect.')
+    elif perturbation_type in ['overexpression', 'activation']:
+        raise ValueError(f"{perturbation_type} perturbation type is not supported for this analysis.")
+    elif perturbation_type == 'cytokine':
+        print('Cytokine perturbation type detected, no filtering for QC perturbation effect.')
         return adata
 
-    # Collect results
-    results = {}
+    # Determine which layer to use
     if 'lognorm' in adata.layers:
-        adata.X = adata.layers['lognorm']
+        layer = 'lognorm'
     elif 'X_norm' in adata.layers:
-        adata.X = adata.layers['X_norm']
+        layer = 'X_norm'
     else:
         raise ValueError("No suitable normalized layer found in adata.layers. Expected 'lognorm' or 'X_norm'.")
 
-    for perturbation in tqdm(adata.obs['perturbation'].unique(), desc='Processing perturbations'):
-        if perturbation not in adata.var_names:
-            continue
-        if perturbation != 'control':
-            perturbed_gene = perturbation
-            rr = compare_perturbed_to_control_sc(
-                adata[(adata.obs['perturbation'] == perturbation) | adata.obs['is_control']], 
-                perturbed_gene
-            )
-            results[perturbation] = rr
+    # Precompute masks and sets
+    perturbations = adata.obs['perturbation'].unique()
+    var_names_set = set(adata.var_names)
+    is_control_mask = adata.obs['is_control'].values
+
+    # Function to process a single perturbation
+    def process_perturbation(pert):
+        if pert == 'control' or pert not in var_names_set:
+            return (pert, None)
+        pert_mask = adata.obs['perturbation'].values == pert
+        subset_mask = pert_mask | is_control_mask
+        rr = compare_perturbed_to_control_sc(
+            adata[subset_mask].copy(),
+            gene=pert,
+            layer=layer
+        )
+        return (pert, rr)
+
+    # Parallel computation
+    results_list = Parallel(n_jobs=n_jobs)(
+        delayed(process_perturbation)(p) for p in tqdm(perturbations, desc='Processing perturbations')
+    )
+
+    # Collect results into a dict
+    results = {pert: rr for pert, rr in results_list if rr is not None}
 
     # Create DataFrame
-    df_results = pd.DataFrame.from_dict(results, orient="index")
-    
-    df_results.index.name = "perturbation"
-    df_results = df_results.reset_index()
+    df_results = pd.DataFrame.from_dict(results, orient="index").reset_index()
+    df_results.rename(columns={'index': 'perturbation'}, inplace=True)
 
-    # - Filter results based on significance and fold change
-    from statsmodels.stats.multitest import multipletests
+    # Adjust p-values
     reject, pvals_corrected, _, _ = multipletests(df_results["p_val"].values, method="fdr_bh")
     df_results['p_adj'] = pvals_corrected
-    print(df_results)
 
-    df_filtered = df_results[(df_results['logf2c']<logf2c_t)&(df_results['p_adj']<p_val_t)]
+    # Filter based on log fold change and significance
+    df_filtered = df_results[(df_results['logf2c'] < logf2c_t) & (df_results['p_adj'] < p_val_t)]
     perturbations_qc_passed = df_filtered['perturbation'].tolist()
-
     print(f'Number of perturbations after QC: {len(perturbations_qc_passed)}', flush=True)
 
     if len(perturbations_qc_passed) == 0:
-        raise ValueError("No perturbations passed the QC criteria. Please adjust the thresholds or check the data.")
-    # - Update adata with passed perturbations
+        raise ValueError("No perturbations passed the QC criteria. Please adjust thresholds or check data.")
+
+    # Subset adata to only include passed perturbations and controls
     adata = adata[(adata.obs['perturbation'].isin(perturbations_qc_passed)) | adata.obs['is_control']]
 
     return adata
@@ -287,7 +352,8 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     del adata.obsm
     del adata.var 
     del adata.uns
-
+    if 'counts' in adata.layers:
+        adata.X = adata.layers['counts']
     adata.X = csr_matrix(adata.X) if not isinstance(adata.X, csr_matrix) else adata.X
 
     expected_cols = np.unique(['perturbation_type', 'perturbation', 'is_control'] + covariates)
@@ -384,4 +450,18 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     adata_train_bulk.write(f'resources/grn_benchmark/inference_data/{save_name}_rna.h5ad', compression='gzip')
     
     print('Data processing completed successfully!', flush=True)
-    
+
+
+def bulkify_func(adata, cell_count_t=10, covariates=['cell_type', 'donor_id', 'age']):
+    from task_grn_inference.src.process_data.helper_data import sum_by
+    adata.obs['sum_by'] = ''
+    for covariate in covariates:
+        adata.obs['sum_by'] += '_' + adata.obs[covariate].astype(str)
+    # adata.obs['sum_by'] = '_' + adata.obs['cell_type'].astype(str) + '_' + adata.obs['donor_id'].astype(str) + '_' + adata.obs['age'].astype(str) 
+    adata.obs['sum_by'] = adata.obs['sum_by'].astype('category')
+    adata_bulk = sum_by(adata, 'sum_by', unique_mapping=True)
+    cell_count_df = adata.obs.groupby('sum_by').size().reset_index(name='cell_count')
+    adata_bulk.obs = adata_bulk.obs.merge(cell_count_df, on='sum_by')
+    adata_bulk = adata_bulk[adata_bulk.obs['cell_count']>=cell_count_t]
+    return adata_bulk
+
