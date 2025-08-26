@@ -14,7 +14,7 @@ par = {
   # 'degrees': [50],
   # 'analysis_types': ["net", "sign", 'weight'],
   'analysis_types': ['direction'],
-  'methods': ['negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost2', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
+  'methods': ['negative_control', 'positive_control', 'pearson_corr', 'portia', 'ppcor', 'grnboost', 'scenic', 'granie', 'scglue', 'celloracle', 'figr', 'scenicplus'],
   # 'methods': ['pearson_corr'],
 
   "evaluation_data": "resources/grn_benchmark/evaluation_data//op.h5ad",

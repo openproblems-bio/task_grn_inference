@@ -145,7 +145,7 @@ else
       "celloracle"
       "granie"
       "figr"
-      "grnboost2"
+      "grnboost"
       "ppcor"
       "portia"
       "scenic"

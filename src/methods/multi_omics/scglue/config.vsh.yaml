@@ -48,8 +48,6 @@ engines:
     #       - openproblems-bio/core#subdirectory=packages/python/openproblems
     #   - type: apt
     #     packages: [bedtools]
-        
-  - type: native
 runners:
   - type: executable
   - type: nextflow
