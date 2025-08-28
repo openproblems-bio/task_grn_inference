@@ -11,10 +11,6 @@ info:
     transcription factor binding information to predict gene regulatory relationships.
   documentation_url: https://github.com/pinellolab/dictys
 arguments:
-  - name: --distance
-    type: integer
-    default: 500000
-    description: "Distance threshold for peak-to-gene assignment"
   - name: --qc
     type: boolean
     default: true
@@ -33,6 +29,7 @@ engines:
       - type: python
         pypi:
           - gdown
+          - numpy<2
     # setup:   
     #   - type: python
     #     github:

@@ -15,11 +15,10 @@ import argparse
 par = {
   'rna': 'resources/grn_benchmark/inference_data/replogle_rna.h5ad',
   "tf_all": 'resources/grn_benchmark/prior/tf_all.csv',
-  'prediction': 'output/grnboost2_test.h5ad',
+  'prediction': 'resources/results/replogle/replogle.grnboost.grnboost.prediction.h5ad',
   'temp_dir': 'output/grnboost2',
-  'num_workers': 1,
-  'seed': "32",
-  'normalize': False
+  'num_workers': 20,
+  'seed': "32"
 }
 ## VIASH END
 

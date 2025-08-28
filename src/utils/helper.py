@@ -3,7 +3,6 @@ import os
 import pandas as pd
 import anndata as ad 
 import numpy as np
-import scanpy as sc 
 import sys 
 import subprocess
 import io
@@ -112,7 +111,7 @@ def process_trace_seqera(trace):
 
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # run_grn_inference()
     # calculate_scores()
     # analyse_meta_cells(task_grn_inference_dir='./')

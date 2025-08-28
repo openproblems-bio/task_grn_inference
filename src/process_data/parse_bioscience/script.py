@@ -134,7 +134,9 @@ def main():
     wrapper_large_perturbation_data(adata, split_func=split_data_perturbation,
         covariates=['cell_type_minor', 'perturbation', 'donor_id', 'well'], 
         add_metadata=add_metadata,
-        save_name='parsebioscience', cell_count_t=cell_count_t)
+        save_name='parsebioscience',
+        qc_perturbation_effect=False
+        )
 
 
 if __name__ == '__main__':
