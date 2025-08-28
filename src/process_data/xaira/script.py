@@ -24,7 +24,7 @@ par = {
 
 raw_dir = '/vol/projects/CIIM/PerturbationDataset/Perturb_seq_dataset_Xiara'
 
-ref_cell_types = ['HEK293T', 'HCT116'] #'HEK293T', 'HCT116' #Human Embryonic Kidney 293T cells, Human Colorectal Carcinoma Cell Line 116
+ref_cell_types = ['HCT116', 'HEK293T'] #'HEK293T', 'HCT116' #Human Embryonic Kidney 293T cells, Human Colorectal Carcinoma Cell Line 116
 
     
 def add_metadata(cell_type):     

@@ -2,20 +2,12 @@ import pandas as pd
 import anndata as ad
 import numpy as np
 from tqdm import tqdm
-from sklearn.preprocessing import StandardScaler
 import scipy.sparse as sp
 
-
-colors_blind = [
-    "#E69F00",  # Orange
-    "#56B4E9",  # Sky Blue
-    "#009E73",  # Bluish Green
-    "#F0E442",  # Yellow
-    "#0072B2",  # Blue
-    "#D55E00",  # Vermillion
-    "#CC79A7",
-]  # Reddish Purple
-
+def naming_convention(dataset, method): 
+    if (dataset in ['replogle', 'parsescience', 'xaira_HEK293T']) & (method in ['scprint']):
+        dataset = f'{dataset}_sc'
+    return f'{dataset}.{method}.{method}.prediction.h5ad'
 
 def binarize_weight(weight):
     if weight > 0:
@@ -83,7 +75,8 @@ def process_links(net, par):
     net["target"] = net["target"].astype(str)
     net = net[net["source"] != net["target"]]
     # - limit the number of links
-    if par["max_n_links"] != -1:
+    if 'max_n_links' not in par["max_n_links"]:
+        par["max_n_links"] = 50000
         net = net.sort_values("weight", ascending=False, key=abs).head(
             par["max_n_links"]
         )
@@ -278,3 +271,18 @@ def fetch_gene_info():
     df.set_index("gene_name", inplace=True)
 
     return df
+
+def download_annotation(par):
+    import os
+    import requests
+
+    if not os.path.exists(par['annotation_file']):
+        print("Downloading prior started")
+        response = requests.get("https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.annotation.gtf.gz")
+        if response.status_code == 200:
+            with open(par['annotation_file'], 'wb') as file:
+                file.write(response.content)
+            print(f"File downloaded and saved to {par['annotation_file']}")
+        else:
+            print(f"Failed to download the gencode.v45.annotation.gtf.gz. Status code: {response.status_code}")
+        print("Downloading prior ended")

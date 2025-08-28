@@ -8,7 +8,6 @@ import sys
 
 import argparse
 
-naming_convention = lambda dataset, method: f'{dataset}.{method}.{method}.prediction.h5ad'
 
 arg = argparse.ArgumentParser(description='Compute consensus number of putative regulators for each gene')
 arg.add_argument('--dataset', type=str, help='Dataset to use for the analysis')
@@ -23,9 +22,15 @@ par = args.__dict__
 
 meta = {
     "resources_dir":'src/metrics/ws_distance/consensus/',
+    "utils_dir":'src/utils/'
 }
 sys.path.append(meta["resources_dir"])
+sys.path.append(meta["utils_dir"])
 from helper import main
+from util import naming_convention
+
+
+
 
 if __name__ == '__main__':
     par['naming_convention'] = naming_convention

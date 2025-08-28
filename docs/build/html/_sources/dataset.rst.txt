@@ -1,6 +1,9 @@
 Datasets
 ========
-In this section, we explain how to access datasets without installing geneRNIB.  The available datasets include **OPSCA, Nakatake, Replogle, Adamson,** and **Norman**. Each dataset provides RNA data, while the `OPSCA` dataset also includes ATAC data. The perturbation signature of these datasets are given below. 
+Here, we explain how to access datasets without installing geneRNIB. The available datasets include **OPSCA, Nakatake, Replogle, Adamson, Norman, Xaira_HCT116, Xaira_HEK293T** and **ParseBioscience**. 
+It should be noted that three datasets of **Xaira_HCT116, Xaira_HEK293T** and **ParseBioscience** are not added to the initial manuscript yet.
+All datasets provide RNA data, while the `OPSCA` dataset also includes ATAC data. 
+The perturbation signature of these datasets are given below. 
 You need `awscli` to download the datasets. If you don't have it installed, you can download it from [here](https://aws.amazon.com/cli/). You do not need to sign in to download the datasets.
 
 .. image:: images/datasets.png
@@ -33,8 +36,8 @@ Downloading the extended datasets
 -----------------------------
 
 Beyond the core datasets, extended datasets include single cell data of large perturbation datasets such as Replogle, Xaira, and Parse bioscience.
-The previous version was pseudobulked for computational efficiency. 
-Additionally, pseudobulked versions of all other datasets are available, representing the combined inference and evaluation datasets. 
+The previous version were pseudobulked for computational efficiency. 
+Additionally, full pseudobulked versions of all other datasets are available, representing the combined inference and evaluation datasets. 
 These files are used for the `positive control` method, which incorporates all variations within a dataset.
 
 To download the extended datasets, use:
@@ -52,14 +55,19 @@ All previously mentioned datasets are processed versions. To access the raw, unp
 
    aws s3 sync s3://openproblems-data/resources/grn/datasets_raw/ resources/datasets_raw/ --no-sign-request
 
+We have not provided raw data for a few recent datasets due to very large file sizes. Pls contact us if you need the raw data for these datasets.
 
 Downloading the GRN models
 ---------------------------------------------
-To download the GRN models used in geneRNIB so far, run:
+To download the GRN models used in geneRNIB, run:
 
 .. code-block:: bash
 
    aws s3 sync s3://openproblems-data/resources/grn/grn_models resources/grn_models/ --no-sign-request
+
+These models are not necessarily the updated models as we are currently making changes to the results. To obtain a specific model, 
+you should run the inference method or reach out to us for the latest model.
+
 
 Downloading the results
 ---------------------------------------------

@@ -18,9 +18,9 @@ import argparse
 
 ## VIASH START
 par = {
-  'rna': 'resources/grn_benchmark/inference_data/op_rna.h5ad',
+  'rna': 'resources/grn_benchmark/inference_data/replogle_rna.h5ad',
   "tf_all": 'resources/grn_benchmark/prior/tf_all.csv',
-  'prediction': 'output/scenic_test.h5ad',
+  'prediction': 'resources/results/replogle/replogle.scenic.scenic.prediction.h5ad',
   'temp_dir': 'output/scenic',
   'num_workers': 20,
   'max_n_links': 50000,
@@ -33,16 +33,19 @@ par = {
 ## VIASH END
 try:
     sys.path.append(meta["resources_dir"])
+    from util import process_links
+    from helper import format_data, run_grn
 except:
     meta = {
-      'utils_dir': 'src/utils',
-      'grnboost_dir': 'src/methods/single_omics/grnboost2'
+      'util_dir': 'src/utils',
+      'helper_dir': 'src/methods/single_omics/grnboost2',
     }
-    sys.path.append(meta["utils_dir"])
-    sys.path.append(meta["grnboost_dir"])
+    sys.path.append(meta["helper_dir"])
+    from helper import format_data, run_grn
+    sys.path.append(meta["util_dir"])
+    from util import process_links
+    
 
-from util import process_links
-from helper import format_data, run_grn
 
 def download_prior(par):
   if not (os.path.exists(par['motif_annotation'])):

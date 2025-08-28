@@ -89,7 +89,7 @@ append_entry() {
 
   if [ "$use_train_sc" = true ]; then
     rna_file="${resources_dir}/extended_data/${dataset}_train_sc.h5ad"
-    group_id="${dataset}_sc_train"
+    group_id="${dataset}_sc"
   else
     rna_file="${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad"
     group_id="${dataset}"
