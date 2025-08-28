@@ -95,6 +95,7 @@ dependencies:
   - name: grn_methods/scenic
   - name: grn_methods/ppcor 
   - name: grn_methods/scprint 
+  - name: grn_methods/scgpt
   
   # ---- multiomics 
   - name: grn_methods/celloracle
@@ -102,6 +103,7 @@ dependencies:
   - name: grn_methods/figr
   - name: grn_methods/scenicplus
   - name: grn_methods/granie
+  - name: grn_methods/dictys
   # ---- baselines
   - name: control_methods/pearson_corr
   - name: control_methods/negative_control
