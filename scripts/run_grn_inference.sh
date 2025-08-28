@@ -121,7 +121,7 @@ HERE
 # else
 #   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint]"
 # fi
-append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, scprint, portia]"
+append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, scprint, portia, scgpt]"
 
 # --- Final configuration ---
 if [ "$RUN_LOCAL" = true ]; then

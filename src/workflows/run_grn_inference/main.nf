@@ -12,7 +12,9 @@ methods = [
   scglue,
   granie,
   figr,
-  celloracle
+  celloracle,
+  scgpt,
+  dictys
 ]
 
 // construct list of metrics

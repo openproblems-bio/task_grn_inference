@@ -4,7 +4,7 @@
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
-#SBATCH --time=50:00:00
+#SBATCH --time=20:00:00
 #SBATCH --mem=1000GB
 #SBATCH --partition=cpu
 #SBATCH --mail-type=END,FAIL      
@@ -18,10 +18,11 @@ set -e
 # python src/process_data/norman/script.py
 
 # python src/process_data/opsca/script.py 
-python src/process_data/replogle/script.py  #--run_test  #--run_test
-python src/process_data/xaira/script.py    #--run_test
+# python src/process_data/replogle/script.py  #--run_test  #--run_test
+# python src/process_data/xaira/script.py    #--run_test
 python src/process_data/parse_bioscience/script.py  #--run_test
 
-
+# echo "Processing 300BCG"
 # python src/process_data/300BCG/script.py 
+# echo "Processing IBD"
 # python src/process_data/ibd/script.py 
