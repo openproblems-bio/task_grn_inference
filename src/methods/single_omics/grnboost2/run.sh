@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=grnboos
+#SBATCH --job-name=grnboost2
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1

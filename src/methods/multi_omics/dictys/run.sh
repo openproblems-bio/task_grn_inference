@@ -1,3 +1,15 @@
+#!/bin/bash
+#SBATCH --job-name=dictys
+#SBATCH --output=logs/%j.out
+#SBATCH --error=logs/%j.err
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=10
+#SBATCH --time=20:00:00
+#SBATCH --mem=250GB
+#SBATCH --partition=cpu
+#SBATCH --mail-type=END,FAIL      
+#SBATCH --mail-user=jalil.nourisa@gmail.com   
+
 
 # viash run src/methods/multi_omics/dictys/config.vsh.yaml -- \
 #     --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \
@@ -8,16 +20,12 @@
 #     --num_workers 10
 
 
-# python src/methods/multi_omics/dictys/greta/extract_data.py \
-#     --pre_path output/dictys/mudata.h5mu \
-#     --exp_path output/dictys/exp.csv \
-#     --pks_path output/dictys/peak.csv 
 
-bash src/methods/multi_omics/dictys/tfb.sh \
-    --input_pre output/dictys/mudata.h5mu \
+singularity run ../../images/dictys.sif bash src/methods/multi_omics/dictys/tfb.sh \
+    --rna_file resources_test/grn_benchmark/inference_data/op_rna.h5ad \
+    --atac_file resources_test/grn_benchmark/inference_data/op_atac.h5ad \
     --output_d output/dictys \
-    --input_frags output/dictys/donor_0.tsv.gz \
     --input_motif output/d_test/data/motif_file.motif \
-    --input_genome output/d_test/data/genome \
+    --input_genome resources/extended_data/genome \
     --threads 10
 

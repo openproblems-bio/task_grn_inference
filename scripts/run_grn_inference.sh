@@ -113,15 +113,15 @@ HERE
   fi
 }
 
-if [[ "$DATASET" =~ ^(replogle|parsescience|xaira_HEK293T)$ ]]; then
-  append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic]"
-  append_entry "$DATASET" "[scprint]" "true"
-elif [ "$DATASET" = "op" ]; then
-  append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint, figr, scenicplus, celloracle, granie, scglue]"
-else
-  append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint]"
-fi
-
+# if [[ "$DATASET" =~ ^(replogle|parsescience|xaira_HEK293T)$ ]]; then
+#   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic]"
+#   append_entry "$DATASET" "[scprint]" "true"
+# elif [ "$DATASET" = "op" ]; then
+#   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint, figr, scenicplus, celloracle, granie, scglue]"
+# else
+#   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint]"
+# fi
+append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, scprint, portia]"
 
 # --- Final configuration ---
 if [ "$RUN_LOCAL" = true ]; then

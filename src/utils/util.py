@@ -75,7 +75,7 @@ def process_links(net, par):
     net["target"] = net["target"].astype(str)
     net = net[net["source"] != net["target"]]
     # - limit the number of links
-    if 'max_n_links' not in par["max_n_links"]:
+    if 'max_n_links' not in par.keys():
         par["max_n_links"] = 50000
         net = net.sort_values("weight", ascending=False, key=abs).head(
             par["max_n_links"]

@@ -1,10 +1,10 @@
 set -e
 
-datasets=('replogle') #'replogle' 'op' 'xaira_HCT116' 'nakatake' 'adamson' 'norman'  'xaira_HEK293T' 'parsebioscience'
+datasets=('ibd' '300BCG') #'replogle' 'op' 'nakatake' 'adamson' 'norman'  'xaira_HEK293T' 'xaira_HCT116'  'parsebioscience' 'ibd' '300BCG'
 run_local=false # set to true to run locally, false to run on AWS
 
-run_grn_inference=false
-run_grn_evaluation=true
+run_grn_inference=true
+run_grn_evaluation=false
 run_download=false
 
 
@@ -58,10 +58,7 @@ for dataset in "${datasets[@]}"; do
             aws s3 sync  s3://openproblems-data/resources/grn/results/$dataset resources/results/$dataset 
         fi
     fi
+
     # bash scripts/prior/run_ws_background.sh # run background distance for ws distance -> needs to be run after adding each dataset
 
 done
-
-
-
-

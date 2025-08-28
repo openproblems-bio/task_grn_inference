@@ -2,15 +2,8 @@
 # Parse command-line arguments
 while [[ "$#" -gt 0 ]]; do
     case $1 in
-        --input_pre) input_pre="$2"; shift ;;
-        --input_frags)
-            shift
-            while [[ "$#" -gt 0 && "$1" != --* ]]; do
-                input_frags+=("$1")
-                shift
-            done
-            continue
-            ;;
+        --rna_file) rna_file="$2"; shift ;;
+        --atac_file) atac_file="$2"; shift ;;
         --input_motif) input_motif="$2"; shift ;;
         --input_genome) input_genome="$2"; shift ;;
         --output_d) output_d="$2"; shift ;;
@@ -21,11 +14,15 @@ while [[ "$#" -gt 0 ]]; do
     shift
 done 
 
-# mkdir -p "$output_d" && \
-# python workflow/scripts/mth/dictys/extract_data.py \
-# --pre_path "$input_pre" \
-# --exp_path "$output_d/expr.tsv.gz" \
-# --pks_path "$output_d/peaks.bed"  && \
+frags_path="$output_d/fragments.tsv.gz"
+
+mkdir -p "$output_d" && \
+python src/methods/multi_omics/dictys/extract_data.py \
+--rna_file "$rna_file" \
+--atac_file "$atac_file" \
+--exp_path "$output_d/expr.tsv.gz" \
+--pks_path "$output_d/peaks.bed" \
+--frags_path $frags_path && \
 for b_file in $output_d/barcodes_*; do
     ctype=$(basename "$b_file" | sed 's/barcodes_//; s/.txt//')
     bam_name="$output_d/reads_$ctype.bam"
@@ -37,10 +34,14 @@ for b_file in $output_d/barcodes_*; do
     bind_name="$output_d/bind_$ctype.tsv.gz"
     tfb_bed="$output_d/tfb_$ctype.bed"
     echo "Processing $ctype"
-    # python  src/methods/multi_omics/dictys/frag_to_bam.py --fnames "${input_frags[@]}" --barcodes $b_file | \
-    # samtools view -b | samtools sort -o "$bam_name" && samtools index "$bam_name" "$bai_name"
+    echo "Creating BAM for $ctype"
+    python  src/methods/multi_omics/dictys/frag_to_bam.py --fnames $frags_path --barcodes $b_file | \
+    samtools view -b | samtools sort -o "$bam_name" && samtools index "$bam_name" "$bai_name"
+    echo "Running footprinting for $ctype"
     python3 -m dictys chromatin wellington "$bam_name" "$bai_name" "$output_d/peaks.bed" "$foot_name" --nth "$threads" && \
-    python3 -m dictys chromatin homer "$foot_name" "$input_motif" "$input_genome" "$output_d/expr.tsv.gz" "$motif_name" "$well_name" "$homer_name" && \
+    echo "Running motif analysis for $ctype"
+    python3 -m dictys chromatin homer "$foot_name" "$input_motif" "$input_genome" "$output_d/expr.tsv.gz" "$motif_name" "$well_name" "$homer_name" --nth "$threads" && \
+    echo "Running binding analysis for $ctype"
     python3 -m dictys chromatin binding "$well_name" "$homer_name" "$bind_name" && \
     zcat "$bind_name" | awk 'BEGIN {FS="\t"; OFS="\t"} NR>1 {split($2, coords, ":"); split(coords[3], pos, "-"); print coords[1], coords[2], coords[3], $1, $3}' | \
     bedtools intersect -a "$output_d/peaks.bed" -b stdin -wa -wb | awk 'BEGIN {FS="\t"; OFS="\t"} {print $1, $2, $3, $7, $8}' > "$tfb_bed"
