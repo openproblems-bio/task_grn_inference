@@ -186,6 +186,9 @@ dependencies:
 - name: "grn_methods/scprint"
   repository:
     type: "local"
+- name: "grn_methods/scgpt"
+  repository:
+    type: "local"
 - name: "grn_methods/celloracle"
   repository:
     type: "local"
@@ -199,6 +202,9 @@ dependencies:
   repository:
     type: "local"
 - name: "grn_methods/granie"
+  repository:
+    type: "local"
+- name: "grn_methods/dictys"
   repository:
     type: "local"
 - name: "control_methods/pearson_corr"
@@ -259,7 +265,7 @@ build_info:
   output: "target/executable/workflows/run_grn_inference"
   executable: "target/executable/workflows/run_grn_inference/run_grn_inference"
   viash_version: "0.9.4"
-  git_commit: "f22913048a55eec101c1172391609e981c4adefd"
+  git_commit: "38e885bcf34e7f4b3f629070a0a41e9104af589c"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
   dependencies:
   - "target/nextflow/metrics/dummy_metric"
@@ -272,11 +278,13 @@ build_info:
   - "target/nextflow/grn_methods/scenic"
   - "target/nextflow/grn_methods/ppcor"
   - "target/nextflow/grn_methods/scprint"
+  - "target/nextflow/grn_methods/scgpt"
   - "target/nextflow/grn_methods/celloracle"
   - "target/nextflow/grn_methods/scglue"
   - "target/nextflow/grn_methods/figr"
   - "target/nextflow/grn_methods/scenicplus"
   - "target/nextflow/grn_methods/granie"
+  - "target/nextflow/grn_methods/dictys"
   - "target/nextflow/control_methods/pearson_corr"
   - "target/nextflow/control_methods/negative_control"
   - "target/nextflow/control_methods/positive_control"

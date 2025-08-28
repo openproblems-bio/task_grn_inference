@@ -3282,6 +3282,12 @@ meta = [
       }
     },
     {
+      "name" : "grn_methods/scgpt",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
       "name" : "grn_methods/celloracle",
       "repository" : {
         "type" : "local"
@@ -3307,6 +3313,12 @@ meta = [
     },
     {
       "name" : "grn_methods/granie",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "grn_methods/dictys",
       "repository" : {
         "type" : "local"
       }
@@ -3397,7 +3409,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_inference",
     "viash_version" : "0.9.4",
-    "git_commit" : "f22913048a55eec101c1172391609e981c4adefd",
+    "git_commit" : "38e885bcf34e7f4b3f629070a0a41e9104af589c",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3507,11 +3519,13 @@ include { grnboost } from "${meta.resources_dir}/../../../nextflow/grn_methods/g
 include { scenic } from "${meta.resources_dir}/../../../nextflow/grn_methods/scenic/main.nf"
 include { ppcor } from "${meta.resources_dir}/../../../nextflow/grn_methods/ppcor/main.nf"
 include { scprint } from "${meta.resources_dir}/../../../nextflow/grn_methods/scprint/main.nf"
+include { scgpt } from "${meta.resources_dir}/../../../nextflow/grn_methods/scgpt/main.nf"
 include { celloracle } from "${meta.resources_dir}/../../../nextflow/grn_methods/celloracle/main.nf"
 include { scglue } from "${meta.resources_dir}/../../../nextflow/grn_methods/scglue/main.nf"
 include { figr } from "${meta.resources_dir}/../../../nextflow/grn_methods/figr/main.nf"
 include { scenicplus } from "${meta.resources_dir}/../../../nextflow/grn_methods/scenicplus/main.nf"
 include { granie } from "${meta.resources_dir}/../../../nextflow/grn_methods/granie/main.nf"
+include { dictys } from "${meta.resources_dir}/../../../nextflow/grn_methods/dictys/main.nf"
 include { pearson_corr } from "${meta.resources_dir}/../../../nextflow/control_methods/pearson_corr/main.nf"
 include { negative_control } from "${meta.resources_dir}/../../../nextflow/control_methods/negative_control/main.nf"
 include { positive_control } from "${meta.resources_dir}/../../../nextflow/control_methods/positive_control/main.nf"
@@ -3532,7 +3546,9 @@ methods = [
   scglue,
   granie,
   figr,
-  celloracle
+  celloracle,
+  scgpt,
+  dictys
 ]
 
 // construct list of metrics

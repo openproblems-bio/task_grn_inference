@@ -3,6 +3,15 @@ import numpy as np
 import anndata as ad
 import scanpy as sc
 import os
+import sys
+meta = {
+    'resource_dir': './',
+}
+
+
+sys.path.append(meta['resource_dir'])
+from src.process_data.helper_data import wrapper_large_perturbation_data
+
 
 def add_metadata(adata):
     adata.uns['dataset_summary'] = '300BCG scRNA cohort with 38 donors, 2 time points and 2 perturbaions (control and LPS)'
@@ -15,6 +24,7 @@ def add_metadata(adata):
     adata.uns['normalization_id'] = 'lognorm'
     return adata
 
+print('Reading data...', flush=True)
 adata = ad.read_h5ad('/vol/projects/CIIM/300BCG/300BCG_scRNA/bcg4-0712.h5ad')
 
 def format_data(adata):
@@ -38,7 +48,6 @@ def split_data_func(adata: ad.AnnData):
 
     return train_group, test_group
 
-from src.process_data.helper_data import wrapper_large_perturbation_data
 wrapper_large_perturbation_data(adata, covariates=['perturbation', 'time', 'donor_id', 'cell_type', 'qc_group'], 
                                     add_metadata=add_metadata, 
                                     save_name='300BCG', 

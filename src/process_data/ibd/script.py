@@ -5,7 +5,15 @@ import anndata as ad
 import scanpy as sc
 import os
 import numpy as np
+import sys
+meta = {
+    'resource_dir': './',
+}
+
+
+sys.path.append(meta['resource_dir'])
 from src.process_data.helper_data import qc_perturbation, pseudobulk_sum_func, normalize_func
+
 
 def parse_donor_id(s):
     import re
