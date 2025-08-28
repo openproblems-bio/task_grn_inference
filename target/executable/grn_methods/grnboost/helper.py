@@ -18,8 +18,12 @@ def format_data(par):
       adata_rna = adata_rna[adata_rna.obs['perturbation'].isin(pertubs)]
       print(adata_rna.shape)
   gene_names = adata_rna.var_names
-  if sp.issparse(adata_rna.X):
-    X = adata_rna.X.toarray()
+  
+  layer = 'lognorm' if 'lognorm' in adata_rna.layers else 'X_norm'
+  X = adata_rna.layers[layer]
+
+  if sp.issparse(X):
+    X = X.toarray()
   pd.DataFrame(X, columns=gene_names).to_csv(par['expression_data'], sep='\t', index=False)
   
 def run_grn(par):

@@ -11,23 +11,11 @@ import numpy as np
 from ast import literal_eval
 import requests
 import torch
-def download_annotation(par):
-    
-    if not os.path.exists(par['annotation_file']):
-        print("Downloading prior started")
-    
-        response = requests.get("https://ftp.ebi.ac.uk/pub/databases/gencode/Gencode_human/release_45/gencode.v45.annotation.gtf.gz")
-        
-        if response.status_code == 200:
-            with open(par['annotation_file'], 'wb') as file:
-                file.write(response.content)
-            print(f"File downloaded and saved to {par['annotation_file']}")
-        else:
-            print(f"Failed to download the gencode.v45.annotation.gtf.gz. Status code: {response.status_code}")
-        print("Downloading prior ended")
+
+from util import download_annotation
+
 def download_motifs(par):
     # get gene annotation
-    
     if not os.path.exists(par['motif_file']):
         tag = par['motif_file'].split('/')[-1]
         print("Downloading motif started")

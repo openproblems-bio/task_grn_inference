@@ -46,6 +46,7 @@
 <li class="toctree-l1"><a class="reference internal" href="dataset.html">Datasets</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">GRN evaluation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extending.html">Adding GRN inference methods, metrics, and datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="leaderboard.html">Leaderboard</a></li>
 </ul>
 
         </div>
@@ -75,11 +76,18 @@
   <section id="grn-evaluation">
 <h1>GRN evaluation<a class="headerlink" href="#grn-evaluation" title="Link to this heading"></a></h1>
 <p>The evaluation metrics used in geneRNIB are summarized below. For a detailed description of each metric, refer to the geneRNIB paper.</p>
-<p>We define <strong>eight evaluation metrics</strong>, grouped into three categories: <strong>Regression 1, Regression 2, and Wasserstein Distance</strong>.</p>
+<p>We originally defined <strong>eight evaluation metrics</strong>, grouped into three categories: <strong>Regression 1, Regression 2, and Wasserstein Distance</strong>.
+However, we recently removed <strong>Regression 1</strong> as it did not prove to be effective for perturbational settings.</p>
 <ul class="simple">
 <li><p>The <strong>regression-based metrics</strong> assess the predictive power of an inferred GRN by using regression models to predict perturbation data (evaluation data) based on the feature space constructed from the inferred network.</p></li>
 <li><p>The <strong>Wasserstein distance-based metric</strong> evaluates GRN edges by measuring the distributional shift in target gene expression between observations and perturbation data for a given transcription factor (TF).</p></li>
 </ul>
+<p>Wasserstein distance-based metrics are only applicable for datasets that are gene perturbations and are in single cell format. Thus, currently the following datasets are supported:
+- Replogle
+- Xaira:HEK293T
+- Xaira:HCT116
+- Norman
+- Adamson</p>
 <a class="reference internal image-reference" href="_images/metrics.png"><img alt="_images/metrics.png" class="align-center" src="_images/metrics.png" style="width: 90%;" />
 </a>
 <hr class="docutils" />
@@ -93,6 +101,17 @@
 </ul>
 </div></blockquote>
 <p>See <cite>resources_test/grn_models/op/collectri.h5ad</cite> for an example of the expected format.</p>
+<p>For the regression based approaches, we used the pseudobulk version of the perturbation data while for the Wasserstein distance, the single cell data are used.</p>
+<p>It should be noted that for Wasserstein distance, we have already computed all possible combination of TF-gene pairs and stored it in the <cite>resources/grn_benchmark/prior/</cite> folder.
+This substantially reduces the computation time during evaluation.</p>
+<p>To run the evalution for a given GRN and dataset, use the following command:
+<code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">bash</span> <span class="pre">scripts/run_grn_evaluation.sh</span> <span class="pre">--prediction=&lt;inferred</span> <span class="pre">GRN</span> <span class="pre">(e.g.collectri.h5ad)&gt;</span> <span class="pre">--save_dir=&lt;e.g.output/&gt;</span> <span class="pre">--dataset=&lt;e.g.</span> <span class="pre">replogle&gt;</span> <span class="pre">--build_images=&lt;true</span> <span class="pre">or</span> <span class="pre">false.</span> <span class="pre">true</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">first</span> <span class="pre">time</span> <span class="pre">running&gt;</span> <span class="pre">--run_test=&lt;true</span> <span class="pre">or</span> <span class="pre">false.</span> <span class="pre">true</span> <span class="pre">to</span> <span class="pre">run</span> <span class="pre">on</span> <span class="pre">test</span> <span class="pre">data&gt;</span>
+<span class="pre">`</span></code></p>
+<p>example command:
+<code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">bash</span> <span class="pre">scripts/run_grn_evaluation.sh</span> <span class="pre">--prediction=resources/grn_models/op/collectri.h5ad</span> <span class="pre">--save_dir=output/</span> <span class="pre">--dataset=op</span> <span class="pre">--build_images=true</span> <span class="pre">--test_run=false</span>
+<span class="pre">`</span></code></p>
 </section>
 
 

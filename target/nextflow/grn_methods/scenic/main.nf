@@ -3500,7 +3500,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scenic",
     "viash_version" : "0.9.4",
-    "git_commit" : "2879eaed82339336a86be2c13eb60dba6a23f718",
+    "git_commit" : "f22913048a55eec101c1172391609e981c4adefd",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3670,16 +3670,19 @@ dep = {
 ## VIASH END
 try:
     sys.path.append(meta["resources_dir"])
+    from util import process_links
+    from helper import format_data, run_grn
 except:
     meta = {
-      'utils_dir': 'src/utils',
-      'grnboost_dir': 'src/methods/single_omics/grnboost2'
+      'util_dir': 'src/utils',
+      'helper_dir': 'src/methods/single_omics/grnboost2',
     }
-    sys.path.append(meta["utils_dir"])
-    sys.path.append(meta["grnboost_dir"])
+    sys.path.append(meta["helper_dir"])
+    from helper import format_data, run_grn
+    sys.path.append(meta["util_dir"])
+    from util import process_links
+    
 
-from util import process_links
-from helper import format_data, run_grn
 
 def download_prior(par):
   if not (os.path.exists(par['motif_annotation'])):

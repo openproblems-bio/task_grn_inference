@@ -10,7 +10,7 @@ Examples of GRN inference methods include GRNBoost2, CellOracle, and SCENIC. The
 Each method requires a `config.vsh` file together
 with a `script.py`. Additionally, the method can have extra files to store and organize the code, such as `helper`, which are stored in the same folder and called by the `script.py`.
 
-The overlook of `config.vsh` is as follows. However, refer to the `src/methods/dummpy/config.yaml` for the updated formatting.
+The overlook of `config.vsh` is as follows. However, refer to the `src/methods/` folder for the updated formatting.
 
 .. code-block:: yaml
    :caption: Example of a `config.vsh` file
@@ -38,7 +38,6 @@ The overlook of `config.vsh` is as follows. However, refer to the `src/methods/d
             - type: python
                 packages: [ grnboost2 ] # additional packages required for your method. see different methods for examples as this could get complicated. or, use your image and omit this.
     
-        - type: native
     runners: # this is for the nextflow pipeline.
         - type: executable
         - type: nextflow
@@ -77,7 +76,7 @@ Your `script.py` should have the following structure:
         X=None,
         uns={
             "method_id": "method_name",
-            "dataset_id": "dataset_name", # one of op, norman, etc.
+            "dataset_id": "dataset_name", 
             "prediction": net[["source", "target", "weight"]]
         }
     )

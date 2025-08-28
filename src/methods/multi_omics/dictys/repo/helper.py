@@ -14,9 +14,48 @@ import gdown
 import os
 warnings.filterwarnings("ignore")
 warnings.filterwarnings("ignore", category=UserWarning, module="torch")
+def format_tss(par):
+    import gzip
+    seen = set()  # to track unique gene names
+    with gzip.open(par['annotation_file'], 'rt') as f_in, open(par['tss_file'], 'w') as f_out:
+        for line in f_in:
+            if line.startswith("#"):
+                continue
+            parts = line.strip().split('\t')
+            if parts[2] != "gene":
+                continue
 
+            attr_str = parts[8]
+            gene_name = ""
+            for attr in attr_str.split(";"):
+                attr = attr.strip()
+                if attr.startswith('gene_name'):
+                    gene_name = attr.split('"')[1]
+                    break
+            if not gene_name:  # fallback to gene_id
+                for attr in attr_str.split(";"):
+                    attr = attr.strip()
+                    if attr.startswith('gene_id'):
+                        gene_name = attr.split('"')[1]
+                        break
 
+            # skip duplicates
+            if gene_name in seen:
+                continue
+            seen.add(gene_name)
 
+            chrom = parts[0]
+            # Add "chr" if chromosome is numeric, X, or Y
+            if chrom.isdigit() or chrom in ["X", "Y"]:
+                chrom = "chr" + chrom
+
+            start = int(parts[3]) - 1
+            end = parts[4]
+            strand = parts[6]
+
+            f_out.write(f"{chrom}\t{start}\t{end}\t{gene_name}\t.\t{strand}\n")
+
+    print(f"TSS file written to {par['tss_file']} with {len(seen)} unique genes")
 def create_mudata(rna_path, atac_path, output_path):
     """Combine RNA and ATAC data into mudata object"""
     print("Creating mudata object from RNA and ATAC data...")
@@ -41,68 +80,34 @@ def create_mudata(rna_path, atac_path, output_path):
     # Write to file
     mdata.write(output_path)
     
-
-def preprocess_data(output_dir, perform_qc=True):
-    """Preprocess data using dictys preprocessing tools"""
-    print("Preprocessing data...")
     
-    if False:
-        tmp_path = os.path.join(output_dir, "temp_rna.tsv.gz")
-    
-    # Read
-    mdata = mu.read(par['mudata'])
-
-    # Process rna
-    pd.DataFrame(
-        np.array(mdata.mod['rna'].layers['counts'].todense()).T,
-        columns=mdata.mod['rna'].obs.index,
-        index=mdata.mod['rna'].var.index
-    ).to_csv(tmp_path, sep="\t", compression="gzip")
-
-    # Quality control on RNA data if requested
-    if perform_qc:
-        print('Performing quality control on RNA data...', flush=True)
-        dictys.preproc.qc_reads(tmp_path, tmp_path, 50, 10, 0, 200, 100, 0)
-        
-    rna_df = pd.read_csv(tmp_path, sep='\t', compression="gzip", index_col=0)
-    genes, barcodes = rna_df.index.values.astype('U'), rna_df.columns.values.astype('U')
-    rna = mdata.mod['rna']
-    rna = rna[barcodes, :][:, genes].copy()
-    rna.X = rna.layers['counts'].todense().A.copy()
-
-    # Process atac
-    atac = mdata.mod['atac']
-    atac.X = atac.layers['counts'].todense().A.copy()
-
-    # Update
-    mdata.mod['rna'] = rna
-    mdata.mod['atac'] = atac
-    mdata.update()
-
-    # Write
-    mdata.write(par['preprocessed_mudata'])
-    
-
 def extract_data(par, use_p2g=False, p2g_path=None):
     """Extract RNA and ATAC data for processing"""
     print("Extracting RNA and ATAC data...")
-    
-   
+
+    # Read TSS annotation
+    tss_genes = set(pd.read_csv(par['tss_file'], header=None, index_col=None, sep='\t')[3])
+
     # Write the RNA matrix
     data = mu.read(par['mudata'])
+    rna = data['rna']
+    rna.var_names_make_unique()
     rna_X = pd.DataFrame(
-        np.array(data['rna'].layers['counts'].todense()).T, 
-        columns=data['rna'].obs.index, 
+        np.array(rna.layers['counts'].todense()).T,
+        columns=data['rna'].obs.index,
         index=data['rna'].var.index
     )
-    print(f"RNA data shape: {rna_X.shape}", flush=True)
+
+    # Filter RNA to keep only genes present in TSS annotation
+    
+    rna_X = rna_X.loc[rna_X.index.isin(tss_genes)]
+    print(f"RNA data shape after filtering with TSS genes: {rna_X.shape}", flush=True)
     rna_X.to_csv(par['exp_path'], sep="\t", compression="gzip")
 
+    # ATAC peaks
     if use_p2g and p2g_path:
-        # Read in p2g and keep only peaks that are wide enough for footprinting
         all_atac_peak = np.unique(pd.read_csv(p2g_path)['cre'])
     else:
-        # From the consensus peak list, keep only peaks that are wide enough for footprinting
         all_atac_peak = np.unique([n.replace(':', '-') for n in data['atac'].var.index])
 
     all_atac_peak = pd.DataFrame([n.split('-') for n in all_atac_peak])
@@ -124,7 +129,6 @@ def extract_data(par, use_p2g=False, p2g_path=None):
                 for i in ctype_ids:
                     f.write(f"{i}\n")
     
-
 def create_p2g_links(par):
     """Create peak-to-gene linkages based on genomic proximity"""
     print("Creating peak-to-gene linkages...")
@@ -142,10 +146,14 @@ def create_p2g_links(par):
     atac_X.to_csv(atac_filename, sep="\t", compression="gzip")
     
     # Run dictys to identify peaks that are within specified distance of annotated TSS
-    os.system(
+    ret = os.system(
         f'PYTHONWARNINGS="ignore" python3 -m dictys chromatin tssdist '
-        f"--cut {par['distance']} {par['exp_path']} {atac_filename} {par['gene_annotation']} {dist_filename}"
+        f"{par['exp_path']} {atac_filename} {par['tss_file']} {dist_filename} "
     )
+
+    if ret != 0:
+        print(f"Command failed with exit code {ret}", file=sys.stderr)
+        sys.exit(ret)  # stops the script immediately
     # Convert distance to score for p2g
     df = pd.read_csv(dist_filename, sep='\t').rename(columns={'region': 'cre', 'target': 'gene', 'dist': 'score'})
     df['score'] = -np.abs(df['score'])
@@ -157,9 +165,7 @@ def create_p2g_links(par):
     os.makedirs(os.path.dirname(par['p2g']), exist_ok=True)
     df[['cre', 'gene', 'score']].to_csv(par['p2g'], index=False)
     
-    return p2g_output
-
-def prepare_for_model(preprocessed_path, p2g_path, output_dir, tf_database):
+def prepare_for_model(preprocessed_path, output_dir, tf_database):
     """Prepare data for modeling"""
     print("Preparing data for GRN inference...")
     
@@ -178,7 +184,7 @@ def prepare_for_model(preprocessed_path, p2g_path, output_dir, tf_database):
     # Process peaks from p2g
     use_peaks = True
     if use_peaks:
-        peaks = pd.read_csv(p2g_path)['cre'].unique()
+        peaks = pd.read_csv(par['p2g'])['cre'].unique()
     else:
         atac_path = preprocessed_path
         peaks = mu.read(atac_path).mod['atac'].var_names

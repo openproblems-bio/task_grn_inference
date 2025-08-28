@@ -89,7 +89,7 @@ append_entry() {
 
   if [ "$use_train_sc" = true ]; then
     rna_file="${resources_dir}/extended_data/${dataset}_train_sc.h5ad"
-    group_id="${dataset}_sc_train"
+    group_id="${dataset}_sc"
   else
     rna_file="${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad"
     group_id="${dataset}"
@@ -113,15 +113,15 @@ HERE
   fi
 }
 
-if [[ "$DATASET" =~ ^(replogle|parsescience|xaira_HEK293T)$ ]]; then
-  append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic]"
-  append_entry "$DATASET" "[scprint]" "true"
-elif [ "$DATASET" = "op" ]; then
-  append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint, figr, scenicplus, celloracle, granie, scglue]"
-else
-  append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint]"
-fi
-
+# if [[ "$DATASET" =~ ^(replogle|parsescience|xaira_HEK293T)$ ]]; then
+#   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic]"
+#   append_entry "$DATASET" "[scprint]" "true"
+# elif [ "$DATASET" = "op" ]; then
+#   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint, figr, scenicplus, celloracle, granie, scglue]"
+# else
+#   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint]"
+# fi
+append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, scprint, portia]"
 
 # --- Final configuration ---
 if [ "$RUN_LOCAL" = true ]; then
