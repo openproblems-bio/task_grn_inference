@@ -119,43 +119,6 @@ def cross_validate_gene(
     return results
 
 
-# def learn_background_distribution(
-#         reg_type: str,
-#         X: np.ndarray,
-#         groups: np.ndarray,
-#         max_n_regulators: int,
-
-# ) -> Dict[int, Tuple[float, float]]:
-
-#     rng = np.random.default_rng(seed=SEED)
-
-#     n_genes = X.shape[1]
-#     random_grn = rng.random(size=(n_genes, n_genes))
-
-#     background = {}
-#     for n_features in tqdm.tqdm(range(1, max_n_regulators + 1), desc='Estimating background dist'):
-#         scores = []
-#         for _ in range(N_POINTS_TO_ESTIMATE_BACKGROUND):
-#             j = rng.integers(low=0, high=n_genes)
-#             random_grn[:, j] = rng.random(size=n_genes)
-
-#             if n_features > 0:
-#                 res = cross_validate_gene(
-#                     reg_type,
-#                     X,
-#                     groups,
-#                     random_grn,
-#                     j,
-#                     n_features=n_features,
-#                     random_state=SEED,
-#                     n_jobs=n_jobs
-#                 )
-#                 scores.append(res['avg-r2'])
-#         background[n_features] = (np.mean(scores), max(0.001, np.std(scores)))
-#     background['max'] = background[max_n_regulators]
-#     return background
-
-
 def cross_validate(
         reg_type: str,
         gene_names: np.ndarray,
@@ -171,69 +134,25 @@ def cross_validate(
     grn = fill_zeros_in_grn(grn)
 
     # Remove interactions when first gene in pair is not in TF list
-    for i, gene_name in tqdm.tqdm(enumerate(gene_names), desc=f'GRN preprocessing'):
-        if gene_name not in tf_names:
-            grn[i, :] = 0
+    mask = np.isin(gene_names, list(tf_names))
+    grn[~mask, :] = 0
     
-    # Perform cross-validation for each gene
-    results = []
-    included_gene_names = []
-    for j in tqdm.tqdm(range(n_genes), desc=f'{reg_type} CV'):
-        if n_features[j] > 0:
-            included_gene_names.append(gene_names[j])
-            res = cross_validate_gene(reg_type, X, groups, grn, j, n_features=int(n_features[j]),n_jobs=n_jobs)
-            results.append(res)
+    from joblib import Parallel, delayed
+    from tqdm.auto import tqdm
+    from tqdm_joblib import tqdm_joblib
+    with tqdm_joblib(tqdm(total=n_genes, desc=f"{reg_type} CV")):
+        results = Parallel(n_jobs=n_jobs, backend="loky")(
+            delayed(cross_validate_gene)(
+                reg_type, X, groups, grn, j, int(n_features[j]), n_jobs
+            )
+            for j in range(n_genes) if n_features[j] > 0
+        )
+    included_gene_names = [gene_names[j] for j in range(n_genes) if n_features[j] > 0]
+
     return {
         'gene_names': list(included_gene_names),
         'results': list(results)
     }
-
-
-# def dynamic_approach(
-#         grn: np.ndarray,
-#         X: np.ndarray,
-#         groups: np.ndarray,
-#         gene_names: List[str],
-#         tf_names: Set[str],
-#         reg_type: str
-# ) -> float:
-
-#     # Determine maximum number of input features
-#     n_genes = X.shape[1]
-#     max_n_regulators = min(100, int(0.5 * n_genes))
-
-#     # Learn background distribution for each value of `n_features`:
-#     # r2 scores using random genes as features.
-#     background = learn_background_distribution(reg_type, X, groups, max_n_regulators)
-
-#     # Cross-validate each gene using the inferred GRN to define select input features
-#     res = cross_validate(
-#         reg_type,
-#         gene_names,
-#         tf_names,
-#         X,
-#         groups,
-#         grn,
-#         np.clip(np.sum(grn != 0, axis=0), 0, max_n_regulators)
-#     )
-
-#     # Compute z-scores from r2 scores to take into account the fact
-#     # that random network can still perform well when the number of features is large
-#     scores = []
-#     for j in range(n_genes):
-#         if np.isnan(res['scores'][j]['avg-r2']):
-#             continue
-#         n_features = int(np.sum(grn[:, j] != 0))
-#         if n_features in background:
-#             mu, sigma = background[n_features]
-#         else:
-#             mu, sigma = background['max']
-#         z_score = (res['scores'][j]['avg-r2'] - mu) / sigma
-#         z_score = max(0, z_score)
-#         scores.append(z_score)
-
-#     return np.mean(scores)
-
 
 def static_approach(
         grn: np.ndarray,
@@ -281,12 +200,8 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     random_groups = np.random.choice(range(1, 5+1), size=n_cells, replace=True) # random sampling
     groups = LabelEncoder().fit_transform(random_groups)
 
-    # Load and standardize perturbation data
-    layer = par['layer']
-    if  layer=='X':
-        X = prturb_adata.X
-    else:
-        X = prturb_adata.layers[layer]
+    # Load and standardize perturbation data    
+    X = prturb_adata.layers[par['layer']]
     
     try:
         X = X.todense().A
@@ -299,10 +214,6 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     with open(par['regulators_consensus'], 'r') as f:
         data = json.load(f)
     
-    # - make present genes consistent across all data
-    # gene_names = np.intersect1d(gene_names, np.asarray(list(data.keys()), dtype=object))
-
-
     n_features_theta_min = np.asarray([data[gene_name]['0'] for gene_name in gene_names], dtype=int)
     n_features_theta_median = np.asarray([data[gene_name]['0.5'] for gene_name in gene_names], dtype=int)
     n_features_theta_max = np.asarray([data[gene_name]['1'] for gene_name in gene_names], dtype=int)
@@ -329,14 +240,6 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         'r2-theta-1.0': [float(score_static_max)],
     }
 
-    # # Add dynamic score
-    # if not par['static_only']:
-    #     score_dynamic = dynamic_approach(grn, X, groups, gene_names, tf_names, par['reg_type'])
-    #     score_overall = score_dynamic + score_static_min + score_static_median + score_static_max
-    #     results['dynamic'] = [float(score_dynamic)]
-    #     results['Overall'] = [float(score_overall)]
-
-    # Convert results to DataFrame
     df_results = pd.DataFrame(results)
 
     return df_results

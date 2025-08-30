@@ -6,15 +6,15 @@ import argparse
 
 ## VIASH START
 par = {
-    'prediction': 'resources/results/replogle/replogle.negative_control.negative_control.prediction.h5ad',
-    'evaluation_data': 'resources/grn_benchmark/evaluation_data/replogle_bulk.h5ad',
-    'regulators_consensus': 'resources/grn_benchmark/prior/regulators_consensus_replogle.json',
+    'prediction': 'resources/results/300BCG/300BCG.pearson_corr.pearson_corr.prediction.h5ad',
+    'evaluation_data': 'resources/grn_benchmark/evaluation_data/300BCG_bulk.h5ad',
+    'regulators_consensus': 'resources/grn_benchmark/prior/regulators_consensus_300BCG.json',
     'layer': 'lognorm',
     "max_n_links": 50000,
     'reg_type': 'ridge',
     'static_only': True,
     'subsample': -1,
-    'num_workers': 4,
+    'num_workers': 20,
     'apply_tf': True,
     'clip_scores': True,
     'apply_skeleton': False,

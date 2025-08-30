@@ -3494,7 +3494,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.9.4",
-    "git_commit" : "38e885bcf34e7f4b3f629070a0a41e9104af589c",
+    "git_commit" : "8df8002bea68a83670f6b4e2c64ab045bf80bcb9",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3650,23 +3650,6 @@ dep = {
 
 ## VIASH END
 
-import argparse
-parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--atac', type=str, help='Path to the multiomics atac file')
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-parser.add_argument('--resources_dir', type=str, help='Path to the prediction file')
-parser.add_argument('--tf_all', type=str, help='Path to the tf_all')
-parser.add_argument('--num_workers', type=int, help='Number of cores')
-parser.add_argument('--max_n_links', type=int)
-args = parser.parse_args()
-
-for key, value in vars(args).items():
-    if value:
-        par[key] = value
-
-# print(par)
-
 try:
     sys.path.append(meta["resources_dir"])
 except:
@@ -3692,23 +3675,24 @@ def main(par):
     par['atac_dir'] = os.path.join(par['temp_dir'], 'atac')
     par['fragments_dict'] = os.path.join(par['temp_dir'], 'fragments_dict.json')
     par['MALLET_PATH'] = os.path.join(par['temp_dir'], 'Mallet-202108', 'bin', 'mallet')
+    par['chromsizes'] = f"{par['temp_dir']}/chromsizes.tsv"
     os.makedirs(par['atac_dir'], exist_ok=True)
 
     # print('------- download_databases -------')
-    download_databases(par)
-    print_memory_usage()
-    print('------- process_peak -------')
-    process_peak(par)
-    print_memory_usage()
-    print('------- run_cistopic -------')
-    run_cistopic(par)
-    print_memory_usage()
-    print('------- process_topics -------')
-    process_topics(par)
-    print_memory_usage()
-    print('------- preprocess_rna -------')
-    preprocess_rna(par)
-    print_memory_usage()
+    # download_databases(par)
+    # print_memory_usage()
+    # print('------- process_peak -------')
+    # process_peak(par)
+    # print_memory_usage()
+    # print('------- run_cistopic -------')
+    # run_cistopic(par)
+    # print_memory_usage()
+    # print('------- process_topics -------')
+    # process_topics(par)
+    # print_memory_usage()
+    # print('------- preprocess_rna -------')
+    # preprocess_rna(par)
+    # print_memory_usage()
     print('------- snakemake_pipeline -------')
     snakemake_pipeline(par)
     print_memory_usage()

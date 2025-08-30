@@ -3438,11 +3438,6 @@ meta = [
       "type" : "nextflow",
       "id" : "nextflow",
       "directives" : {
-        "label" : [
-          "midtime",
-          "highmem",
-          "highcpu"
-        ],
         "tag" : "$id"
       },
       "auto" : {
@@ -3507,7 +3502,8 @@ meta = [
           "user" : false,
           "packages" : [
             "lightgbm==4.3.0",
-            "numpy==1.26.4"
+            "numpy==1.26.4",
+            "tqdm_joblib==0.0.5"
           ],
           "upgrade" : true
         }
@@ -3520,7 +3516,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression_2",
     "viash_version" : "0.9.4",
-    "git_commit" : "38e885bcf34e7f4b3f629070a0a41e9104af589c",
+    "git_commit" : "8df8002bea68a83670f6b4e2c64ab045bf80bcb9",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -4105,11 +4101,6 @@ meta["defaults"] = [
     "image" : "openproblems-bio/task_grn_inference/metrics/regression_2",
     "tag" : "build_main"
   },
-  "label" : [
-    "midtime",
-    "highmem",
-    "highcpu"
-  ],
   "tag" : "$id"
 }'''),
 

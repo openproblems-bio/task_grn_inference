@@ -56,14 +56,18 @@ try:
 except NameError:
     pass
 
+def group_mapping(adata):
+    adata.obs['donor_id'] = 'all_donors'
+    adata.obs['donor_id'] = adata.obs['donor_id'].astype('category')
+    return adata
 def process_peak(par):
     # Get list of samples (e.g., donors)
     print('Collect list of samples')
     adata_atac = anndata.read_h5ad(par['atac'])
+    adata_atac = group_mapping(adata_atac)
     unique_donor_ids = [s.replace(' ', '_') for s in adata_atac.obs.donor_id.cat.categories]
     print(unique_donor_ids)
     unique_cell_types = [s.replace(' ', '_') for s in adata_atac.obs.cell_type.cat.categories]
-
 
     # Create one individual ATAC-seq file per donor
     fragments_dict = {}
@@ -119,17 +123,7 @@ def process_peak(par):
         'donor_id': [s.replace(' ', '_') for s in adata_atac.obs.donor_id.to_numpy()]
     }, index=index, copy=False)
     
-
-    # Get chromosome sizes
-    # if True:
-    #     print(f'Download chromosome sizes from UCSC')
-    #     chromsizes = pd.read_table(
-    #         'http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes',
-    #         header=None,
-    #         names=['Chromosome', 'End']
-    #     )
-    # else:
-    par['chromsizes'] = par['temp_dir'] + 'chromsizes.tsv'
+    
 
     response = requests.get('http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes')
     with open(par['chromsizes'], "wb") as file:
@@ -222,6 +216,7 @@ def process_peak(par):
     gc.collect()
 def run_cistopic(par):
     adata_atac = anndata.read_h5ad(par['atac'])
+    adata_atac = group_mapping(adata_atac)
     unique_donor_ids = [s.replace(' ', '_') for s in adata_atac.obs.donor_id.cat.categories]
     print(unique_donor_ids)
     unique_cell_types = [s.replace(' ', '_') for s in adata_atac.obs.cell_type.cat.categories]
@@ -593,19 +588,14 @@ def download_databases(par):
     print('Download list of blacklist regions')
     url = 'https://raw.githubusercontent.com/aertslab/pycisTopic/d6a2f8c832c14faae07def1d3ad8755531f50ad5/blacklist/hg38-blacklist.v2.bed'
     if not os.path.exists(par['blacklist_path']):
-        # response = requests.get(url)
-        # with open(par['blacklist_path'], 'w') as f:
-        #     f.write(response.text)
         download(url, par['blacklist_path'])
     url = 'https://resources.aertslab.org/cistarget/motif_collections/v10nr_clust_public/snapshots/motifs-v10-nr.hgnc-m0.00001-o0.0.tbl'
     if not os.path.exists(par['motif_annotation']):
         download(url, par['motif_annotation'])
     if not os.path.exists(par['SCORES_DB_PATH']):
-        # download scores
         url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.scores.feather'
         download(url, par['SCORES_DB_PATH'])
     if not os.path.exists(par['RANKINGS_DB_PATH']):
-        # download ranking
         url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.rankings.feather'
         download(url, par['RANKINGS_DB_PATH'])
     if False: # create custom databases
@@ -689,6 +679,7 @@ def preprocess_rna(par):
     # Load scRNA-seq data
     print("Load scRNA-seq data")
     adata_rna = anndata.read_h5ad(par['rna'])
+    adata_rna = group_mapping(adata_rna)
     # Only keep cells with at least 200 expressed genes, and genes with at least 3 cells expressing them
     sc.pp.filter_cells(adata_rna, min_genes=200)
     sc.pp.filter_genes(adata_rna, min_cells=3)
@@ -734,7 +725,6 @@ def snakemake_pipeline(par):
 
     # Update settings
     cwd = os.getcwd()
-    print(cwd)
     
     settings['input_data']['cisTopic_obj_fname'] = f"{cwd}/{par['cistopic_object']}"
     settings['input_data']['GEX_anndata_fname'] = f"{cwd}/{os.path.join(par['temp_dir'], 'rna.h5ad')}"
@@ -766,6 +756,14 @@ def snakemake_pipeline(par):
     settings['params_data_preparation']['nr_cells_per_metacells'] = 5
     settings['params_data_preparation']['species'] = 'hsapiens'
     settings['output_data']['scplus_mdata'] = f"{cwd}/{par['scplus_mdata']}"
+    if True:
+        # url = "https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes"
+        # response = requests.get(url)
+        # with open('hg38.chrom.sizes', 'wb') as file:
+        #     file.write(response.content)
+        # cwd = os.getcwd()
+        # print(cwd)
+        settings["output_data"]["chromsizes"] = par['chromsizes']
     
     import os
 
@@ -794,12 +792,6 @@ def snakemake_pipeline(par):
 
     with contextlib.chdir(snakemake_dir):
         # this fails to download atumatically so we do manually
-        if True:
-            url = "https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes"
-            response = requests.get(url)
-            with open('hg38.chrom.sizes', 'wb') as file:
-                file.write(response.content)
-        
         subprocess.run([
             f'snakemake',
             'touch'
@@ -812,7 +804,7 @@ def snakemake_pipeline(par):
 
         subprocess.run([
             f'snakemake',
-            '--cores', str(par['num_workers'])])
+            '--cores', str(par['num_workers']), '--rerun-incomplete'], check=True)
 
 def post_process(par):
     scplus_mdata = mudata.read(par['scplus_mdata'])

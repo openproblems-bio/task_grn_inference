@@ -14,6 +14,16 @@ meta = {
 sys.path.append(meta['resource_dir'])
 from src.process_data.helper_data import qc_perturbation, pseudobulk_sum_func, normalize_func
 
+def add_metadata(adata):
+    adata.uns['dataset_summary'] = 'IBD multiome of PBMC (scRNA+scATAC) with 38 donors, 2 disease of UC and CD, 3 perturbation of RPMI, LPS, S. enterica'
+    adata.uns['dataset_description'] = 'IBD multiome of PBMC (scRNA+scATAC) with 38 donors, 2 disease of UC and CD, 3 perturbation of RPMI, LPS, S. enterica'
+    adata.uns['data_reference'] = "Not published"
+    adata.uns['data_url'] = ''
+    adata.uns['dataset_id'] = 'ibd'
+    adata.uns['dataset_name'] = 'IBD'
+    adata.uns['dataset_organism'] = 'human'
+    adata.uns['normalization_id'] = 'lognorm'
+    return adata
 
 def parse_donor_id(s):
     import re
@@ -81,6 +91,9 @@ adata_rna = qc_perturbation(adata_rna, col='group_col', min_cells_per_pert=10, m
 adata_atac = qc_atac(adata_atac)
 adata_atac = format_adata(adata_atac)
 
+adata_rna = add_metadata(adata_rna)
+adata_atac = add_metadata(adata_atac)
+
 adata_rna.obs['perturbation'] = adata_rna.obs['perturbation'].astype(str)
 adata_rna.obs['cell_type'] = adata_rna.obs['cell_type'].astype(str)
 adata_rna.obs['disease'] = adata_rna.obs['disease'].astype(str)
@@ -127,9 +140,19 @@ adata_test_rna, adata_test_atac= harmonize(adata_test_rna, adata_test_atac)
 adata_test_rna_bulk = pseudobulk_sum_func(adata_test_rna, group='group_col')
 adata_test_rna_bulk = normalize_func(adata_test_rna_bulk)
 adata_test_rna_bulk.layers['lognorm'] = adata_test_rna_bulk.X.copy()
+adata_test_rna_bulk = add_metadata(adata_test_rna_bulk)
+
+adata_rna_bulk = pseudobulk_sum_func(adata_rna, group='group_col')
+adata_rna_bulk = normalize_func(adata_rna_bulk)
+adata_rna_bulk.layers['lognorm'] = adata_rna_bulk.X.copy()
+adata_rna_bulk = add_metadata(adata_rna_bulk)
+
 
 
 adata_train_rna.write(f'resources/grn_benchmark/inference_data/ibd_rna.h5ad')
 adata_train_atac.write(f'resources/grn_benchmark/inference_data/ibd_atac.h5ad')
 adata_test_rna_bulk.write(f'resources/grn_benchmark/evaluation_data/ibd_bulk.h5ad')
-adata_test_rna.write(f'resources/extended_data/ibd_sc.h5ad')
+adata_test_rna.write(f'resources/processed_data/ibd_sc.h5ad')
+adata_rna_bulk.write(f'resources/extended_data/ibd_bulk.h5ad')
+
+print('Done')
