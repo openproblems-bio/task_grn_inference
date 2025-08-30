@@ -8,7 +8,6 @@ meta = {
     'resource_dir': './',
 }
 
-
 sys.path.append(meta['resource_dir'])
 from src.process_data.helper_data import wrapper_large_perturbation_data
 

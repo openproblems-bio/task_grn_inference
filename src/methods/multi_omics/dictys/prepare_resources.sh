@@ -16,15 +16,18 @@ done
 
 frags_path="$output_d/fragments.tsv.gz"
 
-mkdir -p "$output_d" && \
-python src/methods/multi_omics/dictys/extract_data.py \
---rna_file "$rna_file" \
---atac_file "$atac_file" \
---exp_path "$output_d/expr.tsv.gz" \
---pks_path "$output_d/peaks.bed" \
---frags_path $frags_path && \
+mkdir -p "$output_d" 
+
+# python src/methods/multi_omics/dictys/extract_data.py \
+#     --rna_file "$rna_file" \
+#     --atac_file "$atac_file" \
+#     --exp_path "$output_d/expr.tsv.gz" \
+#     --pks_path "$output_d/peaks.bed" \
+#     --frags_path $frags_path 
+
 for b_file in $output_d/barcodes_*; do
     ctype=$(basename "$b_file" | sed 's/barcodes_//; s/.txt//')
+    echo "Processing $ctype"
     bam_name="$output_d/reads_$ctype.bam"
     bai_name="$output_d/reads_$ctype.bai"
     foot_name="$output_d/foot_$ctype.tsv.gz"
@@ -33,14 +36,17 @@ for b_file in $output_d/barcodes_*; do
     homer_name="$output_d/homer_$ctype.tsv.gz"
     bind_name="$output_d/bind_$ctype.tsv.gz"
     tfb_bed="$output_d/tfb_$ctype.bed"
-    echo "Processing $ctype"
-    echo "Creating BAM for $ctype"
-    python  src/methods/multi_omics/dictys/frag_to_bam.py --fnames $frags_path --barcodes $b_file | \
-    samtools view -b | samtools sort -o "$bam_name" && samtools index "$bam_name" "$bai_name"
-    echo "Running footprinting for $ctype"
-    python3 -m dictys chromatin wellington "$bam_name" "$bai_name" "$output_d/peaks.bed" "$foot_name" --nth "$threads" && \
+    
+    # echo "Creating BAM for $ctype"
+    # python  src/methods/multi_omics/dictys/frag_to_bam.py --fnames $frags_path --barcodes $b_file | \
+    # samtools view -b | samtools sort -o "$bam_name" && samtools index "$bam_name" "$bai_name"
+    # echo "Running footprinting for $ctype"
+    # python3 -m dictys chromatin wellington "$bam_name" "$bai_name" "$output_d/peaks.bed" "$foot_name" --nth "$threads" 
+    
     echo "Running motif analysis for $ctype"
-    python3 -m dictys chromatin homer "$foot_name" "$input_motif" "$input_genome" "$output_d/expr.tsv.gz" "$motif_name" "$well_name" "$homer_name" --nth "$threads" && \
+    python3 -m dictys chromatin homer "$foot_name" "$input_motif" "$input_genome" "$output_d/expr.tsv.gz" "$motif_name" "$well_name" "$homer_name" --nth "$threads" 
+
+    
     echo "Running binding analysis for $ctype"
     python3 -m dictys chromatin binding "$well_name" "$homer_name" "$bind_name" && \
     zcat "$bind_name" | awk 'BEGIN {FS="\t"; OFS="\t"} NR>1 {split($2, coords, ":"); split(coords[3], pos, "-"); print coords[1], coords[2], coords[3], $1, $3}' | \

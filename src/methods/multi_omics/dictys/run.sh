@@ -21,11 +21,11 @@
 
 
 
-singularity run ../../images/dictys.sif bash src/methods/multi_omics/dictys/tfb.sh \
+singularity run ../../images/dictys.sif bash src/methods/multi_omics/dictys/prepare_resources.sh \
     --rna_file resources_test/grn_benchmark/inference_data/op_rna.h5ad \
     --atac_file resources_test/grn_benchmark/inference_data/op_atac.h5ad \
     --output_d output/dictys \
     --input_motif output/d_test/data/motif_file.motif \
     --input_genome resources/extended_data/genome \
-    --threads 10
+    --threads 20
 

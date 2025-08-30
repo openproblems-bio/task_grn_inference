@@ -94,7 +94,7 @@ def bulkify_main(adata, cell_count_t=10, covariates=['cell_type', 'donor_id', 'a
     adata_bulk.X = np.nan_to_num(adata_bulk.X, nan=0)
     return adata_bulk
 
-def split_data_gene_perturbation(adata: ad.AnnData, train_share):
+def split_data_gene_perturbation(adata: ad.AnnData, train_share=.5):
     tf_all = np.loadtxt('resources/grn_benchmark/prior/tf_all.csv', dtype=str)
     obs = adata.obs
     obs['is_tf'] = obs['perturbation'].isin(tf_all)
@@ -257,7 +257,7 @@ def qc_perturbation(
     return adata
 
 
-def qc_perturbation_effect(adata, n_jobs=-1):
+def qc_perturbation_effect_func(adata, n_jobs=-1):
     """
     Perform QC on perturbation effects with parallel processing.
     
@@ -374,7 +374,7 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     print('QC on perturbation effect ...', flush=True)
     adata = normalize_func(adata, pearson_residual=False)
     if qc_perturbation_effect:
-        adata = qc_perturbation_effect(adata)
+        adata = qc_perturbation_effect_func(adata)
 
     print('QC on single cell number of perturbation ...', flush=True)
     adata = qc_perturbation(adata, col=qc_group, min_cells_per_pert=cell_count_t)
