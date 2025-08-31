@@ -228,12 +228,10 @@ def qc_perturbation(
       3. Remove cells with too few genes.
     """
     import scipy.sparse as sp
-    
-    adata = adata.copy()
     # 1. Remove perturbations with too few cells
     pert_counts = adata.obs[col].value_counts()
     keep_perts = pert_counts[pert_counts >= min_cells_per_pert].index
-    adata = adata[adata.obs[col].isin(keep_perts)].copy()
+    adata = adata[adata.obs[col].isin(keep_perts)]
     print(f"Kept {len(keep_perts)} perturbations (>= {min_cells_per_pert} cells each) out of {len(pert_counts)} total")
 
     # 2. Remove genes with too few cells in total (not per condition)
@@ -243,7 +241,7 @@ def qc_perturbation(
         cell_counts = (adata.X > 0).sum(axis=0)
 
     gene_mask = cell_counts >= min_cells_per_gene
-    adata = adata[:, gene_mask].copy()
+    adata = adata[:, gene_mask]
     print(f"Kept {gene_mask.sum()} genes (>= {min_cells_per_gene} cells total) out of {len(gene_mask)} total")
     # 3. Remove cells with too few expressed genes
     if sp.issparse(adata.X):
@@ -251,7 +249,7 @@ def qc_perturbation(
     else:
         gene_counts = (adata.X > 0).sum(axis=1)
     keep_cells = gene_counts >= min_genes_per_cell
-    adata = adata[keep_cells].copy()
+    adata = adata[keep_cells]
     print(f"Kept {keep_cells.sum()} cells (>= {min_genes_per_cell} genes per cell) out of {len(keep_cells)} total")
 
     return adata
@@ -360,6 +358,7 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     if 'counts' in adata.layers:
         adata.X = adata.layers['counts']
     adata.X = csr_matrix(adata.X) if not isinstance(adata.X, csr_matrix) else adata.X
+    adata = normalize_func(adata, pearson_residual=False)
     if "_index" in adata.var.columns:
         adata.var = adata.var.drop(columns=["_index"])
 
@@ -371,9 +370,8 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     print('Pseudobulking data...', flush=True)
     print('Covariates:', covariates, flush=True)
 
-    print('QC on perturbation effect ...', flush=True)
-    adata = normalize_func(adata, pearson_residual=False)
     if qc_perturbation_effect:
+        print('QC on perturbation effect ...', flush=True)
         adata = qc_perturbation_effect_func(adata)
 
     print('QC on single cell number of perturbation ...', flush=True)

@@ -2,6 +2,8 @@
 import sys 
 import os
 import anndata as ad
+import pandas as pd
+import requests
 ## VIASH START
 par = {
   'rna': 'resources_test/grn_benchmark/inference_data/op_rna.h5ad',
@@ -19,8 +21,13 @@ par = {
 try:
     sys.path.append(meta["resources_dir"])
 except:
-    pass
-from main import * 
+    meta = {
+        'resources_dir': 'src/methods/multi_omics/scenicplus',
+        'utils_dir': 'src/utils'
+    }
+    sys.path.append(meta["resources_dir"])
+    sys.path.append(meta["utils_dir"])
+from helper import download_databases, process_peak, run_cistopic, process_topics, preprocess_rna, snakemake_pipeline, post_process 
 
 def print_memory_usage():
     import psutil
@@ -29,8 +36,8 @@ def print_memory_usage():
     mem_info = process.memory_info().rss / (1024 * 1024)  # Convert to MB
     print(f"Memory usage: {mem_info:.2f} MB")
 
-
 def main(par):
+    # - set pathes
     par['cistopic_object'] = f'{par["temp_dir"]}/cistopic_object.pkl'
     par['DB_PATH'] = os.path.join('output', 'db')
     os.makedirs(par['DB_PATH'], exist_ok=True)
@@ -41,24 +48,23 @@ def main(par):
     par['atac_dir'] = os.path.join(par['temp_dir'], 'atac')
     par['fragments_dict'] = os.path.join(par['temp_dir'], 'fragments_dict.json')
     par['MALLET_PATH'] = os.path.join(par['temp_dir'], 'Mallet-202108', 'bin', 'mallet')
-    par['chromsizes'] = f"{par['temp_dir']}/chromsizes.tsv"
     os.makedirs(par['atac_dir'], exist_ok=True)
 
-    # print('------- download_databases -------')
-    # download_databases(par)
-    # print_memory_usage()
-    # print('------- process_peak -------')
-    # process_peak(par)
-    # print_memory_usage()
-    # print('------- run_cistopic -------')
-    # run_cistopic(par)
-    # print_memory_usage()
-    # print('------- process_topics -------')
-    # process_topics(par)
-    # print_memory_usage()
-    # print('------- preprocess_rna -------')
-    # preprocess_rna(par)
-    # print_memory_usage()
+    print('------- download_databases -------')
+    download_databases(par)
+    print_memory_usage()
+    print('------- process_peak -------')
+    process_peak(par)
+    print_memory_usage()
+    print('------- run_cistopic -------')
+    run_cistopic(par)
+    print_memory_usage()
+    print('------- process_topics -------')
+    process_topics(par)
+    print_memory_usage()
+    print('------- preprocess_rna -------')
+    preprocess_rna(par)
+    print_memory_usage()
     print('------- snakemake_pipeline -------')
     snakemake_pipeline(par)
     print_memory_usage()
