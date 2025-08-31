@@ -286,3 +286,61 @@ def download_annotation(par):
         else:
             print(f"Failed to download the gencode.v45.annotation.gtf.gz. Status code: {response.status_code}")
         print("Downloading prior ended")
+
+def read_gtf_as_df(gtf_path: str) -> pd.DataFrame:
+    """
+    Read a GTF/GFF3 file (plain or gzipped) and return gene-level annotation
+    with TSS included.
+
+    Returns
+    -------
+    pd.DataFrame
+        Columns: ['Chromosome', 'Start', 'End', 'Strand', 'Gene', 'Transcription_Start_Site']
+    """
+    import gzip
+    import pandas as pd
+
+    rows = []
+
+    # Open file with automatic gzip detection
+    if gtf_path.endswith(".gz"):
+        f = gzip.open(gtf_path, "rt")
+    else:
+        try:
+            f = open(gtf_path, "r", encoding="utf-8")
+            f.readline()
+            f.seek(0)
+        except UnicodeDecodeError:
+            f = gzip.open(gtf_path, "rt")
+
+    for line in f:
+        if line.startswith("#"):
+            continue
+        parts = line.strip().split("\t")
+        if parts[2] != "gene":
+            continue
+        chrom, start, end, strand = parts[0], int(parts[3]), int(parts[4]), parts[6]
+
+        # attributes
+        attr_str = parts[8]
+        attrs = {}
+        for attr in attr_str.strip().split(";"):
+            if attr.strip() == "":
+                continue
+            key, value = attr.strip().split(" ", 1)
+            attrs[key] = value.strip('"')
+
+        gene_name = attrs.get("gene_name", attrs.get("gene_id", ""))
+
+        # Compute TSS
+        tss = start if strand == "+" else end
+
+        rows.append([chrom, start, end, strand, gene_name, tss])
+
+    f.close()
+
+    df = pd.DataFrame(
+        rows,
+        columns=["Chromosome", "Start", "End", "Strand", "Gene", "Transcription_Start_Site"]
+    )
+    return df

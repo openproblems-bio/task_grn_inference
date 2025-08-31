@@ -125,13 +125,11 @@ def process_peak(par):
     
     
 
-    response = requests.get('http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes')
-    with open(par['chromsizes'], "wb") as file:
-        file.write(response.content)
+    
 
-    chromsizes = pd.read_csv(par['chromsizes'], sep='\t', names=['Chromosome', 'End'])
+    chromsizes = pd.read_csv(par['chromsizes'], sep='\t', names=['Chromosome', 'Start', 'End'])
 
-    chromsizes.insert(1, 'Start', 0)
+    
 
     print(f'Start pseudobulking')
     os.makedirs(os.path.join(par['temp_dir'], 'consensus_peak_calling'), exist_ok=True)
@@ -579,11 +577,29 @@ def process_topics(par):
     )
 
 def download_databases(par):
+    from util import download_annotation, read_gtf_as_df
     def download(url: str, filepath: str) -> None:
         if os.path.exists(filepath):
             return
         print(f'Download {url}...')
         urlretrieve(url, filepath)
+    
+    par['chromsizes'] = f"{par['temp_dir']}/chromsizes.tsv"
+    if os.path.exists(par['chromsizes']):
+        print('Download chromsizes ', flush=True)
+        response = requests.get('http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes')
+        with open(par['chromsizes'], "wb") as file:
+            file.write(response.content)
+        chromsizes = pd.read_csv(par['chromsizes'], sep='\t', names=['Chromosome', 'End'])
+        chromsizes.insert(1, 'Start', 0)
+        chromsizes.to_csv(par['chromsizes'], sep='\t', index=False)
+    par['annotation_file'] = os.path.join(par['temp_dir'], 'gene_annotation.gtf')
+    if os.path.exists(par['annotation_file']):
+        print('Download annotation', flush=True)
+        download_annotation(par)
+        df = read_gtf_as_df(par['annotation_file'])
+        par['annotation_file'] = os.path.join(par['temp_dir'], 'gene_annotation.tsv')
+        df.to_csv(par['annotation_file'], sep='\t', index=False)
     # Download list of blacklist regions
     print('Download list of blacklist regions')
     url = 'https://raw.githubusercontent.com/aertslab/pycisTopic/d6a2f8c832c14faae07def1d3ad8755531f50ad5/blacklist/hg38-blacklist.v2.bed'
@@ -704,7 +720,8 @@ def preprocess_rna(par):
     adata_rna.write_h5ad(os.path.join(par['temp_dir'], 'rna.h5ad'))
 
 def snakemake_pipeline(par):
-    import os
+
+
     snakemake_dir = os.path.join(par['temp_dir'], 'scplus_pipeline', 'Snakemake')
     if os.path.exists(snakemake_dir):
         import shutil
@@ -712,20 +729,20 @@ def snakemake_pipeline(par):
 
     os.makedirs(os.path.join(par['temp_dir'], 'scplus_pipeline'), exist_ok=True)
     os.makedirs(os.path.join(par['temp_dir'], 'scplus_pipeline', 'temp'), exist_ok=True)
-    
+
     pipeline_dir = os.path.join(par['temp_dir'], 'scplus_pipeline')
     # if not os.path.exists(pipeline_dir):
     subprocess.run(['scenicplus', 'init_snakemake', '--out_dir', pipeline_dir])
     print('snake make initialized', flush=True)
 
-    # Load pipeline settings
+        # Load pipeline settings
     with open(os.path.join(snakemake_dir, 'config', 'config.yaml'), 'r') as f:
         settings = yaml.safe_load(f)
     print('output_data:', settings['output_data'], flush=True)
 
     # Update settings
     cwd = os.getcwd()
-    
+        
     settings['input_data']['cisTopic_obj_fname'] = f"{cwd}/{par['cistopic_object']}"
     settings['input_data']['GEX_anndata_fname'] = f"{cwd}/{os.path.join(par['temp_dir'], 'rna.h5ad')}"
     settings['input_data']['region_set_folder'] = f"{cwd}/{os.path.join(par['temp_dir'], 'region_sets')}"
@@ -756,16 +773,10 @@ def snakemake_pipeline(par):
     settings['params_data_preparation']['nr_cells_per_metacells'] = 5
     settings['params_data_preparation']['species'] = 'hsapiens'
     settings['output_data']['scplus_mdata'] = f"{cwd}/{par['scplus_mdata']}"
-    if True:
-        # url = "https://hgdownload.cse.ucsc.edu/goldenpath/hg38/bigZips/hg38.chrom.sizes"
-        # response = requests.get(url)
-        # with open('hg38.chrom.sizes', 'wb') as file:
-        #     file.write(response.content)
-        # cwd = os.getcwd()
-        # print(cwd)
-        settings["output_data"]["chromsizes"] = par['chromsizes']
-    
-    import os
+
+
+    settings["output_data"]["chromsizes"] = f"{cwd}/{par['chromsizes']}"
+    settings["output_data"]["genome_annotation"] = f"{cwd}/{par['annotation_file']}"
 
     # List of file paths to check
     file_paths = [
@@ -780,7 +791,6 @@ def snakemake_pipeline(par):
     # Assert all files exist
     for file_path in file_paths:
         assert os.path.exists(file_path), f"File not found: {file_path}"
-    
 
     # Save pipeline settings
     print('output_data:', settings['output_data'], flush=True)
@@ -790,21 +800,22 @@ def snakemake_pipeline(par):
     # Run pipeline
     print('run snakemake ', flush=True)
 
+
     with contextlib.chdir(snakemake_dir):
-        # this fails to download atumatically so we do manually
         subprocess.run([
             f'snakemake',
-            'touch'
+            '--touch',
+            '--cores', str(par['num_workers'])
         ])
-        
+    with contextlib.chdir(snakemake_dir):
         subprocess.run([
             f'snakemake',
             '--unlock'
         ])
-
+    with contextlib.chdir(snakemake_dir):
         subprocess.run([
             f'snakemake',
-            '--cores', str(par['num_workers']), '--rerun-incomplete'], check=True)
+            '--cores', str(par['num_workers'])], check=True)
 
 def post_process(par):
     scplus_mdata = mudata.read(par['scplus_mdata'])

@@ -27,7 +27,7 @@ sys.path.append(meta["resources_dir"])
 from helper_data import wrapper_large_perturbation_data
 
 
-def split_data_perturbation(adata: ad.AnnData, train_share):
+def split_data_perturbation(adata: ad.AnnData, train_share=.5):
     obs = adata.obs
     
     unique_perts = obs['perturbation'].unique()
@@ -97,7 +97,7 @@ def format_adata(adata):
     adata.obs['perturbation_type'] = 'cytokine'
     return adata
 def main():
-    print('Loading data', flush=True)
+    print('Loading data of parsebioscience', flush=True)
     adata = ad.read_h5ad('/vol/projects/CIIM/perturbation_data/Parse_10M_PBMC_cytokines.h5ad', backed='r')
     group_keys = ['cell_type', 'cytokine', 'donor', 'bc1_well']
     for key in group_keys:
@@ -129,7 +129,7 @@ def main():
     # format the adata
     adata = format_adata(adata)
 
-    
+
     # send to main function
     wrapper_large_perturbation_data(adata, split_func=split_data_perturbation,
         covariates=['cell_type_minor', 'perturbation', 'donor_id', 'well'], 

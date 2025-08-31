@@ -37,7 +37,9 @@ arguments:
 resources:
   - type: python_script
     path: script.py
-  - path: main.py
+  - path: helper.py
+  - path: /src/utils/util.py
+    dest: util.py
 
 engines:
   - type: docker
