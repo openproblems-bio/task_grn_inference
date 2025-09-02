@@ -3440,7 +3440,7 @@ meta = [
       "directives" : {
         "label" : [
           "midtime",
-          "veryhighmem",
+          "highmem",
           "highcpu"
         ],
         "tag" : "$id"
@@ -3521,7 +3521,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression_2",
     "viash_version" : "0.9.4",
-    "git_commit" : "50093d67aaf8958348e4f544b602165c735f53c6",
+    "git_commit" : "5f5d5b2cf93f8e05985a22e98136d3af10107a00",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3678,14 +3678,6 @@ dep = {
 
 ## VIASH END
 
-## LOCAL START
-parser = argparse.ArgumentParser()
-parser.add_argument('--run_local', action='store_true', help='Run locally')
-
-args = parser.parse_args()
-var_local = vars(args)
-
-## LOCAL END
     
 try:
   sys.path.append(meta["resources_dir"])
@@ -4108,7 +4100,7 @@ meta["defaults"] = [
   },
   "label" : [
     "midtime",
-    "veryhighmem",
+    "highmem",
     "highcpu"
   ],
   "tag" : "$id"

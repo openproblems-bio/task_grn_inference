@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   python -c 'from scdataloader.utils import populate_my_ontology; populate_my_ontology()'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-08-31T10:53:09Z"
+LABEL org.opencontainers.image.created="2025-09-02T13:05:56Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="50093d67aaf8958348e4f544b602165c735f53c6"
+LABEL org.opencontainers.image.revision="5f5d5b2cf93f8e05985a22e98136d3af10107a00"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1473,6 +1473,16 @@ dep = {
 }
 
 ## VIASH END
+
+import argparse
+argparser = argparse.ArgumentParser()
+argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
+argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
+args = argparser.parse_args()
+if args.rna is not None:
+  par['rna'] = args.rna
+if args.prediction is not None:
+  par['prediction'] = args.prediction
 
 try:
     sys.path.append(meta["resources_dir"])

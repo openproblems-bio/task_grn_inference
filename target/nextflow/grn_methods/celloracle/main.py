@@ -21,22 +21,25 @@ def base_grn(par) -> None:
     tss_annotated['peak_id'] = tss_annotated['chr'].astype(str)+"_"+tss_annotated['start'].astype(str)+"_"+tss_annotated['end'].astype(str)
     peak_gene = tss_annotated
 
+    genomes_dir=None
     try:
         print("Install ref genome")
-        genomepy.install_genome(name="hg38", provider="UCSC", genomes_dir=None)
+        genomepy.install_genome(name="hg38", provider="UCSC", genomes_dir=genomes_dir)
     except:
         print("Couldnt install genome. Will look for the default location")
 
     ref_genome = "hg38"
+    
 
     genome_installation = ma.is_genome_installed(ref_genome=ref_genome,
-                                                genomes_dir=None)
+                                                genomes_dir=genomes_dir)
     print(ref_genome, "installation: ", genome_installation)
 
     print("Instantiate TFinfo object")
     tfi = ma.TFinfo(peak_data_frame=peak_gene, 
                     ref_genome=ref_genome,
-                    genomes_dir=None) 
+                    genomes_dir=genomes_dir) 
+
     print("Motif scan")
     tfi.scan(fpr=0.05, 
             motifs=None,  # If you enter None, default motifs will be loaded.

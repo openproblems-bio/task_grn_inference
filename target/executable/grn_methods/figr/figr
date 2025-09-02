@@ -457,9 +457,9 @@ RUN Rscript -e 'options(warn = 2); if (!requireNamespace("BiocManager", quietly 
   Rscript -e 'options(warn = 2); if (!requireNamespace("aws.s3", quietly = TRUE)) BiocManager::install("aws.s3")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods figr"
-LABEL org.opencontainers.image.created="2025-08-31T10:53:10Z"
+LABEL org.opencontainers.image.created="2025-09-02T13:05:56Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="50093d67aaf8958348e4f544b602165c735f53c6"
+LABEL org.opencontainers.image.revision="5f5d5b2cf93f8e05985a22e98136d3af10107a00"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1338,6 +1338,18 @@ options(.viash_orig_warn)
 rm(.viash_orig_warn)
 
 ## VIASH END
+args <- commandArgs(trailingOnly = TRUE)
+for (i in seq_along(args)) {
+  if (args[i] == "--rna" && (i+1) <= length(args)) {
+    par\$rna <- args[i+1]
+  } else if (args[i] == "--atac" && (i+1) <= length(args)) {
+    par\$atac <- args[i+1]
+  } 
+  else if (args[i] == "--prediction" && (i+1) <= length(args)) {
+    par\$prediction <- args[i+1]
+  }
+}
+
 dir.create(par\$temp_dir, recursive = TRUE, showWarnings = TRUE)
 
 # - download cell_topic

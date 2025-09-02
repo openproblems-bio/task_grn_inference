@@ -3465,12 +3465,12 @@ meta = [
     }
   ],
   "build_info" : {
-    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/single_omics/ppcor/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/ppcor/config.vsh.yaml",
     "runner" : "nextflow",
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.9.4",
-    "git_commit" : "50093d67aaf8958348e4f544b602165c735f53c6",
+    "git_commit" : "5f5d5b2cf93f8e05985a22e98136d3af10107a00",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3630,28 +3630,11 @@ rm(.viash_orig_warn)
 
 ## VIASH END
 args <- commandArgs(trailingOnly = TRUE)
-
-print(args)
-i <- 1
-while (i <= length(args)) {
-  if (args[i] == "--rna") {
-    par\\$rna <- args[i + 1]
-    i <- i + 2
-  } else if (args[i] == "--prediction") {
-    par\\$prediction <- args[i + 1]
-    i <- i + 2
-  } else if (args[i] == "--tf_all" ) {
-    par\\$tf_all <- args[i + 1]
-    i <- i + 2
-  } else if (args[i] == "--max_n_links") {
-    par\\$max_n_links <- as.numeric(args[i + 1])
-    i <- i + 2
-  } else if (args[i] == "--num_workers") {
-    par\\$num_workers <- as.numeric(args[i + 1])
-    i <- i + 2
-  } else {
-    message("Unknown argument or missing value: ", args[i])
-    
+for (i in seq_along(args)) {
+  if (args[i] == "--rna" && (i+1) <= length(args)) {
+    par\\$rna <- args[i+1]
+  } else if (args[i] == "--prediction" && (i+1) <= length(args)) {
+    par\\$prediction <- args[i+1]
   }
 }
 

@@ -304,6 +304,7 @@ class Exp_analysis:
         grn = grn[grn.weight>grn.weight.quantile(quantile)]
         return grn.link.values
     def calculate_basic_stats(self): 
+        self.net['weight'] = self.net['weight'].astype(float)
         self.stats = dict({'n_links': self.net.shape[0], 'n_source': self.net.source.nunique(), 
                     'n_target': self.net.target.nunique(), 'ratio_positive_negative':(self.net.weight>=0).sum()/(self.net.shape[0])},
                     )

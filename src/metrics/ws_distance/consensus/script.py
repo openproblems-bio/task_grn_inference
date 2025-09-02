@@ -16,6 +16,7 @@ arg.add_argument('--evaluation_data_sc', type=str, help='Path to the evaluation 
 arg.add_argument('--ws_consensus', type=str, help='Path to save the consensus regulators')
 arg.add_argument('--tf_all', type=str, help='Path to the file containing all transcription factors')
 arg.add_argument('--models', nargs='+', help='List of models to use for the analysis')
+arg.add_argument('--max_n_links', type=int, default=50_000)
 args = arg.parse_args()
 
 par = args.__dict__
@@ -28,8 +29,6 @@ sys.path.append(meta["resources_dir"])
 sys.path.append(meta["utils_dir"])
 from helper import main
 from util import naming_convention
-
-
 
 
 if __name__ == '__main__':

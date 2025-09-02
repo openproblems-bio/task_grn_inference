@@ -124,13 +124,9 @@ def process_peak(par):
     }, index=index, copy=False)
     
     
+    chromsizes = pd.read_csv(par['chromsizes'], sep='\t')
 
     
-
-    chromsizes = pd.read_csv(par['chromsizes'], sep='\t', names=['Chromosome', 'Start', 'End'])
-
-    
-
     print(f'Start pseudobulking')
     os.makedirs(os.path.join(par['temp_dir'], 'consensus_peak_calling'), exist_ok=True)
     os.makedirs(os.path.join(par['temp_dir'], 'consensus_peak_calling/pseudobulk_bed_files'), exist_ok=True)
@@ -391,8 +387,7 @@ def process_topics(par):
     # chromsizes = pd.read_table(os.path.join(par['temp_dir'], "qc", "hg38.chrom_sizes_and_alias.tsv"))
     
     # chromsizes.rename({"# ucsc": "Chromosome", "length": "End"}, axis = 1, inplace = True)
-    chromsizes = pd.read_csv(par['chromsizes'], sep='\t', names=['Chromosome', 'End'])
-    chromsizes['Start'] = 0
+    chromsizes = pd.read_csv(par['chromsizes'], sep='\t')
     chromsizes = pr.PyRanges(chromsizes[['Chromosome', 'Start', 'End']])
 
     # Find clusters
@@ -584,7 +579,6 @@ def download_databases(par):
         print(f'Download {url}...')
         urlretrieve(url, filepath)
     
-    par['chromsizes'] = f"{par['temp_dir']}/chromsizes.tsv"
     if os.path.exists(par['chromsizes']):
         print('Download chromsizes ', flush=True)
         response = requests.get('http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes')
@@ -593,7 +587,7 @@ def download_databases(par):
         chromsizes = pd.read_csv(par['chromsizes'], sep='\t', names=['Chromosome', 'End'])
         chromsizes.insert(1, 'Start', 0)
         chromsizes.to_csv(par['chromsizes'], sep='\t', index=False)
-    par['annotation_file'] = os.path.join(par['temp_dir'], 'gene_annotation.gtf')
+    
     if os.path.exists(par['annotation_file']):
         print('Download annotation', flush=True)
         download_annotation(par)

@@ -3649,12 +3649,12 @@ meta = [
     }
   ],
   "build_info" : {
-    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/multi_omics/granie/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/granie/config.vsh.yaml",
     "runner" : "nextflow",
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/granie",
     "viash_version" : "0.9.4",
-    "git_commit" : "50093d67aaf8958348e4f544b602165c735f53c6",
+    "git_commit" : "5f5d5b2cf93f8e05985a22e98136d3af10107a00",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3851,6 +3851,17 @@ rm(.viash_orig_warn)
 
 ## VIASH END
 
+args <- commandArgs(trailingOnly = TRUE)
+for (i in seq_along(args)) {
+  if (args[i] == "--rna" && (i+1) <= length(args)) {
+    par\\$rna <- args[i+1]
+  } else if (args[i] == "--atac" && (i+1) <= length(args)) {
+    par\\$atac <- args[i+1]
+  } 
+  else if (args[i] == "--prediction" && (i+1) <= length(args)) {
+    par\\$prediction <- args[i+1]
+  }
+}
 
 cat("Content of par list:")
 str(par)
@@ -3958,11 +3969,16 @@ print('Seurat object created for atac')
   # Identify the common cells between the RNA and ATAC assays
   common_cells <- intersect(colnames(seurat_object[["RNA"]]), colnames(chrom_assay))
   
+  # Subset RNA object first (so the Seurat object only contains common cells)
+  seurat_object <- subset(seurat_object, cells = common_cells)
   # Subset the Seurat object to include only the common cells
   chrom_assay <- subset(chrom_assay, cells = common_cells)
 
   seurat_object[["peaks"]] = chrom_assay
-    
+  
+  stopifnot(identical(colnames(seurat_object), colnames(seurat_object[["RNA"]])))
+  stopifnot(identical(colnames(seurat_object), colnames(seurat_object[["peaks"]])))
+  
   qs::qsave(seurat_object, paste0(par\\$temp_dir, "seurat_granie.qs" ) )
     
 } else {
@@ -4006,6 +4022,7 @@ if (file.exists(GRaNIE_file_peaks) & file.exists(GRaNIE_file_metadata) & file.ex
   
 }
 
+print('Data preprocessing finished')
 
 
 ##############

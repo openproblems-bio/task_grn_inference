@@ -3,6 +3,7 @@ import pandas as pd
 import anndata as ad
 import numpy as np
 
+from util import process_links
 
 def main(par):
     naming_convention = par['naming_convention'] 
@@ -19,7 +20,8 @@ def main(par):
             continue
         else:
             grn = ad.read_h5ad(prediction_file)
-            grn = pd.DataFrame(grn.uns['prediction'])
+            grn = grn.uns['prediction']
+            grn = process_links(grn, par)
 
         grn['model'] = model
         grn_store.append(grn)

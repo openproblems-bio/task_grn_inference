@@ -3494,12 +3494,12 @@ meta = [
     }
   ],
   "build_info" : {
-    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/multi_omics/scenicplus/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/scenicplus/config.vsh.yaml",
     "runner" : "nextflow",
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.9.4",
-    "git_commit" : "50093d67aaf8958348e4f544b602165c735f53c6",
+    "git_commit" : "5f5d5b2cf93f8e05985a22e98136d3af10107a00",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3656,6 +3656,19 @@ dep = {
 }
 
 ## VIASH END
+import argparse
+argparser = argparse.ArgumentParser()
+argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
+argparser.add_argument('--atac', type=str, help='Path to the input ATAC data in h5ad format.')
+argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
+args = argparser.parse_args()
+if args.rna is not None:
+    par['rna'] = args.rna
+if args.atac is not None:
+    par['atac'] = args.atac
+if args.prediction is not None:
+    par['prediction'] = args.prediction
+
 
 try:
     sys.path.append(meta["resources_dir"])
@@ -3687,8 +3700,11 @@ def main(par):
     par['atac_dir'] = os.path.join(par['temp_dir'], 'atac')
     par['fragments_dict'] = os.path.join(par['temp_dir'], 'fragments_dict.json')
     par['MALLET_PATH'] = os.path.join(par['temp_dir'], 'Mallet-202108', 'bin', 'mallet')
+    par['chromsizes'] = f"{par['temp_dir']}/chromsizes.tsv"
+    par['annotation_file'] = os.path.join(par['temp_dir'], 'gene_annotation.gtf')
     os.makedirs(par['atac_dir'], exist_ok=True)
 
+    
     print('------- download_databases -------')
     download_databases(par)
     print_memory_usage()

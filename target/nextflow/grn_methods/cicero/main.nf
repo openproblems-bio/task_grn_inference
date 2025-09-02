@@ -3149,12 +3149,12 @@ meta = [
     }
   ],
   "build_info" : {
-    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/multi_omics/celloracle/cicero/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/methods/celloracle/cicero/config.vsh.yaml",
     "runner" : "nextflow",
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/cicero",
     "viash_version" : "0.9.4",
-    "git_commit" : "50093d67aaf8958348e4f544b602165c735f53c6",
+    "git_commit" : "5f5d5b2cf93f8e05985a22e98136d3af10107a00",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
