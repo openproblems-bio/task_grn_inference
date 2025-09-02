@@ -113,7 +113,7 @@ def main_multiome(par):
     rna.uns['normalization_id'] = 'lognorm'
     atac.uns['normalization_id'] = 'lognorm'
 
-    # - needed for some R packages
+    # - needed for consistency
     annotation_peak = atac.var.reset_index().location.str.split(':', expand=True)
     atac.var['seqname'] = annotation_peak[0].values
     atac.var['ranges'] = annotation_peak[1].values
@@ -121,7 +121,6 @@ def main_multiome(par):
 
     atac = atac[:, atac.var['seqname'].str.startswith('chr')]
 
-    
     return rna, atac
 
 def main_test_data(par):
@@ -149,6 +148,7 @@ if __name__ == '__main__':
     print('evaluation_data', evaluation_data)
 
     evaluation_data.write(par['op_perturbation_bulk'])
+    evaluation_data.write('resources/extended_data/op_bulk.h5ad')
     rna.write(par['op_rna'])
     atac.write(par['op_atac'])
     

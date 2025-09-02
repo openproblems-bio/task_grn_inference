@@ -15,7 +15,7 @@ The overlook of `config.vsh` is as follows. However, refer to the `src/methods/`
 .. code-block:: yaml
    :caption: Example of a `config.vsh` file
 
-   __merge__: ../../../api/comp_method.yaml # merge with the common method schema
+   __merge__: /src/api/comp_method.yaml # merge with the common method schema
 
     name: method_name
     namespace: "grn_methods"

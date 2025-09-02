@@ -57,30 +57,43 @@ def basic_qc(
 
 
 def process_links(net, par):
-    # - check for symmetriy
+    import numpy as np
+    print('Original net shape: ', net.shape)
+    
+    standard_cols = ["source", "target", "weight"]
+    
+    # Include cell_type if present
+    if 'cell_type' in net.columns:
+        cols = standard_cols + ['cell_type']
+    else:
+        cols = standard_cols
+    
+    # Check for symmetric links
     flipped = net.rename(columns={"source": "target", "target": "source"})
-    merged = net.merge(flipped, on=["source", "target", "weight"], how="inner")
-
+    merged = net.merge(flipped, on=cols, how="inner")
     if not merged.empty:
         print("Warning: The network contains at least one symmetric link.")
-    # - check for duplicates
-    duplicates = net[["source", "target", "weight"]].duplicated().any()
-    if duplicates:
-        # Remove duplicated edges, keeping the first occurrence
-        net = net[~net[["source", "target", "weight"]].duplicated()]
-    else:
-        net = net
-    # - remove self loops
+    
+    # Remove duplicates
+    net = net.drop_duplicates(subset=cols)
+    
+    # Remove self-loops
     net["source"] = net["source"].astype(str)
     net["target"] = net["target"].astype(str)
     net = net[net["source"] != net["target"]]
-    # - limit the number of links
-    if 'max_n_links' not in par.keys():
-        par["max_n_links"] = 50000
-        net = net.sort_values("weight", ascending=False, key=abs).head(
-            par["max_n_links"]
-        )
-
+    
+    # Aggregate duplicates by mean weight
+    net["weight"] = pd.to_numeric(net["weight"], errors='coerce')
+    net = net.groupby(standard_cols, as_index=False)["weight"].mean()
+    
+    print(f"Network shape after cleaning: {net.shape}")
+    
+    # Limit the number of links
+    max_links = par.get("max_n_links", 50000)
+    # sort by absolute weight descending
+    net = net.reindex(net["weight"].abs().sort_values(ascending=False).index).head(max_links)
+    print(f"Network shape applying max_n_links: {net.shape}")
+    
     return net
 
 

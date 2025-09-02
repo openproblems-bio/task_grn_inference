@@ -15,10 +15,19 @@ par = {
     'cell_type_specific': False,
     'max_n_links': 50000,
     'prediction': 'output/pearson_net.h5ad',
-    'layer': 'X_norm',
     'apply_tf_methods': True
 }
 ## VIASH END
+import argparse
+argparser = argparse.ArgumentParser()
+argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
+argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
+args = argparser.parse_args()
+if args.rna is not None:
+  par['rna'] = args.rna
+if args.prediction is not None:
+  par['prediction'] = args.prediction
+
 
 try:
     sys.path.append(meta["resources_dir"])
@@ -32,6 +41,7 @@ from util import corr_net
 
 def main(par):
     adata = ad.read_h5ad(par["rna"])
+    par['layer'] = 'lognorm' if 'lognorm' in adata.layers.keys() else 'X_norm'
     tf_all = np.loadtxt(par["tf_all"], dtype=str)
     dataset_id = adata.uns['dataset_id']
     net = corr_net(adata, tf_all, par)
