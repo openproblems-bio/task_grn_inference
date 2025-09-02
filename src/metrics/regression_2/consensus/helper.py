@@ -7,6 +7,7 @@ import anndata as ad
 import sys
 import numpy as np
 
+from util import process_links
 def main(par):
     if 'naming_convention' not in par:
         naming_convention = lambda dataset, method: f'{dataset}.{method}.{method}.prediction.h5ad'
@@ -17,7 +18,6 @@ def main(par):
     # Load perturbation data
     adata_rna = anndata.read_h5ad(par['evaluation_data'])
     gene_names = adata_rna.var_names
-
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
 
     # Load inferred GRNs
@@ -32,8 +32,10 @@ def main(par):
             continue
         A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
         net = ad.read_h5ad(filepath)
-        net = pd.DataFrame(net.uns['prediction'])
-        net['weight'] = net['weight'].astype(float)
+        net = net.uns['prediction']
+        
+        net = process_links(net, par)
+
 
         for source, target, weight in zip(net['source'], net['target'], net['weight']):
             if (source not in gene_dict) or (target not in gene_dict):

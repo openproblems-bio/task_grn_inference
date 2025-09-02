@@ -9,10 +9,23 @@ par = {
   "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
   "max_n_links": 50000
 }
-meta = {
-    'resources_dir':'src/control_methods/negative_control'
-}
 ## VIASH END
+
+import argparse
+argparser = argparse.ArgumentParser()
+argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
+argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
+args = argparser.parse_args()
+if args.rna is not None:
+  par['rna'] = args.rna
+if args.prediction is not None:
+  par['prediction'] = args.prediction
+
+
+meta = {
+    'resources_dir':'src/control_methods/negative_control',
+    'name': 'negative_control'
+}
 
 def process_links(net, par):
     net = net[net.source!=net.target]
@@ -23,8 +36,8 @@ def process_links(net, par):
     return net
 
 print('Reading input data')
-rna_all = ad.read_h5ad(par["rna_all"])
-gene_names = rna_all.var_names.to_numpy()
+rna = ad.read_h5ad(par["rna"])
+gene_names = rna.var_names.to_numpy()
 tf_all = np.loadtxt(par['tf_all'], dtype=str)
 
 n_tf = 500
@@ -50,7 +63,7 @@ output = ad.AnnData(
     X=None,
     uns={
         "method_id": meta['name'],
-        "dataset_id": rna_all.uns['dataset_id'],
+        "dataset_id": rna.uns['dataset_id'],
         "prediction": pivoted_net[["source", "target", "weight"]]
     }
 )

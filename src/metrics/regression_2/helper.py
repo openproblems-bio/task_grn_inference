@@ -102,6 +102,10 @@ def cross_validate_gene(
         y_train = y_[train_index]
         y_test = y_[test_index]
         
+        X_train = X_train.toarray() if hasattr(X_train, "toarray") else X_train
+        X_test = X_test.toarray() if hasattr(X_test, "toarray") else X_test
+        y_train = y_train.toarray().ravel() if hasattr(y_train, "toarray") else np.ravel(y_train)
+        y_test = y_test.toarray().ravel() if hasattr(y_test, "toarray") else np.ravel(y_test)
         model.fit(X_train, y_train)
 
         y_pred.append(model.predict(X_test))
@@ -188,12 +192,9 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     
     net = ad.read_h5ad(par['prediction'])
     net = pd.DataFrame(net.uns['prediction'])
-    net['weight'] = net['weight'].astype(float)
+    net = process_links(net, par)
     assert net.shape[0]>0, 'No links found in the network'
-    assert all(column in net.columns for column in ['source', 'target', 'weight']), 'Columns in the network should be source, target, weight'
     
-    
-   
     net_matrix = net_to_matrix(net, gene_names, par)
 
     n_cells = prturb_adata.shape[0]
@@ -203,12 +204,13 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     # Load and standardize perturbation data    
     X = prturb_adata.layers[par['layer']]
     
-    try:
-        X = X.todense().A
-    except:
-        pass
+    # try:
+    #     X = X.todense().A
+    # except:
+    #     pass
 
-    X = RobustScaler().fit_transform(X)
+    # X = RobustScaler().fit_transform(X)
+    X = RobustScaler(with_centering=False).fit_transform(X)
 
     # Load consensus numbers of putative regulators
     with open(par['regulators_consensus'], 'r') as f:

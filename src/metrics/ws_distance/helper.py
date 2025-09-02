@@ -4,6 +4,7 @@ import sys
 import numpy as np
 from tqdm import tqdm
 
+from util import process_links
 # For reproducibility
 seed = 42
 np.random.seed(seed)
@@ -11,9 +12,9 @@ np.random.seed(seed)
 def main(par):
     prediction = ad.read_h5ad(par['prediction'])
     prediction = pd.DataFrame(prediction.uns['prediction'])
-    prediction['weight'] = prediction['weight'].astype(float)
+    prediction = process_links(prediction, par)
+    
     assert prediction.shape[0]>0, 'No links found in the network'
-    assert all(column in prediction.columns for column in ['source', 'target', 'weight']), 'Columns in the network should be source, target, weight'
     
     consensus = pd.read_csv(par['ws_consensus']) #  ['source', 'theta', 'value']
     background_distance = pd.read_csv(par['ws_distance_background']) # ['source', 'target', 'ws_distance']
