@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
 #SBATCH --time=20:00:00
-#SBATCH --mem=1500GB
+#SBATCH --mem=1000GB
 #SBATCH --partition=cpu
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com   
@@ -17,12 +17,13 @@ set -e
 # python src/process_data/nakatake/script.py 
 # python src/process_data/norman/script.py
 
-# python src/process_data/opsca/script.py 
-# python src/process_data/replogle/script.py  #--run_test  #--run_test
-# python src/process_data/xaira/script.py    #--run_test
-python src/process_data/parse_bioscience/script.py  #--run_test
-
-# echo "Processing 300BCG"
-# python src/process_data/300BCG/script.py 
-# echo "Processing IBD"
-# python src/process_data/ibd/script.py 
+echo "Processing opsca"
+python src/process_data/opsca/script.py 
+echo "Processing replogle"
+python src/process_data/replogle/script.py  #--run_test  #--run_test
+echo "Processing xaira"
+python src/process_data/xaira/script.py    #--run_test
+echo "Processing 300BCG"
+python src/process_data/300BCG/script.py 
+echo "Processing IBD"
+python src/process_data/ibd/script.py 

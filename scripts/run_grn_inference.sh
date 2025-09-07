@@ -106,7 +106,7 @@ append_entry() {
     apply_tf_methods: $apply_tf_methods
 HERE
 
-  if [[ "$dataset" =~ ^(op|opsca)$ ]]; then
+  if [[ "$dataset" =~ ^(op|opsca|ibd)$ ]]; then
     cat >> "$param_local" << HERE
     atac: ${resources_dir}/grn_benchmark/inference_data/${dataset}_atac.h5ad
 HERE
@@ -121,7 +121,8 @@ HERE
 # else
 #   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint]"
 # fi
-append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, scprint, portia, scgpt]"
+# append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, scprint, portia, scgpt]"
+append_entry "$DATASET" "[figr, celloracle]"
 
 # --- Final configuration ---
 if [ "$RUN_LOCAL" = true ]; then

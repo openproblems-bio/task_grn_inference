@@ -2,13 +2,14 @@
 #!/bin/bash
 set -e
 
-run_prefix='bash' #bash
-DATASETS=('op' ) #'op' 'adamson' 'replogle' 'norman' 'nakatake' 'parsebioscience'  '300BCG' 'xaira_HCT116' 'xaira_HEK293T'
-# METHODS=('negative_control' 'positive_control' 'pearson_corr' 'scenicplus' 'scglue' 'grnboost' 'scenic' 'ppcor')
-METHODS=( 'positive_control' 'pearson_corr')
+run_prefix='sbatch' #bash
+DATASETS=('xaira_HCT116' ) #'op' 'adamson' 'replogle' 'norman' 'nakatake' 'parsebioscience'  '300BCG' 'xaira_HCT116' 'xaira_HEK293T'
+# METHODS=('negative_control' 'positive_control' 'pearson_corr' 'portia' 'ppcor' 'grnboost' 'scenic'  'scenicplus' 'scglue' 'figr' 'granie')
+METHODS=( 'grnboost' 'scenic')
 
 methods_dir='src/methods/'
 ctr_methods_dir='src/control_methods/'
+
 
 
 run_func() {
@@ -39,6 +40,7 @@ run_func() {
 }
 
 for dataset in "${DATASETS[@]}"; do
+    mkdir resources/results/$dataset || true
     for method in "${METHODS[@]}"; do
         run_func "$method" "$dataset"
     done

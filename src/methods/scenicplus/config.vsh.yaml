@@ -29,7 +29,7 @@ arguments:
     description: "Cell-topics prob scores"
   - name: --grn_extended
     type: file 
-    default: output/grn_extended.csv
+    default: scenicplus/grn_extended.csv
     required: false
     direction: output
     description: "Source-target-peak triplets"

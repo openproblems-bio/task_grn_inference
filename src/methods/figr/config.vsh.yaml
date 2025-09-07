@@ -14,10 +14,6 @@ arguments:
     type: file
     required: false
     direction: output
-  - name: --n_topics
-    type: integer 
-    direction: input
-    default: 48
 resources:
   - type: r_script
     path: script.R
@@ -33,4 +29,4 @@ runners:
   - type: executable
   - type: nextflow
     directives:
-      label: [twodaytime, veryveryhighmem, midcpu]
+      label: [twodaytime, veryhighmem, midcpu]

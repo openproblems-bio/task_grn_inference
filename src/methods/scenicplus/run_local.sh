@@ -21,5 +21,6 @@ fi
 rna="resources/grn_benchmark/inference_data/${dataset}_rna.h5ad"
 atac="resources/grn_benchmark/inference_data/${dataset}_atac.h5ad"
 prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
+grn_extended="resources/results/${dataset}/scenicplus/grn_extended.csv"
 
-singularity run ../../images/${method} python src/methods/${method}/script.py --rna $rna --atac $atac --prediction $prediction
+singularity run ../../images/${method} python src/methods/${method}/script.py --rna $rna --atac $atac --prediction $prediction --grn_extended $grn_extended --n_jobs 20

@@ -22,6 +22,8 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
 argparser.add_argument('--atac', type=str, help='Path to the input ATAC data in h5ad format.')
 argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
+argparser.add_argument('--grn_extended', type=str, help='Path to the output prediction extended in csv format.')
+
 args = argparser.parse_args()
 if args.rna is not None:
     par['rna'] = args.rna

@@ -24,16 +24,39 @@ resources:
 
 engines:
   - type: docker
-    image: agabriel/dictys:v1
+    image: andrewsg/dictys
+    
     setup:
       - type: python
         pypi:
           - gdown
-          - numpy<2
-    # setup:   
-    #   - type: python
-    #     github:
-    #       - openproblems-bio/core#subdirectory=packages/python/openproblems
+      - type: apt
+        packages:
+          - bedtools
+
+# engines:
+#   - type: docker
+#     image: python:3.9.23-trixie
+
+#     setup:
+#       - type: apt
+#         packages:
+#           - build-essential
+#           - pkg-config
+#           - libfreetype6-dev
+#           - libpng-dev
+#           - bedtools
+#           - git
+#           - wget
+#       - type: python
+#         pypi:
+#           - dictys==1.1.0
+#           - gdown
+#           - mudata
+#           - torch
+#           - torchvision
+#           - torchaudio
+#         pip_extra: "--index-url https://download.pytorch.org/whl/cu118"
 
 runners:
   - type: executable
