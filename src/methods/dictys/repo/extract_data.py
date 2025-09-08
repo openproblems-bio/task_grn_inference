@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-import mudata as mu
+import anndata as ad
 import os
 import argparse
 import warnings
@@ -21,43 +21,39 @@ exp_path = args['exp_path']
 pks_path = args['pks_path']
 frags_path = args['frags_path']
 
+par = {
+    'rna': 'resources_test/grn_benchmark/inference_data/op_rna.h5ad',
+    'atac': 'resources_test/grn_benchmark/inference_data/op_atac.h5ad',
+    'temp_dir': 'output/temp/'
+}
+
+
 
 # Write the RNA matrix
-rna = mu.read(rna_file)
-atac = mu.read(atac_file)
+rna = ad.read_h5ad(rna_file)
+atac = ad.read_h5ad(atac_file)
 print(rna.obs.head())
 
-
-rna_X = pd.DataFrame(np.array(rna.layers['counts'].todense()).T, columns=rna.obs.index, index=rna.var.index)
-rna_X.to_csv(exp_path, sep="\t", compression="gzip")
-
-all_atac_peak = np.unique([n.replace(':', '-') for n in atac.var.index])
-
-all_atac_peak = pd.DataFrame([n.split('-') for n in all_atac_peak])
-all_atac_peak.columns = ['chr', 'srt', 'end']
-all_atac_peak['srt'] = all_atac_peak['srt'].astype(int)
-all_atac_peak['end'] = all_atac_peak['end'].astype(int)
-all_atac_peak = all_atac_peak[(all_atac_peak.end - all_atac_peak.srt) >= 100]
-all_atac_peak = all_atac_peak.sort_values(by=['chr', 'srt', 'end'])
-all_atac_peak.to_csv(pks_path, sep='\t', header=False, index=False)
-
-# Store clusters
-if False:
-    clus = sorted(rna.obs['cell_type'].unique())
-    for c in clus:
-        ctype_ids = data[rna.obs['cell_type'] == c].obs.index
-        c = c.replace(' ', '_')
-        with open(os.path.join(os.path.dirname(exp_path), f'barcodes_{c}.txt'), "w") as f:
-            for i in ctype_ids:
-                f.write(f"{i}\n")
-else:
+def extract_exp(rna, par):
+    if 'counts' not in rna.layers:
+        raise ValueError('RNA data must have a "counts" layer.')
+    rna_X = pd.DataFrame(np.array(rna.layers['counts'].todense()).T, columns=rna.obs.index, index=rna.var.index)
+    rna_X.to_csv(par['exp_path'], sep="\t", compression="gzip")
     all_ids = rna.obs.index
-
-    # Save all barcodes into one file
-    barcodes_file = os.path.join(os.path.dirname(exp_path), 'barcodes_all.txt')
-    with open(barcodes_file, "w") as f:
+    with open(par['barcodes'], "w") as f:
         for i in all_ids:
             f.write(f"{i}\n")
+
+def extract_peaks(atac, par):
+    all_atac_peak = np.unique([n.replace(':', '-') for n in atac.var.index])
+
+    all_atac_peak = pd.DataFrame([n.split('-') for n in all_atac_peak])
+    all_atac_peak.columns = ['chr', 'srt', 'end']
+    all_atac_peak['srt'] = all_atac_peak['srt'].astype(int)
+    all_atac_peak['end'] = all_atac_peak['end'].astype(int)
+    all_atac_peak = all_atac_peak[(all_atac_peak.end - all_atac_peak.srt) >= 100]
+    all_atac_peak = all_atac_peak.sort_values(by=['chr', 'srt', 'end'])
+    return all_atac_peak
 
 
 def process_peak(adata_atac):
@@ -87,4 +83,15 @@ def process_peak(adata_atac):
     # Compress TSV
     print(f'Sort and compress tsv file {frags_path}')
     os.system(f"sort -k1,1 -k2,2n {temp_path} | bgzip -c > {frags_path}")
-process_peak(atac)
+
+def extract_data(par):
+    par['exp_path'] = f"{par['temp_dir']}/expression.tsv.gz"
+    par['barcodes'] = f"{par['temp_dir']}/barcodes_all.txt"
+    par['pks_path'] = f"{par['temp_dir']}/peaks.bed"
+    par['frags_path'] = f"{par['temp_dir']}/fragments.tsv.gz"
+    os.makedirs(par['temp_dir'], exist_ok=True)
+    
+    extract_exp(rna, par)
+    atac_peaks = extract_peaks(atac)
+    atac_peaks.to_csv(pks_path, sep='\t', header=False, index=False)
+    process_peak(atac)

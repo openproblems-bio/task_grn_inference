@@ -59,7 +59,7 @@ def main_perturbation(par):
 
     bulk_adata.obs = bulk_adata.obs.rename(columns={'sm_name':'perturbation'})
 
-    bulk_adata = normalize_func(bulk_adata)
+    bulk_adata = normalize_func(bulk_adata, pearson_residual=True)
 
     bulk_adata.obs['is_control'] = bulk_adata.obs['perturbation'].isin(['Dimethyl Sulfoxide'])
     bulk_adata.obs['is_positive_control'] = bulk_adata.obs['perturbation'].isin(['Dabrafenib', 'Belinostat'])
@@ -104,8 +104,7 @@ def main_multiome(par):
     atac.obs['donor_id'] = atac.obs['donor_id'].map(donor_map)
 
     # normalize rna 
-    X_norm = sc.pp.normalize_total(rna, inplace=False)['X']
-    rna.layers['lognorm'] = sc.pp.log1p(X_norm, copy=True)
+    rna = normalize_func(rna, log_norm=True, pearson_residual=True)
 
     rna = add_metadata(rna)
     atac = add_metadata(atac)

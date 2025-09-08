@@ -3,7 +3,7 @@
 set -e
 
 run_prefix='sbatch' #bash
-DATASETS=('xaira_HCT116' ) #'op' 'adamson' 'replogle' 'norman' 'nakatake' 'parsebioscience'  '300BCG' 'xaira_HCT116' 'xaira_HEK293T'
+DATASETS=('xaira_HEK293T' ) #'op' 'adamson' 'replogle' 'norman' 'nakatake' 'parsebioscience'  '300BCG' 'xaira_HCT116' 'xaira_HEK293T'
 # METHODS=('negative_control' 'positive_control' 'pearson_corr' 'portia' 'ppcor' 'grnboost' 'scenic'  'scenicplus' 'scglue' 'figr' 'granie')
 METHODS=( 'grnboost' 'scenic')
 
