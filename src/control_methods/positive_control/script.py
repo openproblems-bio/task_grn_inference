@@ -20,24 +20,16 @@ par = {
     'apply_tf_methods': True,
 }
 ## VIASH END
-import argparse
-argparser = argparse.ArgumentParser()
-argparser.add_argument('--rna_all', type=str, help='Path to the input RNA data in h5ad format.')
-argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
-args = argparser.parse_args()
-if args.rna_all is not None:
-  par['rna_all'] = args.rna_all
-if args.prediction is not None:
-  par['prediction'] = args.prediction
-
-
-meta = {
-    "resources_dir": 'src/utils',
-    "name": "positive_control"
-}
-
-sys.path.append(meta["resources_dir"])
-from util import corr_net
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+  meta = {
+      "resources_dir": 'src/utils',
+      "name": "positive_control"
+  }
+  sys.path.append(meta["resources_dir"])
+from util import get_args, process_links
+par = get_args(par)
 
 adata = ad.read_h5ad(par["rna_all"])
 par['layer'] = 'lognorm' if 'lognorm' in adata.layers.keys() else 'X_norm'

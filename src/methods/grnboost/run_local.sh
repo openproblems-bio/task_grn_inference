@@ -4,7 +4,7 @@
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
-#SBATCH --time=40:00:00
+#SBATCH --time=25:00:00
 #SBATCH --mem=250GB
 #SBATCH --partition=cpu
 #SBATCH --mail-type=END,FAIL      
@@ -17,6 +17,7 @@ if [ -z "$dataset" ]; then
     echo "Error: dataset not provided"
     exit 1
 fi
+
 
 rna="resources/grn_benchmark/inference_data/${dataset}_rna.h5ad"
 prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"

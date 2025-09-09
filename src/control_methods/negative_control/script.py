@@ -1,6 +1,7 @@
 import pandas as pd
 import anndata as ad
 import numpy as np
+import sys
 
 ## VIASH START
 par = {
@@ -11,29 +12,21 @@ par = {
 }
 ## VIASH END
 
-import argparse
-argparser = argparse.ArgumentParser()
-argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
-argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
-args = argparser.parse_args()
-if args.rna is not None:
-  par['rna'] = args.rna
-if args.prediction is not None:
-  par['prediction'] = args.prediction
+try:
+    sys.path.append(meta["utils_dir"])
+except:
+    meta = {
+        'resources_dir':'src/control_methods/negative_control',
+        'utils_dir': 'src/utils',
+        'name': 'negative_control'
+    }
+    sys.path.append(meta["resources_dir"])
+    sys.path.append(meta["utils_dir"])
+    
+from util import get_args, process_links
 
+par = get_args(par)
 
-meta = {
-    'resources_dir':'src/control_methods/negative_control',
-    'name': 'negative_control'
-}
-
-def process_links(net, par):
-    net = net[net.source!=net.target]
-    try:
-        net = net.sample(par['max_n_links'])
-    except:
-        net = net.sample(par['max_n_links'], replace=True)
-    return net
 
 print('Reading input data')
 rna = ad.read_h5ad(par["rna"])

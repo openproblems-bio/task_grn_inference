@@ -32,31 +32,19 @@ par = {
 }
 ## VIASH END
 
-import argparse
-argparser = argparse.ArgumentParser()
-argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
-argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
-args = argparser.parse_args()
-if args.rna is not None:
-  par['rna'] = args.rna
-if args.prediction is not None:
-  par['prediction'] = args.prediction
-
-
-
 try:
     sys.path.append(meta["resources_dir"])
-    from util import process_links
-    from helper import format_data, run_grn
 except:
     meta = {
       'util_dir': 'src/utils',
       'helper_dir': 'src/methods/grnboost',
     }
-    sys.path.append(meta["helper_dir"])
-    from helper import format_data, run_grn
-    sys.path.append(meta["util_dir"])
-    from util import process_links
+
+  sys.path.append(meta["helper_dir"])
+  sys.path.append(meta["util_dir"])
+from helper import format_data, run_grn
+from util import get_args, process_links
+par = get_args(par)
     
 
 

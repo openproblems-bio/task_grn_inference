@@ -25,4 +25,4 @@ rna="resources/grn_benchmark/inference_data/${dataset}_rna.h5ad"
 atac="resources/grn_benchmark/inference_data/${dataset}_atac.h5ad"
 prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
 
-singularity run ../../images/${method} python src/methods/${method}/script.py --rna $rna --atac $atac --prediction $prediction
+singularity run --nv ../../images/${method} python src/methods/${method}/script.py --rna $rna --atac $atac --prediction $prediction

@@ -31,24 +31,13 @@ par = {
     "how": "most var across",
 }
 ## VIASH END
-
-import argparse
-argparser = argparse.ArgumentParser()
-argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
-argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
-args = argparser.parse_args()
-if args.rna is not None:
-  par['rna'] = args.rna
-if args.prediction is not None:
-  par['prediction'] = args.prediction
-
 try:
     sys.path.append(meta["resources_dir"])
 except:
     meta = {"resources_dir": "src/utils"}
     sys.path.append(meta["resources_dir"])
-
-from util import efficient_melting
+from util import get_args, process_links, efficient_melting
+par = get_args(par)
 
 adata = ad.read_h5ad(par["rna"], backed="r")
 train_perturbs = adata.obs['perturbation'].unique()

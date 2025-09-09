@@ -17,6 +17,30 @@ def binarize_weight(weight):
     else:
         return 0
 
+def manage_layer(adata, par):
+    dataset = adata.uns['dataset_id']
+    layer = par['layer']
+    if layer not in adata.layers:
+        if ('X_norm' in adata.layers) & (dataset in ['adamson', 'norman', 'nakatake']):
+            layer = 'X_norm'
+            print(f'Layer {par["layer"]} not found, using X_norm instead')
+        else:
+            raise ValueError(f'Layer {par["layer"]} not found in the data. Available layers: {list(adata.layers.keys())}')
+    return layer
+
+def get_args(par):
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
+    parser.add_argument('--atac', type=str, help='Path to the input ATAC data in h5ad format.')
+    parser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
+    parser.add_argument('--layer', type=str)
+
+    args = parser.parse_args()
+    for k, v in vars(args).items():
+        if v is not None:
+            par[k] = v
+    return par
 
 def verbose_print(verbose_level, message, level):
     if level <= verbose_level:

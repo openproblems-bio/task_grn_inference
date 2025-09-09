@@ -17,21 +17,6 @@ par = {
   'grn_extended': 'output/sp_new/grn_extended.csv'
 }
 ## VIASH END
-import argparse
-argparser = argparse.ArgumentParser()
-argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
-argparser.add_argument('--atac', type=str, help='Path to the input ATAC data in h5ad format.')
-argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
-argparser.add_argument('--grn_extended', type=str, help='Path to the output prediction extended in csv format.')
-
-args = argparser.parse_args()
-if args.rna is not None:
-    par['rna'] = args.rna
-if args.atac is not None:
-    par['atac'] = args.atac
-if args.prediction is not None:
-    par['prediction'] = args.prediction
-
 
 try:
     sys.path.append(meta["resources_dir"])
@@ -43,6 +28,8 @@ except:
     sys.path.append(meta["resources_dir"])
     sys.path.append(meta["utils_dir"])
 from helper import download_databases, process_peak, run_cistopic, process_topics, preprocess_rna, snakemake_pipeline, post_process 
+from util import get_args, process_links
+par = get_args(par)
 
 def print_memory_usage():
     import psutil

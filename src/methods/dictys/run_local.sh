@@ -13,10 +13,11 @@
 
 images_dir="/home/jnourisa/projs/images"
 
+
+singularity run --nv $images_dir/dictys_latest.sif bash dictys_helper split_bam.sh  output/dictys/data/bams.bam output/dictys/data/bams --section "CB:Z:" --ref_expression output/dictys/data/expr.tsv.gz
+
+
 # singularity run ../../images/dictys \
 #     python src/methods/dictys/script.py \
 #     --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \
 #     --atac resources_test/grn_benchmark/inference_data/op_atac.h5ad 
-
-singularity run $images_dir/dictys bash dictys_helper split_bam.sh bams.bam bams --section "CB:Z:" --ref_expression expr.tsv.gz
-
