@@ -37,7 +37,6 @@ resources:
 engines:
   - type: docker
     image: pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
-
     setup:
       - type: apt
         packages:
@@ -49,11 +48,15 @@ engines:
           - libtiff5-dev
           - libjpeg-dev
           - python3-dev
+          - samtools
       - type: python
         pypi:
           - gdown
           - matplotlib==3.8.1
           - dictys
+          - anndata
+          - macs2
+          - homer
 
 runners:
   - type: executable
