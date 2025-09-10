@@ -38,8 +38,8 @@ except:
     sys.path.append(meta["util_dir"])
     sys.path.append(meta["resources_dir"])
 from main import main 
-from util import get_args, process_links
-par = get_args(par)
+from util import parse_args, process_links
+par = parse_args(par)
 
 
 if __name__ == '__main__':

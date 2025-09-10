@@ -43,8 +43,8 @@ except:
   sys.path.append(meta["helper_dir"])
   sys.path.append(meta["util_dir"])
 from helper import format_data, run_grn
-from util import get_args, process_links
-par = get_args(par)
+from util import parse_args, process_links
+par = parse_args(par)
     
 
 

@@ -28,8 +28,8 @@ except:
     'resources_dir': 'src/utils'
     }
     sys.path.append(meta["resources_dir"])
-from util import get_args, process_links
-par = get_args(par)
+from util import parse_args, process_links
+par = parse_args(par)
 
 
 def main(par):

@@ -27,8 +27,8 @@ except:
         "name": "pearson_corr"
     }
     sys.path.append(meta["resources_dir"])
-from util import corr_net, get_args, manage_layer
-par = get_args(par)
+from util import corr_net, parse_args, manage_layer
+par = parse_args(par)
 
 def main(par):
     adata = ad.read_h5ad(par["rna"])

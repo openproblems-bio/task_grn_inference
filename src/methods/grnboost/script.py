@@ -31,10 +31,10 @@ except:
     }
     sys.path.append(meta["util_dir"])
     sys.path.append(meta["helper_dir"])
-from util import process_links, get_args
+from util import process_links, parse_args
 from helper import format_data, run_grn
 
-par = get_args(par)
+par = parse_args(par)
 
 def main(par):
   os.makedirs(par['temp_dir'], exist_ok=True)

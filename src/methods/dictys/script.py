@@ -15,34 +15,24 @@ par = {
     'prediction': 'output/temp/prediction.h5ad',
 }
 ## VIASH END
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument('--rna', type=str, help='Path to RNA data in h5ad format', required=False)
-parser.add_argument('--atac', type=str, help='Path to ATAC data in h5ad format', required=False)
-parser.add_argument('--prediction', type=str, help='Path to save the prediction h5ad file', required=False)
-args = parser.parse_args()
-
-for k, v in vars(args).items():
-    if v is not None:
-        par[k] = v
-
-
 try: 
     sys.path.append(meta["resources_dir"])
 except:
     meta = {
         'utils_dir': 'src/utils',
-        'helper_dir': 'src/methods/dictys/'
+        'helper_dir': 'src/methods/dictys/',
+        'frag_to_bam': 'src/methods/dictys/frag_to_bam.py'
     }
     sys.path.append(meta['utils_dir'])
     sys.path.append(meta['helper_dir'])
 
-from helper import define_vars, format_inputs, export_net 
-# from util import process_links
+
+from helper import main 
+from util import parse_args
+
+par['frag_to_bam.py'] = meta['frag_to_bam']
+
+par = parse_args(par)
 
 if __name__ == '__main__':
-    define_vars(par)
-    format_inputs(par)
-    # export_net
-
-
+    main(par)

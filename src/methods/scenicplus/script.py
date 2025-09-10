@@ -28,8 +28,8 @@ except:
     sys.path.append(meta["resources_dir"])
     sys.path.append(meta["utils_dir"])
 from helper import download_databases, process_peak, run_cistopic, process_topics, preprocess_rna, snakemake_pipeline, post_process 
-from util import get_args, process_links
-par = get_args(par)
+from util import parse_args, process_links
+par = parse_args(par)
 
 def print_memory_usage():
     import psutil

@@ -28,8 +28,8 @@ except:
       "name": "positive_control"
   }
   sys.path.append(meta["resources_dir"])
-from util import get_args, process_links
-par = get_args(par)
+from util import parse_args, process_links
+par = parse_args(par)
 
 adata = ad.read_h5ad(par["rna_all"])
 par['layer'] = 'lognorm' if 'lognorm' in adata.layers.keys() else 'X_norm'

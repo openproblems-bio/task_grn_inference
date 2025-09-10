@@ -27,8 +27,12 @@ def manage_layer(adata, par):
         else:
             raise ValueError(f'Layer {par["layer"]} not found in the data. Available layers: {list(adata.layers.keys())}')
     return layer
-
-def get_args(par):
+def read_prediction(prediction, par):
+    adata = ad.read_h5ad(prediction)
+    net = adata.uns['prediction']
+    processed_net = process_links(net, par)
+    return processed_net
+def parse_args(par):
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')

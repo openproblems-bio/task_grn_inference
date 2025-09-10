@@ -36,8 +36,8 @@ try:
 except:
     meta = {"resources_dir": "src/utils"}
     sys.path.append(meta["resources_dir"])
-from util import get_args, process_links, efficient_melting
-par = get_args(par)
+from util import parse_args, process_links, efficient_melting
+par = parse_args(par)
 
 adata = ad.read_h5ad(par["rna"], backed="r")
 train_perturbs = adata.obs['perturbation'].unique()
