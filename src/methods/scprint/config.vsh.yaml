@@ -63,7 +63,6 @@ engines:
         script: import bionty as bt; bt.core.sync_all_sources_to_latest()
       - type: python
         script: from scdataloader.utils import populate_my_ontology; populate_my_ontology()
-  - type: native
 runners:
   - type: executable
    # docker_run_args: --gpus all

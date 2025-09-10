@@ -20,6 +20,7 @@ resources:
   - type: python_script
     path: script.py
   - path: helper.py
+  - path: frag_to_bam.py
   
 
 # engines:

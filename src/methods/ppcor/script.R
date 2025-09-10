@@ -11,13 +11,18 @@ par <- list(
 )
 ## VIASH END
 args <- commandArgs(trailingOnly = TRUE)
+
 for (i in seq_along(args)) {
   if (args[i] == "--rna" && (i+1) <= length(args)) {
     par$rna <- args[i+1]
   } else if (args[i] == "--prediction" && (i+1) <= length(args)) {
     par$prediction <- args[i+1]
+  } else if (args[i] == "--layer" && (i+1) <= length(args)) {
+    par$layer <- args[i+1]
   }
 }
+
+
 
 # input expression data
 tf_names <- scan(par$tf_all, what = "", sep = "\n")
@@ -25,7 +30,14 @@ tf_names <- scan(par$tf_all, what = "", sep = "\n")
 ad <- anndata::read_h5ad(par$rna)
 dataset_id = ad$uns$dataset_id
 
-inputExpr <- ad$X
+layer <- par$layer
+
+if (dataset_id %in% c("nakatake", "norman", "adamson")) {
+  layer <- "X_norm"
+}
+
+inputExpr <- ad$layers[[layer]]
+
 geneNames <- colnames(inputExpr)
 colnames(inputExpr) <- c(geneNames)
 X <- as.matrix(inputExpr)
