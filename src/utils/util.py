@@ -39,6 +39,9 @@ def parse_args(par):
     parser.add_argument('--atac', type=str, help='Path to the input ATAC data in h5ad format.')
     parser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
     parser.add_argument('--layer', type=str)
+    parser.add_argument('--temp_dir', type=str)
+    parser.add_argument('--tf_all', type=str)
+    
 
     args = parser.parse_args()
     for k, v in vars(args).items():

@@ -13,6 +13,8 @@ warnings.filterwarnings("ignore")
 from util import process_links
 
 def define_vars(par):
+    os.makedirs(par['temp_dir'], exist_ok=True)
+    print(f"Temporary directory: {par['temp_dir']}", flush=True)
     par['data_dir'] = f"{par['temp_dir']}/data/"
     os.makedirs(par['data_dir'], exist_ok=True)
     par['exp_path'] = f"{par['data_dir']}/expression.tsv.gz"
@@ -26,7 +28,7 @@ def define_vars(par):
     par['bams_dir'] = f"{par['data_dir']}/bams/"
 
     par['gene_bed'] = f"{par['data_dir']}/gene.bed"
-    os.makedirs(par['temp_dir'], exist_ok=True)
+    
 
 def extract_exp(par):
     print('Extracting expression matrix and barcodes', flush=True)
@@ -88,13 +90,12 @@ def extract_atac(par):
 
 def create_bam(par):
     print('Creating BAM file from fragments', flush=True)
-    
-    print("Creating BAM")
-    cmd = f"python {par['frag_to_bam.py']} --fnames {par['frags_path']} --barcodes {par['barcodes']}"
+    cmd = f"python {par['frag_to_bam']} --fnames {par['frags_path']} --barcodes {par['barcodes']}"
     view_sort_cmd = f"samtools view -b | samtools sort -o {par['bam_name']}"
     full_cmd = f"{cmd} | {view_sort_cmd}"
     subprocess.run(full_cmd, shell=True, check=True)
     subprocess.run(["samtools", "index", par['bam_name'], par['bai_name']], check=True)
+    
 
 def bam_to_bams(par):
     """
@@ -202,12 +203,13 @@ def export_net(par):
 
 def main(par):
     define_vars(par)
-    # extract_exp(par)
-    # extract_atac(par)
-    # create_bam(par)
-    # bam_to_bams(par)
-    # extrac_clusters(par)
-    # extract_priors(par)
-    # configure(par)
-    # infer_grn(par)
+
+    extract_exp(par)
+    extract_atac(par)
+    create_bam(par)
+    bam_to_bams(par)
+    extrac_clusters(par)
+    extract_priors(par)
+    configure(par)
+    infer_grn(par)
     export_net(par)

@@ -5,6 +5,8 @@ import os
 import argparse
 import warnings
 import sys
+import importlib
+
 warnings.filterwarnings("ignore")
 
 ## VIASH START
@@ -17,6 +19,8 @@ par = {
 ## VIASH END
 try: 
     sys.path.append(meta["resources_dir"])
+    par['frag_to_bam'] = f"{meta['resources_dir']}/frag_to_bam.py"
+
 except:
     meta = {
         'utils_dir': 'src/utils',
@@ -25,12 +29,11 @@ except:
     }
     sys.path.append(meta['utils_dir'])
     sys.path.append(meta['helper_dir'])
-
+    par['frag_to_bam'] = meta['frag_to_bam']
 
 from helper import main 
 from util import parse_args
 
-par['frag_to_bam.py'] = meta['frag_to_bam']
 
 par = parse_args(par)
 
