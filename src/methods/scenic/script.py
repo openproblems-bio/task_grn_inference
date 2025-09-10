@@ -33,12 +33,12 @@ par = {
 ## VIASH END
 
 try:
-    sys.path.append(meta["resources_dir"])
+  sys.path.append(meta["resources_dir"])
 except:
-    meta = {
-      'util_dir': 'src/utils',
-      'helper_dir': 'src/methods/grnboost',
-    }
+  meta = {
+    'util_dir': 'src/utils',
+    'helper_dir': 'src/methods/grnboost',
+  }
 
   sys.path.append(meta["helper_dir"])
   sys.path.append(meta["util_dir"])

@@ -41,6 +41,7 @@ resources:
 engines:
   - type: docker
     image: pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
+    __merge__: /src/api/base_requirements.yaml
     setup:
       - type: apt
         packages:

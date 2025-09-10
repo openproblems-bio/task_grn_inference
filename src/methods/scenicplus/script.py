@@ -23,7 +23,8 @@ try:
 except:
     meta = {
         'resources_dir': 'src/methods/multi_omics/scenicplus',
-        'utils_dir': 'src/utils'
+        'utils_dir': 'src/utils',
+        'name': 'scenicplus'
     }
     sys.path.append(meta["resources_dir"])
     sys.path.append(meta["utils_dir"])
@@ -54,7 +55,6 @@ def main(par):
     par['annotation_file'] = os.path.join(par['temp_dir'], 'gene_annotation.gtf')
     os.makedirs(par['atac_dir'], exist_ok=True)
 
-    
     print('------- download_databases -------')
     download_databases(par)
     print_memory_usage()
@@ -77,25 +77,8 @@ def main(par):
     net = post_process(par)
     return net
 if __name__ == '__main__':
-    # - subset to one donor for test
     os.makedirs(par['temp_dir'], exist_ok=True)
-    if False: #TODO: remove this
-        adata = ad.read(par['rna'])
-        adata = adata[adata.obs['donor_id']=='donor_0']
-        adata.obs['donor_id'] = adata.obs['donor_id'].astype(str)
-        assert adata.shape[0]>0, 'no cell left after filtering'
-        par['rna'] = f"{par['temp_dir']}/rna.h5ad"
-        adata.write(par['rna'])
-
-        adata = ad.read(par['atac'])
-        adata = adata[adata.obs['donor_id']=='donor_0']
-        adata.obs['donor_id'] = adata.obs['donor_id'].astype(str)
-        assert adata.shape[0]>0, 'no cell left after filtering'
-        par['atac'] = f"{par['temp_dir']}/atac.h5ad"
-        adata.write(par['atac'])
-    # - main 
     net = main(par)
-    
     dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
-    output = ad.AnnData(X=None, uns={"method_id": 'scenicplus', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
+    output = ad.AnnData(X=None, uns={"method_id": meta['name'], "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])

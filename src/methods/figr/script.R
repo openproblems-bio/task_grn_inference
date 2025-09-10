@@ -63,7 +63,8 @@ if (requireNamespace("aws.s3", quietly = TRUE)) {
     check_region = FALSE
   )
   
-  if (download_success) {
+  if (!is.null(res)) {
+    download_success <- TRUE
     message("Downloaded cell_topic from S3")
   }
 }

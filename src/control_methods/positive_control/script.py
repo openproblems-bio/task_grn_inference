@@ -28,25 +28,26 @@ except:
       "name": "positive_control"
   }
   sys.path.append(meta["resources_dir"])
-from util import parse_args, process_links
+from util import parse_args, process_links, corr_net
 par = parse_args(par)
 
-adata = ad.read_h5ad(par["rna_all"])
-par['layer'] = 'lognorm' if 'lognorm' in adata.layers.keys() else 'X_norm'
-tf_all = np.loadtxt(par["tf_all"], dtype=str)
-dataset_id = adata.uns['dataset_id']
-net = corr_net(adata, tf_all, par)
-print('Shape of the network:', net.shape)
-print(net.sort_values('weight', ascending=False, key=abs).head(10))
+if __name__ == '__main__':
+    adata = ad.read_h5ad(par["rna_all"])
+    par['layer'] = 'lognorm' if 'lognorm' in adata.layers.keys() else 'X_norm'
+    tf_all = np.loadtxt(par["tf_all"], dtype=str)
+    dataset_id = adata.uns['dataset_id']
+    net = corr_net(adata, tf_all, par)
+    print('Shape of the network:', net.shape)
+    print(net.sort_values('weight', ascending=False, key=abs).head(10))
 
-print('Output GRN')
-net = net.astype(str)
-output = ad.AnnData(
-    X=None,
-    uns={
-        "method_id": meta['name'],
-        "dataset_id": adata.uns['dataset_id'],
-        "prediction": net[["source", "target", "weight"]]
-    }
-)
-output.write_h5ad(par['prediction'])
+    print('Output GRN')
+    net = net.astype(str)
+    output = ad.AnnData(
+        X=None,
+        uns={
+            "method_id": meta['name'],
+            "dataset_id": adata.uns['dataset_id'],
+            "prediction": net[["source", "target", "weight"]]
+        }
+    )
+    output.write_h5ad(par['prediction'])
