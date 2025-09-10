@@ -125,6 +125,7 @@ def extrac_clusters(par):
     subprocess.run(cp, shell=True, check=True)
     cp = f"cp {par['barcodes']} {barcode_atac}"
     subprocess.run(cp, shell=True, check=True)
+    print('Extracting clusters successful', flush=True)
 
 def run_cmd(cmd):
     try:
@@ -135,13 +136,22 @@ def run_cmd(cmd):
         print("Command failed with exit code", e.returncode)
         print("STDOUT:", e.stdout)
         print("STDERR:", e.stderr)
-def extract_priors(par):
+
+def download_file(url, dest):
     import requests
+    print(f"Downloading {url} to {dest}", flush=True)
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()  # will raise an error if the download fails
+        with open(dest, "wb") as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+def get_priors(par):
     import gzip
     import shutil
     # - get the genome
+    print('Getting genome ...', flush=True)
     os.makedirs(f"{par['data_dir']}/genome/", exist_ok=True)
-    cmd = f"aws s3 cp s3://openproblems-data/resources/supp_data/genome/genome.fa {par['data_dir']}/genome/ --no-sign-request"
+    cmd = f"aws s3 cp s3://openproblems-data/resources/grn/supp_data/genome/genome.fa {par['data_dir']}/genome/ --no-sign-request"
     try:
         run_cmd(cmd)
     except:
@@ -150,24 +160,28 @@ def extract_priors(par):
             run_cmd(cmd)
         except:
             raise ValueError("Could not get the genome")
+    
     # - get gene annotation       
+    print('Getting gene annotation ...', flush=True)
     data_dir = Path(par['data_dir'])
     gtf_gz = data_dir / "gene.gtf.gz"
     gtf =  data_dir / "gene.gtf"
     url = "http://ftp.ensembl.org/pub/release-107/gtf/homo_sapiens/Homo_sapiens.GRCh38.107.gtf.gz"
-    with requests.get(url, stream=True) as r:
-        r.raise_for_status()  # will raise an error if the download fails
-        with open(gtf_gz, "wb") as f:
-            for chunk in r.iter_content(chunk_size=8192):
-                f.write(chunk)
+    download_file(url, gtf_gz)
 
     with gzip.open(gtf_gz, "rb") as f_in, open(gtf, "wb") as f_out:
         shutil.copyfileobj(f_in, f_out)
     gtf_gz.unlink()
 
     cmd = f"bash dictys_helper gene_gtf.sh {gtf} {par['gene_bed']}"
+    print('Making bed files for gene annotation ...', flush=True)
     run_cmd(cmd)
 
+    print('Downloading motif file...', flush=True)
+
+    url='https://hocomoco11.autosome.org/final_bundle/hocomoco11/full/HUMAN/mono/HOCOMOCOv11_full_HUMAN_mono_homer_format_0.0001.motif'
+    motif_file = data_dir / 'motifs.motif'
+    download_file(url, motif_file)
     
 
     
@@ -209,7 +223,7 @@ def main(par):
     create_bam(par)
     bam_to_bams(par)
     extrac_clusters(par)
-    extract_priors(par)
+    get_priors(par)
     configure(par)
     infer_grn(par)
     export_net(par)

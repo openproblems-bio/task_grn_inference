@@ -55,12 +55,15 @@ engines:
           - python3-dev
           - samtools
           - tabix
+          
       - type: python
         pypi:
           - matplotlib==3.8.1
           - dictys
           - anndata
           - awscli
+          - macs2
+          - homer
 
 runners:
   - type: executable
