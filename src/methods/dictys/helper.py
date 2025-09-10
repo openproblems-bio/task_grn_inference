@@ -166,10 +166,7 @@ def extract_priors(par):
 
     cmd = f"bash dictys_helper gene_gtf.sh {gtf} {par['gene_bed']}"
     run_cmd(cmd)
-
-    
-
-    
+ 
 def configure(par):
     par['make_dir'] = f"{par['temp_dir']}/makefiles"
     os.makedirs(par['make_dir'], exist_ok=True)
