@@ -1,27 +1,38 @@
-# syntax=docker/dockerfile:1
+# Lingfei Wang, 2022-2023. All rights reserved.
+FROM continuumio/miniconda3
+USER root
+SHELL ["/bin/bash", "-c"]
 
-FROM continuumio/miniconda3:latest
+#System update
+RUN DEBIAN_FRONTEND=noninteractive apt-get update \
+	&& DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
+	&& DEBIAN_FRONTEND=noninteractive apt-get install -y curl gawk man pkg-config python3 python3-pip git wget zip unzip xzip \
+	&& rm -Rf /var/lib/apt/lists/*
 
-# set up working directory
-WORKDIR /workspace
+# Install dictys
+# Name of conda environment to create
+ARG CONDAENV_NAME=dictys
+#Commit version to install. If empty, uses local version (./local).
+ARG COMMIT_VERSION=master
+# Python version
+ARG PYTHONVERSION_CONDA=3.9
+# CUDA version. When empty, uses CPU instead
+ARG CUDAVERSION_CONDA=
+COPY local /dictys/local
+RUN cd /dictys \
+	&& if [ "a${COMMIT_VERSION}" != "a" ]; then wget -O install.sh https://raw.githubusercontent.com/pinellolab/dictys/"${COMMIT_VERSION}"/doc/scripts/install.sh; localpath=""; else cp local/doc/scripts/install.sh ./; localpath="/dictys/local"; fi \
+	&& chmod u+x install.sh \
+	&& COMMIT_VERSION="${COMMIT_VERSION}" CONDAENV_NAME="${CONDAENV_NAME}" PYTHONVERSION_CONDA="${PYTHONVERSION_CONDA}" CUDAVERSION_CONDA="${CUDAVERSION_CONDA}" LOCAL_VERSION="$localpath" ./install.sh \
+	&& cd / \
+	&& rm -Rf /dictys
 
-# install mamba for faster solves
-RUN conda install -y -c conda-forge mamba
+#Create entry point
+RUN echo '#!/bin/bash' > /usr/bin/run_dictys \
+	&& echo ". activate ${CONDAENV_NAME}" >> /usr/bin/run_dictys \
+	&& echo 'dictys "$@"' >> /usr/bin/run_dictys \
+	&& chmod u+x /usr/bin/run_dictys
 
-# create environment with base deps
-RUN mamba create -y -n dictys \
-    -c lingfeiwang -c bioconda -c conda-forge -c pytorch -c nvidia \
-    python=3.10 dictys pytorch torchvision torchaudio pytorch-cuda=11.7 mudata pip
+#ENTRYPOINT ["/usr/bin/run_dictys"]
+	
 
-# activate environment and install pip-only deps (torch/cu118 wheels)
-RUN /bin/bash -c "source activate dictys && \
-    pip install torch torchvision torchaudio \
-    --index-url https://download.pytorch.org/whl/cu118"
-
-# make environment default
-SHELL ["conda", "run", "-n", "dictys", "/bin/bash", "-c"]
-
-# optional: verify installation
-RUN python -c "import torch; print('Torch CUDA available:', torch.cuda.is_available())"
-
-ENTRYPOINT ["/bin/bash"]
+CMD ["/bin/bash"]

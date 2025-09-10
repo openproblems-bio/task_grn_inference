@@ -13,6 +13,8 @@ warnings.filterwarnings("ignore")
 from util import process_links
 
 def define_vars(par):
+    os.makedirs(par['temp_dir'], exist_ok=True)
+    print(f"Temporary directory: {par['temp_dir']}", flush=True)
     par['data_dir'] = f"{par['temp_dir']}/data/"
     os.makedirs(par['data_dir'], exist_ok=True)
     par['exp_path'] = f"{par['data_dir']}/expression.tsv.gz"
@@ -26,7 +28,7 @@ def define_vars(par):
     par['bams_dir'] = f"{par['data_dir']}/bams/"
 
     par['gene_bed'] = f"{par['data_dir']}/gene.bed"
-    os.makedirs(par['temp_dir'], exist_ok=True)
+    
 
 def extract_exp(par):
     print('Extracting expression matrix and barcodes', flush=True)
@@ -88,13 +90,12 @@ def extract_atac(par):
 
 def create_bam(par):
     print('Creating BAM file from fragments', flush=True)
-    
-    print("Creating BAM")
-    cmd = f"python {par['frag_to_bam.py']} --fnames {par['frags_path']} --barcodes {par['barcodes']}"
+    cmd = f"python {par['frag_to_bam']} --fnames {par['frags_path']} --barcodes {par['barcodes']}"
     view_sort_cmd = f"samtools view -b | samtools sort -o {par['bam_name']}"
     full_cmd = f"{cmd} | {view_sort_cmd}"
     subprocess.run(full_cmd, shell=True, check=True)
     subprocess.run(["samtools", "index", par['bam_name'], par['bai_name']], check=True)
+    
 
 def bam_to_bams(par):
     """
@@ -124,6 +125,7 @@ def extrac_clusters(par):
     subprocess.run(cp, shell=True, check=True)
     cp = f"cp {par['barcodes']} {barcode_atac}"
     subprocess.run(cp, shell=True, check=True)
+    print('Extracting clusters successful', flush=True)
 
 def run_cmd(cmd):
     try:
@@ -134,13 +136,22 @@ def run_cmd(cmd):
         print("Command failed with exit code", e.returncode)
         print("STDOUT:", e.stdout)
         print("STDERR:", e.stderr)
-def extract_priors(par):
+
+def download_file(url, dest):
     import requests
+    print(f"Downloading {url} to {dest}", flush=True)
+    with requests.get(url, stream=True) as r:
+        r.raise_for_status()  # will raise an error if the download fails
+        with open(dest, "wb") as f:
+            for chunk in r.iter_content(chunk_size=8192):
+                f.write(chunk)
+def get_priors(par):
     import gzip
     import shutil
     # - get the genome
+    print('Getting genome ...', flush=True)
     os.makedirs(f"{par['data_dir']}/genome/", exist_ok=True)
-    cmd = f"aws s3 cp s3://openproblems-data/resources/supp_data/genome/genome.fa {par['data_dir']}/genome/ --no-sign-request"
+    cmd = f"aws s3 cp s3://openproblems-data/resources/grn/supp_data/genome/genome.fa {par['data_dir']}/genome/ --no-sign-request"
     try:
         run_cmd(cmd)
     except:
@@ -149,30 +160,43 @@ def extract_priors(par):
             run_cmd(cmd)
         except:
             raise ValueError("Could not get the genome")
+    
     # - get gene annotation       
+    print('Getting gene annotation ...', flush=True)
     data_dir = Path(par['data_dir'])
     gtf_gz = data_dir / "gene.gtf.gz"
     gtf =  data_dir / "gene.gtf"
     url = "http://ftp.ensembl.org/pub/release-107/gtf/homo_sapiens/Homo_sapiens.GRCh38.107.gtf.gz"
-    with requests.get(url, stream=True) as r:
-        r.raise_for_status()  # will raise an error if the download fails
-        with open(gtf_gz, "wb") as f:
-            for chunk in r.iter_content(chunk_size=8192):
-                f.write(chunk)
+    download_file(url, gtf_gz)
 
     with gzip.open(gtf_gz, "rb") as f_in, open(gtf, "wb") as f_out:
         shutil.copyfileobj(f_in, f_out)
     gtf_gz.unlink()
 
     cmd = f"bash dictys_helper gene_gtf.sh {gtf} {par['gene_bed']}"
+    print('Making bed files for gene annotation ...', flush=True)
     run_cmd(cmd)
- 
+
+    print('Downloading motif file...', flush=True)
+
+    url='https://hocomoco11.autosome.org/final_bundle/hocomoco11/full/HUMAN/mono/HOCOMOCOv11_full_HUMAN_mono_homer_format_0.0001.motif'
+    motif_file = data_dir / 'motifs.motif'
+    download_file(url, motif_file)
+    
 def configure(par):
+    import json
+    device='cpu' #cuda:0
     par['make_dir'] = f"{par['temp_dir']}/makefiles"
     os.makedirs(par['make_dir'], exist_ok=True)
     cmd = f"cd {par['make_dir']} && bash dictys_helper makefile_template.sh common.mk config.mk env_none.mk static.mk"
     run_cmd(cmd)
-    json_arg = '{"DEVICE": "cuda:0", "GENOME_MACS2": "hs", "JOINT": "1"}'
+    
+    json_arg = json.dumps({
+        "DEVICE": device,
+        "GENOME_MACS2": "hs",
+        "JOINT": "1"
+    })
+
     cmd = f"cd {par['make_dir']} && bash dictys_helper makefile_update.py config.mk '{json_arg}'"
     run_cmd(cmd)
     cmd = f"cd {par['temp_dir']} && bash dictys_helper makefile_check.py"
@@ -199,12 +223,13 @@ def export_net(par):
 
 def main(par):
     define_vars(par)
-    # extract_exp(par)
-    # extract_atac(par)
-    # create_bam(par)
-    # bam_to_bams(par)
-    # extrac_clusters(par)
-    # extract_priors(par)
-    # configure(par)
-    # infer_grn(par)
+
+    extract_exp(par)
+    extract_atac(par)
+    create_bam(par)
+    bam_to_bams(par)
+    extrac_clusters(par)
+    get_priors(par)
+    configure(par)
+    infer_grn(par)
     export_net(par)

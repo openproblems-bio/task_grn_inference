@@ -55,7 +55,7 @@ if (requireNamespace("aws.s3", quietly = TRUE)) {
   s3_object <- sprintf("resources/grn/grn_benchmark/prior/cell_topic_%s.csv", dataset_id)
   
   # download the file
-  download_success <- save_object(
+  res <- save_object(
     object = s3_object, 
     bucket = "openproblems-data",
     file = par$cell_topic,
@@ -63,7 +63,8 @@ if (requireNamespace("aws.s3", quietly = TRUE)) {
     check_region = FALSE
   )
   
-  if (download_success) {
+  if (!is.null(res)) {
+    download_success <- TRUE
     message("Downloaded cell_topic from S3")
   }
 }

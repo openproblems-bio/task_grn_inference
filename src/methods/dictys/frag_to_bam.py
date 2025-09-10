@@ -3,13 +3,6 @@ import argparse, os, sys
 import gzip
 
 
-parser = argparse.ArgumentParser(description="Splits fragment file by annotated cell clusters and builds .bam file", usage="")
-parser.add_argument('--fnames', required=True, nargs='+')
-parser.add_argument('--barcodes', required=True)
-
-args = vars(parser.parse_args())
-atac_fnames = args['fnames']
-barcodes = args['barcodes']
 
 fwflag = 99 # 1 + 2 + 32 + 64
 bwflag = 147 # 1 + 2 + 16 + 128
@@ -70,9 +63,18 @@ def filter_fragment_file(atac_fname, barcodes):
     with gzip.open(atac_fname, 'rt', encoding='utf-8') as f:
         for line in f:
             format_sam(line, barcodes)
+def main(atac_fnames, barcodes):
+    sys.stdout.write(sam_header_string)
+    barcodes = set(pd.read_csv(barcodes, header=None)[0].values)
+    for atac_fname in atac_fnames:
+        filter_fragment_file(atac_fname, barcodes)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Splits fragment file by annotated cell clusters and builds .bam file", usage="")
+    parser.add_argument('--fnames', required=True, nargs='+')
+    parser.add_argument('--barcodes', required=True)
 
-sys.stdout.write(sam_header_string)
-barcodes = set(pd.read_csv(barcodes, header=None)[0].values)
-for atac_fname in atac_fnames:
-    filter_fragment_file(atac_fname, barcodes)
+    args = vars(parser.parse_args())
+    atac_fnames = args['fnames']
+    barcodes = args['barcodes']
+    main(atac_fnames, barcodes)
 

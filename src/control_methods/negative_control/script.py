@@ -13,7 +13,7 @@ par = {
 ## VIASH END
 
 try:
-    sys.path.append(meta["utils_dir"])
+    sys.path.append(meta["resources_dir"])
 except:
     meta = {
         'resources_dir':'src/control_methods/negative_control',

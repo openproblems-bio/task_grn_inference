@@ -20,41 +20,51 @@ resources:
   - type: python_script
     path: script.py
   - path: helper.py
-  - path: frag_to_bam.py
+  - type: python_script
+    path: frag_to_bam.py
+  - path: /src/utils/util.py
+    dest: util.py
   
-
-# engines:
-#   - type: docker
-#     image: andrewsg/dictys
-    
-#     setup:
-#       - type: python
-#         pypi:
-#           - gdown
-#       - type: apt
-#         packages:
-#           - bedtools
 
 engines:
   - type: docker
-    image: pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
-
+    image: andrewsg/dictys
+    __merge__: /src/api/base_requirements.yaml
+    
     setup:
-      - type: apt
-        packages:
-          - bedtools
-          - build-essential
-          - pkg-config
-          - libfreetype6-dev
-          - libpng-dev
-          - libtiff5-dev
-          - libjpeg-dev
-          - python3-dev
       - type: python
         pypi:
-          - gdown
-          - matplotlib==3.8.1
-          - dictys
+          - awscli
+      # - type: apt
+      #   packages:
+      #     - bedtools
+
+# engines:
+#   - type: docker
+#     image: pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
+#     __merge__: /src/api/base_requirements.yaml
+#     setup:
+#       - type: apt
+#         packages:
+#           - bedtools
+#           - build-essential
+#           - pkg-config
+#           - libfreetype6-dev
+#           - libpng-dev
+#           - libtiff5-dev
+#           - libjpeg-dev
+#           - python3-dev
+#           - samtools
+#           - tabix
+          
+#       - type: python
+#         pypi:
+#           - matplotlib==3.8.1
+#           - dictys
+#           - anndata
+#           - awscli
+#           - macs2
+#           - homer
 
 runners:
   - type: executable
