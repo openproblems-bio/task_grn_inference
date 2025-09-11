@@ -15,6 +15,7 @@ par = {
     'atac': 'resources_test/grn_benchmark/inference_data/op_atac.h5ad',
     'temp_dir': 'output/temp/',
     'prediction': 'output/temp/prediction.h5ad',
+    'num_workers': 1
 }
 ## VIASH END
 try: 

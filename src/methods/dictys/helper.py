@@ -10,7 +10,7 @@ import warnings
 import subprocess
 warnings.filterwarnings("ignore")
 
-from util import process_links
+
 
 def define_vars(par):
     os.makedirs(par['temp_dir'], exist_ok=True)
@@ -185,7 +185,7 @@ def get_priors(par):
     
 def configure(par):
     import json
-    device='cpu' #cuda:0
+    device='cuda:0' #cuda:0 , cpu
     par['make_dir'] = f"{par['temp_dir']}/makefiles"
     os.makedirs(par['make_dir'], exist_ok=True)
     cmd = f"cd {par['make_dir']} && bash dictys_helper makefile_template.sh common.mk config.mk env_none.mk static.mk"
@@ -202,9 +202,10 @@ def configure(par):
     cmd = f"cd {par['temp_dir']} && bash dictys_helper makefile_check.py"
     run_cmd(cmd)
 def infer_grn(par):
-    cmd = f"cd {par['temp_dir']} && bash dictys_helper network_inference.sh -j 32 -J 1 static"
+    cmd = f"cd {par['temp_dir']} && bash dictys_helper network_inference.sh -j {par['num_workers']} -J 1 static"
     run_cmd(cmd)
 def export_net(par):
+    from util import process_links
     from dictys.net import network
     d0 = network.from_file(f"{par['temp_dir']}/output/static.h5") # check how to control this
     d0.export(f"{par['temp_dir']}/output/net",sparsities=[None])  # no way to control the name it's exporting
