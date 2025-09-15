@@ -1,6 +1,7 @@
 import os
+import traceback
 
-from sklearn.model_selection import GroupShuffleSplit
+from sklearn.model_selection import GroupShuffleSplit, KFold
 
 os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8' # For reproducibility purposes (on GPU)
 
@@ -40,6 +41,15 @@ except:
     sys.path.append(meta["util_dir"])
 from util import read_prediction
 save_dir = 'output/sem/'
+
+
+def combine_multi_index(*arrays) -> np.array:
+    """Combine parallel label arrays into a single integer label per position."""
+    A = np.stack(arrays)
+    n_classes = tuple(int(A[i].max()) + 1 for i in range(A.shape[0]))
+    return np.ravel_multi_index(A, dims=n_classes, order='C')
+
+
 for dataset in ['op']:
     rr_all = {}
     # for method_id in ['pearson_corr', 'grnboost', 'ppcor', 'scenicplus', 'scenic', 'celloracle', 'scprint']:
@@ -47,7 +57,7 @@ for dataset in ['op']:
         ## VIASH START
         par = {
             'prediction': f'resources_test/results/{dataset}/{dataset}.{method_id}.{method_id}.prediction.h5ad',
-            'evaluation_data': 'resources_test/grn_benchmark/evaluation_data/{dataset}_bulk.h5ad',
+            'evaluation_data': f'resources_test/grn_benchmark/evaluation_data/{dataset}_bulk.h5ad',
             'layer': 'lognorm',
             "max_n_links": 50000,
             'num_workers': 20,
@@ -57,11 +67,33 @@ for dataset in ['op']:
         # Load perturbation data
         with h5py.File(par['evaluation_data'], "r") as f:
             assert 'is_control' in f["obs"].keys(), "The evaluation dataset should contain negative controls."
+
+            # Get sample info
+            cv_groups, match_groups, exact_match_groups = [], [], []
+            for obs_name in ["perturbation", "perturbation_type", "cell_type", "donor_id", "plate_name", "row"]:
+                if obs_name in f["obs"]:
+                    if "codes" in f["obs"][obs_name]:
+                        codes = f["obs"][obs_name]["codes"][:]
+                    else:
+                        codes = LabelEncoder().fit_transform(f["obs"][obs_name][:])
+                    if obs_name in {"perturbation", "cell_type"}:
+                        cv_groups.append(codes)
+                    if obs_name not in {"row", "perturbation"}:
+                        match_groups.append(codes)
+                    if obs_name != "perturbation":
+                        exact_match_groups.append(codes)
+
+            # Groups used for cross-validation
+            cv_groups = combine_multi_index(*cv_groups)
+
+            # Groups used for matching with negative controls
+            match_groups = combine_multi_index(*match_groups)
+
+            # Groups used for exact matching with negative controls
+            # (e.g., samples should be from the same plate row)
+            exact_match_groups = combine_multi_index(*exact_match_groups)
+
             are_controls = f["obs"]["is_control"][:].astype(bool)
-            perturbations = f["obs"]["perturbation"]["codes"][:]
-            cell_types = f["obs"]["cell_type"]["codes"][:]
-            donor_ids = f["obs"]["donor_id"]["codes"][:]
-            plate_names = f["obs"]["plate_name"]["codes"][:]
             X = f["layers"][par['layer']]
             if isinstance(X, h5py.Dataset):  # Dense array
                 X = X[:].astype(np.float32)
@@ -73,7 +105,12 @@ for dataset in ['op']:
                 shape = group.attrs['shape']
                 sparse_matrix = csr_matrix((data, indices, indptr), shape=shape)
                 X = sparse_matrix.toarray()
-            gene_names = f["var"]["index"][:].astype(str)
+
+            # Get gene names
+            if "index" in f["var"]:
+                gene_names = f["var"]["index"][:].astype(str)
+            else:
+                gene_names = f["var"]["gene_name"][:].astype(str)
         gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
 
         # Load inferred GRN
@@ -106,24 +143,34 @@ for dataset in ['op']:
         # Get negative controls
         X_controls = X[are_controls, :]
 
-        # Compute perturbations as differences between samples and their matched controls.
-        # By matched control, we mean a negative control from the same donor, located on
-        # the same plate and from the same cell type.
-        # By construction, perturbations will be 0 for control samples.
-        delta_X = np.copy(X)
-        control_map = {}
-        for i, (is_control, donor_id, plate_name, cell_type) in enumerate(
-                zip(are_controls, donor_ids, plate_names, cell_types)):
-            if is_control:
-                control_map[(donor_id, plate_name, cell_type)] = i
-        for i, (donor_id, plate_name, cell_type) in enumerate(zip(donor_ids, plate_names, cell_types)):
-            j = control_map[(donor_id, plate_name, cell_type)]
-            delta_X[i, :] -= delta_X[j, :]
+
+        def compute_perturbations(groups: np.array) -> np.ndarray:
+            # Compute perturbations as differences between samples and their matched controls.
+            # By matched control, we mean a negative control from the same donor, located on
+            # the same plate and from the same cell type.
+            # By construction, perturbations will be 0 for control samples.
+            delta_X = np.copy(X)
+            control_map = {}
+            for i, (is_control, group_id) in enumerate(zip(are_controls, groups)):
+                if is_control:
+                    control_map[group_id] = i
+            for i, group_id in enumerate(groups):
+                j = control_map[group_id]
+                delta_X[i, :] -= delta_X[j, :]
+            return delta_X
+
+
+        try:  # Try exact control matching first (same plate row, if info is available)
+            delta_X = compute_perturbations(exact_match_groups)
+        except:  # If samples are missing, use less stringent control matching instead
+            print(traceback.format_exc())
+            delta_X = compute_perturbations(match_groups)
+
+        # Remove negative controls from downstream analysis
         delta_X = delta_X[~are_controls, :]
-        perturbations = perturbations[~are_controls]
-        cell_types = cell_types[~are_controls]
-        plate_names = plate_names[~are_controls]
-        donor_ids = donor_ids[~are_controls]
+        cv_groups = cv_groups[~are_controls]
+        match_groups = match_groups[~are_controls]
+        exact_match_groups = exact_match_groups[~are_controls]
 
 
         def neumann_series(A: torch.Tensor, k: int = 2) -> torch.Tensor:
@@ -279,9 +326,12 @@ for dataset in ['op']:
 
         # Create a split between training and test sets.
         # Make sure that no compound ends up in both sets.
-        groups = LabelEncoder().fit_transform([f"{donor_id}_{plate_name}" for donor_id, plate_name in zip(donor_ids, plate_names)])
-        splitter = GroupShuffleSplit(test_size=0.5, n_splits=2, random_state=0xCAFE)
-        train_idx, _ = next(splitter.split(delta_X, groups=groups))
+        try:
+            splitter = GroupShuffleSplit(test_size=0.5, n_splits=2, random_state=0xCAFE)
+            train_idx, _ = next(splitter.split(delta_X, groups=cv_groups))
+        except ValueError:
+            splitter = KFold(n_splits=2, random_state=0xCAFE, shuffle=True)
+            train_idx, _ = next(splitter.split(delta_X))
         is_train = np.zeros(len(delta_X), dtype=bool)
         is_train[train_idx] = True
 
