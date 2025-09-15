@@ -33,10 +33,10 @@ except:
     par['frag_to_bam'] = meta['frag_to_bam']
 
 from helper import main 
-from util import parse_args
+# from util import parse_args
 
 
-par = parse_args(par)
+# par = parse_args(par)
 
 if __name__ == '__main__':
     main(par)

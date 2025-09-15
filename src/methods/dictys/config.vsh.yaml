@@ -29,7 +29,7 @@ resources:
 # engines:
 #   - type: docker
 #     image: andrewsg/dictys
-#     __merge__: /src/api/base_requirements.yaml
+#     # __merge__: /src/api/base_requirements.yaml
     
 #     setup:
 #       - type: python
@@ -38,11 +38,11 @@ resources:
 #       - type: apt
 #         packages:
 #           - samtools
-#           - tabix
+#     #       - tabix
 
 engines:
   - type: docker
-    image: nvidia/cuda:11.7.1-devel-ubi8
+    image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: apt
@@ -59,12 +59,13 @@ engines:
           
       - type: python
         pypi:
-          - matplotlib==3.8.1
           - dictys
           - anndata
           - awscli
           - macs2
           - homer
+          # - matplotlib==3.8.1
+
 
 runners:
   - type: executable

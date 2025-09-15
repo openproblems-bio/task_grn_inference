@@ -104,6 +104,7 @@ append_entry() {
     layer: $layer_
     num_workers: $num_workers
     apply_tf_methods: $apply_tf_methods
+    temp_dir: $dataset
 HERE
 
   if [[ "$dataset" =~ ^(op|opsca|ibd)$ ]]; then
@@ -122,8 +123,13 @@ HERE
 #   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint]"
 # fi
 # append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, scprint, portia, scgpt]"
-append_entry "$DATASET" "[figr, celloracle]"
+append_entry "$DATASET" "[scenicplus, figr, celloracle]"
 
+if [ "$RUN_TEST" = true ]; then
+  labels_config="scripts/labels_tw_test.config"
+else
+  labels_config="scripts/labels_tw.config"
+fi
 # --- Final configuration ---
 if [ "$RUN_LOCAL" = true ]; then
   cat >> "$param_local" << HERE
@@ -136,7 +142,7 @@ HERE
     -main-script  target/nextflow/workflows/run_grn_inference/main.nf \
     -profile docker \
     -with-trace \
-    -c common/nextflow_helpers/labels_ci.config \
+    -c $labels_config \
     -params-file ${param_local}
 
 else
@@ -155,7 +161,7 @@ HERE
   #     --workspace 209741690280743 \
   #     --params-file ${param_file} \
   #     --labels ${RUN_ID} \
-  #     --config scripts/hpc_settings.config
+  #     --config $labels_config
 
   echo "Launching task_grn_inference on aws compute..."
   tw launch https://github.com/openproblems-bio/task_grn_inference \
@@ -166,7 +172,7 @@ HERE
     --compute-env 6TJs9kM1T7ot4DbUY2huLF \
     --params-file ${param_file} \
     --labels ${RUN_ID} \
-    --config scripts/labels_tw.config
+    --config $labels_config
 fi
 
 #on demand 6TJs9kM1T7ot4DbUY2huLF   

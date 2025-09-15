@@ -1,6 +1,9 @@
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning)
 import os
+import traceback
 
-from sklearn.model_selection import GroupShuffleSplit
+from sklearn.model_selection import GroupShuffleSplit, KFold
 
 os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8' # For reproducibility purposes (on GPU)
 
@@ -9,6 +12,7 @@ import h5py
 import numpy as np
 import pandas as pd
 import torch
+import anndata as ad
 import tqdm
 from scipy.sparse import csr_matrix
 from scipy.stats import ttest_rel, spearmanr, wilcoxon
@@ -38,43 +42,62 @@ except:
     }
     sys.path.append(meta["resources_dir"])
     sys.path.append(meta["util_dir"])
-from util import read_prediction
+from util import read_prediction, manage_layer
 save_dir = 'output/sem/'
 
-for dataset in ['op']:
+
+def combine_multi_index(*arrays) -> np.array:
+    """Combine parallel label arrays into a single integer label per position."""
+    A = np.stack(arrays)
+    n_classes = tuple(int(A[i].max()) + 1 for i in range(A.shape[0]))
+    return np.ravel_multi_index(A, dims=n_classes, order='C')
+
+
+for dataset in ['op', 'parsebioscience', '300BCG', 'ibd']: #parsebioscience
+    print(f'\n\nProcessing dataset: {dataset}\n')
     rr_all = {}
-    # for method_id in ['pearson_corr', 'grnboost', 'ppcor', 'scenicplus', 'scenic', 'celloracle', 'scprint']:
-    for method_id in ['pearson_corr']:
+    # for method_id in ['negative_control', 'pearson_corr', 'positive_control', 'grnboost', 'ppcor', 'scenic', 'scprint', 'portia',  'granie', 'scenicplus', 'celloracle','figr', 'scglue']:
+    for method_id in ['negative_control', 'pearson_corr', 'positive_control', 'ppcor']:
+
+    # for method_id in ['pearson_corr']:
         ## VIASH START
         par = {
-            'prediction': f'resources_test/results/{dataset}/{dataset}.{method_id}.{method_id}.prediction.h5ad',
-            'evaluation_data': 'resources_test/grn_benchmark/evaluation_data/{dataset}_bulk.h5ad',
+            'prediction': f'resources/results/{dataset}/{dataset}.{method_id}.{method_id}.prediction.h5ad',
+            'evaluation_data': f'resources/grn_benchmark/evaluation_data/{dataset}_bulk.h5ad',
             'layer': 'lognorm',
             "max_n_links": 50000,
             'num_workers': 20,
             'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',    
         }
+        if os.path.exists(par['prediction']) == False:
+            print(f'File not found: {par["prediction"]}, skipping...')
+            continue
+        print(f'\n Processing method: {method_id} \n', flush=True)
         ## VIASH END
-        # Load perturbation data
-        with h5py.File(par['evaluation_data'], "r") as f:
-            assert 'is_control' in f["obs"].keys(), "The evaluation dataset should contain negative controls."
-            are_controls = f["obs"]["is_control"][:].astype(bool)
-            perturbations = f["obs"]["perturbation"]["codes"][:]
-            cell_types = f["obs"]["cell_type"]["codes"][:]
-            donor_ids = f["obs"]["donor_id"]["codes"][:]
-            plate_names = f["obs"]["plate_name"]["codes"][:]
-            X = f["layers"][par['layer']]
-            if isinstance(X, h5py.Dataset):  # Dense array
-                X = X[:].astype(np.float32)
-            else:  # Sparse array
-                group = X
-                data = group['data'][...].astype(np.float32)
-                indices = group['indices'][...]
-                indptr = group['indptr'][...]
-                shape = group.attrs['shape']
-                sparse_matrix = csr_matrix((data, indices, indptr), shape=shape)
-                X = sparse_matrix.toarray()
-            gene_names = f["var"]["index"][:].astype(str)
+        adata = ad.read_h5ad(par['evaluation_data'])
+        layer = manage_layer(adata, par)
+        X = adata.layers[layer]
+        gene_names = adata.var_names
+        # Identify controls
+        assert 'is_control' in adata.obs.columns, "Evaluation dataset must contain 'is_control'."
+        are_controls = adata.obs['is_control'].values.astype(bool)
+        # Encode grouping columns
+        def encode_obs_cols(adata, cols):
+            encoded = []
+            for col in cols:
+                if col in adata.obs:
+                    codes = LabelEncoder().fit_transform(adata.obs[col].values)
+                    encoded.append(codes)
+            return encoded
+
+        cv_groups = encode_obs_cols(adata, ["perturbation", "cell_type"])
+        match_groups = encode_obs_cols(adata, ["perturbation_type", "cell_type", "donor_id", "plate_name"])
+        exact_match_groups = encode_obs_cols(adata, ["perturbation_type", "cell_type", "donor_id", "plate_name", "row"])
+
+        # combine multi-index as before
+        cv_groups = combine_multi_index(*cv_groups)
+        match_groups = combine_multi_index(*match_groups)
+        exact_match_groups = combine_multi_index(*exact_match_groups)
         gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
 
         # Load inferred GRN
@@ -93,6 +116,7 @@ for dataset in ['op']:
         # Only consider the genes that are actually present in the inferred GRN
         gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
         X = X[:, gene_mask]
+        X = X.toarray() if isinstance(X, csr_matrix) else X
         A = A[gene_mask, :][:, gene_mask]
         gene_names = gene_names[gene_mask]
 
@@ -100,6 +124,7 @@ for dataset in ['op']:
         use_signs = np.any(A < 0)
 
         # Center and scale dataset
+        
         scaler = StandardScaler()
         scaler.fit(X[are_controls, :])  # Use controls only to infer statistics (to avoid data leakage)
         X = scaler.transform(X)
@@ -107,24 +132,34 @@ for dataset in ['op']:
         # Get negative controls
         X_controls = X[are_controls, :]
 
-        # Compute perturbations as differences between samples and their matched controls.
-        # By matched control, we mean a negative control from the same donor, located on
-        # the same plate and from the same cell type.
-        # By construction, perturbations will be 0 for control samples.
-        delta_X = np.copy(X)
-        control_map = {}
-        for i, (is_control, donor_id, plate_name, cell_type) in enumerate(
-                zip(are_controls, donor_ids, plate_names, cell_types)):
-            if is_control:
-                control_map[(donor_id, plate_name, cell_type)] = i
-        for i, (donor_id, plate_name, cell_type) in enumerate(zip(donor_ids, plate_names, cell_types)):
-            j = control_map[(donor_id, plate_name, cell_type)]
-            delta_X[i, :] -= delta_X[j, :]
+
+        def compute_perturbations(groups: np.array) -> np.ndarray:
+            # Compute perturbations as differences between samples and their matched controls.
+            # By matched control, we mean a negative control from the same donor, located on
+            # the same plate and from the same cell type.
+            # By construction, perturbations will be 0 for control samples.
+            delta_X = np.copy(X)
+            control_map = {}
+            for i, (is_control, group_id) in enumerate(zip(are_controls, groups)):
+                if is_control:
+                    control_map[group_id] = i
+            for i, group_id in enumerate(groups):
+                j = control_map[group_id]
+                delta_X[i, :] -= delta_X[j, :]
+            return delta_X
+
+
+        try:  # Try exact control matching first (same plate row, if info is available)
+            delta_X = compute_perturbations(exact_match_groups)
+        except:  # If samples are missing, use less stringent control matching instead
+            print(traceback.format_exc())
+            delta_X = compute_perturbations(match_groups)
+
+        # Remove negative controls from downstream analysis
         delta_X = delta_X[~are_controls, :]
-        perturbations = perturbations[~are_controls]
-        cell_types = cell_types[~are_controls]
-        plate_names = plate_names[~are_controls]
-        donor_ids = donor_ids[~are_controls]
+        cv_groups = cv_groups[~are_controls]
+        match_groups = match_groups[~are_controls]
+        exact_match_groups = exact_match_groups[~are_controls]
 
 
         def neumann_series(A: torch.Tensor, k: int = 2) -> torch.Tensor:
@@ -216,8 +251,8 @@ for dataset in ['op']:
 
             # Learn initial GRN weights from the first set
             print("Infer GRN weights from training set, given the provided GRN topology")
-            # A = regression_based_grn_inference(X_controls, A, signed=signed)
-            A = spearman_based_grn_inference(X_controls, A, signed=signed)
+            A = regression_based_grn_inference(X_controls, A, signed=signed)
+            # A = spearman_based_grn_inference(X_controls, A, signed=signed)
 
             # Learn shocks from perturbations, using reporter genes only
             print("Learn shocks from perturbations, using reporter genes only")
@@ -252,7 +287,7 @@ for dataset in ['op']:
                 loss = loss + 0.00001 * torch.sum(torch.square(A))
                 loss.backward()
                 optimizer.step()
-                pbar.set_description(str(loss.item()))
+                # pbar.set_description(str(loss.item()))
             A = A_eff.detach()
             mask = mask.detach().cpu().numpy().astype(bool)
 
@@ -280,9 +315,12 @@ for dataset in ['op']:
 
         # Create a split between training and test sets.
         # Make sure that no compound ends up in both sets.
-        groups = LabelEncoder().fit_transform([f"{donor_id}_{plate_name}" for donor_id, plate_name in zip(donor_ids, plate_names)])
-        splitter = GroupShuffleSplit(test_size=0.5, n_splits=2, random_state=0xCAFE)
-        train_idx, _ = next(splitter.split(delta_X, groups=groups))
+        try:
+            splitter = GroupShuffleSplit(test_size=0.5, n_splits=2, random_state=0xCAFE)
+            train_idx, _ = next(splitter.split(delta_X, groups=cv_groups))
+        except ValueError:
+            splitter = KFold(n_splits=2, random_state=0xCAFE, shuffle=True)
+            train_idx, _ = next(splitter.split(delta_X))
         is_train = np.zeros(len(delta_X), dtype=bool)
         is_train[train_idx] = True
 
@@ -307,8 +345,6 @@ for dataset in ['op']:
         # Evaluate inferred GRN
         print("\n======== Evaluate inferred GRN ========")
         scores = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A, signed=use_signs)
-        print(f"Final score: {np.mean(scores)}")
-
         # Evaluate baseline GRN
         print("\n======== Evaluate shuffled GRN ========")
         scores_baseline = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
@@ -328,11 +364,17 @@ for dataset in ['op']:
         res = wilcoxon(scores - scores_baseline, zero_method='wilcox', alternative='greater')
         rr_all[method_id]['Wilcoxon pvalue'] = float(res.pvalue)
         print(f"Wilcoxon signed-rank test: pvalue={res.pvalue}")
-
+        
+        eps = 1e-300  # very small number to avoid log(0)
+        pval_clipped = max(res.pvalue, eps)
         # Compute final score
-        steepness = 1.5
-        f = lambda p: (-np.log(p)) ** steepness
-        score = f(res.pvalue) / (f(res.pvalue) + f(1e-10))
+        if False:
+            steepness = 1.5
+            f = lambda p: (-np.log(p)) ** steepness
+            score = f(pval_clipped) / (f(pval_clipped) + f(1e-10))
+        else:
+            effect = np.mean(scores) - np.mean(scores_baseline)
+            score = effect * (-np.log10(pval_clipped))
         print(f"Final score: {score}")
         rr_all[method_id]['final'] = float(score)
 

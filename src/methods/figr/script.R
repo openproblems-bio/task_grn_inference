@@ -160,6 +160,7 @@ peak_gene_func <- function(par){
                             p.cut = NULL, # Set this to NULL and we can filter later
                             n_bg = 100)
   write.csv(cisCorr, paste0(par$temp_dir, "cisCorr.csv"), row.names = TRUE)
+  write.csv(cisCorr, par$peak_gene, row.names = TRUE) # for the peak gene analysis later
 }
 
 ## Step 2: create DORCs and smooth them 

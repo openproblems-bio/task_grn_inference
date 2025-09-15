@@ -13,6 +13,7 @@ arguments:
   - name: --peak_gene
     type: file
     required: false
+    default: output/figr_peak_gene.csv
     direction: output
 resources:
   - type: r_script

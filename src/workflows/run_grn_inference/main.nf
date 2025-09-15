@@ -54,6 +54,7 @@ workflow run_wf {
           layer:state.layer,
           apply_tf_methods: state.apply_tf_methods,
           num_workers: state.num_workers,
+          temp_dir: state.temp_dir,
           output: 'predictions/$id.$key.output.h5ad',
           output_model: null
         ]
