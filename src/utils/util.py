@@ -17,6 +17,37 @@ def binarize_weight(weight):
     else:
         return 0
 
+def manage_layer(adata, par):
+    dataset = adata.uns['dataset_id']
+    layer = par['layer']
+    if layer not in adata.layers:
+        if ('X_norm' in adata.layers) & (dataset in ['adamson', 'norman', 'nakatake']):
+            layer = 'X_norm'
+            print(f'Layer {par["layer"]} not found, using X_norm instead')
+        else:
+            raise ValueError(f'Layer {par["layer"]} not found in the data. Available layers: {list(adata.layers.keys())}')
+    return layer
+def read_prediction(prediction, par):
+    adata = ad.read_h5ad(prediction)
+    net = adata.uns['prediction']
+    processed_net = process_links(net, par)
+    return processed_net
+def parse_args(par):
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
+    parser.add_argument('--atac', type=str, help='Path to the input ATAC data in h5ad format.')
+    parser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
+    parser.add_argument('--layer', type=str)
+    parser.add_argument('--temp_dir', type=str)
+    parser.add_argument('--tf_all', type=str)
+    
+
+    args = parser.parse_args()
+    for k, v in vars(args).items():
+        if v is not None:
+            par[k] = v
+    return par
 
 def verbose_print(verbose_level, message, level):
     if level <= verbose_level:
@@ -57,30 +88,43 @@ def basic_qc(
 
 
 def process_links(net, par):
-    # - check for symmetriy
+    import numpy as np
+    print('Original net shape: ', net.shape)
+    
+    standard_cols = ["source", "target", "weight"]
+    
+    # Include cell_type if present
+    if 'cell_type' in net.columns:
+        cols = standard_cols + ['cell_type']
+    else:
+        cols = standard_cols
+    
+    # Check for symmetric links
     flipped = net.rename(columns={"source": "target", "target": "source"})
-    merged = net.merge(flipped, on=["source", "target", "weight"], how="inner")
-
+    merged = net.merge(flipped, on=cols, how="inner")
     if not merged.empty:
         print("Warning: The network contains at least one symmetric link.")
-    # - check for duplicates
-    duplicates = net[["source", "target", "weight"]].duplicated().any()
-    if duplicates:
-        # Remove duplicated edges, keeping the first occurrence
-        net = net[~net[["source", "target", "weight"]].duplicated()]
-    else:
-        net = net
-    # - remove self loops
+    
+    # Remove duplicates
+    net = net.drop_duplicates(subset=cols)
+    
+    # Remove self-loops
     net["source"] = net["source"].astype(str)
     net["target"] = net["target"].astype(str)
     net = net[net["source"] != net["target"]]
-    # - limit the number of links
-    if 'max_n_links' not in par.keys():
-        par["max_n_links"] = 50000
-        net = net.sort_values("weight", ascending=False, key=abs).head(
-            par["max_n_links"]
-        )
-
+    
+    # Aggregate duplicates by mean weight
+    net["weight"] = pd.to_numeric(net["weight"], errors='coerce')
+    net = net.groupby(standard_cols, as_index=False)["weight"].mean()
+    
+    print(f"Network shape after cleaning: {net.shape}")
+    
+    # Limit the number of links
+    max_links = par.get("max_n_links", 50000)
+    # sort by absolute weight descending
+    net = net.reindex(net["weight"].abs().sort_values(ascending=False).index).head(max_links)
+    print(f"Network shape applying max_n_links: {net.shape}")
+    
     return net
 
 
@@ -138,58 +182,58 @@ def corr_net(adata, tf_all, par) -> pd.DataFrame:
     return net
 
 
-def plot_heatmap(scores, ax=None, name="", fmt="0.02f", cmap="viridis"):
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import seaborn
+# def plot_heatmap(scores, ax=None, name="", fmt="0.02f", cmap="viridis"):
+#     import matplotlib.pyplot as plt
+#     import numpy as np
+#     import seaborn
 
-    if ax is None:
-        fig, ax = plt.subplots(1, 1, figsize=(4, 4), sharey=True)
+#     if ax is None:
+#         fig, ax = plt.subplots(1, 1, figsize=(4, 4), sharey=True)
 
-    # Normalize each column individually
-    scores_normalized = scores.apply(
-        lambda x: (x - np.nanmin(x)) / (np.nanmax(x) - np.nanmin(x)), axis=0
-    )
-    scores_normalized = scores_normalized.round(2)
-    # scores_normalized['Rank'] = scores['Rank'].max()-scores['Rank']
-    # scores_normalized['Rank'] = scores_normalized['Rank']/scores_normalized['Rank'].max()
+#     # Normalize each column individually
+#     scores_normalized = scores.apply(
+#         lambda x: (x - np.nanmin(x)) / (np.nanmax(x) - np.nanmin(x)), axis=0
+#     )
+#     scores_normalized = scores_normalized.round(2)
+#     # scores_normalized['Rank'] = scores['Rank'].max()-scores['Rank']
+#     # scores_normalized['Rank'] = scores_normalized['Rank']/scores_normalized['Rank'].max()
 
-    # Define the color scale range for each column (0 to 1 after normalization)
-    vmin = 0
-    vmax = 1
+#     # Define the color scale range for each column (0 to 1 after normalization)
+#     vmin = 0
+#     vmax = 1
 
-    # Plot the heatmap with normalized scores
-    seaborn.heatmap(
-        scores_normalized,
-        ax=ax,
-        square=False,
-        cbar=False,
-        annot=True,
-        fmt=fmt,
-        vmin=vmin,
-        vmax=vmax,
-        cmap=cmap,
-    )
-    # Overlay the original (unnormalized) scores as annotations
-    # scores['Rank'] = scores['Rank'].astype(int)
-    # print(scores['Rank'])
-    # Overlay the original (unnormalized) scores as annotations
-    for text, (i, j) in zip(ax.texts, np.ndindex(scores.shape)):
-        value = scores.iloc[i, j]
-        if isinstance(value, np.int64):  # Check if the value is an integer for 'Rank'
-            text.set_text(f"{value:d}")
-        else:
-            text.set_text(f"{value:.2f}")
+#     # Plot the heatmap with normalized scores
+#     seaborn.heatmap(
+#         scores_normalized,
+#         ax=ax,
+#         square=False,
+#         cbar=False,
+#         annot=True,
+#         fmt=fmt,
+#         vmin=vmin,
+#         vmax=vmax,
+#         cmap=cmap,
+#     )
+#     # Overlay the original (unnormalized) scores as annotations
+#     # scores['Rank'] = scores['Rank'].astype(int)
+#     # print(scores['Rank'])
+#     # Overlay the original (unnormalized) scores as annotations
+#     for text, (i, j) in zip(ax.texts, np.ndindex(scores.shape)):
+#         value = scores.iloc[i, j]
+#         if isinstance(value, np.int64):  # Check if the value is an integer for 'Rank'
+#             text.set_text(f"{value:d}")
+#         else:
+#             text.set_text(f"{value:.2f}")
 
-    # Customize the axes and title
-    ax.tick_params(left=False, bottom=False)
-    ax.xaxis.set_tick_params(width=0)
-    ax.yaxis.set_tick_params(width=0)
-    ax.set_title(name, pad=10)
+#     # Customize the axes and title
+#     ax.tick_params(left=False, bottom=False)
+#     ax.xaxis.set_tick_params(width=0)
+#     ax.yaxis.set_tick_params(width=0)
+#     ax.set_title(name, pad=10)
 
-    ax.xaxis.set_label_position("top")
-    ax.xaxis.tick_top()
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="left")
+#     ax.xaxis.set_label_position("top")
+#     ax.xaxis.tick_top()
+#     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="left")
 
 
 def read_gmt(file_path: str) -> dict[str, list[str]]:

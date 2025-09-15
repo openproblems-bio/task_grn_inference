@@ -15,7 +15,6 @@ par = {
     'cell_type_specific': False,
     'max_n_links': 50000,
     'prediction': 'output/pearson_net.h5ad',
-    'layer': 'X_norm',
     'apply_tf_methods': True
 }
 ## VIASH END
@@ -28,10 +27,12 @@ except:
         "name": "pearson_corr"
     }
     sys.path.append(meta["resources_dir"])
-from util import corr_net
+from util import corr_net, parse_args, manage_layer
+par = parse_args(par)
 
 def main(par):
     adata = ad.read_h5ad(par["rna"])
+    par['layer'] = manage_layer(adata, par)
     tf_all = np.loadtxt(par["tf_all"], dtype=str)
     dataset_id = adata.uns['dataset_id']
     net = corr_net(adata, tf_all, par)

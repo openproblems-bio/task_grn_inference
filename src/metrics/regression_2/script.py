@@ -25,14 +25,6 @@ par = {
 }
 ## VIASH END
 
-## LOCAL START
-parser = argparse.ArgumentParser()
-parser.add_argument('--run_local', action='store_true', help='Run locally')
-
-args = parser.parse_args()
-var_local = vars(args)
-
-## LOCAL END
     
 try:
   sys.path.append(meta["resources_dir"])

@@ -7,34 +7,22 @@ import anndata as ad
 import sys
 import numpy as np
 
+from util import process_links
 def main(par):
-    if 'naming_convention' not in par:
-        naming_convention = lambda dataset, method: f'{dataset}.{method}.{method}.prediction.h5ad'
-    else:
-        naming_convention = par['naming_convention']
-    
     print(par)
     # Load perturbation data
     adata_rna = anndata.read_h5ad(par['evaluation_data'])
     gene_names = adata_rna.var_names
-
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
 
     # Load inferred GRNs
     grns = []
-    for model in par['models']:
-        filepath = os.path.join(par['models_dir'], naming_convention(par['dataset'], model))
-        if not os.path.exists(filepath):
-            print(f"{filepath} didnt exist. Skipped.")
-            continue 
-        if model == 'collectri':
-            print(f"skipping collectri")
-            continue
-        A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
+    for filepath in par['predictions']:
         net = ad.read_h5ad(filepath)
-        net = pd.DataFrame(net.uns['prediction'])
-        net['weight'] = net['weight'].astype(float)
+        net = net.uns['prediction']
 
+        A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
+        net = process_links(net, par)
         for source, target, weight in zip(net['source'], net['target'], net['weight']):
             if (source not in gene_dict) or (target not in gene_dict):
                 continue

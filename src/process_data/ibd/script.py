@@ -62,7 +62,7 @@ map_cell_types = {
     'NK cells': 'NK', 
     'B cells': 'B'
 }
-def format_adata(adata):
+def format_adata(adata, data_type):
     adata.obs['donorID'] = adata.obs['donorID'].astype(str)
     parsed = adata.obs['donorID'].apply(parse_donor_id)
     parsed.columns = ['ID', 'sex', 'disease', 'condition']
@@ -75,13 +75,29 @@ def format_adata(adata):
     adata.obs['perturbation'] = adata.obs['perturbation'].map(lambda x: stim_map.get(x, x))
     adata.obs['cell_type'] = adata.obs['cell_type'].map(map_cell_types).astype('category')
     adata.obs['condition'] = adata.obs['perturbation'].astype('str') + '_' + adata.obs['disease'].astype('str')
+
+    adata.obs['is_control'] = adata.obs['perturbation'].apply(lambda x: x=='RPMI')
+    # we need this for consistency in naming
+    if data_type == 'peak':
+        peak_df = adata.var.index.to_series().str.split('-', expand=True)
+        peak_df.columns = ['seqname', 'start', 'end']
+        # peak_df = peak_df[peak_df['seqname'].str.startswith("chr")]
+        adata.var['start'] = peak_df['start'].astype(int)
+        adata.var['end'] = peak_df['end'].astype(int)
+        adata.var['seqname'] = peak_df['seqname'].values
+        adata = adata[:, adata.var['seqname'].str.startswith("chr")].copy()
+        adata.var['ranges'] = peak_df['start'].astype(str) + '-' + peak_df['end'].astype(str)
+        adata.var['strand'] = '+'
+        adata.var.index = adata.var['seqname'].astype(str) + ':' + adata.var['start'].astype(str) + '-' + adata.var['end'].astype(str)
+    adata.obs.index.name = 'obs_id'
+    adata.X = adata.X.astype(np.float32)
     return adata
 
 data_dir = '/vol/projects/CIIM/processed/multiome/IBD/'
 adata_rna = ad.read_h5ad(f'{data_dir}/rna.h5ad')
 adata_atac = ad.read_h5ad(f'{data_dir}/atac.h5ad')
 
-adata_rna = format_adata(adata_rna)
+adata_rna = format_adata(adata_rna, data_type='rna')
 adata_rna.obs['group_col'] = adata_rna.obs['perturbation'].astype(str) + '_' + \
                              adata_rna.obs['cell_type'].astype(str) + '_' + \
                              adata_rna.obs['donor_id'].astype(str) + '_' + \
@@ -89,7 +105,7 @@ adata_rna.obs['group_col'] = adata_rna.obs['perturbation'].astype(str) + '_' + \
 adata_rna = qc_perturbation(adata_rna, col='group_col', min_cells_per_pert=10, min_cells_per_gene=100, min_genes_per_cell=200)
 
 adata_atac = qc_atac(adata_atac)
-adata_atac = format_adata(adata_atac)
+adata_atac = format_adata(adata_atac, data_type='peak')
 
 adata_rna = add_metadata(adata_rna)
 adata_atac = add_metadata(adata_atac)
@@ -118,12 +134,13 @@ def split_func(adata):
     train_group = ['RPMI']
     test_groups = list(set(adata.obs[group_col].unique().tolist()) - set(train_group))
 
-
-    adata_train = adata_rna[adata_rna.obs[group_col].isin(train_group)]
-    adata_test = adata_rna[adata_rna.obs[group_col].isin(test_groups)]
+    adata_train = adata[adata.obs[group_col].isin(train_group)]
+    adata_test = adata[adata.obs[group_col].isin(test_groups)]
 
     print(f'Shape of training set: {adata_train.shape}', f'Shape of test set: {adata_test.shape}')
     return adata_train, adata_test
+
+
 
 adata_train_rna, adata_test_rna = split_func(adata_rna)
 adata_train_atac, adata_test_atac = split_func(adata_atac)

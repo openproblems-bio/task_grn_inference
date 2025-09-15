@@ -1,0 +1,24 @@
+#!/bin/bash
+#SBATCH --job-name=ppcor
+#SBATCH --output=logs/%j.out
+#SBATCH --error=logs/%j.err
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=20
+#SBATCH --time=40:00:00
+#SBATCH --mem=250GB
+#SBATCH --partition=cpu
+#SBATCH --mail-type=END,FAIL      
+#SBATCH --mail-user=jalil.nourisa@gmail.com   
+
+dataset=$1
+method="ppcor"
+
+if [ -z "$dataset" ]; then
+    echo "Error: dataset not provided"
+    exit 1
+fi
+
+rna="resources/grn_benchmark/inference_data/${dataset}_rna.h5ad"
+prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
+
+singularity run ../../images/${method} Rscript src/methods/${method}/script.R --rna $rna --prediction $prediction

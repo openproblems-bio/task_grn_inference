@@ -59,7 +59,7 @@ def main_perturbation(par):
 
     bulk_adata.obs = bulk_adata.obs.rename(columns={'sm_name':'perturbation'})
 
-    bulk_adata = normalize_func(bulk_adata)
+    bulk_adata = normalize_func(bulk_adata, pearson_residual=True)
 
     bulk_adata.obs['is_control'] = bulk_adata.obs['perturbation'].isin(['Dimethyl Sulfoxide'])
     bulk_adata.obs['is_positive_control'] = bulk_adata.obs['perturbation'].isin(['Dabrafenib', 'Belinostat'])
@@ -104,8 +104,7 @@ def main_multiome(par):
     atac.obs['donor_id'] = atac.obs['donor_id'].map(donor_map)
 
     # normalize rna 
-    X_norm = sc.pp.normalize_total(rna, inplace=False)['X']
-    rna.layers['lognorm'] = sc.pp.log1p(X_norm, copy=True)
+    rna = normalize_func(rna, log_norm=True, pearson_residual=True)
 
     rna = add_metadata(rna)
     atac = add_metadata(atac)
@@ -113,7 +112,7 @@ def main_multiome(par):
     rna.uns['normalization_id'] = 'lognorm'
     atac.uns['normalization_id'] = 'lognorm'
 
-    # - needed for some R packages
+    # - needed for consistency
     annotation_peak = atac.var.reset_index().location.str.split(':', expand=True)
     atac.var['seqname'] = annotation_peak[0].values
     atac.var['ranges'] = annotation_peak[1].values
@@ -121,7 +120,6 @@ def main_multiome(par):
 
     atac = atac[:, atac.var['seqname'].str.startswith('chr')]
 
-    
     return rna, atac
 
 def main_test_data(par):
@@ -149,6 +147,7 @@ if __name__ == '__main__':
     print('evaluation_data', evaluation_data)
 
     evaluation_data.write(par['op_perturbation_bulk'])
+    evaluation_data.write('resources/extended_data/op_bulk.h5ad')
     rna.write(par['op_rna'])
     atac.write(par['op_atac'])
     

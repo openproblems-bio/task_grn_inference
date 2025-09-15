@@ -1,0 +1,32 @@
+__merge__: /src/api/comp_method.yaml
+
+
+name: ppcor
+namespace: "grn_methods"
+info:
+  label: ppcor
+  summary: "GRN inference using PPCOR"
+  description: |
+    GRN inference using PPCOR.
+  documentation_url: https://rdrr.io/cran/ppcor/man/
+
+resources:
+  - type: r_script
+    path: script.R
+  - path: /src/utils/util.py
+    dest: util.py
+
+engines:
+  - type: docker
+    image:  openproblems/base_r:1
+    __merge__: /src/api/base_requirements.yaml
+    setup:
+      - type: r
+        packages: [ppcor, anndata, dplyr]
+    # image: janursa/ppcor-25-07-2025
+  - type: native
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [hightime, veryhighmem, midcpu]

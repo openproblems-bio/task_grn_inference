@@ -13,22 +13,33 @@
 
 set -e
 
-DATASET="${1:-replogle}"
-models_dir="resources/results/$DATASET/"
+DATASET=$1
+if [ -z "$DATASET" ]; then
+  echo "Usage: sbatch run_consensus.sh <dataset>"
+  exit 1
+fi
+
+models_dir="resources/results/$DATASET"
+models=("pearson_corr" "positive_control" "portia" "ppcor" "scenic" "scprint" "grnboost" "scenicplus" "scglue" "granie" "figr" "celloracle")
+predictions=()
+for model in "${models[@]}"; do
+    file="${models_dir}/${DATASET}.${model}.${model}.prediction.h5ad"
+    if [ -e "$file" ]; then
+        predictions+=("$file")
+    fi
+done
+printf '%s\n' "${predictions[@]}"
 
 echo "Running consensus for regression 2"
-models=("pearson_corr" "positive_control" "portia" "ppcor" "scenic" "scprint" "grnboost" "scenicplus" "scglue" "granie" "figr" "celloracle")
-
 datasets=(${DATASET})
 for dataset in "${datasets[@]}"; do
     echo "Running reg2 consensus for dataset: $dataset"
     
     python src/metrics/regression_2/consensus/script.py \
         --dataset "$dataset" \
-        --models_dir "$models_dir" \
         --regulators_consensus "resources/grn_benchmark/prior/regulators_consensus_${dataset}.json" \
         --evaluation_data "resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad" \
-        --models "${models[@]}"
+        --predictions "${predictions[@]}"
 done
 
 

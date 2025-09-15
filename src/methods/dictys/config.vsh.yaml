@@ -1,0 +1,73 @@
+__merge__: /src/api/comp_method.yaml
+
+name: dictys
+namespace: grn_methods
+info:
+  label: dictys
+  summary: "GRN inference using dictys"
+  description: |
+    Infers gene regulatory networks from paired RNA-seq and ATAC-seq data using dictys.
+    The workflow combines multimodal data, creates peak-to-gene linkages, and integrates 
+    transcription factor binding information to predict gene regulatory relationships.
+  documentation_url: https://github.com/pinellolab/dictys
+arguments:
+  - name: --qc
+    type: boolean
+    default: true
+    description: "Whether to perform quality control"
+
+resources:
+  - type: python_script
+    path: script.py
+  - path: helper.py
+  - type: python_script
+    path: frag_to_bam.py
+  - path: /src/utils/util.py
+    dest: util.py
+  
+
+# engines:
+#   - type: docker
+#     image: andrewsg/dictys
+#     __merge__: /src/api/base_requirements.yaml
+    
+#     setup:
+#       - type: python
+#         pypi:
+#           - awscli
+#       - type: apt
+#         packages:
+#           - samtools
+#           - tabix
+
+engines:
+  - type: docker
+    image: nvidia/cuda:11.7.1-devel-ubi8
+    __merge__: /src/api/base_requirements.yaml
+    setup:
+      - type: apt
+        packages:
+          - bedtools
+          - build-essential
+          - pkg-config
+          - libfreetype6-dev
+          - libpng-dev
+          - libtiff5-dev
+          - libjpeg-dev
+          - samtools
+          - tabix
+          
+      - type: python
+        pypi:
+          - matplotlib==3.8.1
+          - dictys
+          - anndata
+          - awscli
+          - macs2
+          - homer
+
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: []

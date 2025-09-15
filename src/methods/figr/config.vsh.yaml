@@ -1,0 +1,32 @@
+__merge__: /src/api/comp_method.yaml
+
+
+name: figr
+namespace: "grn_methods"
+info:
+  label: figr
+  summary: "GRN inference using figr"
+  description: |
+    GRN inference using figr.
+  documentation_url: https://buenrostrolab.github.io/FigR/articles/FigR_shareseq.html
+arguments:
+  - name: --peak_gene
+    type: file
+    required: false
+    direction: output
+resources:
+  - type: r_script
+    path: script.R
+engines:
+  - type: docker
+    image: janursa/figr:19-08-2024
+    __merge__: /src/api/base_requirements.yaml
+    setup:
+      - type: r
+        bioc: ["aws.s3"]
+  # - type: native
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [twodaytime, veryhighmem, midcpu]

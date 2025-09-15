@@ -1,0 +1,63 @@
+__merge__: /src/api/comp_method.yaml
+
+
+
+name: scenicplus
+namespace: grn_methods
+info:
+  label: scenicplus
+  summary: "GRN inference using scenicplus"
+  description: |
+    GRN inference using scenicplus.
+  documentation_url: https://scenicplus.readthedocs.io/en/latest/human_cerebellum.html
+arguments:
+  - name: --scplus_mdata
+    type: file
+    required: false
+    direction: output
+    description: "Main output object."
+    default: "scplus_mdata.h5mu"
+  - name: --qc
+    type: boolean
+    default: false
+    description: "Whether to perform quality control."
+  - name: --cell_topic
+    type: file 
+    default: output/cell_topic.csv
+    required: false
+    direction: output
+    description: "Cell-topics prob scores"
+  - name: --grn_extended
+    type: file 
+    default: scenicplus/grn_extended.csv
+    required: false
+    direction: output
+    description: "Source-target-peak triplets"
+
+resources:
+  - type: python_script
+    path: script.py
+  - path: helper.py
+  - path: /src/utils/util.py
+    dest: util.py
+
+engines:
+  - type: docker
+    image: janursa/scenicplus:29_03_2025
+
+    # setup:   
+    #   - type: python
+    #     packages: [ polars-lts-cpu ]
+    #     github:
+    #       - openproblems-bio/core#subdirectory=packages/python/openproblems
+    setup:   
+      - type: python
+        # packages: [ numba==0.56.4,  pynndescent==0.5.10 ]
+        github:
+          - openproblems-bio/core#subdirectory=packages/python/openproblems
+  # - type: native   
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [twodaytime, veryhighmem, highcpu]

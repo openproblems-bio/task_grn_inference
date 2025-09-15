@@ -1,6 +1,7 @@
 import pandas as pd
 import anndata as ad
 import numpy as np
+import sys
 
 ## VIASH START
 par = {
@@ -9,22 +10,27 @@ par = {
   "tf_all": "resources/grn_benchmark/prior/tf_all.csv",
   "max_n_links": 50000
 }
-meta = {
-    'resources_dir':'src/control_methods/negative_control'
-}
 ## VIASH END
 
-def process_links(net, par):
-    net = net[net.source!=net.target]
-    try:
-        net = net.sample(par['max_n_links'])
-    except:
-        net = net.sample(par['max_n_links'], replace=True)
-    return net
+try:
+    sys.path.append(meta["resources_dir"])
+except:
+    meta = {
+        'resources_dir':'src/control_methods/negative_control',
+        'utils_dir': 'src/utils',
+        'name': 'negative_control'
+    }
+    sys.path.append(meta["resources_dir"])
+    sys.path.append(meta["utils_dir"])
+    
+from util import parse_args, process_links
+
+par = parse_args(par)
+
 
 print('Reading input data')
-rna_all = ad.read_h5ad(par["rna_all"])
-gene_names = rna_all.var_names.to_numpy()
+rna = ad.read_h5ad(par["rna"])
+gene_names = rna.var_names.to_numpy()
 tf_all = np.loadtxt(par['tf_all'], dtype=str)
 
 n_tf = 500
@@ -50,7 +56,7 @@ output = ad.AnnData(
     X=None,
     uns={
         "method_id": meta['name'],
-        "dataset_id": rna_all.uns['dataset_id'],
+        "dataset_id": rna.uns['dataset_id'],
         "prediction": pivoted_net[["source", "target", "weight"]]
     }
 )
