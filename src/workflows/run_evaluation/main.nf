@@ -16,7 +16,8 @@ workflow run_wf {
   metrics = [
     regression_1,
     regression_2,
-    ws_distance
+    ws_distance,
+    sem
   ]
     
   /***************************
