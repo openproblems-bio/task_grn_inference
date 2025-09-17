@@ -3,13 +3,6 @@ import argparse, os, sys
 import gzip
 
 
-parser = argparse.ArgumentParser(description="Splits fragment file by annotated cell clusters and builds .bam file", usage="")
-parser.add_argument('--fnames', required=True, nargs='+')
-parser.add_argument('--barcodes', required=True)
-
-args = vars(parser.parse_args())
-atac_fnames = args['fnames']
-barcodes = args['barcodes']
 
 fwflag = 99 # 1 + 2 + 32 + 64
 bwflag = 147 # 1 + 2 + 16 + 128
@@ -52,7 +45,8 @@ sam_header_string = """@HD	SO:coordinate
 """
 
 def format_sam(s, barcodes):
-    [chrom, srt, end, bc, rpt] = s.strip().split('\t')
+    [chrom, srt, end, bc, rpt] = s.rstrip('\n').split('\t')
+    bc = bc.strip().replace("\r", "")
     if (chrom.lower() not in valid_chr) or (bc not in barcodes):
         return
     qname = f"{chrom}:{srt}:{end}:{bc}"
@@ -61,17 +55,26 @@ def format_sam(s, barcodes):
     tlen  = bwpos + seqlen - fwpos
     for c in range(int(rpt)):
         sys.stdout.write(f"{qname}:{c}\t{fwflag}\t{chrom}\t{fwpos}\t{mapq}\t" +
-              f"{cigar}\t{rnext}\t{bwpos}\t{tlen}\t{seq}\t{qual}\tCB:Z:{bc}\n")
+              f"{cigar}\t{rnext}\t{bwpos}\t{tlen}\t{seq}\t{qual}\tCB:Z:{bc}\tZZ:Z:SPACE\n")
         sys.stdout.write(f"{qname}:{c}\t{bwflag}\t{chrom}\t{bwpos}\t{mapq}\t" +
-              f"{cigar}\t{rnext}\t{fwpos}\t{tlen*-1}\t{seq}\t{qual}\tCB:Z:{bc}\n")
+              f"{cigar}\t{rnext}\t{fwpos}\t{tlen*-1}\t{seq}\t{qual}\tCB:Z:{bc}\tZZ:Z:SPACE\n")
 
 def filter_fragment_file(atac_fname, barcodes):
     with gzip.open(atac_fname, 'rt', encoding='utf-8') as f:
         for line in f:
             format_sam(line, barcodes)
+def main(atac_fnames, barcodes):
+    sys.stdout.write(sam_header_string)
+    barcodes = set(pd.read_csv(barcodes, header=None)[0].values)
+    for atac_fname in atac_fnames:
+        filter_fragment_file(atac_fname, barcodes)
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Splits fragment file by annotated cell clusters and builds .bam file", usage="")
+    parser.add_argument('--fnames', required=True, nargs='+')
+    parser.add_argument('--barcodes', required=True)
 
-sys.stdout.write(sam_header_string)
-barcodes = set(pd.read_csv(barcodes, header=None)[0].values)
-for atac_fname in atac_fnames:
-    filter_fragment_file(atac_fname, barcodes)
+    args = vars(parser.parse_args())
+    atac_fnames = args['fnames']
+    barcodes = args['barcodes']
+    main(atac_fnames, barcodes)
 

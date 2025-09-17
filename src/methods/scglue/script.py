@@ -21,16 +21,7 @@ par = {
 
 import sys
 
-import argparse
-parser = argparse.ArgumentParser(description="Process multiomics RNA data.")
-parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--atac', type=str, help='Path to the multiomics atac file')
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-args = parser.parse_args()
 
-for key, value in vars(args).items():
-    if value:
-        par[key] = value
 
 par['annotation_file'] = f"{par['temp_dir']}/gencode.v45.annotation.gtf.gz"
 # par['motif_file'] = f"{par['temp_dir']}/JASPAR2022-hg38.bed.gz"
@@ -47,6 +38,8 @@ except:
     sys.path.append(meta["util_dir"])
     sys.path.append(meta["resources_dir"])
 from main import main 
+from util import parse_args, process_links
+par = parse_args(par)
 
 
 if __name__ == '__main__':

@@ -19,7 +19,8 @@ methods = [
 metrics = [
   regression_1,
   regression_2,
-  ws_distance
+  ws_distance,
+  sem
 ]
 
 // helper workflow for starting a workflow based on lists of yaml files

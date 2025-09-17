@@ -33,6 +33,11 @@ argument_groups:
         required: false
         direction: input
         default: true
+      - name: --temp_dir
+        type: string
+        required: false
+        direction: input
+        default: 'temp_dir'
   - name: Arguments
     arguments: 
       - name: "--method_ids"

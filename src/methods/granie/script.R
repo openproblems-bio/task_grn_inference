@@ -35,7 +35,7 @@ par <- list(
   GGRaNIE_peak_gene_fdr_threshold = 0.2,
   num_workers = 4,
   peak_gene = "output/granie/peak_gene.csv", # not yet implemented, should I?
-  prediction= "output/granie/prediction.csv",
+  prediction= "output/granie/h5ad",
   useWeightingLinks = FALSE,
   forceRerun = FALSE,
   temp_dir = "output/granie/"

@@ -8,6 +8,7 @@ par = {
   "rna": "resources_test/grn_benchmark/inference_data/op_rna.h5ad",
   "atac": "resources_test/grn_benchmark/inference_data/op_atac.h5ad",
   "base_grn": 'output/celloracle/base_grn.csv',
+  "annotated_peaks": 'output/celloracle/annotated_peaks.csv',
   "temp_dir": 'output/celloracle/',
   "num_workers": 10,
   "prediction": "output/celloracle.h5ad"}
@@ -17,6 +18,7 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
 argparser.add_argument('--atac', type=str, help='Path to the input ATAC data in h5ad format.')
 argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
+argparser.add_argument('--annotated_peaks', type=str, default=par['annotated_peaks'], help='Path to store the annotated peaks.')
 args = argparser.parse_args()
 if args.rna is not None:
     par['rna'] = args.rna

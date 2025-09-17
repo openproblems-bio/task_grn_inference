@@ -31,35 +31,30 @@ par = {
     "how": "most var across",
 }
 ## VIASH END
-
-import argparse
-argparser = argparse.ArgumentParser()
-argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
-argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
-args = argparser.parse_args()
-if args.rna is not None:
-  par['rna'] = args.rna
-if args.prediction is not None:
-  par['prediction'] = args.prediction
-
 try:
     sys.path.append(meta["resources_dir"])
 except:
     meta = {"resources_dir": "src/utils"}
     sys.path.append(meta["resources_dir"])
-
-from util import efficient_melting
+from util import parse_args, process_links, efficient_melting
+par = parse_args(par)
 
 adata = ad.read_h5ad(par["rna"], backed="r")
-train_perturbs = adata.obs['perturbation'].unique()
+
 if adata.uns['dataset_id'] in ['replogle', 'xaira_HCT116', 'xaira_HEK293T']:
+    train_perturbs = adata.obs['perturbation'].unique()
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
     train_perturbs = np.intersect1d(tf_all, train_perturbs) 
     train_perturbs = train_perturbs[:100]  # limit to 100 perturbations
+    mask = adata.obs['perturbation'].isin(train_perturbs)
+    adata = adata[mask].to_memory()
 elif adata.uns['dataset_id'] in ['parsebioscience']:
+    train_perturbs = adata.obs['perturbation'].unique()
     train_perturbs = train_perturbs[:10]
-mask = adata.obs['perturbation'].isin(train_perturbs)
-adata = adata[mask].to_memory()
+    mask = adata.obs['perturbation'].isin(train_perturbs)
+    adata = adata[mask].to_memory()
+else:
+    adata = adata.to_memory()
     
 adata.obs["is_primary_data"] = True
 adata.obs["organism_ontology_term_id"] = "NCBITaxon:9606"

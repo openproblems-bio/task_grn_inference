@@ -6,7 +6,7 @@ library(anndata)
 library(FigR)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(SummarizedExperiment)
-library(aws.s3)
+
 
 Sys.setenv("AWS_ACCESS_KEY_ID" = "",
            "AWS_SECRET_ACCESS_KEY" = "",
@@ -19,7 +19,7 @@ par <- list(
   rna = "resources_test/grn_benchmark/inference_data/op_rna.h5ad",
   atac = "resources_test/grn_benchmark/inference_data/op_atac.h5ad",
   temp_dir =  "output/figr/",
-  # cell_topic = "resources_test/grn_benchmark/prior/cell_topic.csv",
+  cell_topic = "resources_test/grn_benchmark/prior/cell_topic_op.csv",
   num_workers = 5,
   n_topics = 48,
   peak_gene = "output/figr/peak_gene.csv",
@@ -40,22 +40,56 @@ for (i in seq_along(args)) {
 
 dir.create(par$temp_dir, recursive = TRUE, showWarnings = TRUE)
 
-# - download cell_topic
-s3_path <- "s3://openproblems-data/resources/grn/grn_benchmark/prior/cell_topic.csv"
-par$cell_topic <-paste0(par$temp_dir, "cell_topic.csv")
-
-# Download the file
-save_object(object = s3_path, 
-            bucket = "openproblems-data",
-            file = par$cell_topic,
-            use_https = TRUE, 
-            check_region = FALSE)
-
-# ---------------- create summary experiment for rna 
 adata <- anndata::read_h5ad(par$rna)
 dataset_id = adata$uns$dataset_id
 
+# default local path
+par$cell_topic <- paste0(par$temp_dir, sprintf("cell_topic_%s.csv", dataset_id))
 
+# attempt to download via aws.s3
+download_success <- FALSE
+if (requireNamespace("aws.s3", quietly = TRUE)) {
+  library(aws.s3)
+  
+  # S3 object key (relative to bucket)
+  s3_object <- sprintf("resources/grn/grn_benchmark/prior/cell_topic_%s.csv", dataset_id)
+  
+  # download the file
+  res <- save_object(
+    object = s3_object, 
+    bucket = "openproblems-data",
+    file = par$cell_topic,
+    use_https = TRUE, 
+    check_region = FALSE
+  )
+  
+  if (!is.null(res)) {
+    download_success <- TRUE
+    message("Downloaded cell_topic from S3")
+  }
+}
+
+# fallback if download failed
+if (!download_success) {
+  par$cell_topic <- sprintf("resources/grn_benchmark/prior/cell_topic_%s.csv", dataset_id)
+  message("Using local cell_topic file")
+}
+
+print(par$cell_topic)
+# ensure par$cell_topic is a character string
+if (!is.character(par$cell_topic) || length(par$cell_topic) != 1) {
+  stop("par$cell_topic is not a valid string")
+}
+
+# check that the file exists
+if (!file.exists(par$cell_topic)) {
+  stop(paste("Error: cell_topic file does not exist at", par$cell_topic))
+}
+
+par$n_topics <- ncol(read.csv(par$cell_topic, row.names = 1))
+print(sprintf("Number of topics: %d", par$n_topics))
+
+# ---------------- create summary experiment for rna 
 
 rna <- t(adata$X)  # Transpose to match R's column-major order
 rna <- Matrix(rna)
@@ -126,6 +160,7 @@ peak_gene_func <- function(par){
                             p.cut = NULL, # Set this to NULL and we can filter later
                             n_bg = 100)
   write.csv(cisCorr, paste0(par$temp_dir, "cisCorr.csv"), row.names = TRUE)
+  write.csv(cisCorr, par$peak_gene, row.names = TRUE) # for the peak gene analysis later
 }
 
 ## Step 2: create DORCs and smooth them 
