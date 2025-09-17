@@ -3103,6 +3103,17 @@ meta = [
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
+        },
+        {
+          "type" : "string",
+          "name" : "--temp_dir",
+          "default" : [
+            "temp_dir"
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
         }
       ]
     },
@@ -3409,7 +3420,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_inference",
     "viash_version" : "0.9.4",
-    "git_commit" : "5f5d5b2cf93f8e05985a22e98136d3af10107a00",
+    "git_commit" : "a442121e103a8937e7a97ba4dbb10810eb7e1a42",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3588,6 +3599,7 @@ workflow run_wf {
           layer:state.layer,
           apply_tf_methods: state.apply_tf_methods,
           num_workers: state.num_workers,
+          temp_dir: state.temp_dir,
           output: 'predictions/$id.$key.output.h5ad',
           output_model: null
         ]

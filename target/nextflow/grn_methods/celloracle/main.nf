@@ -3320,7 +3320,20 @@ meta = [
           "type" : "file",
           "name" : "--base_grn",
           "default" : [
-            "output/celloracle/base_grn.csv"
+            "celloracle_output/base_grn.csv"
+          ],
+          "must_exist" : true,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "output",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--annotated_peaks",
+          "default" : [
+            "celloracle_output/annotated_peaks.csv"
           ],
           "must_exist" : true,
           "create_parent" : true,
@@ -3468,7 +3481,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/celloracle",
     "viash_version" : "0.9.4",
-    "git_commit" : "5f5d5b2cf93f8e05985a22e98136d3af10107a00",
+    "git_commit" : "a442121e103a8937e7a97ba4dbb10810eb7e1a42",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3594,7 +3607,8 @@ par = {
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'apply_tf_methods': $( if [ ! -z ${VIASH_PAR_APPLY_TF_METHODS+x} ]; then echo "r'${VIASH_PAR_APPLY_TF_METHODS//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'base_grn': $( if [ ! -z ${VIASH_PAR_BASE_GRN+x} ]; then echo "r'${VIASH_PAR_BASE_GRN//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'base_grn': $( if [ ! -z ${VIASH_PAR_BASE_GRN+x} ]; then echo "r'${VIASH_PAR_BASE_GRN//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'annotated_peaks': $( if [ ! -z ${VIASH_PAR_ANNOTATED_PEAKS+x} ]; then echo "r'${VIASH_PAR_ANNOTATED_PEAKS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3626,6 +3640,7 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
 argparser.add_argument('--atac', type=str, help='Path to the input ATAC data in h5ad format.')
 argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
+argparser.add_argument('--annotated_peaks', type=str, default=par['annotated_peaks'], help='Path to store the annotated peaks.')
 args = argparser.parse_args()
 if args.rna is not None:
     par['rna'] = args.rna

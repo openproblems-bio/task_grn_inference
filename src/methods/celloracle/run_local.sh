@@ -30,5 +30,6 @@ fi
 rna="resources/grn_benchmark/inference_data/${dataset}_rna.h5ad"
 atac="resources/grn_benchmark/inference_data/${dataset}_atac.h5ad"
 prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
+annotated_peaks="resources/results/${dataset}/${method}/annotated_peaks.csv"
 
 singularity run ../../images/celloracle python src/methods/${method}/script.py --rna $rna --atac $atac --prediction $prediction

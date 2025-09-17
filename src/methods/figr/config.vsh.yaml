@@ -13,11 +13,8 @@ arguments:
   - name: --peak_gene
     type: file
     required: false
+    default: output/figr_peak_gene.csv
     direction: output
-  - name: --n_topics
-    type: integer 
-    direction: input
-    default: 48
 resources:
   - type: r_script
     path: script.R
@@ -33,4 +30,4 @@ runners:
   - type: executable
   - type: nextflow
     directives:
-      label: [twodaytime, veryveryhighmem, midcpu]
+      label: [twodaytime, veryhighmem, midcpu]

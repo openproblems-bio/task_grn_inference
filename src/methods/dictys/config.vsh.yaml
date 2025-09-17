@@ -20,20 +20,52 @@ resources:
   - type: python_script
     path: script.py
   - path: helper.py
+  - type: python_script
+    path: frag_to_bam.py
+  - path: /src/utils/util.py
+    dest: util.py
   
+
+# engines:
+#   - type: docker
+#     image: andrewsg/dictys
+#     # __merge__: /src/api/base_requirements.yaml
+    
+#     setup:
+#       - type: python
+#         pypi:
+#           - awscli
+#       - type: apt
+#         packages:
+#           - samtools
+#     #       - tabix
 
 engines:
   - type: docker
-    image: agabriel/dictys:v1
+    image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
+    __merge__: /src/api/base_requirements.yaml
     setup:
+      - type: apt
+        packages:
+          - bedtools
+          - build-essential
+          - pkg-config
+          - libfreetype6-dev
+          - libpng-dev
+          - libtiff5-dev
+          - libjpeg-dev
+          - samtools
+          - tabix
+          
       - type: python
         pypi:
-          - gdown
-          - numpy<2
-    # setup:   
-    #   - type: python
-    #     github:
-    #       - openproblems-bio/core#subdirectory=packages/python/openproblems
+          - dictys
+          - anndata
+          - awscli
+          - macs2
+          - homer
+          # - matplotlib==3.8.1
+
 
 runners:
   - type: executable

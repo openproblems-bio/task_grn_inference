@@ -1,31 +1,20 @@
-#!/bin/bash
-#SBATCH --job-name=dictys
-#SBATCH --output=logs/%j.out
-#SBATCH --error=logs/%j.err
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=10
-#SBATCH --time=20:00:00
-#SBATCH --mem=250GB
-#SBATCH --partition=cpu
-#SBATCH --mail-type=END,FAIL      
-#SBATCH --mail-user=jalil.nourisa@gmail.com   
 
+# viash run src/methods/dictys/config.vsh.yaml -- \
+# viash run src/methods/dictys/config.vsh.yaml -- ---setup build
+# docker run -it --rm -v $(pwd):/workspace -w /workspace andrewsg/dictys python src/methods/dictys/script.py \
 
-# viash run src/methods/multi_omics/dictys/config.vsh.yaml -- \
+# docker run -it --rm -v $(pwd):/workspace -w /workspace ghcr.io/openproblems-bio/task_grn_inference/grn_methods/dictys:dev \
+
+# docker run -it --rm -v $(pwd):/workspace -w /workspace ghcr.io/openproblems-bio/task_grn_inference/grn_methods/dictys:dev \
+#     python src/methods/dictys/script.py \
 #     --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \
 #     --atac resources_test/grn_benchmark/inference_data/op_atac.h5ad \
-#     --tf_all resources_test/grn_benchmark/prior/tf_all.csv \
-#     --prediction output/d_test/prediction.h5ad \
-#     --temp_dir output/d_test/ \
-#     --num_workers 10
+#     --temp_dir output/temp \
+#     --prediction output/temp/predictions.h5ad \
+#     --tf_all resources_test/grn_benchmark/prior/tf_all.csv 
+
+# docker run -it --rm -v $(pwd):/workspace -w /workspace ghcr.io/openproblems-bio/task_grn_inference/grn_methods/dictys:dev \
+#     bash -c "cd output/temp && dictys_helper network_inference.sh -j 10 -J 1 static"
 
 
-
-singularity run ../../images/dictys.sif bash src/methods/multi_omics/dictys/prepare_resources.sh \
-    --rna_file resources_test/grn_benchmark/inference_data/op_rna.h5ad \
-    --atac_file resources_test/grn_benchmark/inference_data/op_atac.h5ad \
-    --output_d output/dictys \
-    --input_motif output/d_test/data/motif_file.motif \
-    --input_genome resources/extended_data/genome \
-    --threads 20
-
+docker run -it -v $(pwd):/workspace -w /workspace ghcr.io/openproblems-bio/task_grn_inference/grn_methods/dictys:dev bash 

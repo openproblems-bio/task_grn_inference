@@ -454,9 +454,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods celloracle"
-LABEL org.opencontainers.image.created="2025-09-02T13:05:57Z"
+LABEL org.opencontainers.image.created="2025-09-17T12:32:34Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="5f5d5b2cf93f8e05985a22e98136d3af10107a00"
+LABEL org.opencontainers.image.revision="a442121e103a8937e7a97ba4dbb10810eb7e1a42"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -626,7 +626,11 @@ function ViashHelp {
   echo ""
   echo "    --base_grn"
   echo "        type: file, output, file must exist"
-  echo "        default: output/celloracle/base_grn.csv"
+  echo "        default: celloracle_output/base_grn.csv"
+  echo ""
+  echo "    --annotated_peaks"
+  echo "        type: file, output, file must exist"
+  echo "        default: celloracle_output/annotated_peaks.csv"
   echo ""
   echo "Viash built in Computational Requirements:"
   echo "    ---cpus=INT"
@@ -808,6 +812,17 @@ while [[ $# -gt 0 ]]; do
         --base_grn=*)
             [ -n "$VIASH_PAR_BASE_GRN" ] && ViashError Bad arguments for option \'--base_grn=*\': \'$VIASH_PAR_BASE_GRN\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_BASE_GRN=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --annotated_peaks)
+            [ -n "$VIASH_PAR_ANNOTATED_PEAKS" ] && ViashError Bad arguments for option \'--annotated_peaks\': \'$VIASH_PAR_ANNOTATED_PEAKS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_ANNOTATED_PEAKS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --annotated_peaks. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --annotated_peaks=*)
+            [ -n "$VIASH_PAR_ANNOTATED_PEAKS" ] && ViashError Bad arguments for option \'--annotated_peaks=*\': \'$VIASH_PAR_ANNOTATED_PEAKS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_ANNOTATED_PEAKS=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---engine)
@@ -1036,7 +1051,10 @@ if [ -z ${VIASH_PAR_APPLY_TF_METHODS+x} ]; then
   VIASH_PAR_APPLY_TF_METHODS="true"
 fi
 if [ -z ${VIASH_PAR_BASE_GRN+x} ]; then
-  VIASH_PAR_BASE_GRN="output/celloracle/base_grn.csv"
+  VIASH_PAR_BASE_GRN="celloracle_output/base_grn.csv"
+fi
+if [ -z ${VIASH_PAR_ANNOTATED_PEAKS+x} ]; then
+  VIASH_PAR_ANNOTATED_PEAKS="celloracle_output/annotated_peaks.csv"
 fi
 
 # check whether required files exist
@@ -1158,6 +1176,9 @@ fi
 if [ ! -z "$VIASH_PAR_BASE_GRN" ] && [ ! -d "$(dirname "$VIASH_PAR_BASE_GRN")" ]; then
   mkdir -p "$(dirname "$VIASH_PAR_BASE_GRN")"
 fi
+if [ ! -z "$VIASH_PAR_ANNOTATED_PEAKS" ] && [ ! -d "$(dirname "$VIASH_PAR_ANNOTATED_PEAKS")" ]; then
+  mkdir -p "$(dirname "$VIASH_PAR_ANNOTATED_PEAKS")"
+fi
 
 if [[ "$VIASH_ENGINE_TYPE" == "docker" ]]; then
   # detect volumes from file arguments
@@ -1183,6 +1204,11 @@ if [ ! -z "$VIASH_PAR_BASE_GRN" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_BASE_GRN")" )
   VIASH_PAR_BASE_GRN=$(ViashDockerAutodetectMount "$VIASH_PAR_BASE_GRN")
   VIASH_CHOWN_VARS+=( "$VIASH_PAR_BASE_GRN" )
+fi
+if [ ! -z "$VIASH_PAR_ANNOTATED_PEAKS" ]; then
+  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_ANNOTATED_PEAKS")" )
+  VIASH_PAR_ANNOTATED_PEAKS=$(ViashDockerAutodetectMount "$VIASH_PAR_ANNOTATED_PEAKS")
+  VIASH_CHOWN_VARS+=( "$VIASH_PAR_ANNOTATED_PEAKS" )
 fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_META_RESOURCES_DIR")" )
@@ -1270,7 +1296,8 @@ par = {
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'apply_tf_methods': $( if [ ! -z ${VIASH_PAR_APPLY_TF_METHODS+x} ]; then echo "r'${VIASH_PAR_APPLY_TF_METHODS//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
-  'base_grn': $( if [ ! -z ${VIASH_PAR_BASE_GRN+x} ]; then echo "r'${VIASH_PAR_BASE_GRN//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'base_grn': $( if [ ! -z ${VIASH_PAR_BASE_GRN+x} ]; then echo "r'${VIASH_PAR_BASE_GRN//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'annotated_peaks': $( if [ ! -z ${VIASH_PAR_ANNOTATED_PEAKS+x} ]; then echo "r'${VIASH_PAR_ANNOTATED_PEAKS//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1302,6 +1329,7 @@ argparser = argparse.ArgumentParser()
 argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
 argparser.add_argument('--atac', type=str, help='Path to the input ATAC data in h5ad format.')
 argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
+argparser.add_argument('--annotated_peaks', type=str, default=par['annotated_peaks'], help='Path to store the annotated peaks.')
 args = argparser.parse_args()
 if args.rna is not None:
     par['rna'] = args.rna
@@ -1359,6 +1387,9 @@ if [[ "$VIASH_ENGINE_TYPE" == "docker" ]]; then
   if [ ! -z "$VIASH_PAR_BASE_GRN" ]; then
     VIASH_PAR_BASE_GRN=$(ViashDockerStripAutomount "$VIASH_PAR_BASE_GRN")
   fi
+  if [ ! -z "$VIASH_PAR_ANNOTATED_PEAKS" ]; then
+    VIASH_PAR_ANNOTATED_PEAKS=$(ViashDockerStripAutomount "$VIASH_PAR_ANNOTATED_PEAKS")
+  fi
   if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
     VIASH_META_RESOURCES_DIR=$(ViashDockerStripAutomount "$VIASH_META_RESOURCES_DIR")
   fi
@@ -1381,6 +1412,10 @@ if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -e "$VIASH_PAR_PREDICTION" ]; then
 fi
 if [ ! -z "$VIASH_PAR_BASE_GRN" ] && [ ! -e "$VIASH_PAR_BASE_GRN" ]; then
   ViashError "Output file '$VIASH_PAR_BASE_GRN' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_ANNOTATED_PEAKS" ] && [ ! -e "$VIASH_PAR_ANNOTATED_PEAKS" ]; then
+  ViashError "Output file '$VIASH_PAR_ANNOTATED_PEAKS' does not exist."
   exit 1
 fi
 

@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata==0.11.0"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenic"
-LABEL org.opencontainers.image.created="2025-09-02T13:05:56Z"
+LABEL org.opencontainers.image.created="2025-09-17T12:32:32Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="5f5d5b2cf93f8e05985a22e98136d3af10107a00"
+LABEL org.opencontainers.image.revision="a442121e103a8937e7a97ba4dbb10810eb7e1a42"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1360,31 +1360,19 @@ dep = {
 
 ## VIASH END
 
-import argparse
-argparser = argparse.ArgumentParser()
-argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
-argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
-args = argparser.parse_args()
-if args.rna is not None:
-  par['rna'] = args.rna
-if args.prediction is not None:
-  par['prediction'] = args.prediction
-
-
-
 try:
-    sys.path.append(meta["resources_dir"])
-    from util import process_links
-    from helper import format_data, run_grn
+  sys.path.append(meta["resources_dir"])
 except:
-    meta = {
-      'util_dir': 'src/utils',
-      'helper_dir': 'src/methods/grnboost',
-    }
-    sys.path.append(meta["helper_dir"])
-    from helper import format_data, run_grn
-    sys.path.append(meta["util_dir"])
-    from util import process_links
+  meta = {
+    'util_dir': 'src/utils',
+    'helper_dir': 'src/methods/grnboost',
+  }
+
+  sys.path.append(meta["helper_dir"])
+  sys.path.append(meta["util_dir"])
+from helper import format_data, run_grn
+from util import parse_args, process_links
+par = parse_args(par)
     
 
 

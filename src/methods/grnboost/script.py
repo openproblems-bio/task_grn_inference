@@ -22,18 +22,6 @@ par = {
 }
 ## VIASH END
 
-import argparse
-argparser = argparse.ArgumentParser()
-argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
-argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
-args = argparser.parse_args()
-if args.rna is not None:
-  par['rna'] = args.rna
-if args.prediction is not None:
-  par['prediction'] = args.prediction
-
-
-
 try:
     sys.path.append(meta["resources_dir"])
 except:
@@ -43,9 +31,10 @@ except:
     }
     sys.path.append(meta["util_dir"])
     sys.path.append(meta["helper_dir"])
-from util import process_links
+from util import process_links, parse_args
 from helper import format_data, run_grn
 
+par = parse_args(par)
 
 def main(par):
   os.makedirs(par['temp_dir'], exist_ok=True)

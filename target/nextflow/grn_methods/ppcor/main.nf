@@ -3385,7 +3385,7 @@ meta = [
       "directives" : {
         "label" : [
           "hightime",
-          "highmem",
+          "veryhighmem",
           "midcpu"
         ],
         "tag" : "$id"
@@ -3470,7 +3470,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.9.4",
-    "git_commit" : "5f5d5b2cf93f8e05985a22e98136d3af10107a00",
+    "git_commit" : "a442121e103a8937e7a97ba4dbb10810eb7e1a42",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3630,13 +3630,18 @@ rm(.viash_orig_warn)
 
 ## VIASH END
 args <- commandArgs(trailingOnly = TRUE)
+
 for (i in seq_along(args)) {
   if (args[i] == "--rna" && (i+1) <= length(args)) {
     par\\$rna <- args[i+1]
   } else if (args[i] == "--prediction" && (i+1) <= length(args)) {
     par\\$prediction <- args[i+1]
+  } else if (args[i] == "--layer" && (i+1) <= length(args)) {
+    par\\$layer <- args[i+1]
   }
 }
+
+
 
 # input expression data
 tf_names <- scan(par\\$tf_all, what = "", sep = "\\\\n")
@@ -3644,7 +3649,14 @@ tf_names <- scan(par\\$tf_all, what = "", sep = "\\\\n")
 ad <- anndata::read_h5ad(par\\$rna)
 dataset_id = ad\\$uns\\$dataset_id
 
-inputExpr <- ad\\$X
+layer <- par\\$layer
+
+if (dataset_id %in% c("nakatake", "norman", "adamson")) {
+  layer <- "X_norm"
+}
+
+inputExpr <- ad\\$layers[[layer]]
+
 geneNames <- colnames(inputExpr)
 colnames(inputExpr) <- c(geneNames)
 X <- as.matrix(inputExpr)
@@ -4081,7 +4093,7 @@ meta["defaults"] = [
   },
   "label" : [
     "hightime",
-    "highmem",
+    "veryhighmem",
     "midcpu"
   ],
   "tag" : "$id"

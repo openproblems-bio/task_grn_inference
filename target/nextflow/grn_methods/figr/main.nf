@@ -3319,21 +3319,13 @@ meta = [
         {
           "type" : "file",
           "name" : "--peak_gene",
+          "default" : [
+            "output/figr_peak_gene.csv"
+          ],
           "must_exist" : true,
           "create_parent" : true,
           "required" : false,
           "direction" : "output",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "integer",
-          "name" : "--n_topics",
-          "default" : [
-            48
-          ],
-          "required" : false,
-          "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
         }
@@ -3401,7 +3393,7 @@ meta = [
       "directives" : {
         "label" : [
           "twodaytime",
-          "veryveryhighmem",
+          "veryhighmem",
           "midcpu"
         ],
         "tag" : "$id"
@@ -3480,7 +3472,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/figr",
     "viash_version" : "0.9.4",
-    "git_commit" : "5f5d5b2cf93f8e05985a22e98136d3af10107a00",
+    "git_commit" : "a442121e103a8937e7a97ba4dbb10810eb7e1a42",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3595,7 +3587,7 @@ library(anndata)
 library(FigR)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(SummarizedExperiment)
-library(aws.s3)
+
 
 Sys.setenv("AWS_ACCESS_KEY_ID" = "",
            "AWS_SECRET_ACCESS_KEY" = "",
@@ -3620,8 +3612,7 @@ par <- list(
   "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi ),
   "dataset_id" = $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_DATASET_ID" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
   "apply_tf_methods" = $( if [ ! -z ${VIASH_PAR_APPLY_TF_METHODS+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_APPLY_TF_METHODS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'))"; else echo NULL; fi ),
-  "peak_gene" = $( if [ ! -z ${VIASH_PAR_PEAK_GENE+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PEAK_GENE" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "n_topics" = $( if [ ! -z ${VIASH_PAR_N_TOPICS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_N_TOPICS" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "')"; else echo NULL; fi )
+  "peak_gene" = $( if [ ! -z ${VIASH_PAR_PEAK_GENE+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PEAK_GENE" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi )
 )
 meta <- list(
   "name" = $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo -n "'"; echo -n "$VIASH_META_NAME" | sed "s#['\\\\]#\\\\\\\\&#g"; echo "'"; else echo NULL; fi ),
@@ -3667,22 +3658,56 @@ for (i in seq_along(args)) {
 
 dir.create(par\\$temp_dir, recursive = TRUE, showWarnings = TRUE)
 
-# - download cell_topic
-s3_path <- "s3://openproblems-data/resources/grn/grn_benchmark/prior/cell_topic.csv"
-par\\$cell_topic <-paste0(par\\$temp_dir, "cell_topic.csv")
-
-# Download the file
-save_object(object = s3_path, 
-            bucket = "openproblems-data",
-            file = par\\$cell_topic,
-            use_https = TRUE, 
-            check_region = FALSE)
-
-# ---------------- create summary experiment for rna 
 adata <- anndata::read_h5ad(par\\$rna)
 dataset_id = adata\\$uns\\$dataset_id
 
+# default local path
+par\\$cell_topic <- paste0(par\\$temp_dir, sprintf("cell_topic_%s.csv", dataset_id))
 
+# attempt to download via aws.s3
+download_success <- FALSE
+if (requireNamespace("aws.s3", quietly = TRUE)) {
+  library(aws.s3)
+  
+  # S3 object key (relative to bucket)
+  s3_object <- sprintf("resources/grn/grn_benchmark/prior/cell_topic_%s.csv", dataset_id)
+  
+  # download the file
+  res <- save_object(
+    object = s3_object, 
+    bucket = "openproblems-data",
+    file = par\\$cell_topic,
+    use_https = TRUE, 
+    check_region = FALSE
+  )
+  
+  if (!is.null(res)) {
+    download_success <- TRUE
+    message("Downloaded cell_topic from S3")
+  }
+}
+
+# fallback if download failed
+if (!download_success) {
+  par\\$cell_topic <- sprintf("resources/grn_benchmark/prior/cell_topic_%s.csv", dataset_id)
+  message("Using local cell_topic file")
+}
+
+print(par\\$cell_topic)
+# ensure par\\$cell_topic is a character string
+if (!is.character(par\\$cell_topic) || length(par\\$cell_topic) != 1) {
+  stop("par\\$cell_topic is not a valid string")
+}
+
+# check that the file exists
+if (!file.exists(par\\$cell_topic)) {
+  stop(paste("Error: cell_topic file does not exist at", par\\$cell_topic))
+}
+
+par\\$n_topics <- ncol(read.csv(par\\$cell_topic, row.names = 1))
+print(sprintf("Number of topics: %d", par\\$n_topics))
+
+# ---------------- create summary experiment for rna 
 
 rna <- t(adata\\$X)  # Transpose to match R's column-major order
 rna <- Matrix(rna)
@@ -3753,6 +3778,7 @@ peak_gene_func <- function(par){
                             p.cut = NULL, # Set this to NULL and we can filter later
                             n_bg = 100)
   write.csv(cisCorr, paste0(par\\$temp_dir, "cisCorr.csv"), row.names = TRUE)
+  write.csv(cisCorr, par\\$peak_gene, row.names = TRUE) # for the peak gene analysis later
 }
 
 ## Step 2: create DORCs and smooth them 
@@ -4292,7 +4318,7 @@ meta["defaults"] = [
   },
   "label" : [
     "twodaytime",
-    "veryveryhighmem",
+    "veryhighmem",
     "midcpu"
   ],
   "tag" : "$id"

@@ -81,13 +81,16 @@ def format_adata(adata, data_type):
     if data_type == 'peak':
         peak_df = adata.var.index.to_series().str.split('-', expand=True)
         peak_df.columns = ['seqname', 'start', 'end']
+        # peak_df = peak_df[peak_df['seqname'].str.startswith("chr")]
         adata.var['start'] = peak_df['start'].astype(int)
         adata.var['end'] = peak_df['end'].astype(int)
         adata.var['seqname'] = peak_df['seqname'].values
+        adata = adata[:, adata.var['seqname'].str.startswith("chr")].copy()
         adata.var['ranges'] = peak_df['start'].astype(str) + '-' + peak_df['end'].astype(str)
         adata.var['strand'] = '+'
         adata.var.index = adata.var['seqname'].astype(str) + ':' + adata.var['start'].astype(str) + '-' + adata.var['end'].astype(str)
     adata.obs.index.name = 'obs_id'
+    adata.X = adata.X.astype(np.float32)
     return adata
 
 data_dir = '/vol/projects/CIIM/processed/multiome/IBD/'

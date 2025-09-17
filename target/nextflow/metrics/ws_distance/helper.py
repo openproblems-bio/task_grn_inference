@@ -25,9 +25,6 @@ def main(par):
           ', Number of tfs in the background distance:', len(background_tfs),
           ', Number of common tfs:', len(consensus_tfs_common))
     prediction_tfs = prediction['source'].unique()
-    # evaluation_data = ad.read_h5ad(par['evaluation_data_sc']) 
-    # evaluation_data.X = evaluation_data.layers[par['layer']]
-
     # - for each theta, and each tf: 
     scores_model = []
     for theta in consensus['theta'].unique():

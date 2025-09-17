@@ -17,6 +17,37 @@ def binarize_weight(weight):
     else:
         return 0
 
+def manage_layer(adata, par):
+    dataset = adata.uns['dataset_id']
+    layer = par['layer']
+    if layer not in adata.layers:
+        if ('X_norm' in adata.layers) & (dataset in ['adamson', 'norman', 'nakatake']):
+            layer = 'X_norm'
+            print(f'Layer {par["layer"]} not found, using X_norm instead')
+        else:
+            raise ValueError(f'Layer {par["layer"]} not found in the data. Available layers: {list(adata.layers.keys())}')
+    return layer
+def read_prediction(prediction, par):
+    adata = ad.read_h5ad(prediction)
+    net = adata.uns['prediction']
+    processed_net = process_links(net, par)
+    return processed_net
+def parse_args(par):
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
+    parser.add_argument('--atac', type=str, help='Path to the input ATAC data in h5ad format.')
+    parser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
+    parser.add_argument('--layer', type=str)
+    parser.add_argument('--temp_dir', type=str)
+    parser.add_argument('--tf_all', type=str)
+    
+
+    args = parser.parse_args()
+    for k, v in vars(args).items():
+        if v is not None:
+            par[k] = v
+    return par
 
 def verbose_print(verbose_level, message, level):
     if level <= verbose_level:
@@ -151,58 +182,58 @@ def corr_net(adata, tf_all, par) -> pd.DataFrame:
     return net
 
 
-def plot_heatmap(scores, ax=None, name="", fmt="0.02f", cmap="viridis"):
-    import matplotlib.pyplot as plt
-    import numpy as np
-    import seaborn
+# def plot_heatmap(scores, ax=None, name="", fmt="0.02f", cmap="viridis"):
+#     import matplotlib.pyplot as plt
+#     import numpy as np
+#     import seaborn
 
-    if ax is None:
-        fig, ax = plt.subplots(1, 1, figsize=(4, 4), sharey=True)
+#     if ax is None:
+#         fig, ax = plt.subplots(1, 1, figsize=(4, 4), sharey=True)
 
-    # Normalize each column individually
-    scores_normalized = scores.apply(
-        lambda x: (x - np.nanmin(x)) / (np.nanmax(x) - np.nanmin(x)), axis=0
-    )
-    scores_normalized = scores_normalized.round(2)
-    # scores_normalized['Rank'] = scores['Rank'].max()-scores['Rank']
-    # scores_normalized['Rank'] = scores_normalized['Rank']/scores_normalized['Rank'].max()
+#     # Normalize each column individually
+#     scores_normalized = scores.apply(
+#         lambda x: (x - np.nanmin(x)) / (np.nanmax(x) - np.nanmin(x)), axis=0
+#     )
+#     scores_normalized = scores_normalized.round(2)
+#     # scores_normalized['Rank'] = scores['Rank'].max()-scores['Rank']
+#     # scores_normalized['Rank'] = scores_normalized['Rank']/scores_normalized['Rank'].max()
 
-    # Define the color scale range for each column (0 to 1 after normalization)
-    vmin = 0
-    vmax = 1
+#     # Define the color scale range for each column (0 to 1 after normalization)
+#     vmin = 0
+#     vmax = 1
 
-    # Plot the heatmap with normalized scores
-    seaborn.heatmap(
-        scores_normalized,
-        ax=ax,
-        square=False,
-        cbar=False,
-        annot=True,
-        fmt=fmt,
-        vmin=vmin,
-        vmax=vmax,
-        cmap=cmap,
-    )
-    # Overlay the original (unnormalized) scores as annotations
-    # scores['Rank'] = scores['Rank'].astype(int)
-    # print(scores['Rank'])
-    # Overlay the original (unnormalized) scores as annotations
-    for text, (i, j) in zip(ax.texts, np.ndindex(scores.shape)):
-        value = scores.iloc[i, j]
-        if isinstance(value, np.int64):  # Check if the value is an integer for 'Rank'
-            text.set_text(f"{value:d}")
-        else:
-            text.set_text(f"{value:.2f}")
+#     # Plot the heatmap with normalized scores
+#     seaborn.heatmap(
+#         scores_normalized,
+#         ax=ax,
+#         square=False,
+#         cbar=False,
+#         annot=True,
+#         fmt=fmt,
+#         vmin=vmin,
+#         vmax=vmax,
+#         cmap=cmap,
+#     )
+#     # Overlay the original (unnormalized) scores as annotations
+#     # scores['Rank'] = scores['Rank'].astype(int)
+#     # print(scores['Rank'])
+#     # Overlay the original (unnormalized) scores as annotations
+#     for text, (i, j) in zip(ax.texts, np.ndindex(scores.shape)):
+#         value = scores.iloc[i, j]
+#         if isinstance(value, np.int64):  # Check if the value is an integer for 'Rank'
+#             text.set_text(f"{value:d}")
+#         else:
+#             text.set_text(f"{value:.2f}")
 
-    # Customize the axes and title
-    ax.tick_params(left=False, bottom=False)
-    ax.xaxis.set_tick_params(width=0)
-    ax.yaxis.set_tick_params(width=0)
-    ax.set_title(name, pad=10)
+#     # Customize the axes and title
+#     ax.tick_params(left=False, bottom=False)
+#     ax.xaxis.set_tick_params(width=0)
+#     ax.yaxis.set_tick_params(width=0)
+#     ax.set_title(name, pad=10)
 
-    ax.xaxis.set_label_position("top")
-    ax.xaxis.tick_top()
-    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="left")
+#     ax.xaxis.set_label_position("top")
+#     ax.xaxis.tick_top()
+#     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="left")
 
 
 def read_gmt(file_path: str) -> dict[str, list[str]]:

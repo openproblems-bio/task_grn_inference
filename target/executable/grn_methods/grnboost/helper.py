@@ -8,6 +8,7 @@ import sys
 import os
 import anndata as ad
 
+
 def format_data(par):
   print('Read data')
   adata_rna = anndata.read_h5ad(par['rna'])  
@@ -19,7 +20,8 @@ def format_data(par):
       print(adata_rna.shape)
   gene_names = adata_rna.var_names
   
-  layer = 'lognorm' if 'lognorm' in adata_rna.layers else 'X_norm'
+  from util import manage_layer
+  layer = manage_layer(adata_rna, par)
   X = adata_rna.layers[layer]
 
   if sp.issparse(X):

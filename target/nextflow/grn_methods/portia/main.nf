@@ -3472,7 +3472,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/portia",
     "viash_version" : "0.9.4",
-    "git_commit" : "5f5d5b2cf93f8e05985a22e98136d3af10107a00",
+    "git_commit" : "a442121e103a8937e7a97ba4dbb10810eb7e1a42",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3632,19 +3632,6 @@ dep = {
 
 ## VIASH END
 
-## LOCAL START
-parser = argparse.ArgumentParser(description="Process local inputs.")
-parser.add_argument('--rna', type=str, help='Path to the multiomics RNA file')
-parser.add_argument('--prediction', type=str, help='Path to the prediction file')
-args = parser.parse_args()
-par_local = vars(args)
-
-for key, value in par_local.items():
-    if value is not None:
-        par[key] = value
-
-## LOCAL END
-
 try:
     sys.path.append(meta["resources_dir"])
 except:
@@ -3652,7 +3639,8 @@ except:
     'resources_dir': 'src/utils'
     }
     sys.path.append(meta["resources_dir"])
-from util import process_links
+from util import parse_args, process_links
+par = parse_args(par)
 
 
 def main(par):

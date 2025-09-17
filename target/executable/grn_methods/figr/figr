@@ -457,9 +457,9 @@ RUN Rscript -e 'options(warn = 2); if (!requireNamespace("BiocManager", quietly 
   Rscript -e 'options(warn = 2); if (!requireNamespace("aws.s3", quietly = TRUE)) BiocManager::install("aws.s3")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods figr"
-LABEL org.opencontainers.image.created="2025-09-02T13:05:56Z"
+LABEL org.opencontainers.image.created="2025-09-17T12:32:33Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="5f5d5b2cf93f8e05985a22e98136d3af10107a00"
+LABEL org.opencontainers.image.revision="a442121e103a8937e7a97ba4dbb10810eb7e1a42"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -627,10 +627,7 @@ function ViashHelp {
   echo ""
   echo "    --peak_gene"
   echo "        type: file, output, file must exist"
-  echo ""
-  echo "    --n_topics"
-  echo "        type: integer"
-  echo "        default: 48"
+  echo "        default: output/figr_peak_gene.csv"
   echo ""
   echo "Viash built in Computational Requirements:"
   echo "    ---cpus=INT"
@@ -812,17 +809,6 @@ while [[ $# -gt 0 ]]; do
         --peak_gene=*)
             [ -n "$VIASH_PAR_PEAK_GENE" ] && ViashError Bad arguments for option \'--peak_gene=*\': \'$VIASH_PAR_PEAK_GENE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_PEAK_GENE=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --n_topics)
-            [ -n "$VIASH_PAR_N_TOPICS" ] && ViashError Bad arguments for option \'--n_topics\': \'$VIASH_PAR_N_TOPICS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_N_TOPICS="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --n_topics. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --n_topics=*)
-            [ -n "$VIASH_PAR_N_TOPICS" ] && ViashError Bad arguments for option \'--n_topics=*\': \'$VIASH_PAR_N_TOPICS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_N_TOPICS=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---engine)
@@ -1050,8 +1036,8 @@ fi
 if [ -z ${VIASH_PAR_APPLY_TF_METHODS+x} ]; then
   VIASH_PAR_APPLY_TF_METHODS="true"
 fi
-if [ -z ${VIASH_PAR_N_TOPICS+x} ]; then
-  VIASH_PAR_N_TOPICS="48"
+if [ -z ${VIASH_PAR_PEAK_GENE+x} ]; then
+  VIASH_PAR_PEAK_GENE="output/figr_peak_gene.csv"
 fi
 
 # check whether required files exist
@@ -1090,12 +1076,6 @@ fi
 if [[ -n "$VIASH_PAR_APPLY_TF_METHODS" ]]; then
   if ! [[ "$VIASH_PAR_APPLY_TF_METHODS" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--apply_tf_methods' has to be a boolean. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_N_TOPICS" ]]; then
-  if ! [[ "$VIASH_PAR_N_TOPICS" =~ ^[-+]?[0-9]+$ ]]; then
-    ViashError '--n_topics' has to be an integer. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1280,7 +1260,7 @@ library(anndata)
 library(FigR)
 library(BSgenome.Hsapiens.UCSC.hg38)
 library(SummarizedExperiment)
-library(aws.s3)
+
 
 Sys.setenv("AWS_ACCESS_KEY_ID" = "",
            "AWS_SECRET_ACCESS_KEY" = "",
@@ -1305,8 +1285,7 @@ par <- list(
   "seed" = $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_SEED" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi ),
   "dataset_id" = $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_DATASET_ID" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
   "apply_tf_methods" = $( if [ ! -z ${VIASH_PAR_APPLY_TF_METHODS+x} ]; then echo -n "as.logical(toupper('"; echo -n "$VIASH_PAR_APPLY_TF_METHODS" | sed "s#['\\]#\\\\&#g"; echo "'))"; else echo NULL; fi ),
-  "peak_gene" = $( if [ ! -z ${VIASH_PAR_PEAK_GENE+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PEAK_GENE" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
-  "n_topics" = $( if [ ! -z ${VIASH_PAR_N_TOPICS+x} ]; then echo -n "as.integer('"; echo -n "$VIASH_PAR_N_TOPICS" | sed "s#['\\]#\\\\&#g"; echo "')"; else echo NULL; fi )
+  "peak_gene" = $( if [ ! -z ${VIASH_PAR_PEAK_GENE+x} ]; then echo -n "'"; echo -n "$VIASH_PAR_PEAK_GENE" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi )
 )
 meta <- list(
   "name" = $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo -n "'"; echo -n "$VIASH_META_NAME" | sed "s#['\\]#\\\\&#g"; echo "'"; else echo NULL; fi ),
@@ -1352,22 +1331,56 @@ for (i in seq_along(args)) {
 
 dir.create(par\$temp_dir, recursive = TRUE, showWarnings = TRUE)
 
-# - download cell_topic
-s3_path <- "s3://openproblems-data/resources/grn/grn_benchmark/prior/cell_topic.csv"
-par\$cell_topic <-paste0(par\$temp_dir, "cell_topic.csv")
-
-# Download the file
-save_object(object = s3_path, 
-            bucket = "openproblems-data",
-            file = par\$cell_topic,
-            use_https = TRUE, 
-            check_region = FALSE)
-
-# ---------------- create summary experiment for rna 
 adata <- anndata::read_h5ad(par\$rna)
 dataset_id = adata\$uns\$dataset_id
 
+# default local path
+par\$cell_topic <- paste0(par\$temp_dir, sprintf("cell_topic_%s.csv", dataset_id))
 
+# attempt to download via aws.s3
+download_success <- FALSE
+if (requireNamespace("aws.s3", quietly = TRUE)) {
+  library(aws.s3)
+  
+  # S3 object key (relative to bucket)
+  s3_object <- sprintf("resources/grn/grn_benchmark/prior/cell_topic_%s.csv", dataset_id)
+  
+  # download the file
+  res <- save_object(
+    object = s3_object, 
+    bucket = "openproblems-data",
+    file = par\$cell_topic,
+    use_https = TRUE, 
+    check_region = FALSE
+  )
+  
+  if (!is.null(res)) {
+    download_success <- TRUE
+    message("Downloaded cell_topic from S3")
+  }
+}
+
+# fallback if download failed
+if (!download_success) {
+  par\$cell_topic <- sprintf("resources/grn_benchmark/prior/cell_topic_%s.csv", dataset_id)
+  message("Using local cell_topic file")
+}
+
+print(par\$cell_topic)
+# ensure par\$cell_topic is a character string
+if (!is.character(par\$cell_topic) || length(par\$cell_topic) != 1) {
+  stop("par\$cell_topic is not a valid string")
+}
+
+# check that the file exists
+if (!file.exists(par\$cell_topic)) {
+  stop(paste("Error: cell_topic file does not exist at", par\$cell_topic))
+}
+
+par\$n_topics <- ncol(read.csv(par\$cell_topic, row.names = 1))
+print(sprintf("Number of topics: %d", par\$n_topics))
+
+# ---------------- create summary experiment for rna 
 
 rna <- t(adata\$X)  # Transpose to match R's column-major order
 rna <- Matrix(rna)
@@ -1438,6 +1451,7 @@ peak_gene_func <- function(par){
                             p.cut = NULL, # Set this to NULL and we can filter later
                             n_bg = 100)
   write.csv(cisCorr, paste0(par\$temp_dir, "cisCorr.csv"), row.names = TRUE)
+  write.csv(cisCorr, par\$peak_gene, row.names = TRUE) # for the peak gene analysis later
 }
 
 ## Step 2: create DORCs and smooth them 

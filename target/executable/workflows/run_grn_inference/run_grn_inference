@@ -202,6 +202,10 @@ function ViashHelp {
   echo "        type: boolean"
   echo "        default: true"
   echo ""
+  echo "    --temp_dir"
+  echo "        type: string"
+  echo "        default: temp_dir"
+  echo ""
   echo "Arguments:"
   echo "    --method_ids"
   echo "        type: string, multiple values allowed"
@@ -345,6 +349,17 @@ while [[ $# -gt 0 ]]; do
         --apply_tf_methods=*)
             [ -n "$VIASH_PAR_APPLY_TF_METHODS" ] && ViashError Bad arguments for option \'--apply_tf_methods=*\': \'$VIASH_PAR_APPLY_TF_METHODS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_APPLY_TF_METHODS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --temp_dir)
+            [ -n "$VIASH_PAR_TEMP_DIR" ] && ViashError Bad arguments for option \'--temp_dir\': \'$VIASH_PAR_TEMP_DIR\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TEMP_DIR="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --temp_dir. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --temp_dir=*)
+            [ -n "$VIASH_PAR_TEMP_DIR" ] && ViashError Bad arguments for option \'--temp_dir=*\': \'$VIASH_PAR_TEMP_DIR\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_TEMP_DIR=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --method_ids)
@@ -596,6 +611,9 @@ fi
 if [ -z ${VIASH_PAR_APPLY_TF_METHODS+x} ]; then
   VIASH_PAR_APPLY_TF_METHODS="true"
 fi
+if [ -z ${VIASH_PAR_TEMP_DIR+x} ]; then
+  VIASH_PAR_TEMP_DIR="temp_dir"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_RNA" ] && [ ! -e "$VIASH_PAR_RNA" ]; then
@@ -824,6 +842,7 @@ workflow run_wf {
           layer:state.layer,
           apply_tf_methods: state.apply_tf_methods,
           num_workers: state.num_workers,
+          temp_dir: state.temp_dir,
           output: 'predictions/\$id.\$key.output.h5ad',
           output_model: null
         ]
