@@ -11,15 +11,16 @@
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com   
 
-command=(singularity run --nv /home/jnourisa/projs/images/dictys_latest.sif)
-# data_dir="output/temp/data/"
-# temp_dir="output/dictys_test/"
+# command=(singularity run --nv /home/jnourisa/projs/images/dictys_latest.sif)
+command=(docker run -it  -v $(pwd):/workspace -w /workspace  ghcr.io/openproblems-bio/task_grn_inference/grn_methods/dictys:dev) 
+data_dir="output/temp/data/"
+temp_dir="output/temp/"
 
-"${command[@]}" \
-    python src/methods/dictys/script.py \
-    --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \
-    --atac resources_test/grn_benchmark/inference_data/op_atac.h5ad \
-    --prediction output/temp/predictions.h5ad \
+# "${command[@]}" \
+#     python src/methods/dictys/script.py \
+#     --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \
+#     --atac resources_test/grn_benchmark/inference_data/op_atac.h5ad \
+#     --prediction output/temp/predictions.h5ad \
 
 
 # "${command[@]}" bash dictys_helper genome_homer.sh hg38 $data_dir/genome
@@ -31,7 +32,7 @@ command=(singularity run --nv /home/jnourisa/projs/images/dictys_latest.sif)
 
 # bash dictys_helper network_inference.sh -j 32 -J 1 static --device cpu
 
-# "${command[@]}" python3 -m dictys  chromatin wellington --nth 4 \
-#     $temp_dir/tmp_static/Subset1/reads.bam \
-#     $temp_dir/tmp_static/Subset1/reads.bai $temp_dir/tmp_static/Subset1/peaks.bed \
-#     $temp_dir/tmp_static/Subset1/footprints.bed
+"${command[@]}" python3 -m dictys  chromatin wellington --nth 4 \
+    $temp_dir/tmp_static/cluster_1/reads.bam \
+    $temp_dir/tmp_static/cluster_1/reads.bai $temp_dir/tmp_static/cluster_1/peaks.bed \
+    $temp_dir/tmp_static/cluster_1/footprints.bed
