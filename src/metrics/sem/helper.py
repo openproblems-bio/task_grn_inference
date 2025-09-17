@@ -320,16 +320,14 @@ def main(par):
     scores = scores[mask]
     scores_baseline = scores_baseline[mask]
 
+    rr_all = {}
     # Perform rank test between actual scores and baseline
-    print(f'Method: {method_id}')
-    rr_all[method_id] = {}
-    print(f"Average Spearman: {np.mean(scores)}")
-    rr_all[method_id]['spearman'] = float(np.mean(scores))
-    print(f"Average Spearman (shuffled): {np.mean(scores_baseline)}")
-    rr_all[method_id]['spearman_shuffled'] = float(np.mean(scores_baseline))
+    rr_all['spearman'] = float(np.mean(scores))
+    rr_all['spearman_shuffled'] = float(np.mean(scores_baseline))
     res = wilcoxon(scores - scores_baseline, zero_method='wilcox', alternative='greater')
-    rr_all[method_id]['Wilcoxon pvalue'] = float(res.pvalue)
-    print(f"Wilcoxon signed-rank test: pvalue={res.pvalue}")
+    rr_all['Wilcoxon pvalue'] = float(res.pvalue)
+
+    print(rr_all)
     
     eps = 1e-300  # very small number to avoid log(0)
     pval_clipped = max(res.pvalue, eps)

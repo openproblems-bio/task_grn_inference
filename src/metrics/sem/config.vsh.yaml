@@ -24,11 +24,11 @@ resources:
 
 engines:
   - type: docker
-    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages: [ lightgbm==4.3.0, numpy==1.26.4 , tqdm_joblib==0.0.5]
+        packages: [ tqdm_joblib==0.0.5]
 runners:
   - type: executable
   - type: nextflow
