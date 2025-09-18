@@ -14,7 +14,14 @@ info:
       min: -Inf
       max: +Inf
       maximize: true
-  
+arguments:
+  - name: genes_n
+    type: int
+    default: 5000
+    info:
+      label: Number of genes
+      description: Number of genes to consider in the evaluation (based on most connected genes in the inferred network)
+
 resources:
   - type: python_script
     path: script.py

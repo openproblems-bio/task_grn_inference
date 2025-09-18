@@ -12,30 +12,14 @@ from sklearn.model_selection import GroupKFold, LeaveOneGroupOut
 from sklearn.linear_model import Ridge
 from sklearn.metrics import r2_score, mean_squared_error
 
-from util import verbose_print, process_links, verbose_tqdm
+from util import verbose_print, verbose_tqdm, read_prediction
 
 
 SEED = 0xCAFE
 N_POINTS_TO_ESTIMATE_BACKGROUND = 20
 
-def net_to_matrix(net, gene_names: np.ndarray, par: Dict[str, Any]) -> np.ndarray:
+def net_to_matrix(net, gene_names: np.ndarray) -> np.ndarray:
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
-    if 'cell_type' in net.columns:
-        net.drop(columns=['cell_type'], inplace=True)
-        net = net.groupby(['source', 'target']).mean().reset_index()
-    if par['apply_skeleton']: #apply skeleton
-        print('Before filtering with skeleton:', net.shape)
-        skeleton = pd.read_csv(par['skeleton'])
-        skeleton['link'] = skeleton['source'].astype(str) + '_' + skeleton['target'].astype(str)
-        skeleton = skeleton['link'].values.flatten()
-        
-        net['link'] = net['source'].astype(str) + '_' + net['target'].astype(str)
-        net = net[net['link'].isin(skeleton)]
-        print('After filtering with skeleton:', net.shape)
-    # keep only top n links
-    if net.shape[0] > par['max_n_links']:
-        print(f"Reducing number of links to {par['max_n_links']}")
-        net = process_links(net, par)
     # convert to matrix
     A = np.zeros((len(gene_names), len(gene_names)), dtype=float)
     for source, target, weight in zip(net['source'], net['target'], net['weight']):
@@ -190,10 +174,7 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     gene_names = prturb_adata.var.index.to_numpy()
     n_genes = len(gene_names)
     
-    net = ad.read_h5ad(par['prediction'])
-    net = pd.DataFrame(net.uns['prediction'])
-    net = process_links(net, par)
-    assert net.shape[0]>0, 'No links found in the network'
+    net = read_prediction(prediction, par)
     
     net_matrix = net_to_matrix(net, gene_names, par)
 
@@ -204,11 +185,6 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     # Load and standardize perturbation data    
     X = prturb_adata.layers[par['layer']]
     
-    # try:
-    #     X = X.todense().A
-    # except:
-    #     pass
-
     # X = RobustScaler().fit_transform(X)
     X = RobustScaler(with_centering=False).fit_transform(X)
 
