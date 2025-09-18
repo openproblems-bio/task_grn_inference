@@ -174,9 +174,9 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     gene_names = prturb_adata.var.index.to_numpy()
     n_genes = len(gene_names)
     
-    net = read_prediction(prediction, par)
+    net = read_prediction(par)
     
-    net_matrix = net_to_matrix(net, gene_names, par)
+    net_matrix = net_to_matrix(net, gene_names)
 
     n_cells = prturb_adata.shape[0]
     random_groups = np.random.choice(range(1, 5+1), size=n_cells, replace=True) # random sampling

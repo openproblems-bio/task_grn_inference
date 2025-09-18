@@ -27,22 +27,53 @@ def manage_layer(adata, par):
         else:
             raise ValueError(f'Layer {par["layer"]} not found in the data. Available layers: {list(adata.layers.keys())}')
     return layer
-def read_prediction(prediction, par):
-    adata = ad.read_h5ad(prediction)
+def read_prediction(par):
+    adata = ad.read_h5ad(par['prediction'])
     net = adata.uns['prediction']
     processed_net = process_links(net, par)
     return processed_net
+
+def format_save_score(output, par):
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+    print('Write output to file', flush=True)
+    print(output)
+    metric_ids = output.columns.to_numpy()
+    metric_values = output.values[0]
+
+    output = ad.AnnData(
+        X=np.empty((0, 0)),
+        uns={
+            "dataset_id": dataset_id,
+            "method_id": method_id,
+            "metric_ids": metric_ids,
+            "metric_values": metric_values
+        }
+    )
+    output.write_h5ad(par['score'], compression='gzip')
+    print('Completed', flush=True)
 def parse_args(par):
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
     parser.add_argument('--atac', type=str, help='Path to the input ATAC data in h5ad format.')
     parser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
+    parser.add_argument('--score', type=str, help='Path to the output score in h5ad format.')
     parser.add_argument('--layer', type=str)
     parser.add_argument('--temp_dir', type=str)
     parser.add_argument('--tf_all', type=str)
+    parser.add_argument('--skeleton', type=str)
+    parser.add_argument('--apply_skeleton', action='store_true')
+    parser.add_argument('--apply_tf', action='store_true')
+    parser.add_argument('--max_n_links', type=int)
+    parser.add_argument('--reg_type', type=str)
+    parser.add_argument('--num_workers', type=int)
+    parser.add_argument('--regulators_consensus', type=str)
+    parser.add_argument('--evaluation_data', type=str)
     
 
+   
+    
     args = parser.parse_args()
     for k, v in vars(args).items():
         if v is not None:
@@ -99,7 +130,7 @@ def process_links(net, par):
     if not merged.empty:
         print("Warning: The network contains at least one symmetric link.")
     # Remove duplicates
-    net = net.drop_duplicates(subset=cols)
+    # net = net.drop_duplicates(subset=cols)
     
     # Remove self-loops
     net["source"] = net["source"].astype(str)
@@ -108,7 +139,7 @@ def process_links(net, par):
     
     # Aggregate duplicates by mean weight
     net["weight"] = pd.to_numeric(net["weight"], errors='coerce')
-    net = net.groupby(cols, as_index=False)["weight"].mean()
+    net = net.groupby(["source", "target"], as_index=False)["weight"].mean()
     
     print(f"Network shape after cleaning: {net.shape}")
     # Limit the number of links

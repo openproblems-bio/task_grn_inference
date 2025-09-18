@@ -37,6 +37,7 @@ except:
     sys.path.append(meta["util_dir"])
     sys.path.append(meta["helper_dir"])
 from helper import main as main_sem 
+from util import format_save_score
 
 
 
@@ -71,17 +72,4 @@ if __name__ == "__main__":
     par['loose_match'] = DATASET_GROUPS[dataset_id]['loose_match']
     par['method_id'] = method_id
     output = main_sem(par)
-    metric_ids = output.columns.to_numpy()
-    metric_values = output.values[0]
-
-    output = ad.AnnData(
-        X=np.empty((0, 0)),
-        uns={
-            "dataset_id": dataset_id,
-            "method_id": method_id,
-            "metric_ids": metric_ids,
-            "metric_values": metric_values
-        }
-    )
-    output.write_h5ad(par['score'], compression='gzip')
-    print('Completed', flush=True)
+    format_save_score(output, par)

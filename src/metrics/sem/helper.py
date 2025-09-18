@@ -234,7 +234,7 @@ def main(par):
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
 
     # Load inferred GRN
-    df = read_prediction(par['prediction'], par)
+    df = read_prediction(par)
     sources = df["source"].to_numpy()
     targets = df["target"].to_numpy()
     weights = df["weight"].to_numpy()

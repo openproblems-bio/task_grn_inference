@@ -10,7 +10,7 @@ seed = 42
 np.random.seed(seed)
 
 def main(par):
-    prediction = read_prediction(par['prediction'], par)
+    prediction = read_prediction(par)
     
     assert prediction.shape[0]>0, 'No links found in the network'
     
