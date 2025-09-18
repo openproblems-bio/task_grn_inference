@@ -44,21 +44,6 @@ for dataset in "${datasets[@]}"; do
             --evaluation_data "$evaluation_data" \
             --score "$score"
 
-        # Extract metrics from the .h5ad and append to CSV
-        python - <<EOF
-import anndata as ad
-import pandas as pd
-
-adata = ad.read_h5ad("${score}")
-if "metrics_value" in adata.uns:
-    metrics = adata.uns["metrics_value"]
-    df = pd.DataFrame(list(metrics.items()), columns=["metric", "value"])
-    df["dataset"] = "${dataset}"
-    df["method"] = "${method}"
-    df = df[["dataset", "method", "metric", "value"]]
-    df.to_csv("${combined_csv}", mode="a", header=False, index=False)
-EOF
-
     done
 done
 

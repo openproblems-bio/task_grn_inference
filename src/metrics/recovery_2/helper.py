@@ -2,6 +2,8 @@ import scipy
 import numpy as np
 import pandas as pd
 import anndata as ad
+import warnings
+warnings.filterwarnings("ignore")
 from util import format_save_score, read_prediction
 
 
@@ -41,9 +43,11 @@ def calculate_tf_activity(adata, net, tf_all=None, n_targets_t=1, **kwargs):
     tf_size = net.groupby('source').size()
     tfs = tf_size[tf_size > n_targets_t].index
     net = net[net['source'].isin(tfs)]
-    if True:
+    if False:
         tf_acts = tf_activity_local(net, adata, tf_all, **kwargs)
     else:
+        import decoupler
+        adata.obs['sample'] = adata.obs.index.astype(str)
         mat = pd.DataFrame(
             data=adata.X.todense(),  
             columns=adata.var_names,  
@@ -104,35 +108,49 @@ def main(par):
     c = net.groupby('source').size().sort_values(ascending=False).head(n_tfs)
     tfs = c.index
     net = net[net['source'].isin(tfs)]
+    net_shuffle = net.copy()
+    np.random.seed(42)
+    net_shuffle['target'] = np.random.permutation(net_shuffle['target'].values)
+    net_shuffle = net_shuffle.drop_duplicates(subset=['source', 'target'])
 
 
     tf_act = calculate_tf_activity(evaluation_adata, net, n_targets_t=10)
-    tf_act_random = calculate_tf_activity(evaluation_adata, net, n_targets_t=10, shuffle=True)
+    tf_act_random = calculate_tf_activity(evaluation_adata, net_shuffle, n_targets_t=10)
 
     group = par['group']
     for g in group:
         assert g in tf_act.obs.columns
-    
-    scores = recovery_consistency_score(tf_activity=tf_act, group=group)['consistency_score']
+
+    scores = recovery_consistency_score(tf_activity=tf_act, group=group)['consistency_score']    
     scores_baseline = recovery_consistency_score(tf_activity=tf_act_random, group=group)['consistency_score']
 
+
     from scipy.stats import ttest_rel, spearmanr, wilcoxon
-    res = wilcoxon(scores - scores_baseline, zero_method='wilcox', alternative='greater')
+    try:
+        res = wilcoxon(scores - scores_baseline, zero_method='wilcox', alternative='greater')
+    except Exception as e:
+        print('Error in wilcoxon test:', e)
+        res = None
+    if res is not None:
+        score = np.median(scores)
+        score_baseline = np.median(scores_baseline)
+        print({'res.pvalue': res.pvalue, 'score:': score , 'scores_baseline': score_baseline})
 
-    score = np.median(scores)
-    score_baseline = np.median(scores_baseline)
-    print({'res.pvalue': res.pvalue, 'score:': score , 'scores_baseline': score_baseline})
+        eps = 1e-300  # very small number to avoid log(0)
+        pval_clipped = max(res.pvalue, eps)
 
-    eps = 1e-300  # very small number to avoid log(0)
-    pval_clipped = max(res.pvalue, eps)
+        effect = score - score_baseline
+        score = effect * (-np.log10(pval_clipped))
 
-    effect = score - score_baseline
-    score = effect * (-np.log10(pval_clipped))
-
-    results = {
-        'recovery_2': [float(score)]
-    }
-    results = pd.DataFrame(results)
+        results = {
+            'recovery_2': [float(score)]
+        }
+        results = pd.DataFrame(results)
+    else:
+        results = {
+            'recovery_2': [float('nan')]
+        }
+        results = pd.DataFrame(results)
     return results
 
 

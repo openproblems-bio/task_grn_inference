@@ -15,7 +15,8 @@
 # command=(docker run -it  -v $(pwd):/workspace -w /workspace  ghcr.io/openproblems-bio/task_grn_inference/grn_methods/dictys:dev) 
 
 
-command=(singularity run --nv /home/jnourisa/projs/external/greta/workflow/envs/dictys.sif)
+# command=(singularity run --nv /home/jnourisa/projs/external/greta/workflow/envs/dictys.sif)
+command=(singularity run --nv /home/jnourisa/projs/images/dictys.sif)
 temp_dir="output/temp/"
 data_dir="{$temp_dir}/data/"
 
