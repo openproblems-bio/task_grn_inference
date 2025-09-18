@@ -1,38 +1,57 @@
-# Lingfei Wang, 2022-2023. All rights reserved.
-FROM continuumio/miniconda3
-USER root
+FROM ubuntu:20.04
+
+# Set non-interactive for apt
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PATH=/opt/conda/bin:$PATH
+ENV MAMBA_ROOT_PREFIX=/opt/conda
+ENV MPLCONFIGDIR=/tmp/matplotlib
+
+# Install basic system packages
+RUN apt update -y && \
+    apt install -y --no-install-recommends \
+        tzdata \
+        build-essential \
+        gcc \
+        libstdc++6 \
+        cmake \
+        wget \
+        curl \
+        libcurl4-openssl-dev \
+        libssl-dev \
+        libxml2-dev \
+        libcairo2-dev \
+        libxt-dev \
+        libopenblas-dev \
+        bedtools && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Miniforge
+RUN wget --no-check-certificate -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh" && \
+    bash Miniforge3.sh -b -p /opt/conda && \
+    rm Miniforge3.sh
+
+# Create conda environment with packages
+RUN /opt/conda/bin/conda init bash && \
+    . /opt/conda/etc/profile.d/conda.sh && \
+    /opt/conda/bin/mamba create -y -n dictys_env -c lingfeiwang -c conda-forge -c bioconda -c pytorch \
+        python=3.10 \
+        pip \
+        dictys \
+        pytorch \
+        torchvision \
+        torchaudio \
+        cpuonly \
+        jupyterlab \
+        mudata \
+		awscli \
+		anndata && \
+    /opt/conda/bin/pip cache purge && \
+    /opt/conda/bin/conda clean -a -y
+
+# Default shell
 SHELL ["/bin/bash", "-c"]
 
-#System update
-RUN DEBIAN_FRONTEND=noninteractive apt-get update \
-	&& DEBIAN_FRONTEND=noninteractive apt-get upgrade -y \
-	&& DEBIAN_FRONTEND=noninteractive apt-get install -y curl gawk man pkg-config python3 python3-pip git wget zip unzip xzip \
-	&& rm -Rf /var/lib/apt/lists/*
-
-# Install dictys
-# Name of conda environment to create
-ARG CONDAENV_NAME=dictys
-#Commit version to install. If empty, uses local version (./local).
-ARG COMMIT_VERSION=master
-# Python version
-ARG PYTHONVERSION_CONDA=3.9
-# CUDA version. When empty, uses CPU instead
-ARG CUDAVERSION_CONDA=
-COPY local /dictys/local
-RUN cd /dictys \
-	&& if [ "a${COMMIT_VERSION}" != "a" ]; then wget -O install.sh https://raw.githubusercontent.com/pinellolab/dictys/"${COMMIT_VERSION}"/doc/scripts/install.sh; localpath=""; else cp local/doc/scripts/install.sh ./; localpath="/dictys/local"; fi \
-	&& chmod u+x install.sh \
-	&& COMMIT_VERSION="${COMMIT_VERSION}" CONDAENV_NAME="${CONDAENV_NAME}" PYTHONVERSION_CONDA="${PYTHONVERSION_CONDA}" CUDAVERSION_CONDA="${CUDAVERSION_CONDA}" LOCAL_VERSION="$localpath" ./install.sh \
-	&& cd / \
-	&& rm -Rf /dictys
-
-#Create entry point
-RUN echo '#!/bin/bash' > /usr/bin/run_dictys \
-	&& echo ". activate ${CONDAENV_NAME}" >> /usr/bin/run_dictys \
-	&& echo 'dictys "$@"' >> /usr/bin/run_dictys \
-	&& chmod u+x /usr/bin/run_dictys
-
-#ENTRYPOINT ["/usr/bin/run_dictys"]
-	
-
-CMD ["/bin/bash"]
+# Activate environment by default
+SHELL ["/bin/bash", "-c"]
+ENV PATH=/opt/conda/envs/dictys_env/bin:$PATH
+CMD ["bash"]

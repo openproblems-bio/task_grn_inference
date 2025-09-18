@@ -64,7 +64,8 @@ engines:
           - awscli
           - macs2
           - homer
-          # - matplotlib==3.8.1
+          - numpy==1.23.5
+          - matplotlib==3.8.1
 
 
 runners:

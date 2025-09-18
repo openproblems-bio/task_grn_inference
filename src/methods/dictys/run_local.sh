@@ -12,7 +12,8 @@
 #SBATCH --mail-user=jalil.nourisa@gmail.com   
 
 # command=(singularity run --nv /home/jnourisa/projs/images/dictys_latest.sif)
-command=(docker run -it  -v $(pwd):/workspace -w /workspace  ghcr.io/openproblems-bio/task_grn_inference/grn_methods/dictys:dev) 
+# command=(docker run -it  -v $(pwd):/workspace -w /workspace  ghcr.io/openproblems-bio/task_grn_inference/grn_methods/dictys:dev) 
+command=(docker run -it  -v $(pwd):/workspace -w /workspace  janursa/dictys:latest) 
 data_dir="output/temp/data/"
 temp_dir="output/temp/"
 
