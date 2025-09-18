@@ -185,11 +185,6 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     # Load and standardize perturbation data    
     X = prturb_adata.layers[par['layer']]
     
-    # try:
-    #     X = X.todense().A
-    # except:
-    #     pass
-
     # X = RobustScaler().fit_transform(X)
     X = RobustScaler(with_centering=False).fit_transform(X)
 

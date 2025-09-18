@@ -248,6 +248,10 @@ def main(par):
 
     # Only consider the genes that are actually present in the inferred GRN
     gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
+    if True:
+        idx = np.argsort(np.maximum(np.sum(A!=0, axis=1), np.sum(A!=0, axis=0)))[:-par['genes_n']]
+        gene_mask[idx] = False
+        
     X = X[:, gene_mask]
     X = X.toarray() if isinstance(X, csr_matrix) else X
     A = A[gene_mask, :][:, gene_mask]
@@ -337,4 +341,10 @@ def main(par):
         effect = np.mean(scores) - np.mean(scores_baseline)
         score = effect * (-np.log10(pval_clipped))
     print(f"Final score: {score}")
-    return float(score)
+
+    results = {
+        'sem': [float(score)]
+    }
+
+    df_results = pd.DataFrame(results)
+    return df_results

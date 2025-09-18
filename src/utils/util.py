@@ -92,7 +92,7 @@ def process_links(net, par):
     print('Original net shape: ', net.shape)
     if 'cell_type' in net.columns:
         print('Prediction contains cell type specific links. Averaging weights across cell types.')
-    standard_cols = ["source", "target", "weight"]
+    cols = ["source", "target", "weight"]
     # Check for symmetric links
     flipped = net.rename(columns={"source": "target", "target": "source"})
     merged = net.merge(flipped, on=cols, how="inner")
@@ -108,7 +108,7 @@ def process_links(net, par):
     
     # Aggregate duplicates by mean weight
     net["weight"] = pd.to_numeric(net["weight"], errors='coerce')
-    net = net.groupby(standard_cols, as_index=False)["weight"].mean()
+    net = net.groupby(cols, as_index=False)["weight"].mean()
     
     print(f"Network shape after cleaning: {net.shape}")
     # Limit the number of links
