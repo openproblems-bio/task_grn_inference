@@ -69,9 +69,6 @@ def compute_perturbations(X, are_controls, groups: np.array) -> np.ndarray:
         delta_X[i, :] -= delta_X[j, :]
     return delta_X
 
-
-
-
 def solve_sem(A: torch.Tensor, delta: torch.Tensor, stable: bool = False) -> torch.Tensor:
     """Compute the perturbation using a linear structural equation model (SEM).
 

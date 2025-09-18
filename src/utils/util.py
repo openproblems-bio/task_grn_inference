@@ -90,21 +90,14 @@ def basic_qc(
 def process_links(net, par):
     import numpy as np
     print('Original net shape: ', net.shape)
-    
-    standard_cols = ["source", "target", "weight"]
-    
-    # Include cell_type if present
     if 'cell_type' in net.columns:
-        cols = standard_cols + ['cell_type']
-    else:
-        cols = standard_cols
-    
+        print('Prediction contains cell type specific links. Averaging weights across cell types.')
+    standard_cols = ["source", "target", "weight"]
     # Check for symmetric links
     flipped = net.rename(columns={"source": "target", "target": "source"})
     merged = net.merge(flipped, on=cols, how="inner")
     if not merged.empty:
         print("Warning: The network contains at least one symmetric link.")
-    
     # Remove duplicates
     net = net.drop_duplicates(subset=cols)
     
@@ -118,7 +111,6 @@ def process_links(net, par):
     net = net.groupby(standard_cols, as_index=False)["weight"].mean()
     
     print(f"Network shape after cleaning: {net.shape}")
-    
     # Limit the number of links
     max_links = par.get("max_n_links", 50000)
     # sort by absolute weight descending

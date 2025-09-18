@@ -4,15 +4,13 @@ import sys
 import numpy as np
 from tqdm import tqdm
 
-from util import process_links
+from util import read_prediction
 # For reproducibility
 seed = 42
 np.random.seed(seed)
 
 def main(par):
-    prediction = ad.read_h5ad(par['prediction'])
-    prediction = pd.DataFrame(prediction.uns['prediction'])
-    prediction = process_links(prediction, par)
+    prediction = read_prediction(par['prediction'], par)
     
     assert prediction.shape[0]>0, 'No links found in the network'
     
