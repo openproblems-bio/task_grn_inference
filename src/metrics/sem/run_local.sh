@@ -16,9 +16,9 @@ save_dir="output/sem"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=("300BCG" 'parsebioscience' 'op' 'ibd') #"300BCG" "ibd" 'parsebioscience'
+datasets=("300BCG" 'parsebioscience' 'op' ) #"300BCG" "ibd" 'parsebioscience'
 # methods to process
-methods=("negative_control" "pearson_corr" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint")
+methods=("negative_control" "pearson_corr" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
 
 # temporary file to collect CSV rows
 combined_csv="${save_dir}/sem_scores.csv"
@@ -43,21 +43,6 @@ for dataset in "${datasets[@]}"; do
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
             --score "$score"
-
-        # Extract metrics from the .h5ad and append to CSV
-        python - <<EOF
-import anndata as ad
-import pandas as pd
-
-adata = ad.read_h5ad("${score}")
-if "metrics_value" in adata.uns:
-    metrics = adata.uns["metrics_value"]
-    df = pd.DataFrame(list(metrics.items()), columns=["metric", "value"])
-    df["dataset"] = "${dataset}"
-    df["method"] = "${method}"
-    df = df[["dataset", "method", "metric", "value"]]
-    df.to_csv("${combined_csv}", mode="a", header=False, index=False)
-EOF
 
     done
 done

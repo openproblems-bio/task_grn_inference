@@ -443,7 +443,7 @@ function ViashDockerfile {
 
   if [[ "$engine_id" == "docker" ]]; then
     cat << 'VIASHDOCKER'
-FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
+FROM janursa/dictys:latest
 ENTRYPOINT []
 RUN apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y procps git && \
@@ -453,17 +453,10 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata~=0.10.0" "scanpy~=1.10.0" "pyyaml" "requests" "jsonschema" && \
   pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
 
-RUN apt-get update && \
-  DEBIAN_FRONTEND=noninteractive apt-get install -y bedtools build-essential pkg-config libfreetype6-dev libpng-dev libtiff5-dev libjpeg-dev samtools tabix && \
-  rm -rf /var/lib/apt/lists/*
-
-RUN pip install --upgrade pip && \
-  pip install --upgrade --no-cache-dir "dictys" "anndata" "awscli" "macs2" "homer"
-
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods dictys"
-LABEL org.opencontainers.image.created="2025-09-17T12:32:33Z"
+LABEL org.opencontainers.image.created="2025-09-19T08:44:08Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="a442121e103a8937e7a97ba4dbb10810eb7e1a42"
+LABEL org.opencontainers.image.revision="eded1e0c99a00e49161e9e93d6b397c7f9721754"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

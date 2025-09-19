@@ -3237,18 +3237,6 @@ meta = [
       }
     },
     {
-      "name" : "metrics/regression_2",
-      "repository" : {
-        "type" : "local"
-      }
-    },
-    {
-      "name" : "metrics/regression_1",
-      "repository" : {
-        "type" : "local"
-      }
-    },
-    {
       "name" : "metrics/ws_distance",
       "repository" : {
         "type" : "local"
@@ -3420,7 +3408,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_inference",
     "viash_version" : "0.9.4",
-    "git_commit" : "a442121e103a8937e7a97ba4dbb10810eb7e1a42",
+    "git_commit" : "eded1e0c99a00e49161e9e93d6b397c7f9721754",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3521,8 +3509,6 @@ meta = [
 // resolve dependencies dependencies (if any)
 meta["root_dir"] = getRootDir()
 include { dummy_metric } from "${meta.resources_dir}/../../../nextflow/metrics/dummy_metric/main.nf"
-include { regression_2 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_2/main.nf"
-include { regression_1 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_1/main.nf"
 include { ws_distance } from "${meta.resources_dir}/../../../nextflow/metrics/ws_distance/main.nf"
 include { extract_uns_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
 include { portia } from "${meta.resources_dir}/../../../nextflow/grn_methods/portia/main.nf"

@@ -3314,6 +3314,17 @@ meta = [
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
+        },
+        {
+          "type" : "integer",
+          "name" : "genes_n",
+          "default" : [
+            5000
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
         }
       ]
     }
@@ -3349,17 +3360,6 @@ meta = [
   "info" : {
     "label" : "SEM",
     "summary" : "Structural equation based metric",
-    "description" : "Uses structural equation based approach to evaluate the performance of gene regulatory network inference methods.\n",
-    "metrics" : [
-      {
-        "name" : "sem",
-        "label" : "SEM",
-        "summary" : "Captures the perfomance for the GRN in predicting gene expression data using SEM",
-        "min" : "-Inf",
-        "max" : "+Inf",
-        "maximize" : true
-      }
-    ],
     "type" : "metrics_regression",
     "type_info" : {
       "label" : "feature-based metrics",
@@ -3476,7 +3476,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/sem",
     "viash_version" : "0.9.4",
-    "git_commit" : "a442121e103a8937e7a97ba4dbb10810eb7e1a42",
+    "git_commit" : "eded1e0c99a00e49161e9e93d6b397c7f9721754",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3603,7 +3603,8 @@ par = {
   'skeleton': $( if [ ! -z ${VIASH_PAR_SKELETON+x} ]; then echo "r'${VIASH_PAR_SKELETON//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'evaluation_data': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'genes_n': $( if [ ! -z ${VIASH_PAR_GENES_N+x} ]; then echo "int(r'${VIASH_PAR_GENES_N//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3651,6 +3652,7 @@ except:
     sys.path.append(meta["util_dir"])
     sys.path.append(meta["helper_dir"])
 from helper import main as main_sem 
+from util import format_save_score
 
 
 
@@ -3670,16 +3672,11 @@ DATASET_GROUPS = {
         "loose_match": ["donor_id", "cell_type"],
         "cv": ["perturbation", "cell_type"],
     },
-    "ibd": {
-        "match": ["donor_id", "plate_name", "cell_type"],
-        "cv": ["perturbation", "cell_type"],
-    },
     "300BCG": {
         "match": ["donor_id",  "cell_type"],
         "loose_match": ["cell_type"],
         "cv": ["perturbation", "cell_type"],
     },
-    # add more datasets here if needed
 }
 if __name__ == "__main__":
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
@@ -3689,18 +3686,11 @@ if __name__ == "__main__":
     par['match'] = DATASET_GROUPS[dataset_id]['match']
     par['loose_match'] = DATASET_GROUPS[dataset_id]['loose_match']
     par['method_id'] = method_id
-    score = main_sem(par)
-    output = ad.AnnData(
-        X=np.empty((0, 0)),
-        uns={
-            "dataset_id": dataset_id,
-            "method_id": method_id,
-            "metric_ids": ['sem'],
-            "metric_values": [score]
-        }
-    )
-    output.write_h5ad(par['score'], compression='gzip')
-    print('Completed', flush=True)
+    output = main_sem(par)
+
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+    format_save_score(output, method_id, dataset_id, par['score'])
 VIASHMAIN
 python -B "$tempscript"
 '''

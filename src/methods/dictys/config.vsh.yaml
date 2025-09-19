@@ -26,45 +26,38 @@ resources:
     dest: util.py
   
 
-# engines:
-#   - type: docker
-#     image: andrewsg/dictys
-#     # __merge__: /src/api/base_requirements.yaml
-    
-#     setup:
-#       - type: python
-#         pypi:
-#           - awscli
-#       - type: apt
-#         packages:
-#           - samtools
-#     #       - tabix
-
 engines:
   - type: docker
-    image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
+    image: janursa/dictys:latest
     __merge__: /src/api/base_requirements.yaml
-    setup:
-      - type: apt
-        packages:
-          - bedtools
-          - build-essential
-          - pkg-config
-          - libfreetype6-dev
-          - libpng-dev
-          - libtiff5-dev
-          - libjpeg-dev
-          - samtools
-          - tabix
+
+
+# engines:
+#   - type: docker
+#     image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
+#     __merge__: /src/api/base_requirements.yaml
+#     setup:
+#       - type: apt
+#         packages:
+#           - bedtools
+#           - build-essential
+#           - pkg-config
+#           - libfreetype6-dev
+#           - libpng-dev
+#           - libtiff5-dev
+#           - libjpeg-dev
+#           - samtools
+#           - tabix
           
-      - type: python
-        pypi:
-          - dictys
-          - anndata
-          - awscli
-          - macs2
-          - homer
-          # - matplotlib==3.8.1
+#       - type: python
+#         pypi:
+#           - dictys
+#           - anndata
+#           - awscli
+#           - macs2
+#           - homer
+#           - numpy==1.23.5
+#           - matplotlib==3.8.1
 
 
 runners:

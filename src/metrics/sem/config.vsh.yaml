@@ -5,16 +5,12 @@ namespace: "metrics"
 info:
   label: SEM
   summary: Structural equation based metric
-  description: |
-    Uses structural equation based approach to evaluate the performance of gene regulatory network inference methods.
-  metrics:
-    - name: sem
-      label: SEM
-      summary: Captures the perfomance for the GRN in predicting gene expression data using SEM
-      min: -Inf
-      max: +Inf
-      maximize: true
-  
+
+arguments:
+  - name: genes_n
+    type: integer
+    default: 5000
+
 resources:
   - type: python_script
     path: script.py
