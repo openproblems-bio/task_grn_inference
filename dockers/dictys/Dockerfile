@@ -7,15 +7,23 @@ ENV MAMBA_ROOT_PREFIX=/opt/conda
 ENV MPLCONFIGDIR=/tmp/matplotlib
 
 # Install basic system packages
-RUN apt update -y && \
-    apt install -y --no-install-recommends \
-        tzdata \
-        build-essential \
-        gcc \
-        libstdc++6 \
-        cmake \
+# Install basic system packages including wget
+# Install wget and ca-certificates before downloading Miniforge
+RUN apt update -y && apt install -y --no-install-recommends \
         wget \
         curl \
+        ca-certificates \
+        gcc \
+        g++ \
+        autoconf \
+        automake \
+        libtool \
+        pkg-config \
+        python3-dev \
+        ninja-build \
+        tzdata \
+        libstdc++6 \
+        cmake \
         libcurl4-openssl-dev \
         libssl-dev \
         libxml2-dev \
@@ -26,7 +34,7 @@ RUN apt update -y && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Miniforge
-RUN wget --no-check-certificate -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-x86_64.sh" && \
+RUN wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-$(uname)-$(uname -m).sh" && \
     bash Miniforge3.sh -b -p /opt/conda && \
     rm Miniforge3.sh
 
@@ -44,7 +52,8 @@ RUN /opt/conda/bin/conda init bash && \
         jupyterlab \
         mudata \
 		awscli \
-		anndata && \
+		anndata \
+        macs2 && \
     /opt/conda/bin/pip cache purge && \
     /opt/conda/bin/conda clean -a -y
 
