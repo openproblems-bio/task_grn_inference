@@ -12,7 +12,8 @@ par = {
     "max_n_links": 50000,
     'num_workers': 20,
     'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',    
-    'score': 'output/score.h5ad'
+    'score': 'output/score.h5ad',
+    'genes_n': 5000
 }
 ## VIASH END
 
@@ -36,6 +37,7 @@ except:
     sys.path.append(meta["util_dir"])
     sys.path.append(meta["helper_dir"])
 from helper import main as main_sem 
+from util import format_save_score
 
 
 
@@ -55,16 +57,11 @@ DATASET_GROUPS = {
         "loose_match": ["donor_id", "cell_type"],
         "cv": ["perturbation", "cell_type"],
     },
-    "ibd": {
-        "match": ["donor_id", "plate_name", "cell_type"],
-        "cv": ["perturbation", "cell_type"],
-    },
     "300BCG": {
         "match": ["donor_id",  "cell_type"],
         "loose_match": ["cell_type"],
         "cv": ["perturbation", "cell_type"],
     },
-    # add more datasets here if needed
 }
 if __name__ == "__main__":
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
@@ -74,15 +71,8 @@ if __name__ == "__main__":
     par['match'] = DATASET_GROUPS[dataset_id]['match']
     par['loose_match'] = DATASET_GROUPS[dataset_id]['loose_match']
     par['method_id'] = method_id
-    score = main_sem(par)
-    output = ad.AnnData(
-        X=np.empty((0, 0)),
-        uns={
-            "dataset_id": dataset_id,
-            "method_id": method_id,
-            "metric_ids": ['sem'],
-            "metric_values": [score]
-        }
-    )
-    output.write_h5ad(par['score'], compression='gzip')
-    print('Completed', flush=True)
+    output = main_sem(par)
+
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+    format_save_score(output, method_id, dataset_id, par['score'])

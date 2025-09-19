@@ -1,15 +1,10 @@
 __merge__: ../../api/comp_metric_regression.yaml
 
-name: sem
+name: recovery_2
 namespace: "metrics"
 info:
-  label: SEM
-  summary: Structural equation based metric
-
-arguments:
-  - name: genes_n
-    type: integer
-    default: 5000
+  label: Recovery 2
+  summary: Calculates consistency in the recovery of perturbation across replica
 
 resources:
   - type: python_script
@@ -17,14 +12,14 @@ resources:
   - path: helper.py
   - path: /src/utils/util.py
     dest: util.py
-
+      
 engines:
   - type: docker
-    image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages: [ tqdm_joblib==0.0.5]
+        packages: [ lightgbm==4.3.0, numpy==1.26.4, decoupler ]
 runners:
   - type: executable
   - type: nextflow
