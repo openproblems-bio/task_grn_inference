@@ -50,4 +50,6 @@ if __name__ == '__main__':
             raise FileNotFoundError(f"Dependencies missing {par['ws_consensus']}. Please check the paths of the dependencies")
     else:
         _, output = main(par)
-        format_save_score(output, par)
+        method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+        dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
+        format_save_score(output, method_id, dataset_id)
