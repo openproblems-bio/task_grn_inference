@@ -1,5 +1,0 @@
-test_resources:
-  - type: python_script
-    path: /common/component_tests/run_and_check_output.py
-  - path: /resources_test/
-    dest: resources_test/
