@@ -40,4 +40,6 @@ from util import format_save_score
 
 if __name__ == '__main__':
     output = main(par)
-    format_save_score(output, par)
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+    format_save_score(output, method_id, dataset_id, par['score'])

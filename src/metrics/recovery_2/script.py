@@ -37,4 +37,6 @@ DATASET_GROUPS = {
 if __name__ == '__main__':
     par['group'] = DATASET_GROUPS[ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']]
     output = main(par)
-    format_save_score(output, par)
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+    format_save_score(output, method_id, dataset_id, par['score'])

@@ -33,9 +33,8 @@ def read_prediction(par):
     processed_net = process_links(net, par)
     return processed_net
 
-def format_save_score(output, par):
-    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+def format_save_score(output, method_id, dataset_id, score_file):
+    
     print('Write output to file', flush=True)
     print(output)
     metric_ids = output.columns.to_numpy()
@@ -50,7 +49,7 @@ def format_save_score(output, par):
             "metric_values": metric_values
         }
     )
-    output.write_h5ad(par['score'], compression='gzip')
+    output.write_h5ad(score_file, compression='gzip')
     print('Completed', flush=True)
 def parse_args(par):
     import argparse

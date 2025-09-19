@@ -89,8 +89,6 @@ resources:
 
 dependencies:
   - name: metrics/dummy_metric 
-  - name: metrics/regression_2 
-  - name: metrics/regression_1
   - name: metrics/ws_distance
   - name: utils/extract_uns_metadata
     repository: openproblems
