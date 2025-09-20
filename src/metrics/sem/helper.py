@@ -216,9 +216,32 @@ def evaluate_grn(
             coefficients.append(0.0)
     return np.array(coefficients)
 
+DATASET_GROUPS = {
+    "op": {
+        "match": ["plate_name", "donor_id", "cell_type", 'well'],
+        "loose_match": ["donor_id", "cell_type", "plate_name"],
+        "cv": ["perturbation", "cell_type"],
+    },
+    "parsebioscience": {
+        "match": ["donor_id", "cell_type", "well"],
+        "loose_match": ["donor_id", "cell_type"],
+        "cv": ["perturbation", "cell_type"],
+    },
+    "300BCG": {
+        "match": ["donor_id",  "cell_type"],
+        "loose_match": ["cell_type"],
+        "cv": ["perturbation", "cell_type"],
+    },
+}
 
 def main(par):
-    method_id = par['method_id']
+    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+
+    par['cv_groups'] = DATASET_GROUPS[dataset_id]['cv']
+    par['match'] = DATASET_GROUPS[dataset_id]['match']
+    par['loose_match'] = DATASET_GROUPS[dataset_id]['loose_match']
+
     adata = ad.read_h5ad(par['evaluation_data'])
     layer = manage_layer(adata, par)
     X = adata.layers[layer]
@@ -249,7 +272,7 @@ def main(par):
     # Only consider the genes that are actually present in the inferred GRN
     gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
     if True:
-        idx = np.argsort(np.maximum(np.sum(A!=0, axis=1), np.sum(A!=0, axis=0)))[:-par['genes_n']]
+        idx = np.argsort(np.maximum(np.sum(A!=0, axis=1), np.sum(A!=0, axis=0)))[:-5000]
         gene_mask[idx] = False
         
     X = X[:, gene_mask]
@@ -325,26 +348,29 @@ def main(par):
     # Perform rank test between actual scores and baseline
     rr_all['spearman'] = float(np.mean(scores))
     rr_all['spearman_shuffled'] = float(np.mean(scores_baseline))
-    res = wilcoxon(scores - scores_baseline, zero_method='wilcox', alternative='greater')
-    rr_all['Wilcoxon pvalue'] = float(res.pvalue)
-
-    print(rr_all)
-    
-    eps = 1e-300  # very small number to avoid log(0)
-    pval_clipped = max(res.pvalue, eps)
-    # Compute final score
-    if False:
-        steepness = 1.5
-        f = lambda p: (-np.log(p)) ** steepness
-        score = f(pval_clipped) / (f(pval_clipped) + f(1e-10))
+    if np.std(scores - scores_baseline) == 0:
+        df_results = pd.DataFrame({'sem': [0.0]})
     else:
-        effect = np.mean(scores) - np.mean(scores_baseline)
-        score = effect * (-np.log10(pval_clipped))
-    print(f"Final score: {score}")
+        res = wilcoxon(scores - scores_baseline, zero_method='wilcox', alternative='greater')
+        rr_all['Wilcoxon pvalue'] = float(res.pvalue)
 
-    results = {
-        'sem': [float(score)]
-    }
+        print(rr_all)
+        
+        eps = 1e-300  # very small number to avoid log(0)
+        pval_clipped = max(res.pvalue, eps)
+        # Compute final score
+        if False:
+            steepness = 1.5
+            f = lambda p: (-np.log(p)) ** steepness
+            score = f(pval_clipped) / (f(pval_clipped) + f(1e-10))
+        else:
+            effect = np.mean(scores) - np.mean(scores_baseline)
+            score = effect * (-np.log10(pval_clipped))
+        print(f"Final score: {score}")
 
-    df_results = pd.DataFrame(results)
+        results = {
+            'sem': [float(score)]
+        }
+
+        df_results = pd.DataFrame(results)
     return df_results

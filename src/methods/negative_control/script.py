@@ -16,7 +16,7 @@ try:
     sys.path.append(meta["resources_dir"])
 except:
     meta = {
-        'resources_dir':'src/control_methods/negative_control',
+        'resources_dir':'src/methods/negative_control',
         'utils_dir': 'src/utils',
         'name': 'negative_control'
     }

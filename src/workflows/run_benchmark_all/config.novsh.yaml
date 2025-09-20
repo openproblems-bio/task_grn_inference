@@ -143,9 +143,9 @@ dependencies:
   - name: grn_methods/scenicplus
   - name: grn_methods/granie
   # ---- baselines
-  - name: control_methods/pearson_corr
-  - name: control_methods/negative_control
-  - name: control_methods/positive_control
+  - name: methods/pearson_corr
+  - name: methods/negative_control
+  - name: methods/positive_control
 
 runners:
   - type: executable
