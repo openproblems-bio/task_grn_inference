@@ -79,7 +79,7 @@ Refer to the [Documentation](https://genernib-documentation.readthedocs.io/en/la
 To infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:
 
 ```bash
-viash run src/control_methods/pearson_corr/config.vsh.yaml -- \
+viash run src/methods/pearson_corr/config.vsh.yaml -- \
             --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \
             --prediction output/net.h5ad \
             --tf_all resources_test/grn_benchmark/prior/tf_all.csv

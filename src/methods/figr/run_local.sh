@@ -10,16 +10,21 @@
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com   
 
-dataset=$1
 method="figr"
 
-if [ -z "$dataset" ]; then
-    echo "Error: dataset not provided"
-    exit 1
+# Import argument parsing functionality
+source "src/utils/parse_args.sh"
+
+# Parse command line arguments
+parse_arguments "$@"
+
+# Pass arguments to R script
+r_args="--rna $rna --prediction $prediction"
+if [ ! -z "$atac" ]; then
+    r_args="$r_args --atac $atac"
+fi
+if [ ! -z "$layer" ]; then
+    r_args="$r_args --layer $layer"
 fi
 
-rna="resources/grn_benchmark/inference_data/${dataset}_rna.h5ad"
-atac="resources/grn_benchmark/inference_data/${dataset}_atac.h5ad"
-prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
-
-singularity run ../../images/${method} Rscript src/methods/${method}/script.R --rna $rna --atac $atac --prediction $prediction
+singularity run ../../images/${method} Rscript src/methods/${method}/script.R $r_args

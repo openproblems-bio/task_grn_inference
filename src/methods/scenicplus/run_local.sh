@@ -10,17 +10,20 @@
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com   
 
-dataset=$1
 method="scenicplus"
 
-if [ -z "$dataset" ]; then
-    echo "Error: dataset not provided"
-    exit 1
+# Import argument parsing functionality
+source "src/utils/parse_args.sh"
+
+# Parse command line arguments
+parse_arguments "$@"
+
+# Pass arguments to Python script
+python_args="--rna $rna --atac $atac --prediction $prediction"
+if [ ! -z "$layer" ]; then
+    python_args="$python_args --layer $layer"
 fi
+# Add scenicplus-specific arguments
+python_args="$python_args --n_jobs 20"
 
-rna="resources/grn_benchmark/inference_data/${dataset}_rna.h5ad"
-atac="resources/grn_benchmark/inference_data/${dataset}_atac.h5ad"
-prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
-grn_extended="resources/results/${dataset}/scenicplus/grn_extended.csv"
-
-singularity run ../../images/${method} python src/methods/${method}/script.py --rna $rna --atac $atac --prediction $prediction --grn_extended $grn_extended --n_jobs 20
+singularity run ../../images/${method} python src/methods/${method}/script.py $python_args

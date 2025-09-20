@@ -34,7 +34,7 @@ except:
     sys.path.append(meta["resources_dir"])
     sys.path.append(meta["util_dir"])
 from all_metrics.helper import main
-from util import parse_args
+from util import parse_args, format_save_score
 par = parse_args(par)
 
 if __name__ == '__main__':
@@ -45,18 +45,4 @@ if __name__ == '__main__':
     output = main(par)
 
     print('Write output to file', flush=True)
-    print(output)
-    metric_ids = output.columns.to_numpy()
-    metric_values = output.values[0]
-
-    output = ad.AnnData(
-        X=np.empty((0, 0)),
-        uns={
-            "dataset_id": dataset_id,
-            "method_id": method_id,
-            "metric_ids": metric_ids,
-            "metric_values": metric_values
-        }
-    )
-    output.write_h5ad(par['score'], compression='gzip')
-    print('Completed', flush=True)
+    format_save_score(output, method_id, dataset_id, par['score'])

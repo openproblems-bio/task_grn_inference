@@ -1,16 +1,16 @@
 #!/bin/bash
-#SBATCH --job-name=portia
+#SBATCH --job-name=negative_control
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
-#SBATCH --time=20:00:00
-#SBATCH --mem=250GB
+#SBATCH --time=1:00:00
+#SBATCH --mem=64GB
 #SBATCH --partition=cpu
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com   
 
-method="portia"
+method="negative_control"
 
 # Import argument parsing functionality
 source "src/utils/parse_args.sh"
@@ -19,12 +19,11 @@ source "src/utils/parse_args.sh"
 parse_arguments "$@"
 
 # Pass arguments to Python script
-python_args="--prediction $prediction"
-if [ ! -z "$rna" ]; then
-    python_args="$python_args --rna $rna"
-fi
+python_args="--rna $rna --prediction $prediction"
 if [ ! -z "$layer" ]; then
     python_args="$python_args --layer $layer"
 fi
 
-singularity run ../../images/${method} python src/methods/${method}/script.py $python_args
+echo $python_args
+
+python src/methods/${method}/script.py $python_args

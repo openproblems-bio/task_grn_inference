@@ -41,15 +41,15 @@ from helper import main
 from util import format_save_score
 
 if __name__ == '__main__':
-    if par.get('ws_consensus') is None:
-        if par['silent_missing_dependencies']:
-            dataset_id = 'missing'
-            metric_ids =['ws']
-            metric_values = ['']
-        else:
-            raise FileNotFoundError(f"Dependencies missing {par['ws_consensus']}. Please check the paths of the dependencies")
-    else:
-        _, output = main(par)
-        method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-        dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
-        format_save_score(output, method_id, dataset_id, par['score'])
+    # if par.get('ws_consensus') is None:
+    #     if par['silent_missing_dependencies']:
+    #         dataset_id = 'missing'
+    #         metric_ids =['ws']
+    #         metric_values = ['']
+    #     else:
+    #         raise FileNotFoundError(f"Dependencies missing {par['ws_consensus']}. Please check the paths of the dependencies")
+    # else:
+    _, output = main(par)
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+    dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
+    format_save_score(output, method_id, dataset_id, par['score'])

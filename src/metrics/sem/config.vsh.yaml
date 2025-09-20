@@ -6,11 +6,6 @@ info:
   label: SEM
   summary: Structural equation based metric
 
-arguments:
-  - name: genes_n
-    type: integer
-    default: 5000
-
 resources:
   - type: python_script
     path: script.py

@@ -15,7 +15,7 @@
 for method in positive_control negative_control pearson_corr; do
     echo "Running control method: $method"
     apptainer exec --no-home --pid \
-        docker://ghcr.io/openproblems-bio/task_grn_inference/control_methods/${method}:build_main \
+        docker://ghcr.io/openproblems-bio/task_grn_inference/methods/${method}:build_main \
         /bin/bash -c "echo hi"
 done
 
