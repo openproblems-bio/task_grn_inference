@@ -761,9 +761,9 @@ VIASH_DEP_GRN_METHODS_FIGR="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_meth
 VIASH_DEP_GRN_METHODS_SCENICPLUS="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/scenicplus/main.nf"
 VIASH_DEP_GRN_METHODS_GRANIE="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/granie/main.nf"
 VIASH_DEP_GRN_METHODS_DICTYS="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/dictys/main.nf"
-VIASH_DEP_CONTROL_METHODS_PEARSON_CORR="$VIASH_META_RESOURCES_DIR/../../../nextflow/control_methods/pearson_corr/main.nf"
-VIASH_DEP_CONTROL_METHODS_NEGATIVE_CONTROL="$VIASH_META_RESOURCES_DIR/../../../nextflow/control_methods/negative_control/main.nf"
-VIASH_DEP_CONTROL_METHODS_POSITIVE_CONTROL="$VIASH_META_RESOURCES_DIR/../../../nextflow/control_methods/positive_control/main.nf"
+VIASH_DEP_METHODS_PEARSON_CORR="$VIASH_META_RESOURCES_DIR/../../../nextflow/methods/pearson_corr/main.nf"
+VIASH_DEP_METHODS_NEGATIVE_CONTROL="$VIASH_META_RESOURCES_DIR/../../../nextflow/methods/negative_control/main.nf"
+VIASH_DEP_METHODS_POSITIVE_CONTROL="$VIASH_META_RESOURCES_DIR/../../../nextflow/methods/positive_control/main.nf"
 VIASH_DEP_UTILS_EXTRACT_UNS_METADATA="$VIASH_TARGET_DIR/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
 
 ViashDebug "Running command: $(echo $VIASH_CMD)"

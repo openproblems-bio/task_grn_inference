@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "tqdm_joblib==0.0.5"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics sem"
-LABEL org.opencontainers.image.created="2025-09-19T08:44:08Z"
+LABEL org.opencontainers.image.created="2025-09-20T14:43:10Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="eded1e0c99a00e49161e9e93d6b397c7f9721754"
+LABEL org.opencontainers.image.revision="0126e4a5c1196cb58e1f1a3223db3a3d0e61d5eb"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -628,10 +628,6 @@ function ViashHelp {
   echo "        type: string"
   echo "        default: ridge"
   echo "        name of regretion to use"
-  echo ""
-  echo "    genes_n"
-  echo "        type: integer"
-  echo "        default: 5000"
   echo ""
   echo "Viash built in Computational Requirements:"
   echo "    ---cpus=INT"
@@ -984,12 +980,6 @@ if [ -z "$VIASH_META_CPUS" ]; then
 fi
 
 
-# storing leftover values in positionals
-if [[ $# -gt 0 ]]; then
-  VIASH_PAR_GENES_N="$1"
-  shift 1
-fi
-
 # check whether required parameters exist
 if [ -z ${VIASH_PAR_PREDICTION+x} ]; then
   ViashError '--prediction' is a required argument. Use "--help" to get more information on the parameters.
@@ -1054,9 +1044,6 @@ fi
 if [ -z ${VIASH_PAR_REG_TYPE+x} ]; then
   VIASH_PAR_REG_TYPE="ridge"
 fi
-if [ -z ${VIASH_PAR_GENES_N+x} ]; then
-  VIASH_PAR_GENES_N="5000"
-fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -e "$VIASH_PAR_PREDICTION" ]; then
@@ -1104,12 +1091,6 @@ fi
 if [[ -n "$VIASH_PAR_APPLY_SKELETON" ]]; then
   if ! [[ "$VIASH_PAR_APPLY_SKELETON" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
     ViashError '--apply_skeleton' has to be a boolean. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_GENES_N" ]]; then
-  if ! [[ "$VIASH_PAR_GENES_N" =~ ^[-+]?[0-9]+$ ]]; then
-    ViashError 'genes_n' has to be an integer. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1302,8 +1283,7 @@ par = {
   'skeleton': $( if [ ! -z ${VIASH_PAR_SKELETON+x} ]; then echo "r'${VIASH_PAR_SKELETON//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'evaluation_data': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'genes_n': $( if [ ! -z ${VIASH_PAR_GENES_N+x} ]; then echo "int(r'${VIASH_PAR_GENES_N//\'/\'\"\'\"r\'}')"; else echo None; fi )
+  'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\'/\'\"\'\"r\'}'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1360,35 +1340,11 @@ for key, value in vars(args).items():
     if value is not None:
         par[key] = value
 
-DATASET_GROUPS = {
-    "op": {
-        "match": ["plate_name", "donor_id", "cell_type", 'well'],
-        "loose_match": ["donor_id", "cell_type", "plate_name"],
-        "cv": ["perturbation", "cell_type"],
-    },
-    "parsebioscience": {
-        "match": ["donor_id", "cell_type", "well"],
-        "loose_match": ["donor_id", "cell_type"],
-        "cv": ["perturbation", "cell_type"],
-    },
-    "300BCG": {
-        "match": ["donor_id",  "cell_type"],
-        "loose_match": ["cell_type"],
-        "cv": ["perturbation", "cell_type"],
-    },
-}
 if __name__ == "__main__":
-    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
-    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-
-    par['cv_groups'] = DATASET_GROUPS[dataset_id]['cv']
-    par['match'] = DATASET_GROUPS[dataset_id]['match']
-    par['loose_match'] = DATASET_GROUPS[dataset_id]['loose_match']
-    par['method_id'] = method_id
     output = main_sem(par)
 
-    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     format_save_score(output, method_id, dataset_id, par['score'])
 VIASHMAIN
 python -B "\$tempscript" &

@@ -19,7 +19,15 @@ def binarize_weight(weight):
 
 def manage_layer(adata, par):
     dataset = adata.uns['dataset_id']
-    layer = par['layer']
+    if 'layer' in par:
+        layer = par['layer']
+    else:
+        if 'lognorm' in adata.layers:
+            layer = 'lognorm'
+        elif 'X_norm' in adata.layers:
+            layer = 'X_norm'
+        else:
+            raise ValueError('No layer specified and no default layer found (lognorm or X_norm)')
     if layer not in adata.layers:
         if ('X_norm' in adata.layers) & (dataset in ['adamson', 'norman', 'nakatake']):
             layer = 'X_norm'
@@ -55,6 +63,7 @@ def parse_args(par):
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
+    parser.add_argument('--rna_all', type=str, help='Path to the input RNA all data in h5ad format.')
     parser.add_argument('--atac', type=str, help='Path to the input ATAC data in h5ad format.')
     parser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
     parser.add_argument('--score', type=str, help='Path to the output score in h5ad format.')
@@ -69,7 +78,10 @@ def parse_args(par):
     parser.add_argument('--num_workers', type=int)
     parser.add_argument('--regulators_consensus', type=str)
     parser.add_argument('--evaluation_data', type=str)
-    
+    parser.add_argument('--ws_consensus', type=str)
+    parser.add_argument('--ws_distance_background', type=str)
+
+
 
    
     

@@ -3323,19 +3323,19 @@ meta = [
       }
     },
     {
-      "name" : "control_methods/pearson_corr",
+      "name" : "methods/pearson_corr",
       "repository" : {
         "type" : "local"
       }
     },
     {
-      "name" : "control_methods/negative_control",
+      "name" : "methods/negative_control",
       "repository" : {
         "type" : "local"
       }
     },
     {
-      "name" : "control_methods/positive_control",
+      "name" : "methods/positive_control",
       "repository" : {
         "type" : "local"
       }
@@ -3408,7 +3408,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_inference",
     "viash_version" : "0.9.4",
-    "git_commit" : "eded1e0c99a00e49161e9e93d6b397c7f9721754",
+    "git_commit" : "0126e4a5c1196cb58e1f1a3223db3a3d0e61d5eb",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3426,7 +3426,7 @@ meta = [
           "dest" : "resources_test"
         }
       ],
-      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started. \nHere, we download the **test resources** which are solely used for testing if the framework is installed successfully. \n\n```bash\nscripts/download_resources.sh\n```\n\nRefer to the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/) for downloading the actual datasets. To reproduce the results, run `scripts/run_benchmark_all.sh`, which is a very resource intensive run.\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:\n\n```bash\nviash run src/control_methods/pearson_corr/config.vsh.yaml -- \\\\\n      --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \\\\\n      --prediction output/net.h5ad \\\\\n      --tf_all resources_test/grn_benchmark/prior/tf_all.csv\n```\nIt should be noted that this is using the `resources_test` datasets, which are small versions of the actual datasets. Thus, the obtained predictions are not realistic. To obtain a realistic prediction, download the actual data and set the folder to `resources`.  \n\n## Evaluate a GRN prediction\nOnce got the prediction for a given dataset (e.g. op), use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad op\n```\n\nThis outputs the scores into `output/test_run/score_uns.yaml`\n\n## Add a GRN inference method, evaluation metric, or dataset\n\nTo add a new component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n"
+      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started. \nHere, we download the **test resources** which are solely used for testing if the framework is installed successfully. \n\n```bash\nscripts/download_resources.sh\n```\n\nRefer to the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/) for downloading the actual datasets. To reproduce the results, run `scripts/run_benchmark_all.sh`, which is a very resource intensive run.\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:\n\n```bash\nviash run src/methods/pearson_corr/config.vsh.yaml -- \\\\\n      --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \\\\\n      --prediction output/net.h5ad \\\\\n      --tf_all resources_test/grn_benchmark/prior/tf_all.csv\n```\nIt should be noted that this is using the `resources_test` datasets, which are small versions of the actual datasets. Thus, the obtained predictions are not realistic. To obtain a realistic prediction, download the actual data and set the folder to `resources`.  \n\n## Evaluate a GRN prediction\nOnce got the prediction for a given dataset (e.g. op), use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad op\n```\n\nThis outputs the scores into `output/test_run/score_uns.yaml`\n\n## Add a GRN inference method, evaluation metric, or dataset\n\nTo add a new component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n"
     },
     "repositories" : [
       {
@@ -3523,9 +3523,9 @@ include { figr } from "${meta.resources_dir}/../../../nextflow/grn_methods/figr/
 include { scenicplus } from "${meta.resources_dir}/../../../nextflow/grn_methods/scenicplus/main.nf"
 include { granie } from "${meta.resources_dir}/../../../nextflow/grn_methods/granie/main.nf"
 include { dictys } from "${meta.resources_dir}/../../../nextflow/grn_methods/dictys/main.nf"
-include { pearson_corr } from "${meta.resources_dir}/../../../nextflow/control_methods/pearson_corr/main.nf"
-include { negative_control } from "${meta.resources_dir}/../../../nextflow/control_methods/negative_control/main.nf"
-include { positive_control } from "${meta.resources_dir}/../../../nextflow/control_methods/positive_control/main.nf"
+include { pearson_corr } from "${meta.resources_dir}/../../../nextflow/methods/pearson_corr/main.nf"
+include { negative_control } from "${meta.resources_dir}/../../../nextflow/methods/negative_control/main.nf"
+include { positive_control } from "${meta.resources_dir}/../../../nextflow/methods/positive_control/main.nf"
 
 // inner workflow
 // user-provided Nextflow code

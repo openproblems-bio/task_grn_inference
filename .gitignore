@@ -4,8 +4,6 @@
 
 
 # related to files
-src/metrics/greta/*
-# runs.ipynb
 .pybiomart.sqlite
 logs/
 params*
@@ -18,14 +16,9 @@ state*
 trace*
 tw*
 __init__*
-# postprocess.ipynb
-# test.ipynb
-
-# related to python
 .ipynb_checkpoints
 __pycache__/
 
-# ?
 .$*
 bin*
 bin/

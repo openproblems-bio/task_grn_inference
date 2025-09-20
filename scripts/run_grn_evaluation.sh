@@ -53,7 +53,7 @@ if [ -z "${DATASET:-}" ]; then
 fi
 
 num_workers=10
-metric_ids="[sem]" #regression_1, regression_2, ws_distance
+metric_ids="[regression_2, ws_distance, sem]" #regression_1, regression_2, ws_distance
 RUN_ID="${DATASET}_evaluation"
 
 models_folder="${DATASET}/"

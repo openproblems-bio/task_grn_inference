@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics ws_distance"
-LABEL org.opencontainers.image.created="2025-09-19T08:44:09Z"
+LABEL org.opencontainers.image.created="2025-09-20T14:43:10Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="eded1e0c99a00e49161e9e93d6b397c7f9721754"
+LABEL org.opencontainers.image.revision="0126e4a5c1196cb58e1f1a3223db3a3d0e61d5eb"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1351,18 +1351,18 @@ from helper import main
 from util import format_save_score
 
 if __name__ == '__main__':
-    if par.get('ws_consensus') is None:
-        if par['silent_missing_dependencies']:
-            dataset_id = 'missing'
-            metric_ids =['ws']
-            metric_values = ['']
-        else:
-            raise FileNotFoundError(f"Dependencies missing {par['ws_consensus']}. Please check the paths of the dependencies")
-    else:
-        _, output = main(par)
-        method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-        dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
-        format_save_score(output, method_id, dataset_id, par['score'])
+    # if par.get('ws_consensus') is None:
+    #     if par['silent_missing_dependencies']:
+    #         dataset_id = 'missing'
+    #         metric_ids =['ws']
+    #         metric_values = ['']
+    #     else:
+    #         raise FileNotFoundError(f"Dependencies missing {par['ws_consensus']}. Please check the paths of the dependencies")
+    # else:
+    _, output = main(par)
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+    dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
+    format_save_score(output, method_id, dataset_id, par['score'])
 VIASHMAIN
 python -B "\$tempscript" &
 wait "\$!"
