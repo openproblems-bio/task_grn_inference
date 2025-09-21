@@ -8,9 +8,9 @@ info:
     summary: A Wasserstein distance based metric to evaluate the performance of the inferred GRN
 
 arguments: 
-  - name: --evaluation_data_sc
-    __merge__: file_evaluation_sc_h5ad.yaml
-    required: false
+  - name: --evaluation_data
+    __merge__: file_evaluation_bulk_h5ad.yaml
+    required: true
     direction: input
   
 

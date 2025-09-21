@@ -3206,9 +3206,9 @@ meta = [
         },
         {
           "type" : "file",
-          "name" : "--evaluation_data_sc",
-          "label" : "perturbation data (sc)",
-          "summary" : "Perturbation dataset for benchmarking (sinlge cell).",
+          "name" : "--evaluation_data",
+          "label" : "perturbation data (pseudo)bulk",
+          "summary" : "Perturbation dataset for benchmarking",
           "info" : {
             "format" : {
               "type" : "h5ad",
@@ -3281,11 +3281,11 @@ meta = [
             }
           },
           "example" : [
-            "resources_test/grn_benchmark/evaluation_data/norman_sc.h5ad"
+            "resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad"
           ],
           "must_exist" : true,
           "create_parent" : true,
-          "required" : false,
+          "required" : true,
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
@@ -3507,7 +3507,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/ws_distance",
     "viash_version" : "0.9.4",
-    "git_commit" : "f850d7447ae2dda91c7241719c1681eb939de516",
+    "git_commit" : "38c8bea3e6d9fdd53abadb8aaf592fc3ab21219f",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3635,7 +3635,7 @@ par = {
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'skeleton': $( if [ ! -z ${VIASH_PAR_SKELETON+x} ]; then echo "r'${VIASH_PAR_SKELETON//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'evaluation_data_sc': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA_SC+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA_SC//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'evaluation_data': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'ws_consensus': $( if [ ! -z ${VIASH_PAR_WS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_WS_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'ws_distance_background': $( if [ ! -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then echo "r'${VIASH_PAR_WS_DISTANCE_BACKGROUND//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'silent_missing_dependencies': $( if [ ! -z ${VIASH_PAR_SILENT_MISSING_DEPENDENCIES+x} ]; then echo "r'${VIASH_PAR_SILENT_MISSING_DEPENDENCIES//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )

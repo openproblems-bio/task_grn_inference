@@ -6,7 +6,6 @@
 #     --regulators_consensus resources/grn_benchmark/prior/regulators_consensus_norman.json 
 
 python src/metrics/regression_2/script.py \
-    --run_local \
     --prediction resources/grn_models/op/scprint.h5ad \
     --dataset_id op \
     --method_id op \

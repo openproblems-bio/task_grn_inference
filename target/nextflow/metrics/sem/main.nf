@@ -3206,92 +3206,6 @@ meta = [
         },
         {
           "type" : "file",
-          "name" : "--evaluation_data",
-          "label" : "perturbation data (pseudo)bulk",
-          "summary" : "Perturbation dataset for benchmarking",
-          "info" : {
-            "format" : {
-              "type" : "h5ad",
-              "obs" : [
-                {
-                  "name" : "cell_type",
-                  "type" : "string",
-                  "description" : "The annotated cell type of each cell based on RNA expression.",
-                  "required" : true
-                },
-                {
-                  "name" : "perturbation",
-                  "type" : "string",
-                  "description" : "Name of the column containing perturbation names",
-                  "required" : true
-                },
-                {
-                  "name" : "donor_id",
-                  "type" : "string",
-                  "description" : "Donor id",
-                  "required" : false
-                },
-                {
-                  "name" : "perturbation_type",
-                  "type" : "string",
-                  "description" : "Name of the column indicating perturbation type",
-                  "required" : false
-                }
-              ],
-              "layers" : [
-                {
-                  "name" : "X_norm",
-                  "type" : "double",
-                  "description" : "Normalized values",
-                  "required" : true
-                }
-              ],
-              "uns" : [
-                {
-                  "type" : "string",
-                  "name" : "dataset_id",
-                  "description" : "A unique identifier for the dataset",
-                  "required" : true
-                },
-                {
-                  "name" : "dataset_name",
-                  "type" : "string",
-                  "description" : "Nicely formatted name.",
-                  "required" : true
-                },
-                {
-                  "name" : "dataset_summary",
-                  "type" : "string",
-                  "description" : "Short description of the dataset.",
-                  "required" : true
-                },
-                {
-                  "name" : "dataset_organism",
-                  "type" : "string",
-                  "description" : "The organism of the sample in the dataset.",
-                  "required" : false
-                },
-                {
-                  "type" : "string",
-                  "name" : "normalization_id",
-                  "description" : "Which normalization was used",
-                  "required" : true
-                }
-              ]
-            }
-          },
-          "example" : [
-            "resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad"
-          ],
-          "must_exist" : true,
-          "create_parent" : true,
-          "required" : true,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
           "name" : "--tf_all",
           "example" : [
             "resources_test/grn_benchmark/prior/tf_all.csv"
@@ -3465,7 +3379,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/sem",
     "viash_version" : "0.9.4",
-    "git_commit" : "f850d7447ae2dda91c7241719c1681eb939de516",
+    "git_commit" : "38c8bea3e6d9fdd53abadb8aaf592fc3ab21219f",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3590,7 +3504,6 @@ par = {
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'skeleton': $( if [ ! -z ${VIASH_PAR_SKELETON+x} ]; then echo "r'${VIASH_PAR_SKELETON//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'evaluation_data': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
 }
