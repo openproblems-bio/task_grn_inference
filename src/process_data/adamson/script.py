@@ -13,12 +13,11 @@ from scipy.sparse import csr_matrix
 par = {
     'adamson_raw': f'resources/datasets_raw/adamson.h5ad',
     'adamson_bulk': f'resources/extended_data/adamson_bulk.h5ad',
-    'adamson_test_sc': f'resources/grn_benchmark/evaluation_data/adamson_sc.h5ad',
+    'adamson_test_sc': f'resources/processed_data/adamson_sc.h5ad',
     'adamson_test_bulk': f'resources/grn_benchmark/evaluation_data/adamson_bulk.h5ad',
     'adamson_train_sc': f'resources/grn_benchmark/inference_data/adamson_rna.h5ad',
     'adamson_train_sc_test': f'resources_test/grn_benchmark/inference_data/adamson_rna.h5ad',
     'adamson_test_bulk_test': f'resources_test/grn_benchmark/evaluation_data/adamson_bulk.h5ad',
-    'adamson_test_sc_test': f'resources_test/grn_benchmark/evaluation_data/adamson_sc.h5ad'
 
 }
 ## VIASH END
@@ -26,12 +25,12 @@ try:
     sys.path.append(meta["resources_dir"])
 except:
     meta = {
-        'resources_dir': 'src/utils/'
+        'resources_dir': 'src/process_data'
     }
     sys.path.append(meta["resources_dir"])
 
 
-from util import sum_by
+from helper_data import sum_by
 
 
 def add_metadata(adata):
@@ -172,7 +171,6 @@ def create_test_data(par):
 
     adata_train_sc_test.write(par['adamson_train_sc_test'])
     adata_test_bulk_test.write(par['adamson_test_bulk_test'])
-    adata_test_sc_test.write(par['adamson_test_sc_test'])
 
 
 
