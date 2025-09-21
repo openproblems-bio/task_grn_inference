@@ -6,11 +6,6 @@ info:
   type_info:
     label: Wasserstein distance metrics 
     summary: A Wasserstein distance based metric to evaluate the performance of the inferred GRN
-
-arguments: 
-  - name: --evaluation_data
-    __merge__: file_evaluation_bulk_h5ad.yaml
-    required: true
-    direction: input
+  
   
 

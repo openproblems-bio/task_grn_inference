@@ -3079,6 +3079,92 @@ meta = [
         },
         {
           "type" : "file",
+          "name" : "--evaluation_data",
+          "label" : "perturbation data (pseudo)bulk",
+          "summary" : "Perturbation dataset for benchmarking",
+          "info" : {
+            "format" : {
+              "type" : "h5ad",
+              "obs" : [
+                {
+                  "name" : "cell_type",
+                  "type" : "string",
+                  "description" : "The annotated cell type of each cell based on RNA expression.",
+                  "required" : true
+                },
+                {
+                  "name" : "perturbation",
+                  "type" : "string",
+                  "description" : "Name of the column containing perturbation names",
+                  "required" : true
+                },
+                {
+                  "name" : "donor_id",
+                  "type" : "string",
+                  "description" : "Donor id",
+                  "required" : false
+                },
+                {
+                  "name" : "perturbation_type",
+                  "type" : "string",
+                  "description" : "Name of the column indicating perturbation type",
+                  "required" : false
+                }
+              ],
+              "layers" : [
+                {
+                  "name" : "X_norm",
+                  "type" : "double",
+                  "description" : "Normalized values",
+                  "required" : true
+                }
+              ],
+              "uns" : [
+                {
+                  "type" : "string",
+                  "name" : "dataset_id",
+                  "description" : "A unique identifier for the dataset",
+                  "required" : true
+                },
+                {
+                  "name" : "dataset_name",
+                  "type" : "string",
+                  "description" : "Nicely formatted name.",
+                  "required" : true
+                },
+                {
+                  "name" : "dataset_summary",
+                  "type" : "string",
+                  "description" : "Short description of the dataset.",
+                  "required" : true
+                },
+                {
+                  "name" : "dataset_organism",
+                  "type" : "string",
+                  "description" : "The organism of the sample in the dataset.",
+                  "required" : false
+                },
+                {
+                  "type" : "string",
+                  "name" : "normalization_id",
+                  "description" : "Which normalization was used",
+                  "required" : true
+                }
+              ]
+            }
+          },
+          "example" : [
+            "resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad"
+          ],
+          "must_exist" : true,
+          "create_parent" : true,
+          "required" : true,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
           "name" : "--score",
           "label" : "score",
           "summary" : "File indicating the score of a metric.",
@@ -3200,92 +3286,6 @@ meta = [
           "must_exist" : true,
           "create_parent" : true,
           "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--evaluation_data",
-          "label" : "perturbation data (pseudo)bulk",
-          "summary" : "Perturbation dataset for benchmarking",
-          "info" : {
-            "format" : {
-              "type" : "h5ad",
-              "obs" : [
-                {
-                  "name" : "cell_type",
-                  "type" : "string",
-                  "description" : "The annotated cell type of each cell based on RNA expression.",
-                  "required" : true
-                },
-                {
-                  "name" : "perturbation",
-                  "type" : "string",
-                  "description" : "Name of the column containing perturbation names",
-                  "required" : true
-                },
-                {
-                  "name" : "donor_id",
-                  "type" : "string",
-                  "description" : "Donor id",
-                  "required" : false
-                },
-                {
-                  "name" : "perturbation_type",
-                  "type" : "string",
-                  "description" : "Name of the column indicating perturbation type",
-                  "required" : false
-                }
-              ],
-              "layers" : [
-                {
-                  "name" : "X_norm",
-                  "type" : "double",
-                  "description" : "Normalized values",
-                  "required" : true
-                }
-              ],
-              "uns" : [
-                {
-                  "type" : "string",
-                  "name" : "dataset_id",
-                  "description" : "A unique identifier for the dataset",
-                  "required" : true
-                },
-                {
-                  "name" : "dataset_name",
-                  "type" : "string",
-                  "description" : "Nicely formatted name.",
-                  "required" : true
-                },
-                {
-                  "name" : "dataset_summary",
-                  "type" : "string",
-                  "description" : "Short description of the dataset.",
-                  "required" : true
-                },
-                {
-                  "name" : "dataset_organism",
-                  "type" : "string",
-                  "description" : "The organism of the sample in the dataset.",
-                  "required" : false
-                },
-                {
-                  "type" : "string",
-                  "name" : "normalization_id",
-                  "description" : "Which normalization was used",
-                  "required" : true
-                }
-              ]
-            }
-          },
-          "example" : [
-            "resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad"
-          ],
-          "must_exist" : true,
-          "create_parent" : true,
-          "required" : true,
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
@@ -3507,7 +3507,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/ws_distance",
     "viash_version" : "0.9.4",
-    "git_commit" : "38c8bea3e6d9fdd53abadb8aaf592fc3ab21219f",
+    "git_commit" : "70573b3edcc177186c69b7272167b874580bbabd",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3627,6 +3627,7 @@ import os
 # The following code has been auto-generated by Viash.
 par = {
   'prediction': $( if [ ! -z ${VIASH_PAR_PREDICTION+x} ]; then echo "r'${VIASH_PAR_PREDICTION//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'evaluation_data': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'score': $( if [ ! -z ${VIASH_PAR_SCORE+x} ]; then echo "r'${VIASH_PAR_SCORE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
@@ -3635,7 +3636,6 @@ par = {
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'apply_skeleton': $( if [ ! -z ${VIASH_PAR_APPLY_SKELETON+x} ]; then echo "r'${VIASH_PAR_APPLY_SKELETON//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'skeleton': $( if [ ! -z ${VIASH_PAR_SKELETON+x} ]; then echo "r'${VIASH_PAR_SKELETON//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'evaluation_data': $( if [ ! -z ${VIASH_PAR_EVALUATION_DATA+x} ]; then echo "r'${VIASH_PAR_EVALUATION_DATA//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'ws_consensus': $( if [ ! -z ${VIASH_PAR_WS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_WS_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'ws_distance_background': $( if [ ! -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then echo "r'${VIASH_PAR_WS_DISTANCE_BACKGROUND//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'silent_missing_dependencies': $( if [ ! -z ${VIASH_PAR_SILENT_MISSING_DEPENDENCIES+x} ]; then echo "r'${VIASH_PAR_SILENT_MISSING_DEPENDENCIES//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )

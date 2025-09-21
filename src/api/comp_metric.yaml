@@ -11,6 +11,10 @@ arguments:
     __merge__: file_prediction_h5ad.yaml
     required: true
     direction: input
+  - name: --evaluation_data
+    __merge__: file_evaluation_bulk_h5ad.yaml
+    required: true
+    direction: input
   - name: --score
     __merge__: file_score_h5ad.yaml
     required: true
