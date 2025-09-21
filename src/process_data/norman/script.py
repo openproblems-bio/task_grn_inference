@@ -14,7 +14,7 @@ from scipy.sparse import csr_matrix
 par = {
     'norman_raw': f'resources/datasets_raw/norman.h5ad',
     'norman_bulk': f'resources/extended_data/norman_bulk.h5ad',
-    'norman_test_sc': f'resources/grn_benchmark/evaluation_data/norman_sc.h5ad',
+    'norman_test_sc': f'resources/processed_data/norman_evaluation_sc.h5ad',
     'norman_test_bulk': f'resources/grn_benchmark/evaluation_data/norman_bulk.h5ad',
     'norman_train_sc': f'resources/grn_benchmark/inference_data/norman_rna.h5ad'
 }
@@ -24,11 +24,12 @@ try:
     sys.path.append(meta["resources_dir"])
 except:
     meta = {
-        'resources_dir': 'src/utils/'
+        'resources_dir': 'src/process_data/'
     }
     sys.path.append(meta["resources_dir"])
 
-from util import sum_by
+from helper_data import sum_by
+
 
 def add_metadata(adata):
     adata.uns['dataset_summary'] = 'Single cell RNA-seq data with 231 perturbations (activation) on K562 cells.'
