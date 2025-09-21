@@ -3423,7 +3423,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/methods/pearson_corr",
     "viash_version" : "0.9.4",
-    "git_commit" : "0126e4a5c1196cb58e1f1a3223db3a3d0e61d5eb",
+    "git_commit" : "f850d7447ae2dda91c7241719c1681eb939de516",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
