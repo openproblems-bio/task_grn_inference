@@ -13,7 +13,7 @@ from scipy.sparse import csr_matrix
 par = {
     'adamson_raw': f'resources/datasets_raw/adamson.h5ad',
     'adamson_bulk': f'resources/extended_data/adamson_bulk.h5ad',
-    'adamson_test_sc': f'resources/processed_data/adamson_sc.h5ad',
+    'adamson_test_sc': f'resources/processed_data/adamson_evaluation_sc.h5ad',
     'adamson_test_bulk': f'resources/grn_benchmark/evaluation_data/adamson_bulk.h5ad',
     'adamson_train_sc': f'resources/grn_benchmark/inference_data/adamson_rna.h5ad',
     'adamson_train_sc_test': f'resources_test/grn_benchmark/inference_data/adamson_rna.h5ad',
