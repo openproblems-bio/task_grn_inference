@@ -23,4 +23,4 @@ set -e
 # aws s3 sync  resources/grn_benchmark/ s3://openproblems-data/resources/grn/grn_benchmark --delete
 # aws s3 sync  resources/grn_benchmark/prior s3://openproblems-data/resources/grn/grn_benchmark/prior --delete
 # aws s3 sync  resources/extended_data/ s3://openproblems-data/resources/grn/extended_data --delete
-aws s3 sync resources/results/  s3://openproblems-data/resources/grn/results/ --delete 
+# aws s3 sync resources/results/  s3://openproblems-data/resources/grn/results/ --delete 
