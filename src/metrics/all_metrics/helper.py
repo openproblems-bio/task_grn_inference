@@ -16,6 +16,11 @@ from sem.helper import main as main_sem
 
 def main(par):
     try:
+        rr_reg2 = main_reg2(par)
+    except Exception as e:
+        print(f"Error in regression 2 metrics: {e}")
+        rr_reg2 = pd.DataFrame()
+    try:
         rr_sem = main_sem(par)
     except Exception as e:
         print(f"Error in sem metrics: {e}")
@@ -27,11 +32,7 @@ def main(par):
         print(f"Error in ws distance metrics: {e}")
         rr_ws = pd.DataFrame()
 
-    try:
-        rr_reg2 = main_reg2(par)
-    except Exception as e:
-        print(f"Error in regression 2 metrics: {e}")
-        rr_reg2 = pd.DataFrame()
+    
     
 
     rr_all = pd.concat([rr_reg2, rr_ws, rr_sem], axis=1)
