@@ -46,33 +46,9 @@ for key, value in vars(args).items():
     if value is not None:
         par[key] = value
 
-DATASET_GROUPS = {
-    "op": {
-        "match": ["plate_name", "donor_id", "cell_type", 'well'],
-        "loose_match": ["donor_id", "cell_type", "plate_name"],
-        "cv": ["perturbation", "cell_type"],
-    },
-    "parsebioscience": {
-        "match": ["donor_id", "cell_type", "well"],
-        "loose_match": ["donor_id", "cell_type"],
-        "cv": ["perturbation", "cell_type"],
-    },
-    "300BCG": {
-        "match": ["donor_id",  "cell_type"],
-        "loose_match": ["cell_type"],
-        "cv": ["perturbation", "cell_type"],
-    },
-}
 if __name__ == "__main__":
-    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
-    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-
-    par['cv_groups'] = DATASET_GROUPS[dataset_id]['cv']
-    par['match'] = DATASET_GROUPS[dataset_id]['match']
-    par['loose_match'] = DATASET_GROUPS[dataset_id]['loose_match']
-    par['method_id'] = method_id
     output = main_sem(par)
 
-    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     format_save_score(output, method_id, dataset_id, par['score'])

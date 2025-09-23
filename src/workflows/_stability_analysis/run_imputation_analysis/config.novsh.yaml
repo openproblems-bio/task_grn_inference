@@ -68,7 +68,7 @@ dependencies:
   - name: metrics/regression_2
   - name: metrics/ws_distance
   - name: stability_analysis/impute_rna
-  - name: control_methods/pearson_corr
+  - name: methods/pearson_corr
   - name: utils/extract_uns_metadata
     repository: openproblems
 

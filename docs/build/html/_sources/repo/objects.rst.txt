@@ -69,7 +69,7 @@ Control Method
 --------------
 
 Path:
-``src/control_methods``
+``src/methods``
 
 A control method.
 
