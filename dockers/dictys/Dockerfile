@@ -39,21 +39,10 @@ RUN wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/lat
     rm Miniforge3.sh
 
 # Create conda environment with packages
-RUN /opt/conda/bin/conda init bash && \
+RUN /opt/conda/bin/conda create -y -n dictys -c conda-forge python=3.9 mamba && \
     . /opt/conda/etc/profile.d/conda.sh && \
-    /opt/conda/bin/mamba create -y -n dictys_env -c lingfeiwang -c conda-forge -c bioconda -c pytorch \
-        python=3.10 \
-        pip \
-        dictys \
-        pytorch \
-        torchvision \
-        torchaudio \
-        cpuonly \
-        jupyterlab \
-        mudata \
-		awscli \
-		anndata \
-        macs2 && \
+    conda activate dictys && \
+    mamba install -y -c lingfeiwang -c bioconda -c conda-forge -c pytorch dictys pytorch torchvision torchaudio cpuonly awscli && \
     /opt/conda/bin/pip cache purge && \
     /opt/conda/bin/conda clean -a -y
 
@@ -62,5 +51,5 @@ SHELL ["/bin/bash", "-c"]
 
 # Activate environment by default
 SHELL ["/bin/bash", "-c"]
-ENV PATH=/opt/conda/envs/dictys_env/bin:$PATH
+ENV PATH=/opt/conda/envs/dictys/bin:$PATH
 CMD ["bash"]
