@@ -2,13 +2,13 @@
 #!/bin/bash
 set -e
 
-run_prefix='sbatch' #bash
+run_prefix='bash' #bash
 DATASETS=('xaira_HEK293T' ) #'op' 'adamson' 'replogle' 'norman' 'nakatake' 'parsebioscience'  '300BCG' 'xaira_HCT116' 'xaira_HEK293T'
 # METHODS=('negative_control' 'positive_control' 'pearson_corr' 'portia' 'ppcor' 'grnboost' 'scenic'  'scenicplus' 'scglue' 'figr' 'granie')
-METHODS=( 'grnboost' 'scenic')
+METHODS=( 'positive_control' 'pearson_corr')
 
 methods_dir='src/methods/'
-ctr_methods_dir='src/control_methods/'
+ctr_methods_dir='src/methods/'
 
 
 
@@ -18,18 +18,20 @@ run_func() {
 
     echo "Running $method on $dataset"
 
-    local script
-    if [[ "$method" == "negative_control" || "$method" == "positive_control" || "$method" == "pearson_corr" ]]; then
-        script="${ctr_methods_dir}${method}/run_local.sh"
-    else
-        script="${methods_dir}${method}/run_local.sh"
-    fi
+    script="${methods_dir}${method}/run_local.sh"
+
+    rna="resources/grn_benchmark/inference_data/${dataset}_rna.h5ad"
+    rna_all="resources/extended_data/${dataset}_bulk.h5ad"
+    atac="resources/grn_benchmark/inference_data/${dataset}_atac.h5ad"
+    prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
+
+    arguments="--rna $rna --prediction $prediction --atac $atac --rna_all $rna_all"
 
     if [[ "$run_prefix" == "bash" ]]; then
-        bash "$script" "$dataset"
+        bash "$script" $arguments
     elif [[ "$run_prefix" == "sbatch" ]]; then
         # submit the job and capture the job ID
-        output=$(sbatch "$script" "$dataset")
+        output=$(sbatch "$script" $arguments)
         echo "$output"
         # sbatch usually returns: "Submitted batch job 12345678"
         jobid=$(echo "$output" | awk '{print $4}')

@@ -10,15 +10,21 @@
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com   
 
-dataset=$1
 method="portia"
 
-if [ -z "$dataset" ]; then
-    echo "Error: dataset not provided"
-    exit 1
+# Import argument parsing functionality
+source "src/utils/parse_args.sh"
+
+# Parse command line arguments
+parse_arguments "$@"
+
+# Pass arguments to Python script
+python_args="--prediction $prediction"
+if [ ! -z "$rna" ]; then
+    python_args="$python_args --rna $rna"
+fi
+if [ ! -z "$layer" ]; then
+    python_args="$python_args --layer $layer"
 fi
 
-rna="resources/grn_benchmark/inference_data/${dataset}_rna.h5ad"
-prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
-
-singularity run ../../images/${method} python src/methods/${method}/script.py --rna $rna --prediction $prediction
+singularity run ../../images/${method} python src/methods/${method}/script.py $python_args

@@ -33,6 +33,11 @@ argument_groups:
         required: false
         direction: input
         default: true
+      - name: --temp_dir
+        type: string
+        required: false
+        direction: input
+        default: 'temp_dir'
   - name: Arguments
     arguments: 
       - name: "--method_ids"
@@ -84,8 +89,6 @@ resources:
 
 dependencies:
   - name: metrics/dummy_metric 
-  - name: metrics/regression_2 
-  - name: metrics/regression_1
   - name: metrics/ws_distance
   - name: utils/extract_uns_metadata
     repository: openproblems
@@ -105,9 +108,9 @@ dependencies:
   - name: grn_methods/granie
   - name: grn_methods/dictys
   # ---- baselines
-  - name: control_methods/pearson_corr
-  - name: control_methods/negative_control
-  - name: control_methods/positive_control
+  - name: methods/pearson_corr
+  - name: methods/negative_control
+  - name: methods/positive_control
 
 runners:
   - type: executable

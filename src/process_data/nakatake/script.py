@@ -21,11 +21,11 @@ try:
     sys.path.append(meta["resources_dir"])
 except:
     meta = {
-        'resources_dir': 'src/utils/'
+        'resources_dir': 'src/process_data/'
     }
     sys.path.append(meta["resources_dir"])
 
-from util import sum_by
+from helper_data import sum_by
 
 def add_metadata(adata):
     adata.uns['dataset_summary'] = 'RNA-seq data with 463 perturbations (overexpression) on SEES3 cells.'

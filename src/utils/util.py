@@ -19,7 +19,15 @@ def binarize_weight(weight):
 
 def manage_layer(adata, par):
     dataset = adata.uns['dataset_id']
-    layer = par['layer']
+    if 'layer' in par:
+        layer = par['layer']
+    else:
+        if 'lognorm' in adata.layers:
+            layer = 'lognorm'
+        elif 'X_norm' in adata.layers:
+            layer = 'X_norm'
+        else:
+            raise ValueError('No layer specified and no default layer found (lognorm or X_norm)')
     if layer not in adata.layers:
         if ('X_norm' in adata.layers) & (dataset in ['adamson', 'norman', 'nakatake']):
             layer = 'X_norm'
@@ -27,22 +35,56 @@ def manage_layer(adata, par):
         else:
             raise ValueError(f'Layer {par["layer"]} not found in the data. Available layers: {list(adata.layers.keys())}')
     return layer
-def read_prediction(prediction, par):
-    adata = ad.read_h5ad(prediction)
+def read_prediction(par):
+    adata = ad.read_h5ad(par['prediction'])
     net = adata.uns['prediction']
     processed_net = process_links(net, par)
     return processed_net
+
+def format_save_score(output, method_id, dataset_id, score_file):
+    
+    print('Write output to file', flush=True)
+    print(output)
+    metric_ids = output.columns.to_numpy()
+    metric_values = output.values[0]
+
+    output = ad.AnnData(
+        X=np.empty((0, 0)),
+        uns={
+            "dataset_id": dataset_id,
+            "method_id": method_id,
+            "metric_ids": metric_ids,
+            "metric_values": metric_values
+        }
+    )
+    output.write_h5ad(score_file, compression='gzip')
+    print('Completed', flush=True)
 def parse_args(par):
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('--rna', type=str, help='Path to the input RNA data in h5ad format.')
+    parser.add_argument('--rna_all', type=str, help='Path to the input RNA all data in h5ad format.')
     parser.add_argument('--atac', type=str, help='Path to the input ATAC data in h5ad format.')
     parser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
+    parser.add_argument('--score', type=str, help='Path to the output score in h5ad format.')
     parser.add_argument('--layer', type=str)
     parser.add_argument('--temp_dir', type=str)
     parser.add_argument('--tf_all', type=str)
-    
+    parser.add_argument('--skeleton', type=str)
+    parser.add_argument('--apply_skeleton', action='store_true')
+    parser.add_argument('--apply_tf', action='store_true')
+    parser.add_argument('--max_n_links', type=int)
+    parser.add_argument('--reg_type', type=str)
+    parser.add_argument('--num_workers', type=int)
+    parser.add_argument('--regulators_consensus', type=str)
+    parser.add_argument('--evaluation_data', type=str)
+    parser.add_argument('--ws_consensus', type=str)
+    parser.add_argument('--ws_distance_background', type=str)
 
+
+
+   
+    
     args = parser.parse_args()
     for k, v in vars(args).items():
         if v is not None:
@@ -90,23 +132,16 @@ def basic_qc(
 def process_links(net, par):
     import numpy as np
     print('Original net shape: ', net.shape)
-    
-    standard_cols = ["source", "target", "weight"]
-    
-    # Include cell_type if present
     if 'cell_type' in net.columns:
-        cols = standard_cols + ['cell_type']
-    else:
-        cols = standard_cols
-    
+        print('Prediction contains cell type specific links. Averaging weights across cell types.')
+    cols = ["source", "target", "weight"]
     # Check for symmetric links
     flipped = net.rename(columns={"source": "target", "target": "source"})
     merged = net.merge(flipped, on=cols, how="inner")
     if not merged.empty:
         print("Warning: The network contains at least one symmetric link.")
-    
     # Remove duplicates
-    net = net.drop_duplicates(subset=cols)
+    # net = net.drop_duplicates(subset=cols)
     
     # Remove self-loops
     net["source"] = net["source"].astype(str)
@@ -115,10 +150,9 @@ def process_links(net, par):
     
     # Aggregate duplicates by mean weight
     net["weight"] = pd.to_numeric(net["weight"], errors='coerce')
-    net = net.groupby(standard_cols, as_index=False)["weight"].mean()
+    net = net.groupby(["source", "target"], as_index=False)["weight"].mean()
     
     print(f"Network shape after cleaning: {net.shape}")
-    
     # Limit the number of links
     max_links = par.get("max_n_links", 50000)
     # sort by absolute weight descending

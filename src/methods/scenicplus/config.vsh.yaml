@@ -23,13 +23,13 @@ arguments:
     description: "Whether to perform quality control."
   - name: --cell_topic
     type: file 
-    default: output/cell_topic.csv
+    default: scenicplus_output/sp_cell_topic.csv
     required: false
     direction: output
     description: "Cell-topics prob scores"
   - name: --grn_extended
     type: file 
-    default: scenicplus/grn_extended.csv
+    default: scenicplus_output/sp_grn_extended.csv
     required: false
     direction: output
     description: "Source-target-peak triplets"

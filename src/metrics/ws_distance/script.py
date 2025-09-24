@@ -38,48 +38,18 @@ except:
     sys.path.append(meta["util_dir"])
 
 from helper import main 
+from util import format_save_score
 
 if __name__ == '__main__':
+    # if par.get('ws_consensus') is None:
+    #     if par['silent_missing_dependencies']:
+    #         dataset_id = 'missing'
+    #         metric_ids =['ws']
+    #         metric_values = ['']
+    #     else:
+    #         raise FileNotFoundError(f"Dependencies missing {par['ws_consensus']}. Please check the paths of the dependencies")
+    # else:
+    _, output = main(par)
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-
-    # - check dependencies
-    if par.get('ws_consensus') is None:
-        if par['silent_missing_dependencies']:
-            dataset_id = 'missing'
-            metric_ids =['ws']
-            metric_values = ['']
-        else:
-            raise FileNotFoundError(f"Dependencies missing {par['ws_consensus']}. Please check the paths of the dependencies")
-    else:
-        method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-        # dataset_id = ad.read_h5ad(par['evaluation_data_sc'], backed='r').uns['dataset_id']
-        if 'replogle' in par['ws_consensus']:
-            dataset_id = 'replogle'
-        elif 'adamson' in par['ws_consensus']:
-            dataset_id = 'adamson'
-        elif 'norman' in par['ws_consensus']:
-            dataset_id = 'norman'
-        elif 'xaira_HCT116' in par['ws_consensus']:
-            dataset_id = 'xaira_HCT116'
-        elif 'xaira_HEK293T' in par['ws_consensus']:
-            dataset_id = 'xaira_HEK293T'
-        else:
-            raise ValueError(f"Dataset name did not match expected datasets")
-        print(f"Method id: {method_id}, Dataset id: {dataset_id}")
-        # - main function
-        _, mean_scores = main(par)
-        print(mean_scores)
-        metric_ids = mean_scores.columns.values
-        metric_values = mean_scores.values[0]
-
-    output = ad.AnnData(
-        X=np.empty((0, 0)),
-        uns={
-            "dataset_id": dataset_id,
-            "method_id": method_id,
-            "metric_ids": metric_ids,
-            "metric_values": metric_values
-        }
-    )
-    output.write_h5ad(par['score'], compression='gzip')
-    print('Completed', flush=True)
+    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+    format_save_score(output, method_id, dataset_id, par['score'])

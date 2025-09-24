@@ -126,6 +126,7 @@ dependencies:
   - name: metrics/regression_2 
   - name: metrics/regression_1
   - name: metrics/ws_distance
+  - name: metrics/sem
   - name: utils/extract_uns_metadata
     repository: openproblems
   # ---- single omics
@@ -142,9 +143,9 @@ dependencies:
   - name: grn_methods/scenicplus
   - name: grn_methods/granie
   # ---- baselines
-  - name: control_methods/pearson_corr
-  - name: control_methods/negative_control
-  - name: control_methods/positive_control
+  - name: methods/pearson_corr
+  - name: methods/negative_control
+  - name: methods/positive_control
 
 runners:
   - type: executable

@@ -202,6 +202,7 @@ def configure(par):
     cmd = f"cd {par['temp_dir']} && bash dictys_helper makefile_check.py"
     run_cmd(cmd)
 def infer_grn(par):
+    print('Inferring GRNs', flush=True)
     cmd = f"cd {par['temp_dir']} && bash dictys_helper network_inference.sh -j {par['num_workers']} -J 1 static"
     run_cmd(cmd)
 def export_net(par):
