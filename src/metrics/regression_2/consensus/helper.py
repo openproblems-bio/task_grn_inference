@@ -1,17 +1,20 @@
 
 import os
 import json
-import anndata
+import sys
+from typing import Dict, Any
+
+import numpy as np
 import pandas as pd
 import anndata as ad
-import sys
-import numpy as np
 
 from util import process_links
-def main(par):
+
+
+def main(par: Dict[str, Any]) -> Dict[str, Dict[float, int]]:
     print(par)
     # Load perturbation data
-    adata_rna = anndata.read_h5ad(par['evaluation_data'])
+    adata_rna = ad.read_h5ad(par['evaluation_data'])
     gene_names = adata_rna.var_names
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
 
