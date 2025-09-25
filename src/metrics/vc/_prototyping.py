@@ -1,7 +1,9 @@
 import os
-import traceback
+from typing import Tuple, Dict
 
-from sklearn.model_selection import GroupShuffleSplit, KFold
+import tqdm
+from sklearn.model_selection import GroupKFold
+from torch.utils.data import Dataset
 
 os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8' # For reproducibility purposes (on GPU)
 
@@ -10,10 +12,7 @@ import h5py
 import numpy as np
 import pandas as pd
 import torch
-import tqdm
 from scipy.sparse import csr_matrix
-from scipy.stats import ttest_rel, spearmanr, wilcoxon
-from sklearn.linear_model import ElasticNet
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 
 
@@ -39,157 +38,291 @@ def combine_multi_index(*arrays) -> np.array:
     return np.ravel_multi_index(A, dims=n_classes, order='C')
 
 
-# Load perturbation data
-with h5py.File("../../../resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad", "r") as f:
+for method_name in ["collectRI", "granie", "figr", "scglue", "celloracle", "scenicplus"]:
 
-    # Get sample info
-    print(f["obs"].keys())
-    cv_groups, match_groups, exact_match_groups = [], [], []
-    for obs_name in ["perturbation", "perturbation_type", "cell_type", "donor_id", "plate_name", "row"]:
-        if obs_name in f["obs"]:
-            if "codes" in f["obs"][obs_name]:
-                codes = f["obs"][obs_name]["codes"][:]
-            else:
-                codes = LabelEncoder().fit_transform(f["obs"][obs_name][:])
-            if obs_name in {"perturbation", "cell_type"}:
-                cv_groups.append(codes)
-            if obs_name not in {"row", "perturbation"}:
-                match_groups.append(codes)
-            if obs_name != "perturbation":
+
+    # Load perturbation data
+    with h5py.File("../../../resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad", "r") as f:
+
+        # Get sample info
+        perturbations = None
+        cv_groups, match_groups, exact_match_groups = [], [], []
+        for obs_name in ["perturbation", "perturbation_type", "cell_type", "donor_id", "plate_name", "row"]:
+            if obs_name in f["obs"]:
+                if "codes" in f["obs"][obs_name]:
+                    codes = f["obs"][obs_name]["codes"][:]
+                else:
+                    codes = LabelEncoder().fit_transform(f["obs"][obs_name][:])
+                if perturbations is None:
+                    perturbations = codes
+                if obs_name in {"perturbation", "cell_type"}:
+                    cv_groups.append(codes)
+                if obs_name not in {"row", "perturbation"}:
+                    match_groups.append(codes)
                 exact_match_groups.append(codes)
 
-    # Groups used for cross-validation
-    cv_groups = combine_multi_index(*cv_groups)
+        # Groups used for cross-validation
+        cv_groups = combine_multi_index(*cv_groups)
 
-    # Groups used for matching with negative controls
-    match_groups = combine_multi_index(*match_groups)
+        # Groups used for matching with negative controls
+        match_groups = combine_multi_index(*match_groups)
 
-    # Groups used for exact matching with negative controls
-    # (e.g., samples should be from the same plate row)
-    exact_match_groups = combine_multi_index(*exact_match_groups)
+        # Groups used for exact matching with negative controls
+        # (e.g., samples should be from the same plate row)
+        exact_match_groups = combine_multi_index(*exact_match_groups)
 
-    are_controls = f["obs"]["is_control"][:].astype(bool)
-    X = f["layers"]["X_norm"]
-    if isinstance(X, h5py.Dataset):  # Dense array
-        X = X[:].astype(np.float32)
-    else:  # Sparse array
-        group = X
-        data = group['data'][...].astype(np.float32)
-        indices = group['indices'][...]
-        indptr = group['indptr'][...]
-        shape = group.attrs['shape']
-        sparse_matrix = csr_matrix((data, indices, indptr), shape=shape)
-        X = sparse_matrix.toarray()
-        print(X.shape)
+        are_controls = f["obs"]["is_control"][:].astype(bool)
+        X = f["layers"]["X_norm"]
+        if isinstance(X, h5py.Dataset):  # Dense array
+            X = X[:].astype(np.float32)
+        else:  # Sparse array
+            group = X
+            data = group['data'][...].astype(np.float32)
+            indices = group['indices'][...]
+            indptr = group['indptr'][...]
+            shape = group.attrs['shape']
+            sparse_matrix = csr_matrix((data, indices, indptr), shape=shape)
+            X = sparse_matrix.toarray()
 
-    # Get gene names
-    if "index" in f["var"]:
-        gene_names = f["var"]["index"][:].astype(str)
-    elif "Probe_id" in f["var"]:
-        gene_names = f["var"]["Probe_id"][:].astype(str)
-    else:
-        gene_names = f["var"]["gene_name"][:].astype(str)
-    print(gene_names)
+        # Get gene names
+        if "index" in f["var"]:
+            gene_names = f["var"]["index"][:].astype(str)
+        elif "Probe_id" in f["var"]:
+            gene_names = f["var"]["Probe_id"][:].astype(str)
+        else:
+            gene_names = f["var"]["gene_name"][:].astype(str)
 
-gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
+    gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
 
-# Load inferred GRN
-df = pd.read_csv("../../../output/benchmark/grn_models/scenicplus.csv")
-sources = df["source"].to_numpy()
-targets = df["target"].to_numpy()
-weights = df["weight"].to_numpy()
-#with h5py.File("../../../resources_test/grn_models/op/collectri.h5ad", "r") as f:
-#    sources = f["uns"]["prediction"]["source"][:].astype(str)
-#    targets = f["uns"]["prediction"]["target"][:].astype(str)
-#    weights = f["uns"]["prediction"]["weight"][:]
+    # Load inferred GRN
+    df = pd.read_csv(f"../../../output/benchmark/grn_models/{method_name}.csv")
+    sources = df["source"].to_numpy()
+    targets = df["target"].to_numpy()
+    weights = df["weight"].to_numpy()
+    #with h5py.File("../../../resources_test/grn_models/op/collectri.h5ad", "r") as f:
+    #    sources = f["uns"]["prediction"]["source"][:].astype(str)
+    #    targets = f["uns"]["prediction"]["target"][:].astype(str)
+    #    weights = f["uns"]["prediction"]["weight"][:]
+    A = np.zeros((len(gene_names), len(gene_names)), dtype=X.dtype)
+    for source, target, weight in zip(sources, targets, weights):
+        if (source in gene_dict) and (target in gene_dict):
+            i = gene_dict[source]
+            j = gene_dict[target]
+            A[i, j] = float(weight)
 
-A = np.zeros((len(gene_names), len(gene_names)), dtype=X.dtype)
-for source, target, weight in zip(sources, targets, weights):
-    if (source in gene_dict) and (target in gene_dict):
-        i = gene_dict[source]
-        j = gene_dict[target]
-        A[i, j] = float(weight)
+    # Only consider the genes that are actually present in the inferred GRN
+    gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
+    X = X[:, gene_mask]
+    A = A[gene_mask, :][:, gene_mask]
+    gene_names = gene_names[gene_mask]
 
-# Only consider the genes that are actually present in the inferred GRN
-gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
-X = X[:, gene_mask]
-A = A[gene_mask, :][:, gene_mask]
-gene_names = gene_names[gene_mask]
+    # Restrict to the 1000 most highly variable genes for speed
+    std = np.std(X, axis=0)
+    idx = np.argsort(std)[-1000:]
+    X = X[:, idx]
+    A = A[idx, :][:, idx]
+    gene_names = gene_names[idx]
 
-# Check whether the inferred GRN contains signed predictions
-use_signs = np.any(A < 0)
-
-# Center and scale dataset
-scaler = StandardScaler()
-scaler.fit(X[are_controls, :])  # Use controls only to infer statistics (to avoid data leakage)
-X = scaler.transform(X)
-
-# Get negative controls
-X_controls = X[are_controls, :]
-
-
-def compute_perturbations(groups: np.array) -> np.ndarray:
-    # Compute perturbations as differences between samples and their matched controls.
-    # By matched control, we mean a negative control from the same donor, located on
-    # the same plate and from the same cell type.
-    # By construction, perturbations will be 0 for control samples.
-    delta_X = np.copy(X)
-    control_map = {}
-    for i, (is_control, group_id) in enumerate(zip(are_controls, groups)):
-        if is_control:
-            control_map[group_id] = i
-    for i, group_id in enumerate(groups):
-        j = control_map[group_id]
-        delta_X[i, :] -= delta_X[j, :]
-    return delta_X
+    # Mapping between gene expression profiles and their matched negative controls
+    def create_control_matching(are_controls: np.ndarray, match_groups: np.ndarray) -> Tuple[Dict[int, int], np.ndarray]:
+        control_map = {}
+        for i, (is_control, group_id) in enumerate(zip(are_controls, match_groups)):
+            if is_control:
+                control_map[int(group_id)] = i
+        for i in range(len(are_controls)):
+            assert match_groups[i] in control_map
+        return control_map, match_groups
+    try:
+        control_map, match_groups = create_control_matching(are_controls, exact_match_groups)
+    except AssertionError:
+        print("Failed to match with controls exactly. Using a less stringent matching instead.")
+        control_map, match_groups = create_control_matching(are_controls, match_groups)
 
 
-try:  # Try exact control matching first (same plate row, if info is available)
-    delta_X = compute_perturbations(exact_match_groups)
-except:  # If samples are missing, use less stringent control matching instead
-    print(traceback.format_exc())
-    delta_X = compute_perturbations(match_groups)
+    class GRNLayer(torch.nn.Module):
+
+        def __init__(
+                self,
+                A_weights: torch.nn.Parameter,
+                A_signs: torch.Tensor,
+                signed: bool = True,
+                inverse: bool = True,
+                alpha: float = 1.0
+        ):
+            torch.nn.Module.__init__(self)
+            self.n_genes: int = A_weights.size(1)
+            self.A_weights: torch.nn.Parameter = A_weights
+            self.A_signs: torch.Tensor = A_signs
+            self.A_mask: torch.Tensor = (self.A_signs > 0).to(self.A_weights.dtype)
+            self.I = torch.eye(self.n_genes, dtype=A_weights.dtype, device=DEVICE)
+            self.signed: bool = signed
+            self.inverse: bool = inverse
+            self.alpha: float = alpha
+
+        def forward(self, x: torch.Tensor) -> torch.Tensor:
+            if self.signed:
+                A = torch.abs(self.A_weights) * self.A_signs
+            else:
+                A = self.A_weights * self.A_mask
+            ia = self.I - self.alpha * A.t()
+            if self.inverse:
+                ia = torch.linalg.inv(ia)
+            return torch.mm(ia, x.t()).t()
 
 
-# Remove negative controls from downstream analysis
-delta_X = delta_X[~are_controls, :]
-cv_groups = cv_groups[~are_controls]
-match_groups = match_groups[~are_controls]
-exact_match_groups = exact_match_groups[~are_controls]
+    class Model(torch.nn.Module):
+
+        def __init__(self, A: np.ndarray, n_perturbations: int, n_hidden: int = 64, signed: bool = True):
+            torch.nn.Module.__init__(self)
+            self.n_genes: int = A.shape[1]
+            self.n_perturbations: int = n_perturbations
+            self.n_hidden: int = n_hidden
+            self.perturbation_embedding = torch.nn.Embedding(n_perturbations, n_hidden)
+
+            A_signs = torch.from_numpy(np.sign(A).astype(NUMPY_DTYPE))
+            A_weights = np.copy(A).astype(NUMPY_DTYPE)
+            A_weights /= (np.sqrt(self.n_genes) * float(np.std(A_weights)))
+            A_weights = torch.nn.Parameter(torch.from_numpy(A_weights))
+
+            self.encoder = torch.nn.Sequential(
+                GRNLayer(A_weights, A_signs, inverse=False, signed=signed),
+                torch.nn.PReLU(1),
+                torch.nn.Linear(self.n_genes, self.n_hidden),
+                torch.nn.PReLU(1),
+                torch.nn.Linear(self.n_hidden, self.n_hidden),
+                torch.nn.PReLU(1),
+            )
+            self.decoder = torch.nn.Sequential(
+                torch.nn.Linear(self.n_hidden, self.n_hidden),
+                torch.nn.PReLU(1),
+                torch.nn.Linear(self.n_hidden, self.n_genes),
+                torch.nn.PReLU(1),
+                GRNLayer(A_weights, A_signs, inverse=True, signed=signed)
+            )
+
+        def forward(self, x: torch.Tensor, pert: torch.LongTensor) -> torch.Tensor:
+            y = self.encoder(x)
+            z = self.perturbation_embedding(pert)
+            y = y + z
+            y = self.decoder(y)
+            return x + y
 
 
-def anchor_regression(
-        X: np.ndarray,
-        Z: np.ndarray,
-        Y: np.ndarray,
-        l2_reg: float = 1e-3,
-        anchor_strength: float = 5.0
-) -> np.ndarray:
-    """Anchor regression.
+    class PerturbationDataset(Dataset):
 
-    Args:
-        X: input features, of shape (n, d).
-        Z: anchor variables. The model is required to be invariant to
-            these environmental variables. Shape (n, z).
-        Y: predicted variables, of shape (n, u).
+        def __init__(
+                self,
+                X: np.ndarray,
+                idx: np.ndarray,
+                match_groups: np.ndarray,
+                control_map: Dict[int, int],
+                perturbations: np.ndarray
+        ):
+            self.X: np.ndarray = X.astype(NUMPY_DTYPE)
+            self.idx: np.ndarray = idx
+            self.match_groups: np.ndarray = match_groups
+            self.control_map: Dict[int, int] = control_map
+            self.perturbations: np.ndarray = perturbations.astype(int)
 
-    Returns:
-        Inferred parameters, of shape (d, u).
-    """
+        def __len__(self) -> int:
+            return len(self.idx)
 
-    # Projector onto the anchor subspace
-    pi = Z @ np.linalg.pinv(Z.T @ Z) @ Z.T
-
-    # Whitening
-    W = np.eye(len(Z)) + (np.sqrt(1.0 + anchor_strength) - 1.0) * pi
-    X_t = W @ X
-    Y_t = W @ Y
-
-    # Ridge regression on the whitened data
-    theta = np.linalg.solve(X_t.T @ X_t + l2_reg * np.eye(X_t.shape[1]), X_t.T @ Y_t)
-
-    #Y_hat = X @ Theta
-    return theta
+        def __getitem__(self, i: int) -> Tuple[torch.Tensor, int, torch.Tensor]:
+            i = self.idx[i]
+            y = torch.from_numpy(self.X[i, :])
+            group = int(self.match_groups[i])
+            j = int(self.control_map[group])
+            x = torch.from_numpy(self.X[j, :])
+            p = int(self.perturbations[i])
+            return x, p, y
 
 
+    def evaluate(A, train_data_loader, test_data_loader, n_perturbations: int) -> float:
 
+        # Training
+        signed = np.any(A < 0)
+        model = Model(A, n_perturbations, n_hidden=64, signed=signed)
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, mode='min', patience=5,
+            min_lr=1e-5, cooldown=3, factor=0.8
+        )
+        pbar = tqdm.tqdm(range(350))
+        best_val_loss = float('inf')
+        best_epoch = 0
+        model.train()
+        for epoch in pbar:
+
+            # Train for one epoch
+            total_loss = 0
+            for x, pert, y in train_data_loader:
+                optimizer.zero_grad()
+                y_hat = model(x, pert)
+                loss = torch.mean(torch.square(y - y_hat))
+                loss.backward()
+                optimizer.step()
+                total_loss += loss.item() * len(x)
+            pbar.set_description(str(total_loss))
+            scheduler.step(total_loss)
+
+            # Evaluation
+            model.eval()
+            ss_res = 0
+            with torch.no_grad():
+                for x, pert, y in test_data_loader:
+                    y_hat = model(x, pert)
+                    residuals = torch.square(y - y_hat).cpu().data.numpy()
+                    ss_res += np.sum(residuals)
+            if ss_res < best_val_loss:
+                best_val_loss = ss_res
+                best_epoch = epoch
+            model.train()
+
+        model.eval()
+
+        print(f"Best epoch: {best_epoch} ({best_val_loss})")
+
+        return best_val_loss
+
+
+    ss_res = 0
+    ss_tot = 0
+    cv = GroupKFold(n_splits=5, random_state=seed, shuffle=True)
+    for i, (train_index, test_index) in enumerate(cv.split(X, X, cv_groups)):
+
+        # Center and scale dataset
+        scaler = StandardScaler()
+        scaler.fit(X[train_index, :])
+        X_standardized = scaler.transform(X)
+
+        # Create data loaders
+        n_perturbations = int(np.max(perturbations) + 1)
+        train_dataset = PerturbationDataset(
+            X_standardized,
+            train_index,
+            match_groups,
+            control_map,
+            perturbations
+        )
+        train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=512)
+        test_dataset = PerturbationDataset(
+            X_standardized,
+            test_index,
+            match_groups,
+            control_map,
+            perturbations
+        )
+        test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=512)
+
+        # Evaluate inferred GRN
+        ss_res += evaluate(A, train_data_loader, test_data_loader, n_perturbations)
+
+        # Evaluate baseline GRN (shuffled target genes)
+        A_baseline = np.copy(A).T
+        np.random.shuffle(A_baseline)
+        A_baseline = A_baseline.T
+        ss_tot += evaluate(A_baseline, train_data_loader, test_data_loader, n_perturbations)
+
+    r2 = 1 - ss_res / ss_tot
+    print(method_name)
+    print(f"R2: {r2}")

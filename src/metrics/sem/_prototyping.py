@@ -358,7 +358,7 @@ print(f"Final score: {np.mean(scores)}")
 
 # Evaluate baseline GRN
 print("\n======== Evaluate shuffled GRN ========")
-n_repeats = 5
+n_repeats = 3
 scores_baseline = np.zeros_like(scores)
 for _ in range(n_repeats):  # Repeat for more robust estimation
     scores_baseline += evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
@@ -375,11 +375,3 @@ steepness = 1.5
 f = lambda p: (-np.log(p)) ** steepness
 score = f(res.pvalue) / (f(res.pvalue) + f(1e-10))
 print(f"Final score: {score}")
-
-
-"""
-Average Spearman: 0.20102521156254408
-Average Spearman (shuffled): 0.10157913679830942
-Wilcoxon signed-rank test: pvalue=7.65004668751997e-21
-Final score: 0.7404715122547103
-"""

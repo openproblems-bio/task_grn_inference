@@ -342,8 +342,6 @@ def main(par):
 
     # Create a symmetric (causally-wrong) baseline GRN
     print(f"Creating baseline GRN")
-    mask = np.abs(A) > np.abs(A.T)
-    #A_baseline = mask * A + (~mask) * A.T
     A_baseline = np.copy(A).T
     np.random.shuffle(A_baseline)
     A_baseline = A_baseline.T
@@ -353,7 +351,11 @@ def main(par):
     scores = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A, signed=use_signs)
     # Evaluate baseline GRN
     print("\n======== Evaluate shuffled GRN ========")
-    scores_baseline = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
+    n_repeats = 3
+    scores_baseline = np.zeros_like(scores)
+    for _ in range(n_repeats):  # Repeat for more robust estimation
+        scores_baseline += evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
+    scores_baseline /= n_repeats
 
     # Keep only the genes for which both GRNs got a score
     #mask = ~np.logical_or(np.isnan(scores), np.isnan(scores_baseline))
