@@ -23,8 +23,7 @@ random.seed(seed)
 np.random.seed(seed)
 
 
-#for method_name in ["granie", "scglue", "celloracle", "scenicplus"]:
-for method_name in ["granie"]:
+for method_name in ["collectRI", "granie", "figr", "scglue", "celloracle", "scenicplus"]:
 
     # Load perturbation data
     with h5py.File("../../../resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad", "r") as f:
@@ -77,6 +76,15 @@ for method_name in ["granie"]:
             i = gene_dict[source]
             j = gene_dict[target]
             A[i, j] = float(weight)
+
+    # Only consider the most highly-variable genes
+    gene_mask = np.zeros(len(gene_names), dtype=bool)
+    idx = np.argsort(np.std(X, axis=0))[-1000:]
+    gene_mask[idx] = True
+    X = X[:, gene_mask]
+    X = X.toarray() if isinstance(X, csr_matrix) else X
+    A = A[gene_mask, :][:, gene_mask]
+    gene_names = gene_names[gene_mask]
 
     # Center and scale dataset
     scaler = StandardScaler()
@@ -153,10 +161,11 @@ for method_name in ["granie"]:
     print(method_name, np.mean(scores))
 
 
-# granie 0.0035298622623965653
-# collectRI 0.06945204585826271
-# figr 0.07982196593477102
-# scenicplus 0.10504221454795235
-# scglue 0.11238193085840524
-# positive_control 0.18321761177066967
-# celloracle 0.2524036461174082
+"""
+granie 0.004012749918621728
+collectRI 0.07245154180677192
+figr 0.12552857501981485
+scglue 0.14638436014327466
+scenicplus 0.15850517365008884
+celloracle 0.19987462678804796
+"""
