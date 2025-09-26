@@ -160,9 +160,12 @@ def main(par):
             j = gene_dict[target]
             A[i, j] = float(weight)
 
-    # Only consider genes present in the inferred GRN
-    gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
+    # Only consider the most highly-variable genes
+    gene_mask = np.zeros(len(gene_names), dtype=bool)
+    idx = np.argsort(np.std(X, axis=0))[-1000:]
+    gene_mask[idx] = True
     X = X[:, gene_mask]
+    X = X.toarray() if isinstance(X, csr_matrix) else X
     A = A[gene_mask, :][:, gene_mask]
     gene_names = gene_names[gene_mask]
     
