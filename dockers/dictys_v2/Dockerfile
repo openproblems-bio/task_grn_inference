@@ -42,7 +42,7 @@ RUN wget -O Miniforge3.sh "https://github.com/conda-forge/miniforge/releases/lat
 RUN /opt/conda/bin/conda create -y -n dictys -c conda-forge python=3.9 mamba && \
     . /opt/conda/etc/profile.d/conda.sh && \
     conda activate dictys && \
-    mamba install -y -c lingfeiwang -c bioconda -c conda-forge -c pytorch dictys pytorch torchvision torchaudio cpuonly awscli && \
+    mamba install -y -c lingfeiwang -c bioconda -c conda-forge -c pytorch -c nvidia dictys pytorch torchvision torchaudio pytorch-cuda=11.7 awscli && \
     /opt/conda/bin/pip cache purge && \
     /opt/conda/bin/conda clean -a -y
 

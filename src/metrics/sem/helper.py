@@ -35,8 +35,7 @@ torch.cuda.manual_seed_all(seed)
 torch.use_deterministic_algorithms(True)
 
 from util import read_prediction, manage_layer
-
-
+from dataset_config import DATASET_GROUPS
 
 def encode_obs_cols(adata, cols):
     encoded = []
@@ -232,23 +231,7 @@ def evaluate_grn(
             coefficients.append(0.0)
     return np.nan_to_num(coefficients, nan=0)
 
-DATASET_GROUPS = {
-    "op": {
-        "match": ["plate_name", "donor_id", "cell_type", 'well'],
-        "loose_match": ["donor_id", "cell_type", "plate_name"],
-        "cv": ["perturbation", "cell_type"],
-    },
-    "parsebioscience": {
-        "match": ["donor_id", "cell_type", "well"],
-        "loose_match": ["donor_id", "cell_type"],
-        "cv": ["perturbation", "cell_type"],
-    },
-    "300BCG": {
-        "match": ["donor_id",  "cell_type"],
-        "loose_match": ["cell_type"],
-        "cv": ["perturbation", "cell_type"],
-    },
-}
+
 
 def main(par):
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
