@@ -3,7 +3,7 @@ import anndata as ad
 import sys
 import numpy as np
 from sklearn.metrics import average_precision_score
-
+from fetch_ground_truth import build_celltype_grn
 from util import process_links
 # For reproducibility
 seed = 42
@@ -13,18 +13,15 @@ def main(par):
     prediction = ad.read_h5ad(par['prediction'])
     prediction = pd.DataFrame(prediction.uns['prediction'])
     prediction = process_links(prediction, par)
-    
-    ground_truth_files = {
-        'replogle': 'tbd/replogle_grn_gt.csv',
-        'adamson': 'tbd/adamson_grn_gt.csv',
-        'norman': 'tbd/norman_grn_gt.csv',
-        'xaira_HCT116': 'tbd/xaira_HCT116_grn_gt.csv',
-        'xaira_HEK293T': 'tbd/xaira_HEK293T_grn_gt.csv'
+    cell_type_lookup = {
+        'replogle': 'PBMC',
+        'adamson': 'PBMC',
+        'norman': 'PBMC',
+        'xaira_HCT116': 'PBMC',
+        'xaira_HEK293T': 'PBMC'
     }
-    dataset_id = par.get('dataset_id')
-    if dataset_id not in ground_truth_files:
-        raise ValueError(f"No ground truth file for dataset {dataset_id}")
-    true_graph = pd.read_csv(ground_truth_files[dataset_id])
+    ground_truth_file = build_celltype_grn(cell_type_lookup[par.get('dataset_id')])
+    true_graph = pd.read_csv(ground_truth_file)
     
     assert prediction.shape[0] > 0, 'No links found in the network'
     
