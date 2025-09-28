@@ -17,7 +17,7 @@ from util import download_annotation
 def download_motifs(par):
     if not os.path.exists(par['motif_file']):
         aws_file = "s3://openproblems-data/resources/grn/supp_data/databases/scglue/ENCODE-TF-ChIP-hg38.bed.gz"
-        command = f"aws s3 cp {aws_file} {par['motif_file']}"
+        command = f"aws s3 cp {aws_file} {par['motif_file']} --no-sign-request"
         print("Downloading motif file from", aws_file, "to", par['motif_file'])
         result = subprocess.run(command, shell=True, check=True)
         if result.returncode == 0:  

@@ -241,6 +241,7 @@ def compute_pds(X_true, X_pred, perturbations, gene_names):
 
 
 class GRNLayer(torch.nn.Module):
+
     def __init__(
             self,
             A_weights: torch.nn.Parameter,
@@ -266,26 +267,29 @@ class GRNLayer(torch.nn.Module):
             A = self.A_weights * self.A_mask
         
         if self.inverse:
-            # Memory-efficient iterative solution for (I - αA^T)^-1 x
-            # Use fixed-point iteration: y_k+1 = x + α A^T y_k, starting with y_0 = x
-            # This converges to (I - αA^T)^-1 x when α is small enough
+            # For inverse transformation, use iterative solve to avoid memory issues
+            # Solve (I - alpha * A.t()) * y = x for y
+            ia = self.I - self.alpha * A.t()
             
-            result = x.clone()  # y_0 = x
+            # Add small regularization to diagonal for numerical stability
+            ia = ia + 1e-6 * self.I
             
-            # Fixed-point iterations (usually 3-5 iterations are enough for small α)
-            for _ in range(4):  # Adjust number of iterations as needed
-                grn_term = torch.mm(result, A) * self.alpha  # α A^T y_k
-                result = x + grn_term  # y_k+1 = x + α A^T y_k
-            
-            return result
+            # Use solve instead of inversion to save memory
+            try:
+                # Solve ia * y.t() = x.t() for y.t(), then transpose
+                result = torch.linalg.solve(ia, x.t()).t()
+                return result
+            except torch.linalg.LinAlgError:
+                # Fallback: simple linear transformation without inversion
+                print("Warning: Matrix solve failed, using simplified GRN transformation")
+                return torch.mm(x, A)
         else:
-            # Forward case: (I - αA^T) x = x - α * A^T * x
-            grn_term = torch.mm(x, A) * self.alpha  # α * A^T * x
-            return x - grn_term
+            # Forward transformation: apply GRN directly
+            return torch.mm(x, A.t())
 
 
 class Model(torch.nn.Module):
-    def __init__(self, A: np.ndarray, n_perturbations: int, n_hidden: int = 64, signed: bool = True, alpha: float = .1):
+    def __init__(self, A: np.ndarray, n_perturbations: int, n_hidden: int = 64, signed: bool = True):
         torch.nn.Module.__init__(self)
         self.n_genes: int = A.shape[1]
         self.n_perturbations: int = n_perturbations
@@ -296,10 +300,11 @@ class Model(torch.nn.Module):
         A_weights = np.copy(A).astype(NUMPY_DTYPE)
         A_weights /= (np.sqrt(self.n_genes) * float(np.std(A_weights)))
         A_weights = torch.nn.Parameter(torch.from_numpy(A_weights))
+        # Ensure A_signs is on the same device as A_weights
         A_signs = A_signs.to(A_weights.device)
 
         # First layer: GRN-informed transformation of control expression
-        self.grn_input_layer = GRNLayer(A_weights, A_signs, inverse=False, signed=signed, alpha=alpha)
+        self.grn_input_layer = GRNLayer(A_weights, A_signs, inverse=False, signed=signed, alpha=0.1)
         
         # Middle layers: perturbation processing
         self.encoder = torch.nn.Sequential(
@@ -318,9 +323,10 @@ class Model(torch.nn.Module):
         )
         
         # Last layer: GRN-informed transformation to final expression
-        self.grn_output_layer = GRNLayer(A_weights, A_signs, inverse=True, signed=signed, alpha=alpha)
+        self.grn_output_layer = GRNLayer(A_weights, A_signs, inverse=True, signed=signed, alpha=0.1)
 
     def forward(self, x: torch.Tensor, pert: torch.LongTensor) -> torch.Tensor:
+        # Apply GRN transformation to control expression
         x = self.grn_input_layer(x)
         y = self.encoder(x)
         z = self.perturbation_embedding(pert)
@@ -509,19 +515,29 @@ def main(par):
             A[i, j] = float(weight)
 
     # Only consider the genes that are actually present in the inferred GRN
-    if True:
-        gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
-        X = X[:, gene_mask]
-        A = A[gene_mask, :][:, gene_mask]
-        gene_names = gene_names[gene_mask]
-    
-    A_baseline = np.copy(A).T
-    baseline_rng = np.random.RandomState(seed + 1000)  # Different seed for baseline
-    baseline_rng.shuffle(A_baseline)
-    A_baseline = A_baseline.T
+    gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
+    X = X[:, gene_mask]
+    A = A[gene_mask, :][:, gene_mask]
+    gene_names = gene_names[gene_mask]
 
-    # No gene filtering - use all genes present in the GRN as requested
+    # Filter genes based on GRN instead of HVGs
+    # Keep all genes that are present in the GRN (already filtered above)
     print(f"Using {len(gene_names)} genes present in the GRN")
+    
+    # Additional memory-aware gene filtering for very large GRNs
+    MAX_GENES_FOR_MEMORY = 3000  # Reduced further to avoid memory issues
+    if len(gene_names) > MAX_GENES_FOR_MEMORY:
+        print(f"Too many genes ({len(gene_names)}) for memory. Selecting top {MAX_GENES_FOR_MEMORY} by GRN connectivity.")
+        
+        # Select genes with highest connectivity in the GRN
+        gene_connectivity = np.sum(np.abs(A), axis=0) + np.sum(np.abs(A), axis=1)
+        top_gene_indices = np.argsort(gene_connectivity)[-MAX_GENES_FOR_MEMORY:]
+        
+        X = X[:, top_gene_indices]
+        A = A[top_gene_indices, :][:, top_gene_indices]
+        gene_names = gene_names[top_gene_indices]
+        
+        print(f"Final: Using {len(gene_names)} most connected genes for evaluation")
 
     # Mapping between gene expression profiles and their matched negative controls
     try:
@@ -587,6 +603,10 @@ def main(par):
 
     # Evaluate baseline GRN (shuffled target genes) - use seeded shuffle for reproducibility
     print("Evaluating shuffled GRN...")
+    A_baseline = np.copy(A).T
+    baseline_rng = np.random.RandomState(seed + 1000)  # Different seed for baseline
+    baseline_rng.shuffle(A_baseline)
+    A_baseline = A_baseline.T
     pds_shuffled = evaluate(A_baseline, train_data_loader, test_data_loader, n_perturbations, gene_names)
 
     print(f"Method: {method_id}")
