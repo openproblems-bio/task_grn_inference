@@ -43,7 +43,7 @@ def calculate_tf_activity(adata, net, tf_all=None, n_targets_t=1, **kwargs):
     tf_size = net.groupby('source').size()
     tfs = tf_size[tf_size > n_targets_t].index
     net = net[net['source'].isin(tfs)]
-    if False:
+    if True:
         tf_acts = tf_activity_local(net, adata, tf_all, **kwargs)
     else:
         import decoupler
@@ -79,6 +79,13 @@ def calculate_tf_activity(adata, net, tf_all=None, n_targets_t=1, **kwargs):
     var_df = pd.DataFrame(index=X_df.columns)
     var_df['source'] = var_df.index
     tf_acts_adata = ad.AnnData(X=X_df.values, obs=obs_df, var=var_df)
+
+    # - convert to z score
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(tf_acts_adata.X)
+    tf_acts_adata.X = X_scaled
+
     return tf_acts_adata
 
 from scipy.stats import spearmanr
@@ -88,6 +95,7 @@ def recovery_consistency_score(tf_activity, group):
     for g_vals, df_group in df_tfs.groupby(group):
         df_feats = df_group.drop(columns=group)
         if len(df_feats) < 2:
+            print(f"Skipping group {g_vals} due to insufficient samples")
             continue  # skip if only one sample
         sims = []
         rows = df_feats.values
@@ -98,21 +106,43 @@ def recovery_consistency_score(tf_activity, group):
         mean_sim = np.nanmean(sims) if sims else np.nan
         results.append(list(g_vals) + [mean_sim])
     return pd.DataFrame(results, columns=group + ["consistency_score"])
-    
+
+import numpy as np
+import pandas as pd
+
+def shuffle_net(net):
+    np.random.seed(42)
+    mat_df = net.pivot(index='source', columns='target', values='weight').fillna(0)
+    mat = mat_df.values
+    shuffled = mat.flatten()
+    np.random.shuffle(shuffled)
+    shuffled = shuffled.reshape(mat.shape)
+    shuffled_df = pd.DataFrame(shuffled, index=mat_df.index, columns=mat_df.columns)
+    net_shuffle = shuffled_df.reset_index().melt(
+        id_vars=mat_df.index.name,  # this will be 'source'
+        var_name='target',
+        value_name='weight'
+    )
+
+    # Drop zeros if you only want edges that existed
+    net_shuffle = net_shuffle[net_shuffle['weight'] != 0].reset_index(drop=True)
+
+    return net_shuffle
 
 def main(par):
-    n_tfs = 100
+    
     evaluation_adata = ad.read_h5ad(par['evaluation_data'])
     net = read_prediction(par) # [source	target	weight]
 
-    c = net.groupby('source').size().sort_values(ascending=False).head(n_tfs)
-    tfs = c.index
-    net = net[net['source'].isin(tfs)]
-    net_shuffle = net.copy()
-    np.random.seed(42)
-    net_shuffle['target'] = np.random.permutation(net_shuffle['target'].values)
-    net_shuffle = net_shuffle.drop_duplicates(subset=['source', 'target'])
+    if True:
+        n_tfs = 100
+        c = net.groupby('source').size().sort_values(ascending=False).head(n_tfs)
+        tfs = c.index
+        net = net[net['source'].isin(tfs)]
 
+    net_shuffle = shuffle_net(net)
+    # net_shuffle = net_shuffle.drop_duplicates(subset=['source', 'target'])
+    
 
     tf_act = calculate_tf_activity(evaluation_adata, net, n_targets_t=10)
     tf_act_random = calculate_tf_activity(evaluation_adata, net_shuffle, n_targets_t=10)
@@ -121,10 +151,19 @@ def main(par):
     for g in group:
         assert g in tf_act.obs.columns
 
+    common_tfs = np.intersect1d(tf_act.var_names, tf_act_random.var_names)
+    tf_act = tf_act[:, common_tfs]
+    tf_act_random = tf_act_random[:, common_tfs]
+    assert tf_act.shape[1]==tf_act_random.shape[1], 'Different number of tfs'
+    print(f'Number of TFs considered: {tf_act.shape[1]}')
+
+    # - number of TFs are important in the calculation of the spearman corr between donors. -> needs formatization
+    # - there are very high spearman corr between donors in the random model -> 
+
     scores = recovery_consistency_score(tf_activity=tf_act, group=group)['consistency_score']    
     scores_baseline = recovery_consistency_score(tf_activity=tf_act_random, group=group)['consistency_score']
 
-
+    print('Number of groups evaluated:', len(scores), len(scores_baseline))
     from scipy.stats import ttest_rel, spearmanr, wilcoxon
     try:
         res = wilcoxon(scores - scores_baseline, zero_method='wilcox', alternative='greater')

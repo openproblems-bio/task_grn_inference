@@ -12,7 +12,7 @@
 
 set -euo pipefail
 
-datasets=('op' "300BCG" 'parsebioscience' ) #"300BCG" "ibd" 'parsebioscience'
+datasets=( 'parsebioscience' 'op' "300BCG") #"300BCG" "ibd" 'parsebioscience'
 methods=("negative_control" "pearson_corr" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
 
 # temporary file to collect CSV rows

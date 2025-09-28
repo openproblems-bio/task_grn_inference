@@ -3521,7 +3521,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression_2",
     "viash_version" : "0.9.4",
-    "git_commit" : "70573b3edcc177186c69b7272167b874580bbabd",
+    "git_commit" : "03804d752174c153d610bed0484655f1b66c6372",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3692,10 +3692,11 @@ from helper import main
 from util import format_save_score
 
 if __name__ == '__main__':
-    output = main(par)
-    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
-    format_save_score(output, method_id, dataset_id, par['score'])
+  print(par)
+  output = main(par)
+  method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+  dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+  format_save_score(output, method_id, dataset_id, par['score'])
 VIASHMAIN
 python -B "$tempscript"
 '''

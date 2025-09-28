@@ -450,9 +450,9 @@ RUN pip install --upgrade pip && \
 
 RUN pip install --upgrade --no-deps --force-reinstall git+https://github.com/bowang-lab/scGPT.git
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scgpt"
-LABEL org.opencontainers.image.created="2025-09-21T18:16:25Z"
+LABEL org.opencontainers.image.created="2025-09-28T14:21:37Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="70573b3edcc177186c69b7272167b874580bbabd"
+LABEL org.opencontainers.image.revision="03804d752174c153d610bed0484655f1b66c6372"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

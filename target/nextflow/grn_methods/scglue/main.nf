@@ -3472,7 +3472,17 @@ meta = [
       "type" : "docker",
       "id" : "docker",
       "image" : "janursa/scglue:13_03_2025",
-      "namespace_separator" : "/"
+      "namespace_separator" : "/",
+      "setup" : [
+        {
+          "type" : "python",
+          "user" : false,
+          "packages" : [
+            "awscli"
+          ],
+          "upgrade" : true
+        }
+      ]
     }
   ],
   "build_info" : {
@@ -3481,7 +3491,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scglue",
     "viash_version" : "0.9.4",
-    "git_commit" : "70573b3edcc177186c69b7272167b874580bbabd",
+    "git_commit" : "03804d752174c153d610bed0484655f1b66c6372",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
