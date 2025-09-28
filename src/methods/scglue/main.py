@@ -15,19 +15,17 @@ import torch
 from util import download_annotation
 
 def download_motifs(par):
-    # get gene annotation
     if not os.path.exists(par['motif_file']):
-        tag = par['motif_file'].split('/')[-1]
-        print("Downloading motif started")
-        response = requests.get(f"http://download.gao-lab.org/GLUE/cisreg/{tag}")
-        
-        if response.status_code == 200:
-            with open(par['motif_file'], 'wb') as file:
-                file.write(response.content)
-            print(f"File downloaded and saved to {par['motif_file']}")
+        aws_file = "s3://openproblems-data/resources/grn/supp_data/databases/scglue/ENCODE-TF-ChIP-hg38.bed.gz"
+        command = f"aws s3 cp {aws_file} {par['motif_file']}"
+        print("Downloading motif file from", aws_file, "to", par['motif_file'])
+        result = subprocess.run(command, shell=True, check=True)
+        if result.returncode == 0:  
+            print("Download completed successfully")
         else:
-            print(f"Failed to download the motif file. Status code: {response.status_code}")
-        print("Downloading motif ended")
+            print("Download failed with return code", result.returncode)
+            raise Exception("Download motif file failed")
+        
 def preprocess(par):
     print('Reading input files', flush=True)
     rna = ad.read_h5ad(par['rna'])

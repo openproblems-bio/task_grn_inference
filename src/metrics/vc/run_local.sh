@@ -16,9 +16,10 @@ save_dir="output/vc"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=('op' ) #"300BCG" "ibd" 'parsebioscience'
+datasets=('op' ) #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
 # methods to process
 methods=( "pearson_corr" "positive_control" "negative_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
+# methods=( "pearson_corr" "positive_control" "negative_control")
 
 # temporary file to collect CSV rows
 combined_csv="${save_dir}/vc_scores.csv"

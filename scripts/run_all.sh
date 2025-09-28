@@ -1,12 +1,12 @@
 set -e
 
-datasets=( 'replogle' 'nakatake'  'ibd' '300BCG' ) #'replogle' 'op' 'nakatake' 'adamson' 'norman'  'xaira_HEK293T' 'xaira_HCT116'  'parsebioscience' 'ibd' '300BCG'
+datasets=( 'op' ) #'replogle' 'op' 'nakatake' 'adamson' 'norman'  'xaira_HEK293T' 'xaira_HCT116'  'parsebioscience' 'ibd' '300BCG'
 
 run_local=false # set to true to run locally, false to run on AWS
 
-run_grn_inference=false
+run_grn_inference=true
 run_grn_evaluation=false
-run_download=true
+run_download=false
 
 
 for dataset in "${datasets[@]}"; do

@@ -4,7 +4,7 @@ set -e
 
 # --- Settings ---
 RUN_TEST=false
-num_workers=50
+num_workers=20
 apply_tf_methods=true
 layer='lognorm'
 RUN_LOCAL=false
@@ -114,16 +114,16 @@ HERE
   fi
 }
 
-# if [[ "$DATASET" =~ ^(replogle|parsescience|xaira_HEK293T)$ ]]; then
-#   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic]"
-#   append_entry "$DATASET" "[scprint]" "true"
-# elif [ "$DATASET" = "op" ]; then
-#   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint, figr, scenicplus, celloracle, granie, scglue]"
-# else
-#   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint]"
-# fi
+if [[ "$DATASET" =~ ^(replogle|parsescience|xaira_HEK293T|xaira_HCT116)$ ]]; then
+  append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic]"
+  append_entry "$DATASET" "[scprint]" "true"
+elif [ "$DATASET" = "op" ] || [ "$DATASET" = "ibd" ]; then
+  append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint, figr, scenicplus, celloracle, granie, scglue]"
+else
+  append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint]"
+fi
 # append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, scprint, portia, scgpt]"
-append_entry "$DATASET" "[scenicplus, figr, celloracle]"
+# append_entry "$DATASET" "[scenicplus, figr, celloracle]"
 
 if [ "$RUN_TEST" = true ]; then
   labels_config="scripts/labels_tw_test.config"

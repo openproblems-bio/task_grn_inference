@@ -21,4 +21,14 @@ DATASET_GROUPS = {
         'anchor': ["donor_id", "cell_type"],
         "cv": ["perturbation", "cell_type"],
     },
+    "replogle": {
+        "match": ["perturbation"],
+        "loose_match": ["perturbation"],
+        "cv": ["perturbation"],
+    },
+    "xaira_HEK293T": {
+        "match": ["perturbation"],
+        "loose_match": ["perturbation"],
+        "cv": ["perturbation"],
+    },
 }
