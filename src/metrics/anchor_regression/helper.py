@@ -80,6 +80,7 @@ def evaluate_gene_stability(X, Z, A, j, eps=1e-10):
     Returns:
         Stability score for gene j
     """
+
     is_selected = np.array(A[:, j] != 0)
     if (not np.any(is_selected)) or np.all(is_selected):
         return 0.0
@@ -91,20 +92,21 @@ def evaluate_gene_stability(X, Z, A, j, eps=1e-10):
     # Compare standard vs anchor-regularized regression
     theta0 = anchor_regression(X[:, mask], Z, X[:, j], anchor_strength=0)
     theta0 = np.abs(theta0)
-
     theta = anchor_regression(X[:, mask], Z, X[:, j], anchor_strength=10.0)
     theta = np.abs(theta)
 
     is_selected = is_selected[mask]
 
     # Calculate relative coefficient changes
-    selected_diff = float(
-        np.mean(np.clip((theta0[is_selected] - theta[is_selected]) / (theta0[is_selected] + eps), 0, 1)))
-    unselected_diff = float(
-        np.mean(np.clip((theta0[~is_selected] - theta[~is_selected]) / (theta0[~is_selected] + eps), 0, 1)))
+    #selected_diff = float(
+    #    np.mean(np.clip((theta0[is_selected] - theta[is_selected]) / (theta0[is_selected] + eps), 0, 1)))
+    #unselected_diff = float(
+    #    np.mean(np.clip((theta0[~is_selected] - theta[~is_selected]) / (theta0[~is_selected] + eps), 0, 1)))
     
     # Score: Good GRNs have stable selected regulators, unstable unselected ones
-    score = np.clip((unselected_diff - selected_diff) / (unselected_diff + selected_diff + eps), -1, 1)
+    #score = np.clip((unselected_diff - selected_diff) / (unselected_diff + selected_diff + eps), -1, 1)
+    score = np.mean(theta0[is_selected]) + np.mean(theta[is_selected]) - np.mean(theta0[~is_selected]) - np.mean(theta[~is_selected])
+    score /= np.mean(theta0[is_selected]) + np.mean(theta[is_selected]) + np.mean(theta0[~is_selected]) + np.mean(theta[~is_selected])
     
     if np.isnan(score):
         return 0.0
