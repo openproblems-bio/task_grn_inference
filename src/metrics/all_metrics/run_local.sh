@@ -13,7 +13,9 @@
 
 set -euo pipefail
 
-# Parse arguments
+layer="lognorm" 
+reg_type="ridge"
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --dataset)
@@ -24,8 +26,16 @@ while [[ $# -gt 0 ]]; do
       prediction="$2"
       shift 2
       ;;
+    --layer)
+      layer="$2"
+      shift 2
+      ;;
     --score)
       score="$2"
+      shift 2
+      ;;
+    --reg_type)
+      reg_type="$2"
       shift 2
       ;;
     *)
@@ -34,6 +44,9 @@ while [[ $# -gt 0 ]]; do
       ;;
   esac
 done
+if [[ -n "$layer" ]]; then
+  echo "Layer is set to: $layer"
+fi
 
 # Check required args
 if [[ -z "${dataset:-}" || -z "${prediction:-}" || -z "${score:-}" ]]; then
@@ -41,10 +54,12 @@ if [[ -z "${dataset:-}" || -z "${prediction:-}" || -z "${score:-}" ]]; then
   exit 1
 fi
 
+
+
 # Assemble required inputs
 evaluation_data="resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad"
 regulators_consensus="resources/grn_benchmark/prior/regulators_consensus_${dataset}.json"
-layer="lognorm"
+
 num_workers=20
 tf_all="resources/grn_benchmark/prior/tf_all.csv"
 ws_consensus="resources/grn_benchmark/prior/ws_consensus_${dataset}.csv"
@@ -56,6 +71,7 @@ python src/metrics/all_metrics/script.py \
   --evaluation_data "${evaluation_data}" \
   --regulators_consensus "${regulators_consensus}" \
   --layer "${layer}" \
+  --reg_type "${reg_type}" \
   --num_workers "${num_workers}" \
   --tf_all "${tf_all}" \
   --ws_consensus "${ws_consensus}" \

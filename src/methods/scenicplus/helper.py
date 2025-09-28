@@ -579,7 +579,7 @@ def download_databases(par):
         print(f'Download {url}...')
         urlretrieve(url, filepath)
     
-    if os.path.exists(par['chromsizes']):
+    if not os.path.exists(par['chromsizes']):
         print('Download chromsizes ', flush=True)
         response = requests.get('http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes')
         with open(par['chromsizes'], "wb") as file:
@@ -587,8 +587,8 @@ def download_databases(par):
         chromsizes = pd.read_csv(par['chromsizes'], sep='\t', names=['Chromosome', 'End'])
         chromsizes.insert(1, 'Start', 0)
         chromsizes.to_csv(par['chromsizes'], sep='\t', index=False)
-    
-    if os.path.exists(par['annotation_file']):
+
+    if not os.path.exists(par['annotation_file']):
         print('Download annotation', flush=True)
         download_annotation(par)
         df = read_gtf_as_df(par['annotation_file'])

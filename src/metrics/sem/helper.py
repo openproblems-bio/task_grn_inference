@@ -21,6 +21,9 @@ os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8' # For reproducibility purposes
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 NUMPY_DTYPE = np.float32
 
+# Hyper-parameters
+MAX_N_ITER = 2000
+
 # For reproducibility purposes
 seed = 0xCAFE
 os.environ['PYTHONHASHSEED'] = str(seed)
@@ -32,8 +35,7 @@ torch.cuda.manual_seed_all(seed)
 torch.use_deterministic_algorithms(True)
 
 from util import read_prediction, manage_layer
-
-
+from dataset_config import DATASET_GROUPS
 
 def encode_obs_cols(adata, cols):
     encoded = []
@@ -146,7 +148,7 @@ def evaluate_grn(
         signed: bool = True
 ) -> np.ndarray:
 
-    n_iter = 500
+    n_iter = MAX_N_ITER
     learning_rate = 0.0005
 
     signs = np.sign(A)
@@ -180,6 +182,12 @@ def evaluate_grn(
     A = torch.nn.Parameter(torch.from_numpy(A))
     A_eff = torch.abs(A) * signs if signed else A * mask
     optimizer = torch.optim.Adam([A], lr=learning_rate)
+    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+        optimizer, mode='min', patience=5,
+        min_lr=1e-5, cooldown=3, factor=0.8
+    )
+    best_loss = np.inf
+    best_A_eff = A_eff.detach()
     pbar = tqdm.tqdm(range(n_iter))
     X_non_reporter = delta_X_train[:, ~is_reporter]
     for _ in pbar:
@@ -189,10 +197,17 @@ def evaluate_grn(
         loss = torch.mean(torch.sum(torch.square(X_non_reporter - delta_X_hat[:, ~is_reporter]), dim=1))
         loss = loss + 0.00001 * torch.sum(torch.abs(A))
         loss = loss + 0.00001 * torch.sum(torch.square(A))
+
+        # Keep track of best solution
+        if loss.item() < best_loss:
+            best_loss = loss.item()
+            best_A_eff = A_eff.detach()
+
         loss.backward()
         optimizer.step()
+        scheduler.step(loss.item())
         # pbar.set_description(str(loss.item()))
-    A = A_eff.detach()
+    A = best_A_eff
     mask = mask.detach().cpu().numpy().astype(bool)
 
     # Predict perturbations in test set
@@ -214,25 +229,9 @@ def evaluate_grn(
                 coefficients.append(spearmanr(delta_X_test[:, j], delta_X_hat[:, j]).correlation)
         else:
             coefficients.append(0.0)
-    return np.array(coefficients)
+    return np.nan_to_num(coefficients, nan=0)
 
-DATASET_GROUPS = {
-    "op": {
-        "match": ["plate_name", "donor_id", "cell_type", 'well'],
-        "loose_match": ["donor_id", "cell_type", "plate_name"],
-        "cv": ["perturbation", "cell_type"],
-    },
-    "parsebioscience": {
-        "match": ["donor_id", "cell_type", "well"],
-        "loose_match": ["donor_id", "cell_type"],
-        "cv": ["perturbation", "cell_type"],
-    },
-    "300BCG": {
-        "match": ["donor_id",  "cell_type"],
-        "loose_match": ["cell_type"],
-        "cv": ["perturbation", "cell_type"],
-    },
-}
+
 
 def main(par):
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
@@ -326,8 +325,6 @@ def main(par):
 
     # Create a symmetric (causally-wrong) baseline GRN
     print(f"Creating baseline GRN")
-    mask = np.abs(A) > np.abs(A.T)
-    #A_baseline = mask * A + (~mask) * A.T
     A_baseline = np.copy(A).T
     np.random.shuffle(A_baseline)
     A_baseline = A_baseline.T
@@ -337,12 +334,16 @@ def main(par):
     scores = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A, signed=use_signs)
     # Evaluate baseline GRN
     print("\n======== Evaluate shuffled GRN ========")
-    scores_baseline = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
+    n_repeats = 3
+    scores_baseline = np.zeros_like(scores)
+    for _ in range(n_repeats):  # Repeat for more robust estimation
+        scores_baseline += evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
+    scores_baseline /= n_repeats
 
     # Keep only the genes for which both GRNs got a score
-    mask = ~np.logical_or(np.isnan(scores), np.isnan(scores_baseline))
-    scores = scores[mask]
-    scores_baseline = scores_baseline[mask]
+    #mask = ~np.logical_or(np.isnan(scores), np.isnan(scores_baseline))
+    #scores = scores[mask]
+    #scores_baseline = scores_baseline[mask]
 
     rr_all = {}
     # Perform rank test between actual scores and baseline
