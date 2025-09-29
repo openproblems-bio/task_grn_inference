@@ -10,37 +10,53 @@ info:
     GRN inference using scGPT.
   documentation_url: https://github.com/bowang-lab/scGPT/blob/main/tutorials/Tutorial_Attention_GRN.ipynb 
 arguments:
-  - name: --n_bins
-    type: integer
-    direction: input
-    default: 51
   - name: --batch_size
     type: integer
     direction: input
     default: 10
-  - name: --condition
-    type: string
+  - name: --num_attn_layers
+    type: integer
     direction: input
-    default: cell_type
+    default: 11
+  - name: --num_genes
+    type: integer
+    direction: input
+    default: 5000
+  - name: --max_cells
+    type: integer
+    direction: input
+    default: 1000
 
 resources:
   - type: python_script
     path: script.py
+  - path: /src/utils/util.py
+    dest: util.py
+  - path: scgpt_helper.py
+    dest: scgpt_helper.py
+
 engines:
   - type: docker
     image: openproblems/base_pytorch_nvidia:1
-    # TODO: Try to find working installation of flash attention (flash-attn<1.0.5)
     setup:
-      - type: python
-        pypi:
-          - gdown
-          - scgpt # Install from PyPI to get dependencies
+     # - type: python
+     #   pypi:
+     #     - gdown
+     #     - scgpt # Install from PyPI to get dependencies
+     # - type: docker
+     #   # Force re-installing from GitHub to get bug fixes
+     #   run: pip install --upgrade --no-deps --force-reinstall git+https://github.com/bowang-lab/scGPT.git
       - type: docker
-        # Force re-installing from GitHub to get bug fixes
-        run: pip install --upgrade --no-deps --force-reinstall git+https://github.com/bowang-lab/scGPT.git
+        run: |
+          git clone https://github.com/bowang-lab/scGPT && \
+          pip install torch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu121 && \
+          pip install "flash-attn<1.0.5" --no-build-isolation && \
+          pip install ipykernel pandas scanpy numba "numpy<1.24" torchtext==0.17.0 scib "scvi-tools<1.0" datasets==2.14.5 transformers==4.33.2 wandb "cell-gears<0.0.3" torch_geometric pyarrow==15.0.0 gdown && \
+          cd scGPT && pip install -e . --no-deps
 
 runners:
   - type: executable
+    docker_run_args: --gpus all
   - type: nextflow
     directives:
       label: [midtime, midmem, midcpu, biggpu]
