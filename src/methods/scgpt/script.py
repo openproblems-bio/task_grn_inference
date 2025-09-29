@@ -1,134 +1,155 @@
-import copy
-import json
 import os
-from pathlib import Path
 import sys
-import warnings
 
-import torch
-from anndata import AnnData
-import scanpy as sc
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-import networkx as nx
-import pandas as pd
-import tqdm
+import anndata as ad
 import gdown
-
-
-sys.path.insert(0, "../")
-import scgpt as scg
-from scgpt.tasks import GeneEmbedding
-from scgpt.tokenizer.gene_tokenizer import GeneVocab
-from scgpt.model import TransformerModel
-from scgpt.preprocess import Preprocessor
-from scgpt.utils import set_seed
-
-os.environ["KMP_WARNINGS"] = "off"
-warnings.filterwarnings('ignore')
-
-
-set_seed(42)
-pad_token = "<pad>"
-special_tokens = [pad_token, "<cls>", "<eoc>"]
-n_hvg = 1200
-n_bins = 51
-mask_value = -1
-pad_value = -2
-n_input_bins = n_bins
+import numpy as np
+import pandas as pd
+import scanpy as sc
+import torch
+from scipy.sparse import csr_matrix
 
 ## VIASH START
 par = {
-  'rna': 'resources_test/grn_benchmark/inference_data/op_rna.h5ad',
-  'tf_all': 'resources_test/prior/tf_all.csv',
-  'prediction': 'output/scgpt/prediction.h5ad',
-  'max_n_links': 50000,
-#   'n_bins': 51,
-  'batch_size': 16,
-#   'condition': 'cell_type',
-  'temp_dir': 'output/scgpt/'
+    "rna": "resources_test/grn_benchmark/inference_data/op_rna.h5ad",
+    "tf_all": "resources_test/prior/tf_all.csv",
+    "prediction": "output/scgpt/prediction.h5ad",
+    "max_n_links": 50000,
+    "batch_size": 16,
+    "temp_dir": "output/scgpt/",
+    "file_dir": "src/methods/scgpt",
+    "num_genes": 3000,
+    "max_cells": 1000,
+    "num_attn_layers": 11,
 }
 ## VIASH END
-os.makedirs(par['temp_dir'], exist_ok=True)
-# Download datasets 
+try:
+    sys.path.append(meta["resources_dir"])
+    print(meta["resources_dir"])
+except:
+    meta = {"resources_dir": "src/utils"}
+    sys.path.append(meta["resources_dir"])
+from scgpt_helper import generate_grn, prepare_model
+from util import efficient_melting, parse_args
+
+par = parse_args(par)
+
+## GETTING DATA
+
+os.environ["KMP_WARNINGS"] = "off"
+
+
+adata = sc.read(par["rna"], backed="r")
+
+if adata.uns["dataset_id"] in ["replogle", "xaira_HCT116", "xaira_HEK293T"]:
+    train_perturbs = adata.obs["perturbation"].unique()
+    tf_all = np.loadtxt(par["tf_all"], dtype=str)
+    train_perturbs = np.intersect1d(tf_all, train_perturbs)
+    train_perturbs = train_perturbs[:100]  # limit to 100 perturbations
+    mask = adata.obs["perturbation"].isin(train_perturbs)
+    adata = adata[mask].to_memory()
+elif adata.uns["dataset_id"] in ["parsebioscience"]:
+    train_perturbs = adata.obs["perturbation"].unique()
+    train_perturbs = train_perturbs[:10]
+    mask = adata.obs["perturbation"].isin(train_perturbs)
+    adata = adata[mask].to_memory()
+else:
+    adata = adata.to_memory()
+
+if adata.raw is not None and adata.raw.X.shape[1] != adata.X.shape[1]:
+    print("removing raw")
+    del adata.raw
+if adata.layers is not None and "counts" in adata.layers:
+    adata.X = adata.layers["counts"]
+    del adata.layers["counts"]
+
+if adata[0].X.sum() != int(adata[0].X.sum()):
+    print("WARNING: you are not using count data")
+    print("reverting logp1")
+    adata.X = csr_matrix(np.power(adata.X.todense(), 2) - 1)
+
+adata.var["symbol"] = adata.var.index
+adata.var["ensembl_id"] = adata.var["gene_ids"].values
+dataset_id = adata.uns["dataset_id"] if "dataset_id" in adata.uns else par["dataset_id"]
+
+
+### LOADING MODEL AND PREDICTION
+os.makedirs(par["temp_dir"], exist_ok=True)
+# Download datasets
 model_file = f"{par['temp_dir']}/best_model.pt"
-model_config_file = f"{par['temp_dir']}/args.json"
-vocab_file = f"{par['temp_dir']}/vocab.json"
 
-if os.path.exists(vocab_file) is False:
-    def download_file(output_file, url):
-        import requests
-        response = requests.get(url, stream=True)
-        if response.status_code == 200:
-            with open(output_file, "wb") as f:
-                for chunk in response.iter_content(chunk_size=1024):
-                    if chunk:
-                        f.write(chunk)
-            print(f"File downloaded successfully and saved to {output_file}")
-        else:
-            print(f"Failed to download file. HTTP status code: {response.status_code}")
-    download_file(vocab_file, 'https://docs.google.com/uc?export=download&id=1Qzb6Y9UB342a2QxmY-BCubSvcmYZ5jw3')
-if os.path.exists(model_config_file) is False:
-    download_file(model_config_file, 'https://docs.google.com/uc?export=download&id=1VwPGHuSorVAXyTreMFI1yzMougtUDeUt')
-if os.path.exists(model_file) is False:
-    gdown.download("https://drive.google.com/uc?id=1CPVtpWUJ2nkI9jGignlHLcefBe6Gk-F9", model_file, quiet=False)
+print(os.system("pip list | grep flas"))
 
+if not os.path.exists(model_file):
+    gdown.download(
+        "https://drive.google.com/uc?id=1MJaavaG0ZZkC_yPO4giGRnuCe3F1zt30",
+        par["temp_dir"] if par["temp_dir"].endswith("/") else par["temp_dir"] + "/",
+        quiet=False,
+    )
+    gdown.download(
+        "https://drive.google.com/uc?id=127FdcUyY1EM7rQfAS0YI4ms6LwjmnT9J",
+        par["temp_dir"] if par["temp_dir"].endswith("/") else par["temp_dir"] + "/",
+        quiet=False,
+    )
+    gdown.download(
+        "https://drive.google.com/uc?id=1y4UJVflGl-b2qm-fvpxIoQ3XcC2umjj0",
+        par["temp_dir"] if par["temp_dir"].endswith("/") else par["temp_dir"] + "/",
+        quiet=False,
+    )
 
-vocab = GeneVocab.from_file(vocab_file)
-for s in special_tokens:
-    if s not in vocab:
-        vocab.append_token(s)
-
-# Retrieve model parameters from config files
-with open(model_config_file, "r") as f:
-    model_configs = json.load(f)
-print(
-    f"Resume model from {model_file}, the model args will override the "
-    f"config {model_config_file}."
-)
-embsize = model_configs["embsize"]
-nhead = model_configs["nheads"]
-d_hid = model_configs["d_hid"]
-nlayers = model_configs["nlayers"]
-n_layers_cls = model_configs["n_layers_cls"]
-
-gene2idx = vocab.get_stoi()
-
+print(os.listdir(par["temp_dir"]))
+model, vocab = prepare_model(model_dir=par["temp_dir"])
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-ntokens = len(vocab)  # size of vocabulary
-model = TransformerModel(
-    ntokens,
-    embsize,
-    nhead,
-    d_hid,
-    nlayers,
-    vocab=vocab,
-    pad_value=pad_value,
-    n_input_bins=n_input_bins,
-)
-
-try:
-    model.load_state_dict(torch.load(model_file))
-    # model.load_state_dict(torch.load(model_file, map_location=torch.device('cpu')))
-    print(f"Loading all model params from {model_file}")
-except:
-    # only load params that are in the model and match the size
-    model_dict = model.state_dict()
-    pretrained_dict = torch.load(model_file)
-    pretrained_dict = {
-        k: v
-        for k, v in pretrained_dict.items()
-        if k in model_dict and v.shape == model_dict[k].shape
-    }
-    for k, v in pretrained_dict.items():
-        print(f"Loading params {k} with shape {v.shape}")
-        model_dict.update(pretrained_dict)
-        model.load_state_dict(model_dict)
-
 model.to(device)
 
+#### PREDICTION
+
+if "cell_type" not in adata.obs:
+    adata.obs["cell_type"] = "dummy_cell_type"
+    par["how"] = "most var within"
+for i, cell_type in enumerate(adata.obs["cell_type"].unique()):
+    print(cell_type)
+    subadata = adata[adata.obs["cell_type"] == cell_type]
+    subadata = subadata[
+        : par["max_cells"], subadata.X.sum(0).A1.argsort()[::-1][: par["num_genes"]]
+    ]
+    subadata, net = generate_grn(
+        model,
+        vocab,
+        subadata,
+        batch_size=par["batch_size"],
+        num_attn_layers=par["num_attn_layers"],
+    )
+    gene_names = subadata.var["symbol"].values
+    net = efficient_melting(net.T, gene_names, symmetric=False)
+    net = net[net["weight"] != 0]
+
+    # - subset to TFs
+    tfs = set(np.loadtxt(par["tf_all"], dtype=str))
+
+    net = net[net["source"].isin(tfs)]
+
+    net = net.sort_values(
+        by="weight", ascending=False, key=abs
+    )[
+        : 2 * par["max_n_links"]
+    ]  # i set this to double of allowed link just in case the symmetry exists. metrics will take care of this
+    net["cell_type"] = cell_type
+    if i == 0:
+        net_all = net
+    else:
+        net_all = pd.concat([net_all, net], axis=0)
 
 
+print(f"Writing results to {par['prediction']}")
+net_all = net_all.astype(str)
+output = ad.AnnData(
+    X=None,
+    uns={
+        "method_id": "scprint",
+        "dataset_id": dataset_id,
+        "prediction": net_all[["source", "target", "weight", "cell_type"]],
+    },
+)
+output.write(par["prediction"])
