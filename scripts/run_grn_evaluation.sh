@@ -2,8 +2,6 @@
 # bash scripts/run_grn_evaluation.sh --prediction=<prediction file (e.g. prediction.h5ad)> --save_dir=<save dir> --dataset=<dataset (replogle)> --build_images=<true/false (building docker images-only needed one time)> --test_run=<true/false (to use test data)> --run_local=true>
 
 
-
-#!/bin/bash
 set -e
 
 RUN_LOCAL="true"
@@ -11,6 +9,7 @@ RUN_TEST=false
 PREDICTION="none"
 SAVE_DIR="none"
 BUILD_IMAGES=true
+reg_type="ridge"
 
 
 # Parse arguments
@@ -40,12 +39,25 @@ for arg in "$@"; do
             RUN_LOCAL="${arg#*=}"
             shift
             ;;
+        --reg_type=*)
+            reg_type="${arg#*=}"
+            shift
+            ;;
         *)
             echo "Unknown argument: $arg"
             exit 1
             ;;
     esac
 done
+
+echo "$@"
+echo "DATASET: $DATASET"
+echo "PREDICTION: $PREDICTION"
+echo "SAVE_DIR: $SAVE_DIR"
+echo "RUN_TEST: $RUN_TEST"
+echo "BUILD_IMAGES: $BUILD_IMAGES"
+echo "RUN_LOCAL: $RUN_LOCAL"
+echo "reg_type: $reg_type"
 
 if [ -z "${DATASET:-}" ]; then
     echo "Error: DATASET must be provided. Use --dataset=<dataset_name>."
@@ -55,9 +67,7 @@ fi
 num_workers=10
 metric_ids="[regression_2, ws_distance, sem]" #regression_1, regression_2, ws_distance
 RUN_ID="${DATASET}_evaluation"
-
 models_folder="${DATASET}/"
-reg_type="ridge"
 apply_skeleton=false
 apply_tf=true
 layer='lognorm'
@@ -120,6 +130,7 @@ append_entry() {
     skeleton: ${resources_dir}/grn_benchmark/prior/skeleton.csv
     apply_skeleton: ${apply_skeleton}
     apply_tf: ${apply_tf}
+    reg_type: ${reg_type}
     layer: $layer_
 
 HERE
