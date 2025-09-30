@@ -6,15 +6,8 @@ import pandas as pd
 import requests
 ## VIASH START
 par = {
-  'rna': 'resources_test/grn_benchmark/inference_data/op_rna.h5ad',
-  'atac': 'resources_test/grn_benchmark/inference_data/op_atac.h5ad',
-  'temp_dir': 'output/sp_new',
-  'prediction': 'output/sp_new/prediction.h5ad',
   'qc': False,
-  'num_workers': 20,
-  'scplus_mdata': 'output/sp_new/scplus_mdata.h5mu',
-  'cell_topic': 'output/sp_new/cell_topic.csv',
-  'grn_extended': 'output/sp_new/grn_extended.csv'
+  'num_workers': 20
 }
 ## VIASH END
 
@@ -78,6 +71,13 @@ def main(par):
     return net
 if __name__ == '__main__':
     os.makedirs(par['temp_dir'], exist_ok=True)
+    if 'scplus_mdata' not in par or par['scplus_mdata'] is None:
+        par['scplus_mdata'] = os.path.join(par['temp_dir'], 'scplus_mdata.h5mu')
+    if 'cell_topic' not in par or par['cell_topic'] is None:
+        par['cell_topic'] = os.path.join(par['temp_dir'], 'cell_topic.csv')
+    if 'grn_extended' not in par or par['grn_extended'] is None:
+        par['grn_extended'] = os.path.join(par['temp_dir'], 'grn_extended.csv')
+
     net = main(par)
     dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
     output = ad.AnnData(X=None, uns={"method_id": meta['name'], "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})

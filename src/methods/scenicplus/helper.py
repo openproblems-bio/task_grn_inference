@@ -224,15 +224,24 @@ def run_cistopic(par):
     with open(f"{par['fragments_dict']}", 'r') as f:
         fragments_dict = json.load(f)
     # run pycistopic
-    print('get tss')
+    print('get tss', flush=True)
     os.makedirs(os.path.join(par['temp_dir'], 'qc'), exist_ok=True)
-    subprocess.run([
-        'pycistopic', 'tss', 'get_tss',
-        '--output', os.path.join(par['temp_dir'], 'qc', 'tss.bed'),
-        '--name', 'hsapiens_gene_ensembl',
-        '--to-chrom-source', 'ucsc',
-        '--ucsc', 'hg38'
-    ])
+
+
+    tss_bed = os.path.join(par['temp_dir'], 'qc', 'tss.bed')
+    if False:
+        subprocess.run([
+            'pycistopic', 'tss', 'get_tss',
+            '--output', tss_bed,
+            '--name', 'hsapiens_gene_ensembl',
+            '--to-chrom-source', 'ucsc',
+            '--ucsc', 'hg38'
+        ], check=True)
+    else:
+        aws_path = 's3://openproblems-data/resources/grn/resources/supp_data/tss_h38.bed'
+        command = f'aws s3 cp {aws_path} {tss_bed} --no-sign-request'
+        subprocess.run(command, shell=True, check=True)
+    print('get tss completed', flush=True)
 
     if par['qc']:  # Whether to perform quality control
         # Compute QC metrics
