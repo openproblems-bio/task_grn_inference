@@ -19,11 +19,11 @@ source "src/utils/parse_args.sh"
 parse_arguments "$@"
 
 # Pass arguments to Python script
-python_args="--rna $rna --atac $atac --prediction $prediction"
+python_args="--rna $rna --atac $atac --prediction $prediction --temp_dir output/test_sp"
 if [ ! -z "$layer" ]; then
     python_args="$python_args --layer $layer"
 fi
 # Add scenicplus-specific arguments
-python_args="$python_args --n_jobs 20"
+python_args="$python_args --num_workers 20"
 
 singularity run ../../images/${method} python src/methods/${method}/script.py $python_args

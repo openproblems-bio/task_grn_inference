@@ -20,17 +20,19 @@ def main(par):
     except Exception as e:
         print(f"Error in regression 2 metrics: {e}")
         rr_reg2 = pd.DataFrame()
+    print("reg2 done: ", rr_reg2)
     try:
         rr_sem = main_sem(par)
     except Exception as e:
         print(f"Error in sem metrics: {e}")
         rr_sem = pd.DataFrame()
-
+    print("sem done: ", rr_sem)
     try:
         _, rr_ws = main_ws_distance(par)
     except Exception as e:
         print(f"Error in ws distance metrics: {e}")
         rr_ws = pd.DataFrame()
+    print("ws done: ", rr_ws)
 
     
     
