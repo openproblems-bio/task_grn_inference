@@ -1,3 +1,4 @@
+from typing import Tuple
 import os
 import sys
 import traceback
@@ -6,6 +7,8 @@ import h5py
 import numpy as np
 import pandas as pd
 import tqdm
+from scipy.sparse.linalg import LinearOperator
+from scipy.stats import pearsonr, wilcoxon
 from scipy.sparse import csr_matrix
 from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
 import anndata as ad
@@ -32,11 +35,47 @@ def encode_obs_cols(adata, cols):
     return encoded
 
 
+def combine_multi_index(*arrays) -> np.array:
+    """Combine parallel label arrays into a single integer label per position."""
+    A = np.stack(arrays)
+    n_classes = tuple(int(A[i].max()) + 1 for i in range(A.shape[0]))
+    return np.ravel_multi_index(A, dims=n_classes, order='C')
+
+
+def get_whitening_transform(Z: np.ndarray, gamma: float = 1.0) -> LinearOperator:
+    """Get whitening transformation.
+
+    Args:
+        Z: Anchor variables.
+        gamma: Anchor strength.
+
+    Returns:
+        Sparse linear operator corresponding to a whitening transform.
+    """
+    n, k = Z.shape
+
+    # Precompute Gram inverse with jitter for stability
+    ZTZ = Z.T @ Z + 1e-10 * np.eye(k)
+    ZTZ_inv = np.linalg.inv(ZTZ)
+    sqrt_gamma = np.sqrt(gamma)
+
+    def matvec(v: np.ndarray) -> np.ndarray:
+        """Matrix-vector multiplication."""
+        v = np.atleast_2d(v)
+        if v.shape[0] != n:
+            v = v.T
+        Pv = Z @ (ZTZ_inv @ (Z.T @ v))
+        out = v + (sqrt_gamma - 1.0) * Pv
+        return out if out.shape[1] > 1 else out.ravel()
+
+    return LinearOperator((n, n), matvec=matvec, rmatvec=matvec)
+
+
 def anchor_regression(
         X: np.ndarray,
         Z: np.ndarray,
         Y: np.ndarray,
-        l2_reg: float = 1e-3,
+        l2_reg: float = 1e-2,
         anchor_strength: float = 1.0
 ) -> np.ndarray:
     """Anchor regression for causal inference under confounding.
@@ -53,29 +92,60 @@ def anchor_regression(
     Returns:
         Inferred parameters, of shape (d, u).
     """
-    # Projector onto the anchor subspace
-    pi = Z @ np.linalg.pinv(Z.T @ Z) @ Z.T
 
     # Whitening transformation
-    W = np.eye(len(Z)) + (np.sqrt(1.0 + anchor_strength) - 1.0) * pi
+    W = get_whitening_transform(Z, gamma=anchor_strength)
     X_t = W @ X
     Y_t = W @ Y
 
     # Ridge regression on the whitened data
-    theta = np.linalg.solve(X_t.T @ X_t + l2_reg * np.eye(X_t.shape[1]), X_t.T @ Y_t)
+    sigma_xx = X_t.T @ X_t / X_t.shape[0]
+    sigma_xy = X_t.T @ Y_t / Y_t.shape[0]
+    theta = np.linalg.solve(sigma_xx + l2_reg * np.eye(X_t.shape[1]), sigma_xy)
 
     return theta
 
 
-def evaluate_gene_stability(X, Z, A, j, eps=1e-10):
+def compute_stabilities(
+        X: np.ndarray,
+        y: np.ndarray,
+        Z: np.ndarray,
+        A: np.ndarray,
+        is_selected: np.ndarray,
+        eps: float = 1e-50
+) -> float:
+    theta0_signed = anchor_regression(X, Z, y, anchor_strength=1)
+    theta0_signed = theta0_signed[is_selected]
+    theta0 = np.abs(theta0_signed)
+    theta0 /= np.sum(theta0)
+
+    theta_signed = anchor_regression(X, Z, y, anchor_strength=20)
+    theta_signed = theta_signed[is_selected]
+    theta = np.abs(theta_signed)
+    theta /= np.sum(theta)
+
+    stabilities = np.clip((theta0 - theta) / (theta0 + eps), 0, 1)
+    stabilities[np.sign(theta0_signed) != np.sign(theta_signed)] = 0
+
+    return stabilities
+
+
+
+def evaluate_gene_stability(
+        X: np.ndarray,
+        Z: np.ndarray,
+        A: np.ndarray,
+        j: int,
+        eps: float = 1e-50
+) -> float:
     """Evaluate stability of regulatory relationships for a single target gene.
     
     Args:
-        X: Gene expression matrix (n_samples, n_genes)
-        Z: Anchor variables matrix (n_samples, n_anchors)  
-        A: GRN adjacency matrix (n_genes, n_genes)
-        j: Target gene index
-        eps: Small epsilon for numerical stability
+        X: Gene expression matrix (n_samples, n_genes).
+        Z: Anchor variables matrix (n_samples, n_anchors).
+        A: GRN adjacency matrix (n_genes, n_genes).
+        j: Target gene index.
+        eps: Small epsilon for numerical stability.
         
     Returns:
         Stability score for gene j
@@ -83,33 +153,19 @@ def evaluate_gene_stability(X, Z, A, j, eps=1e-10):
     is_selected = np.array(A[:, j] != 0)
     if (not np.any(is_selected)) or np.all(is_selected):
         return 0.0
+    assert not is_selected[j]
 
-    # Exclude target gene from predictors
+    # Exclude target gene from features
     mask = np.ones(X.shape[1], dtype=bool)
     mask[j] = False
 
-    # Compare standard vs anchor-regularized regression
-    theta0 = anchor_regression(X[:, mask], Z, X[:, j], anchor_strength=0)
-    theta0 = np.abs(theta0)
+    stabilities_selected = np.mean(compute_stabilities(X[:, mask], X[:, j], Z, A, is_selected[mask], eps=eps))
+    #stabilities_non_selected = np.mean(compute_stabilities(X[:, mask], X[:, j], Z, A, ~is_selected[mask], eps=eps))
 
-    theta = anchor_regression(X[:, mask], Z, X[:, j], anchor_strength=10.0)
-    theta = np.abs(theta)
+    #score = (stabilities_selected - stabilities_non_selected) / (stabilities_selected + stabilities_non_selected + eps)
+    score = np.mean(stabilities_selected)
 
-    is_selected = is_selected[mask]
-
-    # Calculate relative coefficient changes
-    selected_diff = float(
-        np.mean(np.clip((theta0[is_selected] - theta[is_selected]) / (theta0[is_selected] + eps), 0, 1)))
-    unselected_diff = float(
-        np.mean(np.clip((theta0[~is_selected] - theta[~is_selected]) / (theta0[~is_selected] + eps), 0, 1)))
-    
-    # Score: Good GRNs have stable selected regulators, unstable unselected ones
-    score = np.clip((unselected_diff - selected_diff) / (unselected_diff + selected_diff + eps), -1, 1)
-    
-    if np.isnan(score):
-        return 0.0
-    else:
-        return score
+    return score
 
 
 def main(par):
@@ -138,13 +194,13 @@ def main(par):
 
     # Encode anchor variables
     anchor_variables = encode_obs_cols(adata, anchor_cols)
+    anchor_encoded = combine_multi_index(*anchor_variables)
     
     if len(anchor_variables) == 0:
         raise ValueError(f"No anchor variables found in dataset for columns: {anchor_cols}")
     
     # One-hot encode anchor variables
-    anchor_variables = np.asarray(anchor_variables).T
-    Z = OneHotEncoder(sparse_output=False, dtype=np.float32).fit_transform(anchor_variables)
+    Z = OneHotEncoder(sparse_output=False, dtype=np.float32).fit_transform(anchor_encoded.reshape(-1, 1))
     print(f"Anchor matrix Z shape: {Z.shape}")
 
     # Load inferred GRN
@@ -160,27 +216,40 @@ def main(par):
             j = gene_dict[target]
             A[i, j] = float(weight)
 
-    # Only consider genes present in the inferred GRN
+    # Only consider the genes that are actually present in the inferred GRN,
+    # and keep only the most-connected genes (for speed).
     gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
+    in_degrees = np.sum(A != 0, axis=0)
+    out_degrees = np.sum(A != 0, axis=1)
+    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-1000]
+    gene_mask[idx] = False
     X = X[:, gene_mask]
+    X = X.toarray() if isinstance(X, csr_matrix) else X
     A = A[gene_mask, :][:, gene_mask]
     gene_names = gene_names[gene_mask]
-    
+
+    # Remove self-regulations from GRN
+    np.fill_diagonal(A, 0)
     print(f"Evaluating {X.shape[1]} genes with {np.sum(A != 0)} regulatory links")
 
     # Center and scale dataset
     scaler = StandardScaler()
-    scaler.fit(X)
-    X = scaler.transform(X)
+    X = scaler.fit_transform(X)
 
-    # Evaluate stability for each target gene
-    scores = []
+    # Create baseline GRN
+    A_baseline = np.copy(A)
+    for j in range(A_baseline.shape[1]):
+        np.random.shuffle(A_baseline[:j, j])
+        np.random.shuffle(A_baseline[j+1:, j])
+    assert np.any(A != A_baseline)
+
+    scores, scores_baseline = [], []
     for j in tqdm.tqdm(range(X.shape[1]), desc="Evaluating gene stability"):
-        score = evaluate_gene_stability(X, Z, A, j)
-        scores.append(score)
+        scores.append(evaluate_gene_stability(X, Z, A, j))
+    scores = np.array(scores)
 
     # Calculate final score
-    final_score = float(np.mean(scores))
+    final_score = np.mean(scores)
     print(f"Method: {method_id}")
     print(f"Anchor Regression Score: {final_score:.6f}")
 
