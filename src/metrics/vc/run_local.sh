@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name=recovery_2
+#SBATCH --job-name=vc
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
-#SBATCH --time=30:00:00
+#SBATCH --time=10:00:00
 #SBATCH --mem=250GB
 #SBATCH --partition=cpu
 #SBATCH --mail-type=END,FAIL      
@@ -12,12 +12,17 @@
 
 set -euo pipefail
 
-datasets=( 'parsebioscience' 'op' "300BCG") #"300BCG" "ibd" 'parsebioscience'
-methods=("negative_control" "pearson_corr" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
+save_dir="output/vc"
+mkdir -p "$save_dir"
+
+# datasets to process
+datasets=('op' ) #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
+# methods to process
+methods=( "pearson_corr" "positive_control" "negative_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
+# methods=( "pearson_corr" "positive_control" "negative_control")
 
 # temporary file to collect CSV rows
-save_dir='output/temp/'
-combined_csv="${save_dir}/scores.csv"
+combined_csv="${save_dir}/vc_scores.csv"
 echo "dataset,method,metric,value" > "$combined_csv"
 
 for dataset in "${datasets[@]}"; do
@@ -27,7 +32,7 @@ for dataset in "${datasets[@]}"; do
 
     for method in "${methods[@]}"; do
         prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
-        score="${save_dir}/sem_${dataset}_${method}.h5ad"
+        score="${save_dir}/vc_${dataset}_${method}.h5ad"
 
         if [[ ! -f "$prediction" ]]; then
             echo "File not found: $prediction, skipping..."
@@ -35,25 +40,10 @@ for dataset in "${datasets[@]}"; do
         fi
 
         echo -e "\nProcessing method: $method\n"
-        python src/metrics/recovery_2/script.py \
+        python src/metrics/vc/script.py \
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
             --score "$score"
-
-        # Extract metrics from the .h5ad and append to CSV
-        python - <<EOF
-import anndata as ad
-import pandas as pd
-
-adata = ad.read_h5ad("${score}")
-if "metrics_value" in adata.uns:
-    metrics = adata.uns["metrics_value"]
-    df = pd.DataFrame(list(metrics.items()), columns=["metric", "value"])
-    df["dataset"] = "${dataset}"
-    df["method"] = "${method}"
-    df = df[["dataset", "method", "metric", "value"]]
-    df.to_csv("${combined_csv}", mode="a", header=False, index=False)
-EOF
 
     done
 done
