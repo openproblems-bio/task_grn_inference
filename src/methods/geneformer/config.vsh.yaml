@@ -53,7 +53,6 @@ resources:
     path: script.py
   - path: /src/utils/util.py
     dest: util.py
-  - path: emb_extractor.py
 
 engines:
   - type: docker
