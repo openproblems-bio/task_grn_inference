@@ -296,6 +296,9 @@ def main(par):
     A = A[gene_mask, :][:, gene_mask]
     gene_names = gene_names[gene_mask]
 
+    # Remove self-regulations
+    np.fill_diagonal(A, 0)
+
     # Check whether the inferred GRN contains signed predictions
     use_signs = np.any(A < 0)
 
@@ -344,8 +347,10 @@ def main(par):
     # Create a symmetric (causally-wrong) baseline GRN
     print(f"Creating baseline GRN")
     A_baseline = np.copy(A)
-    np.random.shuffle(A_baseline)
-    A_baseline = A_baseline
+    for j in range(A.shape[1]):
+        np.random.shuffle(A[:j, j])
+        np.random.shuffle(A[j+1:, j])
+    assert np.any(A_baseline != A)
 
     # Evaluate inferred GRN
     print("\n======== Evaluate inferred GRN ========")

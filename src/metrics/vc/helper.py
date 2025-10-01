@@ -56,8 +56,6 @@ def create_control_matching(are_controls: np.ndarray, match_groups: np.ndarray) 
     for i, (is_control, group_id) in enumerate(zip(are_controls, match_groups)):
         if is_control:
             control_map[int(group_id)] = i
-    for i in range(len(are_controls)):
-        assert match_groups[i] in control_map
     return control_map, match_groups
 
 
@@ -132,18 +130,23 @@ class Model(torch.nn.Module):
 
 
 class PerturbationDataset(Dataset):
+
     def __init__(
             self,
             X: np.ndarray,
             idx: np.ndarray,
             match_groups: np.ndarray,
             control_map: Dict[int, int],
+            loose_match_groups: np.ndarray,
+            loose_control_map: Dict[int, int],
             perturbations: np.ndarray
     ):
         self.X: np.ndarray = X.astype(NUMPY_DTYPE)
         self.idx: np.ndarray = idx
         self.match_groups: np.ndarray = match_groups
         self.control_map: Dict[int, int] = control_map
+        self.loose_match_groups: np.ndarray = loose_match_groups
+        self.loose_control_map: Dict[int, int] = loose_control_map
         self.perturbations: np.ndarray = perturbations.astype(int)
 
     def __len__(self) -> int:
@@ -153,24 +156,29 @@ class PerturbationDataset(Dataset):
         i = self.idx[i]
         y = torch.from_numpy(self.X[i, :])
         group = int(self.match_groups[i])
-        j = int(self.control_map[group])
+        if group in self.control_map:
+            j = int(self.control_map[group])
+        else:
+            group = int(self.loose_match_groups[i])
+            j = int(self.loose_control_map[group])
         x = torch.from_numpy(self.X[j, :])
         p = int(self.perturbations[i])
         return x, p, y
 
 
-def evaluate(A, train_data_loader, test_data_loader, n_perturbations: int) -> float:
+def evaluate(A, train_data_loader, test_data_loader, n_perturbations: int) -> Tuple[float, float]:
     # Training
     signed = np.any(A < 0)
-    model = Model(A, n_perturbations, n_hidden=64, signed=signed)
+    model = Model(A, n_perturbations, n_hidden=16, signed=signed)
     model = model.to(DEVICE)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-5)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode='min', patience=5,
         min_lr=1e-5, cooldown=3, factor=0.8
     )
     pbar = tqdm.tqdm(range(350))
     best_val_loss = float('inf')
+    best_ss_res = None
     best_epoch = 0
     model.train()
     for epoch in pbar:
@@ -193,18 +201,25 @@ def evaluate(A, train_data_loader, test_data_loader, n_perturbations: int) -> fl
                 x, pert, y = x.to(DEVICE), pert.to(DEVICE), y.to(DEVICE)
                 y_hat = model(x, pert)
                 residuals = torch.square(y - y_hat).cpu().data.numpy()
-                ss_res += np.sum(residuals)
-        if ss_res < best_val_loss:
-            best_val_loss = ss_res
+                ss_res += np.sum(residuals, axis=0)
+        if np.sum(ss_res) < best_val_loss:
+            best_val_loss = np.sum(ss_res)
             best_epoch = epoch
+            best_ss_res = ss_res
         model.train()
+    ss_res = best_ss_res
 
     model.eval()
+    ss_tot = 0
+    with torch.no_grad():
+        for x, pert, y in test_data_loader:
+            x, pert, y = x.to(DEVICE), pert.to(DEVICE), y.to(DEVICE)
+            y_hat = model(x, pert)
+            residuals = torch.square(y - torch.mean(y, dim=0).unsqueeze(0)).cpu().data.numpy()
+            ss_tot += np.sum(residuals, axis=0)
+
     print(f"Best epoch: {best_epoch} ({best_val_loss})")
-    return best_val_loss
-
-
-
+    return best_ss_res, ss_tot
 
 
 def main(par):
@@ -276,12 +291,19 @@ def main(par):
     A = A[idx, :][:, idx]
     gene_names = gene_names[idx]
 
+    # Remove self-regulations
+    np.fill_diagonal(A, 0)
+
+    # Create baseline model
+    A_baseline = np.copy(A)
+    for j in range(A.shape[1]):
+        np.random.shuffle(A[:j, j])
+        np.random.shuffle(A[j+1:, j])
+    assert np.any(A_baseline != A)
+
     # Mapping between gene expression profiles and their matched negative controls
-    try:
-        control_map, match_groups = create_control_matching(are_controls, match_groups)
-    except AssertionError:
-        print("Failed to match with controls exactly. Using a less stringent matching instead.")
-        control_map, match_groups = create_control_matching(are_controls, loose_match_groups)
+    control_map, _ = create_control_matching(are_controls, match_groups)
+    loose_control_map, _ = create_control_matching(are_controls, loose_match_groups)
 
     ss_res = 0
     ss_tot = 0
@@ -302,6 +324,8 @@ def main(par):
             train_index,
             match_groups,
             control_map,
+            loose_match_groups,
+            loose_control_map,
             perturbations
         )
         train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=512)
@@ -310,25 +334,28 @@ def main(par):
             test_index,
             match_groups,
             control_map,
+            loose_match_groups,
+            loose_control_map,
             perturbations
         )
         test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=512)
 
         # Evaluate inferred GRN
-        ss_res += evaluate(A, train_data_loader, test_data_loader, n_perturbations)
+        res = evaluate(A, train_data_loader, test_data_loader, n_perturbations)
+        ss_res = ss_res + res[0]
+        ss_tot = ss_tot + res[1]
 
         # Evaluate baseline GRN (shuffled target genes)
-        A_baseline = np.copy(A).T
-        np.random.shuffle(A_baseline)
-        A_baseline = A_baseline.T
-        ss_tot += evaluate(A_baseline, train_data_loader, test_data_loader, n_perturbations)
+        #ss_tot = ss_tot + evaluate(A_baseline, train_data_loader, test_data_loader, n_perturbations)
 
     r2 = 1 - ss_res / ss_tot
+
+    final_score = np.mean(np.clip(r2, 0, 1))
     print(f"Method: {method_id}")
-    print(f"R2: {r2}")
+    print(f"R2: {final_score}")
 
     results = {
-        'vc': [float(r2)]
+        'vc': [float(final_score)]
     }
 
     df_results = pd.DataFrame(results)
