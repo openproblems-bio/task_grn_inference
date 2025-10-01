@@ -28,7 +28,7 @@ resources:
 
 engines:
   - type: docker
-    image: nurisava/dictys:latest
+    image: janursa/dictys:latest
     __merge__: /src/api/base_requirements.yaml
 
 
