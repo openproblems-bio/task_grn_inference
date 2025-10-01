@@ -347,14 +347,15 @@ def main(par):
     # Create a symmetric (causally-wrong) baseline GRN
     print(f"Creating baseline GRN")
     A_baseline = np.copy(A)
-    for j in range(A.shape[1]):
-        np.random.shuffle(A[:j, j])
-        np.random.shuffle(A[j+1:, j])
+    for j in range(A_baseline.shape[1]):
+        np.random.shuffle(A_baseline[:j, j])
+        np.random.shuffle(A_baseline[j+1:, j])
     assert np.any(A_baseline != A)
 
     # Evaluate inferred GRN
     print("\n======== Evaluate inferred GRN ========")
     scores = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A, signed=use_signs)
+
     # Evaluate baseline GRN
     print("\n======== Evaluate shuffled GRN ========")
     n_repeats = 1
