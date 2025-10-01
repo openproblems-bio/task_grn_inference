@@ -224,15 +224,24 @@ def run_cistopic(par):
     with open(f"{par['fragments_dict']}", 'r') as f:
         fragments_dict = json.load(f)
     # run pycistopic
-    print('get tss')
+    print('get tss', flush=True)
     os.makedirs(os.path.join(par['temp_dir'], 'qc'), exist_ok=True)
-    subprocess.run([
-        'pycistopic', 'tss', 'get_tss',
-        '--output', os.path.join(par['temp_dir'], 'qc', 'tss.bed'),
-        '--name', 'hsapiens_gene_ensembl',
-        '--to-chrom-source', 'ucsc',
-        '--ucsc', 'hg38'
-    ])
+
+
+    tss_bed = os.path.join(par['temp_dir'], 'qc', 'tss.bed')
+    if False:
+        subprocess.run([
+            'pycistopic', 'tss', 'get_tss',
+            '--output', tss_bed,
+            '--name', 'hsapiens_gene_ensembl',
+            '--to-chrom-source', 'ucsc',
+            '--ucsc', 'hg38'
+        ], check=True)
+    else:
+        aws_path = 's3://openproblems-data/resources/grn/resources/supp_data/tss_h38.bed'
+        command = f'aws s3 cp {aws_path} {tss_bed} --no-sign-request'
+        subprocess.run(command, shell=True, check=True)
+    print('get tss completed', flush=True)
 
     if par['qc']:  # Whether to perform quality control
         # Compute QC metrics
@@ -579,7 +588,7 @@ def download_databases(par):
         print(f'Download {url}...')
         urlretrieve(url, filepath)
     
-    if os.path.exists(par['chromsizes']):
+    if not os.path.exists(par['chromsizes']):
         print('Download chromsizes ', flush=True)
         response = requests.get('http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes')
         with open(par['chromsizes'], "wb") as file:
@@ -587,8 +596,8 @@ def download_databases(par):
         chromsizes = pd.read_csv(par['chromsizes'], sep='\t', names=['Chromosome', 'End'])
         chromsizes.insert(1, 'Start', 0)
         chromsizes.to_csv(par['chromsizes'], sep='\t', index=False)
-    
-    if os.path.exists(par['annotation_file']):
+
+    if not os.path.exists(par['annotation_file']):
         print('Download annotation', flush=True)
         download_annotation(par)
         df = read_gtf_as_df(par['annotation_file'])

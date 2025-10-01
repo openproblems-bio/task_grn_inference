@@ -12,7 +12,7 @@ resources:
   - path: helper.py
   - path: /src/utils/util.py
     dest: util.py
-  - path: /src/util/dataset_config.py
+  - path: /src/utils/dataset_config.py
     dest: dataset_config.py
 
 engines:
