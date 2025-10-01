@@ -16,7 +16,7 @@ save_dir="output/sem"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=("300BCG" 'parsebioscience' 'op' ) #"300BCG" "ibd" 'parsebioscience'
+datasets=('op' "300BCG" 'parsebioscience' ) #"300BCG" "ibd" 'parsebioscience'
 # methods to process
 methods=("negative_control" "pearson_corr" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
 

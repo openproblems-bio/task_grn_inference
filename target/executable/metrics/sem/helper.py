@@ -1,5 +1,3 @@
-
-
 import os
 import traceback
 import random
@@ -10,13 +8,16 @@ import torch
 import anndata as ad
 import tqdm
 from scipy.sparse import csr_matrix
-from scipy.stats import ttest_rel, spearmanr, wilcoxon
+from scipy.stats import ttest_rel, spearmanr, pearsonr, wilcoxon
 from sklearn.linear_model import ElasticNet
 from sklearn.preprocessing import StandardScaler, LabelEncoder
+from sklearn.metrics import r2_score
 import sys
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 from sklearn.model_selection import GroupShuffleSplit, KFold
+
+
 os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8' # For reproducibility purposes (on GPU)
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 NUMPY_DTYPE = np.float32
@@ -34,8 +35,10 @@ torch.cuda.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)
 torch.use_deterministic_algorithms(True)
 
+
 from util import read_prediction, manage_layer
 from dataset_config import DATASET_GROUPS
+
 
 def encode_obs_cols(adata, cols):
     encoded = []
@@ -51,25 +54,30 @@ def combine_multi_index(*arrays) -> np.array:
     A = np.stack(arrays)
     n_classes = tuple(int(A[i].max()) + 1 for i in range(A.shape[0]))
     return np.ravel_multi_index(A, dims=n_classes, order='C')
-def compute_perturbations(X, are_controls, groups: np.array) -> np.ndarray:
+
+
+def compute_perturbations(X, are_controls, groups: np.array, loose_match_groups: np.array) -> np.ndarray:
     # Compute perturbations as differences between samples and their matched controls.
     # By matched control, we mean a negative control from the same donor, located on
-    # the same plate and from the same cell type.
+    # the same plate, from the same cell type, and eventually from the same well.
     # By construction, perturbations will be 0 for control samples.
     delta_X = np.copy(X)
-    control_map = {}
+    control_map, loose_control_map = {}, {}
     for i, (is_control, group_id) in enumerate(zip(are_controls, groups)):
         if is_control:
             control_map[group_id] = i
+    for i, (is_control, group_id) in enumerate(zip(are_controls, loose_match_groups)):
+        if is_control:
+            loose_control_map[group_id] = i
     
-    for i, group_id in enumerate(groups):
-        if group_id not in control_map:
-            raise ValueError(f"No control found for sample {i} (group {group_id}).")
-            
-    
-        j = control_map[group_id]
+    for i, (group_id, loose_group_id) in enumerate(zip(groups, loose_match_groups)):
+        if group_id in control_map:
+            j = control_map[group_id]
+        else:
+            j = loose_control_map[loose_group_id]
         delta_X[i, :] -= delta_X[j, :]
     return delta_X
+
 
 def solve_sem(A: torch.Tensor, delta: torch.Tensor, stable: bool = False) -> torch.Tensor:
     """Compute the perturbation using a linear structural equation model (SEM).
@@ -93,6 +101,7 @@ def solve_sem(A: torch.Tensor, delta: torch.Tensor, stable: bool = False) -> tor
         I = torch.eye(A.size(1), dtype=A.dtype)
         return torch.linalg.solve((I - A).mT, delta.mT).mT
 
+
 def neumann_series(A: torch.Tensor, k: int = 2) -> torch.Tensor:
     """Approximate the inverse of I - A using Neumann series.
 
@@ -107,6 +116,8 @@ def neumann_series(A: torch.Tensor, k: int = 2) -> torch.Tensor:
     for k in range(k):
         B = B + torch.mm(B, A)
     return B
+
+
 def regression_based_grn_inference(X: np.ndarray, base: np.ndarray, signed: bool = False) -> np.ndarray:
     """Infer GRN weights given a GRN topology.
 
@@ -149,7 +160,7 @@ def evaluate_grn(
 ) -> np.ndarray:
 
     n_iter = MAX_N_ITER
-    learning_rate = 0.0005
+    learning_rate = 0.001
 
     signs = np.sign(A)
     mask = np.asarray(A != 0)
@@ -167,7 +178,7 @@ def evaluate_grn(
     F = np.linalg.inv(np.eye(A.shape[0]) - A)
     F_CR = F[np.ix_(regulator_idx, reporter_idx)]
     Y_R = delta_X[:, reporter_idx]
-    lam = 0.01
+    lam = 0.1
     I = np.eye(len(regulator_idx), dtype=delta_X.dtype)
     M = F_CR @ F_CR.T + lam * I
     delta = np.zeros_like(delta_X)
@@ -188,20 +199,23 @@ def evaluate_grn(
     )
     best_loss = np.inf
     best_A_eff = A_eff.detach()
+    best_iteration = 0
     pbar = tqdm.tqdm(range(n_iter))
     X_non_reporter = delta_X_train[:, ~is_reporter]
-    for _ in pbar:
+    for iteration in pbar:
         optimizer.zero_grad()
         A_eff = torch.abs(A) * signs if signed else A * mask
         delta_X_hat = solve_sem(A_eff, delta_train)
         loss = torch.mean(torch.sum(torch.square(X_non_reporter - delta_X_hat[:, ~is_reporter]), dim=1))
-        loss = loss + 0.00001 * torch.sum(torch.abs(A))
-        loss = loss + 0.00001 * torch.sum(torch.square(A))
+        loss = loss + 0.1 * torch.sum(torch.abs(A))
+        loss = loss + 0.1 * torch.sum(torch.square(A))
+        pbar.set_description(str(loss.item()))
 
         # Keep track of best solution
         if loss.item() < best_loss:
             best_loss = loss.item()
             best_A_eff = A_eff.detach()
+            best_iteration = iteration
 
         loss.backward()
         optimizer.step()
@@ -209,6 +223,7 @@ def evaluate_grn(
         # pbar.set_description(str(loss.item()))
     A = best_A_eff
     mask = mask.detach().cpu().numpy().astype(bool)
+    print(f"Best iteration: {best_iteration + 1} / {n_iter}")
 
     # Predict perturbations in test set
     delta_test = torch.from_numpy(delta[~is_train, :])
@@ -224,13 +239,14 @@ def evaluate_grn(
     for j in range(len(eval_mask)):
         if eval_mask[j]:
             if np.all(delta_X_test[:, j] == delta_X_test[0, j]):  # Constant
-                coefficients.append(0.0)
+                coefficients.append(np.nan)
             else:
-                coefficients.append(spearmanr(delta_X_test[:, j], delta_X_hat[:, j]).correlation)
+                coefficients.append(max(0, r2_score(delta_X_test[:, j], delta_X_hat[:, j])))
         else:
-            coefficients.append(0.0)
-    return np.nan_to_num(coefficients, nan=0)
-
+            coefficients.append(np.nan)
+    coefficients = np.array(coefficients)
+    #return np.nan_to_num(coefficients, nan=0)
+    return coefficients
 
 
 def main(par):
@@ -268,16 +284,20 @@ def main(par):
             j = gene_dict[target]
             A[i, j] = float(weight)
 
-    # Only consider the genes that are actually present in the inferred GRN
+    # Only consider the genes that are actually present in the inferred GRN,
+    # and keep only the most-connected genes (for speed).
     gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
-    if True:
-        idx = np.argsort(np.maximum(np.sum(A!=0, axis=1), np.sum(A!=0, axis=0)))[:-5000]
-        gene_mask[idx] = False
-        
+    in_degrees = np.sum(A != 0, axis=0)
+    out_degrees = np.sum(A != 0, axis=1)
+    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-5000]
+    gene_mask[idx] = False
     X = X[:, gene_mask]
     X = X.toarray() if isinstance(X, csr_matrix) else X
     A = A[gene_mask, :][:, gene_mask]
     gene_names = gene_names[gene_mask]
+
+    # Remove self-regulations
+    np.fill_diagonal(A, 0)
 
     # Check whether the inferred GRN contains signed predictions
     use_signs = np.any(A < 0)
@@ -289,12 +309,7 @@ def main(par):
 
     # Get negative controls
     X_controls = X[are_controls, :]
-    try:
-        delta_X = compute_perturbations(X, are_controls, match_groups)
-    except:
-        print("Error in compute_perturbations with strict matching. Using loose matching instead.")
-        traceback.print_exc()
-        delta_X = compute_perturbations(X, are_controls, loose_match_groups)
+    delta_X = compute_perturbations(X, are_controls, match_groups, loose_match_groups)
 
     # Remove negative controls from downstream analysis
     delta_X = delta_X[~are_controls, :]
@@ -308,6 +323,7 @@ def main(par):
         splitter = GroupShuffleSplit(test_size=0.5, n_splits=2, random_state=0xCAFE)
         train_idx, _ = next(splitter.split(delta_X, groups=cv_groups))
     except ValueError:
+        print("Group k-fold failed. Using k-fold CV instead.")
         splitter = KFold(n_splits=2, random_state=0xCAFE, shuffle=True)
         train_idx, _ = next(splitter.split(delta_X))
     is_train = np.zeros(len(delta_X), dtype=bool)
@@ -320,30 +336,37 @@ def main(par):
     n_genes = A.shape[1]
     reg_mask = np.asarray(A != 0).any(axis=1)  # TF mask
     is_reporter = np.copy(reg_mask)
+    if np.mean(is_reporter) < 0.5 * len(is_reporter):
+        idx = np.where(~is_reporter)[0]
+        np.random.shuffle(idx)
+        idx = idx[:int(0.5 * len(is_reporter) - np.sum(is_reporter))]
+        is_reporter[idx] = True
     print(f"Proportion of reporter genes: {np.mean(is_reporter)}")
     print(f"Use regulatory modes/signs: {use_signs}")
 
     # Create a symmetric (causally-wrong) baseline GRN
     print(f"Creating baseline GRN")
-    A_baseline = np.copy(A).T
-    np.random.shuffle(A_baseline)
-    A_baseline = A_baseline.T
+    A_baseline = np.copy(A)
+    for j in range(A.shape[1]):
+        np.random.shuffle(A[:j, j])
+        np.random.shuffle(A[j+1:, j])
+    assert np.any(A_baseline != A)
 
     # Evaluate inferred GRN
     print("\n======== Evaluate inferred GRN ========")
     scores = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A, signed=use_signs)
     # Evaluate baseline GRN
     print("\n======== Evaluate shuffled GRN ========")
-    n_repeats = 3
+    n_repeats = 1
     scores_baseline = np.zeros_like(scores)
     for _ in range(n_repeats):  # Repeat for more robust estimation
         scores_baseline += evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
     scores_baseline /= n_repeats
 
     # Keep only the genes for which both GRNs got a score
-    #mask = ~np.logical_or(np.isnan(scores), np.isnan(scores_baseline))
-    #scores = scores[mask]
-    #scores_baseline = scores_baseline[mask]
+    mask = ~np.logical_or(np.isnan(scores), np.isnan(scores_baseline))
+    scores = scores[mask]
+    scores_baseline = scores_baseline[mask]
 
     rr_all = {}
     # Perform rank test between actual scores and baseline
@@ -360,13 +383,7 @@ def main(par):
         eps = 1e-300  # very small number to avoid log(0)
         pval_clipped = max(res.pvalue, eps)
         # Compute final score
-        if False:
-            steepness = 1.5
-            f = lambda p: (-np.log(p)) ** steepness
-            score = f(pval_clipped) / (f(pval_clipped) + f(1e-10))
-        else:
-            effect = np.mean(scores) - np.mean(scores_baseline)
-            score = effect * (-np.log10(pval_clipped))
+        score = -np.log10(pval_clipped)
         print(f"Final score: {score}")
 
         results = {

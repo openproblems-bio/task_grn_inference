@@ -446,12 +446,13 @@ function ViashDockerfile {
 FROM janursa/scenicplus:29_03_2025
 ENTRYPOINT []
 RUN pip install --upgrade pip && \
+  pip install --upgrade --no-cache-dir "awscli" && \
   pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenicplus"
-LABEL org.opencontainers.image.created="2025-09-30T19:51:38Z"
+LABEL org.opencontainers.image.created="2025-10-01T16:46:55Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="c3ea0c8962b550d944590203d9902e0657aaf4b9"
+LABEL org.opencontainers.image.revision="7de0ed1397383f015c88fd03d7f76fa3637df978"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

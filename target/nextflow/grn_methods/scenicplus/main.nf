@@ -3485,6 +3485,9 @@ meta = [
         {
           "type" : "python",
           "user" : false,
+          "packages" : [
+            "awscli"
+          ],
           "github" : [
             "openproblems-bio/core#subdirectory=packages/python/openproblems"
           ],
@@ -3499,7 +3502,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scenicplus",
     "viash_version" : "0.9.4",
-    "git_commit" : "c3ea0c8962b550d944590203d9902e0657aaf4b9",
+    "git_commit" : "7de0ed1397383f015c88fd03d7f76fa3637df978",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

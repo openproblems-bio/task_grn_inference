@@ -3557,7 +3557,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scprint",
     "viash_version" : "0.9.4",
-    "git_commit" : "c3ea0c8962b550d944590203d9902e0657aaf4b9",
+    "git_commit" : "7de0ed1397383f015c88fd03d7f76fa3637df978",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3664,7 +3664,6 @@ def innerWorkflowFactory(args) {
   def rawScript = '''set -e
 tempscript=".viash_script.py"
 cat > "$tempscript" << VIASHMAIN
-import argparse
 import sys
 
 import anndata as ad
@@ -3730,29 +3729,31 @@ dep = {
 ## VIASH END
 try:
     sys.path.append(meta["resources_dir"])
+    print(meta["resources_dir"])
 except:
     meta = {"resources_dir": "src/utils"}
     sys.path.append(meta["resources_dir"])
-from util import parse_args, process_links, efficient_melting
+from util import efficient_melting, parse_args
+
 par = parse_args(par)
 
 adata = ad.read_h5ad(par["rna"], backed="r")
 
-if adata.uns['dataset_id'] in ['replogle', 'xaira_HCT116', 'xaira_HEK293T']:
-    train_perturbs = adata.obs['perturbation'].unique()
-    tf_all = np.loadtxt(par['tf_all'], dtype=str)
-    train_perturbs = np.intersect1d(tf_all, train_perturbs) 
+if adata.uns["dataset_id"] in ["replogle", "xaira_HCT116", "xaira_HEK293T"]:
+    train_perturbs = adata.obs["perturbation"].unique()
+    tf_all = np.loadtxt(par["tf_all"], dtype=str)
+    train_perturbs = np.intersect1d(tf_all, train_perturbs)
     train_perturbs = train_perturbs[:100]  # limit to 100 perturbations
-    mask = adata.obs['perturbation'].isin(train_perturbs)
+    mask = adata.obs["perturbation"].isin(train_perturbs)
     adata = adata[mask].to_memory()
-elif adata.uns['dataset_id'] in ['parsebioscience']:
-    train_perturbs = adata.obs['perturbation'].unique()
+elif adata.uns["dataset_id"] in ["parsebioscience"]:
+    train_perturbs = adata.obs["perturbation"].unique()
     train_perturbs = train_perturbs[:10]
-    mask = adata.obs['perturbation'].isin(train_perturbs)
+    mask = adata.obs["perturbation"].isin(train_perturbs)
     adata = adata[mask].to_memory()
 else:
     adata = adata.to_memory()
-    
+
 adata.obs["is_primary_data"] = True
 adata.obs["organism_ontology_term_id"] = "NCBITaxon:9606"
 # adata.var = adata.var.set_index("gene_ids")

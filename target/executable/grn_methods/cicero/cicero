@@ -462,9 +462,9 @@ RUN Rscript -e 'options(warn = 2); if (!requireNamespace("remotes", quietly = TR
 RUN Rscript -e 'reticulate::py_install("anndata", envname = "r-reticulate")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods cicero"
-LABEL org.opencontainers.image.created="2025-09-30T19:51:38Z"
+LABEL org.opencontainers.image.created="2025-10-01T16:46:54Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="c3ea0c8962b550d944590203d9902e0657aaf4b9"
+LABEL org.opencontainers.image.revision="7de0ed1397383f015c88fd03d7f76fa3637df978"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

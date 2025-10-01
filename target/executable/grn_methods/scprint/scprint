@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   python -c 'from scdataloader.utils import populate_my_ontology; populate_my_ontology()'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-09-30T19:51:38Z"
+LABEL org.opencontainers.image.created="2025-10-01T16:46:54Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="c3ea0c8962b550d944590203d9902e0657aaf4b9"
+LABEL org.opencontainers.image.revision="7de0ed1397383f015c88fd03d7f76fa3637df978"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1398,7 +1398,6 @@ function interrupt {
 trap clean_up EXIT
 trap interrupt INT SIGINT
 cat > "\$tempscript" << 'VIASHMAIN'
-import argparse
 import sys
 
 import anndata as ad
@@ -1464,29 +1463,31 @@ dep = {
 ## VIASH END
 try:
     sys.path.append(meta["resources_dir"])
+    print(meta["resources_dir"])
 except:
     meta = {"resources_dir": "src/utils"}
     sys.path.append(meta["resources_dir"])
-from util import parse_args, process_links, efficient_melting
+from util import efficient_melting, parse_args
+
 par = parse_args(par)
 
 adata = ad.read_h5ad(par["rna"], backed="r")
 
-if adata.uns['dataset_id'] in ['replogle', 'xaira_HCT116', 'xaira_HEK293T']:
-    train_perturbs = adata.obs['perturbation'].unique()
-    tf_all = np.loadtxt(par['tf_all'], dtype=str)
-    train_perturbs = np.intersect1d(tf_all, train_perturbs) 
+if adata.uns["dataset_id"] in ["replogle", "xaira_HCT116", "xaira_HEK293T"]:
+    train_perturbs = adata.obs["perturbation"].unique()
+    tf_all = np.loadtxt(par["tf_all"], dtype=str)
+    train_perturbs = np.intersect1d(tf_all, train_perturbs)
     train_perturbs = train_perturbs[:100]  # limit to 100 perturbations
-    mask = adata.obs['perturbation'].isin(train_perturbs)
+    mask = adata.obs["perturbation"].isin(train_perturbs)
     adata = adata[mask].to_memory()
-elif adata.uns['dataset_id'] in ['parsebioscience']:
-    train_perturbs = adata.obs['perturbation'].unique()
+elif adata.uns["dataset_id"] in ["parsebioscience"]:
+    train_perturbs = adata.obs["perturbation"].unique()
     train_perturbs = train_perturbs[:10]
-    mask = adata.obs['perturbation'].isin(train_perturbs)
+    mask = adata.obs["perturbation"].isin(train_perturbs)
     adata = adata[mask].to_memory()
 else:
     adata = adata.to_memory()
-    
+
 adata.obs["is_primary_data"] = True
 adata.obs["organism_ontology_term_id"] = "NCBITaxon:9606"
 # adata.var = adata.var.set_index("gene_ids")
