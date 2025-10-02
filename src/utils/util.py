@@ -200,7 +200,15 @@ def corr_net(adata, tf_all, par) -> pd.DataFrame:
     X = X[:, nonzero_std_genes]
     gene_names = adata[:, nonzero_std_genes].var_names.to_numpy()
     # - calculate correlation
-    net = np.corrcoef(X.T)
+    corr_type = par.get("corr_type", "pearson")
+    if corr_type == "pearson":
+        net = np.corrcoef(X.T)
+    elif corr_type == "spearman":
+        from scipy.stats import spearmanr
+        rho, _ = spearmanr(X, axis=0)  # (n_genes x n_genes)
+        net = rho
+    else:
+        raise ValueError(f"Unknown corr_type: {corr_type}")
     # - melt the matrix
     net = efficient_melting(net, gene_names, symmetric=True)
 

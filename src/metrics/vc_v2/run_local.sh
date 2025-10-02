@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=vc
+#SBATCH --job-name=vc_v2
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
@@ -16,14 +16,15 @@ save_dir="output/vc"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=( "replogle" "xaira_HEK293T" "xaira_HCT116" "nakatake" "norman" "adamson" 'parsebioscience' 'op' "300BCG") #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
+datasets=('parsebioscience' "300BCG" 'op'  "adamson"  "replogle" "xaira_HEK293T" "xaira_HCT116" "nakatake" "norman" ) #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
+# datasets=('parsebioscience'  ) #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
 
 # methods to process
 methods=( "pearson_corr" "positive_control" "negative_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
-# methods=( "pearson_corr" "positive_control" "negative_control")
+# methods=( "pearson_corr" "positive_control" )
 
 # temporary file to collect CSV rows
-combined_csv="${save_dir}/vc_scores.csv"
+combined_csv="${save_dir}/vc_v2_scores.csv"
 echo "dataset,method,metric,value" > "$combined_csv"
 
 
@@ -42,11 +43,12 @@ for dataset in "${datasets[@]}"; do
         fi
 
         echo -e "\nProcessing method: $method\n"
-        python src/metrics/vc/script.py \
+        python src/metrics/vc_v2/script.py \
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
             --score "$score"
-
+        
+        # Extract metrics from the .h5ad and append to CSV
         python -u - <<EOF
 import anndata as ad
 import pandas as pd

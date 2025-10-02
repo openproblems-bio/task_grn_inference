@@ -3,13 +3,15 @@
 set -e
 
 run_prefix='bash' #bash
-DATASETS=('op' ) #'op' 'adamson' 'replogle' 'norman' 'nakatake' 'parsebioscience'  '300BCG' 'xaira_HCT116' 'xaira_HEK293T'
+DATASETS=('op' 'adamson' 'replogle' 'norman' 'nakatake' 'parsebioscience'  '300BCG' 'xaira_HCT116' 'xaira_HEK293T') #'op' 'adamson' 'replogle' 'norman' 'nakatake' 'parsebioscience'  '300BCG' 'xaira_HCT116' 'xaira_HEK293T'
+# DATASETS=('op' ) 
+
 # METHODS=('negative_control' 'positive_control' 'pearson_corr' 'portia' 'ppcor' 'grnboost' 'scenic'  'scenicplus' 'scglue' 'figr' 'granie')
-METHODS=( 'scenicplus' ) #'negative_control' 'positive_control' 'pearson_corr' 'portia' 'ppcor' 'grnboost' 'scenic'  'scenicplus' 'scglue' 'figr' 'granie'
+METHODS=( 'spearman_corr' ) #'negative_control' 'positive_control' 'pearson_corr' 'portia' 'ppcor' 'grnboost' 'scenic'  'scenicplus' 'scglue' 'figr' 'granie'
 
 methods_dir='src/methods/'
 ctr_methods_dir='src/methods/'
-resources_dir='resources_test'
+resources_dir='resources'
 predictions_dir="$resources_dir/results/"
 
 

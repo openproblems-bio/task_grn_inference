@@ -12,31 +12,50 @@ import os
 from regression_2.helper import main as main_reg2
 from ws_distance.helper import main as main_ws_distance
 from sem.helper import main as main_sem
+from vc_v2.helper import main as main_vc_v2
 
 
 def main(par):
-    try:
-        rr_reg2 = main_reg2(par)
-    except Exception as e:
-        print(f"Error in regression 2 metrics: {e}")
-        rr_reg2 = pd.DataFrame()
-    print("reg2 done: ", rr_reg2)
-    try:
-        rr_sem = main_sem(par)
-    except Exception as e:
-        print(f"Error in sem metrics: {e}")
-        rr_sem = pd.DataFrame()
-    print("sem done: ", rr_sem)
-    try:
-        _, rr_ws = main_ws_distance(par)
-    except Exception as e:
-        print(f"Error in ws distance metrics: {e}")
-        rr_ws = pd.DataFrame()
-    print("ws done: ", rr_ws)
+    rr_store = []
+    if True:
+        try:
+            rr_vc = main_vc_v2(par)
+        except Exception as e:
+            print(f"Error in vc metrics: {e}")
+            rr_vc = pd.DataFrame()
+        print("vc done: ", rr_vc)
+        rr_store.append(rr_vc)
+
+
+    # try:
+    #     rr_reg2 = main_reg2(par)
+    # except Exception as e:
+    #     print(f"Error in regression 2 metrics: {e}")
+    #     rr_reg2 = pd.DataFrame()
+    # rr_store.append(rr_reg2)
+    # print("reg2 done: ", rr_reg2)
+
+    # if False:
+    #     try:
+    #         rr_sem = main_sem(par)
+    #     except Exception as e:
+    #         print(f"Error in sem metrics: {e}")
+    #         rr_sem = pd.DataFrame()
+    #     print("sem done: ", rr_sem)
+    #     rr_store.append(rr_sem)
+    
+    
+    # try:
+    #     _, rr_ws = main_ws_distance(par)
+    # except Exception as e:
+    #     print(f"Error in ws distance metrics: {e}")
+    #     rr_ws = pd.DataFrame()
+    # print("ws done: ", rr_ws)
+    # rr_store.append(rr_ws)
 
     
     
 
-    rr_all = pd.concat([rr_reg2, rr_ws, rr_sem], axis=1)
-    assert rr_all.shape[1] >1
+    rr_all = pd.concat(rr_store, axis=1)
+    assert rr_all.shape[1] >0
     return rr_all

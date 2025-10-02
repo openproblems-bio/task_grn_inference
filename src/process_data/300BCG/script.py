@@ -33,6 +33,8 @@ def format_data(adata):
     adata.obs['perturbation_type'] = 'chemical'
     return adata
 adata = format_data(adata)
+adata = adata[adata.obs['cell_type'].isin(['B', 'CD4+ T', 'CD8+ T', 'Monocytes', 'NK'])]
+
 
 adata.obs['qc_group'] = adata.obs['perturbation'] + '_' + adata.obs['time'].astype(str) + '_' + adata.obs['donor_id'].astype(str) + '_' + adata.obs['cell_type'].astype(str)
 
@@ -46,6 +48,7 @@ def split_data_func(adata: ad.AnnData):
     test_group = np.setdiff1d(obs['split_group'].unique(), train_group)
 
     return train_group, test_group
+
 
 wrapper_large_perturbation_data(adata, covariates=['perturbation', 'time', 'donor_id', 'cell_type', 'qc_group'], 
                                     add_metadata=add_metadata, 
