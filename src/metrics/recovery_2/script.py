@@ -24,19 +24,20 @@ except:
 
 from helper import main
 from util import format_save_score, parse_args
+from dataset_config import DATASET_GROUPS
 
 par = parse_args(par)
 
 
-
-DATASET_GROUPS = {
-    "op": ["perturbation", "cell_type"],
-    "parsebioscience": ["perturbation", "cell_type"],
-    "300BCG": ["perturbation", "cell_type"]
-}
 if __name__ == '__main__':
-    par['group'] = DATASET_GROUPS[ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']]
-    output = main(par)
-    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
-    format_save_score(output, method_id, dataset_id, par['score'])
+  method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+  dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+  if dataset_id == 'op':
+    par['group'] = ['perturbation', 'cell_type']
+  elif dataset_id in '300BCG':
+    par['group'] = ['cell_type', 'time', 'perturbation']
+  else:
+    raise ValueError(f"Dataset {dataset_id} not supported yet")
+  output = main(par)
+  
+  format_save_score(output, method_id, dataset_id, par['score'])

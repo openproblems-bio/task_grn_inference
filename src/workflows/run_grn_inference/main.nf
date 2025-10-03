@@ -1,6 +1,7 @@
 // construct list of methods
 methods = [
   pearson_corr,
+  spearman_corr,
   negative_control, 
   positive_control, 
   portia, 
@@ -14,7 +15,8 @@ methods = [
   figr,
   celloracle,
   scgpt,
-  dictys
+  dictys,
+  geneformer
 ]
 
 // construct list of metrics

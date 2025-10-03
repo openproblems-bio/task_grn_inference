@@ -220,76 +220,119 @@ def compute_pds(X_true, X_pred, perturbations, gene_names):
     return mean_level_pds, cell_level_pds
 
 
-class GRNLayer(torch.nn.Module):
-
-    def __init__(
-            self,
-            A_weights: torch.nn.Parameter,
-            A_signs: torch.Tensor,
-            signed: bool = True,
-            inverse: bool = True,
-            alpha: float = 1.0
-    ):
-        torch.nn.Module.__init__(self)
-        self.n_genes: int = A_weights.size(1)
-        self.A_weights: torch.nn.Parameter = A_weights
-        self.register_buffer('A_signs', A_signs.to(A_weights.device))
-        self.register_buffer('A_mask', (A_signs > 0).to(self.A_weights.dtype).to(A_weights.device))
-        self.register_buffer('I', torch.eye(self.n_genes, dtype=A_weights.dtype, device=A_weights.device))
-        self.signed: bool = signed
-        self.inverse: bool = inverse
-        self.alpha: float = alpha
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        if self.signed:
-            A = torch.abs(self.A_weights) * self.A_signs
-        else:
-            A = self.A_weights * self.A_mask
+class SparseGRNLayer(torch.nn.Module):
+    """
+    Efficient sparse linear layer using PyTorch's scatter_add for fast computation.
+    Maps gene expression to TF activities based on GRN connections.
+    """
+    
+    def __init__(self, grn_connections: torch.Tensor, n_genes: int, n_tfs: int):
+        """
+        Args:
+            grn_connections: [n_connections, 2] tensor with [source_gene_idx, tf_idx] pairs
+            n_genes: number of input genes
+            n_tfs: number of output TFs
+        """
+        super().__init__()
+        self.n_genes = n_genes
+        self.n_tfs = n_tfs
         
-        if self.inverse:
-            # For inverse transformation, use iterative solve to avoid memory issues
-            # Solve (I - alpha * A.t()) * y = x for y
-            ia = self.I - self.alpha * A.t()
-            
-            # Add small regularization to diagonal for numerical stability
-            ia = ia + 1e-6 * self.I
-            
-            # Use solve instead of inversion to save memory
-            try:
-                # Solve ia * y.t() = x.t() for y.t(), then transpose
-                result = torch.linalg.solve(ia, x.t()).t()
-                return result
-            except torch.linalg.LinAlgError:
-                # Fallback: simple linear transformation without inversion
-                print("Warning: Matrix solve failed, using simplified GRN transformation")
-                return torch.mm(x, A)
-        else:
-            # Forward transformation: apply GRN directly
-            return torch.mm(x, A.t())
+        # Store connections - genes regulate TFs
+        self.register_buffer('gene_indices', grn_connections[:, 0].long())  # Source gene indices
+        self.register_buffer('tf_indices', grn_connections[:, 1].long())    # Target TF indices
+        
+        # Trainable weights for each connection (normal NN training)
+        self.weights = torch.nn.Parameter(torch.randn(grn_connections.size(0)) * 0.1)
+        
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            x: (batch_size, n_genes) input gene expression
+        Returns:
+            (batch_size, n_tfs) TF activities
+        """
+        batch_size = x.size(0)
+        
+        # Gather gene expressions for all connections: (batch_size, n_connections)
+        gene_vals = x[:, self.gene_indices]  # Shape: (batch_size, n_connections)
+        
+        # Apply weights: (batch_size, n_connections)
+        weighted_vals = gene_vals * self.weights.unsqueeze(0)  # Broadcast weights
+        
+        # Initialize output tensor
+        tf_output = torch.zeros(batch_size, self.n_tfs, dtype=x.dtype, device=x.device)
+        
+        # Use scatter_add to efficiently sum contributions to each TF
+        # Expand tf_indices to match batch dimension
+        tf_indices_expanded = self.tf_indices.unsqueeze(0).expand(batch_size, -1)  # (batch_size, n_connections)
+        
+        # Scatter add: for each TF, sum all weighted gene contributions
+        tf_output.scatter_add_(1, tf_indices_expanded, weighted_vals)
+        
+        return tf_output
 
 
 class Model(torch.nn.Module):
-    def __init__(self, A: np.ndarray, n_perturbations: int, n_hidden: int = 64, signed: bool = True):
-        torch.nn.Module.__init__(self)
-        self.n_genes: int = A.shape[1]
-        self.n_perturbations: int = n_perturbations
-        self.n_hidden: int = n_hidden
-        self.perturbation_embedding = torch.nn.Embedding(n_perturbations, n_hidden)
-
-        A_signs = torch.from_numpy(np.sign(A).astype(NUMPY_DTYPE))
-        A_weights = np.copy(A).astype(NUMPY_DTYPE)
-        A_weights /= (np.sqrt(self.n_genes) * float(np.std(A_weights)))
-        A_weights = torch.nn.Parameter(torch.from_numpy(A_weights))
-        # Ensure A_signs is on the same device as A_weights
-        A_signs = A_signs.to(A_weights.device)
-
-        # First layer: GRN-informed transformation of control expression
-        self.grn_input_layer = GRNLayer(A_weights, A_signs, inverse=False, signed=signed, alpha=0.1)
+    def __init__(self, net: pd.DataFrame, gene_names: np.ndarray, n_perturbations: int, n_hidden: int = 64):
+        """
+        Args:
+            net: DataFrame with columns ['source', 'target', 'weight'] 
+            gene_names: array of gene names (expression data genes)
+            n_perturbations: number of perturbation types
+            n_hidden: hidden layer size
+        """
+        super().__init__()
+        self.n_genes = len(gene_names)
+        self.n_perturbations = n_perturbations
+        self.n_hidden = n_hidden
         
-        # Middle layers: perturbation processing
+        # Create gene name to index mapping
+        gene_to_idx = {gene: idx for idx, gene in enumerate(gene_names)}
+        
+        # Extract all TFs (sources) from the network - don't filter by gene_names
+        tf_genes = set(net['source'].unique())
+        tf_list = sorted(list(tf_genes))
+        self.n_tfs = len(tf_list)
+        
+        print(f"Identified {self.n_tfs} transcription factors")
+        print(f"Using {self.n_genes} genes from expression data")
+        
+        # Create TF index mapping
+        tf_to_idx = {tf: idx for idx, tf in enumerate(tf_list)}
+        
+        connections = []
+        edge_weights = []
+        for _, row in net.iterrows():
+            source, target, weight = row['source'], row['target'], row['weight']
+            # If target gene is in expression data, it can contribute to source TF activity
+            if target in gene_to_idx and source in tf_to_idx:
+                gene_idx = gene_to_idx[target]  # Target gene in expression data
+                tf_idx = tf_to_idx[source]      # Source TF that regulates this gene
+                connections.append([gene_idx, tf_idx])
+                edge_weights.append(float(weight))
+        
+        if len(connections) == 0:
+            raise ValueError("No valid GRN connections found!")
+            
+        connections = torch.tensor(connections, dtype=torch.long)
+        edge_weights = torch.tensor(edge_weights, dtype=torch.float32)
+        
+        print(f"Created {len(connections)} gene->TF connections")
+        print(f"Average edge weight: {edge_weights.mean().item():.4f}")
+        
+        # Create sparse GRN layer: genes -> TFs
+        self.grn_layer = SparseGRNLayer(connections, self.n_genes, self.n_tfs)
+        
+        # Initialize weights with GRN edge weights
+        with torch.no_grad():
+            self.grn_layer.weights.data = edge_weights
+        
+        self.perturbation_embedding = torch.nn.Embedding(n_perturbations, self.n_hidden)
+        
+        # Processing layers
         self.encoder = torch.nn.Sequential(
             torch.nn.PReLU(1),
-            torch.nn.Linear(self.n_genes, self.n_hidden),
+            torch.nn.Linear(self.n_tfs, self.n_hidden),
             torch.nn.PReLU(1),
             torch.nn.Linear(self.n_hidden, self.n_hidden),
             torch.nn.PReLU(1),
@@ -298,22 +341,73 @@ class Model(torch.nn.Module):
         self.decoder = torch.nn.Sequential(
             torch.nn.Linear(self.n_hidden, self.n_hidden),
             torch.nn.PReLU(1),
-            torch.nn.Linear(self.n_hidden, self.n_genes),
+            torch.nn.Linear(self.n_hidden, self.n_genes),  # Output back to gene space
+        )
+
+    def forward(self, x: torch.Tensor, pert: torch.LongTensor) -> torch.Tensor:
+        # 1. Map gene expression to TF activities using sparse GRN layer
+        tf_activities = self.grn_layer(x)
+        
+        # 2. Process TF activities through encoder
+        encoded = self.encoder(tf_activities)
+        
+        # 3. Add perturbation embedding
+        pert_embedding = self.perturbation_embedding(pert)
+        encoded = encoded + pert_embedding
+        
+        # 4. Decode back to gene expression space
+        gene_expression = self.decoder(encoded)
+        
+        return gene_expression
+
+
+class BaselineModel(torch.nn.Module):
+    """
+    Baseline model without GRN layer - uses fully connected layers instead.
+    This serves as a comparison to show the value of the GRN structure.
+    """
+    def __init__(self, n_genes: int, n_perturbations: int, n_hidden: int = 64):
+        """
+        Args:
+            n_genes: number of genes (input/output dimension)
+            n_perturbations: number of perturbation types
+            n_hidden: hidden layer size
+        """
+        super().__init__()
+        self.n_genes = n_genes
+        self.n_perturbations = n_perturbations
+        self.n_hidden = n_hidden
+        
+        self.perturbation_embedding = torch.nn.Embedding(n_perturbations, self.n_hidden)
+        
+        # Fully connected encoder (no GRN structure)
+        self.encoder = torch.nn.Sequential(
+            torch.nn.Linear(self.n_genes, self.n_hidden),
+            torch.nn.PReLU(1),
+            torch.nn.Linear(self.n_hidden, self.n_hidden),
+            torch.nn.PReLU(1),
+            torch.nn.Linear(self.n_hidden, self.n_hidden),
             torch.nn.PReLU(1),
         )
         
-        # Last layer: GRN-informed transformation to final expression
-        self.grn_output_layer = GRNLayer(A_weights, A_signs, inverse=True, signed=signed, alpha=0.1)
+        self.decoder = torch.nn.Sequential(
+            torch.nn.Linear(self.n_hidden, self.n_hidden),
+            torch.nn.PReLU(1),
+            torch.nn.Linear(self.n_hidden, self.n_genes),  # Output back to gene space
+        )
 
     def forward(self, x: torch.Tensor, pert: torch.LongTensor) -> torch.Tensor:
-        # Apply GRN transformation to control expression
-        x = self.grn_input_layer(x)
-        y = self.encoder(x)
-        z = self.perturbation_embedding(pert)
-        y = y + z
-        y = self.decoder(y)
-        y = self.grn_output_layer(y)
-        return y
+        # 1. Process gene expression through fully connected encoder
+        encoded = self.encoder(x)
+        
+        # 2. Add perturbation embedding
+        pert_embedding = self.perturbation_embedding(pert)
+        encoded = encoded + pert_embedding
+        
+        # 3. Decode back to gene expression space
+        gene_expression = self.decoder(encoded)
+        
+        return gene_expression
 
 
 class PerturbationDataset(Dataset):
@@ -364,18 +458,17 @@ class PerturbationDataset(Dataset):
 
 
 
-def evaluate(A, train_data_loader, test_data_loader, n_perturbations: int) -> Tuple[float, float]:
-    # Training
-
-    signed = np.any(A < 0)
-    model = Model(A, n_perturbations, n_hidden=16, signed=signed)
+def evaluate_model(model, train_data_loader, test_data_loader, model_name: str = "Model") -> Tuple[float, float]:
+    """
+    Generic evaluation function that works with any model.
+    """
     model = model.to(DEVICE)
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-5)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode='min', patience=5,
         min_lr=1e-5, cooldown=3, factor=0.8
     )
-    pbar = tqdm.tqdm(range(100))  # Reduced epochs for faster testing
+    pbar = tqdm.tqdm(range(100), desc=f"Training {model_name}")  # Reduced epochs for faster testing
     best_val_loss = float('inf')
     best_ss_res = None
     best_epoch = 0
@@ -391,7 +484,7 @@ def evaluate(A, train_data_loader, test_data_loader, n_perturbations: int) -> Tu
             loss.backward()
             optimizer.step()
             total_loss += loss.item() * len(x)
-        pbar.set_description(str(total_loss))
+        pbar.set_description(f"{model_name} - Loss: {total_loss:.4f}")
         scheduler.step(total_loss)
 
         model.eval()
@@ -410,7 +503,7 @@ def evaluate(A, train_data_loader, test_data_loader, n_perturbations: int) -> Tu
         model.train()
     ss_res = best_ss_res
 
-    # Final evaluation with PDS
+    # Final evaluation
     model.eval()
 
     ss_tot = 0
@@ -423,12 +516,41 @@ def evaluate(A, train_data_loader, test_data_loader, n_perturbations: int) -> Tu
             residuals = torch.square(y - torch.mean(y, dim=0).unsqueeze(0)).cpu().data.numpy()
             ss_tot += np.sum(residuals, axis=0)
 
-    print(f"Best epoch: {best_epoch} ({best_val_loss})")
+    print(f"{model_name} - Best epoch: {best_epoch} (Loss: {best_val_loss:.4f})")
     return best_ss_res, ss_tot
+
+
+def evaluate(net: pd.DataFrame, gene_names: np.ndarray, train_data_loader, test_data_loader, n_perturbations: int) -> Tuple[Tuple[float, float], Tuple[float, float]]:
+    """
+    Evaluate both GRN-based model and baseline fully-connected model.
+    Returns: ((grn_ss_res, grn_ss_tot), (baseline_ss_res, baseline_ss_tot))
+    """
+    print("Evaluating GRN-based model...")
+    grn_model = Model(net, gene_names, n_perturbations, n_hidden=32)
+    grn_results = evaluate_model(grn_model, train_data_loader, test_data_loader, "GRN Model")
+    
+    print("\nEvaluating baseline fully-connected model...")
+    baseline_model = BaselineModel(len(gene_names), n_perturbations, n_hidden=32)
+    baseline_results = evaluate_model(baseline_model, train_data_loader, test_data_loader, "Baseline Model")
+    
+    return grn_results, baseline_results
 
 
 
 def main(par):
+    """
+    Main evaluation function that compares GRN-based model performance against a baseline.
+    
+    The evaluation now includes:
+    1. GRN Model: Uses sparse GRN layer to map genes to TF activities
+    2. Baseline Model: Fully connected network without GRN structure
+    3. Comparison metrics to show the value of incorporating GRN structure
+    
+    Returns results with:
+    - vc: GRN model performance
+    - vc_baseline: Baseline model performance  
+    - vc_improvement: Improvement of GRN over baseline
+    """
     # Load evaluation data
     adata = ad.read_h5ad(par['evaluation_data'])
     assert 'is_control' in adata.obs.columns, "'is_control' column is required in the dataset for perturbation evaluation"
@@ -441,14 +563,7 @@ def main(par):
     par['match'] = DATASET_GROUPS[dataset_id]['match'] 
     par['loose_match'] = DATASET_GROUPS[dataset_id]['loose_match']
 
-    layer = manage_layer(adata, par)
-    X = adata.layers[layer]
-    if isinstance(X, csr_matrix):
-        X = X.toarray()
-    X = X.astype(np.float32)
-    
-    gene_names = adata.var_names
-    gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
+    # X and gene_names will be defined later after network loading
 
     # Get sample info
     perturbations = None
@@ -487,65 +602,42 @@ def main(par):
     
     print(f"Found {n_controls} control samples and {n_perturbed} perturbed samples")
 
-    # Load inferred GRN
+        # Load inferred GRN
     net = read_prediction(par)
-    sources = net["source"].to_numpy()
-    targets = net["target"].to_numpy()
-    weights = net["weight"].to_numpy()
-
-    A = np.zeros((len(gene_names), len(gene_names)), dtype=X.dtype)
-    for source, target, weight in zip(sources, targets, weights):
-        if (source in gene_dict) and (target in gene_dict):
-            i = gene_dict[source]
-            j = gene_dict[target]
-            A[i, j] = float(weight)
-
-    # Only consider the genes that are actually present in the inferred GRN
-    gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
-    X = X[:, gene_mask]
-    A = A[gene_mask, :][:, gene_mask]
-    gene_names = gene_names[gene_mask]
-
-    print(f"Using {len(gene_names)} genes present in the GRN")
+    common_genes = set(net['target']).intersection(set(adata.var_names))
+    net = net[net['target'].isin(common_genes)]
+    adata = adata[:, adata.var_names.isin(common_genes)].copy()
+    print(f"Loaded GRN with {len(net)} edges")
+    print(f"Unique sources (TFs): {len(net['source'].unique())}")
+    print(f"Unique targets: {len(net['target'].unique())}")
     
-    # Additional memory-aware gene filtering for very large GRNs
-    MAX_GENES_FOR_MEMORY = 3000  # Reduced further to avoid memory issues
-    if len(gene_names) > MAX_GENES_FOR_MEMORY:
-        print(f"Too many genes ({len(gene_names)}) for memory. Selecting top {MAX_GENES_FOR_MEMORY} by GRN connectivity.")
-        
-        # Select genes with highest connectivity in the GRN
-        gene_connectivity = np.sum(np.abs(A), axis=0) + np.sum(np.abs(A), axis=1)
-        top_gene_indices = np.argsort(gene_connectivity)[-MAX_GENES_FOR_MEMORY:]
-        
-        X = X[:, top_gene_indices]
-        A = A[top_gene_indices, :][:, top_gene_indices]
-        gene_names = gene_names[top_gene_indices]
-        
-        print(f"Final: Using {len(gene_names)} most connected genes for evaluation")
-
-    # Remove self-regulations
-    np.fill_diagonal(A, 0)
-
-    # Create baseline model
-    A_baseline = np.copy(A)
-    for j in range(A.shape[1]):
-        np.random.shuffle(A[:j, j])
-        np.random.shuffle(A[j+1:, j])
-    assert np.any(A_baseline != A)
+    # Update X and gene_names to match current adata (after any filtering that might have occurred)
+    layer = manage_layer(adata, par)
+    X = adata.layers[layer]
+    if isinstance(X, csr_matrix):
+        X = X.toarray()
+    X = X.astype(np.float32)
+    
+    gene_names = adata.var_names.to_numpy()
+    gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
+    print(f"Using {len(gene_names)} genes from expression data")
 
     # Mapping between gene expression profiles and their matched negative controls
-
     control_map, _ = create_control_matching(are_controls, match_groups)
     loose_control_map, _ = create_control_matching(are_controls, loose_match_groups)
 
-
-    ss_res = 0
-    ss_tot = 0
+    # Initialize accumulators for both models
+    grn_ss_res = 0
+    grn_ss_tot = 0
+    baseline_ss_res = 0
+    baseline_ss_tot = 0
     cv = GroupKFold(n_splits=5)
     
     results = []
     
     for i, (train_index, test_index) in enumerate(cv.split(X, X, cv_groups)):
+        print(f"\nCross-validation fold {i+1}/5")
+        
         # Center and scale dataset
         scaler = StandardScaler()
         scaler.fit(X[train_index, :])
@@ -574,23 +666,33 @@ def main(par):
         )
         test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=512)
 
-        # Evaluate inferred GRN
-        res = evaluate(A, train_data_loader, test_data_loader, n_perturbations)
-        ss_res = ss_res + res[0]
-        ss_tot = ss_tot + res[1]
+        # Evaluate both GRN and baseline models
+        grn_res, baseline_res = evaluate(net, gene_names, train_data_loader, test_data_loader, n_perturbations)
+        
+        # Accumulate results
+        grn_ss_res = grn_ss_res + grn_res[0]
+        grn_ss_tot = grn_ss_tot + grn_res[1]
+        baseline_ss_res = baseline_ss_res + baseline_res[0]
+        baseline_ss_tot = baseline_ss_tot + baseline_res[1]
 
-        # Evaluate baseline GRN (shuffled target genes)
-        #ss_tot = ss_tot + evaluate(A_baseline, train_data_loader, test_data_loader, n_perturbations)
+    # Calculate R2 scores for both models
+    grn_r2 = 1 - grn_ss_res / grn_ss_tot
+    baseline_r2 = 1 - baseline_ss_res / baseline_ss_tot
 
-    r2 = 1 - ss_res / ss_tot
-
-    final_score = np.mean(np.clip(r2, 0, 1))
+    grn_final_score = np.mean(np.clip(grn_r2, 0, 1))
+    baseline_final_score = np.mean(np.clip(baseline_r2, 0, 1))
+    
+    print(f"\n=== FINAL RESULTS ===")
     print(f"Method: {method_id}")
-    print(f"R2: {final_score}")
+    print(f"GRN Model R2: {grn_final_score:.4f}")
+    print(f"Baseline Model R2: {baseline_final_score:.4f}")
+    print(f"GRN vs Baseline Improvement: {grn_final_score - baseline_final_score:.4f}")
+    print(f"Relative Improvement: {((grn_final_score - baseline_final_score) / baseline_final_score * 100):.2f}%")
 
     results = {
-        'vc': [float(final_score)]
-
+        'vc': [float(grn_final_score)],
+        'vc_baseline': [float(baseline_final_score)],
+        'vc_improvement': [float(grn_final_score - baseline_final_score)]
     }
 
     df_results = pd.DataFrame(results)

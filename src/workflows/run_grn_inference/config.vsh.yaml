@@ -99,6 +99,7 @@ dependencies:
   - name: grn_methods/ppcor 
   - name: grn_methods/scprint 
   - name: grn_methods/scgpt
+  - name: grn_methods/geneformer
   
   # ---- multiomics 
   - name: grn_methods/celloracle
@@ -111,6 +112,7 @@ dependencies:
   - name: methods/pearson_corr
   - name: methods/negative_control
   - name: methods/positive_control
+  - name: methods/spearman_corr
 
 runners:
   - type: executable
