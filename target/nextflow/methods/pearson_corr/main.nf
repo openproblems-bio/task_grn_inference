@@ -3263,17 +3263,6 @@ meta = [
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
-        },
-        {
-          "type" : "boolean",
-          "name" : "--normalize",
-          "default" : [
-            true
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
         }
       ]
     }
@@ -3423,7 +3412,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/methods/pearson_corr",
     "viash_version" : "0.9.4",
-    "git_commit" : "7de0ed1397383f015c88fd03d7f76fa3637df978",
+    "git_commit" : "cd7b29c7789773da6882898a3bec3057f01842c2",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3553,8 +3542,7 @@ par = {
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'seed': $( if [ ! -z ${VIASH_PAR_SEED+x} ]; then echo "int(r'${VIASH_PAR_SEED//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'dataset_id': $( if [ ! -z ${VIASH_PAR_DATASET_ID+x} ]; then echo "r'${VIASH_PAR_DATASET_ID//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'apply_tf_methods': $( if [ ! -z ${VIASH_PAR_APPLY_TF_METHODS+x} ]; then echo "r'${VIASH_PAR_APPLY_TF_METHODS//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'normalize': $( if [ ! -z ${VIASH_PAR_NORMALIZE+x} ]; then echo "r'${VIASH_PAR_NORMALIZE//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
+  'apply_tf_methods': $( if [ ! -z ${VIASH_PAR_APPLY_TF_METHODS+x} ]; then echo "r'${VIASH_PAR_APPLY_TF_METHODS//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),

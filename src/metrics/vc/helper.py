@@ -58,11 +58,16 @@ def create_control_matching(are_controls: np.ndarray, match_groups: np.ndarray) 
     if len(control_indices) == 0:
         raise ValueError("No control samples found in dataset!")
     
-    # First, try to create exact matching (original approach)
+    # Create control mapping
     control_map = {}
     for i, (is_control, group_id) in enumerate(zip(are_controls, match_groups)):
         if is_control:
             control_map[int(group_id)] = i
+    
+    # If no controls were mapped (shouldn't happen but safety check), 
+    # map group 0 to the first control
+    if not control_map and len(control_indices) > 0:
+        control_map[0] = control_indices[0]
 
     return control_map, match_groups
 
@@ -341,9 +346,17 @@ class PerturbationDataset(Dataset):
 
         if group in self.control_map:
             j = int(self.control_map[group])
-        else:
+        elif int(self.loose_match_groups[i]) in self.loose_control_map:
             group = int(self.loose_match_groups[i])
             j = int(self.loose_control_map[group])
+        else:
+            # Fallback: use any available control sample
+            # This handles cases where no matching control exists (e.g., single control scenarios)
+            available_controls = list(self.control_map.values()) + list(self.loose_control_map.values())
+            if available_controls:
+                j = available_controls[0]  # Use first available control
+            else:
+                raise ValueError("No control samples available for matching!")
 
         x = torch.from_numpy(self.X[j, :])
         p = int(self.perturbations[i])
@@ -418,6 +431,8 @@ def evaluate(A, train_data_loader, test_data_loader, n_perturbations: int) -> Tu
 def main(par):
     # Load evaluation data
     adata = ad.read_h5ad(par['evaluation_data'])
+    assert 'is_control' in adata.obs.columns, "'is_control' column is required in the dataset for perturbation evaluation"
+    assert adata.obs['is_control'].sum() > 0, "'is_control' column must contain at least one True value for control samples"
     dataset_id = adata.uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     
@@ -491,8 +506,6 @@ def main(par):
     A = A[gene_mask, :][:, gene_mask]
     gene_names = gene_names[gene_mask]
 
-    # Filter genes based on GRN instead of HVGs
-    # Keep all genes that are present in the GRN (already filtered above)
     print(f"Using {len(gene_names)} genes present in the GRN")
     
     # Additional memory-aware gene filtering for very large GRNs
@@ -524,6 +537,7 @@ def main(par):
 
     control_map, _ = create_control_matching(are_controls, match_groups)
     loose_control_map, _ = create_control_matching(are_controls, loose_match_groups)
+
 
     ss_res = 0
     ss_tot = 0

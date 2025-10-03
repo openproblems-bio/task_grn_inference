@@ -3467,7 +3467,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/recovery_2",
     "viash_version" : "0.9.4",
-    "git_commit" : "7de0ed1397383f015c88fd03d7f76fa3637df978",
+    "git_commit" : "cd7b29c7789773da6882898a3bec3057f01842c2",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3632,22 +3632,23 @@ except:
 
 from helper import main
 from util import format_save_score, parse_args
+from dataset_config import DATASET_GROUPS
 
 par = parse_args(par)
 
 
-
-DATASET_GROUPS = {
-    "op": ["perturbation", "cell_type"],
-    "parsebioscience": ["perturbation", "cell_type"],
-    "300BCG": ["perturbation", "cell_type"]
-}
 if __name__ == '__main__':
-    par['group'] = DATASET_GROUPS[ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']]
-    output = main(par)
-    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-    dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
-    format_save_score(output, method_id, dataset_id, par['score'])
+  method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+  dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+  if dataset_id == 'op':
+    par['group'] = ['perturbation', 'cell_type']
+  elif dataset_id in '300BCG':
+    par['group'] = ['cell_type', 'time', 'perturbation']
+  else:
+    raise ValueError(f"Dataset {dataset_id} not supported yet")
+  output = main(par)
+  
+  format_save_score(output, method_id, dataset_id, par['score'])
 VIASHMAIN
 python -B "$tempscript"
 '''

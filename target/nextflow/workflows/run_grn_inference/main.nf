@@ -3287,6 +3287,12 @@ meta = [
       }
     },
     {
+      "name" : "grn_methods/geneformer",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
       "name" : "grn_methods/celloracle",
       "repository" : {
         "type" : "local"
@@ -3336,6 +3342,12 @@ meta = [
     },
     {
       "name" : "methods/positive_control",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "methods/spearman_corr",
       "repository" : {
         "type" : "local"
       }
@@ -3408,7 +3420,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_inference",
     "viash_version" : "0.9.4",
-    "git_commit" : "7de0ed1397383f015c88fd03d7f76fa3637df978",
+    "git_commit" : "cd7b29c7789773da6882898a3bec3057f01842c2",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3517,6 +3529,7 @@ include { scenic } from "${meta.resources_dir}/../../../nextflow/grn_methods/sce
 include { ppcor } from "${meta.resources_dir}/../../../nextflow/grn_methods/ppcor/main.nf"
 include { scprint } from "${meta.resources_dir}/../../../nextflow/grn_methods/scprint/main.nf"
 include { scgpt } from "${meta.resources_dir}/../../../nextflow/grn_methods/scgpt/main.nf"
+include { geneformer } from "${meta.resources_dir}/../../../nextflow/grn_methods/geneformer/main.nf"
 include { celloracle } from "${meta.resources_dir}/../../../nextflow/grn_methods/celloracle/main.nf"
 include { scglue } from "${meta.resources_dir}/../../../nextflow/grn_methods/scglue/main.nf"
 include { figr } from "${meta.resources_dir}/../../../nextflow/grn_methods/figr/main.nf"
@@ -3526,12 +3539,14 @@ include { dictys } from "${meta.resources_dir}/../../../nextflow/grn_methods/dic
 include { pearson_corr } from "${meta.resources_dir}/../../../nextflow/methods/pearson_corr/main.nf"
 include { negative_control } from "${meta.resources_dir}/../../../nextflow/methods/negative_control/main.nf"
 include { positive_control } from "${meta.resources_dir}/../../../nextflow/methods/positive_control/main.nf"
+include { spearman_corr } from "${meta.resources_dir}/../../../nextflow/methods/spearman_corr/main.nf"
 
 // inner workflow
 // user-provided Nextflow code
 // construct list of methods
 methods = [
   pearson_corr,
+  spearman_corr,
   negative_control, 
   positive_control, 
   portia, 
@@ -3545,7 +3560,8 @@ methods = [
   figr,
   celloracle,
   scgpt,
-  dictys
+  dictys,
+  geneformer
 ]
 
 // construct list of metrics

@@ -3521,7 +3521,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression_2",
     "viash_version" : "0.9.4",
-    "git_commit" : "7de0ed1397383f015c88fd03d7f76fa3637df978",
+    "git_commit" : "cd7b29c7789773da6882898a3bec3057f01842c2",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3677,8 +3677,6 @@ dep = {
 }
 
 ## VIASH END
-
-    
 try:
   sys.path.append(meta["resources_dir"])
 except:
@@ -3689,11 +3687,16 @@ except:
     sys.path.append(meta["resources_dir"])
     sys.path.append(meta["util_dir"])
 from helper import main
-from util import format_save_score
+from util import format_save_score, parse_args
+
+par = parse_args(par)
+
+ 
 
 if __name__ == '__main__':
   print(par)
   output = main(par)
+  print(output)
   method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
   dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
   format_save_score(output, method_id, dataset_id, par['score'])

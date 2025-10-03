@@ -12,14 +12,17 @@ DATASET_GROUPS = {
     "parsebioscience": {
         "match": ["donor_id", "cell_type", "well"],
         "loose_match": ["donor_id", "cell_type"],
-        'anchor': ["donor_id"],
+        'anchors': ["donor_id"],
         "cv": ["perturbation", "cell_type"],
     },
     "300BCG": {
         "match": ["donor_id", "cell_type"],
-        "loose_match": ["cell_type"],  # TODO: Why is donor_id not listed here?
-        'anchor': ["donor_id"],
+        "loose_match": ["cell_type"],  
+        'anchors': ["donor_id"],
         "cv": ["perturbation", "cell_type"],
+    },
+    "IBD": {
+        'anchors': ['donor_id'],
     },
     "replogle": {
         "match": ["perturbation"],
@@ -31,4 +34,26 @@ DATASET_GROUPS = {
         "loose_match": ["perturbation"],
         "cv": ["perturbation"],
     },
+    "xaira_HCT116": {
+        "match": ["perturbation"],
+        "loose_match": ["perturbation"],
+        "cv": ["perturbation"],
+    },
+    "nakatake": {
+        "match": ["perturbation"],
+        "loose_match": ["perturbation"],
+        "cv": ["perturbation"],
+    },
+     "norman": {
+        "match": ["perturbation"],
+        "loose_match": ["perturbation"],
+        "cv": ["perturbation"],
+    },
+     "adamson": {
+        "match": ["perturbation"],
+        "loose_match": ["perturbation"],
+        "cv": ["perturbation"],
+    },
+
 }
+

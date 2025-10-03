@@ -1,27 +1,29 @@
-__merge__: ../../api/comp_metric_regression.yaml
+__merge__: ../../api/comp_control_method.yaml
 
-name: recovery_2
-namespace: "metrics"
+name: spearman_corr
 info:
-  label: Recovery 2
-  summary: Calculates consistency in the recovery of perturbation across replica
+  label: Spearman correlation
+  summary: "Baseline based on correlation"
+  description: |
+    Baseline GRN inference method using Spearman correlation.
+
 
 resources:
   - type: python_script
     path: script.py
-  - path: helper.py
+
   - path: /src/utils/util.py
     dest: util.py
-      
 engines:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages: [ lightgbm==4.3.0, numpy==1.26.4 ]
+        packages: [  ]
+  - type: native
 runners:
   - type: executable
   - type: nextflow
     directives:
-      label: [ midtime, highmem, highcpu ]
+      label: [midtime, midmem, midcpu]

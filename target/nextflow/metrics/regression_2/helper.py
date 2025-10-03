@@ -12,7 +12,7 @@ from sklearn.model_selection import GroupKFold, LeaveOneGroupOut
 from sklearn.linear_model import Ridge
 from sklearn.metrics import r2_score, mean_squared_error
 
-from util import verbose_print, verbose_tqdm, read_prediction
+from util import verbose_print, verbose_tqdm, read_prediction, manage_layer
 
 
 SEED = 0xCAFE
@@ -163,54 +163,93 @@ def static_approach(
 
 
 def main(par: Dict[str, Any]) -> pd.DataFrame:
-    # Set global seed for reproducibility purposes
     random_state = SEED
     np.random.seed(random_state)
     random.seed(random_state)
     lightgbm.LGBMRegressor().set_params(random_state=random_state)
     
-    # Load perturbation data
+    # Load data
     prturb_adata = ad.read_h5ad(par['evaluation_data'])
+    layer = manage_layer(prturb_adata, par)
     gene_names = prturb_adata.var.index.to_numpy()
+    with open(par['regulators_consensus'], 'r') as f:
+        data = json.load(f)
+    print(len(data), len(gene_names))
+    
+    n_features_theta_min = np.asarray([data[gene_name]['0'] for gene_name in gene_names], dtype=int)
+    n_features_theta_median = np.asarray([data[gene_name]['0.5'] for gene_name in gene_names], dtype=int)
+    n_features_theta_max = np.asarray([data[gene_name]['1'] for gene_name in gene_names], dtype=int)
     n_genes = len(gene_names)
     
     net = read_prediction(par)
     
-    net_matrix = net_to_matrix(net, gene_names)
-
     n_cells = prturb_adata.shape[0]
     random_groups = np.random.choice(range(1, 5+1), size=n_cells, replace=True) # random sampling
     groups = LabelEncoder().fit_transform(random_groups)
 
     # Load and standardize perturbation data    
-    X = prturb_adata.layers[par['layer']]
-    
-    # X = RobustScaler().fit_transform(X)
+    X = prturb_adata.layers[layer]
     X = RobustScaler(with_centering=False).fit_transform(X)
 
-    # Load consensus numbers of putative regulators
-    with open(par['regulators_consensus'], 'r') as f:
-        data = json.load(f)
-    
-    n_features_theta_min = np.asarray([data[gene_name]['0'] for gene_name in gene_names], dtype=int)
-    n_features_theta_median = np.asarray([data[gene_name]['0.5'] for gene_name in gene_names], dtype=int)
-    n_features_theta_max = np.asarray([data[gene_name]['1'] for gene_name in gene_names], dtype=int)
-
-    # Load list of putative TFs
     tf_names = np.loadtxt(par['tf_all'], dtype=str)
     if par['apply_tf']==False:
         tf_names = gene_names
 
-    # Evaluate GRN
-    if (n_features_theta_min!=0).any()==False:
-        score_static_min = np.nan
+    # Check if group-specific evaluation is requested
+    if 'group_specific' in par and par['group_specific'] is not None:
+        # Group-specific evaluation
+        group_column = par['group_specific']
+        unique_groups = prturb_adata.obs[group_column].unique()
+        
+        scores_min_by_group = []
+        scores_median_by_group = []
+        scores_max_by_group = []
+        
+        for group in unique_groups:
+            print(f'Evaluating group: {group}', flush=True)
+            
+            # Subset evaluation data by group
+            group_mask = prturb_adata.obs[group_column] == group
+            X_group = X[group_mask, :]
+            groups_group = groups[group_mask]
+            
+            # Subset network if group name is in net (check if net has group-specific data)
+            net_group = net.copy()
+            if 'group' in net.columns and group in net['group'].values:
+                net_group = net[net['group'] == group]
+            
+            net_matrix_group = net_to_matrix(net_group, gene_names)
+            
+            # Evaluate GRN for this group
+            if (n_features_theta_min!=0).any()==False:
+                score_static_min = np.nan
+            else:
+                score_static_min = static_approach(net_matrix_group, n_features_theta_min, X_group, groups_group, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
+            
+            score_static_median = static_approach(net_matrix_group, n_features_theta_median, X_group, groups_group, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
+            score_static_max = static_approach(net_matrix_group, n_features_theta_max, X_group, groups_group, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
+            
+            scores_min_by_group.append(score_static_min)
+            scores_median_by_group.append(score_static_median)
+            scores_max_by_group.append(score_static_max)
+        
+        # Take the mean across groups
+        score_static_min = np.nanmean(scores_min_by_group)
+        score_static_median = np.nanmean(scores_median_by_group)
+        score_static_max = np.nanmean(scores_max_by_group)
+        
     else:
-        print(f'Static approach (theta=0):', flush=True)
-        score_static_min = static_approach(net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
-    print(f'Static approach (theta=.5):', flush=True)
-    score_static_median = static_approach(net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
-    print(f'Static approach (theta=1):', flush=True)
-    score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
+        net_matrix = net_to_matrix(net, gene_names)
+        # Original evaluation (no group-specific)
+        if (n_features_theta_min!=0).any()==False:
+            score_static_min = np.nan
+        else:
+            print(f'Static approach (theta=0):', flush=True)
+            score_static_min = static_approach(net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
+        print(f'Static approach (theta=.5):', flush=True)
+        score_static_median = static_approach(net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
+        print(f'Static approach (theta=1):', flush=True)
+        score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
 
     results = {
         'r2-theta-0.0': [float(score_static_min)],
