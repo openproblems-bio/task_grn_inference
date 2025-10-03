@@ -80,8 +80,7 @@ def parse_args(par):
     parser.add_argument('--evaluation_data', type=str)
     parser.add_argument('--ws_consensus', type=str)
     parser.add_argument('--ws_distance_background', type=str)
-
-
+    parser.add_argument('--group_specific', type=str)
 
    
     
@@ -133,32 +132,54 @@ def process_links(net, par):
     import numpy as np
     print('Original net shape: ', net.shape)
     if 'cell_type' in net.columns:
-        print('Prediction contains cell type specific links. Averaging weights across cell types.')
+        print('Prediction contains cell type specific links. ')
+    net_org = net.copy()
     cols = ["source", "target", "weight"]
+    supp_cols = []
+
+    if 'group_specific' in par and par['group_specific'] is not None:
+        if par['group_specific'] in net.columns:
+            supp_cols.append(par['group_specific'])
+            
     # Check for symmetric links
-    flipped = net.rename(columns={"source": "target", "target": "source"})
-    merged = net.merge(flipped, on=cols, how="inner")
-    if not merged.empty:
-        print("Warning: The network contains at least one symmetric link.")
-    # Remove duplicates
-    # net = net.drop_duplicates(subset=cols)
-    
-    # Remove self-loops
-    net["source"] = net["source"].astype(str)
-    net["target"] = net["target"].astype(str)
-    net = net[net["source"] != net["target"]]
-    
-    # Aggregate duplicates by mean weight
-    net["weight"] = pd.to_numeric(net["weight"], errors='coerce')
-    net = net.groupby(["source", "target"], as_index=False)["weight"].mean()
-    
-    print(f"Network shape after cleaning: {net.shape}")
-    # Limit the number of links
-    max_links = par.get("max_n_links", 50000)
-    # sort by absolute weight descending
-    net = net.reindex(net["weight"].abs().sort_values(ascending=False).index).head(max_links)
-    print(f"Network shape applying max_n_links: {net.shape}")
-    
+    def per_group_process(net):
+        flipped = net.rename(columns={"source": "target", "target": "source"})
+        merged = net.merge(flipped, on=cols, how="inner")
+        if not merged.empty:
+            print("Warning: The network contains at least one symmetric link.")
+        # Remove duplicates
+        # net = net.drop_duplicates(subset=cols)
+        
+        # Remove self-loops
+        net["source"] = net["source"].astype(str)
+        net["target"] = net["target"].astype(str)
+        net = net[net["source"] != net["target"]]
+        
+        # Aggregate duplicates by mean weight
+        net["weight"] = pd.to_numeric(net["weight"], errors='coerce')
+        net = net.groupby(["source", "target"], as_index=False)["weight"].mean()
+        
+        print(f"Network shape after cleaning: {net.shape}")
+        # Limit the number of links
+        max_links = par.get("max_n_links", 50000)
+        # sort by absolute weight descending
+        net = net.reindex(net["weight"].abs().sort_values(ascending=False).index).head(max_links)
+        print(f"Network shape applying max_n_links: {net.shape}")
+        return net
+
+    if len(supp_cols) == 0:
+        net = per_group_process(net)
+    else:
+        net_store = []
+        for sup_col in supp_cols:
+            net = net_org[net_org[par['group_specific']] == sup_col]
+            net = per_group_process(net)
+            net[par['group_specific']] = sup_col
+            net_store.append(net)
+        net = pd.concat(net_store)
+        net = net.reset_index(drop=True)
+        print(f"Final network shape after group-specific processing: {net.shape}")
+    # print(net)
     return net
 
 

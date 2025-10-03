@@ -506,8 +506,6 @@ def main(par):
     A = A[gene_mask, :][:, gene_mask]
     gene_names = gene_names[gene_mask]
 
-    # Filter genes based on GRN instead of HVGs
-    # Keep all genes that are present in the GRN (already filtered above)
     print(f"Using {len(gene_names)} genes present in the GRN")
     
     # Additional memory-aware gene filtering for very large GRNs

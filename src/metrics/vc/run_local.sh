@@ -41,11 +41,11 @@ for dataset in "${datasets[@]}"; do
             continue
         fi
 
-        echo -e "\nProcessing method: $method\n"
-        python src/metrics/vc/script.py \
-            --prediction "$prediction" \
-            --evaluation_data "$evaluation_data" \
-            --score "$score"
+        # echo -e "\nProcessing method: $method\n"
+        # python src/metrics/vc/script.py \
+        #     --prediction "$prediction" \
+        #     --evaluation_data "$evaluation_data" \
+        #     --score "$score"
 
         python -u - <<EOF
 import anndata as ad

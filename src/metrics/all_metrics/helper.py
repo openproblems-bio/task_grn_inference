@@ -13,18 +13,30 @@ from regression_2.helper import main as main_reg2
 from ws_distance.helper import main as main_ws_distance
 from sem.helper import main as main_sem
 from vc_v2.helper import main as main_vc_v2
+from vc.helper import main as main_vc
 
 
 def main(par):
     rr_store = []
+
     if True:
         try:
-            rr_vc = main_vc_v2(par)
+            rr_vc = main_vc(par)
         except Exception as e:
             print(f"Error in vc metrics: {e}")
             rr_vc = pd.DataFrame()
         print("vc done: ", rr_vc)
         rr_store.append(rr_vc)
+
+    
+    # if True:
+    #     try:
+    #         rr_vc = main_vc_v2(par)
+    #     except Exception as e:
+    #         print(f"Error in vc metrics: {e}")
+    #         rr_vc = pd.DataFrame()
+    #     print("vc done: ", rr_vc)
+    #     rr_store.append(rr_vc)
 
 
     # try:
