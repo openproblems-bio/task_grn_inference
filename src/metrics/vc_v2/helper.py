@@ -241,8 +241,8 @@ class SparseGRNLayer(torch.nn.Module):
         self.register_buffer('gene_indices', grn_connections[:, 0].long())  # Source gene indices
         self.register_buffer('tf_indices', grn_connections[:, 1].long())    # Target TF indices
         
-        # Trainable weights for each connection (normal NN training)
-        self.weights = torch.nn.Parameter(torch.randn(grn_connections.size(0)) * 0.1)
+        # Non-trainable weights for each connection (fixed GRN structure)
+        self.register_buffer('weights', torch.randn(grn_connections.size(0)) * 0.1)
         
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -257,7 +257,7 @@ class SparseGRNLayer(torch.nn.Module):
         gene_vals = x[:, self.gene_indices]  # Shape: (batch_size, n_connections)
         
         # Apply weights: (batch_size, n_connections)
-        weighted_vals = gene_vals * self.weights.unsqueeze(0)  # Broadcast weights
+        weighted_vals = gene_vals * self.weights  # Broadcast weights (non-trainable)
         
         # Initialize output tensor
         tf_output = torch.zeros(batch_size, self.n_tfs, dtype=x.dtype, device=x.device)
@@ -323,9 +323,8 @@ class Model(torch.nn.Module):
         # Create sparse GRN layer: genes -> TFs
         self.grn_layer = SparseGRNLayer(connections, self.n_genes, self.n_tfs)
         
-        # Initialize weights with GRN edge weights
-        with torch.no_grad():
-            self.grn_layer.weights.data = edge_weights
+        # Initialize weights with GRN edge weights (non-trainable)
+        self.grn_layer.weights.data = edge_weights
         
         self.perturbation_embedding = torch.nn.Embedding(n_perturbations, self.n_hidden)
         
@@ -516,7 +515,7 @@ def evaluate_model(model, train_data_loader, test_data_loader, model_name: str =
             residuals = torch.square(y - torch.mean(y, dim=0).unsqueeze(0)).cpu().data.numpy()
             ss_tot += np.sum(residuals, axis=0)
 
-    print(f"{model_name} - Best epoch: {best_epoch} (Loss: {best_val_loss:.4f})")
+    # print(f"{model_name} - Best epoch: {best_epoch} (Loss: {best_val_loss:.4f})")
     return best_ss_res, ss_tot
 
 
@@ -636,7 +635,7 @@ def main(par):
     results = []
     
     for i, (train_index, test_index) in enumerate(cv.split(X, X, cv_groups)):
-        print(f"\nCross-validation fold {i+1}/5")
+        # print(f"\nCross-validation fold {i+1}/5")
         
         # Center and scale dataset
         scaler = StandardScaler()

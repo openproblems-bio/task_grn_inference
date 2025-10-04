@@ -119,7 +119,7 @@ if [[ "$DATASET" =~ ^(replogle|parsescience|xaira_HEK293T|xaira_HCT116)$ ]]; the
   append_entry "$DATASET" "[scprint]" "true"
 elif [ "$DATASET" = "op" ] || [ "$DATASET" = "ibd" ]; then
   # append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint, figr, scenicplus, celloracle, granie, scglue]"
-  append_entry "$DATASET" "[ scenicplus]"
+  append_entry "$DATASET" "[ scenicplus, celloracle, geneformer]"
 
 else
   append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint]"

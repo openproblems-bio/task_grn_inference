@@ -14,6 +14,7 @@ set -e
 
 # aws s3 sync  s3://openproblems-data/resources/grn/grn_benchmark resources/grn_benchmark  --no-sign-request
 
+aws s3 sync  s3://openproblems-data/resources/grn/results/op resources/results/op  --no-sign-request
 
 # aws s3 sync  s3://openproblems-data/resources/grn/grn_models resources/grn_models --delete 
 # aws s3 sync  resources_test/ s3://openproblems-data/resources_test/grn/  --delete 
@@ -24,4 +25,4 @@ set -e
 # aws s3 sync  resources/grn_benchmark/prior s3://openproblems-data/resources/grn/grn_benchmark/prior --delete
 # aws s3 sync  resources/extended_data/ s3://openproblems-data/resources/grn/extended_data --delete
 # aws s3 sync resources/results/experiment  s3://openproblems-data/resources/grn/results/experiment --delete 
-aws s3 sync resources/supp_data  s3://openproblems-data/resources/grn/supp_data --delete 
+# aws s3 sync resources/supp_data  s3://openproblems-data/resources/grn/supp_data --delete 
