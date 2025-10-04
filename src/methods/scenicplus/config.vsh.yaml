@@ -45,17 +45,11 @@ engines:
   - type: docker
     image: janursa/scenicplus:29_03_2025
 
-    # setup:   
-    #   - type: python
-    #     packages: [ polars-lts-cpu ]
-    #     github:
-    #       - openproblems-bio/core#subdirectory=packages/python/openproblems
     setup:   
       - type: python
-        # packages: [ numba==0.56.4,  pynndescent==0.5.10 ]
+        packages: [ awscli]
         github:
           - openproblems-bio/core#subdirectory=packages/python/openproblems
-  # - type: native   
 runners:
   - type: executable
   - type: nextflow

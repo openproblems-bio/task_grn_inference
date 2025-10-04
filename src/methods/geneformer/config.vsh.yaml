@@ -1,0 +1,72 @@
+__merge__: /src/api/comp_method.yaml
+
+name: geneformer
+namespace: "grn_methods"
+
+info:
+  label: Geneformer
+  summary: Geneformer is a foundation transformer model pretrained on a large-scale corpus of single cell transcriptomes
+  description: |
+    Geneformer is a foundation transformer model pretrained on a large-scale
+    corpus of single cell transcriptomes to enable context-aware predictions in
+    net work biology. For this task, Geneformer is used to create a batch-corrected
+    cell embedding.
+  references:
+    doi:
+      - 10.1038/s41586-023-06139-9
+      - 10.1101/2024.08.16.608180
+  links:
+    documentation: https://geneformer.readthedocs.io/en/latest/index.html
+    repository: https://huggingface.co/ctheodoris/Geneformer
+  preferred_normalization: counts
+  variants:
+    Geneformer-V1-10M:
+      model: Geneformer-V1-10M
+    Geneformer-V2-104M:
+      model: Geneformer-V2-104M
+    Geneformer-V2-316M:
+      model: Geneformer-V2-316M
+arguments:
+  - name: --model
+    type: string
+    description: String representing the Geneformer model to use
+    choices:
+      - Geneformer-V1-10M
+      - Geneformer-V2-104M
+      - Geneformer-V2-316M
+    default: Geneformer-V2-104M
+  - name: --batch_size
+    type: integer
+    direction: input
+    default: 10
+  - name: --num_genes
+    type: integer
+    direction: input
+    default: 5000
+  - name: --max_cells
+    type: integer
+    direction: input
+    default: 2000
+
+resources:
+  - type: python_script
+    path: script.py
+  - path: /src/utils/util.py
+    dest: util.py
+
+engines:
+  - type: docker
+    image: openproblems/base_pytorch_nvidia:1
+    setup:
+      - type: python
+        pip:
+          - pyarrow<15.0.0a0,>=14.0.1
+          - huggingface_hub
+          - git+https://huggingface.co/ctheodoris/Geneformer.git
+
+runners:
+  - type: executable
+    docker_run_args: --gpus all
+  - type: nextflow
+    directives:
+      label: [midtime, midmem, midcpu, biggpu]
