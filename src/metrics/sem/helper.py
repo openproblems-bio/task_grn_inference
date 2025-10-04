@@ -112,9 +112,12 @@ def neumann_series(A: torch.Tensor, k: int = 2) -> torch.Tensor:
     Returns:
         Approximated inverse of I - A.
     """
-    B = torch.eye(A.shape[0], device=A.device, dtype=A.dtype)
-    for k in range(k):
-        B = B + torch.mm(B, A)
+    I = torch.eye(A.shape[0], device=A.device, dtype=A.dtype)
+    term = I.clone()
+    B = I.clone()
+    for _ in range(k):
+        term = term @ A
+        B = B + term
     return B
 
 
@@ -344,7 +347,6 @@ def main(par):
     print(f"Proportion of reporter genes: {np.mean(is_reporter)}")
     print(f"Use regulatory modes/signs: {use_signs}")
 
-    # Create a symmetric (causally-wrong) baseline GRN
     print(f"Creating baseline GRN")
     A_baseline = np.copy(A)
     for j in range(A_baseline.shape[1]):
