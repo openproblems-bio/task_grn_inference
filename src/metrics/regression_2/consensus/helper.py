@@ -13,6 +13,7 @@ def main(par):
     # Load perturbation data
     adata_rna = anndata.read_h5ad(par['evaluation_data'])
     gene_names = adata_rna.var_names
+    
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
 
     # Load inferred GRNs
