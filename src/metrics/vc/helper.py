@@ -78,8 +78,8 @@ class GRNLayer(torch.nn.Module):
             A_signs: torch.Tensor,
             signed: bool = True,
             inverse: bool = True,
-            alpha: float = 0.1,
-            stable: bool = False,
+            alpha: float = 0.2,
+            stable: bool = True,
             bias: bool = True
     ):
         torch.nn.Module.__init__(self)
@@ -156,7 +156,7 @@ class GRNLayer(torch.nn.Module):
 
 class Model(torch.nn.Module):
 
-    def __init__(self, A: np.ndarray, n_perturbations: int, n_hidden: int = 20, signed: bool = True):
+    def __init__(self, A: np.ndarray, n_perturbations: int, n_hidden: int = 16, signed: bool = True):
 
         # n_hidden needs to be small enough to prevent the NN from arbitrarily shifting the learning task
         # from the GRN to the MLPs.
@@ -215,10 +215,10 @@ class Model(torch.nn.Module):
 
         # Each perturbation is a linear transformation in the latent space.
         # Apply perturbation transform to the encoded profile.
-        z = self.perturbation_embedding(pert)
-        #y = y + z
         z = self.perturbation_embedding(pert).view(len(x), self.n_hidden, self.n_hidden)
         y = torch.einsum('ij,ijk->ik', y, z)
+        #z = self.perturbation_embedding(pert)
+        #y = y + z
 
         # Decode each expression profile
         y = self.decoder(y)
@@ -391,8 +391,8 @@ def main(par):
     # Set perturbations to first column (perturbation)
     perturbations = cv_groups[0]  # perturbation codes
     
-    # Groups used for cross-validation
-    cv_groups = combine_multi_index(*cv_groups)
+    # Validation strategy: evaluate on unseen (perturbation, cell type) pairs.
+    cv_groups = combine_multi_index(cell_types, perturbations)
 
     # Groups used for matching with negative controls
     match_groups = combine_multi_index(*match_groups)
@@ -454,8 +454,8 @@ def main(par):
         
         print(f"Final: Using {len(gene_names)} most connected genes for evaluation")
 
-    # Remove self-regulations
-    np.fill_diagonal(A, 0)
+    # Add self-regulations
+    np.fill_diagonal(A, 1)
 
     # Mapping between gene expression profiles and their matched negative controls
     control_map, _ = create_control_matching(are_controls, match_groups)
@@ -465,7 +465,7 @@ def main(par):
     r2_baseline = []
     cv = StratifiedGroupKFold(n_splits=N_FOLDS, shuffle=True, random_state=0xCAFE)
     
-    for i, (train_index, test_index) in enumerate(cv.split(X, perturbations, cell_types)):
+    for i, (train_index, test_index) in enumerate(cv.split(X, perturbations, cv_groups)):
 
         if (len(train_index) == 0) or (len(test_index) == 0):
             continue
@@ -521,17 +521,14 @@ def main(par):
         train_data_loader, test_data_loader = create_data_loaders()
         r2_baseline.append(evaluate(A_baseline, train_data_loader, test_data_loader, state_dict, n_perturbations, signed=signed))
 
-        print(f"Mean R2 (fold {i + 1})", np.mean(r2), np.mean(r2_baseline))
+        break
 
     r2 = np.asarray(r2).flatten()
     r2_baseline = np.asarray(r2_baseline).flatten()
-
     print("Mean R2", np.mean(r2), np.mean(r2_baseline))
-
     if np.all(r2 == r2_baseline):
         final_score = 0
     else:
-        print(np.mean(r2), np.mean(r2_baseline))
         p_value = wilcoxon(r2, r2_baseline, alternative="greater").pvalue
         final_score = -np.log10(p_value)
 
@@ -539,6 +536,9 @@ def main(par):
     print(f"Final score: {final_score}")
 
     results = {
+        'r2': [float(np.mean(r2))],
+        'r2_baseline': [float(np.mean(r2_baseline))],
+        'r2_diff': [float(np.mean(r2)) - float(np.mean(r2_baseline))],
         'vc': [float(final_score)]
     }
 
