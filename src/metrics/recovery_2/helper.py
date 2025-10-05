@@ -36,7 +36,9 @@ def evaluate_grn(
         C: np.ndarray,
         A: np.ndarray,
         n_tfs: Optional[int] = None,
-        max_targets_per_tf: Optional[int] = None
+        max_targets_per_tf: Optional[int] = None,
+        tf_tg: bool = True,
+        tg_tg: bool = True
 ) -> float:
     """
     Evaluate a specific setting (recall, balanced, or precision)
@@ -45,6 +47,7 @@ def evaluate_grn(
     # Compute the min and max correlation coefficients across groups
     C_min = np.min(C, axis=0)
     C_max = np.max(C, axis=0)
+    consistency_scores = 2 - (C_max - C_min)
     
     # Filter TFs if specified (keep the TFs with the most target genes)
     if n_tfs is None:
@@ -78,9 +81,12 @@ def evaluate_grn(
                 # the consistency scores.
                 weights = np.abs(A[j, tg_idx])
                 weights /= np.sum(weights)
-                consistency_scores = 2 - (C_max[j, tg_idx] - C_min[j, tg_idx])
-                tf_score = float(np.sum(weights * consistency_scores))
-                scores.append(tf_score)
+                overall_score = 0.0
+                if tf_tg:
+                    overall_score += float(np.sum(weights * consistency_scores[j, tg_idx]))
+                if tg_tg:
+                    overall_score += float(np.sum(weights * np.mean(consistency_scores[tg_idx, :][:, tg_idx], axis=0)))
+                scores.append(overall_score)
 
         else:
             scores.append(np.nan)
@@ -204,6 +210,7 @@ def main(par):
         # 1. Recall setting: all TFs, all target genes (no filtering)
         recall_results.append(evaluate_setting(
             C, A, "recall",
+            tf_tg=True, tg_tg=True,
             n_tfs=None,  # Use all TFs
             max_targets_per_tf=None  # Use all target genes (up to default limit)
         ))
@@ -211,6 +218,7 @@ def main(par):
         # 2. Balanced setting: top 100 TFs, top 100 target genes
         balanced_results.append(evaluate_setting(
             C, A, "balanced",
+            tf_tg=True, tg_tg=True,
             n_tfs=100, 
             max_targets_per_tf=100
         ))
@@ -218,6 +226,7 @@ def main(par):
         # 3. Precision setting: top 40 TFs, top 40 target genes
         precision_results.append(evaluate_setting(
             C, A, "precision",
+            tf_tg=True, tg_tg=True,
             n_tfs=40, 
             max_targets_per_tf=40
         ))
