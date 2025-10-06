@@ -16,6 +16,7 @@ workflow run_wf {
   metrics = [
     regression_2,
     ws_distance,
+    tf_recovery,
     sem
   ]
     

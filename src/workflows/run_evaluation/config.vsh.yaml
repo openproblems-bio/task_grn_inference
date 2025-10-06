@@ -106,6 +106,7 @@ dependencies:
   - name: metrics/regression_2 
   - name: metrics/ws_distance
   - name: metrics/sem
+  - name: metrics/tf_recovery
   - name: utils/extract_uns_metadata
     repository: openproblems
 

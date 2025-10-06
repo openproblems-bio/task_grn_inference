@@ -13,7 +13,7 @@ from regression_2.helper import main as main_reg2
 from ws_distance.helper import main as main_ws_distance
 from sem.helper import main as main_sem
 from vc_v2.helper import main as main_vc_v2
-from vc.helper import main as main_vc
+from tf_recovery import main as main_tf_rec
 
 
 def main(par):
@@ -21,12 +21,12 @@ def main(par):
 
     if True:
         try:
-            rr_vc = main_vc(par)
+            tf_rec = main_tf_rec(par)
         except Exception as e:
-            print(f"Error in vc metrics: {e}")
-            rr_vc = pd.DataFrame()
-        print("vc done: ", rr_vc)
-        rr_store.append(rr_vc)
+            print(f"Error in main_tf_rec metrics: {e}")
+            tf_rec = pd.DataFrame()
+        print("tf_rec done: ", tf_rec)
+        rr_store.append(tf_rec)
 
     
     # if True:

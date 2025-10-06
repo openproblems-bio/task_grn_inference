@@ -81,6 +81,7 @@ def parse_args(par):
     parser.add_argument('--ws_consensus', type=str)
     parser.add_argument('--ws_distance_background', type=str)
     parser.add_argument('--group_specific', type=str)
+    parser.add_argument('--evaluation_data_de', type=str)
 
    
     
