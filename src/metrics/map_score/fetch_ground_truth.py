@@ -2,30 +2,25 @@ import pandas as pd
 import os
 import urllib.request
 
-GENOME = 'hg38'
-LOCAL_PATH = './data/chip_atlas/'
-FILE_LIST = 'fileList.tab'
-FILE_LIST_URL = f'https://chip-atlas.dbcls.jp/data/metadata/{FILE_LIST}'
-PEAKS_URL = f'https://chip-atlas.dbcls.jp/data/{GENOME}/assembled/'
-TSS_FILE = 'refGene.txt.gz'
-TSS_URL = f'https://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/{TSS_FILE}'
-
-def get_peak_file_name(celltype, qval="50"):
-    file_path = os.path.join(LOCAL_PATH, FILE_LIST)
+def get_peak_file_name(celltype, genome, local_path, qval):
+    FILE_LIST = 'fileList.tab'
+    FILE_LIST_URL = f'https://chip-atlas.dbcls.jp/data/metadata/{FILE_LIST}'
+    file_path = os.path.join(local_path, FILE_LIST)
     if not os.path.exists(file_path):
-        os.makedirs(LOCAL_PATH, exist_ok=True)
+        os.makedirs(local_path, exist_ok=True)
         print(f'Downloading {FILE_LIST} from {FILE_LIST_URL} to {file_path}')
         urllib.request.urlretrieve(FILE_LIST_URL, file_path)
     df = pd.read_csv(file_path, sep='\t', header=None, dtype=str, comment='#', usecols=range(7))
     ct = str(celltype).strip().casefold()
     s_ct = df.iloc[:, 5].fillna('').str.strip().str.casefold()
-    return df[(df[1] == GENOME) & (df[2] == "TFs and others") & (df[6] == qval) & (s_ct == ct)][0].iloc[0]
+    return df[(df[1] == genome) & (df[2] == "TFs and others") & (df[6] == qval) & (s_ct == ct)][0].iloc[0]
 
-def download_peaks_for_celltype(celltype):
-    filename = get_peak_file_name(celltype)
-    peaks_path = os.path.join(LOCAL_PATH, filename + '.bed')
+def download_peaks_for_celltype(celltype, genome, local_path, qval):
+    filename = get_peak_file_name(celltype, genome, local_path, qval)
+    peaks_path = os.path.join(local_path, filename + '.bed')
     if not os.path.exists(peaks_path):
-        os.makedirs(LOCAL_PATH, exist_ok=True)
+        os.makedirs(local_path, exist_ok=True)
+        PEAKS_URL = f'https://chip-atlas.dbcls.jp/data/{genome}/assembled/'
         peaks_url = PEAKS_URL + filename + '.bed'
         print(f'Downloading peaks from {peaks_url} to {peaks_path}')
         urllib.request.urlretrieve(peaks_url, peaks_path)
@@ -56,10 +51,12 @@ def subset_peaks_by_tf(peaks_df, tf_name):
     mask = peaks_df['metadata'].str.contains(tf_pattern, na=False)
     return peaks_df[mask][['chromosome', 'start', 'end']].reset_index(drop=True)
 
-def genes_with_peaks_near_tss(peaks_df, window_bp=1000):
+def genes_with_peaks_near_tss(peaks_df, local_path, window_bp=1000):
     if peaks_df is None or len(peaks_df) == 0:
         return []
-    TSS_PATH = os.path.join(LOCAL_PATH, TSS_FILE)
+    TSS_FILE = 'refGene.txt.gz'
+    TSS_URL = f'https://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/{TSS_FILE}'
+    TSS_PATH = os.path.join(local_path, TSS_FILE)
     if not os.path.exists(TSS_PATH):
         os.makedirs(os.path.dirname(TSS_PATH), exist_ok=True)
         print(f'Downloading TSS (refGene) from {TSS_URL} to {TSS_PATH}')
@@ -104,19 +101,20 @@ def genes_with_peaks_near_tss(peaks_df, window_bp=1000):
                 hits.append(row['gene'])
     return sorted(set(hits))
 
-def build_celltype_grn(cell_type, window_bp=1000):
+def build_celltype_grn(cell_type, genome='hg38', local_path='./data/chip_atlas/', window_bp=1000, qval="50"):
+
     safe_ct = str(cell_type).strip().replace(' ', '_')
-    output_csv_path = LOCAL_PATH + f'grn_{safe_ct}_{GENOME}.csv'
+    output_csv_path = local_path + f'grn_{safe_ct}_{genome}_{window_bp}bp.csv'
     if os.path.exists(output_csv_path):
         return output_csv_path
-    peaks_df = download_peaks_for_celltype(cell_type)
+    peaks_df = download_peaks_for_celltype(cell_type, genome, local_path, qval)
     tfs = get_tfs_from_peaks(peaks_df)
     rows = []
     for tf in tfs:
         peaks = subset_peaks_by_tf(peaks_df, tf)
         if peaks is None or len(peaks) == 0:
             continue
-        genes = genes_with_peaks_near_tss(peaks, window_bp=window_bp)
+        genes = genes_with_peaks_near_tss(peaks, local_path, window_bp=window_bp)
         if not genes:
             continue
         rows.extend({'source': tf, 'target': g} for g in genes)
