@@ -238,7 +238,7 @@ def run_cistopic(par):
             '--ucsc', 'hg38'
         ], check=True)
     else:
-        aws_path = 's3://openproblems-data/resources/grn/resources/supp_data/tss_h38.bed'
+        aws_path = 's3://openproblems-data/resources/grn/supp_data/tss_h38.bed'
         command = f'aws s3 cp {aws_path} {tss_bed} --no-sign-request'
         subprocess.run(command, shell=True, check=True)
     print('get tss completed', flush=True)

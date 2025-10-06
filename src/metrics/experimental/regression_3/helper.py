@@ -142,9 +142,9 @@ def main(par):
         X_test = X[~mask, :]
 
         # Standardize features
-        scaler = StandardScaler()
-        X_train = scaler.fit_transform(X_train)
-        X_test = scaler.transform(X_test)
+        #scaler = StandardScaler()
+        #X_train = scaler.fit_transform(X_train)
+        #X_test = scaler.transform(X_test)
 
         for j in tqdm.tqdm(range(X_train.shape[1])):
 

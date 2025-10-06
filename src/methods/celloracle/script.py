@@ -49,7 +49,7 @@ if __name__ == '__main__':
 
     print('Write output to file', flush=True)
     net['weight'] = net['weight'].astype(str)
-    output = ad.AnnData(X=None, uns={"method_id": 'celloracle', "dataset_id": dataset_id, "prediction": net[["source", "target", "weight"]]})
+    output = ad.AnnData(X=None, uns={"method_id": 'celloracle', "dataset_id": dataset_id, "prediction": net})
     output.write(par['prediction'])
 
 
