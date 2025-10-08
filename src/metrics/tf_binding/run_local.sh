@@ -39,11 +39,11 @@ for dataset in "${datasets[@]}"; do
         fi
 
         echo -e "\nProcessing method: $method\n"
-        # python src/metrics/tf_binding/script.py \
-        #     --prediction "$prediction" \
-        #     --evaluation_data "$evaluation_data" \
-        #     --ground_truth "resources/grn_benchmark/ground_truth/K562.csv" \
-        #     --score "$score"
+        python src/metrics/tf_binding/script.py \
+            --prediction "$prediction" \
+            --evaluation_data "$evaluation_data" \
+            --ground_truth "resources/grn_benchmark/ground_truth/K562.csv" \
+            --score "$score"
 
         # Extract metrics from the .h5ad and append to CSV
         python -u - <<EOF

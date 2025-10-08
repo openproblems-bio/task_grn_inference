@@ -23,7 +23,7 @@ arguments:
     type: string
     direction: input
     required: false
-    default: X_norm
+    default: lognorm
   - name: --max_n_links
     type: integer
     default: 50000

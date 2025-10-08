@@ -12,7 +12,7 @@ arguments:
     direction: input
     must_exist: false
     required: false
-    example: resources_test/grn_benchmark/evaluation_data/replogle_de.csv 
+    example: resources_test/grn_benchmark/evaluation_data/replogle_de.h5ad 
 
 
 resources:
@@ -28,7 +28,7 @@ engines:
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages: [ decoupler]
+        packages: [ decoupler==1.7.0]
 runners:
   - type: executable
   - type: nextflow

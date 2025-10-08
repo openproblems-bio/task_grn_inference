@@ -46,7 +46,7 @@ arguments:
   - name: --layer
     type: string
     direction: input
-    default: X_norm
+    default: lognorm
   - name: --seed
     type: integer
     direction: input
