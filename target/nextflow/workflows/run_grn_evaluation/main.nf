@@ -3276,7 +3276,7 @@ meta = [
       }
     },
     {
-      "name" : "metrics/sem",
+      "name" : "metrics/tf_recovery",
       "repository" : {
         "type" : "local"
       }
@@ -3354,7 +3354,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.4",
-    "git_commit" : "cd7b29c7789773da6882898a3bec3057f01842c2",
+    "git_commit" : "f5628fc0dc4321867c2562c990715151d434ec97",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3456,7 +3456,7 @@ meta = [
 meta["root_dir"] = getRootDir()
 include { regression_2 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_2/main.nf"
 include { ws_distance } from "${meta.resources_dir}/../../../nextflow/metrics/ws_distance/main.nf"
-include { sem } from "${meta.resources_dir}/../../../nextflow/metrics/sem/main.nf"
+include { tf_recovery } from "${meta.resources_dir}/../../../nextflow/metrics/tf_recovery/main.nf"
 include { extract_uns_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
 
 // inner workflow
@@ -3479,7 +3479,7 @@ workflow run_wf {
   metrics = [
     regression_2,
     ws_distance,
-    sem
+    tf_recovery
   ]
     
   /***************************

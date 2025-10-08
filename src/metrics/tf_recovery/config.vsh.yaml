@@ -1,0 +1,36 @@
+__merge__: ../../api/comp_metric_regression.yaml
+
+name: tf_recovery
+namespace: "metrics"
+info:
+  label: TF recovery
+  summary: Calculates TF activity for perturbations and determines recovery performance
+
+arguments:
+  - name: --evaluation_data_de
+    type: file
+    direction: input
+    must_exist: false
+    required: false
+    example: resources_test/grn_benchmark/evaluation_data/replogle_de.h5ad 
+
+
+resources:
+  - type: python_script
+    path: script.py
+  - path: helper.py
+  - path: /src/utils/util.py
+    dest: util.py
+
+engines:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    __merge__: /src/api/base_requirements.yaml
+    setup:
+      - type: python
+        packages: [ decoupler==1.7.0]
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [ midtime, highmem, highcpu ]

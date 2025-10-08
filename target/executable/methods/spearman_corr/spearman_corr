@@ -456,9 +456,9 @@ RUN pip install --upgrade pip && \
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component methods spearman_corr"
-LABEL org.opencontainers.image.created="2025-10-03T15:24:59Z"
+LABEL org.opencontainers.image.created="2025-10-08T10:57:19Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="cd7b29c7789773da6882898a3bec3057f01842c2"
+LABEL org.opencontainers.image.revision="f5628fc0dc4321867c2562c990715151d434ec97"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -610,7 +610,7 @@ function ViashHelp {
   echo ""
   echo "    --layer"
   echo "        type: string"
-  echo "        default: X_norm"
+  echo "        default: lognorm"
   echo ""
   echo "    --seed"
   echo "        type: integer"
@@ -1011,7 +1011,7 @@ if [ -z ${VIASH_PAR_TEMP_DIR+x} ]; then
   VIASH_PAR_TEMP_DIR="output/temdir"
 fi
 if [ -z ${VIASH_PAR_LAYER+x} ]; then
-  VIASH_PAR_LAYER="X_norm"
+  VIASH_PAR_LAYER="lognorm"
 fi
 if [ -z ${VIASH_PAR_SEED+x} ]; then
   VIASH_PAR_SEED="32"

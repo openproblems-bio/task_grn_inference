@@ -81,6 +81,8 @@ def parse_args(par):
     parser.add_argument('--ws_consensus', type=str)
     parser.add_argument('--ws_distance_background', type=str)
     parser.add_argument('--group_specific', type=str)
+    parser.add_argument('--evaluation_data_de', type=str)
+    parser.add_argument('--ground_truth', type=str)
 
    
     
@@ -166,12 +168,14 @@ def process_links(net, par):
         net = net.reindex(net["weight"].abs().sort_values(ascending=False).index).head(max_links)
         print(f"Network shape applying max_n_links: {net.shape}")
         return net
-
+    print('Supplementary columns for grouping:', supp_cols)
     if len(supp_cols) == 0:
         net = per_group_process(net)
     else:
+        print('Processing group-specific networks for:', supp_cols)
         net_store = []
         for sup_col in supp_cols:
+            print(f"Processing group: {sup_col}")
             net = net_org[net_org[par['group_specific']] == sup_col]
             net = per_group_process(net)
             net[par['group_specific']] = sup_col
