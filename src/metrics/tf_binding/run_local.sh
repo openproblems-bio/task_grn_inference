@@ -16,16 +16,16 @@ save_dir="output/tf_binding"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=('replogle' 'norman' 'adamson' ) #"300BCG" "ibd" 'parsebioscience''op' "300BCG" 'parsebioscience' 
+datasets=('replogle' 'norman' 'adamson') #"300BCG" "ibd" 'parsebioscience''op' "300BCG" 'parsebioscience' 
 # methods to process
 methods=("negative_control" "pearson_corr" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
 
-# temporary file to collect CSV rows
-combined_csv="${save_dir}/tf_binding_scores.csv"
-echo "dataset,method,metric,value" > "$combined_csv"
-
 for dataset in "${datasets[@]}"; do
     echo -e "\n\nProcessing dataset: $dataset\n"
+    
+    # Create separate CSV file for each dataset
+    dataset_csv="${save_dir}/tf_binding_scores_${dataset}.csv"
+    echo "dataset,method,metric,value" > "$dataset_csv"
 
     evaluation_data="resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad"
 
@@ -39,13 +39,30 @@ for dataset in "${datasets[@]}"; do
         fi
 
         echo -e "\nProcessing method: $method\n"
-        python src/metrics/tf_binding/script.py \
-            --prediction "$prediction" \
-            --evaluation_data "$evaluation_data" \
-            --ground_truth "resources/grn_benchmark/ground_truth/K562.csv" \
-            --score "$score"
+        # python src/metrics/tf_binding/script.py \
+        #     --prediction "$prediction" \
+        #     --evaluation_data "$evaluation_data" \
+        #     --ground_truth "resources/grn_benchmark/ground_truth/K562.csv" \
+        #     --score "$score"
+
+        # Extract metrics from the .h5ad and append to CSV
+        python -u - <<EOF
+import anndata as ad
+import pandas as pd
+
+adata = ad.read_h5ad("${score}")
+if "metric_values" in adata.uns:
+    metric_names = adata.uns["metric_ids"]
+    metric_values = adata.uns["metric_values"]
+    df = pd.DataFrame({"metric": metric_names, "value": metric_values})
+    df["dataset"] = "${dataset}"
+    df["method"] = "${method}"
+    df = df[["dataset", "method", "metric", "value"]]  # Reorder columns to match header
+    df.to_csv("${dataset_csv}", mode="a", header=False, index=False)
+EOF
 
     done
+    echo -e "\nResults for dataset $dataset collected in: $dataset_csv"
 done
 
-echo -e "\nAll results collected in: $combined_csv"
+echo -e "\nAll dataset results saved in separate CSV files in: $save_dir"

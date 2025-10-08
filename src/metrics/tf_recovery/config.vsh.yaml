@@ -6,7 +6,15 @@ info:
   label: TF recovery
   summary: Calculates TF activity for perturbations and determines recovery performance
 
-  
+arguments:
+  - name: --evaluation_data_de
+    type: file
+    direction: input
+    must_exist: false
+    required: false
+    example: resources_test/grn_benchmark/evaluation_data/replogle_de.csv 
+
+
 resources:
   - type: python_script
     path: script.py
