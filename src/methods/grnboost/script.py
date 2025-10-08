@@ -27,7 +27,7 @@ try:
 except:
     meta = {
       'util_dir': 'src/utils',
-      'helper_dir': 'src/methods/single_omics/grnboost2',
+      'helper_dir': 'src/methods/grnboost2',
     }
     sys.path.append(meta["util_dir"])
     sys.path.append(meta["helper_dir"])

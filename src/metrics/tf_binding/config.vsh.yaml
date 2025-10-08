@@ -1,0 +1,38 @@
+__merge__: ../../api/comp_metric.yaml
+
+name: tf_binding
+namespace: "metrics"
+info:
+  label: TF binding
+  summary: Calculates TF binding scores for a given GRN and dataset
+  description: |
+    Calculates TF binding scores for a given GRN and dataset
+  
+arguments:
+  - name: --ground_truth
+    type: file
+    direction: input
+    must_exist: false
+    required: false
+    example: resources_test/grn_benchmark/ground_truth/PBMC.csv 
+
+  
+resources:
+  - type: python_script
+    path: script.py
+  - path: /src/utils/util.py
+    dest: util.py
+  - path: helper.py
+  
+engines:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    __merge__: /src/api/base_requirements.yaml
+    setup:
+      - type: python
+        packages: [numpy==1.26.4 ]
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [ midtime, midmem, midcpu ]
