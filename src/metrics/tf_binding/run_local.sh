@@ -16,7 +16,7 @@ save_dir="output/tf_binding"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=('op' "300BCG" 'parsebioscience' ) #"300BCG" "ibd" 'parsebioscience'
+datasets=('replogle' 'norman' 'adamson' ) #"300BCG" "ibd" 'parsebioscience''op' "300BCG" 'parsebioscience' 
 # methods to process
 methods=("negative_control" "pearson_corr" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
 
@@ -42,7 +42,7 @@ for dataset in "${datasets[@]}"; do
         python src/metrics/tf_binding/script.py \
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
-            --ground_truth "resources/grn_benchmark/ground_truth/PBMC.csv" \
+            --ground_truth "resources/grn_benchmark/ground_truth/K562.csv" \
             --score "$score"
 
     done

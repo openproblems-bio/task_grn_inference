@@ -121,13 +121,13 @@ def build_celltype_grn(cell_type, genome='hg38', local_path='./data/chip_atlas/'
     
     return grn
 if __name__ == '__main__':
-    # Example usage
-    cell_type = 'PBMC'
     genome = 'hg38'
     local_path = 'resources/chip_atlas/'
-    output_csv_path = f'resources/grn_benchmark/ground_truth/{cell_type}.csv'
-    os.makedirs(local_path, exist_ok=True)
-    window_bp = 1000
-    qval = "50"
-    grn = build_celltype_grn(cell_type, genome, local_path, window_bp, qval)
-    grn.to_csv(output_csv_path, index=False)
+    for cell_type in ['K-562']: #'PBMC'
+        
+        output_csv_path = f'resources/grn_benchmark/ground_truth/{cell_type.replace("-", "")}.csv'
+        os.makedirs(local_path, exist_ok=True)
+        window_bp = 1000
+        qval = "50"
+        grn = build_celltype_grn(cell_type, genome, local_path, window_bp, qval)
+        grn.to_csv(output_csv_path, index=False)

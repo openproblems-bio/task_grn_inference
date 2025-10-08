@@ -1,4 +1,4 @@
-__merge__: ../../api/comp_metric_ws.yaml
+__merge__: ../../api/comp_metric.yaml
 
 name: tf_binding
 namespace: "metrics"

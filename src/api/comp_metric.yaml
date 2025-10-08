@@ -31,7 +31,11 @@ arguments:
     type: integer
     default: 2
     direction: input
-
+  - name: --tf_all
+    type: file
+    direction: input
+    required: true
+    example: resources_test/grn_benchmark/prior/tf_all.csv
   - name: --num_workers
     type: integer
     direction: input

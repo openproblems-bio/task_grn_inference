@@ -8,12 +8,6 @@ info:
     summary: A regression metric to evaluate the performance of the inferred GRN
 
 arguments: 
-
-  - name: --tf_all
-    type: file
-    direction: input
-    required: true
-    example: resources_test/grn_benchmark/prior/tf_all.csv
   - name: --reg_type
     type: string
     direction: input
