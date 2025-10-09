@@ -7,7 +7,6 @@ import h5py
 import numpy as np
 import pandas as pd
 import tqdm
-import xgboost
 from scipy.sparse.linalg import LinearOperator
 from scipy.stats import pearsonr, spearmanr, wilcoxon, ConstantInputWarning
 from scipy.sparse import csr_matrix
@@ -52,8 +51,7 @@ def compute_residual_correlations(
         y_test: np.ndarray,
         Z_test: np.ndarray
 ) -> np.ndarray:
-    model = xgboost.XGBRegressor(n_estimators=10)
-    #model = Ridge(alpha=10)
+    model = Ridge(alpha=10)
     model.fit(X_train, y_train)
     y_hat = model.predict(X_test)
     residuals = y_test - y_hat
@@ -122,19 +120,29 @@ def main(par):
     A = A[gene_mask, :][:, gene_mask]
     gene_names = gene_names[gene_mask]
 
+    # Whether or not to take into account the regulatory modes (enhancer/inhibitor)
+    signed = np.any(A < 0)
+
     # Remove self-regulations
     np.fill_diagonal(A, 0)
     print(f"Evaluating {X.shape[1]} genes with {np.sum(A != 0)} regulatory links")
 
-    # Create baseline model
-    A_baseline = np.copy(A)
-    for j in range(A.shape[1]):
-        np.random.shuffle(A_baseline[:j, j])
-        np.random.shuffle(A_baseline[j+1:, j])
-    assert np.any(A_baseline != A)
-
-    scores, baseline_scores = [], []
+    overall_scores = []
     for group in np.unique(anchor_encoded):
+        scores, baseline_scores = [], []
+
+        # Create baseline model: for each TG, shuffle the TFs
+        A_baseline = np.copy(A)
+        if signed:
+            A_baseline *= (2 * (np.random.randint(0, 2) - 0.5))
+        tf_mask = np.any(A_baseline != 0, axis=1)
+        for j in range(A.shape[1]):
+            mask = np.copy(tf_mask)
+            mask[j] = False
+            if np.any(mask):
+                values = np.copy(A_baseline[mask, j])
+                np.random.shuffle(values)
+                A_baseline[mask, j] = values
 
         # Train/test split
         mask = (anchor_encoded != group)
@@ -142,9 +150,9 @@ def main(par):
         X_test = X[~mask, :]
 
         # Standardize features
-        #scaler = StandardScaler()
-        #X_train = scaler.fit_transform(X_train)
-        #X_test = scaler.transform(X_test)
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
 
         for j in tqdm.tqdm(range(X_train.shape[1])):
 
@@ -164,32 +172,30 @@ def main(par):
                 )
                 scores.append(np.mean(coefs))
 
-            # Evaluate baseline GRN
-            selected = (A_baseline[:, j] != 0)
-            unselected = ~np.copy(selected)
-            unselected[j] = False
-            coefs = compute_residual_correlations(
-                X_train[:, selected],
-                X_train[:, j],
-                X_test[:, selected],
-                X_test[:, j],
-                X_test[:, ~selected]
-            )
-            baseline_scores.append(np.mean(coefs))
-    scores = np.array(scores)
-    baseline_scores = np.array(baseline_scores)
+                # Evaluate baseline GRN
+                selected = (A_baseline[:, j] != 0)
+                coefs = compute_residual_correlations(
+                    X_train[:, selected],
+                    X_train[:, j],
+                    X_test[:, selected],
+                    X_test[:, j],
+                    X_test[:, ~selected]
+                )
+                baseline_scores.append(np.mean(coefs))
 
-    p_value = wilcoxon(baseline_scores, scores, alternative="greater").pvalue
-    p_value = max(p_value, 1e-300)
+        # Compute fold score
+        p_value = wilcoxon(baseline_scores, scores, alternative="greater").pvalue
+        p_value = max(p_value, 1e-300)
+        overall_scores.append(-np.log10(p_value))
 
     # Calculate final score
-    final_score = -np.log10(p_value)
-    print(f"Anchor Regression Score: {final_score:.6f}")
+    final_score = np.mean(overall_scores)
+    print(f"Regression Score: {final_score:.6f}")
     print(f"Method: {method_id}")
 
     # Return results as DataFrame
     results = {
-        'regression_3': [final_score]
+        'regression_3': [float(final_score)]
     }
 
     df_results = pd.DataFrame(results)

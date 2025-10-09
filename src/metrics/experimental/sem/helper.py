@@ -23,7 +23,7 @@ DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 NUMPY_DTYPE = np.float32
 
 # Hyper-parameters
-MAX_N_ITER = 2000
+MAX_N_ITER = 500
 
 # For reproducibility purposes
 seed = 0xCAFE
@@ -181,7 +181,7 @@ def evaluate_grn(
     F = np.linalg.inv(np.eye(A.shape[0]) - A)
     F_CR = F[np.ix_(regulator_idx, reporter_idx)]
     Y_R = delta_X[:, reporter_idx]
-    lam = 0.1
+    lam = 0.001
     I = np.eye(len(regulator_idx), dtype=delta_X.dtype)
     M = F_CR @ F_CR.T + lam * I
     delta = np.zeros_like(delta_X)
@@ -210,8 +210,8 @@ def evaluate_grn(
         A_eff = torch.abs(A) * signs if signed else A * mask
         delta_X_hat = solve_sem(A_eff, delta_train)
         loss = torch.mean(torch.sum(torch.square(X_non_reporter - delta_X_hat[:, ~is_reporter]), dim=1))
-        loss = loss + 0.1 * torch.sum(torch.abs(A))
-        loss = loss + 0.1 * torch.sum(torch.square(A))
+        loss = loss + 0.001 * torch.sum(torch.abs(A))
+        loss = loss + 0.001 * torch.sum(torch.square(A))
         pbar.set_description(str(loss.item()))
 
         # Keep track of best solution
@@ -292,7 +292,7 @@ def main(par):
     gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
     in_degrees = np.sum(A != 0, axis=0)
     out_degrees = np.sum(A != 0, axis=1)
-    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-5000]
+    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-2000]
     gene_mask[idx] = False
     X = X[:, gene_mask]
     X = X.toarray() if isinstance(X, csr_matrix) else X
@@ -347,12 +347,19 @@ def main(par):
     print(f"Proportion of reporter genes: {np.mean(is_reporter)}")
     print(f"Use regulatory modes/signs: {use_signs}")
 
+    # Create baseline model: for each TG, shuffle the TFs
     print(f"Creating baseline GRN")
     A_baseline = np.copy(A)
-    for j in range(A_baseline.shape[1]):
-        np.random.shuffle(A_baseline[:j, j])
-        np.random.shuffle(A_baseline[j+1:, j])
-    assert np.any(A_baseline != A)
+    if use_signs:
+        A_baseline *= (2 * (np.random.randint(0, 2) - 0.5))
+    tf_mask = np.any(A_baseline != 0, axis=1)
+    for j in range(A.shape[1]):
+        mask = np.copy(tf_mask)
+        mask[j] = False
+        if np.any(mask):
+            values = np.copy(A_baseline[mask, j])
+            np.random.shuffle(values)
+            A_baseline[mask, j] = values
 
     # Evaluate inferred GRN
     print("\n======== Evaluate inferred GRN ========")
@@ -360,11 +367,7 @@ def main(par):
 
     # Evaluate baseline GRN
     print("\n======== Evaluate shuffled GRN ========")
-    n_repeats = 1
-    scores_baseline = np.zeros_like(scores)
-    for _ in range(n_repeats):  # Repeat for more robust estimation
-        scores_baseline += evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
-    scores_baseline /= n_repeats
+    scores_baseline = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
 
     # Keep only the genes for which both GRNs got a score
     mask = ~np.logical_or(np.isnan(scores), np.isnan(scores_baseline))
@@ -375,7 +378,7 @@ def main(par):
     # Perform rank test between actual scores and baseline
     rr_all['spearman'] = float(np.mean(scores))
     rr_all['spearman_shuffled'] = float(np.mean(scores_baseline))
-    if np.std(scores - scores_baseline) == 0:
+    if np.all(scores - scores_baseline == 0):
         df_results = pd.DataFrame({'sem': [0.0]})
     else:
         res = wilcoxon(scores - scores_baseline, zero_method='wilcox', alternative='greater')
@@ -390,6 +393,9 @@ def main(par):
         print(f"Final score: {score}")
 
         results = {
+            'r2': [float(np.mean(scores))],
+            'r2_baseline': [float(np.mean(scores_baseline))],
+            'r2_diff': [float(np.mean(scores) - np.mean(scores_baseline))],
             'sem': [float(score)]
         }
 

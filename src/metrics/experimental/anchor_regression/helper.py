@@ -75,8 +75,8 @@ def anchor_regression(
         X: np.ndarray,
         Z: np.ndarray,
         Y: np.ndarray,
-        l2_reg: float = 1e-2,
-        anchor_strength: float = 1.0
+        l2_reg: float = 1e-4,
+        gamma: float = 1.0
 ) -> np.ndarray:
     """Anchor regression for causal inference under confounding.
 
@@ -86,15 +86,15 @@ def anchor_regression(
             these environmental variables. Shape (n, z).
         Y: predicted variables, of shape (n, u).
         l2_reg: L2 regularization strength.
-        anchor_strength: Strength of anchor regularization. 
-                        0 = standard regression, higher = more anchor regularization.
+        gamma: Strength of anchor regularization. 
+            1 = standard regression, higher = more anchor regularization.
 
     Returns:
         Inferred parameters, of shape (d, u).
     """
 
     # Whitening transformation
-    W = get_whitening_transform(Z, gamma=anchor_strength)
+    W = get_whitening_transform(Z, gamma=gamma)
     X_t = W @ X
     Y_t = W @ Y
 
@@ -110,25 +110,50 @@ def compute_stabilities(
         X: np.ndarray,
         y: np.ndarray,
         Z: np.ndarray,
-        A: np.ndarray,
+        weights: np.ndarray,
         is_selected: np.ndarray,
         eps: float = 1e-50
 ) -> float:
-    theta0_signed = anchor_regression(X, Z, y, anchor_strength=1)
+    theta0_signed = anchor_regression(X, Z, y, gamma=1)
     theta0_signed = theta0_signed[is_selected]
-    theta0 = np.abs(theta0_signed)
-    theta0 /= np.sum(theta0)
+    #theta0 = np.abs(theta0_signed)
+    theta0 = theta0_signed / np.sum(np.abs(theta0_signed))
 
-    theta_signed = anchor_regression(X, Z, y, anchor_strength=20)
+    theta_signed = anchor_regression(X, Z, y, gamma=1.65)
     theta_signed = theta_signed[is_selected]
-    theta = np.abs(theta_signed)
-    theta /= np.sum(theta)
+    #theta = np.abs(theta_signed)
+    theta = theta_signed / np.sum(np.abs(theta_signed))
 
-    stabilities = np.clip((theta0 - theta) / (theta0 + eps), 0, 1)
-    stabilities[np.sign(theta0_signed) != np.sign(theta_signed)] = 0
+    stabilities = np.clip(np.abs(theta0 - theta) / np.abs(theta0 + eps), 0, 1)
+    #stabilities[np.sign(theta0_signed) != np.sign(theta_signed)] = 0
 
-    return stabilities
+    weights = np.abs(weights[is_selected])
+    weights /= np.sum(weights)
 
+    return float(np.sum(weights * stabilities))
+
+
+def compute_stabilities_v2(
+        X: np.ndarray,
+        y: np.ndarray,
+        Z: np.ndarray,
+        A: np.ndarray,
+        is_selected: np.ndarray,
+        eps: float = 1e-50
+) -> Tuple[float, float]:
+
+    theta0 = anchor_regression(X[:, is_selected], Z, y, gamma=1)
+    theta = anchor_regression(X[:, is_selected], Z, y, gamma=1.5)
+    s1 = np.clip(np.abs(theta0 - theta) / np.abs(theta0 + eps), 0, 1)
+
+    theta0 = anchor_regression(X[:, ~is_selected], Z, y, gamma=1)
+    theta = anchor_regression(X[:, ~is_selected], Z, y, gamma=1.5)
+    s2 = np.clip(np.abs(theta0 - theta) / np.abs(theta0 + eps), 0, 1)
+
+    s1 = np.mean(s1)
+    s2 = np.mean(s2)
+
+    return s1, s2
 
 
 def evaluate_gene_stability(
@@ -148,22 +173,21 @@ def evaluate_gene_stability(
         eps: Small epsilon for numerical stability.
         
     Returns:
-        Stability score for gene j
+        Stability score for gene j.
     """
     is_selected = np.array(A[:, j] != 0)
     if (not np.any(is_selected)) or np.all(is_selected):
-        return 0.0
+        return np.nan
     assert not is_selected[j]
 
     # Exclude target gene from features
     mask = np.ones(X.shape[1], dtype=bool)
     mask[j] = False
 
-    stabilities_selected = np.mean(compute_stabilities(X[:, mask], X[:, j], Z, A, is_selected[mask], eps=eps))
+    score = compute_stabilities(X[:, mask], X[:, j], Z, A[mask, j], is_selected[mask], eps=eps)
     #stabilities_non_selected = np.mean(compute_stabilities(X[:, mask], X[:, j], Z, A, ~is_selected[mask], eps=eps))
-
     #score = (stabilities_selected - stabilities_non_selected) / (stabilities_selected + stabilities_non_selected + eps)
-    score = np.mean(stabilities_selected)
+    #score = np.mean(stabilities_selected)
 
     return score
 
@@ -200,8 +224,11 @@ def main(par):
         raise ValueError(f"No anchor variables found in dataset for columns: {anchor_cols}")
     
     # One-hot encode anchor variables
-    Z = OneHotEncoder(sparse_output=False, dtype=np.float32).fit_transform(anchor_encoded.reshape(-1, 1))
+    Z = OneHotEncoder(drop="first", sparse_output=False, dtype=np.float32).fit_transform(anchor_encoded.reshape(-1, 1))
     print(f"Anchor matrix Z shape: {Z.shape}")
+
+    # Add intercept
+    Z = np.concatenate((Z, np.ones((len(Z), 1), dtype=np.float32)), axis=1)
 
     # Load inferred GRN
     df = read_prediction(par)
@@ -232,24 +259,43 @@ def main(par):
     np.fill_diagonal(A, 0)
     print(f"Evaluating {X.shape[1]} genes with {np.sum(A != 0)} regulatory links")
 
+    # Whether or not to take into account the regulatory modes (enhancer/inhibitor)
+    signed = np.any(A < 0)
+
     # Center and scale dataset
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
 
-    # Create baseline GRN
+    # Create baseline model: for each TG, shuffle the TFs
     A_baseline = np.copy(A)
-    for j in range(A_baseline.shape[1]):
-        np.random.shuffle(A_baseline[:j, j])
-        np.random.shuffle(A_baseline[j+1:, j])
-    assert np.any(A != A_baseline)
+    if signed:
+        A_baseline *= (2 * (np.random.randint(0, 2) - 0.5))
+    tf_mask = np.any(A_baseline != 0, axis=1)
+    for j in range(A.shape[1]):
+        mask = np.copy(tf_mask)
+        mask[j] = False
+        if np.any(mask):
+            values = np.copy(A_baseline[mask, j])
+            np.random.shuffle(values)
+            A_baseline[mask, j] = values
 
+    # Compute gene stabilities
     scores, scores_baseline = [], []
     for j in tqdm.tqdm(range(X.shape[1]), desc="Evaluating gene stability"):
         scores.append(evaluate_gene_stability(X, Z, A, j))
+        scores_baseline.append(evaluate_gene_stability(X, Z, A_baseline, j))
     scores = np.array(scores)
+    scores_baseline = np.array(scores_baseline)
+
+    # Skip NaNs
+    mask = ~np.logical_or(np.isnan(scores), np.isnan(scores_baseline))
+    scores = scores[mask]
+    scores_baseline = scores_baseline[mask]
 
     # Calculate final score
-    final_score = np.mean(scores)
+    p_value = wilcoxon(scores, scores_baseline).pvalue
+    p_value = np.clip(p_value, 1e-300, 1)
+    final_score = -np.log10(p_value)
     print(f"Method: {method_id}")
     print(f"Anchor Regression Score: {final_score:.6f}")
 

@@ -4,7 +4,7 @@ import tqdm
 import scipy
 import numpy as np
 from scipy.sparse import csr_matrix
-from scipy.stats import spearmanr, pearsonr, wilcoxon, rankdata
+from scipy.stats import spearmanr, pearsonr, wilcoxon
 from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
 import pandas as pd
 import anndata as ad
@@ -51,18 +51,25 @@ def evaluate_grn(
     # counts 3 times more if the inferred regulatory edge is positive, and vice versa.
     C_min = np.min(C, axis=0)
     C_max = np.max(C, axis=0)
+
+    #C_min = np.quantile(C, 0.2, axis=0)
+    #C_max = np.quantile(C, 0.8, axis=0)
     if signed:
         is_positive = (A > 0)
         is_negative = (A < 0)
-        pos_spread = np.clip(C_max, 0, 1) - np.clip(C_min, 0, 1)
-        neg_spread = np.clip(C_max, -1, 0) - np.clip(C_min, -1, 0)
-        spread = is_positive * (pos_spread + 3 * neg_spread)
-        spread += is_negative * (3 * pos_spread + neg_spread)
-        consistency_scores = 1 - 0.25 * spread
-        #consistency_scores = is_positive * C_min + is_negative * (-C_max)
+        #pos_spread = np.clip(C_max, 0, 1) - np.clip(C_min, 0, 1)
+        #neg_spread = np.clip(C_max, -1, 0) - np.clip(C_min, -1, 0)
+        #spread = is_positive * (pos_spread + 3 * neg_spread)
+        #spread += is_negative * (3 * pos_spread + neg_spread)
+        #consistency_scores = 1 - 0.25 * spread
+        consistency_scores = is_positive * C_min + is_negative * (-C_max)
         #C_mean = np.mean(C, axis=0)
+        #consistency_scores = is_positive * C_mean + is_negative * (-C_mean)
+        #consistency_scores = 1 - 0.5 * (C_max - C_min)
     else:
         consistency_scores = 1 - 0.5 * (C_max - C_min)
+    #assert np.all(consistency_scores >= 0)
+    #assert np.all(consistency_scores <= 1)
     
     # Filter TFs if specified (keep the TFs with the most target genes)
     if n_tfs is None:
@@ -157,16 +164,16 @@ def evaluate_setting(C: np.ndarray, A: np.ndarray, setting_name: str, **kwargs) 
             p_value = np.clip(p_value, 1e-300, 1)
             print(f"p-value={p_value}")
             return -np.log10(p_value)
+            #return np.mean(np.clip(scores - scores_baseline, 0, None))
         except ValueError:
             return 0.0
 
 
 def spearman_corrcoef(X: np.ndarray) -> np.ndarray:
-    R = np.apply_along_axis(rankdata, 0, X, method="average")
-    R -= R.mean(axis=0, keepdims=True)
-    R /= (R.std(axis=0, ddof=1, keepdims=True) + 1e-9)
-    C = (R.T @ R) / (R.shape[0] - 1)
-    np.fill_diagonal(C, 0.0)
+    eps = np.random.uniform(0, 1e-30, size=X.shape)  # To break ties
+    #X = np.argsort(X + eps, axis=0)
+    C = np.corrcoef(X.T)
+    np.fill_diagonal(C, 0)
     return C
 
 

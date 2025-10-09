@@ -299,7 +299,7 @@ def evaluate(A, train_data_loader, test_data_loader, state_dict, n_perturbations
         optimizer, mode='min', patience=5,
         min_lr=1e-6, cooldown=3, factor=0.8
     )
-    pbar = tqdm.tqdm(range(300))
+    pbar = tqdm.tqdm(range(1000))
     best_avg_r2, best_r2 = -np.inf, None
     model.train()
     for epoch in pbar:
@@ -440,7 +440,7 @@ def main(par):
     print(f"Using {len(gene_names)} genes present in the GRN")
     
     # Additional memory-aware gene filtering for very large GRNs
-    MAX_GENES_FOR_MEMORY = 3000  # Reduced further to avoid memory issues
+    MAX_GENES_FOR_MEMORY = 2000  # Reduced further to avoid memory issues
     if len(gene_names) > MAX_GENES_FOR_MEMORY:
         print(f"Too many genes ({len(gene_names)}) for memory. Selecting top {MAX_GENES_FOR_MEMORY} by GRN connectivity.")
         
@@ -457,6 +457,9 @@ def main(par):
     # Add self-regulations
     np.fill_diagonal(A, 1)
 
+    # Check whether the inferred GRN contains signed predictions
+    signed = np.any(A < 0)
+
     # Mapping between gene expression profiles and their matched negative controls
     control_map, _ = create_control_matching(are_controls, match_groups)
     loose_control_map, _ = create_control_matching(are_controls, loose_match_groups)
@@ -470,12 +473,19 @@ def main(par):
         if (len(train_index) == 0) or (len(test_index) == 0):
             continue
 
-        # Create baseline model
+        # Create baseline model: for each TG, shuffle the TFs
+        print(f"Creating baseline GRN")
         A_baseline = np.copy(A)
-        for j in range(A_baseline.shape[1]):
-            np.random.shuffle(A_baseline[:j, j])
-            np.random.shuffle(A_baseline[j+1:, j])
-        assert np.any(A_baseline != A)
+        if signed:
+            A_baseline *= (2 * (np.random.randint(0, 2) - 0.5))
+        tf_mask = np.any(A_baseline != 0, axis=1)
+        for j in range(A.shape[1]):
+            mask = np.copy(tf_mask)
+            mask[j] = False
+            if np.any(mask):
+                values = np.copy(A_baseline[mask, j])
+                np.random.shuffle(values)
+                A_baseline[mask, j] = values
 
         # Center and scale dataset
         scaler = StandardScaler()
@@ -509,7 +519,6 @@ def main(par):
 
         # For fair comparison, we first randomly initialize NN parameters, and use these same
         # parameters to build both models (only the GRN weights will differ).
-        signed = np.any(A < 0)
         model_template = Model(A, n_perturbations, signed=signed).to(DEVICE)
         state_dict = model_template.state_dict()
 
@@ -520,8 +529,6 @@ def main(par):
         # Evaluate baseline GRN (shuffled target genes)
         train_data_loader, test_data_loader = create_data_loaders()
         r2_baseline.append(evaluate(A_baseline, train_data_loader, test_data_loader, state_dict, n_perturbations, signed=signed))
-
-        break
 
     r2 = np.asarray(r2).flatten()
     r2_baseline = np.asarray(r2_baseline).flatten()
