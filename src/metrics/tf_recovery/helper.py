@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 import decoupler as dc
-import mudata as mu
 import sys
 import os
 import re

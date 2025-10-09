@@ -1,36 +1,38 @@
-__merge__: ../../api/comp_metric_regression.yaml
+__merge__: ../../api/comp_metric.yaml
 
-name: tf_recovery
+name: tf_binding
 namespace: "metrics"
 info:
-  label: TF recovery
-  summary: Calculates TF activity for perturbations and determines recovery performance
-
+  label: TF binding
+  summary: Calculates TF binding scores for a given GRN and dataset
+  description: |
+    Calculates TF binding scores for a given GRN and dataset
+  
 arguments:
-  - name: --evaluation_data_de
+  - name: --ground_truth
     type: file
     direction: input
     must_exist: false
     required: false
-    example: resources_test/grn_benchmark/evaluation_data/replogle_de.h5ad 
+    example: resources_test/grn_benchmark/ground_truth/PBMC.csv 
 
-
+  
 resources:
   - type: python_script
     path: script.py
-  - path: helper.py
   - path: /src/utils/util.py
     dest: util.py
-
+  - path: helper.py
+  
 engines:
   - type: docker
     image: ghcr.io/openproblems-bio/base_python:1.0.4
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages: [ decoupler==1.7.0]
+        packages: [numpy==1.26.4 ]
 runners:
   - type: executable
   - type: nextflow
     directives:
-      label: [ midtime, highmem, highcpu ]
+      label: [ midtime, midmem, midcpu ]

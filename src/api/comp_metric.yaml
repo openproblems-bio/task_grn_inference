@@ -23,7 +23,7 @@ arguments:
     type: string
     direction: input
     required: false
-    default: X_norm
+    default: lognorm
   - name: --max_n_links
     type: integer
     default: 50000
@@ -31,7 +31,11 @@ arguments:
     type: integer
     default: 2
     direction: input
-
+  - name: --tf_all
+    type: file
+    direction: input
+    required: true
+    example: resources_test/grn_benchmark/prior/tf_all.csv
   - name: --num_workers
     type: integer
     direction: input
