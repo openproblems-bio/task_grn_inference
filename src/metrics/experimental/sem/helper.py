@@ -26,7 +26,7 @@ NUMPY_DTYPE = np.float32
 MAX_N_ITER = 500
 
 # For reproducibility purposes
-seed = 0xCAFE
+seed = 0xCAFF
 os.environ['PYTHONHASHSEED'] = str(seed)
 random.seed(seed)
 np.random.seed(seed)

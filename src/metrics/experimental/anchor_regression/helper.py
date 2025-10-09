@@ -10,6 +10,7 @@ import tqdm
 from scipy.sparse.linalg import LinearOperator
 from scipy.stats import pearsonr, wilcoxon
 from scipy.sparse import csr_matrix
+from sklearn.model_selection import KFold
 from sklearn.preprocessing import StandardScaler, LabelEncoder, OneHotEncoder
 import anndata as ad
 import warnings
@@ -106,6 +107,32 @@ def anchor_regression(
     return theta
 
 
+def cross_val(
+        cv,
+        X: np.ndarray,
+        y: np.ndarray,
+        Z: np.ndarray,
+        eps: float = 1e-50
+) -> float:
+    cv = KFold(5)
+    ss_res, ss_tot = 0, 0
+    y_mean = np.mean(y)
+    for idx_train, idx_test in cv.split(X, y):
+        X_train, X_test = X[idx_train, :], X[idx_test, :]
+        Z_train, Z_test = Z[idx_train, :], Z[idx_test, :]
+        y_train, y_test = y[idx_train], y[idx_test]
+        theta = anchor_regression(X_train, Z_train, y_train, gamma=1)
+        y_hat = np.dot(X_test, theta)
+        ss_res += np.sum(np.square(y_test - y_hat))
+        ss_tot += np.sum(np.square(y_test - y_mean))
+        break  # TODO
+    if ss_tot == 0:
+        r2 = 0
+    else:
+        r2 = 1 - ss_res / ss_tot
+    return float(r2)
+
+
 def compute_stabilities(
         X: np.ndarray,
         y: np.ndarray,
@@ -114,23 +141,10 @@ def compute_stabilities(
         is_selected: np.ndarray,
         eps: float = 1e-50
 ) -> float:
-    theta0_signed = anchor_regression(X, Z, y, gamma=1)
-    theta0_signed = theta0_signed[is_selected]
-    #theta0 = np.abs(theta0_signed)
-    theta0 = theta0_signed / np.sum(np.abs(theta0_signed))
-
-    theta_signed = anchor_regression(X, Z, y, gamma=1.65)
-    theta_signed = theta_signed[is_selected]
-    #theta = np.abs(theta_signed)
-    theta = theta_signed / np.sum(np.abs(theta_signed))
-
-    stabilities = np.clip(np.abs(theta0 - theta) / np.abs(theta0 + eps), 0, 1)
-    #stabilities[np.sign(theta0_signed) != np.sign(theta_signed)] = 0
-
-    weights = np.abs(weights[is_selected])
-    weights /= np.sum(weights)
-
-    return float(np.sum(weights * stabilities))
+    cv = KFold(5, random_state=0xCAFE, shuffle=True)
+    r2_selected = cross_val(cv, X[:, is_selected], y, Z)
+    r2_non_selected = cross_val(cv, X[:, ~is_selected], y, Z)
+    return r2_selected - r2_non_selected
 
 
 def compute_stabilities_v2(

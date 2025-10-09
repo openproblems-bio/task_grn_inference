@@ -18,10 +18,10 @@ warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=ConstantInputWarning)
 
 # For reproducibility purposes
-seed = 0xCAFE
-os.environ['PYTHONHASHSEED'] = str(seed)
-random.seed(seed)
-np.random.seed(seed)
+#seed = 0xCAFE
+#os.environ['PYTHONHASHSEED'] = str(seed)
+#random.seed(seed)
+#np.random.seed(seed)
 
 from util import read_prediction, manage_layer
 from dataset_config import DATASET_GROUPS
@@ -51,7 +51,7 @@ def compute_residual_correlations(
         y_test: np.ndarray,
         Z_test: np.ndarray
 ) -> np.ndarray:
-    model = Ridge(alpha=10)
+    model = Ridge(alpha=0.1)
     model.fit(X_train, y_train)
     y_hat = model.predict(X_test)
     residuals = y_test - y_hat
