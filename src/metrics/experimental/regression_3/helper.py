@@ -25,6 +25,7 @@ warnings.filterwarnings("ignore", category=ConstantInputWarning)
 
 from util import read_prediction, manage_layer
 from dataset_config import DATASET_GROUPS
+from baseline import create_grn_baseline
 
 
 def encode_obs_cols(adata, cols):
@@ -131,18 +132,8 @@ def main(par):
     for group in np.unique(anchor_encoded):
         scores, baseline_scores = [], []
 
-        # Create baseline model: for each TG, shuffle the TFs
-        A_baseline = np.copy(A)
-        if signed:
-            A_baseline *= (2 * (np.random.randint(0, 2) - 0.5))
-        tf_mask = np.any(A_baseline != 0, axis=1)
-        for j in range(A.shape[1]):
-            mask = np.copy(tf_mask)
-            mask[j] = False
-            if np.any(mask):
-                values = np.copy(A_baseline[mask, j])
-                np.random.shuffle(values)
-                A_baseline[mask, j] = values
+        # Create baseline model
+        A_baseline = create_grn_baseline(A)
 
         # Train/test split
         mask = (anchor_encoded != group)

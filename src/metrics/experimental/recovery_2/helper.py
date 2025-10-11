@@ -14,6 +14,7 @@ from util import format_save_score, read_prediction
 
 np.random.seed(0)
 from util import manage_layer
+from baseline import create_grn_baseline
 
 
 def encode_obs_cols(adata, cols):
@@ -124,19 +125,8 @@ def evaluate_setting(C: np.ndarray, A: np.ndarray, setting_name: str, **kwargs) 
     # Evaluate inferred GRN
     scores = evaluate_grn(C, A, **kwargs)
 
-    # Create baseline model: for each TG, shuffle the TFs
-    A_baseline = np.copy(A)
-    if signed:
-        A_baseline *= (2 * (np.random.randint(0, 2) - 0.5))
-    tf_mask = np.any(A_baseline != 0, axis=1)
-    for j in range(A.shape[1]):
-        mask = np.copy(tf_mask)
-        mask[j] = False
-        if np.any(mask):
-            values = np.copy(A_baseline[mask, j])
-            np.random.shuffle(values)
-            A_baseline[mask, j] = values
-    # assert np.any(A_baseline != A)
+    # Create baseline model
+    A_baseline = create_grn_baseline(A)
 
     # Evaluate baseline GRN
     scores_baseline = evaluate_grn(C, A_baseline, **kwargs)

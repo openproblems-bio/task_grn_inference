@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 import torch
 from scipy.sparse import csr_matrix
+from scipy.spatial.distance import cityblock
 from scipy.stats import wilcoxon
 from sklearn.model_selection import StratifiedGroupKFold, StratifiedKFold
 from sklearn.preprocessing import StandardScaler, LabelEncoder
@@ -36,7 +37,7 @@ def set_seed():
 
 from util import read_prediction, manage_layer
 from dataset_config import DATASET_GROUPS
-from scipy.spatial.distance import cityblock
+from baseline import create_grn_baseline
 
 
 def combine_multi_index(*arrays) -> np.array:
@@ -473,19 +474,8 @@ def main(par):
         if (len(train_index) == 0) or (len(test_index) == 0):
             continue
 
-        # Create baseline model: for each TG, shuffle the TFs
-        print(f"Creating baseline GRN")
-        A_baseline = np.copy(A)
-        if signed:
-            A_baseline *= (2 * (np.random.randint(0, 2) - 0.5))
-        tf_mask = np.any(A_baseline != 0, axis=1)
-        for j in range(A.shape[1]):
-            mask = np.copy(tf_mask)
-            mask[j] = False
-            if np.any(mask):
-                values = np.copy(A_baseline[mask, j])
-                np.random.shuffle(values)
-                A_baseline[mask, j] = values
+        # Create baseline model
+        A_baseline = create_grn_baseline(A)
 
         # Center and scale dataset
         scaler = StandardScaler()
