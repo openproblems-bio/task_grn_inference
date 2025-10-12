@@ -16,6 +16,8 @@ import sys
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 from sklearn.model_selection import GroupShuffleSplit, KFold
+from joblib import Parallel, delayed
+from multiprocessing import cpu_count
 
 
 os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8' # For reproducibility purposes (on GPU)
@@ -23,10 +25,10 @@ DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 NUMPY_DTYPE = np.float32
 
 # Hyper-parameters
-MAX_N_ITER = 2000
+MAX_N_ITER = 500
 
 # For reproducibility purposes
-seed = 0xCAFE
+seed = 0xCAFF
 os.environ['PYTHONHASHSEED'] = str(seed)
 random.seed(seed)
 np.random.seed(seed)
@@ -36,8 +38,33 @@ torch.cuda.manual_seed_all(seed)
 torch.use_deterministic_algorithms(True)
 
 
-from util import read_prediction, manage_layer
+from util import read_prediction, manage_layer, create_grn_baseline
 from dataset_config import DATASET_GROUPS
+
+
+def _fit_single_gene_regression(j, X, mask):
+    """Helper function to fit regression for a single gene."""
+    model = ElasticNet(alpha=0.001, fit_intercept=False)
+    if not np.any(mask[:, j]):
+        return j, np.zeros(mask.shape[0])  # If gene has no regulator, return zeros
+    model.fit(X[:, mask[:, j]], X[:, j])
+    coef = np.zeros(mask.shape[0])
+    coef[mask[:, j]] = model.coef_
+    return j, coef
+
+
+def _compute_r2_score(j, delta_X_test, delta_X_hat, eval_mask):
+    """Helper function to compute R² score for a single gene."""
+    if eval_mask[j]:
+        if np.all(delta_X_test[:, j] == delta_X_test[0, j]):  # Constant
+            return j, np.nan
+        else:
+            return j, max(0, r2_score(delta_X_test[:, j], delta_X_hat[:, j]))
+    else:
+        return j, np.nan
+
+
+
 
 
 def encode_obs_cols(adata, cols):
@@ -112,14 +139,17 @@ def neumann_series(A: torch.Tensor, k: int = 2) -> torch.Tensor:
     Returns:
         Approximated inverse of I - A.
     """
-    B = torch.eye(A.shape[0], device=A.device, dtype=A.dtype)
-    for k in range(k):
-        B = B + torch.mm(B, A)
+    I = torch.eye(A.shape[0], device=A.device, dtype=A.dtype)
+    term = I.clone()
+    B = I.clone()
+    for _ in range(k):
+        term = term @ A
+        B = B + term
     return B
 
 
-def regression_based_grn_inference(X: np.ndarray, base: np.ndarray, signed: bool = False) -> np.ndarray:
-    """Infer GRN weights given a GRN topology.
+def regression_based_grn_inference(X: np.ndarray, base: np.ndarray, signed: bool = False, n_jobs: int = -1) -> np.ndarray:
+    """Infer GRN weights given a GRN topology using parallel processing.
 
     Args:
         X: gene expression from control samples. A matrix of shape `(n_samples, n_genes)`.
@@ -129,19 +159,30 @@ def regression_based_grn_inference(X: np.ndarray, base: np.ndarray, signed: bool
             for all the non-zero elements in `base`.
         signed: Whether to force the output regulatory links to have the same sign as
             the input regulatory links.
+        n_jobs: Number of parallel jobs. -1 means use all available cores.
 
     Returns:
         A new GRN matrix of shape `(n_genes, n_genes)`.
     """
     mask = (base != 0)
     n_genes = X.shape[1]
+    
+    # Determine number of jobs
+    if n_jobs == -1:
+        n_jobs = min(cpu_count(), n_genes)
+    
+    print(f"Running regression with {n_jobs} parallel jobs for {n_genes} genes")
+    
+    # Use joblib for parallel processing
+    results = Parallel(n_jobs=n_jobs, verbose=1)(
+        delayed(_fit_single_gene_regression)(j, X, mask) 
+        for j in range(n_genes)
+    )
+    
+    # Reconstruct the matrix from results
     A = np.zeros((n_genes, n_genes), dtype=X.dtype)
-    for j in tqdm.tqdm(range(n_genes)):
-        model = ElasticNet(alpha=0.001, fit_intercept=False)
-        if not np.any(mask[:, j]):
-            continue  # If gene has no regulator, skip it.
-        model.fit(X[:, mask[:, j]], X[:, j])
-        A[mask[:, j], j] = model.coef_
+    for j, coef in results:
+        A[:, j] = coef
 
     # For each parameter that has the wrong regulatory sign, set it to zero.
     if signed:
@@ -156,7 +197,8 @@ def evaluate_grn(
         is_train: np.ndarray,
         is_reporter: np.ndarray,
         A: np.ndarray,
-        signed: bool = True
+        signed: bool = True,
+        n_jobs: int = -1
 ) -> np.ndarray:
 
     n_iter = MAX_N_ITER
@@ -168,7 +210,7 @@ def evaluate_grn(
 
     # Learn initial GRN weights from the first set
     print("Infer GRN weights from training set, given the provided GRN topology")
-    A = regression_based_grn_inference(X_controls, A, signed=signed)
+    A = regression_based_grn_inference(X_controls, A, signed=signed, n_jobs=n_jobs)
     # A = spearman_based_grn_inference(X_controls, A, signed=signed)
 
     # Learn shocks from perturbations, using reporter genes only
@@ -178,7 +220,7 @@ def evaluate_grn(
     F = np.linalg.inv(np.eye(A.shape[0]) - A)
     F_CR = F[np.ix_(regulator_idx, reporter_idx)]
     Y_R = delta_X[:, reporter_idx]
-    lam = 0.1
+    lam = 0.001
     I = np.eye(len(regulator_idx), dtype=delta_X.dtype)
     M = F_CR @ F_CR.T + lam * I
     delta = np.zeros_like(delta_X)
@@ -207,8 +249,8 @@ def evaluate_grn(
         A_eff = torch.abs(A) * signs if signed else A * mask
         delta_X_hat = solve_sem(A_eff, delta_train)
         loss = torch.mean(torch.sum(torch.square(X_non_reporter - delta_X_hat[:, ~is_reporter]), dim=1))
-        loss = loss + 0.1 * torch.sum(torch.abs(A))
-        loss = loss + 0.1 * torch.sum(torch.square(A))
+        loss = loss + 0.001 * torch.sum(torch.abs(A))
+        loss = loss + 0.001 * torch.sum(torch.square(A))
         pbar.set_description(str(loss.item()))
 
         # Keep track of best solution
@@ -235,16 +277,18 @@ def evaluate_grn(
     delta_X_hat = delta_X_hat.detach().cpu().numpy()
     has_parent = (mask.any(axis=0))
     eval_mask = ((~is_reporter) & has_parent)
-    coefficients = []
-    for j in range(len(eval_mask)):
-        if eval_mask[j]:
-            if np.all(delta_X_test[:, j] == delta_X_test[0, j]):  # Constant
-                coefficients.append(np.nan)
-            else:
-                coefficients.append(max(0, r2_score(delta_X_test[:, j], delta_X_hat[:, j])))
-        else:
-            coefficients.append(np.nan)
-    coefficients = np.array(coefficients)
+    
+    # Parallel computation of R² scores
+    print(f"Computing R² scores with {n_jobs if n_jobs != -1 else cpu_count()} parallel jobs")
+    results = Parallel(n_jobs=n_jobs, verbose=1)(
+        delayed(_compute_r2_score)(j, delta_X_test, delta_X_hat, eval_mask)
+        for j in range(len(eval_mask))
+    )
+    
+    # Reconstruct coefficients array from results
+    coefficients = np.full(len(eval_mask), np.nan)
+    for j, coef in results:
+        coefficients[j] = coef
     #return np.nan_to_num(coefficients, nan=0)
     return coefficients
 
@@ -252,6 +296,9 @@ def evaluate_grn(
 def main(par):
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+    
+    # Get number of parallel jobs from parameter or use default
+    n_jobs = 10
 
     par['cv_groups'] = DATASET_GROUPS[dataset_id]['cv']
     par['match'] = DATASET_GROUPS[dataset_id]['match']
@@ -289,7 +336,7 @@ def main(par):
     gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
     in_degrees = np.sum(A != 0, axis=0)
     out_degrees = np.sum(A != 0, axis=1)
-    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-5000]
+    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-2000]
     gene_mask[idx] = False
     X = X[:, gene_mask]
     X = X.toarray() if isinstance(X, csr_matrix) else X
@@ -344,25 +391,16 @@ def main(par):
     print(f"Proportion of reporter genes: {np.mean(is_reporter)}")
     print(f"Use regulatory modes/signs: {use_signs}")
 
-    # Create a symmetric (causally-wrong) baseline GRN
-    print(f"Creating baseline GRN")
-    A_baseline = np.copy(A)
-    for j in range(A_baseline.shape[1]):
-        np.random.shuffle(A_baseline[:j, j])
-        np.random.shuffle(A_baseline[j+1:, j])
-    assert np.any(A_baseline != A)
+    # Create baseline model
+    A_baseline = create_grn_baseline(A)
 
     # Evaluate inferred GRN
     print("\n======== Evaluate inferred GRN ========")
-    scores = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A, signed=use_signs)
+    scores = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A, signed=use_signs, n_jobs=n_jobs)
 
     # Evaluate baseline GRN
     print("\n======== Evaluate shuffled GRN ========")
-    n_repeats = 1
-    scores_baseline = np.zeros_like(scores)
-    for _ in range(n_repeats):  # Repeat for more robust estimation
-        scores_baseline += evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
-    scores_baseline /= n_repeats
+    scores_baseline = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs, n_jobs=n_jobs)
 
     # Keep only the genes for which both GRNs got a score
     mask = ~np.logical_or(np.isnan(scores), np.isnan(scores_baseline))
@@ -373,7 +411,7 @@ def main(par):
     # Perform rank test between actual scores and baseline
     rr_all['spearman'] = float(np.mean(scores))
     rr_all['spearman_shuffled'] = float(np.mean(scores_baseline))
-    if np.std(scores - scores_baseline) == 0:
+    if np.all(scores - scores_baseline == 0):
         df_results = pd.DataFrame({'sem': [0.0]})
     else:
         res = wilcoxon(scores - scores_baseline, zero_method='wilcox', alternative='greater')
@@ -388,7 +426,10 @@ def main(par):
         print(f"Final score: {score}")
 
         results = {
-            'sem': [float(score)]
+            'r2': [float(np.mean(scores))],
+            'r2_baseline': [float(np.mean(scores_baseline))],
+            'sem_lift': [np.mean(scores)/(np.mean(scores_baseline) + 1e-10)],
+            'sem_score': [float(score)]
         }
 
         df_results = pd.DataFrame(results)

@@ -18,7 +18,7 @@ mkdir -p "$save_dir"
 # datasets to process
 datasets=('op' "300BCG" 'parsebioscience' ) #"300BCG" "ibd" 'parsebioscience'
 # methods to process
-methods=("negative_control" "pearson_corr" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
+methods=("pearson_corr" "negative_control" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
 
 # temporary file to collect CSV rows
 combined_csv="${save_dir}/sem_scores.csv"
@@ -39,7 +39,7 @@ for dataset in "${datasets[@]}"; do
         fi
 
         echo -e "\nProcessing method: $method\n"
-        python src/metrics/sem/script.py \
+        python src/metrics/experimental/sem/script.py \
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
             --score "$score"

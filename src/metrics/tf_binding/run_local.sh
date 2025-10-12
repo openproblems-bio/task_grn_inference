@@ -16,9 +16,9 @@ save_dir="output/tf_binding"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=('replogle' 'norman' 'adamson') #"300BCG" "ibd" 'parsebioscience''op' "300BCG" 'parsebioscience' 
+datasets=( 'xaira_HCT116' 'xaira_HEK293T'  'replogle' 'norman'  'adamson' ) # ) #"300BCG" "ibd" 'parsebioscience''op' "300BCG" 'parsebioscience'   'replogle' 'norman' 'adamson'
 # methods to process
-methods=("negative_control" "pearson_corr" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
+methods=( "pearson_corr" "negative_control" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
 
 for dataset in "${datasets[@]}"; do
     echo -e "\n\nProcessing dataset: $dataset\n"
@@ -37,12 +37,22 @@ for dataset in "${datasets[@]}"; do
             echo "File not found: $prediction, skipping..."
             continue
         fi
+        if [[ "$dataset" == "replogle" || "$dataset" == "norman" || "$dataset" == "adamson" ]]; then
+            ground_truth="resources/grn_benchmark/ground_truth/K562_chipatlas.csv"
+        elif [[ "$dataset" == "xaira_HEK293T" ]]; then
+            ground_truth="resources/grn_benchmark/ground_truth/HEK293T_remap.csv"
+        elif [[ "$dataset" == "xaira_HCT116" ]]; then
+            ground_truth="resources/grn_benchmark/ground_truth/HCT116_chipatlas.csv"
+        else
+            echo "No ground truth available for dataset: $dataset, skipping..."
+            continue
+        fi
 
         echo -e "\nProcessing method: $method\n"
         python src/metrics/tf_binding/script.py \
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
-            --ground_truth "resources/grn_benchmark/ground_truth/K562.csv" \
+            --ground_truth "$ground_truth" \
             --score "$score"
 
         # Extract metrics from the .h5ad and append to CSV

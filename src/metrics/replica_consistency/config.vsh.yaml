@@ -1,0 +1,28 @@
+__merge__: ../../api/comp_metric.yaml
+
+name: replica_consistency
+namespace: "metrics"
+info:
+  label: Replica consistency
+  summary: Calculates replica consistency scores
+
+  
+resources:
+  - type: python_script
+    path: script.py
+  - path: helper.py
+  - path: /src/utils/util.py
+    dest: util.py
+
+engines:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    __merge__: /src/api/base_requirements.yaml
+    setup:
+      - type: python
+        packages: [ ]
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [ midtime, highmem, highcpu ]
