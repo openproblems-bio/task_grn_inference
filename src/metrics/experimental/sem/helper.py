@@ -26,7 +26,7 @@ NUMPY_DTYPE = np.float32
 MAX_N_ITER = 500
 
 # For reproducibility purposes
-seed = 0xCAFF
+seed = 0xCADD
 os.environ['PYTHONHASHSEED'] = str(seed)
 random.seed(seed)
 np.random.seed(seed)
@@ -39,6 +39,35 @@ torch.use_deterministic_algorithms(True)
 from util import read_prediction, manage_layer
 from baseline import create_grn_baseline
 from dataset_config import DATASET_GROUPS
+
+
+# List of immediate early genes (IEGs) - scCustomize v3.2.0
+IEG = [
+    "CCL7"  , "CCL2"    , "TNFSF9"  , "SIK1B"   , "RASD1"  ,  "NUP98",
+    "CEBPD" , "NFKBID"  , "NOCT"    , "FOS"     , "IER2"   ,  "HBEGF",
+    "RHEB"  , "PLAU"    , "IFNB1"   , "PCDH8"   , "WEE1"   ,  "FBXO33",
+    "PMAIP1", "DUSP1"   , "PLK2"    , "TSC22D1" , "MAP3K8" ,  "PIAS1",
+    "KLF10" , "BDNF"    , "CCN2"    , "TRIB1"   , "SOD2"   ,  "IER3",
+    "PLAT"  , "RCAN1"   , "ZFP36"   , "CCL5"    , "NFKBIA" ,  "NRN1",
+    "KLF2"  , "SERPINE1", "MAFF"    , "NCOA7"   , "GDF15"  ,  "LDLR",
+    "TNF"   , "CCRL2"   , "CCL18"   , "CCL3"    , "FOSL1"  ,  "DUSP2",
+    "INHBA" , "JUND"    , "NR4A1"   , "EGR3"    , "IRF1"   ,  "IFIT3",
+    "IFIT1B", "NR4A3"   , "PER2"    , "GADD45G" , "SOCS3"  ,  "TLR2",
+    "PELI1" , "IL1A"    , "RGS2"    , "CSF2"    , "F3"     ,  "APOLD1",
+    "ACKR4" , "BHLHE40" , "IL23A"   , "GBP2"    , "IL1B"   ,  "ARIH1",
+    "GBP2"  , "JUN"     , "NPTX2"   , "FOSB"    , "EGR1"   ,  "MBNL2",
+    "VCAM1" , "ZFP36L2" , "ARF4"    , "MMP13"   , "JUNB"   ,  "ZFP36L1",
+    "CCN1"  , "NPAS4"   , "PPP1R15A", "EGR4"    , "NFKBIZ" ,  "ARC",
+    "MCL1"  , "RGS1"    , "KLF6"    , "CLEC4E"  , "SGK1"   ,  "ARHGEF3",
+    "EGR2"  , "IFIT2"   , "ID2"     , "DUSP6"   , "SIK1"   ,  "DUSP5",
+    "NFIB"  , "SAA2"    , "SAA1"    , "THBS1"   , "FOSL2"  ,  "ICAM1",
+    "CXCL10", "CSRNP1"  , "BCL3"    , "MARCKSL1", "HOMER1" ,  "TRAF1",
+    "ATF3"  , "FLG"     , "SRF"     , "PIM1"    , "GADD45B",  "HES1",
+    "GEM"   , "TNFAIP3" , "PER1"    , "CREM"    , "CD69"   ,  "IL6",
+    "BTG2"  , "ACOD1"   , "CEBPB"   , "CXCL11"  , "IL12B"  ,  "NR4A2",
+    "PTGS2" , "IKBKE"   , "TXNIP"   , "CD83"    , "IER5"   ,  "IL10",
+    "MYC"   , "CXCL12"  , "SLC2A3"  , "CXCL1"
+]
 
 
 def encode_obs_cols(adata, cols):
@@ -334,17 +363,16 @@ def main(par):
     is_train[train_idx] = True
 
     # Create a split between genes: reporter genes and evaluation genes.
-    # All TFs should be included in the reporter gene set.
-    # If the reporter gene set does not represent at least 50% of all genes,
-    # then we randomly add target genes until the 50% threshold is reached.
+    # All TFs and IEGs should be included in the reporter gene set.
     n_genes = A.shape[1]
-    reg_mask = np.asarray(A != 0).any(axis=1)  # TF mask
-    is_reporter = np.copy(reg_mask)
-    if np.mean(is_reporter) < 0.5 * len(is_reporter):
-        idx = np.where(~is_reporter)[0]
-        np.random.shuffle(idx)
-        idx = idx[:int(0.5 * len(is_reporter) - np.sum(is_reporter))]
-        is_reporter[idx] = True
+    reg_mask = np.asarray(A != 0).any(axis=1)
+    ieg_mask = np.asarray([gene_name in IEG for gene_name in gene_names], dtype=bool)
+    is_reporter = np.logical_or(reg_mask, ieg_mask)
+    #if np.mean(is_reporter) < 0.5 * len(is_reporter):
+    #    idx = np.where(~is_reporter)[0]
+    #    np.random.shuffle(idx)
+    #    idx = idx[:int(0.5 * len(is_reporter) - np.sum(is_reporter))]
+    #    is_reporter[idx] = True
     print(f"Proportion of reporter genes: {np.mean(is_reporter)}")
     print(f"Use regulatory modes/signs: {use_signs}")
 
