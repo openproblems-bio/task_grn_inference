@@ -16,7 +16,7 @@ save_dir="output/tf_binding"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=( 'xaira_HCT116' 'xaira_HEK293T'  'replogle' 'norman'  'adamson' ) # ) #"300BCG" "ibd" 'parsebioscience''op' "300BCG" 'parsebioscience'   'replogle' 'norman' 'adamson'
+datasets=(  'replogle' 'norman'  'adamson' ) # 'xaira_HCT116' 'replogle' 'norman'  'adamson') #"300BCG" "ibd" 'parsebioscience''op' "300BCG" 'parsebioscience'   'replogle' 'norman' 'adamson'
 # methods to process
 methods=( "pearson_corr" "negative_control" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
 
@@ -38,7 +38,7 @@ for dataset in "${datasets[@]}"; do
             continue
         fi
         if [[ "$dataset" == "replogle" || "$dataset" == "norman" || "$dataset" == "adamson" ]]; then
-            ground_truth="resources/grn_benchmark/ground_truth/K562_chipatlas.csv"
+            ground_truth="resources/grn_benchmark/ground_truth/K562_remap.csv"
         elif [[ "$dataset" == "xaira_HEK293T" ]]; then
             ground_truth="resources/grn_benchmark/ground_truth/HEK293T_remap.csv"
         elif [[ "$dataset" == "xaira_HCT116" ]]; then

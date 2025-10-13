@@ -16,8 +16,6 @@ import sys
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 from sklearn.model_selection import GroupShuffleSplit, KFold
-from joblib import Parallel, delayed
-from multiprocessing import cpu_count
 
 
 os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8' # For reproducibility purposes (on GPU)
@@ -28,7 +26,7 @@ NUMPY_DTYPE = np.float32
 MAX_N_ITER = 500
 
 # For reproducibility purposes
-seed = 0xCAFF
+seed = 0xCADD
 os.environ['PYTHONHASHSEED'] = str(seed)
 random.seed(seed)
 np.random.seed(seed)
@@ -42,29 +40,33 @@ from util import read_prediction, manage_layer, create_grn_baseline
 from dataset_config import DATASET_GROUPS
 
 
-def _fit_single_gene_regression(j, X, mask):
-    """Helper function to fit regression for a single gene."""
-    model = ElasticNet(alpha=0.001, fit_intercept=False)
-    if not np.any(mask[:, j]):
-        return j, np.zeros(mask.shape[0])  # If gene has no regulator, return zeros
-    model.fit(X[:, mask[:, j]], X[:, j])
-    coef = np.zeros(mask.shape[0])
-    coef[mask[:, j]] = model.coef_
-    return j, coef
-
-
-def _compute_r2_score(j, delta_X_test, delta_X_hat, eval_mask):
-    """Helper function to compute R² score for a single gene."""
-    if eval_mask[j]:
-        if np.all(delta_X_test[:, j] == delta_X_test[0, j]):  # Constant
-            return j, np.nan
-        else:
-            return j, max(0, r2_score(delta_X_test[:, j], delta_X_hat[:, j]))
-    else:
-        return j, np.nan
-
-
-
+# List of immediate early genes (IEGs) - scCustomize v3.2.0
+IEG = [
+    "CCL7"  , "CCL2"    , "TNFSF9"  , "SIK1B"   , "RASD1"  ,  "NUP98",
+    "CEBPD" , "NFKBID"  , "NOCT"    , "FOS"     , "IER2"   ,  "HBEGF",
+    "RHEB"  , "PLAU"    , "IFNB1"   , "PCDH8"   , "WEE1"   ,  "FBXO33",
+    "PMAIP1", "DUSP1"   , "PLK2"    , "TSC22D1" , "MAP3K8" ,  "PIAS1",
+    "KLF10" , "BDNF"    , "CCN2"    , "TRIB1"   , "SOD2"   ,  "IER3",
+    "PLAT"  , "RCAN1"   , "ZFP36"   , "CCL5"    , "NFKBIA" ,  "NRN1",
+    "KLF2"  , "SERPINE1", "MAFF"    , "NCOA7"   , "GDF15"  ,  "LDLR",
+    "TNF"   , "CCRL2"   , "CCL18"   , "CCL3"    , "FOSL1"  ,  "DUSP2",
+    "INHBA" , "JUND"    , "NR4A1"   , "EGR3"    , "IRF1"   ,  "IFIT3",
+    "IFIT1B", "NR4A3"   , "PER2"    , "GADD45G" , "SOCS3"  ,  "TLR2",
+    "PELI1" , "IL1A"    , "RGS2"    , "CSF2"    , "F3"     ,  "APOLD1",
+    "ACKR4" , "BHLHE40" , "IL23A"   , "GBP2"    , "IL1B"   ,  "ARIH1",
+    "GBP2"  , "JUN"     , "NPTX2"   , "FOSB"    , "EGR1"   ,  "MBNL2",
+    "VCAM1" , "ZFP36L2" , "ARF4"    , "MMP13"   , "JUNB"   ,  "ZFP36L1",
+    "CCN1"  , "NPAS4"   , "PPP1R15A", "EGR4"    , "NFKBIZ" ,  "ARC",
+    "MCL1"  , "RGS1"    , "KLF6"    , "CLEC4E"  , "SGK1"   ,  "ARHGEF3",
+    "EGR2"  , "IFIT2"   , "ID2"     , "DUSP6"   , "SIK1"   ,  "DUSP5",
+    "NFIB"  , "SAA2"    , "SAA1"    , "THBS1"   , "FOSL2"  ,  "ICAM1",
+    "CXCL10", "CSRNP1"  , "BCL3"    , "MARCKSL1", "HOMER1" ,  "TRAF1",
+    "ATF3"  , "FLG"     , "SRF"     , "PIM1"    , "GADD45B",  "HES1",
+    "GEM"   , "TNFAIP3" , "PER1"    , "CREM"    , "CD69"   ,  "IL6",
+    "BTG2"  , "ACOD1"   , "CEBPB"   , "CXCL11"  , "IL12B"  ,  "NR4A2",
+    "PTGS2" , "IKBKE"   , "TXNIP"   , "CD83"    , "IER5"   ,  "IL10",
+    "MYC"   , "CXCL12"  , "SLC2A3"  , "CXCL1"
+]
 
 
 def encode_obs_cols(adata, cols):
@@ -148,8 +150,8 @@ def neumann_series(A: torch.Tensor, k: int = 2) -> torch.Tensor:
     return B
 
 
-def regression_based_grn_inference(X: np.ndarray, base: np.ndarray, signed: bool = False, n_jobs: int = -1) -> np.ndarray:
-    """Infer GRN weights given a GRN topology using parallel processing.
+def regression_based_grn_inference(X: np.ndarray, base: np.ndarray, signed: bool = False) -> np.ndarray:
+    """Infer GRN weights given a GRN topology.
 
     Args:
         X: gene expression from control samples. A matrix of shape `(n_samples, n_genes)`.
@@ -159,30 +161,19 @@ def regression_based_grn_inference(X: np.ndarray, base: np.ndarray, signed: bool
             for all the non-zero elements in `base`.
         signed: Whether to force the output regulatory links to have the same sign as
             the input regulatory links.
-        n_jobs: Number of parallel jobs. -1 means use all available cores.
 
     Returns:
         A new GRN matrix of shape `(n_genes, n_genes)`.
     """
     mask = (base != 0)
     n_genes = X.shape[1]
-    
-    # Determine number of jobs
-    if n_jobs == -1:
-        n_jobs = min(cpu_count(), n_genes)
-    
-    print(f"Running regression with {n_jobs} parallel jobs for {n_genes} genes")
-    
-    # Use joblib for parallel processing
-    results = Parallel(n_jobs=n_jobs, verbose=1)(
-        delayed(_fit_single_gene_regression)(j, X, mask) 
-        for j in range(n_genes)
-    )
-    
-    # Reconstruct the matrix from results
     A = np.zeros((n_genes, n_genes), dtype=X.dtype)
-    for j, coef in results:
-        A[:, j] = coef
+    for j in tqdm.tqdm(range(n_genes)):
+        model = ElasticNet(alpha=0.001, fit_intercept=False)
+        if not np.any(mask[:, j]):
+            continue  # If gene has no regulator, skip it.
+        model.fit(X[:, mask[:, j]], X[:, j])
+        A[mask[:, j], j] = model.coef_
 
     # For each parameter that has the wrong regulatory sign, set it to zero.
     if signed:
@@ -197,8 +188,7 @@ def evaluate_grn(
         is_train: np.ndarray,
         is_reporter: np.ndarray,
         A: np.ndarray,
-        signed: bool = True,
-        n_jobs: int = -1
+        signed: bool = True
 ) -> np.ndarray:
 
     n_iter = MAX_N_ITER
@@ -210,7 +200,7 @@ def evaluate_grn(
 
     # Learn initial GRN weights from the first set
     print("Infer GRN weights from training set, given the provided GRN topology")
-    A = regression_based_grn_inference(X_controls, A, signed=signed, n_jobs=n_jobs)
+    A = regression_based_grn_inference(X_controls, A, signed=signed)
     # A = spearman_based_grn_inference(X_controls, A, signed=signed)
 
     # Learn shocks from perturbations, using reporter genes only
@@ -277,18 +267,16 @@ def evaluate_grn(
     delta_X_hat = delta_X_hat.detach().cpu().numpy()
     has_parent = (mask.any(axis=0))
     eval_mask = ((~is_reporter) & has_parent)
-    
-    # Parallel computation of R² scores
-    print(f"Computing R² scores with {n_jobs if n_jobs != -1 else cpu_count()} parallel jobs")
-    results = Parallel(n_jobs=n_jobs, verbose=1)(
-        delayed(_compute_r2_score)(j, delta_X_test, delta_X_hat, eval_mask)
-        for j in range(len(eval_mask))
-    )
-    
-    # Reconstruct coefficients array from results
-    coefficients = np.full(len(eval_mask), np.nan)
-    for j, coef in results:
-        coefficients[j] = coef
+    coefficients = []
+    for j in range(len(eval_mask)):
+        if eval_mask[j]:
+            if np.all(delta_X_test[:, j] == delta_X_test[0, j]):  # Constant
+                coefficients.append(np.nan)
+            else:
+                coefficients.append(max(0, r2_score(delta_X_test[:, j], delta_X_hat[:, j])))
+        else:
+            coefficients.append(np.nan)
+    coefficients = np.array(coefficients)
     #return np.nan_to_num(coefficients, nan=0)
     return coefficients
 
@@ -296,9 +284,6 @@ def evaluate_grn(
 def main(par):
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-    
-    # Get number of parallel jobs from parameter or use default
-    n_jobs = 10
 
     par['cv_groups'] = DATASET_GROUPS[dataset_id]['cv']
     par['match'] = DATASET_GROUPS[dataset_id]['match']
@@ -336,7 +321,7 @@ def main(par):
     gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
     in_degrees = np.sum(A != 0, axis=0)
     out_degrees = np.sum(A != 0, axis=1)
-    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-2000]
+    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-5000]
     gene_mask[idx] = False
     X = X[:, gene_mask]
     X = X.toarray() if isinstance(X, csr_matrix) else X
@@ -377,17 +362,16 @@ def main(par):
     is_train[train_idx] = True
 
     # Create a split between genes: reporter genes and evaluation genes.
-    # All TFs should be included in the reporter gene set.
-    # If the reporter gene set does not represent at least 50% of all genes,
-    # then we randomly add target genes until the 50% threshold is reached.
+    # All TFs and IEGs should be included in the reporter gene set.
     n_genes = A.shape[1]
-    reg_mask = np.asarray(A != 0).any(axis=1)  # TF mask
-    is_reporter = np.copy(reg_mask)
-    if np.mean(is_reporter) < 0.5 * len(is_reporter):
-        idx = np.where(~is_reporter)[0]
-        np.random.shuffle(idx)
-        idx = idx[:int(0.5 * len(is_reporter) - np.sum(is_reporter))]
-        is_reporter[idx] = True
+    reg_mask = np.asarray(A != 0).any(axis=1)
+    ieg_mask = np.asarray([gene_name in IEG for gene_name in gene_names], dtype=bool)
+    is_reporter = np.logical_or(reg_mask, ieg_mask)
+    #if np.mean(is_reporter) < 0.5 * len(is_reporter):
+    #    idx = np.where(~is_reporter)[0]
+    #    np.random.shuffle(idx)
+    #    idx = idx[:int(0.5 * len(is_reporter) - np.sum(is_reporter))]
+    #    is_reporter[idx] = True
     print(f"Proportion of reporter genes: {np.mean(is_reporter)}")
     print(f"Use regulatory modes/signs: {use_signs}")
 
@@ -396,11 +380,11 @@ def main(par):
 
     # Evaluate inferred GRN
     print("\n======== Evaluate inferred GRN ========")
-    scores = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A, signed=use_signs, n_jobs=n_jobs)
+    scores = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A, signed=use_signs)
 
     # Evaluate baseline GRN
     print("\n======== Evaluate shuffled GRN ========")
-    scores_baseline = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs, n_jobs=n_jobs)
+    scores_baseline = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
 
     # Keep only the genes for which both GRNs got a score
     mask = ~np.logical_or(np.isnan(scores), np.isnan(scores_baseline))
@@ -426,10 +410,10 @@ def main(par):
         print(f"Final score: {score}")
 
         results = {
-            'r2': [float(np.mean(scores))],
-            'r2_baseline': [float(np.mean(scores_baseline))],
-            'sem_lift': [np.mean(scores)/(np.mean(scores_baseline) + 1e-10)],
-            'sem_score': [float(score)]
+            # 'r2': [float(np.mean(scores))],
+            # 'r2_baseline': [float(np.mean(scores_baseline))],
+            'sem_precision': [float(np.mean(scores)/( np.mean(scores_baseline) + 1e-6))],
+            'sem_balanced': [float(score)]
         }
 
         df_results = pd.DataFrame(results)

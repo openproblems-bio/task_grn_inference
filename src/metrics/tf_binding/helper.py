@@ -101,8 +101,6 @@ def main(par):
             recall_at_k = np.nan
             lift_recall = np.nan
         
-
-
         scores_model.append({
             'source': tf,
             'ap': ap,

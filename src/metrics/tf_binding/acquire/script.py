@@ -3,6 +3,11 @@ import os
 import urllib.request
 from tqdm import tqdm
 
+# panda prints all the columns
+pd.set_option('display.max_columns', None)
+pd.set_option('display.max_rows', None)
+pd.set_option('display.width', 1000)
+
 def download_peaks_chip_atlas(celltype, genome, local_path, qval):
     def get_peak_file_name(celltype, genome, local_path, qval):
         FILE_LIST = 'fileList.tab'
@@ -13,9 +18,15 @@ def download_peaks_chip_atlas(celltype, genome, local_path, qval):
             print(f'Downloading {FILE_LIST} from {FILE_LIST_URL} to {file_path}')
             urllib.request.urlretrieve(FILE_LIST_URL, file_path)
         df = pd.read_csv(file_path, sep='\t', header=None, dtype=str, comment='#', usecols=range(7))
+        assert df.shape[0] > 0, f'No entries found in {file_path}'
         ct = str(celltype).strip().casefold()
         s_ct = df.iloc[:, 5].fillna('').str.strip().str.casefold()
-        return df[(df[1] == genome) & (df[2] == "TFs and others") & (df[6] == qval) & (s_ct == ct)][0].iloc[0]
+        
+        df_sub = df[(df[1] == genome) & (df[2] == "TFs and others") & (df[6] == qval) & (s_ct == ct)][0]
+        
+        if df_sub.shape[0] == 0:
+            raise ValueError(f'No peaks found for cell type {celltype}, {genome}, {qval} in {file_path}')
+        return df_sub.iloc[0]
     filename = get_peak_file_name(celltype, genome, local_path, qval)
     peaks_path = os.path.join(local_path, filename + '.bed')
     if not os.path.exists(peaks_path):
@@ -47,6 +58,7 @@ def read_peak_file(peaks_path, source):
         df[['experiment_id', 'tf', 'cell_type']] = df['metadata'].str.split('.', n=2, expand=True)
     else:
         raise ValueError(f"Unknown source: {source}")
+    df['score'] = pd.to_numeric(df['score'], errors='coerce').fillna(0).astype(float)
     return df
 
 # def get_tfs_from_peaks(peaks_df, format='chip_atlas'):
@@ -147,23 +159,28 @@ if __name__ == '__main__':
     local_path = 'resources/datasets_raw/chipseq/'
     tss_local_path = os.path.join(local_path, 'TSS.txt.gz')
     download_tss_file(tss_local_path)
-    if False:
-        for cell_type in []: #'PBMC' 'K-562' 'HCT 116' 
-            output_csv_path = f'resources/grn_benchmark/ground_truth/{cell_type.replace("-", "").replace(" ", "")}_chipatlas.csv'
+    if True:
+        print('Processing chip-atlas', flush=True)
+        for cell_type in ['k-562']: #'PBMC' 'K-562' 'HCT 116'  
+            cell_type_c = cell_type.replace('/', '').replace('-', '').replace('.', '').replace(' ', '').replace('_', '').upper()
+            if cell_type_c == 'HEK293TREx':
+                cell_type_c = 'HEK293T'
+            output_csv_path = f'resources/grn_benchmark/ground_truth/{cell_type_c}_chipatlas.csv'
             os.makedirs(f"{local_path}/chip_atlas/", exist_ok=True)
             print(f'Processing cell type: {cell_type}', flush=True)
             peaks_file = download_peaks_chip_atlas(cell_type, genome, f"{local_path}/chip_atlas/", qval)
             peaks_df = read_peak_file(peaks_file, source='chip_atlas')
             if True: 
                 # Filter for score == 1000
-                print('Filtering peaks with score == 1000', flush=True)
+                print('Filtering peaks with score > 0', flush=True)
                 print(f'Original number of peaks: {len(peaks_df)}', flush=True)
-                peaks_df = peaks_df[peaks_df['score'] == '1000']
+                peaks_df = peaks_df[peaks_df['score'] > 0]
                 print(f'Number of peaks after filtering: {len(peaks_df)}', flush=True)
             grn = build_grn(peaks_df, tss_local_path, genome=genome, window_bp=window_bp, max_workers=10)
             grn.to_csv(output_csv_path, index=False)
     
     if True: # remap
+        print('Processing remap2', flush=True)
         if False:
             print('Processing remap2022_all_macs2_hg38_v1_0', flush=True)
             peaks_file = f"{local_path}/remap/remap2022_all_macs2_hg38_v1_0.bed.gz"
@@ -175,24 +192,36 @@ if __name__ == '__main__':
             for cell_type in top_cells:
                 subset = peaks_df[peaks_df['cell_type'] == cell_type]
                 print(cell_type, subset.shape[0])
+                 
                 subset.to_csv(
-                    f"resources/datasets_raw/chipseq/remap/{cell_type.replace('/', '').replace('-', '').replace('.', '').replace(' ', '')}.bed",
+                    f"resources/datasets_raw/chipseq/remap/{cell_type_c}.bed",
                     sep='\t',
                     index=False,
                     header=False
                 )
-        # if True: 
-        #     # Filter for score == 1000
-        #     print('Filtering peaks with score == 1000', flush=True)
-        #     print(f'Original number of peaks: {len(peaks_df)}', flush=True)
-        #     peaks_df = peaks_df[peaks_df['score'] == '1000']
-        #     print(f'Number of peaks after filtering: {len(peaks_df)}', flush=True)
-        for cell_type in ['HEK293T', 'K-562', 'Hep-G2', 'HEK293', 'GM12878']:
+        for cell_type in [ 'K562']: #'HCT116', 'HEK293T', 'HEK293',
             print(f'Processing cell type: {cell_type}', flush=True)
-            df_sub = peaks_df[peaks_df['cell_type'] == cell_type]
-            grn = build_grn(df_sub, tss_local_path, genome=genome, window_bp=window_bp)
-            output_csv_path = f'resources/grn_benchmark/ground_truth/{cell_type.replace("-", "")}_remap.csv'
+            peaks_file = f"resources/datasets_raw/chipseq/remap/{cell_type}.bed"
+            df = pd.read_csv(
+                peaks_file,
+                sep='\t',
+                header=None,
+                dtype=str,
+                comment='#',
+                names=['chromosome', 'start', 'end', 'metadata', 'score', 'strand', 
+                    'thick_start', 'thick_end', 'rgb', '_', 'tf', 'cell_type']
+            )
+            df['score'] = pd.to_numeric(df['score'], errors='coerce')
+
+            print('Shape before filtering:', df.shape)
+            print("Before filtering, ", df.shape[0], " peaks")
+            df = df[df['score'] > 0]
+            print("After filtering, ", df.shape[0], " peaks")
+
+            grn = build_grn(df, tss_local_path, genome=genome, window_bp=window_bp)
+            output_csv_path = f'resources/grn_benchmark/ground_truth/{cell_type}_remap.csv'
             print(f'Writing GRN to {output_csv_path}', flush=True)
             grn.to_csv(output_csv_path, index=False)
+            print('Shape after filtering:', df.shape)
 
         

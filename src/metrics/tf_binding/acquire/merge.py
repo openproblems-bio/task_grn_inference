@@ -1,6 +1,7 @@
 import pandas as pd
 
-for cell_type in ['HCT116']: #'K562'
+for cell_type in ['K562']: #'K562'
+    print(f'Processing cell type: {cell_type}', flush=True)
 
     gt_1 = pd.read_csv(f"resources/grn_benchmark/ground_truth/{cell_type}_chipatlas.csv")
     gt_2 = pd.read_csv(f"resources/grn_benchmark/ground_truth/{cell_type}_remap.csv")

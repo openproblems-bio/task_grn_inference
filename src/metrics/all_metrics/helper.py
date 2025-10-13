@@ -11,7 +11,7 @@ import os
 
 from regression_2.helper import main as main_reg2
 from ws_distance.helper import main as main_ws_distance
-# from sem.helper import main as main_sem
+from experimental.sem.helper import main as main_sem
 # from vc_v2.helper import main as main_vc_v2
 from tf_recovery.helper import main as main_tf_rec
 from tf_binding.helper import main as main_tf_binding
@@ -65,14 +65,14 @@ def main(par):
     # rr_store.append(rr_reg2)
     # print("reg2 done: ", rr_reg2)
 
-    # if False:
-    #     try:
-    #         rr_sem = main_sem(par)
-    #     except Exception as e:
-    #         print(f"Error in sem metrics: {e}")
-    #         rr_sem = pd.DataFrame()
-    #     print("sem done: ", rr_sem)
-    #     rr_store.append(rr_sem)
+    if True:
+        try:
+            rr_sem = main_sem(par)
+        except Exception as e:
+            print(f"Error in sem metrics: {e}")
+            rr_sem = pd.DataFrame()
+        print("sem done: ", rr_sem)
+        rr_store.append(rr_sem)
     
     
     # try:
