@@ -36,8 +36,7 @@ torch.cuda.manual_seed_all(seed)
 torch.use_deterministic_algorithms(True)
 
 
-from util import read_prediction, manage_layer
-from baseline import create_grn_baseline
+from util import read_prediction, manage_layer, create_grn_baseline
 from dataset_config import DATASET_GROUPS
 
 
@@ -322,7 +321,7 @@ def main(par):
     gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
     in_degrees = np.sum(A != 0, axis=0)
     out_degrees = np.sum(A != 0, axis=1)
-    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-2000]
+    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-5000]
     gene_mask[idx] = False
     X = X[:, gene_mask]
     X = X.toarray() if isinstance(X, csr_matrix) else X
@@ -411,10 +410,10 @@ def main(par):
         print(f"Final score: {score}")
 
         results = {
-            'r2': [float(np.mean(scores))],
-            'r2_baseline': [float(np.mean(scores_baseline))],
-            'r2_diff': [float(np.mean(scores) - np.mean(scores_baseline))],
-            'sem': [float(score)]
+            # 'r2': [float(np.mean(scores))],
+            # 'r2_baseline': [float(np.mean(scores_baseline))],
+            'sem_precision': [float(np.mean(scores)/( np.mean(scores_baseline) + 1e-6))],
+            'sem_balanced': [float(score)]
         }
 
         df_results = pd.DataFrame(results)

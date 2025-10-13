@@ -10,11 +10,10 @@ import pandas as pd
 import anndata as ad
 import warnings
 warnings.filterwarnings("ignore")
-from util import format_save_score, read_prediction
+from util import format_save_score, read_prediction, manage_layer, create_grn_baseline
+from dataset_config import DATASET_GROUPS
 
 np.random.seed(0)
-from util import manage_layer
-from baseline import create_grn_baseline
 
 
 def encode_obs_cols(adata, cols):
@@ -26,13 +25,11 @@ def encode_obs_cols(adata, cols):
             encoded.append(codes)
     return encoded
 
-
 def combine_multi_index(*arrays) -> np.array:
     """Combine parallel label arrays into a single integer label per position."""
     A = np.stack(arrays)
     n_classes = tuple(int(A[i].max()) + 1 for i in range(A.shape[0]))
     return np.ravel_multi_index(A, dims=n_classes, order='C')
-
 
 def evaluate_grn(
         C: np.ndarray,
@@ -116,9 +113,7 @@ def evaluate_grn(
 
     return np.array(scores)
 
-
 def evaluate_setting(C: np.ndarray, A: np.ndarray, setting_name: str, **kwargs) -> float:
-
     # Whether or not to take into account the regulatory modes (enhancer/inhibitor)
     signed = kwargs.get("signed", True)
 
@@ -142,15 +137,14 @@ def evaluate_setting(C: np.ndarray, A: np.ndarray, setting_name: str, **kwargs) 
         return 0.0
     else:
         print(f"Mean corr. coef. for setting '{setting_name}': grn={np.mean(scores):.3f}, baseline={np.mean(scores_baseline):.3f}")
-        try:
-            p_value = wilcoxon(scores, scores_baseline, alternative="greater", zero_method="pratt").pvalue
-            p_value = np.clip(p_value, 1e-300, 1)
-            print(f"p-value={p_value}")
-            return -np.log10(p_value)
-        except ValueError:
-            return 0.0
+        
+        p_value = wilcoxon(scores, scores_baseline, alternative="greater", zero_method="pratt").pvalue
+        p_value = np.clip(p_value, 1e-300, 1)
+        print(f"p-value={p_value}")
 
-
+        score_lift = np.mean(scores) / (np.mean(scores_baseline) + 1e-10)
+        return score_lift, -np.log10(p_value)
+        
 def spearman_corrcoef(X: np.ndarray) -> np.ndarray:
     R = np.apply_along_axis(rankdata, 0, X, method="average")
     R -= R.mean(axis=0, keepdims=True)
@@ -158,7 +152,6 @@ def spearman_corrcoef(X: np.ndarray) -> np.ndarray:
     C = (R.T @ R) / (R.shape[0] - 1)
     np.fill_diagonal(C, 0.0)
     return C
-
 
 def main(par):
     # Load evaluation data
@@ -178,14 +171,11 @@ def main(par):
 
     # Get groups
     group_variables, group_names = [], []
-    if ("donor_id" in adata.obs) or ("plate_name" in adata.obs):
-        variables = encode_obs_cols(adata, ["donor_id", "plate_name"])
-        group_variables.append(combine_multi_index(*variables))
-        group_names.append("donor_id/plate_name")
-    if len(group_variables) == 0:
-        group_variables.append(np.random.randint(0, 6, size=len(X)))
-        group_names.append("random_split")
-
+    variables = DATASET_GROUPS[dataset_id]['anchors']
+    variables = encode_obs_cols(adata, variables)
+    group_variables.append(combine_multi_index(*variables))
+    group_names.append("anchors")
+    
     # Load inferred GRN
     df = read_prediction(par)
     sources = df["source"].to_numpy()
@@ -215,7 +205,6 @@ def main(par):
 
     tftg_results = []
     tgtg_results = []
-    tftg_tgtg_results = []
     for group_name, groups in zip(group_names, group_variables):
         print("\n" + "=" * 30)
         print(f"Grouping samples by {group_name}")
@@ -248,27 +237,24 @@ def main(par):
             max_targets_per_tf=300,
             signed=signed
         ))
-        
-        tftg_tgtg_results.append(evaluate_setting(
-            C, A, "tftg+tgtg",
-            tf_tg=True,
-            tg_tg=True,
-            n_tfs=100, 
-            max_targets_per_tf=300,
-            signed=signed
-        ))
 
-    tftg_score = np.mean(tftg_results)
-    tgtg_score = np.mean(tgtg_results)
-    tftg_tgtg_score = np.mean(tftg_tgtg_results)
-    final_score = (tftg_score + tgtg_score + tftg_tgtg_score) / 3.0
+    tftg_score = np.mean([score for score_lift, score in tftg_results])
+    tftg_score_lift = np.mean([score_lift for score_lift, score in tftg_results])
+    tgtg_score = np.mean([score for score_lift, score in tgtg_results])
+    tgtg_score_lift = np.mean([score_lift for score_lift, score in tgtg_results])
+    # final_score = (tftg_score + tgtg_score + tftg_tgtg_score) / 3.0
+
+    replica_consistency_precision = np.mean([tftg_score_lift, tgtg_score_lift])
+    replica_consistency_balanced = np.mean([tftg_score, tgtg_score])
     
     # Create results DataFrame with all three scores
     results = pd.DataFrame({
-        'tftg': [tftg_score],
-        'tgtg': [tgtg_score],
-        'tftg_tgtg': [tftg_tgtg_score],
-        'final_score': [final_score]
+        # 'tftg': [tftg_score],
+        # 'tftg_score_lift': [tftg_score_lift],
+        # 'tgtg': [tgtg_score],
+        # 'tgtg_score_lift': [tgtg_score_lift],
+        'replica_consistency_precision': [replica_consistency_precision],
+        'replica_consistency_balanced': [replica_consistency_balanced],
     })
     print(results)
     

@@ -7,6 +7,7 @@ import h5py
 import numpy as np
 import pandas as pd
 import tqdm
+import xgboost
 from scipy.sparse.linalg import LinearOperator
 from scipy.stats import pearsonr, spearmanr, wilcoxon, ConstantInputWarning
 from scipy.sparse import csr_matrix
@@ -18,14 +19,13 @@ warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=ConstantInputWarning)
 
 # For reproducibility purposes
-#seed = 0xCAFE
-#os.environ['PYTHONHASHSEED'] = str(seed)
-#random.seed(seed)
-#np.random.seed(seed)
+seed = 0xCAFE
+os.environ['PYTHONHASHSEED'] = str(seed)
+random.seed(seed)
+np.random.seed(seed)
 
 from util import read_prediction, manage_layer
 from dataset_config import DATASET_GROUPS
-from baseline import create_grn_baseline
 
 
 def encode_obs_cols(adata, cols):
@@ -52,7 +52,8 @@ def compute_residual_correlations(
         y_test: np.ndarray,
         Z_test: np.ndarray
 ) -> np.ndarray:
-    model = Ridge(alpha=0.1)
+    model = xgboost.XGBRegressor(n_estimators=10)
+    #model = Ridge(alpha=10)
     model.fit(X_train, y_train)
     y_hat = model.predict(X_test)
     residuals = y_test - y_hat
@@ -72,7 +73,7 @@ def main(par):
     if dataset_id not in DATASET_GROUPS:
         raise ValueError(f"Dataset {dataset_id} not found in DATASET_GROUPS")
     
-    anchor_cols = DATASET_GROUPS[dataset_id].get('anchors', ['donor_id', 'plate_name'])
+    anchor_cols = DATASET_GROUPS[dataset_id]['anchors']
     print(f"Using anchor variables: {anchor_cols}")
 
     # Manage layer
@@ -114,26 +115,26 @@ def main(par):
     gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
     in_degrees = np.sum(A != 0, axis=0)
     out_degrees = np.sum(A != 0, axis=1)
-    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-1000]
+    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-2000]
     gene_mask[idx] = False
     X = X[:, gene_mask]
     X = X.toarray() if isinstance(X, csr_matrix) else X
     A = A[gene_mask, :][:, gene_mask]
     gene_names = gene_names[gene_mask]
 
-    # Whether or not to take into account the regulatory modes (enhancer/inhibitor)
-    signed = np.any(A < 0)
-
     # Remove self-regulations
     np.fill_diagonal(A, 0)
     print(f"Evaluating {X.shape[1]} genes with {np.sum(A != 0)} regulatory links")
 
-    overall_scores = []
-    for group in np.unique(anchor_encoded):
-        scores, baseline_scores = [], []
+    # Create baseline model
+    A_baseline = np.copy(A)
+    for j in range(A.shape[1]):
+        np.random.shuffle(A_baseline[:j, j])
+        np.random.shuffle(A_baseline[j+1:, j])
+    assert np.any(A_baseline != A)
 
-        # Create baseline model
-        A_baseline = create_grn_baseline(A)
+    scores, baseline_scores = [], []
+    for group in np.unique(anchor_encoded):
 
         # Train/test split
         mask = (anchor_encoded != group)
@@ -163,30 +164,33 @@ def main(par):
                 )
                 scores.append(np.mean(coefs))
 
-                # Evaluate baseline GRN
-                selected = (A_baseline[:, j] != 0)
-                coefs = compute_residual_correlations(
-                    X_train[:, selected],
-                    X_train[:, j],
-                    X_test[:, selected],
-                    X_test[:, j],
-                    X_test[:, ~selected]
-                )
-                baseline_scores.append(np.mean(coefs))
-
-        # Compute fold score
-        p_value = wilcoxon(baseline_scores, scores, alternative="greater").pvalue
-        p_value = max(p_value, 1e-300)
-        overall_scores.append(-np.log10(p_value))
+            # Evaluate baseline GRN
+            selected = (A_baseline[:, j] != 0)
+            unselected = ~np.copy(selected)
+            unselected[j] = False
+            coefs = compute_residual_correlations(
+                X_train[:, selected],
+                X_train[:, j],
+                X_test[:, selected],
+                X_test[:, j],
+                X_test[:, ~selected]
+            )
+            baseline_scores.append(np.mean(coefs))
+    scores = np.array(scores)
+    baseline_scores = np.array(baseline_scores)
+    reg3_lift = np.mean(scores) / (np.mean(baseline_scores) + 1e-6)
+    p_value = wilcoxon(baseline_scores, scores, alternative="greater").pvalue
+    p_value = max(p_value, 1e-300)
 
     # Calculate final score
-    final_score = np.mean(overall_scores)
-    print(f"Regression Score: {final_score:.6f}")
+    final_score = -np.log10(p_value)
+    print(f"Anchor Regression Score: {final_score:.6f}")
     print(f"Method: {method_id}")
 
     # Return results as DataFrame
     results = {
-        'regression_3': [float(final_score)]
+        'reg3_precision': [reg3_lift],
+        'reg3_balanced': [final_score]
     }
 
     df_results = pd.DataFrame(results)

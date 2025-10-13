@@ -20,8 +20,8 @@ datasets=('op' 'parsebioscience' "300BCG"   "adamson"  "replogle" "xaira_HEK293T
 datasets=('op'  ) #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
 
 # methods to process
-methods=( "pearson_corr" "positive_control" "negative_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
-methods=( "pearson_corr" "negative_control" "positive_control" )
+methods=( "scprint"  "pearson_corr" "positive_control" "negative_control" "ppcor" "portia" "scenic" "grnboost" "scenicplus" "celloracle" "scglue" "figr" "granie")
+# methods=( "pearson_corr" "negative_control" "positive_control" )
 
 # temporary file to collect CSV rows
 combined_csv="${save_dir}/reg2_scores.csv"
@@ -47,7 +47,6 @@ for dataset in "${datasets[@]}"; do
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
             --regulators_consensus "resources/grn_benchmark/prior/regulators_consensus_${dataset}.json" \
-            --group_specific cell_type \
             --score "$score"
         
         # Extract metrics from the .h5ad and append to CSV
