@@ -26,6 +26,7 @@ np.random.seed(seed)
 
 from util import read_prediction, manage_layer
 from dataset_config import DATASET_GROUPS
+from baseline import create_grn_baseline
 
 
 def encode_obs_cols(adata, cols):
@@ -52,8 +53,8 @@ def compute_residual_correlations(
         y_test: np.ndarray,
         Z_test: np.ndarray
 ) -> np.ndarray:
-    model = xgboost.XGBRegressor(n_estimators=10)
-    #model = Ridge(alpha=10)
+    #model = xgboost.XGBRegressor(n_estimators=10)
+    model = Ridge(alpha=0.01)
     model.fit(X_train, y_train)
     y_hat = model.predict(X_test)
     residuals = y_test - y_hat
@@ -115,7 +116,7 @@ def main(par):
     gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
     in_degrees = np.sum(A != 0, axis=0)
     out_degrees = np.sum(A != 0, axis=1)
-    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-2000]
+    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-1000]
     gene_mask[idx] = False
     X = X[:, gene_mask]
     X = X.toarray() if isinstance(X, csr_matrix) else X
@@ -127,11 +128,7 @@ def main(par):
     print(f"Evaluating {X.shape[1]} genes with {np.sum(A != 0)} regulatory links")
 
     # Create baseline model
-    A_baseline = np.copy(A)
-    for j in range(A.shape[1]):
-        np.random.shuffle(A_baseline[:j, j])
-        np.random.shuffle(A_baseline[j+1:, j])
-    assert np.any(A_baseline != A)
+    A_baseline = create_grn_baseline(A)
 
     scores, baseline_scores = [], []
     for group in np.unique(anchor_encoded):
