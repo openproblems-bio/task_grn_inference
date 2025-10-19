@@ -18,7 +18,8 @@ workflow run_wf {
     ws_distance,
     tf_recovery,
     tf_binding,
-    replica_consistency
+    replica_consistency,
+    sem
   ]
     
   /***************************

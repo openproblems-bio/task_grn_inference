@@ -108,6 +108,7 @@ dependencies:
   - name: metrics/tf_recovery
   - name: metrics/tf_binding
   - name: metrics/replica_consistency
+  - name: metrics/sem
   - name: utils/extract_uns_metadata
     repository: openproblems
 

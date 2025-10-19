@@ -21,7 +21,7 @@ engines:
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages: [ tqdm_joblib==0.0.5]
+        packages: [ ]
 runners:
   - type: executable
   - type: nextflow
