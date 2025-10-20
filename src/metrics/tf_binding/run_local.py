@@ -4,7 +4,7 @@ import anndata as ad
 import pandas as pd
 
 
-for dataset in ["op"]:
+for dataset in ["replogle"]:
     #for method in ['granie']:
     for method in ["negative_control", "granie", "ppcor", "portia", "pearson_corr", "positive_control", "scenic", "grnboost", "scprint", "scenicplus", "celloracle", "scglue", "figr"]:
         
