@@ -77,7 +77,7 @@ def anchor_regression(
         X: np.ndarray,
         Z: np.ndarray,
         Y: np.ndarray,
-        l2_reg: float = 1e-4,
+        l2_reg: float = 1e-5,
         gamma: float = 1.0
 ) -> np.ndarray:
     """Anchor regression for causal inference under confounding.
@@ -115,7 +115,6 @@ def cross_val(
         Z: np.ndarray,
         eps: float = 1e-50
 ) -> float:
-    cv = KFold(5)
     ss_res, ss_tot = 0, 0
     y_mean = np.mean(y)
     for idx_train, idx_test in cv.split(X, y):
@@ -152,23 +151,23 @@ def compute_stabilities_v2(
         X: np.ndarray,
         y: np.ndarray,
         Z: np.ndarray,
-        A: np.ndarray,
         is_selected: np.ndarray,
         eps: float = 1e-50
-) -> Tuple[float, float]:
+) -> float:
 
-    theta0 = anchor_regression(X[:, is_selected], Z, y, gamma=1)
-    theta = anchor_regression(X[:, is_selected], Z, y, gamma=1.5)
-    s1 = np.clip(np.abs(theta0 - theta) / np.abs(theta0 + eps), 0, 1)
-
-    theta0 = anchor_regression(X[:, ~is_selected], Z, y, gamma=1)
-    theta = anchor_regression(X[:, ~is_selected], Z, y, gamma=1.5)
-    s2 = np.clip(np.abs(theta0 - theta) / np.abs(theta0 + eps), 0, 1)
+    theta0 = np.abs(anchor_regression(X, Z, y, gamma=1))
+    theta0 /= np.sum(theta0)
+    theta = np.abs(anchor_regression(X, Z, y, gamma=2))
+    theta /= np.sum(theta)
+    s1 = np.clip(np.abs(theta0[is_selected] - theta[is_selected]) / np.abs(theta0[is_selected] + eps), 0, 1)
+    s2 = np.clip(np.abs(theta0[~is_selected] - theta[~is_selected]) / np.abs(theta0[~is_selected] + eps), 0, 1)
 
     s1 = np.mean(s1)
     s2 = np.mean(s2)
 
-    return s1, s2
+    stability = (s1 - s2) / (s1 + s2 + eps)
+
+    return stability
 
 
 def evaluate_gene_stability(
@@ -199,27 +198,16 @@ def evaluate_gene_stability(
     mask = np.ones(X.shape[1], dtype=bool)
     mask[j] = False
 
-    score = compute_stabilities(X[:, mask], X[:, j], Z, A[mask, j], is_selected[mask], eps=eps)
-    #stabilities_non_selected = np.mean(compute_stabilities(X[:, mask], X[:, j], Z, A, ~is_selected[mask], eps=eps))
-    #score = (stabilities_selected - stabilities_non_selected) / (stabilities_selected + stabilities_non_selected + eps)
-    #score = np.mean(stabilities_selected)
-
-    return score
+    return compute_stabilities_v2(X[:, mask], X[:, j], Z, is_selected[mask])
 
 
 def main(par):
     """Main anchor regression evaluation function."""
+
     # Load evaluation data
     adata = ad.read_h5ad(par['evaluation_data'])
     dataset_id = adata.uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-    
-    # Get dataset-specific anchor variables
-    if dataset_id not in DATASET_GROUPS:
-        raise ValueError(f"Dataset {dataset_id} not found in DATASET_GROUPS")
-    
-    anchor_cols = DATASET_GROUPS[dataset_id].get('anchors', ['donor_id', 'plate_name'])
-    print(f"Using anchor variables: {anchor_cols}")
 
     # Manage layer
     layer = manage_layer(adata, par)
@@ -231,9 +219,22 @@ def main(par):
     gene_names = adata.var_names
     gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
 
+    # Get dataset-specific anchor variables
+    if dataset_id not in DATASET_GROUPS:
+        raise ValueError(f"Dataset {dataset_id} not found in DATASET_GROUPS")
+    anchor_cols = DATASET_GROUPS[dataset_id].get('anchors', ['donor_id', 'plate_name'])
+    print(f"Using anchor variables: {anchor_cols}")
+
     # Encode anchor variables
     anchor_variables = encode_obs_cols(adata, anchor_cols)
     anchor_encoded = combine_multi_index(*anchor_variables)
+
+    # Get CV groups
+    if "cell_type" in adata.obs:
+        cv_groups = LabelEncoder().fit_transform(adata.obs["cell_type"].values)
+    else:
+        np.random.randint(0, 5)
+        cv_groups = np.random.shuffle()
     
     if len(anchor_variables) == 0:
         raise ValueError(f"No anchor variables found in dataset for columns: {anchor_cols}")

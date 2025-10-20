@@ -4,9 +4,13 @@ import anndata as ad
 import pandas as pd
 
 
-for dataset in ["replogle", "norman", "adamson"]:
-    for method in ["negative_control", "pearson_corr", "positive_control", "ppcor", "portia", "scenic", "grnboost", "scprint", "scenicplus", "celloracle", "scglue", "figr", "granie"]:
+for dataset in ["op"]:
+    #for method in ['granie']:
+    for method in ["negative_control", "granie", "ppcor", "portia", "pearson_corr", "positive_control", "scenic", "grnboost", "scprint", "scenicplus", "celloracle", "scglue", "figr"]:
         
+        print()
+        print(method)
+
         score_filepath = f"output/tf_binding/tf_binding.h5ad"
         subprocess.call([
             "python",
