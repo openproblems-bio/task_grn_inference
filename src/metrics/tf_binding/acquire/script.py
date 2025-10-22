@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import numpy as np
 import urllib.request
 from tqdm import tqdm
 
@@ -77,11 +78,13 @@ def download_tss_file(tss_local_path):
     TSS_FILE = 'refGene.txt.gz'
     TSS_URL = f'https://hgdownload.soe.ucsc.edu/goldenPath/hg38/database/{TSS_FILE}'
     TSS_PATH = os.path.join(local_path, TSS_FILE)
+
     if not os.path.exists(tss_local_path):
         print(f'Downloading TSS (refGene) from {TSS_URL} to {tss_local_path}')
+        os.makedirs(os.path.dirname(tss_local_path), exist_ok=True)
         urllib.request.urlretrieve(TSS_URL, tss_local_path)
 
-def genes_with_peaks_near_tss(peaks_df, tss_file, window_bp=1000):
+def genes_with_peaks_near_tss(peaks_df, tss_file, window_up=1000, window_down=100):
     if peaks_df is None or len(peaks_df) == 0:
         raise ValueError("Peaks DataFrame is empty or None.")
     
@@ -99,11 +102,11 @@ def genes_with_peaks_near_tss(peaks_df, tss_file, window_bp=1000):
     tx_end = pd.to_numeric(ref.iloc[:, 5], errors='coerce').fillna(0).astype(int)
     gene = ref.iloc[:, 12].astype(str)
     tss = tx_start.where(strand == '+', tx_end)
-    win_start = (tss - int(window_bp)).clip(lower=0)
-    win_end = tss + int(window_bp)
+    win_start = np.where(strand == '+', tss - window_up, tss - window_down)[0]
+    win_end = np.where(strand == '+', tss + window_down, tss + window_up)[0]
     genes_df = pd.DataFrame({
         'chrom': chrom,
-        'start': win_start.astype(int),
+        'start': np.clip(win_start, 0, None).astype(int), 
         'end': win_end.astype(int),
         'gene': gene.str.strip(),
     })
@@ -129,22 +132,22 @@ import pandas as pd
 from tqdm import tqdm
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-def _process_tf(tf, peaks_df, tss_file, window_bp):
+def _process_tf(tf, peaks_df, tss_file):
     peaks = peaks_df[peaks_df['tf'] == tf]
     if peaks is None or len(peaks) == 0:
         return []
-    genes = genes_with_peaks_near_tss(peaks, tss_file, window_bp=window_bp)
+    genes = genes_with_peaks_near_tss(peaks, tss_file)
     if not genes:
         return []
     return [{'source': tf, 'target': g} for g in genes]
 
-def build_grn(peaks_df, tss_file, genome='hg38', window_bp=1000, max_workers=None):
+def build_grn(peaks_df, tss_file, genome='hg38', max_workers=None):
     tfs = peaks_df['tf'].unique()
     rows = []
 
     # Use ProcessPoolExecutor for parallel processing
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        futures = {executor.submit(_process_tf, tf, peaks_df, tss_file, window_bp): tf for tf in tfs}
+        futures = {executor.submit(_process_tf, tf, peaks_df, tss_file): tf for tf in tfs}
         for future in tqdm(as_completed(futures), total=len(futures)):
             result = future.result()
             if result:
@@ -154,7 +157,6 @@ def build_grn(peaks_df, tss_file, genome='hg38', window_bp=1000, max_workers=Non
     return grn
 if __name__ == '__main__':
     genome = 'hg38'
-    window_bp = 1000
     qval = "50"
     local_path = 'resources/datasets_raw/chipseq/'
     tss_local_path = os.path.join(local_path, 'TSS.txt.gz')
@@ -172,16 +174,16 @@ if __name__ == '__main__':
             peaks_df = read_peak_file(peaks_file, source='chip_atlas')
             if True: 
                 # Filter for score == 1000
-                print('Filtering peaks with score > 0', flush=True)
+                print('Filtering peaks with score > 50', flush=True)
                 print(f'Original number of peaks: {len(peaks_df)}', flush=True)
-                peaks_df = peaks_df[peaks_df['score'] > 0]
+                peaks_df = peaks_df[peaks_df['score'] > 50]
                 print(f'Number of peaks after filtering: {len(peaks_df)}', flush=True)
-            grn = build_grn(peaks_df, tss_local_path, genome=genome, window_bp=window_bp, max_workers=10)
+            grn = build_grn(peaks_df, tss_local_path, genome=genome, max_workers=10)
             grn.to_csv(output_csv_path, index=False)
     
     if True: # remap
         print('Processing remap2', flush=True)
-        if False:
+        if True:
             print('Processing remap2022_all_macs2_hg38_v1_0', flush=True)
             peaks_file = f"{local_path}/remap/remap2022_all_macs2_hg38_v1_0.bed.gz"
             print('Reading peaks file', flush=True)
@@ -218,7 +220,7 @@ if __name__ == '__main__':
             df = df[df['score'] > 0]
             print("After filtering, ", df.shape[0], " peaks")
 
-            grn = build_grn(df, tss_local_path, genome=genome, window_bp=window_bp)
+            grn = build_grn(df, tss_local_path, genome=genome)
             output_csv_path = f'resources/grn_benchmark/ground_truth/{cell_type}_remap.csv'
             print(f'Writing GRN to {output_csv_path}', flush=True)
             grn.to_csv(output_csv_path, index=False)
