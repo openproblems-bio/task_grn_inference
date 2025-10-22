@@ -21,7 +21,7 @@ DATASET_GROUPS = {
         'anchors': ["donor_id"],
         "cv": ["perturbation", "cell_type"],
     },
-    "IBD": {
+    "ibd": {
         'anchors': ['donor_id'],
     },
     "replogle": {

@@ -32,12 +32,7 @@ par = parse_args(par)
 if __name__ == '__main__':
   method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
   dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
-  if dataset_id == 'op':
-    par['group'] = ['perturbation', 'cell_type']
-  elif dataset_id in '300BCG':
-    par['group'] = ['cell_type', 'time', 'perturbation']
-  else:
-    raise ValueError(f"Dataset {dataset_id} not supported yet")
+
   output = main(par)
   
   format_save_score(output, method_id, dataset_id, par['score'])

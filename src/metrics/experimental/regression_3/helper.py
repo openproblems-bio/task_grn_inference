@@ -73,7 +73,7 @@ def main(par):
     if dataset_id not in DATASET_GROUPS:
         raise ValueError(f"Dataset {dataset_id} not found in DATASET_GROUPS")
     
-    anchor_cols = DATASET_GROUPS[dataset_id].get('anchors', ['donor_id', 'plate_name'])
+    anchor_cols = DATASET_GROUPS[dataset_id]['anchors']
     print(f"Using anchor variables: {anchor_cols}")
 
     # Manage layer
@@ -115,7 +115,7 @@ def main(par):
     gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
     in_degrees = np.sum(A != 0, axis=0)
     out_degrees = np.sum(A != 0, axis=1)
-    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-1000]
+    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-2000]
     gene_mask[idx] = False
     X = X[:, gene_mask]
     X = X.toarray() if isinstance(X, csr_matrix) else X
@@ -142,9 +142,9 @@ def main(par):
         X_test = X[~mask, :]
 
         # Standardize features
-        #scaler = StandardScaler()
-        #X_train = scaler.fit_transform(X_train)
-        #X_test = scaler.transform(X_test)
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
 
         for j in tqdm.tqdm(range(X_train.shape[1])):
 
@@ -178,7 +178,7 @@ def main(par):
             baseline_scores.append(np.mean(coefs))
     scores = np.array(scores)
     baseline_scores = np.array(baseline_scores)
-
+    reg3_lift = np.mean(scores) / (np.mean(baseline_scores) + 1e-6)
     p_value = wilcoxon(baseline_scores, scores, alternative="greater").pvalue
     p_value = max(p_value, 1e-300)
 
@@ -189,7 +189,8 @@ def main(par):
 
     # Return results as DataFrame
     results = {
-        'regression_3': [final_score]
+        'reg3_precision': [reg3_lift],
+        'reg3_balanced': [final_score]
     }
 
     df_results = pd.DataFrame(results)

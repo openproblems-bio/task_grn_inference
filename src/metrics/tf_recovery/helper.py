@@ -7,9 +7,6 @@ import re
 import anndata as ad
 from scipy.stats import ttest_rel
 
-
-    
-    
 from util import read_prediction
 
 def calculate_ulm_score(tf_mat, tf_grn):
