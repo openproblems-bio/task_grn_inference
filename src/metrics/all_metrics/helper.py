@@ -11,9 +11,11 @@ import os
 
 from regression_2.helper import main as main_reg2
 from ws_distance.helper import main as main_ws_distance
-from sem.helper import main as main_sem
-from vc_v2.helper import main as main_vc_v2
-from tf_recovery import main as main_tf_rec
+from experimental.sem.helper import main as main_sem
+# from vc_v2.helper import main as main_vc_v2
+from tf_recovery.helper import main as main_tf_rec
+from tf_binding.helper import main as main_tf_binding
+from replica_consistency.helper import main as main_replica_consistency
 
 
 def main(par):
@@ -27,6 +29,22 @@ def main(par):
             tf_rec = pd.DataFrame()
         print("tf_rec done: ", tf_rec)
         rr_store.append(tf_rec)
+    if True:
+        try:
+            tf_binding = main_tf_binding(par)
+        except Exception as e:
+            print(f"Error in main_tf_binding metrics: {e}")
+            tf_binding = pd.DataFrame()
+        print("tf_binding done: ", tf_binding)
+        rr_store.append(tf_binding)
+    if True:
+        try:
+            rr_replica = main_replica_consistency(par)
+        except Exception as e:
+            print(f"Error in replica consistency metrics: {e}")
+            rr_replica = pd.DataFrame()
+        print("replica consistency done: ", rr_replica)
+        rr_store.append(rr_replica)
 
     
     # if True:
@@ -47,14 +65,14 @@ def main(par):
     # rr_store.append(rr_reg2)
     # print("reg2 done: ", rr_reg2)
 
-    # if False:
-    #     try:
-    #         rr_sem = main_sem(par)
-    #     except Exception as e:
-    #         print(f"Error in sem metrics: {e}")
-    #         rr_sem = pd.DataFrame()
-    #     print("sem done: ", rr_sem)
-    #     rr_store.append(rr_sem)
+    if True:
+        try:
+            rr_sem = main_sem(par)
+        except Exception as e:
+            print(f"Error in sem metrics: {e}")
+            rr_sem = pd.DataFrame()
+        print("sem done: ", rr_sem)
+        rr_store.append(rr_sem)
     
     
     # try:

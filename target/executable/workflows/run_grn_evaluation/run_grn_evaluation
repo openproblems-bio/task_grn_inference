@@ -791,6 +791,8 @@ fi
 VIASH_DEP_METRICS_REGRESSION_2="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/regression_2/main.nf"
 VIASH_DEP_METRICS_WS_DISTANCE="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/ws_distance/main.nf"
 VIASH_DEP_METRICS_TF_RECOVERY="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/tf_recovery/main.nf"
+VIASH_DEP_METRICS_TF_BINDING="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/tf_binding/main.nf"
+VIASH_DEP_METRICS_REPLICA_CONSISTENCY="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/replica_consistency/main.nf"
 VIASH_DEP_UTILS_EXTRACT_UNS_METADATA="$VIASH_TARGET_DIR/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
 
 ViashDebug "Running command: $(echo $VIASH_CMD)"
@@ -829,7 +831,9 @@ workflow run_wf {
   metrics = [
     regression_2,
     ws_distance,
-    tf_recovery
+    tf_recovery,
+    tf_binding,
+    replica_consistency
   ]
     
   /***************************

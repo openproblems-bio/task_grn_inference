@@ -3282,6 +3282,18 @@ meta = [
       }
     },
     {
+      "name" : "metrics/tf_binding",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "metrics/replica_consistency",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
       "name" : "utils/extract_uns_metadata",
       "repository" : {
         "type" : "github",
@@ -3354,7 +3366,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.4",
-    "git_commit" : "f5628fc0dc4321867c2562c990715151d434ec97",
+    "git_commit" : "41b4cb030af2fd7a9f848434ffcb0af7d080098c",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3457,6 +3469,8 @@ meta["root_dir"] = getRootDir()
 include { regression_2 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_2/main.nf"
 include { ws_distance } from "${meta.resources_dir}/../../../nextflow/metrics/ws_distance/main.nf"
 include { tf_recovery } from "${meta.resources_dir}/../../../nextflow/metrics/tf_recovery/main.nf"
+include { tf_binding } from "${meta.resources_dir}/../../../nextflow/metrics/tf_binding/main.nf"
+include { replica_consistency } from "${meta.resources_dir}/../../../nextflow/metrics/replica_consistency/main.nf"
 include { extract_uns_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
 
 // inner workflow
@@ -3479,7 +3493,9 @@ workflow run_wf {
   metrics = [
     regression_2,
     ws_distance,
-    tf_recovery
+    tf_recovery,
+    tf_binding,
+    replica_consistency
   ]
     
   /***************************
