@@ -13,6 +13,10 @@ argument_groups:
         type: file
         required: true
         direction: input
+      - name: --evaluation_data_de
+        type: file
+        required: false
+        direction: input
       - name: --prediction
         type: file
         required: true

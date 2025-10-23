@@ -44,6 +44,7 @@ workflow run_wf {
       fromState: [
         evaluation_data: "evaluation_data",
         evaluation_data_sc: "evaluation_data_sc",
+        evaluation_data_de: "evaluation_data_de",
         prediction: "prediction",
         ws_distance_background: "ws_distance_background",
         subsample: "subsample",

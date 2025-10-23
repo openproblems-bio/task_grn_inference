@@ -48,7 +48,14 @@ for key, value in vars(args).items():
         par[key] = value
 
 if __name__ == "__main__":
-    output = main_sem(par)
+    try:
+        output = main_sem(par)
+    except Exception as e:
+        print(f"Error in SEM evaluation: {e}")
+        output = pd.DataFrame({
+            'key': [None],
+            'value': [None]
+        })
 
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
