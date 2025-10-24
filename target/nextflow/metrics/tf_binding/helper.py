@@ -4,7 +4,11 @@ import pandas as pd
 import numpy as np
 from sklearn.metrics import average_precision_score
 from tqdm import tqdm
+import sys
+import os
+
 from util import read_prediction
+
 from scipy.stats import wilcoxon
 
 # Wilcoxon signed-rank test: AP vs prevalence
@@ -131,14 +135,49 @@ def main(par):
 
     # Calculate TF coverage
     n_tfs_in_gt = true_graph['source'].nunique()
-    n_tfs_in_grn = set(prediction['source'].unique()) & set(true_graph['source'].unique())
-    n_tfs_in_grn = len(n_tfs_in_grn)
-
+    tfs_in_grn = set(prediction['source'].unique())
+    tfs_in_gt = set(true_graph['source'].unique())
+    tfs_evaluated = tfs_in_grn & tfs_in_gt
+    n_tfs_in_grn = len(tfs_in_grn)
+    n_tfs_evaluated = len(tfs_evaluated)
+    
+    # Print debug info
+    # print(f"\n=== TF COVERAGE DEBUG ===")
+    # print(f"TFs in ground truth: {n_tfs_in_gt}")
+    # print(f"TFs in prediction: {n_tfs_in_grn}")
+    # print(f"TFs evaluated (intersection): {n_tfs_evaluated}")
+    # print(f"TF coverage: {n_tfs_evaluated/n_tfs_in_gt*100:.1f}%")
+    # print(f"TFs in GT: {sorted(tfs_in_gt)}")
+    # print(f"TFs in GRN: {sorted(tfs_in_grn)}")
+    # print(f"TFs evaluated: {sorted(tfs_evaluated)}")
+    
+    # Debug precision/recall calculation
+    # print(f"\n=== METRIC DEBUG  ===")
+    # print(f"AP values (non-NaN): {len(ap_values_pred)} TFs")
+    # print(f"Mean AP: {ap_pred_mean:.4f}")
+    # print(f"Mean prevalence: {preval_pred_mean:.4f}")
+    # print(f"Lift (precision): {lift_pred:.4f}")
+    # print(f"Mean recall@k: {mean_recall_at_k:.4f}")
+    # print(f"Mean lift recall: {mean_lift_recall:.4f}")
+    
+    # Calculate final recall - fix the variable assignment issue
     recall = mean_lift_recall_all * mean_lift_recall
+    # print(f"Final recall: {recall:.4f}")
+
+    # Handle case where no TFs are evaluated (prevent None values)
+    if n_tfs_evaluated == 0:
+        print("WARNING: No TFs overlap between prediction and ground truth!")
+        lift_pred = 0.0
+        recall = 0.0
 
     summary_df = pd.DataFrame([{
         'tf_binding_precision': lift_pred,
-        'tf_binding_recall': recall
+        'tf_binding_recall': recall,
+
+        'n_tfs_in_gt': n_tfs_in_gt,
+        'n_tfs_in_grn': n_tfs_in_grn,
+        'n_tfs_evaluated': n_tfs_evaluated,
+        'tf_coverage_pct': n_tfs_evaluated/n_tfs_in_gt*100 if n_tfs_in_gt > 0 else 0
     }])
 
     return summary_df

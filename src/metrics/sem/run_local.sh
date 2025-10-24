@@ -42,7 +42,7 @@ for dataset in "${datasets[@]}"; do
         fi
 
         echo -e "\nProcessing method: $method\n"
-        python src/metrics/experimental/sem/script.py \
+        python src/metrics/sem/script.py \
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
             --score "$score"

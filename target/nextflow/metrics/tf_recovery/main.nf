@@ -3478,7 +3478,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/tf_recovery",
     "viash_version" : "0.9.4",
-    "git_commit" : "41b4cb030af2fd7a9f848434ffcb0af7d080098c",
+    "git_commit" : "b59166d48dab40e69efec82691d01d35ed200951",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3658,7 +3658,15 @@ if __name__ == "__main__":
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
 
     print(par)
-    output = main(par)
+    try:
+        output = main(par)
+    except Exception as e:
+        print(f"Error in TF recovery evaluation: {e}")
+        output = pd.DataFrame({
+            'key': [None],
+            'value': [None]
+        })
+        
     
     format_save_score(output, method_id, dataset_id, par['score'])
 VIASHMAIN

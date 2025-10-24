@@ -3467,7 +3467,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/tf_binding",
     "viash_version" : "0.9.4",
-    "git_commit" : "41b4cb030af2fd7a9f848434ffcb0af7d080098c",
+    "git_commit" : "b59166d48dab40e69efec82691d01d35ed200951",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3639,9 +3639,14 @@ args = parse_args(par)
 
 
 if __name__ == "__main__":
-    output = main(par)
-    
-    # print(output)
+    try:
+        output = main(par)
+    except Exception as e:
+        print(f"Error in TF binding evaluation: {e}")
+        output = pd.DataFrame({
+            'key': [None],
+            'value': [None]
+        })
 
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']

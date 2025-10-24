@@ -456,9 +456,9 @@ RUN pip install --upgrade pip && \
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics replica_consistency"
-LABEL org.opencontainers.image.created="2025-10-22T12:36:34Z"
+LABEL org.opencontainers.image.created="2025-10-24T11:10:51Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="41b4cb030af2fd7a9f848434ffcb0af7d080098c"
+LABEL org.opencontainers.image.revision="b59166d48dab40e69efec82691d01d35ed200951"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1309,8 +1309,16 @@ if __name__ == '__main__':
   method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
   dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
 
-  output = main(par)
-  
+  try:
+    output = main(par)
+  except Exception as e:
+    print({'error': str(e)})
+
+    output = pd.DataFrame({
+        'key': [None],
+        'value': [None],
+    })
+
   format_save_score(output, method_id, dataset_id, par['score'])
 VIASHMAIN
 python -B "\$tempscript" &

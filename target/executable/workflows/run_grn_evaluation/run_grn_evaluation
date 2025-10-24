@@ -183,6 +183,9 @@ function ViashHelp {
   echo "    --evaluation_data"
   echo "        type: file, required parameter, file must exist"
   echo ""
+  echo "    --evaluation_data_de"
+  echo "        type: file, file must exist"
+  echo ""
   echo "    --prediction"
   echo "        type: file, required parameter, file must exist"
   echo ""
@@ -296,6 +299,17 @@ while [[ $# -gt 0 ]]; do
         --evaluation_data=*)
             [ -n "$VIASH_PAR_EVALUATION_DATA" ] && ViashError Bad arguments for option \'--evaluation_data=*\': \'$VIASH_PAR_EVALUATION_DATA\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_EVALUATION_DATA=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --evaluation_data_de)
+            [ -n "$VIASH_PAR_EVALUATION_DATA_DE" ] && ViashError Bad arguments for option \'--evaluation_data_de\': \'$VIASH_PAR_EVALUATION_DATA_DE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_EVALUATION_DATA_DE="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --evaluation_data_de. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --evaluation_data_de=*)
+            [ -n "$VIASH_PAR_EVALUATION_DATA_DE" ] && ViashError Bad arguments for option \'--evaluation_data_de=*\': \'$VIASH_PAR_EVALUATION_DATA_DE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_EVALUATION_DATA_DE=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --prediction)
@@ -654,6 +668,10 @@ if [ ! -z "$VIASH_PAR_EVALUATION_DATA" ] && [ ! -e "$VIASH_PAR_EVALUATION_DATA" 
   ViashError "Input file '$VIASH_PAR_EVALUATION_DATA' does not exist."
   exit 1
 fi
+if [ ! -z "$VIASH_PAR_EVALUATION_DATA_DE" ] && [ ! -e "$VIASH_PAR_EVALUATION_DATA_DE" ]; then
+  ViashError "Input file '$VIASH_PAR_EVALUATION_DATA_DE' does not exist."
+  exit 1
+fi
 if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -e "$VIASH_PAR_PREDICTION" ]; then
   ViashError "Input file '$VIASH_PAR_PREDICTION' does not exist."
   exit 1
@@ -793,6 +811,7 @@ VIASH_DEP_METRICS_WS_DISTANCE="$VIASH_META_RESOURCES_DIR/../../../nextflow/metri
 VIASH_DEP_METRICS_TF_RECOVERY="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/tf_recovery/main.nf"
 VIASH_DEP_METRICS_TF_BINDING="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/tf_binding/main.nf"
 VIASH_DEP_METRICS_REPLICA_CONSISTENCY="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/replica_consistency/main.nf"
+VIASH_DEP_METRICS_SEM="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/sem/main.nf"
 VIASH_DEP_UTILS_EXTRACT_UNS_METADATA="$VIASH_TARGET_DIR/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
 
 ViashDebug "Running command: $(echo $VIASH_CMD)"
@@ -833,7 +852,8 @@ workflow run_wf {
     ws_distance,
     tf_recovery,
     tf_binding,
-    replica_consistency
+    replica_consistency,
+    sem
   ]
     
   /***************************
@@ -858,6 +878,7 @@ workflow run_wf {
       fromState: [
         evaluation_data: "evaluation_data",
         evaluation_data_sc: "evaluation_data_sc",
+        evaluation_data_de: "evaluation_data_de",
         prediction: "prediction",
         ws_distance_background: "ws_distance_background",
         subsample: "subsample",

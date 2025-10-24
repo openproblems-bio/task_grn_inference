@@ -23,7 +23,7 @@ from scipy.sparse import csr_matrix
 logger = logging.getLogger(__name__)
 
 
-def tokenize_data(nproc, model_details=None, gene_median=None, token=None, gene_mapping_file=None, tokenized_dir=None):
+def tokenize_data(nproc, temp_dir, model_details=None, gene_median=None, token=None, gene_mapping_file=None, tokenized_dir=None):
     """Tokenize data with required parameters"""
     if not all([model_details, gene_median, token, gene_mapping_file, tokenized_dir]):
         raise ValueError("Missing required parameters for tokenization")
@@ -37,7 +37,7 @@ def tokenize_data(nproc, model_details=None, gene_median=None, token=None, gene_
     )
 
     tokenizer.tokenize_data(
-        "/tmp/geneformer/", tokenized_dir, "tokenized", file_format="h5ad"
+        temp_dir, tokenized_dir, "tokenized", file_format="h5ad"
     )
 # extract embeddings
 def get_embs(
@@ -970,6 +970,7 @@ def tryParallelFunction(func, label, **kwargs):
 
 def compute_geneformer_network(
     adata,
+    temp_dir,
     forward_batch_size=4,
     max_ncells=1000,
     n_processors=20,
@@ -990,19 +991,19 @@ def compute_geneformer_network(
     ]
     adata.obs["n_counts"] = adata.X.sum(1)
     # Create the geneformer folder if it doesn't exist
-    geneformer_folder = "/tmp/geneformer"
+    geneformer_folder = f"{temp_dir}/geneformer"
     if not os.path.exists(geneformer_folder):
         os.makedirs(geneformer_folder)
-    adata.write_h5ad("/tmp/geneformer/to_token.h5ad")
+    adata.write_h5ad(f"{temp_dir}/geneformer/to_token.h5ad")
 
     genelist = [gene_mapping_dict[u] for u in adata.var.index]
 
-    tokenized_data_path = "/tmp/geneformer/tokenized_data.dataset"
+    tokenized_data_path = f"{temp_dir}/geneformer/tokenized_data.dataset"
     if os.path.exists(tokenized_data_path):
         shutil.rmtree(tokenized_data_path)
 
     # Note: This would need proper model_details, gene_median, gene_mapping_file parameters
-    # tryParallelFunction(tokenize_data, "Tokenizing data")
+    tryParallelFunction(tokenize_data, "Tokenizing data", temp_dir=geneformer_folder)
 
     embex = EmbExtractor(
         model_type="Pretrained",  # CellClassifier
@@ -1153,6 +1154,7 @@ def main(par):
         ]
         subadata, net = compute_geneformer_network(
             subadata,
+            temp_dir=par["temp_dir"],
             forward_batch_size=par["batch_size"], 
             n_processors=n_processors,
             max_ncells=par["max_cells"],

@@ -3049,6 +3049,16 @@ meta = [
         },
         {
           "type" : "file",
+          "name" : "--evaluation_data_de",
+          "must_exist" : true,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
           "name" : "--prediction",
           "must_exist" : true,
           "create_parent" : true,
@@ -3294,6 +3304,12 @@ meta = [
       }
     },
     {
+      "name" : "metrics/sem",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
       "name" : "utils/extract_uns_metadata",
       "repository" : {
         "type" : "github",
@@ -3366,7 +3382,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.4",
-    "git_commit" : "41b4cb030af2fd7a9f848434ffcb0af7d080098c",
+    "git_commit" : "b59166d48dab40e69efec82691d01d35ed200951",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3471,6 +3487,7 @@ include { ws_distance } from "${meta.resources_dir}/../../../nextflow/metrics/ws
 include { tf_recovery } from "${meta.resources_dir}/../../../nextflow/metrics/tf_recovery/main.nf"
 include { tf_binding } from "${meta.resources_dir}/../../../nextflow/metrics/tf_binding/main.nf"
 include { replica_consistency } from "${meta.resources_dir}/../../../nextflow/metrics/replica_consistency/main.nf"
+include { sem } from "${meta.resources_dir}/../../../nextflow/metrics/sem/main.nf"
 include { extract_uns_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
 
 // inner workflow
@@ -3495,7 +3512,8 @@ workflow run_wf {
     ws_distance,
     tf_recovery,
     tf_binding,
-    replica_consistency
+    replica_consistency,
+    sem
   ]
     
   /***************************
@@ -3520,6 +3538,7 @@ workflow run_wf {
       fromState: [
         evaluation_data: "evaluation_data",
         evaluation_data_sc: "evaluation_data_sc",
+        evaluation_data_de: "evaluation_data_de",
         prediction: "prediction",
         ws_distance_background: "ws_distance_background",
         subsample: "subsample",
