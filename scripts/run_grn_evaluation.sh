@@ -65,7 +65,7 @@ if [ -z "${DATASET:-}" ]; then
 fi
 
 num_workers=10
-metric_ids="[regression_2, ws_distance, sem]" #regression_1, regression_2, ws_distance
+metric_ids="[regression_2, ws_distance, sem, tf_recovery, tf_binding, replica_consistency]" #regression_1, regression_2, ws_distance
 RUN_ID="${DATASET}_evaluation"
 models_folder="${DATASET}/"
 apply_skeleton=false
@@ -109,8 +109,6 @@ param_list:
 HERE
 fi
 
-# Write YAML header
-
 append_entry() {
   local grn_name="$1"
   local prediction="$2"
@@ -121,7 +119,7 @@ append_entry() {
       layer_=$layer
   fi
   cat >> "$param_local" << HERE
-  - id: ${reg_type}_${grn_name}_${dataset}
+  - id: ${grn_name}_${dataset}
     metric_ids: ${metric_ids}
     evaluation_data: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad
     tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
@@ -134,12 +132,12 @@ append_entry() {
     layer: $layer_
 
 HERE
-
   # Additional fields for specific datasets
   if [[ "$dataset" =~ ^(norman|replogle|adamson|xaira_HCT116|xaira_HEK293T)$ ]]; then
     cat >> "$param_local" << HERE
     ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
     ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv
+    evaluation_data_de: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_de.h5ad
 HERE
   fi
 }

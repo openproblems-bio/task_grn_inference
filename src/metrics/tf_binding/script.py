@@ -35,9 +35,14 @@ args = parse_args(par)
 
 
 if __name__ == "__main__":
-    output = main(par)
-    
-    # print(output)
+    try:
+        output = main(par)
+    except Exception as e:
+        print(f"Error in TF binding evaluation: {e}")
+        output = pd.DataFrame({
+            'key': [None],
+            'value': [None]
+        })
 
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']

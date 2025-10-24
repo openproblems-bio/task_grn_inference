@@ -13,6 +13,10 @@ argument_groups:
         type: file
         required: true
         direction: input
+      - name: --evaluation_data_de
+        type: file
+        required: false
+        direction: input
       - name: --prediction
         type: file
         required: true
@@ -108,6 +112,7 @@ dependencies:
   - name: metrics/tf_recovery
   - name: metrics/tf_binding
   - name: metrics/replica_consistency
+  - name: metrics/sem
   - name: utils/extract_uns_metadata
     repository: openproblems
 
