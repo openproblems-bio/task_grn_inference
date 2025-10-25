@@ -28,6 +28,7 @@ def load_cell_type_categories():
                     "peripheral blood mononuclear cells", "GM12878"],  # Added GM12878
         },
         
+
         # K562 cell line (myelogenous leukemia)
         "k562": {
             "chipatlas": ["K-562"],
@@ -47,34 +48,6 @@ def load_cell_type_categories():
             "chipatlas": ["HCT116", "HCT-116", "DLD-1", "HT-29"],
             "remap2022": ["HCT-116 cell", "DLD-1 cell", "CACO-2 cell"],
             "unibind": ["HCT116"],
-        },
-        
-        # MCF7 cell line (breast cancer)
-        "mcf7": {
-            "chipatlas": ["MCF-7", "MCF 7"],
-            "remap2022": ["MCF-7 cell"],
-            "unibind": ["MCF7", "MCF7  Invasive ductal breast carcinoma"],
-        },
-        
-        # HepG2 cell line (liver/hepatoma)
-        "hepg2": {
-            "chipatlas": ["Hep G2"],
-            "remap2022": ["Hep-G2 cell"],
-            "unibind": ["HepG2", "HepG2  hepatoblastoma"],
-        },
-        
-        # A549 cell line (lung cancer)
-        "a549": {
-            "chipatlas": ["A549"],
-            "remap2022": ["A-549 cell"],
-            "unibind": ["A549"],
-        },
-        
-        # All cancer cell lines combined
-        "cancer_lines": {
-            "chipatlas": ["K-562", "293", "HEK293", "MCF-7", "MCF 7", "Hep G2", "A549", "HCT116"],
-            "remap2022": ["K-562 cell", "HEK-293 cell", "HEK-293T cell", "MCF-7 cell", "Hep-G2 cell", "A-549 cell", "HCT-116 cell"],
-            "unibind": ["K562", "K562  myelogenous leukemia", "HEK293", "HEK293  embryonic kidney", "MCF7", "MCF7  Invasive ductal breast carcinoma", "HepG2", "HepG2  hepatoblastoma", "A549", "HCT116"],
         }
     }
     

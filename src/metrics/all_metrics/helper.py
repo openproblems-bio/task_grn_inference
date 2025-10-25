@@ -11,8 +11,7 @@ import os
 
 from regression_2.helper import main as main_reg2
 from ws_distance.helper import main as main_ws_distance
-from experimental.sem.helper import main as main_sem
-# from vc_v2.helper import main as main_vc_v2
+from sem.helper import main as main_sem
 from tf_recovery.helper import main as main_tf_rec
 from tf_binding.helper import main as main_tf_binding
 from replica_consistency.helper import main as main_replica_consistency
@@ -45,25 +44,14 @@ def main(par):
             rr_replica = pd.DataFrame()
         print("replica consistency done: ", rr_replica)
         rr_store.append(rr_replica)
-
-    
-    # if True:
-    #     try:
-    #         rr_vc = main_vc_v2(par)
-    #     except Exception as e:
-    #         print(f"Error in vc metrics: {e}")
-    #         rr_vc = pd.DataFrame()
-    #     print("vc done: ", rr_vc)
-    #     rr_store.append(rr_vc)
-
-
-    # try:
-    #     rr_reg2 = main_reg2(par)
-    # except Exception as e:
-    #     print(f"Error in regression 2 metrics: {e}")
-    #     rr_reg2 = pd.DataFrame()
-    # rr_store.append(rr_reg2)
-    # print("reg2 done: ", rr_reg2)
+    if True:
+        try:
+            rr_reg2 = main_reg2(par)
+        except Exception as e:
+            print(f"Error in regression 2 metrics: {e}")
+            rr_reg2 = pd.DataFrame()
+        rr_store.append(rr_reg2)
+        print("reg2 done: ", rr_reg2)
 
     if True:
         try:
