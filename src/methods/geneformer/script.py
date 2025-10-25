@@ -10,6 +10,8 @@ par = {
     "rna": "resources_test/grn_benchmark/inference_data/op_rna.h5ad",
     "tf_all": "resources_test/prior/tf_all.csv",
     "prediction": "output/geneformer/prediction.h5ad",
+    "model": "Geneformer-V2-104M",
+    
     "max_n_links": 50000,
     "batch_size": 16,
     "temp_dir": "output/geneformer",

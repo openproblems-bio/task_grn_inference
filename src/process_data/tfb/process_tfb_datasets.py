@@ -182,6 +182,7 @@ def process_all_tfb_datasets(cell_types=None, base_dir=None):
     
     return all_cell_type_results
 
+
 def main():
     """Main function to handle command line arguments."""
     parser = argparse.ArgumentParser(description='Process TF binding datasets for multiple cell types')
