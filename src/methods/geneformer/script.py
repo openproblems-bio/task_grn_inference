@@ -36,6 +36,7 @@ from helper import main
 par = parse_args(par)
 
 if __name__ == "__main__":
+    dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
     net = main(par)
     output = ad.AnnData(
         X=None,
