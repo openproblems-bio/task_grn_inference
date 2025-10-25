@@ -2,22 +2,12 @@
 import math
 import pandas as pd
 import numpy as np
-from sklearn.metrics import average_precision_score
+import anndata as ad
 from tqdm import tqdm
 import sys
 import os
 
 from util import read_prediction
-
-from scipy.stats import wilcoxon
-
-# Wilcoxon signed-rank test: AP vs prevalence
-def wilcoxon_logp(x, y):
-    try:
-        stat, p = wilcoxon(x, y, zero_method='wilcox', alternative='greater')
-        return -np.log10(p) if p > 0 else np.inf
-    except Exception:
-        return np.nan
 
 
 # For reproducibility
@@ -25,159 +15,79 @@ seed = 42
 np.random.seed(seed)
 
 def main(par):
-
-    # Load predictions
+    evaluation_data = ad.read_h5ad(par['evaluation_data'], backed='r')
+    genes = evaluation_data.var_names.tolist()
+    n_targets = len(genes)
     prediction = read_prediction(par)
     assert prediction.shape[0] > 0, 'No links found in the network'
-    if not {'source', 'target', 'weight'}.issubset(set(prediction.columns)):
-        raise ValueError("prediction must have columns: 'source', 'target', 'weight'")
-
-    # Load TF list and ground truth edges
     tf_all = np.loadtxt(par['tf_all'], dtype=str, delimiter=',', skiprows=1)
     true_graph = pd.read_csv(par['ground_truth'])
     if not {'source', 'target'}.issubset(set(true_graph.columns)):
         raise ValueError("ground_truth must have columns: 'source', 'target'")
 
-    # Keep only TFs that are in the provided TF list
     true_graph = true_graph[true_graph['source'].isin(tf_all)]
     assert true_graph.shape[0] > 0, 'No links found in the ground truth after filtering to TF list'
 
-    # Use the union of all targets that appear in either predictions or ground-truth
-    pred_targets = set(prediction['target'].astype(str).unique())
-    true_targets = set(true_graph['target'].astype(str).unique())
-    evaluation_genes = sorted(pred_targets.union(true_targets))
-    if len(evaluation_genes) == 0:
-        raise ValueError("Empty evaluation target set (no targets in predictions or ground truth).")
-
-    # Precompute lookup to avoid O(n^2)
-    gene_to_idx = {g: i for i, g in enumerate(evaluation_genes)}
-    n_targets_total = len(evaluation_genes)
-
     scores_model = []
-    # Iterate over TFs that actually have at least one positive in ground-truth
-    for tf in tqdm(true_graph['source'].unique()):
-        # Positives for this TF
+    tfs_in_gt = set(true_graph['source'].unique())
+    tfs_to_evaluate = tfs_in_gt & set(tf_all)  # TFs in both GT and TF_all list
+    
+    for tf in tqdm(tfs_to_evaluate):
         true_edges = true_graph[true_graph['source'] == tf]
-        y_true = np.zeros(n_targets_total, dtype=int)
+        gt_targets = set(true_edges['target'].astype(str))
+        gt_targets = set(gt_targets & genes)
+        k = len(gt_targets)  # Number of true targets for this TF
+        if k == 0:
+            continue
         
-        # Mark positives
-        for t in true_edges['target'].astype(str):
-            y_true[gene_to_idx[t]] = 1
-        assert y_true.sum() > 0, f'TF {tf} has no positive targets in ground truth'
-
-        # Scores over all candidate targets
-        y_score = np.zeros(n_targets_total, dtype=float)
         if tf in prediction['source'].unique():
             pred_edges = prediction[prediction['source'] == tf]
-
-            # Fill scores where predicted
-            for tgt, w in zip(pred_edges['target'].astype(str), pred_edges['weight'].abs().astype(float)):
-                idx = gene_to_idx.get(tgt, None)
-                if idx is not None:
-                    y_score[idx] = w
-
-            # Ensure numerical safety
-            y_score = np.nan_to_num(y_score, nan=0.0, posinf=0.0, neginf=0.0)
-            # AP requires at least one positive
-            ap = average_precision_score(y_true, y_score)
-        else:
-            ap = np.nan
-
-        # Random baseline AUPRC is just the prevalence of positives
-        prevalence = y_true.mean()
-
-        # Calculate recall@k for this TF
-        
-        if tf in prediction['source'].unique() and not np.isnan(ap):
-            gt_targets = set(true_edges['target'].astype(str))
-            k = len(gt_targets)  # Top k predictions to consider
-            # Get top k predicted targets for this TF
-            genes_in_grn = set(pred_edges.sort_values(by='weight', key=abs, ascending=False).head(k)['target'].astype(str).unique() )
             
-            # Calculate recall@k
-            true_positives_in_top_k = len(gt_targets & genes_in_grn)
-            recall_at_k = true_positives_in_top_k / len(gt_targets)
             
-            # Calculate random recall baseline
-            random_recall = len(genes_in_grn) / n_targets_total
-            lift_recall = recall_at_k / (random_recall + 1e-10)
+            if False:
+                top_k_t = set(pred_edges.sort_values(by='weight', key=abs, ascending=False).head(k)['target'].astype(str))
+                
+                tp_n = len(gt_targets & top_k_t)  
+                top_k_t_n = len(top_k_t)  # Actual number returned (might be less than k)          
+                
+                # Calculate precision and recall scores
+                precision_score = tp_n / top_k_t_n if top_k_t_n > 0 else 0.0             
+                precision_baseline = k / n_targets
+            
         else:
-            recall_at_k = np.nan
-            lift_recall = np.nan
+            precision_score = 0.0
         
         scores_model.append({
             'source': tf,
-            'ap': ap,
-            'n_targets_pos': int(y_true.sum()),
-            'prevalence': prevalence,
-            'recall_at_k': recall_at_k,
-            'lift_recall': lift_recall
+            'precision_score': precision_score,
+            'n_targets_pos': k,
+            'is_predicted': tf in prediction['source'].unique()
         })
 
-        from scipy.stats import wilcoxon
-
     scores_df = pd.DataFrame(scores_model)
-    ap_values_pred = scores_df['ap'].dropna().values
-    preval_all = scores_df['prevalence'].values
-    preval_pred = scores_df[~scores_df['ap'].isna()]['prevalence'].values
-    ap_pred_mean = ap_values_pred.mean() if len(ap_values_pred) > 0 else 0.0
-    preval_pred_mean = preval_pred.mean() if len(preval_pred) > 0 else 0.0
-    lift_pred = ap_pred_mean / (preval_pred_mean + 1e-10)
-
-    # Calculate mean recall metrics
-    recall_values_pred = scores_df['recall_at_k'].dropna().values
-    lift_recall_values_pred = scores_df['lift_recall'].dropna().values
-    lift_recall_values_all = scores_df['lift_recall'].fillna(1).values
-
-    mean_recall_at_k = recall_values_pred.mean() if len(recall_values_pred) > 0 else 0.0
-    mean_lift_recall = lift_recall_values_pred.mean() if len(lift_recall_values_pred) > 0 else 1
-    mean_lift_recall_all = lift_recall_values_all.mean() if len(lift_recall_values_all) > 0 else 1
-
-    # Calculate TF coverage
-    n_tfs_in_gt = true_graph['source'].nunique()
+    available_tfs = scores_df[scores_df['is_predicted'] == True]
+    precision_available = available_tfs['precision_score'].mean() if len(available_tfs) > 0 else 0.0
+    
+    precision_all = scores_df['precision_score'].mean()
+    
+    
+    # Calculate TF coverage statistics
+    n_tfs_in_gt = len(tfs_in_gt)
+    n_tfs_to_evaluate = len(tfs_to_evaluate)
     tfs_in_grn = set(prediction['source'].unique())
-    tfs_in_gt = set(true_graph['source'].unique())
-    tfs_evaluated = tfs_in_grn & tfs_in_gt
+    tfs_evaluated = tfs_to_evaluate & tfs_in_grn
     n_tfs_in_grn = len(tfs_in_grn)
     n_tfs_evaluated = len(tfs_evaluated)
     
-    # Print debug info
-    # print(f"\n=== TF COVERAGE DEBUG ===")
-    # print(f"TFs in ground truth: {n_tfs_in_gt}")
-    # print(f"TFs in prediction: {n_tfs_in_grn}")
-    # print(f"TFs evaluated (intersection): {n_tfs_evaluated}")
-    # print(f"TF coverage: {n_tfs_evaluated/n_tfs_in_gt*100:.1f}%")
-    # print(f"TFs in GT: {sorted(tfs_in_gt)}")
-    # print(f"TFs in GRN: {sorted(tfs_in_grn)}")
-    # print(f"TFs evaluated: {sorted(tfs_evaluated)}")
-    
-    # Debug precision/recall calculation
-    # print(f"\n=== METRIC DEBUG  ===")
-    # print(f"AP values (non-NaN): {len(ap_values_pred)} TFs")
-    # print(f"Mean AP: {ap_pred_mean:.4f}")
-    # print(f"Mean prevalence: {preval_pred_mean:.4f}")
-    # print(f"Lift (precision): {lift_pred:.4f}")
-    # print(f"Mean recall@k: {mean_recall_at_k:.4f}")
-    # print(f"Mean lift recall: {mean_lift_recall:.4f}")
-    
-    # Calculate final recall - fix the variable assignment issue
-    recall = mean_lift_recall_all * mean_lift_recall
-    # print(f"Final recall: {recall:.4f}")
-
-    # Handle case where no TFs are evaluated (prevent None values)
-    if n_tfs_evaluated == 0:
-        print("WARNING: No TFs overlap between prediction and ground truth!")
-        lift_pred = 0.0
-        recall = 0.0
-
     summary_df = pd.DataFrame([{
-        'tf_binding_precision': lift_pred,
-        'tf_binding_recall': recall,
+        'tfb_grn': precision_available,
+        'tfb_all': precision_all,
 
         'n_tfs_in_gt': n_tfs_in_gt,
+        'n_tfs_to_evaluate': n_tfs_to_evaluate,
         'n_tfs_in_grn': n_tfs_in_grn,
         'n_tfs_evaluated': n_tfs_evaluated,
-        'tf_coverage_pct': n_tfs_evaluated/n_tfs_in_gt*100 if n_tfs_in_gt > 0 else 0
+        'tf_coverage_pct': n_tfs_evaluated/n_tfs_to_evaluate*100 if n_tfs_to_evaluate > 0 else 0
     }])
 
     return summary_df

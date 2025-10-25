@@ -1,3 +1,4 @@
+
 import logging
 import pickle
 from collections import Counter
@@ -978,7 +979,10 @@ def compute_geneformer_network(
     token=None,
     model_dir=None,
     tokenized_dir=None,
-    embedding_dir=None
+    embedding_dir=None,
+    model_details=None,
+    gene_median=None,
+    gene_mapping_file=None
 ):
     if not all([gene_mapping_dict, token, model_dir, tokenized_dir, embedding_dir]):
         raise ValueError("Missing required parameters for compute_geneformer_network")
@@ -1002,8 +1006,17 @@ def compute_geneformer_network(
     if os.path.exists(tokenized_data_path):
         shutil.rmtree(tokenized_data_path)
 
-    # Note: This would need proper model_details, gene_median, gene_mapping_file parameters
-    tryParallelFunction(tokenize_data, "Tokenizing data", temp_dir=geneformer_folder)
+    # Pass all required parameters to tokenize_data
+    tryParallelFunction(
+        tokenize_data,
+        "Tokenizing data",
+        temp_dir=geneformer_folder,
+        model_details=model_details,
+        gene_median=gene_median,
+        token=token,
+        gene_mapping_file=gene_mapping_file,
+        tokenized_dir=tokenized_dir
+    )
 
     embex = EmbExtractor(
         model_type="Pretrained",  # CellClassifier
@@ -1162,7 +1175,10 @@ def main(par):
             token=token,
             model_dir=model_dir,
             tokenized_dir=tokenized_dir,
-            embedding_dir=embedding_dir
+            embedding_dir=embedding_dir,
+            model_details=model_details,
+            gene_median=gene_median,
+            gene_mapping_file=gene_mapping_file
         )
         gene_names = subadata.var["symbol"].values
         print(net.shape, net.sum(), len(gene_names), gene_names[:10])

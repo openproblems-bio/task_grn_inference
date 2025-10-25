@@ -51,6 +51,7 @@ def genes_with_peaks_near_tss(peaks_df, tss_file, window_up=1000, window_down=10
                 comment='#',
                 compression='infer',
             )
+            
             chrom = ref.iloc[:, 2].astype(str)
             strand = ref.iloc[:, 3].astype(str)
             tx_start = pd.to_numeric(ref.iloc[:, 4], errors='coerce').fillna(0).astype(int)
