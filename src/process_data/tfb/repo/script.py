@@ -1,3 +1,13 @@
+"""
+LEGACY FILE - This file has been split into modular components:
+
+1. download_data.py - Contains functions for downloading and preparing data
+2. build_grn.py - Contains functions for building Gene Regulatory Networks
+3. main.py - Main pipeline script that combines both functionalities
+
+Please use the new modular structure instead of this monolithic script.
+"""
+
 import pandas as pd
 import os
 import numpy as np
@@ -62,13 +72,6 @@ def read_peak_file(peaks_path, source):
     df['score'] = pd.to_numeric(df['score'], errors='coerce').fillna(0).astype(float)
     return df
 
-# def get_tfs_from_peaks(peaks_df, format='chip_atlas'):
-#     if format == 'chip_atlas':
-        
-#     else:
-#         raise ValueError(f"Unknown format: {format}")
-    
-#     return unique_tfs
 
 def subset_peaks_by_tf(peaks_df, tf_name):
     tf_pattern = f'Name={tf_name.replace(" ", "%20")}%'
@@ -174,9 +177,9 @@ if __name__ == '__main__':
             peaks_df = read_peak_file(peaks_file, source='chip_atlas')
             if True: 
                 # Filter for score == 1000
-                print('Filtering peaks with score > 0', flush=True)
+                print('Filtering peaks with score > 50', flush=True)
                 print(f'Original number of peaks: {len(peaks_df)}', flush=True)
-                peaks_df = peaks_df[peaks_df['score'] > 0]
+                peaks_df = peaks_df[peaks_df['score'] > 50]
                 print(f'Number of peaks after filtering: {len(peaks_df)}', flush=True)
             grn = build_grn(peaks_df, tss_local_path, genome=genome, max_workers=10)
             grn.to_csv(output_csv_path, index=False)
