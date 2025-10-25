@@ -174,9 +174,9 @@ if __name__ == '__main__':
             peaks_df = read_peak_file(peaks_file, source='chip_atlas')
             if True: 
                 # Filter for score == 1000
-                print('Filtering peaks with score > 50', flush=True)
+                print('Filtering peaks with score > 0', flush=True)
                 print(f'Original number of peaks: {len(peaks_df)}', flush=True)
-                peaks_df = peaks_df[peaks_df['score'] > 50]
+                peaks_df = peaks_df[peaks_df['score'] > 0]
                 print(f'Number of peaks after filtering: {len(peaks_df)}', flush=True)
             grn = build_grn(peaks_df, tss_local_path, genome=genome, max_workers=10)
             grn.to_csv(output_csv_path, index=False)
