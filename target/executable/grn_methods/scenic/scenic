@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "anndata==0.11.0"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenic"
-LABEL org.opencontainers.image.created="2025-10-25T15:09:37Z"
+LABEL org.opencontainers.image.created="2025-10-26T07:11:01Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="bf3ffa8caae0b72e0d67244e2bcdddda75fea07f"
+LABEL org.opencontainers.image.revision="0ca2e54a3fa47ad53cad2192b9866ae6909723df"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

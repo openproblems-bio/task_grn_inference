@@ -3522,7 +3522,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/geneformer",
     "viash_version" : "0.9.4",
-    "git_commit" : "bf3ffa8caae0b72e0d67244e2bcdddda75fea07f",
+    "git_commit" : "0ca2e54a3fa47ad53cad2192b9866ae6909723df",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3696,6 +3696,7 @@ from helper import main
 par = parse_args(par)
 
 if __name__ == "__main__":
+    dataset_id = ad.read_h5ad(par['rna'], backed='r').uns['dataset_id']
     net = main(par)
     output = ad.AnnData(
         X=None,

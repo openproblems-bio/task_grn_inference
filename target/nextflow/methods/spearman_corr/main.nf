@@ -3412,7 +3412,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/methods/spearman_corr",
     "viash_version" : "0.9.4",
-    "git_commit" : "bf3ffa8caae0b72e0d67244e2bcdddda75fea07f",
+    "git_commit" : "0ca2e54a3fa47ad53cad2192b9866ae6909723df",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
