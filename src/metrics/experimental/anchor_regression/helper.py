@@ -77,7 +77,7 @@ def anchor_regression(
         X: np.ndarray,
         Z: np.ndarray,
         Y: np.ndarray,
-        l2_reg: float = 1e-5,
+        l2_reg: float = 1e-6,
         gamma: float = 1.0
 ) -> np.ndarray:
     """Anchor regression for causal inference under confounding.
@@ -108,46 +108,7 @@ def anchor_regression(
     return theta
 
 
-def cross_val(
-        cv,
-        X: np.ndarray,
-        y: np.ndarray,
-        Z: np.ndarray,
-        eps: float = 1e-50
-) -> float:
-    ss_res, ss_tot = 0, 0
-    y_mean = np.mean(y)
-    for idx_train, idx_test in cv.split(X, y):
-        X_train, X_test = X[idx_train, :], X[idx_test, :]
-        Z_train, Z_test = Z[idx_train, :], Z[idx_test, :]
-        y_train, y_test = y[idx_train], y[idx_test]
-        theta = anchor_regression(X_train, Z_train, y_train, gamma=1)
-        y_hat = np.dot(X_test, theta)
-        ss_res += np.sum(np.square(y_test - y_hat))
-        ss_tot += np.sum(np.square(y_test - y_mean))
-        break  # TODO
-    if ss_tot == 0:
-        r2 = 0
-    else:
-        r2 = 1 - ss_res / ss_tot
-    return float(r2)
-
-
 def compute_stabilities(
-        X: np.ndarray,
-        y: np.ndarray,
-        Z: np.ndarray,
-        weights: np.ndarray,
-        is_selected: np.ndarray,
-        eps: float = 1e-50
-) -> float:
-    cv = KFold(5, random_state=0xCAFE, shuffle=True)
-    r2_selected = cross_val(cv, X[:, is_selected], y, Z)
-    r2_non_selected = cross_val(cv, X[:, ~is_selected], y, Z)
-    return r2_selected - r2_non_selected
-
-
-def compute_stabilities_v2(
         X: np.ndarray,
         y: np.ndarray,
         Z: np.ndarray,
@@ -157,10 +118,10 @@ def compute_stabilities_v2(
 
     theta0 = np.abs(anchor_regression(X, Z, y, gamma=1))
     theta0 /= np.sum(theta0)
-    theta = np.abs(anchor_regression(X, Z, y, gamma=2))
+    theta = np.abs(anchor_regression(X, Z, y, gamma=1.2))
     theta /= np.sum(theta)
-    s1 = np.clip(np.abs(theta0[is_selected] - theta[is_selected]) / np.abs(theta0[is_selected] + eps), 0, 1)
-    s2 = np.clip(np.abs(theta0[~is_selected] - theta[~is_selected]) / np.abs(theta0[~is_selected] + eps), 0, 1)
+    s1 = theta[is_selected] * theta0[is_selected]
+    s2 = theta[~is_selected] * theta0[~is_selected]
 
     s1 = np.mean(s1)
     s2 = np.mean(s2)
@@ -198,7 +159,7 @@ def evaluate_gene_stability(
     mask = np.ones(X.shape[1], dtype=bool)
     mask[j] = False
 
-    return compute_stabilities_v2(X[:, mask], X[:, j], Z, is_selected[mask])
+    return compute_stabilities(X[:, mask], X[:, j], Z, is_selected[mask])
 
 
 def main(par):
