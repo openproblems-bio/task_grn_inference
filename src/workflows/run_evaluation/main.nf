@@ -19,7 +19,8 @@ workflow run_wf {
     tf_recovery,
     tf_binding,
     replica_consistency,
-    sem
+    sem,
+    all_metrics
   ]
     
   /***************************

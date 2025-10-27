@@ -11,7 +11,7 @@ Benchmarking GRN inference methods
 <!-- Leaderboard: 
   [Performance comparision](https://add-grn--openproblems.netlify.app/results/grn_inference/) -->
 
-[Performance comparision](https://github.com/janursa/grn_benchmark/blob/main/notebooks/process_results.ipynb) -- we are currently under revision and the official leaderboard will be released soon.
+Check for [performance comparision](https://github.com/janursa/grn_benchmark/blob/main/notebooks/process_results.ipynb) of integrated GRN inference methods.
 
 Article: [geneRNIB: a living benchmark for gene regulatory network inference](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1)
 
@@ -22,7 +22,7 @@ Documentation:
 Repository:
 [openproblems-bio/task_grn_inference](https://github.com/openproblems-bio/task_grn_inference)
 
-If you use this framework, please cite it as
+If you use this framework, please cite
 
 ```
   @article{nourisa2025genernib,
@@ -49,16 +49,10 @@ are re-assessed, and the leaderboard is updated accordingly. The aim is
 to evaluate both the accuracy and completeness of inferred GRNs. It is
 designed for both single-modality and multi-omics GRN inference.
 
-In the current version, geneRNIB contains 10 inference methods including
-both single and multi-omics, 8 evalation metrics, and five datasets.
-
-See our publication for the details of methods.
-
 ## Installation
 
-You need to have Docker, Java, and Viash installed. Follow
-[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)
-to install the required dependencies. 
+Install Docker, Java, and Viash using
+[these instructions](https://openproblems.bio/documentation/fundamentals/requirements).
 
 ## Download resources
 ```bash
@@ -66,14 +60,14 @@ git clone --recursive git@github.com:openproblems-bio/task_grn_inference.git
 
 cd task_grn_inference
 ```
-To interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started. 
-Here, we download the **test resources** which are solely used for testing if the framework is installed successfully. 
+To interact with the framework,download the resources containing necessary inferene and evaluation datasets. 
 
 ```bash
-scripts/download_resources.sh
+pip install awscli
+aws s3 sync  s3://openproblems-data/resources/grn/grn_benchmark resources/grn_benchmark  --no-sign-request
+
 ```
 
-Refer to the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/) for downloading the actual datasets. To reproduce the results, run `scripts/run_benchmark_all.sh`, which is a very resource intensive run.
 
 ## Run a GRN inference method 
 
@@ -81,26 +75,32 @@ To infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:
 
 ```bash
 viash run src/methods/pearson_corr/config.vsh.yaml -- \
-            --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \
-            --prediction output/net.h5ad \
-            --tf_all resources_test/grn_benchmark/prior/tf_all.csv
+            --rna resources/grn_benchmark/inference_data/op_rna.h5ad \
+            --tf_all resources/grn_benchmark/prior/tf_all.csv \ 
+            --prediction output/net.h5ad
 ```
-Of note, we are using the `resources_test` datasets, which are small versions of the actual datasets for computational speed. Thus, the obtained predictions are not realistic. To obtain a realistic prediction, download the actual data and set the folder to `resources`.  
 
-## Evaluate a GRN prediction
-Once got the prediction for a given dataset (e.g. op), use the following code to obtain evaluation scores. 
+## Evaluate a GRN model
 
 ```bash
-bash scripts/run_grn_evaluation.sh --prediction=output/net.h5ad --save_dir=output/ --dataset=op --build_images=true --test_run=true
+bash scripts/run_grn_evaluation.sh \
+             --prediction=output/net.h5ad \
+             --dataset=op \ 
+             --build_images=true \ 
+             --save_dir=output 
 ```
+`build_images` only needed for the first run.
 
-**This** outputs the scores into `output/score_uns.yaml`. Of note, by passing `--test_run`, the evaluations are done on the test data. To use the actual data (`resources` folder), omit this flag.
+This outputs the scores into `output/score_uns.yaml`. 
 
 
 ## Add a GRN inference method, evaluation metric, or dataset
 
 To add a new component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).
 
+## Run the entire pipline
+
+Run `scripts/run_all.sh` for the entire pipeline. Due to resource intensive nature of the task, we have splitted the pipeline into two steps of GRN inference and evaluation.
 
 ## Authors & contributors
 
@@ -109,9 +109,10 @@ To add a new component to the repository, follow the [Documentation](https://gen
 | Jalil Nourisa     | author      |
 | Robrecht Cannoodt | author      |
 | Antoine Passimier | contributor |
+| Jérémie Kalfon    | contributor |
 | Marco Stock       | contributor |
 | Christian Arnold  | contributor |
-| Jérémie Kalfon    | contributor |
+
 
 ## API
 

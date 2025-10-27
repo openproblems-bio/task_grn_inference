@@ -1,4 +1,4 @@
-__merge__: ../../api/comp_metric_regression.yaml
+__merge__: ../../api/comp_metric.yaml
 
 name: regression_2
 namespace: "metrics"
@@ -33,17 +33,6 @@ info:
       max: 1
       maximize: true
 
-arguments: 
-  - name: --regulators_consensus
-    type: file
-    direction: input
-    must_exist: false
-    required: true
-    example: resources_test/grn_benchmark/prior/regulators_consensus_op.json
-  - name: --static_only
-    direction: input
-    type: boolean
-    default: true
   
 resources:
   - type: python_script
@@ -51,6 +40,19 @@ resources:
   - path: helper.py
   - path: /src/utils/util.py
     dest: util.py
+  - path: /src/metrics/regression_2/helper.py
+    dest: helper_regression_2.py
+  - path: /src/metrics/ws_distance/helper.py
+    dest: helper_ws_distance.py
+  - path: /src/metrics/sem/helper.py
+    dest: helper_sem.py
+  - path: /src/metrics/tf_recovery/helper.py
+    dest: helper_tf_recovery.py
+  - path: /src/metrics/tf_binding/helper.py
+    dest: helper_tf_binding.py
+  - path: /src/metrics/replica_consistency/helper.py
+    dest: helper_replica_consistency.py
+
 
 engines:
   - type: docker

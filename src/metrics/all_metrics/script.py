@@ -28,12 +28,18 @@ try:
   sys.path.append(meta["resources_dir"])
 except:
     meta = {
-      "resources_dir":'src/metrics/',
+      "all_dir":'src/metrics/',
+      "resources_dir":'src/metrics/all_metrics',
       "util_dir":'src/utils'
     }
-    sys.path.append(meta["resources_dir"])
+    sys.path.append(meta["all_dir"])
     sys.path.append(meta["util_dir"])
-from all_metrics.helper import main
+    sys.path.append(meta["resources_dir"])
+print(meta["resources_dir"])
+from helper_ws_distance import main as main_reg2
+aaa
+from helper import main_all
+
 from util import parse_args, format_save_score
 par = parse_args(par)
 
@@ -42,7 +48,7 @@ if __name__ == '__main__':
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     print(f"Method id: {method_id}, Dataset id: {dataset_id}")
 
-    output = main(par)
+    output = main_all(par)
 
     print('Write output to file', flush=True)
     format_save_score(output, method_id, dataset_id, par['score'])

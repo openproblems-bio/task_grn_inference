@@ -53,7 +53,6 @@ done
 echo "$@"
 echo "DATASET: $DATASET"
 echo "PREDICTION: $PREDICTION"
-echo "SAVE_DIR: $SAVE_DIR"
 echo "RUN_TEST: $RUN_TEST"
 echo "BUILD_IMAGES: $BUILD_IMAGES"
 echo "RUN_LOCAL: $RUN_LOCAL"
@@ -64,11 +63,11 @@ if [ -z "${DATASET:-}" ]; then
     exit 1
 fi
 
+
 num_workers=10
-metric_ids="[regression_2, ws_distance, sem, tf_recovery, tf_binding, replica_consistency]" #regression_1, regression_2, ws_distance
+metric_ids="[all_metrics]" #regression_2, ws_distance, sem, tf_recovery, tf_binding, replica_consistency
 RUN_ID="${DATASET}_evaluation"
 models_folder="${DATASET}/"
-apply_skeleton=false
 apply_tf=true
 layer='lognorm'
 if [ "$RUN_TEST" = "false" ]; then
@@ -125,8 +124,6 @@ append_entry() {
     tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
     regulators_consensus: ${resources_dir}/grn_benchmark/prior/regulators_consensus_${dataset}.json
     prediction: ${prediction}
-    skeleton: ${resources_dir}/grn_benchmark/prior/skeleton.csv
-    apply_skeleton: ${apply_skeleton}
     apply_tf: ${apply_tf}
     reg_type: ${reg_type}
     layer: $layer_

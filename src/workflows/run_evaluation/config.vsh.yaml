@@ -45,13 +45,6 @@ argument_groups:
         type: boolean 
         required: false
         default: true
-      - name: --apply_skeleton
-        type: boolean 
-        required: false
-        default: false
-      - name: --skeleton
-        type: file 
-        required: false
       - name: --layer
         type: string
         direction: input
@@ -113,6 +106,7 @@ dependencies:
   - name: metrics/tf_binding
   - name: metrics/replica_consistency
   - name: metrics/sem
+  - name: metrics/all_metrics
   - name: utils/extract_uns_metadata
     repository: openproblems
 
