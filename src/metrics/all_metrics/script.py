@@ -48,5 +48,7 @@ if __name__ == '__main__':
 
     output = main_all(par)
 
+    print(output)
+
     print('Write output to file', flush=True)
     format_save_score(output, method_id, dataset_id, par['score'])

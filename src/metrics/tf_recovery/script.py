@@ -36,14 +36,15 @@ if __name__ == "__main__":
     print(par)
     try:
         output = main(par)
-    except Exception as e:
-        print(f"Error in TF recovery evaluation: {e}")
+        method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+        dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+    except:
+        print(f"Error in TF recovery evaluation")
         output = pd.DataFrame({
-            'key': [None],
-            'value': [None]
+            'key': ["None"],
+            'value': ["None"]
         })
+        method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
+        dataset_id = "None"
         
-    evaluation_data_de = ad.read_h5ad(par['evaluation_data_de'], backed='r')
-    dataset_id = evaluation_data_de.uns['dataset_id']
-    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     format_save_score(output, method_id, dataset_id, par['score'])

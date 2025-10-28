@@ -212,5 +212,5 @@ HERE
     --workspace 53907369739130 \
     --params-file ${param_file} \
     --labels ${RUN_ID} \
-    --config common/nextflow_helpers/labels_tw.config
+    --config scripts/configs/labels_tw.config
 fi 

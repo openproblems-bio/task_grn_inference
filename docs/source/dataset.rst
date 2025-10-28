@@ -1,6 +1,7 @@
 Datasets
 ========
 The list of datasets integrated into geneRNIB is provided below with their perturbation signatures as well as the type of perturbation used in each dataset.
+
 .. image:: images/datasets.png
    :width: 80%
    :align: center
@@ -9,6 +10,7 @@ The list of datasets integrated into geneRNIB is provided below with their pertu
 All datasets provide RNA data, while the `OPSCA` and `IBD` datasets also includes scATAC data. 
 
 You need `awscli` to download the datasets. 
+
 .. code-block:: bash
    pip install awscli
 
@@ -21,7 +23,7 @@ Downloading the main datasets
 
 This command downloads the data to `resources/grn_benchmark/`, which is the default directory for geneRNIB for further GRN inference and evaluation.
 
-Additionally, you will find the `resources/grn_benchmark/prior/` folder, which contains supplementary files such as the list of known transcription factors (TFs). 
+Additionally, you will find the `resources/grn_benchmark/prior/` folder, which contains supplementary files such as the list of known TFs. 
 Files containing `consensus` tags are used in the evaluation metrics to standardize comparisons.
 
 Downloading the extended datasets

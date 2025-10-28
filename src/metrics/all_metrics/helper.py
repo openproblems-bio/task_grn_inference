@@ -67,7 +67,11 @@ def main(par):
     for metric in metrics:
         rr = metric(par, dataset_id)
         if rr is not None:
-            rr_store.append(rr.set_index('key')['value'].rename(metric.__name__.replace('_metric','')))
+            if 'key' in rr.columns:
+                if rr['key']=="None":
+                    print(f"Skipping metric {metric.__name__} due to None output")
+                    continue
+            rr_store.append(rr)
 
     rr_all = pd.concat(rr_store, axis=1)
     assert rr_all.shape[1] >0

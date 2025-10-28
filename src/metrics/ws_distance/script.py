@@ -45,8 +45,8 @@ if __name__ == '__main__':
         _, output = main(par)
     except:
         output = pd.DataFrame({
-            'key': [None],
-            'value': [None]
+            'key': ["None"],
+            'value': ["None"]
         })
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']

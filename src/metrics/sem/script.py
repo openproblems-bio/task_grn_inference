@@ -53,8 +53,8 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"Error in SEM evaluation: {e}")
         output = pd.DataFrame({
-            'key': [None],
-            'value': [None]
+            'key': ["None"],
+            'value': ["None"]
         })
 
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
