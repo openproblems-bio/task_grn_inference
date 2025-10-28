@@ -17,6 +17,11 @@ argument_groups:
         type: file
         required: false
         direction: input
+      - name: --evaluation_data_sc
+        type: file
+        required: false
+        direction: input
+        example: 'resources_test/datasets_raw/adamson_sc_counts.h5ad'
       - name: --prediction
         type: file
         required: true
@@ -66,11 +71,7 @@ argument_groups:
         must_exist: false
         required: false
         example: resources_test/grn_benchmark/prior/ws_distance_background_norman.csv
-      - name: --evaluation_data_sc
-        type: file
-        required: false
-        direction: input
-        example: 'resources_test/datasets_raw/adamson_sc_counts.h5ad'
+      
       
   - name: Outputs
     arguments:
@@ -100,7 +101,7 @@ resources:
 
 
 dependencies:
-  - name: metrics/regression_2 
+  - name: metrics/regression 
   - name: metrics/ws_distance
   - name: metrics/tf_recovery
   - name: metrics/tf_binding

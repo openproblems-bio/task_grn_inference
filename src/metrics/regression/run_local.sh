@@ -43,7 +43,7 @@ for dataset in "${datasets[@]}"; do
         fi
 
         echo -e "\nProcessing method: $method\n"
-        python src/metrics/regression_2/script.py \
+        python src/metrics/regression/script.py \
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
             --regulators_consensus "resources/grn_benchmark/prior/regulators_consensus_${dataset}.json" \

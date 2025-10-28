@@ -19,7 +19,7 @@ args = arg.parse_args()
 par = args.__dict__
 
 meta = {
-    "resources_dir":'src/metrics/regression_2/consensus/',
+    "resources_dir":'src/metrics/regression/consensus/',
     "utils_dir":'src/utils/'
 
 }

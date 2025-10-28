@@ -3,7 +3,7 @@ GRN evaluation
 =================
 The evaluation metrics used in geneRNIB are summarized below. For a detailed description of each metric, refer to the geneRNIB paper.
 
-We originally defined **eight evaluation metrics**, grouped into three categories: **Regression 1, Regression 2, and Wasserstein Distance**. 
+We originally defined **eight evaluation metrics**, grouped into three categories: **Regression 1, Regression, and Wasserstein Distance**. 
 However, we recently removed **Regression 1** as it did not prove to be effective for perturbational settings. 
 
 - The **regression-based metrics** assess the predictive power of an inferred GRN by using regression models to predict perturbation data (evaluation data) based on the feature space constructed from the inferred network.  

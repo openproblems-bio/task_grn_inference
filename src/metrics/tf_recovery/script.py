@@ -33,12 +33,6 @@ args = parse_args(par)
 
 
 if __name__ == "__main__":
-    evaluation_data_de = ad.read_h5ad(par['evaluation_data_de'], backed='r')
-    dataset_id = evaluation_data_de.uns['dataset_id']
-    if dataset_id not in ["replogle", "xaira_HEK293T", "xaira_HCT116"]:
-        raise ValueError(f"Dataset {dataset_id} not supported for TF recovery metric.")
-    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-
     print(par)
     try:
         output = main(par)
@@ -49,5 +43,7 @@ if __name__ == "__main__":
             'value': [None]
         })
         
-    
+    evaluation_data_de = ad.read_h5ad(par['evaluation_data_de'], backed='r')
+    dataset_id = evaluation_data_de.uns['dataset_id']
+    method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     format_save_score(output, method_id, dataset_id, par['score'])

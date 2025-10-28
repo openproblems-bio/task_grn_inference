@@ -1,9 +1,9 @@
 __merge__: ../../api/comp_metric.yaml
 
-name: regression_2
+name: regression
 namespace: "metrics"
 info:
-  label: regression_2
+  label: regression
   summary: Calculates regression scores 2
   description: |
     Calculates regression scores 2
@@ -40,8 +40,8 @@ resources:
   - path: helper.py
   - path: /src/utils/util.py
     dest: util.py
-  - path: /src/metrics/regression_2/helper.py
-    dest: helper_regression_2.py
+  - path: /src/metrics/regression/helper.py
+    dest: helper_regression.py
   - path: /src/metrics/ws_distance/helper.py
     dest: helper_ws_distance.py
   - path: /src/metrics/sem/helper.py

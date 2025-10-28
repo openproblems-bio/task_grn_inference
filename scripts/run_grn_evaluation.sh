@@ -8,7 +8,7 @@ RUN_LOCAL="true"
 RUN_TEST=false
 PREDICTION="none"
 SAVE_DIR="none"
-BUILD_IMAGES=true
+BUILD_IMAGES=false
 reg_type="ridge"
 
 
@@ -65,7 +65,7 @@ fi
 
 
 num_workers=10
-metric_ids="[all_metrics]" #regression_2, ws_distance, sem, tf_recovery, tf_binding, replica_consistency
+metric_ids="[regression, ws_distance, sem, tf_recovery, replica_consistency]" #
 RUN_ID="${DATASET}_evaluation"
 models_folder="${DATASET}/"
 apply_tf=true
