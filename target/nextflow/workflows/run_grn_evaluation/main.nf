@@ -3059,6 +3059,19 @@ meta = [
         },
         {
           "type" : "file",
+          "name" : "--evaluation_data_sc",
+          "example" : [
+            "resources_test/datasets_raw/adamson_sc_counts.h5ad"
+          ],
+          "must_exist" : true,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
           "name" : "--prediction",
           "must_exist" : true,
           "create_parent" : true,
@@ -3127,27 +3140,6 @@ meta = [
           "multiple_sep" : ";"
         },
         {
-          "type" : "boolean",
-          "name" : "--apply_skeleton",
-          "default" : [
-            false
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--skeleton",
-          "must_exist" : true,
-          "create_parent" : true,
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
           "type" : "string",
           "name" : "--layer",
           "required" : false,
@@ -3188,19 +3180,6 @@ meta = [
             "resources_test/grn_benchmark/prior/ws_distance_background_norman.csv"
           ],
           "must_exist" : false,
-          "create_parent" : true,
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--evaluation_data_sc",
-          "example" : [
-            "resources_test/datasets_raw/adamson_sc_counts.h5ad"
-          ],
-          "must_exist" : true,
           "create_parent" : true,
           "required" : false,
           "direction" : "input",
@@ -3274,7 +3253,7 @@ meta = [
   },
   "dependencies" : [
     {
-      "name" : "metrics/regression_2",
+      "name" : "metrics/regression",
       "repository" : {
         "type" : "local"
       }
@@ -3305,6 +3284,12 @@ meta = [
     },
     {
       "name" : "metrics/sem",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "metrics/all_metrics",
       "repository" : {
         "type" : "local"
       }
@@ -3382,15 +3367,15 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.4",
-    "git_commit" : "0ca2e54a3fa47ad53cad2192b9866ae6909723df",
+    "git_commit" : "efe795f1eef3137d3f4ef3492a6fd5640b98c1e5",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
     "name" : "task_grn_inference",
     "version" : "build_main",
     "label" : "GRN Inference",
-    "summary" : "Benchmarking GRN inference methods\nLeaderboard: \n[Performance comparision](https://add-grn--openproblems.netlify.app/results/grn_inference/)\n\nArticle: [geneRNIB: a living benchmark for gene regulatory network inference](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1)\n\nDocumentation: \n[geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)\n\nRepository:\n[openproblems-bio/task_grn_inference](https://github.com/openproblems-bio/task_grn_inference)\n\nIf you use this framework, please cite it as\n@article{nourisa2025genernib,\n  title={geneRNIB: a living benchmark for gene regulatory network inference},\n  author={Nourisa, Jalil and Passemiers, Antoine and Stock, Marco and Zeller-Plumhoff, Berit and Cannoodt, Robrecht and Arnold, Christian and Tong, Alexander and Hartford, Jason and Scialdone, Antonio and Moreau, Yves and others},\n  journal={bioRxiv},\n  pages={2025--02},\n  year={2025},\n  publisher={Cold Spring Harbor Laboratory}\n}\n",
-    "description" : "\ngeneRNIB is a living benchmark platform for GRN inference. This platform provides curated datasets for GRN inference and evaluation, standardized evaluation protocols and metrics, computational infrastructure, and a dynamically updated leaderboard to track state-of-the-art methods. It runs novel GRNs in the cloud, offers competition scores, and stores them for future comparisons, reflecting new developments over time.\n\nThe platform supports the integration of new inference methods, datasets and protocols. When a new feature is added, previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly. The aim is to evaluate both the accuracy and completeness of inferred GRNs. It is designed for both single-modality and multi-omics GRN inference. \n\nIn the current version, geneRNIB contains 10 inference methods including both single and multi-omics, 8 evalation metrics, and five datasets. \n\nSee our publication for the details of methods. \n",
+    "summary" : "Article: [geneRNIB: a living benchmark for gene regulatory network inference](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1)\n\nDocumentation: \n[geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)\n\nIf you use this framework, please cite\n\n```\n  @article{nourisa2025genernib,\n    title={geneRNIB: a living benchmark for gene regulatory network inference},\n    author={Nourisa, Jalil and Passemiers, Antoine and Stock, Marco and Zeller-Plumhoff, Berit and Cannoodt, Robrecht and Arnold, Christian and Tong, Alexander and Hartford, Jason and Scialdone, Antonio and Moreau, Yves and others},\n    journal={bioRxiv},\n    pages={2025--02},\n    year={2025},\n    publisher={Cold Spring Harbor Laboratory}\n  }\n```\n",
+    "description" : "\ngeneRNIB is a living benchmark platform for GRN inference. This platform\nprovides curated datasets for GRN inference and evaluation, standardized\nevaluation protocols and metrics, computational infrastructure, and a\ndynamically updated leaderboard to track state-of-the-art methods. It\nruns novel GRNs in the cloud, offers competition scores, and stores them\nfor future comparisons, reflecting new developments over time.\n\nThe platform supports the integration of new inference methods, datasets\nand protocols. When a new feature is added, previously evaluated GRNs\nare re-assessed, and the leaderboard is updated accordingly. The aim is\nto evaluate both the accuracy and completeness of inferred GRNs. It is\ndesigned for both single-modality and multi-omics GRN inference.\n",
     "info" : {
       "image" : "thumbnail.svg",
       "test_resources" : [
@@ -3400,7 +3385,7 @@ meta = [
           "dest" : "resources_test"
         }
       ],
-      "readme" : "## Installation\n\nYou need to have Docker, Java, and Viash installed. Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\nto install the required dependencies. \n\n## Download resources\n```bash\ngit clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\nTo interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started. \nHere, we download the **test resources** which are solely used for testing if the framework is installed successfully. \n\n```bash\nscripts/download_resources.sh\n```\n\nRefer to the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/) for downloading the actual datasets. To reproduce the results, run `scripts/run_benchmark_all.sh`, which is a very resource intensive run.\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:\n\n```bash\nviash run src/methods/pearson_corr/config.vsh.yaml -- \\\\\n      --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \\\\\n      --prediction output/net.h5ad \\\\\n      --tf_all resources_test/grn_benchmark/prior/tf_all.csv\n```\nIt should be noted that this is using the `resources_test` datasets, which are small versions of the actual datasets. Thus, the obtained predictions are not realistic. To obtain a realistic prediction, download the actual data and set the folder to `resources`.  \n\n## Evaluate a GRN prediction\nOnce got the prediction for a given dataset (e.g. op), use the following code to obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad op\n```\n\nThis outputs the scores into `output/test_run/score_uns.yaml`\n\n## Add a GRN inference method, evaluation metric, or dataset\n\nTo add a new component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n"
+      "readme" : "## Installation\nInstall Docker, Java, and Viash using\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements).\n\n## Download resources\n```bash\ngit clone --recursive git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\nTo interact with the framework,download the resources containing necessary inferene and evaluation datasets. \n\n```bash\npip install awscli\naws s3 sync  s3://openproblems-data/resources/grn/grn_benchmark resources/grn_benchmark  --no-sign-request\n\n```\n\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:\n\n```bash\nviash run src/methods/pearson_corr/config.vsh.yaml -- \\\\\n            --rna resources/grn_benchmark/inference_data/op_rna.h5ad \\\\\n            --tf_all resources/grn_benchmark/prior/tf_all.csv \\\\ \n            --prediction output/net.h5ad\n```\n\n## Evaluate a GRN model\n\n```bash\nbash scripts/run_grn_evaluation.sh \\\\\n            --prediction=output/net.h5ad \\\\\n            --dataset=op \\\\ \n            --build_images=true \\\\ \n            --save_dir=output \n```\n`build_images` only needed for the first run.\n\nThis outputs the scores into `output/score_uns.yaml`. \n\n\n## Add a GRN inference method, evaluation metric, or dataset\n\nTo add a new component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n\n## Run the entire pipline\n\nRun `scripts/run_all.sh` for the entire pipeline. Due to resource intensive nature of the task, we have splitted the pipeline into two steps of GRN inference and evaluation.\n"
     },
     "repositories" : [
       {
@@ -3435,6 +3420,15 @@ meta = [
         "info" : {
           "github" : "rcannood",
           "orcid" : "0000-0003-3641-729X"
+        }
+      },
+      {
+        "name" : "Jérémie Kalfon",
+        "roles" : [
+          "contributor"
+        ],
+        "info" : {
+          "github" : "jkobject"
         }
       },
       {
@@ -3482,12 +3476,13 @@ meta = [
 
 // resolve dependencies dependencies (if any)
 meta["root_dir"] = getRootDir()
-include { regression_2 } from "${meta.resources_dir}/../../../nextflow/metrics/regression_2/main.nf"
+include { regression } from "${meta.resources_dir}/../../../nextflow/metrics/regression/main.nf"
 include { ws_distance } from "${meta.resources_dir}/../../../nextflow/metrics/ws_distance/main.nf"
 include { tf_recovery } from "${meta.resources_dir}/../../../nextflow/metrics/tf_recovery/main.nf"
 include { tf_binding } from "${meta.resources_dir}/../../../nextflow/metrics/tf_binding/main.nf"
 include { replica_consistency } from "${meta.resources_dir}/../../../nextflow/metrics/replica_consistency/main.nf"
 include { sem } from "${meta.resources_dir}/../../../nextflow/metrics/sem/main.nf"
+include { all_metrics } from "${meta.resources_dir}/../../../nextflow/metrics/all_metrics/main.nf"
 include { extract_uns_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
 
 // inner workflow
@@ -3508,12 +3503,13 @@ workflow run_wf {
 
   // construct list of metrics
   metrics = [
-    regression_2,
+    regression,
     ws_distance,
     tf_recovery,
     tf_binding,
     replica_consistency,
-    sem
+    sem,
+    all_metrics
   ]
     
   /***************************

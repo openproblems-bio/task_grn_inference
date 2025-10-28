@@ -14,12 +14,13 @@ workflow run_wf {
 
   // construct list of metrics
   metrics = [
-    regression_2,
+    regression,
     ws_distance,
     tf_recovery,
     tf_binding,
     replica_consistency,
-    sem
+    sem,
+    all_metrics
   ]
     
   /***************************

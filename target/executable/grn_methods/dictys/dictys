@@ -454,9 +454,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods dictys"
-LABEL org.opencontainers.image.created="2025-10-26T07:11:00Z"
+LABEL org.opencontainers.image.created="2025-10-28T13:15:38Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="0ca2e54a3fa47ad53cad2192b9866ae6909723df"
+LABEL org.opencontainers.image.revision="efe795f1eef3137d3f4ef3492a6fd5640b98c1e5"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

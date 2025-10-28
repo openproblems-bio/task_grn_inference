@@ -410,8 +410,6 @@ def main(par):
         print(f"Final score: {score}")
 
         results = {
-            # 'r2': [float(np.mean(scores))],
-            # 'r2_baseline': [float(np.mean(scores_baseline))],
             'sem_precision': [float(np.mean(scores)/( np.mean(scores_baseline) + 1e-6))],
             'sem_balanced': [float(score)]
         }

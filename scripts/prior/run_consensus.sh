@@ -30,12 +30,12 @@ for model in "${models[@]}"; do
 done
 printf '%s\n' "${predictions[@]}"
 
-echo "Running consensus for regression 2"
+echo "Running consensus for Regression"
 datasets=(${DATASET})
 for dataset in "${datasets[@]}"; do
     echo "Running reg2 consensus for dataset: $dataset"
     
-    python src/metrics/regression_2/consensus/script.py \
+    python src/metrics/regression/consensus/script.py \
         --dataset "$dataset" \
         --regulators_consensus "resources/grn_benchmark/prior/regulators_consensus_${dataset}.json" \
         --evaluation_data "resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad" \

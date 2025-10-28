@@ -86,7 +86,118 @@ argument_groups:
     - "resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad"
     must_exist: true
     create_parent: true
-    required: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--evaluation_data_sc"
+    label: "perturbation data (sc)"
+    summary: "Perturbation dataset for benchmarking (sinlge cell)."
+    info:
+      format:
+        type: "h5ad"
+        obs:
+        - name: "cell_type"
+          type: "string"
+          description: "The annotated cell type of each cell based on RNA expression."
+          required: true
+        - name: "perturbation"
+          type: "string"
+          description: "Name of the column containing perturbation names"
+          required: true
+        - name: "donor_id"
+          type: "string"
+          description: "Donor id"
+          required: false
+        - name: "perturbation_type"
+          type: "string"
+          description: "Name of the column indicating perturbation type"
+          required: false
+        layers:
+        - name: "X_norm"
+          type: "double"
+          description: "Normalized values"
+          required: true
+        uns:
+        - type: "string"
+          name: "dataset_id"
+          description: "A unique identifier for the dataset"
+          required: true
+        - name: "dataset_name"
+          type: "string"
+          description: "Nicely formatted name."
+          required: true
+        - name: "dataset_summary"
+          type: "string"
+          description: "Short description of the dataset."
+          required: true
+        - name: "dataset_organism"
+          type: "string"
+          description: "The organism of the sample in the dataset."
+          required: false
+        - type: "string"
+          name: "normalization_id"
+          description: "Which normalization was used"
+          required: true
+    example:
+    - "resources_test/grn_benchmark/evaluation_data/norman_sc.h5ad"
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--evaluation_data_de"
+    label: "perturbation data differential expression"
+    summary: "Perturbation dataset for benchmarking (differential expression)"
+    info:
+      format:
+        type: "h5ad"
+        obs:
+        - name: "cell_type"
+          type: "string"
+          description: "The annotated cell type of each cell based on RNA expression."
+          required: true
+        - name: "perturbation"
+          type: "string"
+          description: "Name of the column containing perturbation names"
+          required: true
+        - name: "donor_id"
+          type: "string"
+          description: "Donor id"
+          required: false
+        - name: "perturbation_type"
+          type: "string"
+          description: "Name of the column indicating perturbation type"
+          required: false
+        uns:
+        - type: "string"
+          name: "dataset_id"
+          description: "A unique identifier for the dataset"
+          required: true
+        - name: "dataset_name"
+          type: "string"
+          description: "Nicely formatted name."
+          required: true
+        - name: "dataset_summary"
+          type: "string"
+          description: "Short description of the dataset."
+          required: true
+        - name: "dataset_organism"
+          type: "string"
+          description: "The organism of the sample in the dataset."
+          required: false
+        - type: "string"
+          name: "normalization_id"
+          description: "Which normalization was used"
+          required: true
+    example:
+    - "resources_test/grn_benchmark/evaluation_data/replogle_de.h5ad"
+    must_exist: true
+    create_parent: true
+    required: false
     direction: "input"
     multiple: false
     multiple_sep: ";"
@@ -143,15 +254,6 @@ argument_groups:
     direction: "input"
     multiple: false
     multiple_sep: ";"
-  - type: "integer"
-    name: "--verbose"
-    info: null
-    default:
-    - 2
-    required: false
-    direction: "input"
-    multiple: false
-    multiple_sep: ";"
   - type: "file"
     name: "--tf_all"
     info: null
@@ -159,7 +261,7 @@ argument_groups:
     - "resources_test/grn_benchmark/prior/tf_all.csv"
     must_exist: true
     create_parent: true
-    required: true
+    required: false
     direction: "input"
     multiple: false
     multiple_sep: ";"
@@ -181,22 +283,23 @@ argument_groups:
     direction: "input"
     multiple: false
     multiple_sep: ";"
-  - type: "boolean"
-    name: "--apply_skeleton"
+  - type: "file"
+    name: "--regulators_consensus"
     info: null
-    default:
-    - false
+    example:
+    - "resources_test/grn_benchmark/prior/regulators_consensus_op.json"
+    must_exist: false
+    create_parent: true
     required: false
     direction: "input"
     multiple: false
     multiple_sep: ";"
-  - type: "file"
-    name: "--skeleton"
+  - type: "string"
+    name: "--reg_type"
+    description: "name of regression to use"
     info: null
-    example:
-    - "resources_test/grn_benchmark/prior/skeleton.csv"
-    must_exist: true
-    create_parent: true
+    default:
+    - "ridge"
     required: false
     direction: "input"
     multiple: false
@@ -249,7 +352,7 @@ test_resources:
   path: "resources_test/"
   dest: "resources_test/"
 info:
-  label: "ws_distance"
+  label: "Wasserstein distance metrics"
   summary: "Calculates Wasserstein distance for a given GRN and dataset"
   description: "Calculates Wasserstein distance for a given GRN and dataset\n"
   metrics:
@@ -274,11 +377,10 @@ info:
     min: 0
     max: 1
     maximize: true
-  type: "metrics_ws"
+  type: "metrics"
   type_info:
-    label: "Wasserstein distance metrics"
-    summary: "A Wasserstein distance based metric to evaluate the performance of the\
-      \ inferred GRN"
+    label: "metrics"
+    summary: "A metric to evaluate the performance of the inferred GRN"
     description: "A metric to evaluate the performance of the inferred GRN\n"
 status: "enabled"
 scope:
@@ -363,66 +465,57 @@ build_info:
   output: "target/executable/metrics/ws_distance"
   executable: "target/executable/metrics/ws_distance/ws_distance"
   viash_version: "0.9.4"
-  git_commit: "0ca2e54a3fa47ad53cad2192b9866ae6909723df"
+  git_commit: "efe795f1eef3137d3f4ef3492a6fd5640b98c1e5"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
 package_config:
   name: "task_grn_inference"
   version: "build_main"
   label: "GRN Inference"
-  summary: "Benchmarking GRN inference methods\nLeaderboard: \n[Performance comparision](https://add-grn--openproblems.netlify.app/results/grn_inference/)\n\
-    \nArticle: [geneRNIB: a living benchmark for gene regulatory network inference](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1)\n\
+  summary: "Article: [geneRNIB: a living benchmark for gene regulatory network inference](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1)\n\
     \nDocumentation: \n[geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)\n\
-    \nRepository:\n[openproblems-bio/task_grn_inference](https://github.com/openproblems-bio/task_grn_inference)\n\
-    \nIf you use this framework, please cite it as\n@article{nourisa2025genernib,\n\
-    \  title={geneRNIB: a living benchmark for gene regulatory network inference},\n\
-    \  author={Nourisa, Jalil and Passemiers, Antoine and Stock, Marco and Zeller-Plumhoff,\
+    \nIf you use this framework, please cite\n\n```\n  @article{nourisa2025genernib,\n\
+    \    title={geneRNIB: a living benchmark for gene regulatory network inference},\n\
+    \    author={Nourisa, Jalil and Passemiers, Antoine and Stock, Marco and Zeller-Plumhoff,\
     \ Berit and Cannoodt, Robrecht and Arnold, Christian and Tong, Alexander and Hartford,\
-    \ Jason and Scialdone, Antonio and Moreau, Yves and others},\n  journal={bioRxiv},\n\
-    \  pages={2025--02},\n  year={2025},\n  publisher={Cold Spring Harbor Laboratory}\n\
-    }\n"
+    \ Jason and Scialdone, Antonio and Moreau, Yves and others},\n    journal={bioRxiv},\n\
+    \    pages={2025--02},\n    year={2025},\n    publisher={Cold Spring Harbor Laboratory}\n\
+    \  }\n```\n"
   description: "\ngeneRNIB is a living benchmark platform for GRN inference. This\
-    \ platform provides curated datasets for GRN inference and evaluation, standardized\
-    \ evaluation protocols and metrics, computational infrastructure, and a dynamically\
-    \ updated leaderboard to track state-of-the-art methods. It runs novel GRNs in\
-    \ the cloud, offers competition scores, and stores them for future comparisons,\
+    \ platform\nprovides curated datasets for GRN inference and evaluation, standardized\n\
+    evaluation protocols and metrics, computational infrastructure, and a\ndynamically\
+    \ updated leaderboard to track state-of-the-art methods. It\nruns novel GRNs in\
+    \ the cloud, offers competition scores, and stores them\nfor future comparisons,\
     \ reflecting new developments over time.\n\nThe platform supports the integration\
-    \ of new inference methods, datasets and protocols. When a new feature is added,\
-    \ previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly.\
-    \ The aim is to evaluate both the accuracy and completeness of inferred GRNs.\
-    \ It is designed for both single-modality and multi-omics GRN inference. \n\n\
-    In the current version, geneRNIB contains 10 inference methods including both\
-    \ single and multi-omics, 8 evalation metrics, and five datasets. \n\nSee our\
-    \ publication for the details of methods. \n"
+    \ of new inference methods, datasets\nand protocols. When a new feature is added,\
+    \ previously evaluated GRNs\nare re-assessed, and the leaderboard is updated accordingly.\
+    \ The aim is\nto evaluate both the accuracy and completeness of inferred GRNs.\
+    \ It is\ndesigned for both single-modality and multi-omics GRN inference.\n"
   info:
     image: "thumbnail.svg"
     test_resources:
     - type: "s3"
       path: "s3://openproblems-data/resources_test/grn"
       dest: "resources_test"
-    readme: "## Installation\n\nYou need to have Docker, Java, and Viash installed.\
-      \ Follow\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements)\n\
-      to install the required dependencies. \n\n## Download resources\n```bash\ngit\
-      \ clone git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n\
-      ```\nTo interact with the framework, you should download the resources containing\
-      \ necessary inferene and evaluation datasets to get started. \nHere, we download\
-      \ the **test resources** which are solely used for testing if the framework\
-      \ is installed successfully. \n\n```bash\nscripts/download_resources.sh\n```\n\
-      \nRefer to the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/)\
-      \ for downloading the actual datasets. To reproduce the results, run `scripts/run_benchmark_all.sh`,\
-      \ which is a very resource intensive run.\n\n## Run a GRN inference method \n\
-      \nTo infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:\n\
-      \n```bash\nviash run src/methods/pearson_corr/config.vsh.yaml -- \\\n      --rna\
-      \ resources_test/grn_benchmark/inference_data/op_rna.h5ad \\\n      --prediction\
-      \ output/net.h5ad \\\n      --tf_all resources_test/grn_benchmark/prior/tf_all.csv\n\
-      ```\nIt should be noted that this is using the `resources_test` datasets, which\
-      \ are small versions of the actual datasets. Thus, the obtained predictions\
-      \ are not realistic. To obtain a realistic prediction, download the actual data\
-      \ and set the folder to `resources`.  \n\n## Evaluate a GRN prediction\nOnce\
-      \ got the prediction for a given dataset (e.g. op), use the following code to\
-      \ obtain evaluation scores. \n\n```bash\nscripts/single_grn_evaluation.sh output/net.h5ad\
-      \ op\n```\n\nThis outputs the scores into `output/test_run/score_uns.yaml`\n\
-      \n## Add a GRN inference method, evaluation metric, or dataset\n\nTo add a new\
-      \ component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n"
+    readme: "## Installation\nInstall Docker, Java, and Viash using\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements).\n\
+      \n## Download resources\n```bash\ngit clone --recursive git@github.com:openproblems-bio/task_grn_inference.git\n\
+      \ncd task_grn_inference\n```\nTo interact with the framework,download the resources\
+      \ containing necessary inferene and evaluation datasets. \n\n```bash\npip install\
+      \ awscli\naws s3 sync  s3://openproblems-data/resources/grn/grn_benchmark resources/grn_benchmark\
+      \  --no-sign-request\n\n```\n\n\n## Run a GRN inference method \n\nTo infer\
+      \ a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:\n\n\
+      ```bash\nviash run src/methods/pearson_corr/config.vsh.yaml -- \\\n        \
+      \    --rna resources/grn_benchmark/inference_data/op_rna.h5ad \\\n         \
+      \   --tf_all resources/grn_benchmark/prior/tf_all.csv \\ \n            --prediction\
+      \ output/net.h5ad\n```\n\n## Evaluate a GRN model\n\n```bash\nbash scripts/run_grn_evaluation.sh\
+      \ \\\n            --prediction=output/net.h5ad \\\n            --dataset=op\
+      \ \\ \n            --build_images=true \\ \n            --save_dir=output \n\
+      ```\n`build_images` only needed for the first run.\n\nThis outputs the scores\
+      \ into `output/score_uns.yaml`. \n\n\n## Add a GRN inference method, evaluation\
+      \ metric, or dataset\n\nTo add a new component to the repository, follow the\
+      \ [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n\
+      \n## Run the entire pipline\n\nRun `scripts/run_all.sh` for the entire pipeline.\
+      \ Due to resource intensive nature of the task, we have splitted the pipeline\
+      \ into two steps of GRN inference and evaluation.\n"
   repositories:
   - type: "github"
     name: "openproblems"
@@ -451,6 +544,11 @@ package_config:
     info:
       github: "rcannood"
       orcid: "0000-0003-3641-729X"
+  - name: "Jérémie Kalfon"
+    roles:
+    - "contributor"
+    info:
+      github: "jkobject"
   - name: "Antoine Passimier"
     roles:
     - "contributor"

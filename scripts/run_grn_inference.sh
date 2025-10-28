@@ -134,9 +134,9 @@ fi
 # append_entry "$DATASET" "[scenicplus, figr, celloracle]"
 
 if [ "$RUN_TEST" = true ]; then
-  labels_config="scripts/labels_tw_test.config"
+  labels_config="scripts/configs/labels_tw_test.config"
 else
-  labels_config="scripts/labels_tw.config"
+  labels_config="scripts/configs/labels_tw.config"
 fi
 # --- Final configuration ---
 if [ "$RUN_LOCAL" = true ]; then
