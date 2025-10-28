@@ -233,8 +233,8 @@ def main(par):
             C, A, "tgtg",
             tf_tg=False,
             tg_tg=True,
-            n_tfs=40, 
-            max_targets_per_tf=300,
+            n_tfs=100, 
+            max_targets_per_tf=100,
             signed=signed
         ))
 

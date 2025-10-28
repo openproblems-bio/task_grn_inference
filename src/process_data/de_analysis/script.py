@@ -29,7 +29,6 @@ for dataset in ["replogle", "xaira_HEK293T", "xaira_HCT116"]:
     else:
         print(f'------ {dataset} ------ ')
 
-
     # load data
     adata = sc.read_h5ad(single_cell_file, backed='r')
     perturbation_type = adata.uns['perturbation_type']
@@ -126,5 +125,8 @@ for dataset in ["replogle", "xaira_HEK293T", "xaira_HCT116"]:
 
     adata_de.uns['dataset_id'] = dataset
     adata_de.uns['perturbation_type'] = perturbation_type
+
+    for ky, value in adata.uns.items():
+        adata_de.uns[ky] = value
 
     adata_de.write(f'resources/grn_benchmark/evaluation_data/{dataset}_de.h5ad')

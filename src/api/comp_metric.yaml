@@ -13,7 +13,15 @@ arguments:
     direction: input
   - name: --evaluation_data
     __merge__: file_evaluation_bulk_h5ad.yaml
-    required: true
+    required: false
+    direction: input
+  - name: --evaluation_data_sc
+    __merge__: file_evaluation_sc_h5ad.yaml
+    required: false
+    direction: input
+  - name: --evaluation_data_de
+    __merge__: file_evaluation_de_h5ad.yaml
+    required: false
     direction: input
   - name: --score
     __merge__: file_score_h5ad.yaml
@@ -27,14 +35,10 @@ arguments:
   - name: --max_n_links
     type: integer
     default: 50000
-  - name: --verbose
-    type: integer
-    default: 2
-    direction: input
   - name: --tf_all
     type: file
     direction: input
-    required: true
+    required: false
     example: resources_test/grn_benchmark/prior/tf_all.csv
   - name: --num_workers
     type: integer
@@ -44,14 +48,17 @@ arguments:
     type: boolean 
     required: false
     default: true
-  - name: --apply_skeleton
-    type: boolean 
+  - name: --regulators_consensus
+    type: file
+    direction: input
+    must_exist: false
     required: false
-    default: false
-  - name: --skeleton
-    type: file 
-    required: false
-    example: resources_test/grn_benchmark/prior/skeleton.csv
+    example: resources_test/grn_benchmark/prior/regulators_consensus_op.json
+  - name: --reg_type
+    type: string
+    direction: input
+    default: ridge
+    description: name of regression to use
 
 
 test_resources:

@@ -97,19 +97,19 @@ HERE
 
 # --------- COMBINATIONS TO ADD ----------
 
-# append_entry "op" "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
+# append_entry "op" "[regression_1,regression, ws_distance]" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, scprint, grnboost,
 #                                                                         scenicplus, scglue, granie, figr, celloracle]" 
-# append_entry "norman"  "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
+# append_entry "norman"  "[regression_1,regression, ws_distance]" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, scprint, grnboost]"
-# append_entry "adamson"  "[regression_1,regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, 
+# append_entry "adamson"  "[regression_1,regression, ws_distance]" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, ppcor, scenic, grnboost]"
-# append_entry "nakatake"  "[regression_1,regression_2]" "[pearson_corr, negative_control, positive_control, 
+# append_entry "nakatake"  "[regression_1,regression]" "[pearson_corr, negative_control, positive_control, 
 #                                                                         portia, scenic, grnboost]"
-# append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[pearson_corr, negative_control, positive_control, portia, ppcor, scenic, grnboost]"
-# append_entry "replogle" "[regression_1, regression_2, ws_distance]" "[scprint]" "special_case" 
+# append_entry "replogle" "[regression_1, regression, ws_distance]" "[pearson_corr, negative_control, positive_control, portia, ppcor, scenic, grnboost]"
+# append_entry "replogle" "[regression_1, regression, ws_distance]" "[scprint]" "special_case" 
 
-append_entry "xaira_HCT116"  "[regression_1, regression_2]" "[pearson_corr, negative_control, positive_control]"
+append_entry "xaira_HCT116"  "[regression_1, regression]" "[pearson_corr, negative_control, positive_control]"
 
 # --- Final configuration ---
 if [ "$run_local" = true ]; then

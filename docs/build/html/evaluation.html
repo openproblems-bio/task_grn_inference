@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GRN evaluation &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
@@ -20,7 +20,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Adding GRN inference methods, metrics, and datasets" href="extending.html" />
-    <link rel="prev" title="Datasets" href="dataset.html" /> 
+    <link rel="prev" title="Run GRN Inference" href="inference.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -44,6 +44,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="dataset.html">Datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inference.html">Run GRN Inference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">GRN evaluation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extending.html">Adding GRN inference methods, metrics, and datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="leaderboard.html">Leaderboard</a></li>
@@ -75,23 +76,14 @@
              
   <section id="grn-evaluation">
 <h1>GRN evaluation<a class="headerlink" href="#grn-evaluation" title="Link to this heading"></a></h1>
-<p>The evaluation metrics used in geneRNIB are summarized below. For a detailed description of each metric, refer to the geneRNIB paper.</p>
-<p>We originally defined <strong>eight evaluation metrics</strong>, grouped into three categories: <strong>Regression 1, Regression 2, and Wasserstein Distance</strong>.
-However, we recently removed <strong>Regression 1</strong> as it did not prove to be effective for perturbational settings.</p>
-<ul class="simple">
-<li><p>The <strong>regression-based metrics</strong> assess the predictive power of an inferred GRN by using regression models to predict perturbation data (evaluation data) based on the feature space constructed from the inferred network.</p></li>
-<li><p>The <strong>Wasserstein distance-based metric</strong> evaluates GRN edges by measuring the distributional shift in target gene expression between observations and perturbation data for a given transcription factor (TF).</p></li>
-</ul>
-<p>Wasserstein distance-based metrics are only applicable for datasets that are gene perturbations and are in single cell format. Thus, currently the following datasets are supported:
-- Replogle
-- Xaira:HEK293T
-- Xaira:HCT116
-- Norman
-- Adamson</p>
-<a class="reference internal image-reference" href="_images/metrics.png"><img alt="_images/metrics.png" class="align-center" src="_images/metrics.png" style="width: 90%;" />
-</a>
+<p>The evaluation metrics used in geneRNIB are summarized below.</p>
+<a class="reference internal image-reference" href="_images/metrics.png"><img alt="_images/metrics.png" class="align-center" src="_images/metrics.png" style="width: 90%;" /></a>
 <hr class="docutils" />
-<p>The evaluation metrics expect the inferred network to be in the form of an AnnData object with specific format as explained here. It should be noted that the metric currently evaluate only the <strong>top TF-gene pairs</strong>, currently limited to <strong>50,000 edges</strong>, ranked by their assigned weight.</p>
+<a class="reference internal image-reference" href="_images/datasets_metrics.png"><img alt="_images/datasets_metrics.png" class="align-center" src="_images/datasets_metrics.png" style="width: 90%;" /></a>
+<hr class="docutils" />
+<p>For a detailed description of each metric, refer to the geneRNIB paper.</p>
+<p>The evaluation metrics expect the inferred network to be in the form of an AnnData object with specific format as explained here.
+It should be noted that the metric currently evaluate only the <strong>top TF-gene pairs</strong>, currently limited to <strong>50,000 edges</strong>, ranked by their assigned weight.</p>
 <p>The inferred network should have a tabular format with the following columns:</p>
 <blockquote>
 <div><ul class="simple">
@@ -100,17 +92,24 @@ However, we recently removed <strong>Regression 1</strong> as it did not prove t
 <li><p><cite>weight</cite>: Regulatory importance/likelihood score/etc.</p></li>
 </ul>
 </div></blockquote>
-<p>See <cite>resources_test/grn_models/op/collectri.h5ad</cite> for an example of the expected format.</p>
-<p>For the regression based approaches, we used the pseudobulk version of the perturbation data while for the Wasserstein distance, the single cell data are used.</p>
-<p>It should be noted that for Wasserstein distance, we have already computed all possible combination of TF-gene pairs and stored it in the <cite>resources/grn_benchmark/prior/</cite> folder.
-This substantially reduces the computation time during evaluation.</p>
+<p>See <cite>resources/grn_benchmark/prior/collectri.h5ad</cite> for an example of the expected format.</p>
+<p>## Running GRN evaluation using standard pipeline</p>
 <p>To run the evalution for a given GRN and dataset, use the following command:
 <code class="docutils literal notranslate"><span class="pre">`bash</span>
-<span class="pre">bash</span> <span class="pre">scripts/run_grn_evaluation.sh</span> <span class="pre">--prediction=&lt;inferred</span> <span class="pre">GRN</span> <span class="pre">(e.g.collectri.h5ad)&gt;</span> <span class="pre">--save_dir=&lt;e.g.output/&gt;</span> <span class="pre">--dataset=&lt;e.g.</span> <span class="pre">replogle&gt;</span> <span class="pre">--build_images=&lt;true</span> <span class="pre">or</span> <span class="pre">false.</span> <span class="pre">true</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">first</span> <span class="pre">time</span> <span class="pre">running&gt;</span> <span class="pre">--run_test=&lt;true</span> <span class="pre">or</span> <span class="pre">false.</span> <span class="pre">true</span> <span class="pre">to</span> <span class="pre">run</span> <span class="pre">on</span> <span class="pre">test</span> <span class="pre">data&gt;</span>
+<span class="pre">bash</span> <span class="pre">scripts/run_grn_evaluation.sh</span> <span class="pre">--prediction=&lt;inferred</span> <span class="pre">GRN</span> <span class="pre">(e.g.collectri.h5ad)&gt;</span> <span class="pre">--save_dir=&lt;e.g.output/&gt;</span> <span class="pre">--dataset=&lt;e.g.</span> <span class="pre">replogle&gt;</span> <span class="pre">--build_images=&lt;true</span> <span class="pre">or</span> <span class="pre">false.</span> <span class="pre">true</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">first</span> <span class="pre">time</span> <span class="pre">running&gt;</span>
 <span class="pre">`</span></code></p>
 <p>example command:
 <code class="docutils literal notranslate"><span class="pre">`bash</span>
-<span class="pre">bash</span> <span class="pre">scripts/run_grn_evaluation.sh</span> <span class="pre">--prediction=resources/grn_models/op/collectri.h5ad</span> <span class="pre">--save_dir=output/</span> <span class="pre">--dataset=op</span> <span class="pre">--build_images=true</span> <span class="pre">--test_run=false</span>
+<span class="pre">bash</span> <span class="pre">scripts/run_grn_evaluation.sh</span> <span class="pre">--prediction=resources/grn_models/op/collectri.h5ad</span> <span class="pre">--save_dir=output/</span> <span class="pre">--dataset=op</span> <span class="pre">--build_images=true</span>
+<span class="pre">`</span></code></p>
+<p>## Running GRN evaluation without docker
+Considering that Docker is not supported by certtain systems, you can run the evaluation without Docker by following these steps:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">bash</span> <span class="pre">src/metrics/all_metrics/run_local.sh</span> <span class="pre">--dataset</span> <span class="pre">&lt;dataset_name&gt;</span> <span class="pre">--prediction=&lt;inferred</span> <span class="pre">GRN</span> <span class="pre">(e.g.collectri.h5ad)&gt;</span> <span class="pre">--score</span> <span class="pre">&lt;output_score_file.h5ad&gt;</span> <span class="pre">--num_workers</span> <span class="pre">&lt;number_of_workers&gt;</span>
+<span class="pre">`</span></code></p>
+<p>example command:
+<code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">bash</span> <span class="pre">src/metrics/all_metrics/run_local.sh</span> <span class="pre">--dataset</span> <span class="pre">op</span> <span class="pre">--prediction=resources/grn_models/op/collectri.h5ad</span> <span class="pre">--score=output_score_file.h5ad</span> <span class="pre">--num_workers=20</span>
 <span class="pre">`</span></code></p>
 </section>
 
@@ -118,7 +117,7 @@ This substantially reduces the computation time during evaluation.</p>
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="dataset.html" class="btn btn-neutral float-left" title="Datasets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="inference.html" class="btn btn-neutral float-left" title="Run GRN Inference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="extending.html" class="btn btn-neutral float-right" title="Adding GRN inference methods, metrics, and datasets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 

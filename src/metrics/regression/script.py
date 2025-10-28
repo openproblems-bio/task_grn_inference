@@ -28,17 +28,16 @@ try:
   sys.path.append(meta["resources_dir"])
 except:
     meta = {
-      "resources_dir":'src/metrics/regression_2/',
+      "resources_dir":'src/metrics/regression/',
       "util_dir":'src/utils'
     }
     sys.path.append(meta["resources_dir"])
     sys.path.append(meta["util_dir"])
+    
 from helper import main
 from util import format_save_score, parse_args
 
 par = parse_args(par)
-
- 
 
 if __name__ == '__main__':
   print(par)

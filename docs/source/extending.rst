@@ -1,11 +1,13 @@
-Adding GRN inference methods, metrics, and datasets
+Extending
 ======================
-In this section, we provide instructions on how to add new GRN inference methods, metrics, and datasets to the geneRNIB platform. Installing geneRNIB is a prerequisite for integrating new features. 
+In this section, we provide instructions on how to add new GRN inference methods, metrics, and datasets to the geneRNIB platform. 
+Installing geneRNIB is a prerequisite for integrating new features. 
 
 Add a GRN inference method
 -----------------------------------
 
-Examples of GRN inference methods include GRNBoost2, CellOracle, and SCENIC. The list of integrated GRN inference methods can be found on the geneRNIB platform, `src/methods`, which are examples of how to integrate new methods for both R and Python. 
+Examples of GRN inference methods include GRNBoost2, CellOracle, and SCENIC. 
+The list of integrated GRN inference methods can be found on the geneRNIB platform, `src/methods`, which are examples of how to integrate new methods for both R and Python. 
 
 Each method requires a `config.vsh` file together
 with a `script.py`. Additionally, the method can have extra files to store and organize the code, such as `helper`, which are stored in the same folder and called by the `script.py`.
@@ -15,12 +17,12 @@ The overlook of `config.vsh` is as follows. However, refer to the `src/methods/`
 .. code-block:: yaml
    :caption: Example of a `config.vsh` file
 
-   __merge__: /src/api/comp_method.yaml # merge with the common method schema
+   __merge__: /src/api/comp_method.yaml # merge with the common method scheme
 
-    name: method_name
+    name: method_name # unique id for your method
     namespace: "grn_methods"
     info:
-    label: pretty method name
+    label: pretty method name # e.g. "GRNBoost2"
     summary: "summary of your method"
     description: |
        more about your method 
@@ -32,7 +34,7 @@ The overlook of `config.vsh` is as follows. However, refer to the `src/methods/`
 
     engines:
         - type: docker 
-            image: ghcr.io/openproblems-bio/base_python:1.0.4 # or base_R, which are base images with some essentials installed. or your own image 
+            image: ghcr.io/openproblems-bio/base_python:1.0.4 # a base docker image
             __merge__: /src/api/base_requirements.yaml # merge with the base requirements schema required for the pipeline
             setup:
             - type: python
@@ -42,7 +44,7 @@ The overlook of `config.vsh` is as follows. However, refer to the `src/methods/`
         - type: executable
         - type: nextflow
             directives:
-            label: [midtime, midmem, midcpu] # expected resources. see _viash.yaml for their definition 
+            label: [midtime, midmem, midcpu] # expected resources. see scripts/labels_tw.config for their definition 
 
 Your `script.py` should have the following structure:
 
@@ -100,8 +102,35 @@ See additional Viash commands in the `Viash documentation <https://viash.io/guid
 
 Add a GRN evaluation metric
 -----------------------------------
-Under development ...
+Similar to method integration, metrics also follow similar file formatting. See folder `src/metrics/` for examples.
+While new metrics could use different evaluation datasets, the current files for evaluation are located in `resources/grn_benchmark/evaluation_data`.
+There are three formats of datasets; single cell, (pseudo)bulk, and differential expression (de). 
+The choice of the dataset depends on the evaluation metric.
+
+A few tips:
+
+- use `read_prediction` from from `src/utils/util` to read the inferred GRNs and do checking the format.
+- the metric should output a score which has to be a h5ad file. In Python, this can be done:
+
+.. code-block:: python
+
+    import pandas as pd
+    from util import format_save_score
+
+    results = pd.DataFrame({
+        'metric_key_1': [metric_value_1],  # submetric 1
+        'metric_key_2': [metric_value_2],  # submetric 2
+    })
+    method_id = 'name of GRN method'
+    dataset_id = 'name of dataset used for GRN inference'
+    score_file = 'output/score.h5ad'
+
+    format_save_score(results, method_id, dataset_id, score_file)
 
 Add a GRN inference and evalaution dataset
 -----------------------------------
-Under development ...
+Here we explain how to integrate new datasets. All datasets are in h5ad, and the example structure of a inference or evaluation dataset can be found in `resources/grn_benchmark/`.
+The inference datasets are in `resources/grn_benchmark/inference_data/` and the evaluation datasets are in `resources/grn_benchmark/evaluation_data/`.
+Each dataset should have a unique `dataset_id`, stored in `.uns['dataset_id']`, that will be used to identify it in the platform.
+In addition, there should be additional information stored in `.uns`, such as the description, reference, and normalization type.
+Also, the normalized values should be stores in `layers` with the name of normalization method, e.g. lognorm.

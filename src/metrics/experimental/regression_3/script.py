@@ -28,7 +28,7 @@ try:
   sys.path.append(meta["resources_dir"])
 except:
     meta = {
-      "resources_dir":'src/metrics/regression_2/',
+      "resources_dir":'src/metrics/regression/',
       "util_dir":'src/utils'
     }
     sys.path.append(meta["resources_dir"])
