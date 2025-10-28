@@ -28,6 +28,7 @@ To see the comparitive performance of the integrated GRN inference methods, refe
    :align: center
 ----
 
+
 Pls see the GitHub page for the list of currently integrated methods. The methods are implemented in Python and R, and they can be used to infer GRNs from the datasets provided by geneRNIB.
 
 In addition, three baseline methods are integrated into geneRNIB. These methods are used to evaluate the performance of new methods. The baseline methods are:
@@ -53,9 +54,6 @@ In addition, three baseline methods are integrated into geneRNIB. These methods 
 ..      - author
 
 
-.. note::
-
-   This project is under active development and this documentation is still a draft.
 
 Contents
 --------

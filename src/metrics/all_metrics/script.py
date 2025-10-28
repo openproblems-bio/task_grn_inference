@@ -36,8 +36,8 @@ except:
     sys.path.append(meta["util_dir"])
     sys.path.append(meta["resources_dir"])
 print(meta["resources_dir"])
-from helper_ws_distance import main as main_reg2
-aaa
+from helper_ws_distance import main as main_ws_distance
+
 from helper import main_all
 
 from util import parse_args, format_save_score
