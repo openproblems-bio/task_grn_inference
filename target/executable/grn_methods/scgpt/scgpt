@@ -452,9 +452,9 @@ pip install ipykernel pandas scanpy numba "numpy<1.24" torchtext==0.17.0 scib "s
 cd scGPT && pip install -e . --no-deps
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scgpt"
-LABEL org.opencontainers.image.created="2025-10-28T13:15:38Z"
+LABEL org.opencontainers.image.created="2025-10-30T04:19:18Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="efe795f1eef3137d3f4ef3492a6fd5640b98c1e5"
+LABEL org.opencontainers.image.revision="e439c5f0945dec14d92ff3844ee576fedadbee49"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1418,7 +1418,7 @@ if adata[0].X.sum() != int(adata[0].X.sum()):
     adata.X = csr_matrix(np.power(adata.X.todense(), 2) - 1)
 
 adata.var["symbol"] = adata.var.index
-adata.var["ensembl_id"] = adata.var["gene_ids"].values
+# adata.var["ensembl_id"] = adata.var["gene_ids"].values
 dataset_id = adata.uns["dataset_id"] if "dataset_id" in adata.uns else par["dataset_id"]
 
 

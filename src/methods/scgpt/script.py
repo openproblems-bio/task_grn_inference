@@ -69,7 +69,7 @@ if adata[0].X.sum() != int(adata[0].X.sum()):
     adata.X = csr_matrix(np.power(adata.X.todense(), 2) - 1)
 
 adata.var["symbol"] = adata.var.index
-adata.var["ensembl_id"] = adata.var["gene_ids"].values
+# adata.var["ensembl_id"] = adata.var["gene_ids"].values
 dataset_id = adata.uns["dataset_id"] if "dataset_id" in adata.uns else par["dataset_id"]
 
 
