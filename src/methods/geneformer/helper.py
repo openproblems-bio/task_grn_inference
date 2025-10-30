@@ -1035,7 +1035,11 @@ def compute_geneformer_network(
         get_avg_attentions=True,
     )
     return adata.copy(), avg_attentions.to("cpu").numpy()
-
+def add_gene_id(adata):
+    from util import fetch_gene_info
+    df_annot = fetch_gene_info()[['gene_id']]
+    adata.var = adata.var.merge(df_annot, left_index=True, right_index=True, how='left').dropna()
+    return adata
 
 def main(par):
     n_processors = os.cpu_count()
@@ -1072,7 +1076,9 @@ def main(par):
         adata.X = csr_matrix(np.power(adata.X.todense(), 2) - 1)
 
     adata.var["symbol"] = adata.var.index
-    # adata.var["ensembl_id"] = adata.var["gene_ids"].values
+    if "gene_id" not in adata.var.columns:
+        adata = add_gene_id(adata)
+    adata.var["ensembl_id"] = adata.var["gene_id"].values
     dataset_id = adata.uns["dataset_id"] if "dataset_id" in adata.uns else par["dataset_id"]
 
 
