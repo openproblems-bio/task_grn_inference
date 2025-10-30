@@ -156,6 +156,8 @@ else
       "portia"
       "scenic"
       "scprint"
+      "geneformer"
+      "scgpt"
   )
   grn_models_folder="${resources_dir}/results/${models_folder}/"
   grn_models_folder_local="./resources/results/${models_folder}/" # just to control the hetergenity of the models for different datasets
