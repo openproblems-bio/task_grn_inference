@@ -448,13 +448,14 @@ ENTRYPOINT []
 RUN git clone https://github.com/bowang-lab/scGPT && \
 pip install torch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu121 && \
 pip install "flash-attn<1.0.5" --no-build-isolation && \
+pip install pybiomart && \
 pip install ipykernel pandas scanpy numba "numpy<1.24" torchtext==0.17.0 scib "scvi-tools<1.0" datasets==2.14.5 transformers==4.33.2 wandb "cell-gears<0.0.3" torch_geometric pyarrow==15.0.0 gdown && \
 cd scGPT && pip install -e . --no-deps
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scgpt"
-LABEL org.opencontainers.image.created="2025-10-30T05:46:23Z"
+LABEL org.opencontainers.image.created="2025-10-30T06:47:33Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="96b64ccc19a2cf227ce130a1711f98f63a552479"
+LABEL org.opencontainers.image.revision="e997fe71c7b44e65f440cd9aebd0e1db4ca1b7a6"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

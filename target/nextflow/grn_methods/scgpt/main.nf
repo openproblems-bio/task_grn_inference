@@ -3376,8 +3376,7 @@ meta = [
     },
     {
       "type" : "file",
-      "path" : "scgpt_helper.py",
-      "dest" : "scgpt_helper.py"
+      "path" : "scgpt_helper.py"
     }
   ],
   "test_resources" : [
@@ -3480,7 +3479,7 @@ meta = [
         {
           "type" : "docker",
           "run" : [
-            "git clone https://github.com/bowang-lab/scGPT && \\\\\npip install torch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu121 && \\\\\npip install \\"flash-attn<1.0.5\\" --no-build-isolation && \\\\\npip install ipykernel pandas scanpy numba \\"numpy<1.24\\" torchtext==0.17.0 scib \\"scvi-tools<1.0\\" datasets==2.14.5 transformers==4.33.2 wandb \\"cell-gears<0.0.3\\" torch_geometric pyarrow==15.0.0 gdown && \\\\\ncd scGPT && pip install -e . --no-deps\n"
+            "git clone https://github.com/bowang-lab/scGPT && \\\\\npip install torch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu121 && \\\\\npip install \\"flash-attn<1.0.5\\" --no-build-isolation && \\\\\npip install pybiomart && \\\\\npip install ipykernel pandas scanpy numba \\"numpy<1.24\\" torchtext==0.17.0 scib \\"scvi-tools<1.0\\" datasets==2.14.5 transformers==4.33.2 wandb \\"cell-gears<0.0.3\\" torch_geometric pyarrow==15.0.0 gdown && \\\\\ncd scGPT && pip install -e . --no-deps\n"
           ]
         }
       ]
@@ -3492,7 +3491,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scgpt",
     "viash_version" : "0.9.4",
-    "git_commit" : "96b64ccc19a2cf227ce130a1711f98f63a552479",
+    "git_commit" : "e997fe71c7b44e65f440cd9aebd0e1db4ca1b7a6",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

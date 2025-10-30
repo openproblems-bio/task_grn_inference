@@ -446,12 +446,12 @@ function ViashDockerfile {
 FROM openproblems/base_pytorch_nvidia:1
 ENTRYPOINT []
 RUN pip install --upgrade pip && \
-  pip install --upgrade --no-cache-dir "pyarrow<15.0.0a0,>=14.0.1" "huggingface_hub" "git+https://huggingface.co/ctheodoris/Geneformer.git"
+  pip install --upgrade --no-cache-dir "pyarrow<15.0.0a0,>=14.0.1" "huggingface_hub" "git+https://huggingface.co/ctheodoris/Geneformer.git" "pybiomart"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods geneformer"
-LABEL org.opencontainers.image.created="2025-10-30T05:46:23Z"
+LABEL org.opencontainers.image.created="2025-10-30T06:47:32Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="96b64ccc19a2cf227ce130a1711f98f63a552479"
+LABEL org.opencontainers.image.revision="e997fe71c7b44e65f440cd9aebd0e1db4ca1b7a6"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

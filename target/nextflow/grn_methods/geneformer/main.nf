@@ -3509,7 +3509,8 @@ meta = [
           "pip" : [
             "pyarrow<15.0.0a0,>=14.0.1",
             "huggingface_hub",
-            "git+https://huggingface.co/ctheodoris/Geneformer.git"
+            "git+https://huggingface.co/ctheodoris/Geneformer.git",
+            "pybiomart"
           ],
           "upgrade" : true
         }
@@ -3522,7 +3523,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/geneformer",
     "viash_version" : "0.9.4",
-    "git_commit" : "96b64ccc19a2cf227ce130a1711f98f63a552479",
+    "git_commit" : "e997fe71c7b44e65f440cd9aebd0e1db4ca1b7a6",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
