@@ -33,7 +33,6 @@ resources:
   - path: /src/utils/util.py
     dest: util.py
   - path: scgpt_helper.py
-    dest: scgpt_helper.py
 
 engines:
   - type: docker
@@ -51,6 +50,7 @@ engines:
           git clone https://github.com/bowang-lab/scGPT && \
           pip install torch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu121 && \
           pip install "flash-attn<1.0.5" --no-build-isolation && \
+          pip install pybiomart && \
           pip install ipykernel pandas scanpy numba "numpy<1.24" torchtext==0.17.0 scib "scvi-tools<1.0" datasets==2.14.5 transformers==4.33.2 wandb "cell-gears<0.0.3" torch_geometric pyarrow==15.0.0 gdown && \
           cd scGPT && pip install -e . --no-deps
 
