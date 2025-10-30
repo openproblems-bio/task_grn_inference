@@ -358,7 +358,17 @@ def read_gene_annotation(annotation_file):
 
 
 
-
+def add_gene_id(adata):
+    df_annot = fetch_gene_info()[['gene_id']]
+    genes_1 = df_annot.index 
+    genes_2 = adata.var.index
+    common_genes = genes_1.intersection(genes_2)
+    assert len(common_genes) > 0, "No common genes between annotation and adata.var"
+    merged = adata.var.merge(df_annot, left_index=True, right_index=True, how='left')
+    valid_genes = merged.dropna().index
+    adata = adata[:, valid_genes].copy()
+    adata.var = merged.loc[valid_genes]
+    return adata
 def fetch_gene_info():
     from pybiomart import Server
 
