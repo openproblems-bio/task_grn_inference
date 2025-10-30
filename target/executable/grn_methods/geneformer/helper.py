@@ -1037,8 +1037,28 @@ def compute_geneformer_network(
     return adata.copy(), avg_attentions.to("cpu").numpy()
 def add_gene_id(adata):
     from util import fetch_gene_info
+    
+    # Fetch gene info
     df_annot = fetch_gene_info()[['gene_id']]
-    adata.var = adata.var.merge(df_annot, left_index=True, right_index=True, how='left').dropna()
+    
+    # If adata.var has a 'gene_name' or similar column, use it to merge
+    if 'gene_name' in adata.var.columns:
+        adata.var = (
+            adata.var.reset_index()
+            .merge(df_annot, left_on='gene_name', right_index=True, how='left')
+            .set_index('index')
+        )
+    else:
+        # Assume var index corresponds directly to df_annot index
+        adata.var = (
+            adata.var.reset_index()
+            .merge(df_annot, left_on='index', right_index=True, how='left')
+            .set_index('index')
+        )
+    
+    # Drop rows with no match (optional, depending on your need)
+    adata.var = adata.var.dropna(subset=['gene_id'])
+    
     return adata
 
 def main(par):
