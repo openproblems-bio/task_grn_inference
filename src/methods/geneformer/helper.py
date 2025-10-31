@@ -1072,7 +1072,10 @@ def main(par):
         adata.X = csr_matrix(np.power(adata.X.todense(), 2) - 1)
 
     adata.var["symbol"] = adata.var.index
-    adata.var["ensembl_id"] = adata.var["gene_ids"].values
+    if "gene_id" not in adata.var.columns:
+        from util import add_gene_id
+        adata = add_gene_id(adata)
+    adata.var["ensembl_id"] = adata.var["gene_id"].values
     dataset_id = adata.uns["dataset_id"] if "dataset_id" in adata.uns else par["dataset_id"]
 
 
@@ -1127,7 +1130,7 @@ def main(par):
     print(f"Working directory: '{work_dir.name}'", flush=True)
 
     print(">>> Preparing data...", flush=True)
-    adata.var["ensembl_id"] = adata.var_names
+    # adata.var["ensembl_id"] = adata.var_names
     adata.obs["n_counts"] = np.ravel(adata.X.sum(axis=1))
     adata.write_h5ad(os.path.join(input_dir, "input.h5ad"))
     print(adata)

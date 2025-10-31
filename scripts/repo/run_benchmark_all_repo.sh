@@ -13,7 +13,7 @@ apply_tf_methods=true
 apply_skeleton=false
 # - specify inputs
 dataset_ids=" op " 
-metric_ids="[regression_1, regression_2, ws_distance]" 
+metric_ids="[regression_1, regression, ws_distance]" 
 method_ids="[pearson_corr,
             negative_control, 
             positive_control, 

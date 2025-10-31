@@ -8,7 +8,7 @@ RUN_LOCAL="true"
 RUN_TEST=false
 PREDICTION="none"
 SAVE_DIR="none"
-BUILD_IMAGES=true
+BUILD_IMAGES=false
 reg_type="ridge"
 
 
@@ -53,7 +53,6 @@ done
 echo "$@"
 echo "DATASET: $DATASET"
 echo "PREDICTION: $PREDICTION"
-echo "SAVE_DIR: $SAVE_DIR"
 echo "RUN_TEST: $RUN_TEST"
 echo "BUILD_IMAGES: $BUILD_IMAGES"
 echo "RUN_LOCAL: $RUN_LOCAL"
@@ -64,11 +63,11 @@ if [ -z "${DATASET:-}" ]; then
     exit 1
 fi
 
+
 num_workers=10
-metric_ids="[regression_2, ws_distance, sem, tf_recovery, tf_binding, replica_consistency]" #regression_1, regression_2, ws_distance
+metric_ids="[regression, ws_distance, sem, tf_recovery, replica_consistency]" #
 RUN_ID="${DATASET}_evaluation"
 models_folder="${DATASET}/"
-apply_skeleton=false
 apply_tf=true
 layer='lognorm'
 if [ "$RUN_TEST" = "false" ]; then
@@ -125,8 +124,6 @@ append_entry() {
     tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
     regulators_consensus: ${resources_dir}/grn_benchmark/prior/regulators_consensus_${dataset}.json
     prediction: ${prediction}
-    skeleton: ${resources_dir}/grn_benchmark/prior/skeleton.csv
-    apply_skeleton: ${apply_skeleton}
     apply_tf: ${apply_tf}
     reg_type: ${reg_type}
     layer: $layer_
@@ -159,6 +156,8 @@ else
       "portia"
       "scenic"
       "scprint"
+      "geneformer"
+      "scgpt"
   )
   grn_models_folder="${resources_dir}/results/${models_folder}/"
   grn_models_folder_local="./resources/results/${models_folder}/" # just to control the hetergenity of the models for different datasets
@@ -215,5 +214,5 @@ HERE
     --workspace 53907369739130 \
     --params-file ${param_file} \
     --labels ${RUN_ID} \
-    --config common/nextflow_helpers/labels_tw.config
+    --config scripts/configs/labels_tw.config
 fi 

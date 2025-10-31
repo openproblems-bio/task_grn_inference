@@ -1,10 +1,10 @@
 __merge__: ../../api/comp_metric.yaml
 
-name: sem
+name: all_metrics
 namespace: "metrics"
 info:
-  label: SEM
-  summary: Structural equation based metric
+  label: All metrics
+  summary: A wrapper component to compute all metrics
 
 resources:
   - type: python_script
@@ -12,8 +12,6 @@ resources:
   - path: helper.py
   - path: /src/utils/util.py
     dest: util.py
-  - path: /src/utils/dataset_config.py
-    dest: dataset_config.py
 
 engines:
   - type: docker
@@ -21,7 +19,9 @@ engines:
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages: [ ]
+        packages: [ lightgbm==4.3.0, numpy==1.26.4 , tqdm_joblib==0.0.5]
+
+
 runners:
   - type: executable
   - type: nextflow

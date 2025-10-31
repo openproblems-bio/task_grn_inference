@@ -18,7 +18,7 @@ methods = [
 // construct list of metrics
 metrics = [
   regression_1,
-  regression_2,
+  regression,
   ws_distance,
   sem
 ]

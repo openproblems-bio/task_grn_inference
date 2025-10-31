@@ -123,7 +123,7 @@ resources:
     path: /_viash.yaml
 
 dependencies:
-  - name: metrics/regression_2 
+  - name: metrics/regression 
   - name: metrics/regression_1
   - name: metrics/ws_distance
   - name: metrics/sem

@@ -64,6 +64,7 @@ engines:
           - pyarrow<15.0.0a0,>=14.0.1
           - huggingface_hub
           - git+https://huggingface.co/ctheodoris/Geneformer.git
+          - pybiomart
 
 runners:
   - type: executable

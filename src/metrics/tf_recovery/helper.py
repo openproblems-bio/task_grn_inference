@@ -45,7 +45,6 @@ def main(par):
     tf_counts = net['source'].value_counts()
     tfs_to_keep = tf_counts[tf_counts >= 3].index
     net = net[net['source'].isin(tfs_to_keep)]
-    n_tfs = net['source'].nunique()
 
     all_genes = list(df_de.columns)
     acts_in_net, pvals_in_net, acts_random_in_net, pvals_random_in_net = [], [], [], []

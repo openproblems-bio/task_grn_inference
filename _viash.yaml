@@ -14,36 +14,37 @@ links:
 
 label: GRN Inference
 summary: |
-  Benchmarking GRN inference methods
-  Leaderboard: 
-  [Performance comparision](https://add-grn--openproblems.netlify.app/results/grn_inference/)
-
   Article: [geneRNIB: a living benchmark for gene regulatory network inference](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1)
 
   Documentation: 
   [geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)
 
-  Repository:
-  [openproblems-bio/task_grn_inference](https://github.com/openproblems-bio/task_grn_inference)
+  If you use this framework, please cite
 
-  If you use this framework, please cite it as
-  @article{nourisa2025genernib,
-    title={geneRNIB: a living benchmark for gene regulatory network inference},
-    author={Nourisa, Jalil and Passemiers, Antoine and Stock, Marco and Zeller-Plumhoff, Berit and Cannoodt, Robrecht and Arnold, Christian and Tong, Alexander and Hartford, Jason and Scialdone, Antonio and Moreau, Yves and others},
-    journal={bioRxiv},
-    pages={2025--02},
-    year={2025},
-    publisher={Cold Spring Harbor Laboratory}
-  }
+  ```
+    @article{nourisa2025genernib,
+      title={geneRNIB: a living benchmark for gene regulatory network inference},
+      author={Nourisa, Jalil and Passemiers, Antoine and Stock, Marco and Zeller-Plumhoff, Berit and Cannoodt, Robrecht and Arnold, Christian and Tong, Alexander and Hartford, Jason and Scialdone, Antonio and Moreau, Yves and others},
+      journal={bioRxiv},
+      pages={2025--02},
+      year={2025},
+      publisher={Cold Spring Harbor Laboratory}
+    }
+  ```
 description: |
 
-  geneRNIB is a living benchmark platform for GRN inference. This platform provides curated datasets for GRN inference and evaluation, standardized evaluation protocols and metrics, computational infrastructure, and a dynamically updated leaderboard to track state-of-the-art methods. It runs novel GRNs in the cloud, offers competition scores, and stores them for future comparisons, reflecting new developments over time.
+  geneRNIB is a living benchmark platform for GRN inference. This platform
+  provides curated datasets for GRN inference and evaluation, standardized
+  evaluation protocols and metrics, computational infrastructure, and a
+  dynamically updated leaderboard to track state-of-the-art methods. It
+  runs novel GRNs in the cloud, offers competition scores, and stores them
+  for future comparisons, reflecting new developments over time.
 
-  The platform supports the integration of new inference methods, datasets and protocols. When a new feature is added, previously evaluated GRNs are re-assessed, and the leaderboard is updated accordingly. The aim is to evaluate both the accuracy and completeness of inferred GRNs. It is designed for both single-modality and multi-omics GRN inference. 
-  
-  In the current version, geneRNIB contains 10 inference methods including both single and multi-omics, 8 evalation metrics, and five datasets. 
-  
-  See our publication for the details of methods. 
+  The platform supports the integration of new inference methods, datasets
+  and protocols. When a new feature is added, previously evaluated GRNs
+  are re-assessed, and the leaderboard is updated accordingly. The aim is
+  to evaluate both the accuracy and completeness of inferred GRNs. It is
+  designed for both single-modality and multi-omics GRN inference.
 info:
   image: thumbnail.svg
   test_resources:
@@ -53,25 +54,23 @@ info:
 
   readme: |
       ## Installation
-
-      You need to have Docker, Java, and Viash installed. Follow
-      [these instructions](https://openproblems.bio/documentation/fundamentals/requirements)
-      to install the required dependencies. 
+      Install Docker, Java, and Viash using
+      [these instructions](https://openproblems.bio/documentation/fundamentals/requirements).
 
       ## Download resources
       ```bash
-      git clone git@github.com:openproblems-bio/task_grn_inference.git
+      git clone --recursive git@github.com:openproblems-bio/task_grn_inference.git
 
       cd task_grn_inference
       ```
-      To interact with the framework, you should download the resources containing necessary inferene and evaluation datasets to get started. 
-      Here, we download the **test resources** which are solely used for testing if the framework is installed successfully. 
+      To interact with the framework,download the resources containing necessary inferene and evaluation datasets. 
 
       ```bash
-      scripts/download_resources.sh
+      pip install awscli
+      aws s3 sync  s3://openproblems-data/resources/grn/grn_benchmark resources/grn_benchmark  --no-sign-request
+
       ```
 
-      Refer to the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/) for downloading the actual datasets. To reproduce the results, run `scripts/run_benchmark_all.sh`, which is a very resource intensive run.
 
       ## Run a GRN inference method 
 
@@ -79,24 +78,33 @@ info:
 
       ```bash
       viash run src/methods/pearson_corr/config.vsh.yaml -- \
-            --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \
-            --prediction output/net.h5ad \
-            --tf_all resources_test/grn_benchmark/prior/tf_all.csv
+                  --rna resources/grn_benchmark/inference_data/op_rna.h5ad \
+                  --tf_all resources/grn_benchmark/prior/tf_all.csv \ 
+                  --prediction output/net.h5ad
       ```
-      It should be noted that this is using the `resources_test` datasets, which are small versions of the actual datasets. Thus, the obtained predictions are not realistic. To obtain a realistic prediction, download the actual data and set the folder to `resources`.  
 
-      ## Evaluate a GRN prediction
-      Once got the prediction for a given dataset (e.g. op), use the following code to obtain evaluation scores. 
-      
+      ## Evaluate a GRN model
+
       ```bash
-      scripts/single_grn_evaluation.sh output/net.h5ad op
+      bash scripts/run_grn_evaluation.sh \
+                  --prediction=output/net.h5ad \
+                  --dataset=op \ 
+                  --build_images=true \ 
+                  --save_dir=output 
       ```
+      `build_images` only needed for the first run.
 
-      This outputs the scores into `output/test_run/score_uns.yaml`
+      This outputs the scores into `output/score_uns.yaml`. 
+
 
       ## Add a GRN inference method, evaluation metric, or dataset
 
       To add a new component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).
+
+      ## Run the entire pipline
+
+      Run `scripts/run_all.sh` for the entire pipeline. Due to resource intensive nature of the task, we have splitted the pipeline into two steps of GRN inference and evaluation.
+
 
 
 authors:
@@ -110,6 +118,10 @@ authors:
     info:
       github: rcannood
       orcid: "0000-0003-3641-729X"
+  - name: Jérémie Kalfon  
+    roles: [ contributor ]
+    info:
+      github: jkobject
   - name: Antoine Passimier 
     roles: [ contributor ]
     info:

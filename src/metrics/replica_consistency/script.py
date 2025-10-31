@@ -39,8 +39,8 @@ if __name__ == '__main__':
     print({'error': str(e)})
 
     output = pd.DataFrame({
-        'key': [None],
-        'value': [None],
+        'key': ["None"],
+        'value': ["None"],
     })
 
   format_save_score(output, method_id, dataset_id, par['score'])

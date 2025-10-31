@@ -115,7 +115,8 @@ HERE
 }
 
 if [[ "$DATASET" =~ ^(replogle|parsescience|xaira_HEK293T|xaira_HCT116)$ ]]; then
-  methods="[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic]"
+  # methods="[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic]"
+  methods="[geneformer, scgpt]"
   append_entry "$DATASET" "$methods" 
   append_entry "$DATASET" "[scprint]" "true"
   echo $methods 
@@ -126,7 +127,8 @@ elif [ "$DATASET" = "op" ] || [ "$DATASET" = "ibd" ]; then
   echo $methods 
 
 else
-  methods="[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint]"
+  # methods="[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint]"
+  methods="[geneformer, scgpt]"
   append_entry "$DATASET" "$methods"
   echo $methods
 fi
@@ -134,9 +136,9 @@ fi
 # append_entry "$DATASET" "[scenicplus, figr, celloracle]"
 
 if [ "$RUN_TEST" = true ]; then
-  labels_config="scripts/labels_tw_test.config"
+  labels_config="scripts/configs/labels_tw_test.config"
 else
-  labels_config="scripts/labels_tw.config"
+  labels_config="scripts/configs/labels_tw.config"
 fi
 # --- Final configuration ---
 if [ "$RUN_LOCAL" = true ]; then

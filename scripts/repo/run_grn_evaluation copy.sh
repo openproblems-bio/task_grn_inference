@@ -14,7 +14,7 @@ grn_models_folder="${resources_dir}/grn_models"
 subsample=-2
 max_workers=10
 layer=scgen_pearson
-metric_ids="[regression_1, regression_2]"
+metric_ids="[regression_1, regression]"
 
 param_file="./params/${RUN_ID}.yaml"
 

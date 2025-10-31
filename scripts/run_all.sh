@@ -1,6 +1,6 @@
 set -e
 
-datasets=( 'op') #'replogle' 'op' 'nakatake' 'adamson' 'norman'  'xaira_HEK293T' 'xaira_HCT116'  'parsebioscience' 'ibd' '300BCG'
+datasets=('ibd' ) #'replogle' 'op' 'nakatake' 'adamson' 'norman'  'xaira_HEK293T' 'xaira_HCT116'  'parsebioscience' 'ibd' '300BCG') #
 
 run_local=false # set to true to run locally, false to run on AWS
 
@@ -47,7 +47,7 @@ for dataset in "${datasets[@]}"; do
             aws s3 sync  s3://openproblems-data/resources/grn/results/$dataset resources/results/$dataset 
         fi 
         echo "Running consensus for dataset: $dataset"
-        bash scripts/prior/run_consensus.sh $dataset # run consensus for regression 2 and ws distance -> needs to be run after adding each method and dataset
+        bash scripts/prior/run_consensus.sh $dataset # run consensus for Regression and ws distance -> needs to be run after adding each method and dataset
         
         if [ "$run_local" = false ]; then
             echo "Syncing prior results to AWS"
