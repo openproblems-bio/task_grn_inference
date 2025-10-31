@@ -30,14 +30,14 @@ try:
     sys.path.append(meta["resources_dir"])
 except:
     meta = {
-    "resources_dir":'src/metrics/anchor_regression/',
+    "resources_dir":'src/metrics/regression_3/',
     "util_dir": 'src/utils',
-    'helper_dir': 'src/metrics/anchor_regression/'
+    'helper_dir': 'src/metrics/regression_3/'
     }
     sys.path.append(meta["resources_dir"])
     sys.path.append(meta["util_dir"])
     sys.path.append(meta["helper_dir"])
-from helper import main as main_anchor 
+from helper import main as main_reg3
 from util import format_save_score
 
 
@@ -48,7 +48,7 @@ for key, value in vars(args).items():
         par[key] = value
 
 if __name__ == "__main__":
-    output = main_anchor(par)
+    output = main_reg3(par)
 
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
