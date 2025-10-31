@@ -53,8 +53,9 @@ def compute_residual_correlations(
         y_test: np.ndarray,
         Z_test: np.ndarray
 ) -> np.ndarray:
+    model = xgboost.XGBRegressor(n_estimators=10)
     #model = xgboost.XGBRegressor(n_estimators=10)
-    model = Ridge(alpha=0.01)
+    model = Ridge(alpha=1)
     model.fit(X_train, y_train)
     y_hat = model.predict(X_test)
     residuals = y_test - y_hat
