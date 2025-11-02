@@ -146,6 +146,7 @@ else
       "positive_control"
       "pearson_corr"
       "negative_control"
+      "spearman_corr"
       "scglue"
       "scenicplus"
       "celloracle"

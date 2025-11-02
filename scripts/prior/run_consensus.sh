@@ -20,7 +20,7 @@ if [ -z "$DATASET" ]; then
 fi
 
 models_dir="resources/results/$DATASET"
-models=("pearson_corr" "positive_control" "portia" "ppcor" "scenic" "scprint" "grnboost" "scenicplus" "scglue" "granie" "figr" "celloracle")
+models=("pearson_corr" "positive_control" "portia" "ppcor" "scenic" "scprint" "grnboost" "scenicplus" "scglue" "granie" "figr" "celloracle" "scgpt" "geneformer" "spearman_corr")
 predictions=()
 for model in "${models[@]}"; do
     file="${models_dir}/${DATASET}.${model}.${model}.prediction.h5ad"
