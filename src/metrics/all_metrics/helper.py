@@ -41,7 +41,10 @@ def tf_binding_metric(par, dataset_id):
 def replica_consistency_metric(par, dataset_id):
     if dataset_id in datasets_metrics:
         if 'replica_consistency' in datasets_metrics[dataset_id]:
-            output = main_replica_consistency(par)
+            try:
+                output = main_replica_consistency(par)
+            except:
+                output = None
             return output
     return None
 

@@ -7,8 +7,8 @@ import pandas as pd
 
 ## VIASH START
 par = {
-    'prediction': f'resources/results/op/op.pearson_corr.pearson_corr.prediction.h5ad',
-    'evaluation_data': f'resources/grn_benchmark/evaluation_data/op_bulk.h5ad',
+    'prediction': f'resources/results/replogle/replogle.pearson_corr.pearson_corr.prediction.h5ad',
+    'evaluation_data': f'resources/grn_benchmark/evaluation_data/replogle_bulk.h5ad',
     'layer': 'lognorm',
     "max_n_links": 50000,
     'num_workers': 20,
