@@ -9,15 +9,36 @@ from scipy.stats import ttest_rel
 
 from util import read_prediction
 
-def calculate_ulm_score(tf_mat, tf_grn):
-    """Calculate ULM score for a TF and its network."""
-    act, pval = dc.run_ulm(
-        mat=tf_mat,
-        net=tf_grn,
-        weight='weight',
-        min_n=3,
+def calculate_ulm_score(tf_mat, tf_grn, min_targets=3):
+    """Calculate ULM score for a TF and its network using new dc.mt.ulm API.
+    
+    Args:
+        tf_mat: DataFrame with TF expression (rows=TFs, cols=genes)
+        tf_grn: DataFrame with network edges (source, target, weight)
+        min_targets: Minimum number of targets required
+    
+    Returns:
+        tuple: (activity_score, pvalue)
+    """
+    # Create AnnData object from the TF matrix
+    # tf_mat has TF as index (rows), genes as columns
+    # AnnData expects obs=samples, var=genes
+    adata = ad.AnnData(X=tf_mat.values)
+    adata.var_names = tf_mat.columns
+    adata.obs_names = tf_mat.index
+    
+    # Run ULM with new API (dc.mt.ulm modifies adata in place)
+    dc.mt.ulm(
+        adata,
+        tf_grn,
+        tmin=min_targets
     )
-    return act.values[0, 0], pval.values[0, 0]
+    act = adata.obsm['score_ulm'].iloc[0,0]
+    pval = adata.obsm['padj_ulm'].iloc[0, 0]
+
+    
+    
+    return act, pval
 
 def create_random_network(tf, n_targets, all_genes):
     """Create a random network for a TF."""
@@ -30,13 +51,16 @@ def create_random_network(tf, n_targets, all_genes):
 
 def calculate_precision_recall(acts, pvals, total_tfs):
     """Calculate precision and recall scores."""
-    padj = dc.p_adjust_fdr(pvals)
-    tp = np.sum((acts < 0) & (padj < 0.05))
+    tp = np.sum((acts < 0) & (pvals < 0.05))
     prc = tp / acts.size if tp > 0 else 0.0
     rcl = tp / total_tfs if tp > 0 else 0.0
     return prc, rcl
 
 def main(par):
+    # Set random seed for reproducibility
+    seed = par.get('seed', 42)
+    np.random.seed(seed)
+    
     df_de = ad.read_h5ad(par['evaluation_data_de'])
     df_de = df_de.to_df()  # convert X to DataFrame
     net = read_prediction(par)

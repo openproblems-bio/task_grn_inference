@@ -3594,7 +3594,7 @@ meta = [
           "type" : "python",
           "user" : false,
           "packages" : [
-            "decoupler==1.7.0"
+            "decoupler==2.1.1"
           ],
           "upgrade" : true
         }
@@ -3607,7 +3607,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/tf_recovery",
     "viash_version" : "0.9.4",
-    "git_commit" : "17a0d2a4fafbeab612321721879269b544a1c6b7",
+    "git_commit" : "b63af66525f06a345da643c8207bca0c7c08b03d",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3792,7 +3792,7 @@ if __name__ == "__main__":
     try:
         output = main(par)
         method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-        dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+        dataset_id = ad.read_h5ad(par['evaluation_data_de'], backed='r').uns['dataset_id']
     except:
         print(f"Error in TF recovery evaluation")
         output = pd.DataFrame({

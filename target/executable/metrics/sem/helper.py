@@ -34,6 +34,8 @@ torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)
 torch.use_deterministic_algorithms(True)
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = False
 
 
 from util import read_prediction, manage_layer, create_grn_baseline
@@ -84,27 +86,67 @@ def combine_multi_index(*arrays) -> np.array:
     n_classes = tuple(int(A[i].max()) + 1 for i in range(A.shape[0]))
     return np.ravel_multi_index(A, dims=n_classes, order='C')
 
+import numpy as np
 
-def compute_perturbations(X, are_controls, groups: np.array, loose_match_groups: np.array) -> np.ndarray:
-    # Compute perturbations as differences between samples and their matched controls.
-    # By matched control, we mean a negative control from the same donor, located on
-    # the same plate, from the same cell type, and eventually from the same well.
-    # By construction, perturbations will be 0 for control samples.
+def compute_perturbations(X, are_controls, groups: np.ndarray, loose_match_groups: np.ndarray) -> np.ndarray:
+    """
+    Compute perturbations as differences between samples and their matched controls.
+    Each sample is compared to its matched control (from the same donor, plate, etc.).
+    If no matching control is found (even for loose grouping), assign any available control.
+
+    Parameters
+    ----------
+    X : np.ndarray
+        Expression or feature matrix (samples × features)
+    are_controls : np.ndarray (bool)
+        Boolean array indicating which samples are controls
+    groups : np.ndarray
+        Strict matching groups (e.g., donor+plate+celltype)
+    loose_match_groups : np.ndarray
+        Looser matching groups (e.g., donor+plate)
+    """
+
     delta_X = np.copy(X)
     control_map, loose_control_map = {}, {}
+
+    # Build maps for strict and loose control matching
     for i, (is_control, group_id) in enumerate(zip(are_controls, groups)):
         if is_control:
             control_map[group_id] = i
     for i, (is_control, group_id) in enumerate(zip(are_controls, loose_match_groups)):
         if is_control:
             loose_control_map[group_id] = i
-    
+
+    # Identify any available control indices (for fallback)
+    all_controls = np.where(are_controls)[0]
+    if len(all_controls) == 0:
+        raise RuntimeError("No control samples found at all — cannot compute perturbations.")
+
+    # Compute perturbations
     for i, (group_id, loose_group_id) in enumerate(zip(groups, loose_match_groups)):
-        if group_id in control_map:
-            j = control_map[group_id]
-        else:
-            j = loose_control_map[loose_group_id]
-        delta_X[i, :] -= delta_X[j, :]
+        try:
+            if group_id in control_map:
+                j = control_map[group_id]
+            elif loose_group_id in loose_control_map:
+                j = loose_control_map[loose_group_id]
+            else:
+                # Fall back to any available control (e.g., first one)
+                j = all_controls[0]
+
+            delta_X[i, :] -= X[j, :]
+
+        except Exception as e:
+            raise RuntimeError(
+                f"Failed to compute perturbation for sample index {i}:\n"
+                f"  group_id = {group_id}\n"
+                f"  loose_group_id = {loose_group_id}\n"
+                f"  Are controls found for this group? "
+                f"Strict = {group_id in control_map}, Loose = {loose_group_id in loose_control_map}\n"
+                f"  Fallback control used = {len(all_controls) > 0}\n"
+                f"  Total controls available: {sum(are_controls)} / {len(are_controls)}\n"
+                f"Hint: Loose grouping may be inconsistent; used fallback control."
+            ) from e
+
     return delta_X
 
 
@@ -169,7 +211,7 @@ def regression_based_grn_inference(X: np.ndarray, base: np.ndarray, signed: bool
     n_genes = X.shape[1]
     A = np.zeros((n_genes, n_genes), dtype=X.dtype)
     for j in tqdm.tqdm(range(n_genes)):
-        model = ElasticNet(alpha=0.001, fit_intercept=False)
+        model = ElasticNet(alpha=0.001, fit_intercept=False, random_state=seed)
         if not np.any(mask[:, j]):
             continue  # If gene has no regulator, skip it.
         model.fit(X[:, mask[:, j]], X[:, j])
@@ -224,6 +266,9 @@ def evaluate_grn(
     mask = torch.from_numpy(mask).to(torch.bool)
     A = torch.nn.Parameter(torch.from_numpy(A))
     A_eff = torch.abs(A) * signs if signed else A * mask
+    
+    # Set manual seed again before optimizer initialization for determinism
+    torch.manual_seed(seed)
     optimizer = torch.optim.Adam([A], lr=learning_rate)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode='min', patience=5,
@@ -298,6 +343,9 @@ def main(par):
     cv_groups = encode_obs_cols(adata, par['cv_groups'])
     match_groups = encode_obs_cols(adata, par['match'])
     loose_match_groups = encode_obs_cols(adata, par['loose_match'])
+    assert len(cv_groups) > 0, "No cv_groups could be encoded."
+    assert len(match_groups) > 0, "No match_groups could be encoded."
+    assert len(loose_match_groups) > 0, "No loose_match_groups could be encoded."
     cv_groups = combine_multi_index(*cv_groups)
     match_groups = combine_multi_index(*match_groups)
     loose_match_groups = combine_multi_index(*loose_match_groups)
@@ -376,7 +424,11 @@ def main(par):
     print(f"Use regulatory modes/signs: {use_signs}")
 
     # Create baseline model
-    A_baseline = create_grn_baseline(A)
+    try:
+        A_baseline = create_grn_baseline(A)
+    except:
+        print("Failed to create baseline GRN. Using zero baseline.")
+        raise ValueError("Failed to create baseline GRN.")
 
     # Evaluate inferred GRN
     print("\n======== Evaluate inferred GRN ========")

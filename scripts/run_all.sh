@@ -1,12 +1,12 @@
 set -e
 
-datasets=('ibd' ) #'replogle' 'op' 'nakatake' 'adamson' 'norman'  'xaira_HEK293T' 'xaira_HCT116'  'parsebioscience' 'ibd' '300BCG') #
+datasets=('op' 'ibd' ) #'replogle' 'op' 'nakatake' 'adamson' 'norman'  'xaira_HEK293T' 'xaira_HCT116'  'parsebioscience' 'ibd' '300BCG') #
 
 run_local=false # set to true to run locally, false to run on AWS
 
-run_grn_inference=true
+run_grn_inference=false
 run_grn_evaluation=false
-run_download=false
+run_download=true
 
 
 for dataset in "${datasets[@]}"; do
@@ -37,15 +37,16 @@ for dataset in "${datasets[@]}"; do
             today=$(date +%Y-%m-%d)
             cp "$trace_file" "${dir}/${base}_${today}.txt"
         fi
-        # if [ "$run_local" = false ]; then
-        #     echo "Downloading inference results from AWS"
-        #     aws s3 sync  s3://openproblems-data/resources/grn/results/$dataset resources/results/$dataset 
-        # fi
+        
         if [ "$run_local" = false ]; then
             echo "Uploading inference results to AWS"
             aws s3 sync  resources/results/$dataset s3://openproblems-data/resources/grn/results/$dataset 
             aws s3 sync  s3://openproblems-data/resources/grn/results/$dataset resources/results/$dataset 
         fi 
+        if [ "$run_local" = false ]; then
+            echo "Downloading inference results from AWS"
+            aws s3 sync  s3://openproblems-data/resources/grn/results/$dataset resources/results/$dataset 
+        fi
         echo "Running consensus for dataset: $dataset"
         bash scripts/prior/run_consensus.sh $dataset # run consensus for Regression and ws distance -> needs to be run after adding each method and dataset
         

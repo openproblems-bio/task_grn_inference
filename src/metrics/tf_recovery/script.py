@@ -37,7 +37,7 @@ if __name__ == "__main__":
     try:
         output = main(par)
         method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-        dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
+        dataset_id = ad.read_h5ad(par['evaluation_data_de'], backed='r').uns['dataset_id']
     except:
         print(f"Error in TF recovery evaluation")
         output = pd.DataFrame({

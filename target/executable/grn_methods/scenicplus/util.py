@@ -252,60 +252,6 @@ def corr_net(adata, tf_all, par) -> pd.DataFrame:
     return net
 
 
-# def plot_heatmap(scores, ax=None, name="", fmt="0.02f", cmap="viridis"):
-#     import matplotlib.pyplot as plt
-#     import numpy as np
-#     import seaborn
-
-#     if ax is None:
-#         fig, ax = plt.subplots(1, 1, figsize=(4, 4), sharey=True)
-
-#     # Normalize each column individually
-#     scores_normalized = scores.apply(
-#         lambda x: (x - np.nanmin(x)) / (np.nanmax(x) - np.nanmin(x)), axis=0
-#     )
-#     scores_normalized = scores_normalized.round(2)
-#     # scores_normalized['Rank'] = scores['Rank'].max()-scores['Rank']
-#     # scores_normalized['Rank'] = scores_normalized['Rank']/scores_normalized['Rank'].max()
-
-#     # Define the color scale range for each column (0 to 1 after normalization)
-#     vmin = 0
-#     vmax = 1
-
-#     # Plot the heatmap with normalized scores
-#     seaborn.heatmap(
-#         scores_normalized,
-#         ax=ax,
-#         square=False,
-#         cbar=False,
-#         annot=True,
-#         fmt=fmt,
-#         vmin=vmin,
-#         vmax=vmax,
-#         cmap=cmap,
-#     )
-#     # Overlay the original (unnormalized) scores as annotations
-#     # scores['Rank'] = scores['Rank'].astype(int)
-#     # print(scores['Rank'])
-#     # Overlay the original (unnormalized) scores as annotations
-#     for text, (i, j) in zip(ax.texts, np.ndindex(scores.shape)):
-#         value = scores.iloc[i, j]
-#         if isinstance(value, np.int64):  # Check if the value is an integer for 'Rank'
-#             text.set_text(f"{value:d}")
-#         else:
-#             text.set_text(f"{value:.2f}")
-
-#     # Customize the axes and title
-#     ax.tick_params(left=False, bottom=False)
-#     ax.xaxis.set_tick_params(width=0)
-#     ax.yaxis.set_tick_params(width=0)
-#     ax.set_title(name, pad=10)
-
-#     ax.xaxis.set_label_position("top")
-#     ax.xaxis.tick_top()
-#     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="left")
-
-
 def read_gmt(file_path: str) -> dict[str, list[str]]:
     """Reas gmt file and returns a dict of gene"""
     gene_sets = {}

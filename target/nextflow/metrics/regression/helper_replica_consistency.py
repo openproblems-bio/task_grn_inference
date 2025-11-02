@@ -121,7 +121,11 @@ def evaluate_setting(C: np.ndarray, A: np.ndarray, setting_name: str, **kwargs) 
     scores = evaluate_grn(C, A, **kwargs)
 
     # Create baseline model
-    A_baseline = create_grn_baseline(A)
+    try:
+        A_baseline = create_grn_baseline(A)
+    except:
+        print("Failed to create baseline GRN. Using zero baseline.")
+        raise ValueError("Failed to create baseline GRN.")
 
     # Evaluate baseline GRN
     scores_baseline = evaluate_grn(C, A_baseline, **kwargs)
