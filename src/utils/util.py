@@ -1,8 +1,15 @@
+import io
+import os
+import zipfile
+import tempfile
+import requests
+from pathlib import Path
 import pandas as pd
 import anndata as ad
 import numpy as np
 from tqdm import tqdm
 import scipy.sparse as sp
+
 
 def naming_convention(dataset, method): 
     if (dataset in ['replogle', 'parsescience', 'xaira_HEK293T']) & (method in ['scprint']):
@@ -357,6 +364,47 @@ def download_annotation(par):
             print(f"Failed to download the gencode.v45.annotation.gtf.gz. Status code: {response.status_code}")
         print("Downloading prior ended")
 
+def download_and_uncompress_zip(url: str, folder: str) -> None:
+
+    chunk_size = 1 << 20
+    dest = Path(folder)
+    dest.mkdir(parents=True, exist_ok=True)
+
+    # Stream download -> seekable temp file (ZipFile needs seekable)
+    with requests.get(url, stream=True, timeout=60) as r:
+        r.raise_for_status()
+        with tempfile.TemporaryFile() as tf:
+            for chunk in r.iter_content(chunk_size=chunk_size):
+                if chunk:  # skip keep-alives
+                    tf.write(chunk)
+            tf.seek(0)
+
+            with zipfile.ZipFile(tf) as zf:
+                for member in zf.infolist():
+                    print(member)
+                    # Normalize path and prevent traversal outside `dest`
+                    extracted_path = dest / Path(member.filename).as_posix()
+                    normalized = extracted_path.resolve()
+
+                    if not str(normalized).startswith(str(dest.resolve()) + os.sep) and normalized != dest.resolve():
+                        raise RuntimeError(f"Unsafe path in ZIP: {member.filename}")
+
+                    if member.is_dir():
+                        normalized.mkdir(parents=True, exist_ok=True)
+                        continue
+
+                    # Ensure parent dirs exist
+                    normalized.parent.mkdir(parents=True, exist_ok=True)
+
+                    # Extract the file
+                    with zf.open(member, "r") as source, open(normalized, "wb") as target:
+                        while True:
+                            chunk = source.read(1 << 20)
+                            if not chunk:
+                                break
+                            target.write(chunk)
+
+
 def read_gtf_as_df(gtf_path: str) -> pd.DataFrame:
     """
     Read a GTF/GFF3 file (plain or gzipped) and return gene-level annotation
@@ -466,6 +514,10 @@ def create_grn_baseline(A):
     reassigned deterministically to different edges (no randomness).
     """
 
+    # Ensure no self-regulation
+    A = np.copy(A)
+    np.fill_diagonal(A, 0)
+
     n = A.shape[0]
 
     # Order nodes by degrees, with explicit tie-breaking by weight
@@ -510,7 +562,7 @@ def create_grn_baseline(A):
                             B[x, w] = 0
                             B[x, v] = 1
                             in_degrees[w].degree += 1
-                            in_degrees[v].degree -= 1
+                            #in_degrees[v].degree -= 1
                             picks.append(v)
                             swapped = True
                             break
@@ -519,14 +571,13 @@ def create_grn_baseline(A):
                 if len(picks) == k:
                     break
 
-        if len(picks) < k:
-            raise ValueError("Directed degree sequence not realizable with simple digraph under constraints.")
+        #if len(picks) < k:
+        #    raise ValueError("Directed degree sequence not realizable with simple digraph under constraints.")
 
         # Place edges for u
         for v in picks:
             B[u, v] = 1
             in_degrees[v].degree -= 1
-        #out_degrees[v].degree = 0
         out_degrees[u].degree = 0
 
         # Stable re-sort by residual in-degree, with explicit tie-breaking by weight
@@ -585,5 +636,13 @@ def create_grn_baseline(A):
 
         # Assign exact weights to new edges deterministically
         B[u, targets_ranked] = W_sorted
+
+    # Quality check
+    #target_in_degrees = np.sum((A != 0), axis=0)
+    #target_out_degrees = np.sum((A != 0), axis=1)
+    #in_degrees = np.sum((B != 0), axis=0)
+    #out_degrees = np.sum((B != 0), axis=1)
+    #print(target_in_degrees - in_degrees)
+    #print(target_out_degrees - out_degrees)
 
     return B

@@ -26,7 +26,6 @@ np.random.seed(seed)
 
 from util import read_prediction, manage_layer
 from dataset_config import DATASET_GROUPS
-from baseline import create_grn_baseline
 
 
 def encode_obs_cols(adata, cols):
@@ -54,8 +53,7 @@ def compute_residual_correlations(
         Z_test: np.ndarray
 ) -> np.ndarray:
     model = xgboost.XGBRegressor(n_estimators=10)
-    #model = xgboost.XGBRegressor(n_estimators=10)
-    model = Ridge(alpha=1)
+    #model = Ridge(alpha=10)
     model.fit(X_train, y_train)
     y_hat = model.predict(X_test)
     residuals = y_test - y_hat
@@ -75,7 +73,7 @@ def main(par):
     if dataset_id not in DATASET_GROUPS:
         raise ValueError(f"Dataset {dataset_id} not found in DATASET_GROUPS")
     
-    anchor_cols = DATASET_GROUPS[dataset_id]['anchors']
+    anchor_cols = DATASET_GROUPS[dataset_id].get('anchors', ['donor_id', 'plate_name'])
     print(f"Using anchor variables: {anchor_cols}")
 
     # Manage layer
@@ -129,7 +127,11 @@ def main(par):
     print(f"Evaluating {X.shape[1]} genes with {np.sum(A != 0)} regulatory links")
 
     # Create baseline model
-    A_baseline = create_grn_baseline(A)
+    A_baseline = np.copy(A)
+    for j in range(A.shape[1]):
+        np.random.shuffle(A_baseline[:j, j])
+        np.random.shuffle(A_baseline[j+1:, j])
+    assert np.any(A_baseline != A)
 
     scores, baseline_scores = [], []
     for group in np.unique(anchor_encoded):
@@ -176,7 +178,7 @@ def main(par):
             baseline_scores.append(np.mean(coefs))
     scores = np.array(scores)
     baseline_scores = np.array(baseline_scores)
-    reg3_lift = np.mean(scores) / (np.mean(baseline_scores) + 1e-6)
+
     p_value = wilcoxon(baseline_scores, scores, alternative="greater").pvalue
     p_value = max(p_value, 1e-300)
 
@@ -187,8 +189,7 @@ def main(par):
 
     # Return results as DataFrame
     results = {
-        'reg3_precision': [reg3_lift],
-        'reg3_balanced': [final_score]
+        'regression_3': [final_score]
     }
 
     df_results = pd.DataFrame(results)

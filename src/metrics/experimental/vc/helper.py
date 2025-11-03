@@ -1,4 +1,5 @@
 import os
+import traceback
 from typing import Tuple, Dict
 import sys
 import tqdm
@@ -8,7 +9,9 @@ import numpy as np
 import pandas as pd
 import torch
 from scipy.sparse import csr_matrix
-from sklearn.model_selection import GroupKFold
+from scipy.spatial.distance import cityblock
+from scipy.stats import wilcoxon
+from sklearn.model_selection import StratifiedGroupKFold, StratifiedKFold
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from torch.utils.data import Dataset
 import anndata as ad
@@ -22,18 +25,19 @@ DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 NUMPY_DTYPE = np.float32
 
 # For reproducibility purposes
-seed = 0xCAFE
-os.environ['PYTHONHASHSEED'] = str(seed)
-random.seed(seed)
-np.random.seed(seed)
-torch.manual_seed(seed)
-torch.cuda.manual_seed(seed)
-torch.cuda.manual_seed_all(seed)
-torch.use_deterministic_algorithms(True)
+def set_seed():
+    seed = 0xCAFE
+    os.environ['PYTHONHASHSEED'] = str(seed)
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    torch.use_deterministic_algorithms(True)
 
 from util import read_prediction, manage_layer
 from dataset_config import DATASET_GROUPS
-from scipy.spatial.distance import cityblock
+from baseline import create_grn_baseline
 
 
 def combine_multi_index(*arrays) -> np.array:
@@ -58,166 +62,13 @@ def create_control_matching(are_controls: np.ndarray, match_groups: np.ndarray) 
     if len(control_indices) == 0:
         raise ValueError("No control samples found in dataset!")
     
-    # Create control mapping
+    # First, try to create exact matching (original approach)
     control_map = {}
     for i, (is_control, group_id) in enumerate(zip(are_controls, match_groups)):
         if is_control:
             control_map[int(group_id)] = i
-    
-    # If no controls were mapped (shouldn't happen but safety check), 
-    # map group 0 to the first control
-    if not control_map and len(control_indices) > 0:
-        control_map[0] = control_indices[0]
 
     return control_map, match_groups
-
-
-def compute_pds_cell_level(X_true, X_pred, perturbations, gene_names, max_cells_per_pert=10):
-    """
-    Compute PDS at individual cell level (more challenging than mean-based PDS).
-    
-    For each individual predicted cell, find its rank when compared to 
-    true mean profiles of all perturbations.
-    """
-    unique_perts = np.unique(perturbations)
-    n_perts = len(unique_perts)
-    
-    print(f"Computing cell-level PDS for {n_perts} unique perturbations")
-    
-    if n_perts < 2:
-        return 0.0
-    
-    # Compute mean true expression profiles per perturbation
-    true_means = {}
-    for pert in unique_perts:
-        mask = (perturbations == pert)
-        if np.sum(mask) == 0:
-            continue
-        true_means[pert] = np.mean(X_true[mask, :], axis=0)
-    
-    all_scores = []
-    
-    # For each perturbation, sample some cells and compute their PDS
-    for pert in unique_perts:
-        if pert not in true_means:
-            continue
-            
-        # Get cells for this perturbation
-        mask = (perturbations == pert)
-        pert_indices = np.where(mask)[0]
-        
-        if len(pert_indices) == 0:
-            continue
-            
-        # Sample max_cells_per_pert cells to avoid bias from perturbations with many cells
-        # Use seeded random generator for reproducibility
-        cell_rng = np.random.RandomState(seed + int(pert))  # Different seed per perturbation
-        sampled_indices = cell_rng.choice(
-            pert_indices, 
-            size=min(max_cells_per_pert, len(pert_indices)), 
-            replace=False
-        )
-        
-        for cell_idx in sampled_indices:
-            # Get predicted profile for this individual cell
-            pred_vec = X_pred[cell_idx, :].copy()
-            
-            # Calculate distances to all true mean profiles
-            dists = []
-            for t in unique_perts:
-                if t not in true_means:
-                    continue
-                true_vec = true_means[t].copy()
-                
-                # Remove target gene if it exists
-                if str(pert) in gene_names:
-                    gene_idx = np.where(gene_names == str(pert))[0]
-                    if len(gene_idx) > 0:
-                        true_vec = np.delete(true_vec, gene_idx)
-                        pred_vec_temp = np.delete(pred_vec, gene_idx)
-                    else:
-                        pred_vec_temp = pred_vec
-                else:
-                    pred_vec_temp = pred_vec
-                
-                dist = cityblock(pred_vec_temp, true_vec)
-                dists.append((t, dist))
-            
-            # Sort by distance and find rank of correct perturbation
-            dists_sorted = sorted(dists, key=lambda x: x[1])
-            true_rank = next((i for i, (t, _) in enumerate(dists_sorted) if t == pert), n_perts-1)
-            
-            # Cell-level PDS
-            pds = 1 - (true_rank / (n_perts - 1)) if n_perts > 1 else 1.0
-            all_scores.append(pds)
-    
-    mean_pds = np.mean(all_scores) if all_scores else 0.0
-    print(f"Cell-level PDS scores: min={min(all_scores):.3f}, max={max(all_scores):.3f}, mean={mean_pds:.3f} (n_cells={len(all_scores)})")
-    return mean_pds
-
-
-def compute_pds(X_true, X_pred, perturbations, gene_names):
-    """
-    Compute both mean-level and cell-level PDS for comparison.
-    """
-    # Mean-level PDS (original approach)
-    unique_perts = np.unique(perturbations)
-    n_perts = len(unique_perts)
-    
-    print(f"Computing mean-level PDS for {n_perts} unique perturbations")
-    
-    if n_perts < 2:
-        return 0.0, 0.0
-    
-    # Compute mean expression profiles per perturbation
-    true_means = {}
-    pred_means = {}
-    
-    for pert in unique_perts:
-        mask = (perturbations == pert)
-        if np.sum(mask) == 0:
-            continue
-        true_means[pert] = np.mean(X_true[mask, :], axis=0)
-        pred_means[pert] = np.mean(X_pred[mask, :], axis=0)
-    
-    scores = {}
-    for pert in unique_perts:
-        if pert not in pred_means or pert not in true_means:
-            continue
-            
-        pred_vec = pred_means[pert].copy()
-        dists = []
-        
-        for t in unique_perts:
-            if t not in true_means:
-                continue
-            true_vec = true_means[t].copy()
-            
-            if str(pert) in gene_names:
-                gene_idx = np.where(gene_names == str(pert))[0]
-                if len(gene_idx) > 0:
-                    true_vec = np.delete(true_vec, gene_idx)
-                    pred_vec_temp = np.delete(pred_vec, gene_idx)
-                else:
-                    pred_vec_temp = pred_vec
-            else:
-                pred_vec_temp = pred_vec
-            
-            dist = cityblock(pred_vec_temp, true_vec)
-            dists.append((t, dist))
-        
-        dists_sorted = sorted(dists, key=lambda x: x[1])
-        true_rank = next((i for i, (t, _) in enumerate(dists_sorted) if t == pert), n_perts-1)
-        pds = 1 - (true_rank / (n_perts - 1)) if n_perts > 1 else 1.0
-        scores[pert] = pds
-    
-    mean_level_pds = np.mean(list(scores.values())) if scores else 0.0
-    print(f"Mean-level PDS: min={min(scores.values()):.3f}, max={max(scores.values()):.3f}, mean={mean_level_pds:.3f}")
-    
-    # Cell-level PDS (more challenging)
-    cell_level_pds = compute_pds_cell_level(X_true, X_pred, perturbations, gene_names)
-    
-    return mean_level_pds, cell_level_pds
 
 
 class GRNLayer(torch.nn.Module):
@@ -228,92 +79,163 @@ class GRNLayer(torch.nn.Module):
             A_signs: torch.Tensor,
             signed: bool = True,
             inverse: bool = True,
-            alpha: float = 1.0
+            alpha: float = 0.2,
+            stable: bool = True,
+            bias: bool = True
     ):
         torch.nn.Module.__init__(self)
         self.n_genes: int = A_weights.size(1)
         self.A_weights: torch.nn.Parameter = A_weights
+        dtype = A_weights.dtype
+        device = A_weights.device
+        if bias:
+            self.b: torch.nn.Parameter = torch.nn.Parameter(torch.zeros((1, self.n_genes), dtype=dtype, device=device))
+        else:
+            self.b = None
         self.register_buffer('A_signs', A_signs.to(A_weights.device))
-        self.register_buffer('A_mask', (A_signs > 0).to(self.A_weights.dtype).to(A_weights.device))
-        self.register_buffer('I', torch.eye(self.n_genes, dtype=A_weights.dtype, device=A_weights.device))
+        self.register_buffer('A_mask', (A_signs != 0).to(self.A_weights.dtype).to(A_weights.device))
+        self.register_buffer('I', torch.eye(self.n_genes, dtype=dtype, device=device))
         self.signed: bool = signed
         self.inverse: bool = inverse
         self.alpha: float = alpha
+        self.stable: bool = stable
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if self.signed:
             A = torch.abs(self.A_weights) * self.A_signs
+            assert torch.any(A < 0)
         else:
             A = self.A_weights * self.A_mask
         
         if self.inverse:
-            # For inverse transformation, use iterative solve to avoid memory issues
-            # Solve (I - alpha * A.t()) * y = x for y
-            ia = self.I - self.alpha * A.t()
-            
-            # Add small regularization to diagonal for numerical stability
-            ia = ia + 1e-6 * self.I
-            
-            # Use solve instead of inversion to save memory
-            try:
-                # Solve ia * y.t() = x.t() for y.t(), then transpose
-                result = torch.linalg.solve(ia, x.t()).t()
-                return result
-            except torch.linalg.LinAlgError:
-                # Fallback: simple linear transformation without inversion
-                print("Warning: Matrix solve failed, using simplified GRN transformation")
-                return torch.mm(x, A)
+            if self.stable:
+                # Approximation using Neumann series
+                B = GRNLayer.neumann_series(A.t(), self.alpha)
+                y = torch.mm(x, B)
+            else:
+                # For inverse transformation, use iterative solve to avoid memory issues
+                # Solve (I - alpha * A.t()) * y = x for y
+                ia = self.I - self.alpha * A.t()
+                
+                try:
+                    # Use solve instead of inversion to save memory
+                    y = torch.linalg.solve(ia, x.t()).t()
+                except torch.linalg.LinAlgError:
+                    # Fallback: approximation using Neumann series
+                    B = GRNLayer.neumann_series(A.t(), self.alpha)
+                    y = torch.mm(x, B)
         else:
             # Forward transformation: apply GRN directly
-            return torch.mm(x, A.t())
+            y = torch.mm(x, self.I - self.alpha * A.t())
+
+        # Add bias term
+        if self.b is not None:
+            y = y + self.b
+
+        return y
+
+    @staticmethod
+    def neumann_series(A: torch.Tensor, alpha: float, k: int = 2) -> torch.Tensor:
+        """Approximate the inverse of I - A using Neumann series.
+
+        Args:
+            A: the matrix for which to invert I - A.
+            k: the number of terms in the series. The higher, the more accurate.
+
+        Returns:
+            Approximated inverse of I - A.
+        """
+        I = torch.eye(A.shape[0], device=A.device, dtype=A.dtype)
+        M = alpha * A
+        term = I.clone()
+        B = I.clone()
+        for _ in range(k):
+            term = term @ M
+            B = B + term
+        return B
 
 
 class Model(torch.nn.Module):
-    def __init__(self, A: np.ndarray, n_perturbations: int, n_hidden: int = 64, signed: bool = True):
+
+    def __init__(self, A: np.ndarray, n_perturbations: int, n_hidden: int = 16, signed: bool = True):
+
+        # n_hidden needs to be small enough to prevent the NN from arbitrarily shifting the learning task
+        # from the GRN to the MLPs.
+
         torch.nn.Module.__init__(self)
         self.n_genes: int = A.shape[1]
         self.n_perturbations: int = n_perturbations
         self.n_hidden: int = n_hidden
-        self.perturbation_embedding = torch.nn.Embedding(n_perturbations, n_hidden)
+        self.signed: bool = signed
 
+        # Perturbation transformations defined in the latent space
+        #self.perturbation_embedding = torch.nn.Embedding(n_perturbations, n_hidden)
+        self.perturbation_embedding = torch.nn.Embedding(n_perturbations, n_hidden * n_hidden)
+
+        # First layer: GRN-informed transformation of control expression
         A_signs = torch.from_numpy(np.sign(A).astype(NUMPY_DTYPE))
         A_weights = np.copy(A).astype(NUMPY_DTYPE)
         A_weights /= (np.sqrt(self.n_genes) * float(np.std(A_weights)))
         A_weights = torch.nn.Parameter(torch.from_numpy(A_weights))
         # Ensure A_signs is on the same device as A_weights
         A_signs = A_signs.to(A_weights.device)
-
-        # First layer: GRN-informed transformation of control expression
-        self.grn_input_layer = GRNLayer(A_weights, A_signs, inverse=False, signed=signed, alpha=0.1)
+        self.grn_input_layer = GRNLayer(A_weights, A_signs, inverse=False, signed=signed)
         
-        # Middle layers: perturbation processing
+        # Middle layers: encode/decode between expression profiles and latent space
         self.encoder = torch.nn.Sequential(
+            torch.nn.LayerNorm(self.n_genes),
+            torch.nn.Dropout(p=0.4, inplace=True),
             torch.nn.PReLU(1),
             torch.nn.Linear(self.n_genes, self.n_hidden),
-            torch.nn.PReLU(1),
+            torch.nn.PReLU(self.n_hidden),
             torch.nn.Linear(self.n_hidden, self.n_hidden),
-            torch.nn.PReLU(1),
+            torch.nn.PReLU(self.n_hidden),
+            torch.nn.Linear(self.n_hidden, self.n_hidden),
+            torch.nn.PReLU(self.n_hidden),
         )
         
         self.decoder = torch.nn.Sequential(
+            torch.nn.LayerNorm(self.n_hidden),
             torch.nn.Linear(self.n_hidden, self.n_hidden),
-            torch.nn.PReLU(1),
+            torch.nn.PReLU(self.n_hidden),
+            torch.nn.Linear(self.n_hidden, self.n_hidden),
+            torch.nn.PReLU(self.n_hidden),
             torch.nn.Linear(self.n_hidden, self.n_genes),
             torch.nn.PReLU(1),
+            torch.nn.Dropout(p=0.4, inplace=True),
         )
         
         # Last layer: GRN-informed transformation to final expression
-        self.grn_output_layer = GRNLayer(A_weights, A_signs, inverse=True, signed=signed, alpha=0.1)
+        self.grn_output_layer = GRNLayer(A_weights, A_signs, inverse=True, signed=signed)
 
     def forward(self, x: torch.Tensor, pert: torch.LongTensor) -> torch.Tensor:
-        # Apply GRN transformation to control expression
+
+        # Encode each expression profile
         x = self.grn_input_layer(x)
         y = self.encoder(x)
-        z = self.perturbation_embedding(pert)
-        y = y + z
+
+        # Each perturbation is a linear transformation in the latent space.
+        # Apply perturbation transform to the encoded profile.
+        z = self.perturbation_embedding(pert).view(len(x), self.n_hidden, self.n_hidden)
+        y = torch.einsum('ij,ijk->ik', y, z)
+        #z = self.perturbation_embedding(pert)
+        #y = y + z
+
+        # Decode each expression profile
         y = self.decoder(y)
         y = self.grn_output_layer(y)
         return y
+
+    def set_grn(self, A: np.ndarray) -> None:
+        signed = np.any(A < 0)
+        A_signs = torch.from_numpy(np.sign(A).astype(NUMPY_DTYPE))
+        A_weights = np.copy(A).astype(NUMPY_DTYPE)
+        A_weights /= (np.sqrt(self.n_genes) * float(np.std(A_weights)))
+        A_weights = torch.nn.Parameter(torch.from_numpy(A_weights))
+        # Ensure A_signs is on the same device as A_weights
+        A_signs = A_signs.to(A_weights.device)
+        self.grn_input_layer = GRNLayer(A_weights, A_signs, inverse=False, signed=self.signed)
+        self.grn_output_layer = GRNLayer(A_weights, A_signs, inverse=True, signed=self.signed)
 
 
 class PerturbationDataset(Dataset):
@@ -342,97 +264,97 @@ class PerturbationDataset(Dataset):
     def __getitem__(self, i: int) -> Tuple[torch.Tensor, int, torch.Tensor]:
         i = self.idx[i]
         y = torch.from_numpy(self.X[i, :])
-        group = int(self.match_groups[i])
 
+        # Find matched control
+        group = int(self.match_groups[i])
         if group in self.control_map:
             j = int(self.control_map[group])
-        elif int(self.loose_match_groups[i]) in self.loose_control_map:
+        else:
             group = int(self.loose_match_groups[i])
             j = int(self.loose_control_map[group])
-        else:
-            # Fallback: use any available control sample
-            # This handles cases where no matching control exists (e.g., single control scenarios)
-            available_controls = list(self.control_map.values()) + list(self.loose_control_map.values())
-            if available_controls:
-                j = available_controls[0]  # Use first available control
-            else:
-                raise ValueError("No control samples available for matching!")
 
         x = torch.from_numpy(self.X[j, :])
         p = int(self.perturbations[i])
-        return x, p, y
+        d_x = y - x
+        return x, p, d_x
 
 
+def coefficients_of_determination(y_target: np.ndarray, y_pred: np.ndarray, eps: float = 1e-20) -> np.ndarray:
+    residuals = np.square(y_target - y_pred)
+    ss_res = np.sum(residuals, axis=0) + eps
+    mean = np.mean(y_target, axis=0)[np.newaxis, :]
+    residuals = np.square(y_target - mean)
+    ss_tot = np.sum(residuals, axis=0) + eps
+    return 1 - ss_res / ss_tot
 
-def evaluate(A, train_data_loader, test_data_loader, n_perturbations: int) -> Tuple[float, float]:
-    # Training
 
-    signed = np.any(A < 0)
-    model = Model(A, n_perturbations, n_hidden=16, signed=signed)
+def evaluate(A, train_data_loader, test_data_loader, state_dict, n_perturbations: int, signed: bool = True) -> np.ndarray:
+    set_seed()
+    A = np.copy(A)
+    model = Model(A, n_perturbations, signed=signed)
     model = model.to(DEVICE)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-5)
+    model.load_state_dict(state_dict, strict=False)
+    model.set_grn(A)
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-6)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer, mode='min', patience=5,
-        min_lr=1e-5, cooldown=3, factor=0.8
+        min_lr=1e-6, cooldown=3, factor=0.8
     )
-    pbar = tqdm.tqdm(range(100))  # Reduced epochs for faster testing
-    best_val_loss = float('inf')
-    best_ss_res = None
-    best_epoch = 0
+    pbar = tqdm.tqdm(range(1000))
+    best_avg_r2, best_r2 = -np.inf, None
     model.train()
     for epoch in pbar:
         total_loss = 0
-        for x, pert, y in train_data_loader:
-            x, pert, y = x.to(DEVICE), pert.to(DEVICE), y.to(DEVICE)
+        y_target, y_pred = [], []
+        for x, pert, d_x in train_data_loader:
+            x, pert, d_x = x.to(DEVICE), pert.to(DEVICE), d_x.to(DEVICE)
+
+            # Reset gradients
             optimizer.zero_grad()
+
             # Model now predicts full perturbed expression directly
-            y_hat = model(x, pert)
-            loss = torch.mean(torch.square(y - y_hat))
-            loss.backward()
-            optimizer.step()
+            d_x_hat = model(x, pert)
+            y_target.append(d_x.cpu().data.numpy())
+            y_pred.append(d_x_hat.cpu().data.numpy())
+
+            # Compute mean squared error
+            loss = torch.mean(torch.square(d_x - d_x_hat))
             total_loss += loss.item() * len(x)
-        pbar.set_description(str(total_loss))
+
+            # Compute gradients (clip them to prevent divergence)
+            loss.backward()
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1)
+
+            # Update parameters
+            optimizer.step()
+
         scheduler.step(total_loss)
+        r2_train = coefficients_of_determination(np.concatenate(y_target, axis=0), np.concatenate(y_pred, axis=0))
 
         model.eval()
-        ss_res = 0
+        y_target, y_pred = [], []
         with torch.no_grad():
-            for x, pert, y in test_data_loader:
-                x, pert, y = x.to(DEVICE), pert.to(DEVICE), y.to(DEVICE)
-                # Model predicts full perturbed expression
-                y_hat = model(x, pert)
-                residuals = torch.square(y - y_hat).cpu().data.numpy()
-                ss_res += np.sum(residuals, axis=0)
-        if np.sum(ss_res) < best_val_loss:
-            best_val_loss = np.sum(ss_res)
-            best_epoch = epoch
-            best_ss_res = ss_res
+            for x, pert, d_x in test_data_loader:
+                x, pert, d_x = x.to(DEVICE), pert.to(DEVICE), d_x.to(DEVICE)
+                d_x_hat = model(x, pert)
+                y_target.append(d_x.cpu().data.numpy())
+                y_pred.append(d_x_hat.cpu().data.numpy())
+        r2_test = coefficients_of_determination(np.concatenate(y_target, axis=0), np.concatenate(y_pred, axis=0))
+        avg_r2 = np.mean(r2_test)
+        if avg_r2 > best_avg_r2:
+            best_avg_r2 = avg_r2
+            best_r2 = r2_test
+        pbar.set_description(str(np.mean(r2_train)) + "  " + str(np.mean(r2_test)))
         model.train()
-    ss_res = best_ss_res
-
-    # Final evaluation with PDS
     model.eval()
 
-    ss_tot = 0
-
-    with torch.no_grad():
-        for x, pert, y in test_data_loader:
-            x, pert, y = x.to(DEVICE), pert.to(DEVICE), y.to(DEVICE)
-            y_hat = model(x, pert)
-
-            residuals = torch.square(y - torch.mean(y, dim=0).unsqueeze(0)).cpu().data.numpy()
-            ss_tot += np.sum(residuals, axis=0)
-
-    print(f"Best epoch: {best_epoch} ({best_val_loss})")
-    return best_ss_res, ss_tot
-
+    return best_r2
 
 
 def main(par):
+
     # Load evaluation data
     adata = ad.read_h5ad(par['evaluation_data'])
-    assert 'is_control' in adata.obs.columns, "'is_control' column is required in the dataset for perturbation evaluation"
-    assert adata.obs['is_control'].sum() > 0, "'is_control' column must contain at least one True value for control samples"
     dataset_id = adata.uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     
@@ -458,12 +380,20 @@ def main(par):
     cv_groups = encode_obs_cols(adata, par['cv_groups'])
     match_groups = encode_obs_cols(adata, par['match'])
     loose_match_groups = encode_obs_cols(adata, par['loose_match'])
+
+    # Get cell types
+    N_FOLDS = 5
+    try:
+        cell_types = np.squeeze(encode_obs_cols(adata, ["cell_type"]))
+    except Exception:
+        print(traceback.format_exc())
+        cell_types = np.random.randint(0, 5, size=len(X))
     
     # Set perturbations to first column (perturbation)
     perturbations = cv_groups[0]  # perturbation codes
     
-    # Groups used for cross-validation
-    cv_groups = combine_multi_index(*cv_groups)
+    # Validation strategy: evaluate on unseen (perturbation, cell type) pairs.
+    cv_groups = combine_multi_index(cell_types, perturbations)
 
     # Groups used for matching with negative controls
     match_groups = combine_multi_index(*match_groups)
@@ -506,10 +436,12 @@ def main(par):
     A = A[gene_mask, :][:, gene_mask]
     gene_names = gene_names[gene_mask]
 
+    # Filter genes based on GRN instead of HVGs
+    # Keep all genes that are present in the GRN (already filtered above)
     print(f"Using {len(gene_names)} genes present in the GRN")
     
     # Additional memory-aware gene filtering for very large GRNs
-    MAX_GENES_FOR_MEMORY = 3000  # Reduced further to avoid memory issues
+    MAX_GENES_FOR_MEMORY = 500  # Reduced further to avoid memory issues
     if len(gene_names) > MAX_GENES_FOR_MEMORY:
         print(f"Too many genes ({len(gene_names)}) for memory. Selecting top {MAX_GENES_FOR_MEMORY} by GRN connectivity.")
         
@@ -523,29 +455,28 @@ def main(par):
         
         print(f"Final: Using {len(gene_names)} most connected genes for evaluation")
 
-    # Remove self-regulations
-    np.fill_diagonal(A, 0)
+    # Add self-regulations
+    np.fill_diagonal(A, 1)
 
-    # Create baseline model
-    A_baseline = np.copy(A)
-    for j in range(A.shape[1]):
-        np.random.shuffle(A[:j, j])
-        np.random.shuffle(A[j+1:, j])
-    assert np.any(A_baseline != A)
+    # Check whether the inferred GRN contains signed predictions
+    signed = np.any(A < 0)
 
     # Mapping between gene expression profiles and their matched negative controls
-
     control_map, _ = create_control_matching(are_controls, match_groups)
     loose_control_map, _ = create_control_matching(are_controls, loose_match_groups)
 
+    r2 = []
+    r2_baseline = []
+    cv = StratifiedGroupKFold(n_splits=N_FOLDS, shuffle=True, random_state=0xCAFE)
+    
+    for i, (train_index, test_index) in enumerate(cv.split(X, perturbations, cv_groups)):
 
-    ss_res = 0
-    ss_tot = 0
-    cv = GroupKFold(n_splits=5)
-    
-    results = []
-    
-    for i, (train_index, test_index) in enumerate(cv.split(X, X, cv_groups)):
+        if (len(train_index) == 0) or (len(test_index) == 0):
+            continue
+
+        # Create baseline model
+        A_baseline = create_grn_baseline(A)
+
         # Center and scale dataset
         scaler = StandardScaler()
         scaler.fit(X[train_index, :])
@@ -553,44 +484,59 @@ def main(par):
 
         # Create data loaders
         n_perturbations = int(np.max(perturbations) + 1)
-        train_dataset = PerturbationDataset(
-            X_standardized,
-            train_index,
-            match_groups,
-            control_map,
-            loose_match_groups,
-            loose_control_map,
-            perturbations
-        )
-        train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=512)
-        test_dataset = PerturbationDataset(
-            X_standardized,
-            test_index,
-            match_groups,
-            control_map,
-            loose_match_groups,
-            loose_control_map,
-            perturbations
-        )
-        test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=512)
+        def create_data_loaders():
+            train_dataset = PerturbationDataset(
+                X_standardized,
+                train_index,
+                match_groups,
+                control_map,
+                loose_match_groups,
+                loose_control_map,
+                perturbations
+            )
+            train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=512, shuffle=True)
+            test_dataset = PerturbationDataset(
+                X_standardized,
+                test_index,
+                match_groups,
+                control_map,
+                loose_match_groups,
+                loose_control_map,
+                perturbations
+            )
+            test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=512)
+            return train_data_loader, test_data_loader
+
+        # For fair comparison, we first randomly initialize NN parameters, and use these same
+        # parameters to build both models (only the GRN weights will differ).
+        model_template = Model(A, n_perturbations, signed=signed).to(DEVICE)
+        state_dict = model_template.state_dict()
 
         # Evaluate inferred GRN
-        res = evaluate(A, train_data_loader, test_data_loader, n_perturbations)
-        ss_res = ss_res + res[0]
-        ss_tot = ss_tot + res[1]
+        train_data_loader, test_data_loader = create_data_loaders()
+        r2.append(evaluate(A, train_data_loader, test_data_loader, state_dict, n_perturbations, signed=signed))
 
         # Evaluate baseline GRN (shuffled target genes)
-        #ss_tot = ss_tot + evaluate(A_baseline, train_data_loader, test_data_loader, n_perturbations)
+        train_data_loader, test_data_loader = create_data_loaders()
+        r2_baseline.append(evaluate(A_baseline, train_data_loader, test_data_loader, state_dict, n_perturbations, signed=signed))
 
-    r2 = 1 - ss_res / ss_tot
+    r2 = np.asarray(r2).flatten()
+    r2_baseline = np.asarray(r2_baseline).flatten()
+    print("Mean R2", np.mean(r2), np.mean(r2_baseline))
+    if np.all(r2 == r2_baseline):
+        final_score = 0
+    else:
+        p_value = wilcoxon(r2, r2_baseline, alternative="greater").pvalue
+        final_score = -np.log10(p_value)
 
-    final_score = np.mean(np.clip(r2, 0, 1))
     print(f"Method: {method_id}")
-    print(f"R2: {final_score}")
+    print(f"Final score: {final_score}")
 
     results = {
+        'r2': [float(np.mean(r2))],
+        'r2_baseline': [float(np.mean(r2_baseline))],
+        'r2_diff': [float(np.mean(r2)) - float(np.mean(r2_baseline))],
         'vc': [float(final_score)]
-
     }
 
     df_results = pd.DataFrame(results)
