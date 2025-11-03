@@ -35,7 +35,7 @@ def main(par):
     for tf in tqdm(tfs_to_evaluate):
         true_edges = true_graph[true_graph['source'] == tf]
         gt_targets = set(true_edges['target'].astype(str))
-        gt_targets = set(gt_targets & genes)
+        gt_targets = set(gt_targets) & set(genes)
         k = len(gt_targets)  # Number of true targets for this TF
         if k == 0:
             continue
