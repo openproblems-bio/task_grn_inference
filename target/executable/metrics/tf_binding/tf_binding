@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics tf_binding"
-LABEL org.opencontainers.image.created="2025-11-02T10:02:12Z"
+LABEL org.opencontainers.image.created="2025-11-03T12:59:38Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="b63af66525f06a345da643c8207bca0c7c08b03d"
+LABEL org.opencontainers.image.revision="e0618e1832fbf97d498b798d0e95dddadb70f910"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1334,14 +1334,14 @@ args = parse_args(par)
 
 
 if __name__ == "__main__":
-    try:
-        output = main(par)
-    except Exception as e:
-        print(f"Error in TF binding evaluation: {e}")
-        output = pd.DataFrame({
-            'key': [None],
-            'value': [None]
-        })
+    # try:
+    output = main(par)
+    # except Exception as e:
+    #     print(f"Error in TF binding evaluation: {e}")
+    #     output = pd.DataFrame({
+    #         'key': [None],
+    #         'value': [None]
+    #     })
 
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']

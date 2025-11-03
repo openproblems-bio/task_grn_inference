@@ -152,7 +152,7 @@ if __name__ == "__main__":
     output = ad.AnnData(
         X=None,
         uns={
-            "method_id": "scprint",
+            "method_id": "scgpt",
             "dataset_id": dataset_id,
             "prediction": net_all[["source", "target", "weight", "cell_type"]],
         },

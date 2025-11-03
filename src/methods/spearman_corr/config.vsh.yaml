@@ -21,7 +21,6 @@ engines:
     setup:
       - type: python
         packages: [  ]
-  - type: native
 runners:
   - type: executable
   - type: nextflow
