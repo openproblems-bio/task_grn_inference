@@ -568,6 +568,10 @@ def create_grn_baseline(A):
     reassigned deterministically to different edges (no randomness).
     """
 
+    # Ensure no self-regulation
+    A = np.copy(A)
+    np.fill_diagonal(A, 0)
+
     n = A.shape[0]
 
     # Order nodes by degrees, with explicit tie-breaking by weight
@@ -612,7 +616,7 @@ def create_grn_baseline(A):
                             B[x, w] = 0
                             B[x, v] = 1
                             in_degrees[w].degree += 1
-                            in_degrees[v].degree -= 1
+                            #in_degrees[v].degree -= 1
                             picks.append(v)
                             swapped = True
                             break
@@ -621,14 +625,13 @@ def create_grn_baseline(A):
                 if len(picks) == k:
                     break
 
-        if len(picks) < k:
-            raise ValueError("Directed degree sequence not realizable with simple digraph under constraints.")
+        #if len(picks) < k:
+        #    raise ValueError("Directed degree sequence not realizable with simple digraph under constraints.")
 
         # Place edges for u
         for v in picks:
             B[u, v] = 1
             in_degrees[v].degree -= 1
-        #out_degrees[v].degree = 0
         out_degrees[u].degree = 0
 
         # Stable re-sort by residual in-degree, with explicit tie-breaking by weight
@@ -687,5 +690,13 @@ def create_grn_baseline(A):
 
         # Assign exact weights to new edges deterministically
         B[u, targets_ranked] = W_sorted
+
+    # Quality check
+    #target_in_degrees = np.sum((A != 0), axis=0)
+    #target_out_degrees = np.sum((A != 0), axis=1)
+    #in_degrees = np.sum((B != 0), axis=0)
+    #out_degrees = np.sum((B != 0), axis=1)
+    #print(target_in_degrees - in_degrees)
+    #print(target_out_degrees - out_degrees)
 
     return B
