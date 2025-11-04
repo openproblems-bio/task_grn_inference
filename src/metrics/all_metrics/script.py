@@ -26,6 +26,8 @@ par = {
     
 try:
   sys.path.append(meta["resources_dir"])
+  from sem_helper import main as main_sem
+  print(main_sem)
 except:
     meta = {
       "all_dir":'src/metrics/',

@@ -65,7 +65,7 @@ fi
 
 
 num_workers=10
-metric_ids="[regression, ws_distance, sem, tf_recovery, replica_consistency]" #
+metric_ids="[all_metrics]" # regression, ws_distance, sem, tf_recovery, replica_consistency
 RUN_ID="${DATASET}_evaluation"
 models_folder="${DATASET}/"
 apply_tf=true

@@ -33,14 +33,6 @@ if __name__ == '__main__':
   method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
   dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
 
-  try:
-    output = main(par)
-  except Exception as e:
-    print({'error': str(e)})
-
-    output = pd.DataFrame({
-        'key': ["None"],
-        'value': ["None"],
-    })
+  output = main(par)
 
   format_save_score(output, method_id, dataset_id, par['score'])
