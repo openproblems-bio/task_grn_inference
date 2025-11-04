@@ -5,6 +5,7 @@
 
 # related to files
 .pybiomart.sqlite
+.venv/
 logs/
 params*
 resources*
