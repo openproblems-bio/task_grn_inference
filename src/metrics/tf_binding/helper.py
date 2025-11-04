@@ -43,16 +43,14 @@ def main(par):
         if tf in prediction['source'].unique():
             pred_edges = prediction[prediction['source'] == tf]
             
+            top_k_t = set(pred_edges.sort_values(by='weight', key=abs, ascending=False).head(k)['target'].astype(str))
             
-            if False:
-                top_k_t = set(pred_edges.sort_values(by='weight', key=abs, ascending=False).head(k)['target'].astype(str))
-                
-                tp_n = len(gt_targets & top_k_t)  
-                top_k_t_n = len(top_k_t)  # Actual number returned (might be less than k)          
-                
-                # Calculate precision and recall scores
-                precision_score = tp_n / top_k_t_n if top_k_t_n > 0 else 0.0             
-                precision_baseline = k / n_targets
+            tp_n = len(gt_targets & top_k_t)  
+            top_k_t_n = len(top_k_t)  # Actual number returned (might be less than k)          
+            
+            # Calculate precision and recall scores
+            precision_score = tp_n / top_k_t_n if top_k_t_n > 0 else 0.0             
+            precision_baseline = k / n_targets
             
         else:
             precision_score = 0.0

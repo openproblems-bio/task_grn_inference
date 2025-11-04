@@ -25,6 +25,32 @@ def main(par):
     prediction_tfs = prediction['source'].unique()
     # - for each theta, and each tf: 
     scores_model = []
+    if True: # raw scores
+        print('Processing raw (no theta):', flush=True)
+        scores_raw = []
+        for tf in tqdm(prediction_tfs, desc='Processing tfs (raw)', leave=False):
+            # Only process TFs that are in the background distance
+            if tf not in background_tfs:
+                continue
+            
+            # Get all edges from the prediction for this TF
+            prediction_tf = prediction[prediction['source']==tf]
+            
+            # Get the background distance for the given tf
+            background_distance_tf = background_distance[background_distance['source']==tf]
+            
+            # Get the ws distance for predicted edges that exist in background
+            ws_distance = background_distance_tf[background_distance_tf['target'].isin(prediction_tf['target'])].copy()
+            
+            if len(ws_distance) > 0:
+                ws_distance['present_edges_n'] = len(ws_distance)
+                # Use the raw ws_distance values directly (no percentile ranking)
+                ws_distance['ws_distance_pc'] = ws_distance['ws_distance']
+                ws_distance['tf'] = tf
+                ws_distance['theta'] = 'ws_raw'
+                scores_raw.append(ws_distance)
+        scores_raw = pd.concat(scores_raw).reset_index(drop=True)
+        scores_model.append(scores_raw)
     for theta in consensus['theta'].unique():
         print('Processing theta:', theta, flush=True)
         consensus_theta = consensus[consensus['theta'] == theta]
@@ -49,9 +75,12 @@ def main(par):
             background_distance_random = np.random.choice(background_distance_tf['ws_distance'].values, 1000)
             ws_distance_pc = ws_distance['ws_distance'].apply(lambda val: (val>background_distance_random).sum())/len(background_distance_random)
             ws_distance['ws_distance_pc'] = ws_distance_pc
+            ws_distance['tf'] = tf
             
             ws_distance['theta'] = theta
             scores_model.append(ws_distance)
+    
     scores_model = pd.concat(scores_model).reset_index(drop=True)
     mean_scores = scores_model.groupby('theta')['ws_distance_pc'].mean().to_frame().T.reset_index(drop=True)
+    print(mean_scores)
     return scores_model, mean_scores
