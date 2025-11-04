@@ -59,6 +59,29 @@ arguments:
     direction: input
     default: ridge
     description: name of regression to use
+  - name: --ground_truth
+    type: file
+    direction: input
+    must_exist: false
+    required: false
+    example: resources_test/grn_benchmark/ground_truth/PBMC.csv 
+  - name: --ws_consensus
+    type: file
+    direction: input
+    must_exist: false
+    required: false
+    example: resources_test/grn_benchmark/prior/ws_consensus_norman.csv 
+  - name: --ws_distance_background
+    type: file
+    direction: input
+    must_exist: false
+    required: false
+    example: resources_test/grn_benchmark/prior/ws_distance_background_norman.csv
+  - name: --silent_missing_dependencies 
+    type: boolean
+    required: false
+    direction: input
+    default: true
 
 
 test_resources:

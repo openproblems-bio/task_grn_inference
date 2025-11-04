@@ -33,25 +33,7 @@ info:
       min: 0
       max: 1
       maximize: true
-
-arguments:
-  - name: --ws_consensus
-    type: file
-    direction: input
-    must_exist: false
-    required: false
-    example: resources_test/grn_benchmark/prior/ws_consensus_norman.csv 
-  - name: --ws_distance_background
-    type: file
-    direction: input
-    must_exist: false
-    required: false
-    example: resources_test/grn_benchmark/prior/ws_distance_background_norman.csv
-  - name: --silent_missing_dependencies 
-    type: boolean
-    required: false
-    direction: input
-    default: true
+  
   
 resources:
   - type: python_script
