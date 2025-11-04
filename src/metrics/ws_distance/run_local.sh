@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=reg2_v2
+#SBATCH --job-name=ws_distance_v2
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
@@ -12,19 +12,19 @@
 
 set -euo pipefail
 
-save_dir="output/reg2"
+save_dir="output/ws_distance"
 mkdir -p "$save_dir"
 
 # datasets to process
 datasets=('op' 'parsebioscience' "300BCG"   "adamson"  "replogle" "xaira_HEK293T" "xaira_HCT116" "nakatake" "norman" ) #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
-datasets=('op'  ) #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
+datasets=('replogle'  ) #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
 
 # methods to process
 methods=( "pearson_corr" "positive_control" "negative_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
-methods=( "celloracle" )
+methods=( "pearson_corr" )
 
 # temporary file to collect CSV rows
-combined_csv="${save_dir}/reg2_scores.csv"
+combined_csv="${save_dir}/ws_distance_scores.csv"
 echo "dataset,method,metric,value" > "$combined_csv"
 
 
@@ -35,7 +35,7 @@ for dataset in "${datasets[@]}"; do
 
     for method in "${methods[@]}"; do
         prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
-        score="${save_dir}/reg2_${dataset}_${method}.h5ad"
+        score="${save_dir}/ws_distance_${dataset}_${method}.h5ad"
 
         if [[ ! -f "$prediction" ]]; then
             echo "File not found: $prediction, skipping..."
@@ -43,10 +43,11 @@ for dataset in "${datasets[@]}"; do
         fi
 
         echo -e "\nProcessing method: $method\n"
-        python src/metrics/regression/script.py \
+        python src/metrics/ws_distance/script.py \
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
-            --regulators_consensus "resources/grn_benchmark/prior/regulators_consensus_${dataset}.json" \
+            --ws_consensus "resources/grn_benchmark/prior/ws_consensus_${dataset}.csv" \
+            --ws_distance_background "resources/grn_benchmark/prior/ws_distance_background_${dataset}.csv" \
             --score "$score"
             # --group_specific cell_type \
         

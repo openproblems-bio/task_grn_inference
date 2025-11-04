@@ -7,7 +7,8 @@ import pandas as pd
 
 ## VIASH START
 par = {
-    'prediction': f'resources/results/replogle/replogle.pearson_corr.pearson_corr.prediction.h5ad',
+    # 'prediction': f'resources/results/replogle/replogle.pearson_corr.pearson_corr.prediction.h5ad',
+    'prediction': 'resources/results/experiment/global_grns/Gtex:Whole blood.csv.h5ad',
     'evaluation_data': f'resources/grn_benchmark/evaluation_data/replogle_bulk.h5ad',
     'layer': 'lognorm',
     "max_n_links": 50000,
