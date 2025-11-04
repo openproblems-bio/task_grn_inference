@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics ws_distance"
-LABEL org.opencontainers.image.created="2025-11-04T07:14:20Z"
+LABEL org.opencontainers.image.created="2025-11-04T10:35:11Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="ca5d88e6f46225d420446480d75c6813bcc64c9a"
+LABEL org.opencontainers.image.revision="69cc31421d2da48c0fbc076deeaa758a613fa41c"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -628,6 +628,10 @@ function ViashHelp {
   echo "        type: string"
   echo "        default: ridge"
   echo "        name of regression to use"
+  echo ""
+  echo "    --ground_truth"
+  echo "        type: file"
+  echo "        example: resources_test/grn_benchmark/ground_truth/PBMC.csv"
   echo ""
   echo "    --ws_consensus"
   echo "        type: file"
@@ -822,6 +826,17 @@ while [[ $# -gt 0 ]]; do
         --reg_type=*)
             [ -n "$VIASH_PAR_REG_TYPE" ] && ViashError Bad arguments for option \'--reg_type=*\': \'$VIASH_PAR_REG_TYPE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_REG_TYPE=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --ground_truth)
+            [ -n "$VIASH_PAR_GROUND_TRUTH" ] && ViashError Bad arguments for option \'--ground_truth\': \'$VIASH_PAR_GROUND_TRUTH\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ground_truth. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --ground_truth=*)
+            [ -n "$VIASH_PAR_GROUND_TRUTH" ] && ViashError Bad arguments for option \'--ground_truth=*\': \'$VIASH_PAR_GROUND_TRUTH\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --ws_consensus)
@@ -1237,6 +1252,10 @@ if [ ! -z "$VIASH_PAR_REGULATORS_CONSENSUS" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_REGULATORS_CONSENSUS")" )
   VIASH_PAR_REGULATORS_CONSENSUS=$(ViashDockerAutodetectMount "$VIASH_PAR_REGULATORS_CONSENSUS")
 fi
+if [ ! -z "$VIASH_PAR_GROUND_TRUTH" ]; then
+  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_GROUND_TRUTH")" )
+  VIASH_PAR_GROUND_TRUTH=$(ViashDockerAutodetectMount "$VIASH_PAR_GROUND_TRUTH")
+fi
 if [ ! -z "$VIASH_PAR_WS_CONSENSUS" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_WS_CONSENSUS")" )
   VIASH_PAR_WS_CONSENSUS=$(ViashDockerAutodetectMount "$VIASH_PAR_WS_CONSENSUS")
@@ -1336,6 +1355,7 @@ par = {
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'regulators_consensus': $( if [ ! -z ${VIASH_PAR_REGULATORS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_REGULATORS_CONSENSUS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'ground_truth': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'ws_consensus': $( if [ ! -z ${VIASH_PAR_WS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_WS_CONSENSUS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'ws_distance_background': $( if [ ! -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then echo "r'${VIASH_PAR_WS_DISTANCE_BACKGROUND//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'silent_missing_dependencies': $( if [ ! -z ${VIASH_PAR_SILENT_MISSING_DEPENDENCIES+x} ]; then echo "r'${VIASH_PAR_SILENT_MISSING_DEPENDENCIES//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
@@ -1381,13 +1401,7 @@ from util import format_save_score, parse_args
 par = parse_args(par)
 
 if __name__ == '__main__':
-    try:
-        _, output = main(par)
-    except:
-        output = pd.DataFrame({
-            'key': ["None"],
-            'value': ["None"]
-        })
+    _, output = main(par)
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     format_save_score(output, method_id, dataset_id, par['score'])
@@ -1421,6 +1435,9 @@ if [[ "$VIASH_ENGINE_TYPE" == "docker" ]]; then
   fi
   if [ ! -z "$VIASH_PAR_REGULATORS_CONSENSUS" ]; then
     VIASH_PAR_REGULATORS_CONSENSUS=$(ViashDockerStripAutomount "$VIASH_PAR_REGULATORS_CONSENSUS")
+  fi
+  if [ ! -z "$VIASH_PAR_GROUND_TRUTH" ]; then
+    VIASH_PAR_GROUND_TRUTH=$(ViashDockerStripAutomount "$VIASH_PAR_GROUND_TRUTH")
   fi
   if [ ! -z "$VIASH_PAR_WS_CONSENSUS" ]; then
     VIASH_PAR_WS_CONSENSUS=$(ViashDockerStripAutomount "$VIASH_PAR_WS_CONSENSUS")

@@ -304,6 +304,48 @@ argument_groups:
     direction: "input"
     multiple: false
     multiple_sep: ";"
+  - type: "file"
+    name: "--ground_truth"
+    info: null
+    example:
+    - "resources_test/grn_benchmark/ground_truth/PBMC.csv"
+    must_exist: false
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--ws_consensus"
+    info: null
+    example:
+    - "resources_test/grn_benchmark/prior/ws_consensus_norman.csv"
+    must_exist: false
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--ws_distance_background"
+    info: null
+    example:
+    - "resources_test/grn_benchmark/prior/ws_distance_background_norman.csv"
+    must_exist: false
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "boolean"
+    name: "--silent_missing_dependencies"
+    info: null
+    default:
+    - true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
 resources:
 - type: "python_script"
   path: "script.py"
@@ -412,7 +454,7 @@ build_info:
   output: "target/executable/metrics/replica_consistency"
   executable: "target/executable/metrics/replica_consistency/replica_consistency"
   viash_version: "0.9.4"
-  git_commit: "ca5d88e6f46225d420446480d75c6813bcc64c9a"
+  git_commit: "69cc31421d2da48c0fbc076deeaa758a613fa41c"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
 package_config:
   name: "task_grn_inference"

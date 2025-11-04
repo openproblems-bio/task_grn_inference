@@ -3456,6 +3456,56 @@ meta = [
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--ground_truth",
+          "example" : [
+            "resources_test/grn_benchmark/ground_truth/PBMC.csv"
+          ],
+          "must_exist" : false,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--ws_consensus",
+          "example" : [
+            "resources_test/grn_benchmark/prior/ws_consensus_norman.csv"
+          ],
+          "must_exist" : false,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--ws_distance_background",
+          "example" : [
+            "resources_test/grn_benchmark/prior/ws_distance_background_norman.csv"
+          ],
+          "must_exist" : false,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "boolean",
+          "name" : "--silent_missing_dependencies",
+          "default" : [
+            true
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
         }
       ]
     }
@@ -3474,6 +3524,46 @@ meta = [
       "type" : "file",
       "path" : "/src/utils/util.py",
       "dest" : "util.py"
+    },
+    {
+      "type" : "file",
+      "path" : "/src/metrics/regression/helper.py",
+      "dest" : "regression_helper.py"
+    },
+    {
+      "type" : "file",
+      "path" : "/src/metrics/ws_distance/helper.py",
+      "dest" : "ws_helper.py"
+    },
+    {
+      "type" : "file",
+      "path" : "/src/metrics/sem/helper.py",
+      "dest" : "sem_helper.py"
+    },
+    {
+      "type" : "file",
+      "path" : "/src/metrics/tf_recovery/helper.py",
+      "dest" : "tf_recovery_helper.py"
+    },
+    {
+      "type" : "file",
+      "path" : "/src/metrics/tf_binding/helper.py",
+      "dest" : "tf_binding_helper.py"
+    },
+    {
+      "type" : "file",
+      "path" : "/src/metrics/replica_consistency/helper.py",
+      "dest" : "replica_consistency_helper.py"
+    },
+    {
+      "type" : "file",
+      "path" : "/src/utils/dataset_config.py",
+      "dest" : "dataset_config.py"
+    },
+    {
+      "type" : "file",
+      "path" : "/src/metrics/metrics_config.py",
+      "dest" : "metrics_config.py"
     }
   ],
   "test_resources" : [
@@ -3596,7 +3686,8 @@ meta = [
           "packages" : [
             "lightgbm==4.3.0",
             "numpy==1.26.4",
-            "tqdm_joblib==0.0.5"
+            "tqdm_joblib==0.0.5",
+            "decoupler==2.1.1"
           ],
           "upgrade" : true
         }
@@ -3609,7 +3700,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/all_metrics",
     "viash_version" : "0.9.4",
-    "git_commit" : "ca5d88e6f46225d420446480d75c6813bcc64c9a",
+    "git_commit" : "69cc31421d2da48c0fbc076deeaa758a613fa41c",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3745,7 +3836,11 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'regulators_consensus': $( if [ ! -z ${VIASH_PAR_REGULATORS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_REGULATORS_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'ground_truth': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'ws_consensus': $( if [ ! -z ${VIASH_PAR_WS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_WS_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'ws_distance_background': $( if [ ! -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then echo "r'${VIASH_PAR_WS_DISTANCE_BACKGROUND//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'silent_missing_dependencies': $( if [ ! -z ${VIASH_PAR_SILENT_MISSING_DEPENDENCIES+x} ]; then echo "r'${VIASH_PAR_SILENT_MISSING_DEPENDENCIES//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3775,6 +3870,8 @@ dep = {
     
 try:
   sys.path.append(meta["resources_dir"])
+  from sem_helper import main as main_sem
+  print(main_sem)
 except:
     meta = {
       "all_dir":'src/metrics/',

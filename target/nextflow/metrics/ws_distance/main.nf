@@ -3459,6 +3459,19 @@ meta = [
         },
         {
           "type" : "file",
+          "name" : "--ground_truth",
+          "example" : [
+            "resources_test/grn_benchmark/ground_truth/PBMC.csv"
+          ],
+          "must_exist" : false,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
           "name" : "--ws_consensus",
           "example" : [
             "resources_test/grn_benchmark/prior/ws_consensus_norman.csv"
@@ -3674,7 +3687,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/ws_distance",
     "viash_version" : "0.9.4",
-    "git_commit" : "ca5d88e6f46225d420446480d75c6813bcc64c9a",
+    "git_commit" : "69cc31421d2da48c0fbc076deeaa758a613fa41c",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3814,6 +3827,7 @@ par = {
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
   'regulators_consensus': $( if [ ! -z ${VIASH_PAR_REGULATORS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_REGULATORS_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'ground_truth': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'ws_consensus': $( if [ ! -z ${VIASH_PAR_WS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_WS_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'ws_distance_background': $( if [ ! -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then echo "r'${VIASH_PAR_WS_DISTANCE_BACKGROUND//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'silent_missing_dependencies': $( if [ ! -z ${VIASH_PAR_SILENT_MISSING_DEPENDENCIES+x} ]; then echo "r'${VIASH_PAR_SILENT_MISSING_DEPENDENCIES//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
@@ -3859,13 +3873,7 @@ from util import format_save_score, parse_args
 par = parse_args(par)
 
 if __name__ == '__main__':
-    try:
-        _, output = main(par)
-    except:
-        output = pd.DataFrame({
-            'key': ["None"],
-            'value': ["None"]
-        })
+    _, output = main(par)
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     format_save_score(output, method_id, dataset_id, par['score'])

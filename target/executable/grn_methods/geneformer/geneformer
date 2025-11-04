@@ -449,9 +449,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "pyarrow<15.0.0a0,>=14.0.1" "huggingface_hub" "git+https://huggingface.co/ctheodoris/Geneformer.git" "pybiomart"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods geneformer"
-LABEL org.opencontainers.image.created="2025-11-04T07:14:20Z"
+LABEL org.opencontainers.image.created="2025-11-04T10:35:10Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="ca5d88e6f46225d420446480d75c6813bcc64c9a"
+LABEL org.opencontainers.image.revision="69cc31421d2da48c0fbc076deeaa758a613fa41c"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

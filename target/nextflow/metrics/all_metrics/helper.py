@@ -7,13 +7,39 @@ import scanpy as sc
 import sys
 import os
 
+try:
+    from regression_helper import main as main_reg
+except:
+    from regression.helper import main as main_reg
 
-from regression.helper import main as main_reg2
-from ws_distance.helper import main as main_ws_distance
-from sem.helper import main as main_sem
-from tf_recovery.helper import main as main_tf_rec
-from tf_binding.helper import main as main_tf_binding
-from replica_consistency.helper import main as main_replica_consistency
+try:
+    from ws_helper import main as main_ws_distance
+except:
+    from ws_distance.helper import main as main_ws_distance
+
+try:
+    from sem_helper import main as main_sem
+except:
+    from sem.helper import main as main_sem
+
+
+try:
+    from tf_recovery_helper import main as main_tf_rec
+except:
+    from tf_recovery.helper import main as main_tf_rec
+
+
+try:
+    from tf_binding_helper import main as main_tf_binding
+except:
+    from tf_binding.helper import main as main_tf_binding
+
+
+try:
+    from replica_consistency_helper import main as main_replica_consistency
+except:
+    from replica_consistency.helper import main as main_replica_consistency
+
 from metrics_config import datasets_metrics
 
 
@@ -51,7 +77,7 @@ def replica_consistency_metric(par, dataset_id):
 def reg2_metric(par, dataset_id):
     if dataset_id in datasets_metrics:
         if 'regression' in datasets_metrics[dataset_id]:
-            output = main_reg2(par)
+            output = main_reg(par)
             return output
     return None
 
