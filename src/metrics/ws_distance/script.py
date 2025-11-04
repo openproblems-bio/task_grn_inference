@@ -17,16 +17,6 @@ par = {
     'silent_missing_dependencies': False
 }
 ## VIASH END
-
-## LOCAL START
-parser = argparse.ArgumentParser()
-parser.add_argument('--run_local', action='store_true', help='Run locally')
-
-args = parser.parse_args()
-var_local = vars(args)
-
-## LOCAL END
-
 try:
     sys.path.append(meta["resources_dir"])
 except:
@@ -38,7 +28,9 @@ except:
     sys.path.append(meta["util_dir"])
 
 from helper import main 
-from util import format_save_score
+from util import format_save_score, parse_args
+
+par = parse_args(par)
 
 if __name__ == '__main__':
     try:

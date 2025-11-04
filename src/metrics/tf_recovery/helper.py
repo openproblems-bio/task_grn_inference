@@ -62,12 +62,12 @@ def main(par):
     np.random.seed(seed)
     
     df_de = ad.read_h5ad(par['evaluation_data_de'])
-    df_de = df_de.to_df()  # convert X to DataFrame
+    df_de = df_de.to_df()  
     net = read_prediction(par)
 
-    # filter TFs with less than 3 targets
+    # filter TFs with less than 5 targets
     tf_counts = net['source'].value_counts()
-    tfs_to_keep = tf_counts[tf_counts >= 3].index
+    tfs_to_keep = tf_counts[tf_counts >= 5].index
     net = net[net['source'].isin(tfs_to_keep)]
 
     all_genes = list(df_de.columns)

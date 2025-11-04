@@ -424,8 +424,11 @@ def main(par):
     print(f"Use regulatory modes/signs: {use_signs}")
 
     # Create baseline model
-    A_baseline = create_grn_baseline(A)
-    
+    try:
+        A_baseline = create_grn_baseline(A)
+    except:
+        print("Failed to create baseline GRN. Using zero baseline.")
+        raise ValueError("Failed to create baseline GRN.")
 
     # Evaluate inferred GRN
     print("\n======== Evaluate inferred GRN ========")
@@ -434,13 +437,14 @@ def main(par):
     # Evaluate baseline GRN
     print("\n======== Evaluate shuffled GRN ========")
     scores_baseline = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
-    print('scores baseline', scores_baseline)
+
     # Keep only the genes for which both GRNs got a score
     mask = ~np.logical_or(np.isnan(scores), np.isnan(scores_baseline))
     scores = scores[mask]
     scores_baseline = scores_baseline[mask]
 
     rr_all = {}
+    # Perform rank test between actual scores and baseline
     rr_all['spearman'] = float(np.mean(scores))
     rr_all['spearman_shuffled'] = float(np.mean(scores_baseline))
     if np.all(scores - scores_baseline == 0):
