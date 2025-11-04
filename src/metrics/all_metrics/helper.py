@@ -68,6 +68,7 @@ def main(par):
     rr_store = []
     metrics = [reg2_metric, ws_distance_metric, sem_metric, tf_rec_metric, replica_consistency_metric]
     for metric in metrics:
+        print(f"Computing metric: {metric.__name__}")
         rr = metric(par, dataset_id)
         if rr is not None:
             if 'key' in rr.columns:
