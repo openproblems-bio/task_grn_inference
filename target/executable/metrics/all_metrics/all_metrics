@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4" "tqdm_joblib==0.0.5" "decoupler==2.1.1"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics all_metrics"
-LABEL org.opencontainers.image.created="2025-11-04T10:35:10Z"
+LABEL org.opencontainers.image.created="2025-11-05T10:54:52Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="69cc31421d2da48c0fbc076deeaa758a613fa41c"
+LABEL org.opencontainers.image.revision="ad0264fded20bbd93fc29cf660480b9312d12b21"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -629,7 +629,15 @@ function ViashHelp {
   echo "        default: ridge"
   echo "        name of regression to use"
   echo ""
-  echo "    --ground_truth"
+  echo "    --ground_truth_unibind"
+  echo "        type: file"
+  echo "        example: resources_test/grn_benchmark/ground_truth/PBMC.csv"
+  echo ""
+  echo "    --ground_truth_chipatlas"
+  echo "        type: file"
+  echo "        example: resources_test/grn_benchmark/ground_truth/PBMC.csv"
+  echo ""
+  echo "    --ground_truth_remap"
   echo "        type: file"
   echo "        example: resources_test/grn_benchmark/ground_truth/PBMC.csv"
   echo ""
@@ -828,15 +836,37 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_REG_TYPE=$(ViashRemoveFlags "$1")
             shift 1
             ;;
-        --ground_truth)
-            [ -n "$VIASH_PAR_GROUND_TRUTH" ] && ViashError Bad arguments for option \'--ground_truth\': \'$VIASH_PAR_GROUND_TRUTH\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_GROUND_TRUTH="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ground_truth. Use "--help" to get more information on the parameters. && exit 1
+        --ground_truth_unibind)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_UNIBIND" ] && ViashError Bad arguments for option \'--ground_truth_unibind\': \'$VIASH_PAR_GROUND_TRUTH_UNIBIND\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_UNIBIND="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ground_truth_unibind. Use "--help" to get more information on the parameters. && exit 1
             shift 2
             ;;
-        --ground_truth=*)
-            [ -n "$VIASH_PAR_GROUND_TRUTH" ] && ViashError Bad arguments for option \'--ground_truth=*\': \'$VIASH_PAR_GROUND_TRUTH\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_GROUND_TRUTH=$(ViashRemoveFlags "$1")
+        --ground_truth_unibind=*)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_UNIBIND" ] && ViashError Bad arguments for option \'--ground_truth_unibind=*\': \'$VIASH_PAR_GROUND_TRUTH_UNIBIND\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_UNIBIND=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --ground_truth_chipatlas)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS" ] && ViashError Bad arguments for option \'--ground_truth_chipatlas\': \'$VIASH_PAR_GROUND_TRUTH_CHIPATLAS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_CHIPATLAS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ground_truth_chipatlas. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --ground_truth_chipatlas=*)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS" ] && ViashError Bad arguments for option \'--ground_truth_chipatlas=*\': \'$VIASH_PAR_GROUND_TRUTH_CHIPATLAS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_CHIPATLAS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --ground_truth_remap)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_REMAP" ] && ViashError Bad arguments for option \'--ground_truth_remap\': \'$VIASH_PAR_GROUND_TRUTH_REMAP\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_REMAP="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ground_truth_remap. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --ground_truth_remap=*)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_REMAP" ] && ViashError Bad arguments for option \'--ground_truth_remap=*\': \'$VIASH_PAR_GROUND_TRUTH_REMAP\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_REMAP=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --ws_consensus)
@@ -1252,9 +1282,17 @@ if [ ! -z "$VIASH_PAR_REGULATORS_CONSENSUS" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_REGULATORS_CONSENSUS")" )
   VIASH_PAR_REGULATORS_CONSENSUS=$(ViashDockerAutodetectMount "$VIASH_PAR_REGULATORS_CONSENSUS")
 fi
-if [ ! -z "$VIASH_PAR_GROUND_TRUTH" ]; then
-  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_GROUND_TRUTH")" )
-  VIASH_PAR_GROUND_TRUTH=$(ViashDockerAutodetectMount "$VIASH_PAR_GROUND_TRUTH")
+if [ ! -z "$VIASH_PAR_GROUND_TRUTH_UNIBIND" ]; then
+  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_GROUND_TRUTH_UNIBIND")" )
+  VIASH_PAR_GROUND_TRUTH_UNIBIND=$(ViashDockerAutodetectMount "$VIASH_PAR_GROUND_TRUTH_UNIBIND")
+fi
+if [ ! -z "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS" ]; then
+  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS")" )
+  VIASH_PAR_GROUND_TRUTH_CHIPATLAS=$(ViashDockerAutodetectMount "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS")
+fi
+if [ ! -z "$VIASH_PAR_GROUND_TRUTH_REMAP" ]; then
+  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_GROUND_TRUTH_REMAP")" )
+  VIASH_PAR_GROUND_TRUTH_REMAP=$(ViashDockerAutodetectMount "$VIASH_PAR_GROUND_TRUTH_REMAP")
 fi
 if [ ! -z "$VIASH_PAR_WS_CONSENSUS" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_WS_CONSENSUS")" )
@@ -1352,7 +1390,9 @@ par = {
   'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
   'regulators_consensus': $( if [ ! -z ${VIASH_PAR_REGULATORS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_REGULATORS_CONSENSUS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'ground_truth': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'ground_truth_unibind': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_UNIBIND+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_UNIBIND//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'ground_truth_chipatlas': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_CHIPATLAS+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_CHIPATLAS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'ground_truth_remap': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_REMAP+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_REMAP//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'ws_consensus': $( if [ ! -z ${VIASH_PAR_WS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_WS_CONSENSUS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'ws_distance_background': $( if [ ! -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then echo "r'${VIASH_PAR_WS_DISTANCE_BACKGROUND//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'silent_missing_dependencies': $( if [ ! -z ${VIASH_PAR_SILENT_MISSING_DEPENDENCIES+x} ]; then echo "r'${VIASH_PAR_SILENT_MISSING_DEPENDENCIES//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
@@ -1444,8 +1484,14 @@ if [[ "$VIASH_ENGINE_TYPE" == "docker" ]]; then
   if [ ! -z "$VIASH_PAR_REGULATORS_CONSENSUS" ]; then
     VIASH_PAR_REGULATORS_CONSENSUS=$(ViashDockerStripAutomount "$VIASH_PAR_REGULATORS_CONSENSUS")
   fi
-  if [ ! -z "$VIASH_PAR_GROUND_TRUTH" ]; then
-    VIASH_PAR_GROUND_TRUTH=$(ViashDockerStripAutomount "$VIASH_PAR_GROUND_TRUTH")
+  if [ ! -z "$VIASH_PAR_GROUND_TRUTH_UNIBIND" ]; then
+    VIASH_PAR_GROUND_TRUTH_UNIBIND=$(ViashDockerStripAutomount "$VIASH_PAR_GROUND_TRUTH_UNIBIND")
+  fi
+  if [ ! -z "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS" ]; then
+    VIASH_PAR_GROUND_TRUTH_CHIPATLAS=$(ViashDockerStripAutomount "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS")
+  fi
+  if [ ! -z "$VIASH_PAR_GROUND_TRUTH_REMAP" ]; then
+    VIASH_PAR_GROUND_TRUTH_REMAP=$(ViashDockerStripAutomount "$VIASH_PAR_GROUND_TRUTH_REMAP")
   fi
   if [ ! -z "$VIASH_PAR_WS_CONSENSUS" ]; then
     VIASH_PAR_WS_CONSENSUS=$(ViashDockerStripAutomount "$VIASH_PAR_WS_CONSENSUS")

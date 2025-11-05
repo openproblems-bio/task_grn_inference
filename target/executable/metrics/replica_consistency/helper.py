@@ -11,7 +11,7 @@ import anndata as ad
 import warnings
 warnings.filterwarnings("ignore")
 from util import format_save_score, read_prediction, manage_layer, create_grn_baseline
-from dataset_config import DATASET_GROUPS
+from config import DATASET_GROUPS
 
 np.random.seed(0)
 

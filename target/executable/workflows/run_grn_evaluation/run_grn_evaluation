@@ -232,6 +232,15 @@ function ViashHelp {
   echo "        example:"
   echo "resources_test/grn_benchmark/prior/ws_distance_background_norman.csv"
   echo ""
+  echo "    --ground_truth_unibind"
+  echo "        type: file"
+  echo ""
+  echo "    --ground_truth_chipatlas"
+  echo "        type: file"
+  echo ""
+  echo "    --ground_truth_remap"
+  echo "        type: file"
+  echo ""
   echo "Outputs:"
   echo "    --scores"
   echo "        type: file, required parameter, output, file must exist"
@@ -424,6 +433,39 @@ while [[ $# -gt 0 ]]; do
         --ws_distance_background=*)
             [ -n "$VIASH_PAR_WS_DISTANCE_BACKGROUND" ] && ViashError Bad arguments for option \'--ws_distance_background=*\': \'$VIASH_PAR_WS_DISTANCE_BACKGROUND\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_WS_DISTANCE_BACKGROUND=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --ground_truth_unibind)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_UNIBIND" ] && ViashError Bad arguments for option \'--ground_truth_unibind\': \'$VIASH_PAR_GROUND_TRUTH_UNIBIND\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_UNIBIND="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ground_truth_unibind. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --ground_truth_unibind=*)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_UNIBIND" ] && ViashError Bad arguments for option \'--ground_truth_unibind=*\': \'$VIASH_PAR_GROUND_TRUTH_UNIBIND\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_UNIBIND=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --ground_truth_chipatlas)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS" ] && ViashError Bad arguments for option \'--ground_truth_chipatlas\': \'$VIASH_PAR_GROUND_TRUTH_CHIPATLAS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_CHIPATLAS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ground_truth_chipatlas. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --ground_truth_chipatlas=*)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS" ] && ViashError Bad arguments for option \'--ground_truth_chipatlas=*\': \'$VIASH_PAR_GROUND_TRUTH_CHIPATLAS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_CHIPATLAS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --ground_truth_remap)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_REMAP" ] && ViashError Bad arguments for option \'--ground_truth_remap\': \'$VIASH_PAR_GROUND_TRUTH_REMAP\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_REMAP="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ground_truth_remap. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --ground_truth_remap=*)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_REMAP" ] && ViashError Bad arguments for option \'--ground_truth_remap=*\': \'$VIASH_PAR_GROUND_TRUTH_REMAP\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_REMAP=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --scores)
@@ -850,7 +892,10 @@ workflow run_wf {
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",
         tf_all: "tf_all",
-        layer: "layer"
+        layer: "layer",
+        ground_truth_unibind: "ground_truth_unibind",
+        ground_truth_chipatlas: "ground_truth_chipatlas",
+        ground_truth_remap: "ground_truth_remap"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->

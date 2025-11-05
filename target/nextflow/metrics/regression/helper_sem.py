@@ -39,7 +39,7 @@ torch.backends.cudnn.benchmark = False
 
 
 from util import read_prediction, manage_layer, create_grn_baseline
-from dataset_config import DATASET_GROUPS
+from config import DATASET_GROUPS
 
 
 # List of immediate early genes (IEGs) - scCustomize v3.2.0
@@ -447,8 +447,13 @@ def main(par):
     # Perform rank test between actual scores and baseline
     rr_all['spearman'] = float(np.mean(scores))
     rr_all['spearman_shuffled'] = float(np.mean(scores_baseline))
-    if np.all(scores - scores_baseline == 0):
-        df_results = pd.DataFrame({'sem': [0.0]})
+    if len(scores) == 0:
+        # No valid genes to evaluate
+        df_results = pd.DataFrame({'sem_precision': [np.nan], 'sem_balanced': [np.nan]})
+    elif np.all(scores - scores_baseline == 0):
+        # Identical performance (suspicious - likely an error)
+        print("WARNING: Identical scores detected - possible evaluation error!")
+        df_results = pd.DataFrame({'sem_precision': [1.0], 'sem_balanced': [0.0]})
     else:
         res = wilcoxon(scores - scores_baseline, zero_method='wilcox', alternative='greater')
         rr_all['Wilcoxon pvalue'] = float(res.pvalue)

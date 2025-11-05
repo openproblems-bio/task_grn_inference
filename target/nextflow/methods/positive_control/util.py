@@ -43,23 +43,29 @@ def read_prediction(par):
 
 def format_save_score(output, method_id, dataset_id, score_file):
     pd.set_option('display.max_columns', None)
-    
     print('Write output to file', flush=True)
-    print(output)
-    metric_ids = output.columns.to_numpy()
-    metric_values = output.values[0]
 
-    output = ad.AnnData(
+    if not isinstance(output, pd.DataFrame):
+        raise ValueError("Expected 'output' to be a pandas DataFrame.")
+
+    metric_ids = output.columns.tolist()
+    metric_values = output.to_numpy().astype(str)[0]  # assuming single row of metrics
+
+    
+
+    adata = ad.AnnData(
         X=np.empty((0, 0)),
         uns={
             "dataset_id": dataset_id,
             "method_id": method_id,
             "metric_ids": metric_ids,
-            "metric_values": metric_values
+            "metric_values": metric_values  # store as numpy array directly
         }
     )
-    output.write_h5ad(score_file, compression='gzip')
+
+    adata.write_h5ad(score_file, compression='gzip')
     print('Completed', flush=True)
+
 def parse_args(par):
     import argparse
     parser = argparse.ArgumentParser()
@@ -84,7 +90,9 @@ def parse_args(par):
     parser.add_argument('--group_specific', type=str)
     parser.add_argument('--evaluation_data_de', type=str)
     parser.add_argument('--evaluation_data_sc', type=str)
-    parser.add_argument('--ground_truth', type=str)
+    parser.add_argument('--ground_truth_unibind', type=str)
+    parser.add_argument('--ground_truth_chipatlas', type=str)
+    parser.add_argument('--ground_truth_remap', type=str)
 
    
     

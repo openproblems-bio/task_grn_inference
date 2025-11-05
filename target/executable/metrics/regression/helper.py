@@ -369,7 +369,7 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         'r2-theta-0.0': [float(score_static_min)],
         'r2-theta-0.5': [float(score_static_median)],
         'r2-theta-1.0': [float(score_static_max)],
-        'R_raw': [float(score_raw)],
+        'r2_raw': [float(score_raw)],
     }
 
     df_results = pd.DataFrame(results)

@@ -40,33 +40,33 @@ try:
 except:
     from replica_consistency.helper import main as main_replica_consistency
 
-from metrics_config import datasets_metrics
+from config import DATASETS_METRICS
 
 
 def sem_metric(par, dataset_id):
-    if dataset_id in datasets_metrics:
-        if 'sem' in datasets_metrics[dataset_id]:
+    if dataset_id in DATASETS_METRICS:
+        if 'sem' in DATASETS_METRICS[dataset_id]:
             output = main_sem(par)
             return output
     return None
 
 def tf_rec_metric(par, dataset_id):
-    if dataset_id in datasets_metrics:
-        if 'tf_recovery' in datasets_metrics[dataset_id]:
+    if dataset_id in DATASETS_METRICS:
+        if 'tf_recovery' in DATASETS_METRICS[dataset_id]:
             output = main_tf_rec(par)
             return output
     return None
 
 def tf_binding_metric(par, dataset_id):
-    if dataset_id in datasets_metrics:
-        if 'tf_binding' in datasets_metrics[dataset_id]:
+    if dataset_id in DATASETS_METRICS:
+        if 'tf_binding' in DATASETS_METRICS[dataset_id]:
             output = main_tf_binding(par)
             return output
     return None
 
 def replica_consistency_metric(par, dataset_id):
-    if dataset_id in datasets_metrics:
-        if 'replica_consistency' in datasets_metrics[dataset_id]:
+    if dataset_id in DATASETS_METRICS:
+        if 'replica_consistency' in DATASETS_METRICS[dataset_id]:
             try:
                 output = main_replica_consistency(par)
             except:
@@ -75,15 +75,15 @@ def replica_consistency_metric(par, dataset_id):
     return None
 
 def reg2_metric(par, dataset_id):
-    if dataset_id in datasets_metrics:
-        if 'regression' in datasets_metrics[dataset_id]:
+    if dataset_id in DATASETS_METRICS:
+        if 'regression' in DATASETS_METRICS[dataset_id]:
             output = main_reg(par)
             return output
     return None
 
 def ws_distance_metric(par, dataset_id):
-    if dataset_id in datasets_metrics:
-        if 'ws_distance' in datasets_metrics[dataset_id]:
+    if dataset_id in DATASETS_METRICS:
+        if 'ws_distance' in DATASETS_METRICS[dataset_id]:
             _, output = main_ws_distance(par)
             return output
     return None

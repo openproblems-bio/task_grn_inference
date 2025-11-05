@@ -14,7 +14,8 @@ from util import read_prediction
 seed = 42
 np.random.seed(seed)
 
-def main(par):
+def main_sub(par):
+
     evaluation_data = ad.read_h5ad(par['evaluation_data'], backed='r')
     genes = evaluation_data.var_names.tolist()
     n_targets = len(genes)
@@ -89,3 +90,20 @@ def main(par):
     }])
 
     return summary_df
+
+def main(par):
+    gts = ['unibind', 'chipatlas', 'remap']
+
+    rr_store = []
+    for gt in gts:
+        par['ground_truth'] = par[f'ground_truth_{gt}']
+        df = main_sub(par)
+        df['gt'] = gt
+        rr_store.append(df)
+    result_df = pd.concat(rr_store, ignore_index=True)
+    
+    # Average across all ground truth sources to get one row
+    numeric_cols = ['tfb_grn', 'tfb_all']
+    result_df = result_df[numeric_cols].mean().to_frame().T
+    
+    return result_df

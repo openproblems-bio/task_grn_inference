@@ -65,7 +65,6 @@ fi
 
 
 num_workers=10
-metric_ids="[all_metrics]" # regression, ws_distance, sem, tf_recovery, replica_consistency
 RUN_ID="${DATASET}_evaluation"
 models_folder="${DATASET}/"
 apply_tf=true
@@ -102,6 +101,11 @@ param_aws="s3://openproblems-data/resources/grn/results/params/${RUN_ID}_param_l
 > "$param_local"
 > "$param_file"
 
+# Generate and source config file
+echo "Generating dataset configuration..."
+python src/utils/config.py --output src/utils/dataset_config.env
+source src/utils/dataset_config.env
+
 if [ "$RUN_LOCAL" = true ]; then
   cat >> "$param_local" << HERE
 param_list:
@@ -112,6 +116,16 @@ append_entry() {
   local grn_name="$1"
   local prediction="$2"
   local dataset="$3"
+
+  # Get cell type and metrics from sourced env variables
+  cell_type_var="CELLTYPE_${dataset}"
+  metrics_var="METRICS_${dataset}"
+
+  cell_type="${!cell_type_var}"
+  metric_ids="[${!metrics_var}]"
+
+  echo ${dataset}  ${cell_type} ${metric_ids}
+
   if [[ "$dataset" =~ ^(norman|nakatake|adamson)$ ]]; then
     layer_='X_norm'
   else
@@ -127,7 +141,7 @@ append_entry() {
     apply_tf: ${apply_tf}
     reg_type: ${reg_type}
     layer: $layer_
-
+    
 HERE
   # Additional fields for specific datasets
   if [[ "$dataset" =~ ^(norman|replogle|adamson|xaira_HCT116|xaira_HEK293T)$ ]]; then
@@ -135,6 +149,14 @@ HERE
     ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
     ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv
     evaluation_data_de: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_de.h5ad
+HERE
+  fi
+
+  if [[ "$dataset" != "nakatake" ]]; then
+    cat >> "$param_local" << HERE
+    ground_truth_unibind: ${resources_dir}/grn_benchmark/ground_truth/${cell_type}_unibind.csv
+    ground_truth_chipatlas: ${resources_dir}/grn_benchmark/ground_truth/${cell_type}_chipatlas.csv
+    ground_truth_remap: ${resources_dir}/grn_benchmark/ground_truth/${cell_type}_remap.csv
 HERE
   fi
 }
