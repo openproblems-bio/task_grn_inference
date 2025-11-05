@@ -25,7 +25,7 @@ random.seed(seed)
 np.random.seed(seed)
 
 from util import read_prediction, manage_layer
-from dataset_config import DATASET_GROUPS
+from config import DATASET_GROUPS
 
 
 def encode_obs_cols(adata, cols):
