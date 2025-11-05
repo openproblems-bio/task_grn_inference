@@ -24,10 +24,8 @@ resources:
     dest: tf_binding_helper.py
   - path: /src/metrics/replica_consistency/helper.py
     dest: replica_consistency_helper.py
-  - path: /src/utils/dataset_config.py
-    dest: dataset_config.py
-  - path: /src/metrics/metrics_config.py
-    dest: metrics_config.py
+  - path: /src/utils/config.py
+    dest: config.py
   
   
   

@@ -57,7 +57,10 @@ workflow run_wf {
         regulators_consensus: "regulators_consensus",
         ws_consensus: "ws_consensus",
         tf_all: "tf_all",
-        layer: "layer"
+        layer: "layer",
+        ground_truth_unibind: "ground_truth_unibind",
+        ground_truth_chipatlas: "ground_truth_chipatlas",
+        ground_truth_remap: "ground_truth_remap"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->

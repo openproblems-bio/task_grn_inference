@@ -5,8 +5,8 @@ datasets=('replogle' 'op') #'replogle' 'op' 'nakatake' 'adamson' 'norman'  'xair
 run_local=false # set to true to run locally, false to run on AWS
 
 run_grn_inference=false
-run_grn_evaluation=false
-run_download=true
+run_grn_evaluation=true
+run_download=false
 
 
 for dataset in "${datasets[@]}"; do

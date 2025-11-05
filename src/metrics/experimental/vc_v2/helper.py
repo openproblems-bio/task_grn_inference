@@ -32,7 +32,7 @@ torch.cuda.manual_seed_all(seed)
 torch.use_deterministic_algorithms(True)
 
 from util import read_prediction, manage_layer
-from dataset_config import DATASET_GROUPS
+from config import DATASET_GROUPS
 from scipy.spatial.distance import cityblock
 
 

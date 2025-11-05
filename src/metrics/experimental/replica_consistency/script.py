@@ -24,7 +24,7 @@ except:
 
 from helper import main
 from util import format_save_score, parse_args
-# from dataset_config import DATASET_GROUPS
+# from config import DATASET_GROUPS
 
 par = parse_args(par)
 
