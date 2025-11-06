@@ -2,6 +2,7 @@ import os
 os.environ["MKL_SERVICE_FORCE_INTEL"] = "1"
 os.environ["MKL_THREADING_LAYER"] = "GNU"
 import shutil
+import json
 from typing import Optional, List
 
 import numpy as np
@@ -33,6 +34,10 @@ def run_cmd(cmd: List[str], cwd: Optional[str] = None) -> None:
         rc = proc.wait()
     if rc != 0:
         raise RuntimeError(f"Command {cmd} failed with exit code {rc}")
+
+
+def run_cmd_inside_dictys(cmd: List[str], cwd: Optional[str] = None) -> None:
+    run_cmd(["conda", "run", "-n", "dictys", "--no-capture-output", *cmd], cwd=cwd)
 
 
 def define_vars(par):
@@ -144,8 +149,8 @@ def bam_to_bams(par):
             shutil.rmtree(folder)
 
     print('Splitting BAM into per-cell BAMs', flush=True)
-    run_cmd([
-        "bash", "dictys_helper", "split_bam.sh", par['bam_name'], par['bams_dir'],
+    run_cmd_inside_dictys([
+        "dictys_helper", "split_bam.sh", par['bam_name'], par['bams_dir'],
         "--section", "CB:Z:", "--ref_expression", par['exp_path']
     ])
 
@@ -212,8 +217,8 @@ def get_priors(par):
     gtf_gz.unlink()
 
     print('Making bed files for gene annotation ...', flush=True)
-    run_cmd([
-        "bash", "dictys_helper", "gene_gtf.sh", gtf, par['gene_bed']
+    run_cmd_inside_dictys([
+        "dictys_helper", "gene_gtf.sh", str(gtf), str(par['gene_bed'])
     ])
 
     print('Downloading motif file...', flush=True)
@@ -225,11 +230,11 @@ def get_priors(par):
 
 
 def configure(par):
-    import json
-    device='cuda:0' #cuda:0 , cpu
+
+    device = 'cpu'
     os.makedirs(par['make_dir'], exist_ok=True)
-    run_cmd([
-        "bash", "dictys_helper", "makefile_template.sh", "common.mk", "config.mk", "env_none.mk", "static.mk"
+    run_cmd_inside_dictys([
+        "dictys_helper", "makefile_template.sh", "common.mk", "config.mk", "env_none.mk", "static.mk"
     ], cwd=par['make_dir'])
     
     json_arg = json.dumps({
@@ -238,20 +243,20 @@ def configure(par):
         "JOINT": "1"
     })
 
-    run_cmd([
-        "bash", "dictys_helper", "makefile_update.py", "config.mk", json_arg
+    run_cmd_inside_dictys([
+        "dictys_helper", "makefile_update.py", "config.mk", json_arg
     ], cwd=par['make_dir'])
 
-    run_cmd([
-        "bash", "dictys_helper", "makefile_check.py", "--dir_makefiles", par['make_dir'],
+    run_cmd_inside_dictys([
+        "dictys_helper", "makefile_check.py", "--dir_makefiles", par['make_dir'],
         "--dir_data", par['data_dir']
     ])
 
 
 def infer_grn(par):
     print('Inferring GRNs', flush=True)
-    run_cmd([
-        "bash", "dictys_helper", "network_inference.sh", "-j", str(par['num_workers']), "-J", "1", "static"
+    run_cmd_inside_dictys([
+        "dictys_helper", "network_inference.sh", "-j", str(par['num_workers']), "-J", "1", "static"
     ], cwd=par['temp_dir'])
 
 
@@ -272,6 +277,7 @@ def export_net(par):
     net['weight'] = net['weight'].astype(str)
     output = ad.AnnData(X=None, uns={"method_id": "dictys", "dataset_id": ad.read_h5ad(par['rna'], backed='r').uns['dataset_id'], "prediction": net[["source", "target", "weight"]]})
     output.write(par['prediction'])
+
 
 def main(par):
 
