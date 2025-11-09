@@ -26,7 +26,7 @@ NUMPY_DTYPE = np.float32
 MAX_N_ITER = 500
 
 # For reproducibility purposes
-seed = 0xCADD
+seed = 0xCAFF
 os.environ['PYTHONHASHSEED'] = str(seed)
 random.seed(seed)
 np.random.seed(seed)
@@ -242,8 +242,11 @@ def evaluate_grn(
 
     # Learn initial GRN weights from the first set
     print("Infer GRN weights from training set, given the provided GRN topology")
+    signed = False
     A = regression_based_grn_inference(X_controls, A, signed=signed)
-    # A = spearman_based_grn_inference(X_controls, A, signed=signed)
+
+    print(np.mean(A != 0))
+    exit()
 
     # Learn shocks from perturbations, using reporter genes only
     print("Learn shocks from perturbations, using reporter genes only")
@@ -279,13 +282,16 @@ def evaluate_grn(
     best_iteration = 0
     pbar = tqdm.tqdm(range(n_iter))
     X_non_reporter = delta_X_train[:, ~is_reporter]
+    losses = []
     for iteration in pbar:
         optimizer.zero_grad()
         A_eff = torch.abs(A) * signs if signed else A * mask
+
         delta_X_hat = solve_sem(A_eff, delta_train)
         loss = torch.mean(torch.sum(torch.square(X_non_reporter - delta_X_hat[:, ~is_reporter]), dim=1))
         loss = loss + 0.001 * torch.sum(torch.abs(A))
         loss = loss + 0.001 * torch.sum(torch.square(A))
+        losses.append(loss.item())
         pbar.set_description(str(loss.item()))
 
         # Keep track of best solution
@@ -298,6 +304,7 @@ def evaluate_grn(
         optimizer.step()
         scheduler.step(loss.item())
         # pbar.set_description(str(loss.item()))
+
     A = best_A_eff
     mask = mask.detach().cpu().numpy().astype(bool)
     print(f"Best iteration: {best_iteration + 1} / {n_iter}")
@@ -389,6 +396,10 @@ def main(par):
 
     # Get negative controls
     X_controls = X[are_controls, :]
+    if np.all(np.std(X_controls, axis=0) == 0):
+        raise RuntimeError("All negative controls have the same expression profile")
+
+    # Compute perturbations
     delta_X = compute_perturbations(X, are_controls, match_groups, loose_match_groups)
 
     # Remove negative controls from downstream analysis
