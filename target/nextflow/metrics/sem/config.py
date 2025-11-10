@@ -71,7 +71,7 @@ DATASETS_CELLTYPES = {
 }
 
 
-DATASETS_METRICS = {
+DATASETS_METRICS_EXPERIMENTAL = {
     'replogle': ['regression', 'ws_distance', 'sem', 'tf_recovery', 'tf_binding'],
     'adamson': ['regression', 'ws_distance', 'sem', 'tf_recovery', 'tf_binding'],
     'norman': ['regression', 'ws_distance', 'sem', 'tf_recovery', 'tf_binding'],
@@ -82,6 +82,19 @@ DATASETS_METRICS = {
     'parsebioscience': ['regression','sem', 'tf_binding', 'replica_consistency'],
     'xaira_HEK293T': ['regression', 'ws_distance', 'sem', 'tf_recovery', 'tf_binding'],
     'xaira_HCT116': ['regression', 'ws_distance', 'sem', 'tf_recovery', 'tf_binding'],
+}
+
+DATASETS_METRICS = {
+    'replogle': ['regression', 'ws_distance', 'tf_recovery'],
+    'adamson': ['regression', 'ws_distance', 'tf_recovery'],
+    'norman': ['regression', 'ws_distance', 'tf_recovery'],
+    'nakatake': ['regression'],
+    'op': ['regression'],
+    '300BCG': ['regression'],
+    'ibd': ['regression'],
+    'parsebioscience': ['regression'],
+    'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery'],
+    'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery'],
 }
 
 METRICS_DATASETS = {}

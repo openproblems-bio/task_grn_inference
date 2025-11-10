@@ -3412,7 +3412,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/methods/pearson_corr",
     "viash_version" : "0.9.4",
-    "git_commit" : "ad0264fded20bbd93fc29cf660480b9312d12b21",
+    "git_commit" : "d57df342a097cf8e96df7a10db9ce8e886880bcc",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3600,6 +3600,8 @@ def main(par):
     print('Output GRN')
     print('Shape of the network:', net.shape)
     print(net.sort_values('weight', ascending=False, key=abs).head(10))
+    print(net['source'].nunique(), 'TFs')
+    print('Num neg signs?:', (net['weight'] < 0).sum())
     net = net.astype(str)
     output = ad.AnnData(
         X=None,

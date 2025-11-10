@@ -102,8 +102,17 @@ def main(par):
         rr_store.append(df)
     result_df = pd.concat(rr_store, ignore_index=True)
     
-    # Average across all ground truth sources to get one row
-    numeric_cols = ['tfb_grn', 'tfb_all']
-    result_df = result_df[numeric_cols].mean().to_frame().T
+    # Weighted average across all ground truth sources
+    weights = result_df['n_tfs_to_evaluate'].values
+    total_weight = weights.sum()
+    
+    tfb_grn_weighted = (result_df['tfb_grn'] * weights).sum() / total_weight
+    tfb_all_weighted = (result_df['tfb_all'] * weights).sum() / total_weight
+    
+    
+    result_df = pd.DataFrame([{
+        'tfb_grn': tfb_grn_weighted,
+        'tfb_all': tfb_all_weighted
+    }])
     
     return result_df

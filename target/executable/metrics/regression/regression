@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "lightgbm==4.3.0" "numpy==1.26.4" "tqdm_joblib==0.0.5"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics regression"
-LABEL org.opencontainers.image.created="2025-11-05T10:54:53Z"
+LABEL org.opencontainers.image.created="2025-11-10T05:31:47Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="ad0264fded20bbd93fc29cf660480b9312d12b21"
+LABEL org.opencontainers.image.revision="d57df342a097cf8e96df7a10db9ce8e886880bcc"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1439,7 +1439,7 @@ par = parse_args(par)
 
 if __name__ == '__main__':
   print(par)
-  output = main(par)
+  detailed_output, output = main(par)
   print(output)
   method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
   dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']

@@ -80,7 +80,7 @@ def main(par):
             ws_distance['theta'] = theta
             scores_model.append(ws_distance)
     
+    
     scores_model = pd.concat(scores_model).reset_index(drop=True)
     mean_scores = scores_model.groupby('theta')['ws_distance_pc'].mean().to_frame().T.reset_index(drop=True)
-    print(mean_scores)
     return scores_model, mean_scores

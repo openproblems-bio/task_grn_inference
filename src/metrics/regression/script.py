@@ -41,7 +41,7 @@ par = parse_args(par)
 
 if __name__ == '__main__':
   print(par)
-  output = main(par)
+  detailed_output, output = main(par)
   print(output)
   method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
   dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']

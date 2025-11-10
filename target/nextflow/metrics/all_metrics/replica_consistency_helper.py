@@ -247,9 +247,12 @@ def main(par):
     tgtg_score = np.mean([score for score_lift, score in tgtg_results])
     tgtg_score_lift = np.mean([score_lift for score_lift, score in tgtg_results])
     # final_score = (tftg_score + tgtg_score + tftg_tgtg_score) / 3.0
-
-    replica_consistency_precision = np.mean([tftg_score_lift, tgtg_score_lift])
-    replica_consistency_balanced = np.mean([tftg_score, tgtg_score])
+    if False:
+        replica_consistency_precision = np.mean([tftg_score_lift, tgtg_score_lift])
+        replica_consistency_balanced = np.mean([tftg_score, tgtg_score])
+    else:
+        replica_consistency_precision = tgtg_score_lift
+        replica_consistency_balanced = tgtg_score
     
     # Create results DataFrame with all three scores
     results = pd.DataFrame({

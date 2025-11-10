@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   python -c 'from scdataloader.utils import populate_my_ontology; populate_my_ontology()'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-11-05T10:54:53Z"
+LABEL org.opencontainers.image.created="2025-11-10T05:31:48Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="ad0264fded20bbd93fc29cf660480b9312d12b21"
+LABEL org.opencontainers.image.revision="d57df342a097cf8e96df7a10db9ce8e886880bcc"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

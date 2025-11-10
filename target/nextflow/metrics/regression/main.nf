@@ -3600,7 +3600,7 @@ meta = [
     "description" : "Calculates regression scores 2\n",
     "metrics" : [
       {
-        "name" : "r2-theta-0.0",
+        "name" : "r2-theta-0.1",
         "label" : "R2 (precision)",
         "summary" : "Captures the perfomance for the top regulatory links",
         "description" : "Captures the perfomance for the top regulatory links\n",
@@ -3745,7 +3745,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/regression",
     "viash_version" : "0.9.4",
-    "git_commit" : "ad0264fded20bbd93fc29cf660480b9312d12b21",
+    "git_commit" : "d57df342a097cf8e96df7a10db9ce8e886880bcc",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3931,7 +3931,7 @@ par = parse_args(par)
 
 if __name__ == '__main__':
   print(par)
-  output = main(par)
+  detailed_output, output = main(par)
   print(output)
   method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
   dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
