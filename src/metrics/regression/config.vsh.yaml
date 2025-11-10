@@ -8,7 +8,7 @@ info:
   description: |
     Calculates regression scores 2
   metrics:
-    - name: r2-theta-0.0
+    - name: r2-theta-0.1
       label: R2 (precision)
       summary: Captures the perfomance for the top regulatory links
       description: |

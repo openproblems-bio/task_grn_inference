@@ -106,6 +106,7 @@ echo "Generating dataset configuration..."
 python src/utils/config.py --output src/utils/dataset_config.env
 source src/utils/dataset_config.env
 
+
 if [ "$RUN_LOCAL" = true ]; then
   cat >> "$param_local" << HERE
 param_list:

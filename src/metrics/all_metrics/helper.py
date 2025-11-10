@@ -74,10 +74,10 @@ def replica_consistency_metric(par, dataset_id):
             return output
     return None
 
-def reg2_metric(par, dataset_id):
+def reg_metric(par, dataset_id):
     if dataset_id in DATASETS_METRICS:
         if 'regression' in DATASETS_METRICS[dataset_id]:
-            output = main_reg(par)
+            _ , output = main_reg(par)
             return output
     return None
 
@@ -92,7 +92,9 @@ def ws_distance_metric(par, dataset_id):
 def main(par):
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     rr_store = []
-    metrics = [reg2_metric, ws_distance_metric, sem_metric, tf_rec_metric, replica_consistency_metric]
+    metrics = [reg_metric, ws_distance_metric, sem_metric, tf_rec_metric, replica_consistency_metric, tf_binding_metric]
+    # metrics = [tf_binding_metric, sem_metric, replica_consistency_metric]
+
     for metric in metrics:
         print(f"Computing metric: {metric.__name__}")
         rr = metric(par, dataset_id)

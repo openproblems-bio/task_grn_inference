@@ -16,6 +16,9 @@ set -euo pipefail
 layer="lognorm" 
 reg_type="ridge"
 num_workers=20
+prediction="output/net.h5ad"
+score="output/score.h5ad"
+dataset="op"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -53,12 +56,15 @@ if [[ -n "$layer" ]]; then
   echo "Layer is set to: $layer"
 fi
 
-# Check required args
-if [[ -z "${dataset:-}" || -z "${prediction:-}" || -z "${score:-}" ]]; then
-  echo "Usage: $0 --dataset <name> --prediction <file> --score <metric>"
-  exit 1
-fi
+# # Check required args
+# if [[ -z "${dataset:-}" || -z "${prediction:-}" || -z "${score:-}" ]]; then
+#   echo "Usage: $0 --dataset <name> --prediction <file> --score <metric>"
+#   exit 1
+# fi
 
+source src/utils/dataset_config.env
+cell_type_var="CELLTYPE_${dataset}"
+cell_type="${!cell_type_var}"
 
 # Run metrics
 python src/metrics/all_metrics/script.py \
@@ -67,6 +73,9 @@ python src/metrics/all_metrics/script.py \
   --evaluation_data_sc "resources/grn_benchmark/evaluation_data/${dataset}_sc.h5ad" \
   --evaluation_data_de "resources/grn_benchmark/evaluation_data/${dataset}_de.h5ad" \
   --regulators_consensus "resources/grn_benchmark/prior/regulators_consensus_${dataset}.json" \
+  --ground_truth_unibind "resources/grn_benchmark/ground_truth/${cell_type}_unibind.csv" \
+  --ground_truth_chipatlas "resources/grn_benchmark/ground_truth/${cell_type}_chipatlas.csv" \
+  --ground_truth_remap "resources/grn_benchmark/ground_truth/${cell_type}_remap.csv" \
   --layer "${layer}" \
   --reg_type "${reg_type}" \
   --num_workers "${num_workers}" \

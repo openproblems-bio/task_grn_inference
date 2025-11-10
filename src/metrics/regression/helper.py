@@ -40,6 +40,59 @@ def fill_zeros_in_grn(A: np.ndarray, eps: float = 1e-10) -> np.ndarray:
     return A
 
 
+def create_regression_model(reg_type: str, random_state: int = 0xCAFE, n_jobs: int = 10):
+    """Create a regression model based on the specified type."""
+    if reg_type == 'ridge':
+        return Ridge(random_state=random_state)
+    elif reg_type == 'GB':
+        return lightgbm.LGBMRegressor(verbosity=-1, n_estimators=100, n_jobs=n_jobs, random_state=random_state)
+    elif reg_type == 'RF':
+        return lightgbm.LGBMRegressor(boosting_type='rf', feature_fraction=0.05, verbosity=-1, n_estimators=100, n_jobs=n_jobs, random_state=random_state)
+    else:
+        raise NotImplementedError(f'Unknown model "{reg_type}"')
+
+
+def to_dense_array(arr):
+    """Convert sparse matrix to dense array if needed."""
+    return arr.toarray() if hasattr(arr, "toarray") else arr
+
+
+def perform_cross_validation(
+        reg_type: str,
+        X_: np.ndarray,
+        y_: np.ndarray,
+        groups: np.ndarray,
+        random_state: int = 0xCAFE,
+        n_jobs: int = 10
+) -> Dict[str, Any]:
+    """Perform leave-one-group-out cross-validation."""
+    y_pred, y_target, r2s, models = [], [], [], []
+    
+    for train_index, test_index in LeaveOneGroupOut().split(X_, y_, groups):
+        model = create_regression_model(reg_type, random_state, n_jobs)
+        
+        X_train = to_dense_array(X_[train_index, :])
+        X_test = to_dense_array(X_[test_index, :])
+        y_train = np.ravel(to_dense_array(y_[train_index]))
+        y_test = np.ravel(to_dense_array(y_[test_index]))
+        
+        model.fit(X_train, y_train)
+        
+        y_pred.append(model.predict(X_test))
+        y_target.append(y_test)
+        r2s.append(r2_score(y_target[-1], y_pred[-1]))
+        models.append(model)
+    
+    y_pred = np.concatenate(y_pred, axis=0)
+    y_target = np.concatenate(y_target, axis=0)
+    
+    return {
+        'r2': float(np.clip(r2_score(y_target, y_pred), 0, 1)),
+        'avg-r2': float(np.clip(np.mean(r2s), 0, 1)),
+        'models': models
+    }
+
+
 def cross_validate_gene(
         reg_type: str,
         X: np.ndarray,
@@ -64,47 +117,11 @@ def cross_validate_gene(
     if len(selected_features) == 0:
         return results
     assert j not in selected_features
+    
     X_ = X[:, selected_features]
-
-    # Define labels
     y_ = X[:, j]
-
-    y_pred, y_target, r2s, models = [], [], [], []
-    for t, (train_index, test_index) in enumerate(LeaveOneGroupOut().split(X_, y_, groups)):
-
-        if reg_type == 'ridge':
-            model = Ridge(random_state=random_state)
-        elif reg_type == 'GB':
-            model = lightgbm.LGBMRegressor(verbosity=-1, n_estimators=100, n_jobs=n_jobs, random_state=random_state)
-        elif reg_type == 'RF':
-            model = lightgbm.LGBMRegressor(boosting_type='rf', feature_fraction=0.05, verbosity=-1, n_estimators=100, n_jobs=n_jobs, random_state=random_state)
-        else:
-            raise NotImplementedError(f'Unknown model "{reg_type}"')
-
-        X_train = X_[train_index, :]
-        X_test = X_[test_index, :]
-        y_train = y_[train_index]
-        y_test = y_[test_index]
-        
-        X_train = X_train.toarray() if hasattr(X_train, "toarray") else X_train
-        X_test = X_test.toarray() if hasattr(X_test, "toarray") else X_test
-        y_train = y_train.toarray().ravel() if hasattr(y_train, "toarray") else np.ravel(y_train)
-        y_test = y_test.toarray().ravel() if hasattr(y_test, "toarray") else np.ravel(y_test)
-        model.fit(X_train, y_train)
-
-        y_pred.append(model.predict(X_test))
-        y_target.append(y_test)
-        r2s.append(r2_score(y_target[-1], y_pred[-1]))
-        models.append(model)
-
-    y_pred = np.concatenate(y_pred, axis=0)
-    y_target = np.concatenate(y_target, axis=0)
     
-    results['r2'] = float(np.clip(r2_score(y_target, y_pred), 0, 1))
-    results['avg-r2'] = float(np.clip(np.mean(r2s), 0, 1))
-    results['models'] = models
-    
-    return results
+    return perform_cross_validation(reg_type, X_, y_, groups, random_state, n_jobs)
 
 
 def cross_validate(
@@ -115,8 +132,9 @@ def cross_validate(
         groups: np.ndarray,
         grn: np.ndarray,
         n_features: np.ndarray,
-        n_jobs: int
-) -> List[Dict[str, float]]:
+        n_jobs: int,
+        theta: str = None
+) -> pd.DataFrame:
     n_genes = len(grn)
 
     grn = fill_zeros_in_grn(grn)
@@ -136,11 +154,19 @@ def cross_validate(
             for j in range(n_genes) if n_features[j] > 0
         )
     included_gene_names = [gene_names[j] for j in range(n_genes) if n_features[j] > 0]
-
-    return {
-        'gene_names': list(included_gene_names),
-        'results': list(results)
-    }
+    included_n_features = [int(n_features[j]) for j in range(n_genes) if n_features[j] > 0]
+    
+    # Create detailed DataFrame
+    detailed_results = []
+    for gene_name, result, n_tf in zip(included_gene_names, results, included_n_features):
+        detailed_results.append({
+            'gene': gene_name,
+            'r2': result['avg-r2'],
+            'n_regulators': n_tf,
+            'theta': theta
+        })
+    
+    return pd.DataFrame(detailed_results)
 
 def static_approach(
         grn: np.ndarray,
@@ -150,16 +176,14 @@ def static_approach(
         gene_names: List[str],
         tf_names: Set[str],
         reg_type: str,
-        n_jobs:int
-) -> float:
+        n_jobs:int,
+        theta: str = None
+) -> pd.DataFrame:
 
     # Cross-validate each gene using the inferred GRN to define select input features
-    res = cross_validate(reg_type, gene_names, tf_names, X, groups, grn, n_features, n_jobs=n_jobs)
+    detailed_df = cross_validate(reg_type, gene_names, tf_names, X, groups, grn, n_features, n_jobs=n_jobs, theta=theta)
     
-    r2_scores = np.asarray([res['results'][j]['avg-r2'] for j in range(len(res['results']))])
-    mean_r2_scores = np.mean(r2_scores)
-
-    return mean_r2_scores
+    return detailed_df
 
 
 def cross_validate_gene_raw(
@@ -191,43 +215,8 @@ def cross_validate_gene_raw(
     
     X_ = X[:, selected_features]
     y_ = X[:, j]
-
-    y_pred, y_target, r2s, models = [], [], [], []
-    for t, (train_index, test_index) in enumerate(LeaveOneGroupOut().split(X_, y_, groups)):
-
-        if reg_type == 'ridge':
-            model = Ridge(random_state=random_state)
-        elif reg_type == 'GB':
-            model = lightgbm.LGBMRegressor(verbosity=-1, n_estimators=100, n_jobs=n_jobs, random_state=random_state)
-        elif reg_type == 'RF':
-            model = lightgbm.LGBMRegressor(boosting_type='rf', feature_fraction=0.05, verbosity=-1, n_estimators=100, n_jobs=n_jobs, random_state=random_state)
-        else:
-            raise NotImplementedError(f'Unknown model "{reg_type}"')
-
-        X_train = X_[train_index, :]
-        X_test = X_[test_index, :]
-        y_train = y_[train_index]
-        y_test = y_[test_index]
-        
-        X_train = X_train.toarray() if hasattr(X_train, "toarray") else X_train
-        X_test = X_test.toarray() if hasattr(X_test, "toarray") else X_test
-        y_train = y_train.toarray().ravel() if hasattr(y_train, "toarray") else np.ravel(y_train)
-        y_test = y_test.toarray().ravel() if hasattr(y_test, "toarray") else np.ravel(y_test)
-        model.fit(X_train, y_train)
-
-        y_pred.append(model.predict(X_test))
-        y_target.append(y_test)
-        r2s.append(r2_score(y_target[-1], y_pred[-1]))
-        models.append(model)
-
-    y_pred = np.concatenate(y_pred, axis=0)
-    y_target = np.concatenate(y_target, axis=0)
     
-    results['r2'] = float(np.clip(r2_score(y_target, y_pred), 0, 1))
-    results['avg-r2'] = float(np.clip(np.mean(r2s), 0, 1))
-    results['models'] = models
-    
-    return results
+    return perform_cross_validation(reg_type, X_, y_, groups, random_state, n_jobs)
 
 
 def raw_approach(
@@ -238,10 +227,11 @@ def raw_approach(
         tf_names: Set[str],
         reg_type: str,
         n_jobs: int
-) -> float:
+) -> pd.DataFrame:
     """
     Evaluate GRN using raw network structure without theta-based standardization.
     For each gene, use all its TFs from the network as predictors.
+    Only evaluates genes with more than 2 regulators (excluding self-regulation).
     """
     n_genes = len(gene_names)
     
@@ -251,25 +241,97 @@ def raw_approach(
     grn_filtered = grn.copy()
     grn_filtered[~mask, :] = 0
     
+    # Count regulators for each gene to determine which genes to evaluate
+    n_regulators_per_gene = []
+    genes_to_evaluate = []
+    for j in range(n_genes):
+        regulators = grn_filtered[:, j]
+        # Count non-zero regulators excluding self-regulation
+        regulator_indices = np.where(regulators != 0)[0]
+        regulator_indices = regulator_indices[regulator_indices != j]  # Exclude self
+        n_regulators = len(regulator_indices)
+        
+        if n_regulators > 2:
+            n_regulators_per_gene.append(n_regulators)
+            genes_to_evaluate.append(j)
+    
     from joblib import Parallel, delayed
     from tqdm.auto import tqdm
     from tqdm_joblib import tqdm_joblib
     
-    with tqdm_joblib(tqdm(total=n_genes, desc=f"{reg_type} CV (raw)")):
+    with tqdm_joblib(tqdm(total=len(genes_to_evaluate), desc=f"{reg_type} CV (raw)")):
         results = Parallel(n_jobs=n_jobs, backend="loky")(
             delayed(cross_validate_gene_raw)(
                 reg_type, X, groups, grn_filtered, j, gene_names, tf_names, SEED, n_jobs
             )
-            for j in range(n_genes)
+            for j in genes_to_evaluate
         )
     
-    r2_scores = np.asarray([results[j]['avg-r2'] for j in range(n_genes)])
-    mean_r2_scores = np.mean(r2_scores)
+    # Create detailed DataFrame only for genes with regulators
+    detailed_results = []
+    for j, result, n_tf in zip(genes_to_evaluate, results, n_regulators_per_gene):
+        detailed_results.append({
+            'gene': gene_names[j],
+            'r2': result['avg-r2'],
+            'n_regulators': n_tf,
+            'theta': 'r2_raw'
+        })
     
-    return mean_r2_scores
+    return pd.DataFrame(detailed_results)
 
 
-def main(par: Dict[str, Any]) -> pd.DataFrame:
+
+def evaluate_static_approach(
+        net_matrix: np.ndarray,
+        n_features: np.ndarray,
+        X: np.ndarray,
+        groups: np.ndarray,
+        gene_names: np.ndarray,
+        tf_names: Set[str],
+        reg_type: str,
+        n_jobs: int,
+        theta: str
+) -> pd.DataFrame:
+    """Evaluate GRN using static approach with given theta."""
+    print(f'Static approach (theta={theta}):', flush=True)
+    return static_approach(net_matrix, n_features, X, groups, gene_names, tf_names, reg_type, n_jobs=n_jobs, theta=theta)
+
+
+def evaluate_network_for_group(
+        net_matrix: np.ndarray,
+        n_features_theta_min: np.ndarray,
+        n_features_theta_median: np.ndarray,
+        n_features_theta_max: np.ndarray,
+        X: np.ndarray,
+        groups: np.ndarray,
+        gene_names: np.ndarray,
+        tf_names: Set[str],
+        reg_type: str,
+        n_jobs: int
+) -> List[pd.DataFrame]:
+    """Evaluate a network using multiple theta values and raw approach."""
+    detailed_scores = []
+    
+    # Evaluate with different theta values
+    assert n_features_theta_min.sum() > 0, "No gene has regulators with theta=0.1"
+    detailed_scores.append(evaluate_static_approach(
+        net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, reg_type, n_jobs, theta='r2-theta-0.1'
+    ))
+    detailed_scores.append(evaluate_static_approach(
+        net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, reg_type, n_jobs, theta='r2-theta-0.5'
+    ))
+    detailed_scores.append(evaluate_static_approach(
+        net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, reg_type, n_jobs, theta='r2-theta-1.0'
+    ))
+    
+    # Evaluate with raw approach
+    print(f'Raw approach (no theta):', flush=True)
+    detailed_scores.append(raw_approach(net_matrix, X, groups, gene_names, tf_names, reg_type, n_jobs=n_jobs))
+    
+    return detailed_scores
+
+
+def main(par: Dict[str, Any]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     random_state = SEED
     np.random.seed(random_state)
     random.seed(random_state)
@@ -283,7 +345,7 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
         data = json.load(f)
     print(len(data), len(gene_names))
     
-    n_features_theta_min = np.asarray([data[gene_name]['0'] for gene_name in gene_names], dtype=int)
+    n_features_theta_min = np.asarray([data[gene_name]['0.1'] for gene_name in gene_names], dtype=int)
     n_features_theta_median = np.asarray([data[gene_name]['0.5'] for gene_name in gene_names], dtype=int)
     n_features_theta_max = np.asarray([data[gene_name]['1'] for gene_name in gene_names], dtype=int)
     n_genes = len(gene_names)
@@ -302,16 +364,13 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
     if par['apply_tf']==False:
         tf_names = gene_names
 
+    detailed_scores = []
+    
     # Check if group-specific evaluation is requested
     if 'group_specific' in par and par['group_specific'] is not None:
         # Group-specific evaluation
         group_column = par['group_specific']
         unique_groups = prturb_adata.obs[group_column].unique()
-        
-        scores_min_by_group = []
-        scores_median_by_group = []
-        scores_max_by_group = []
-        scores_raw_by_group = []
         
         for group in unique_groups:
             print(f'Evaluating group: {group}', flush=True)
@@ -328,50 +387,28 @@ def main(par: Dict[str, Any]) -> pd.DataFrame:
             
             net_matrix_group = net_to_matrix(net_group, gene_names)
             
-            # Evaluate GRN for this group
-            if (n_features_theta_min!=0).any()==False:
-                score_static_min = np.nan
-            else:
-                score_static_min = static_approach(net_matrix_group, n_features_theta_min, X_group, groups_group, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
-            
-            score_static_median = static_approach(net_matrix_group, n_features_theta_median, X_group, groups_group, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
-            score_static_max = static_approach(net_matrix_group, n_features_theta_max, X_group, groups_group, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
-            score_raw = raw_approach(net_matrix_group, X_group, groups_group, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
-            
-            scores_min_by_group.append(score_static_min)
-            scores_median_by_group.append(score_static_median)
-            scores_max_by_group.append(score_static_max)
-            scores_raw_by_group.append(score_raw)
-        
-        # Take the mean across groups
-        score_static_min = np.nanmean(scores_min_by_group)
-        score_static_median = np.nanmean(scores_median_by_group)
-        score_static_max = np.nanmean(scores_max_by_group)
-        score_raw = np.nanmean(scores_raw_by_group)
+            # Evaluate network for this group
+            group_scores = evaluate_network_for_group(
+                net_matrix_group, n_features_theta_min, n_features_theta_median, n_features_theta_max,
+                X_group, groups_group, gene_names, tf_names, par['reg_type'], par['num_workers']
+            )
+            detailed_scores.extend(group_scores)
         
     else:
-        net_matrix = net_to_matrix(net, gene_names)
         # Original evaluation (no group-specific)
-        print(f'Raw approach (no theta):', flush=True)
-        score_raw = raw_approach(net_matrix, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
+        net_matrix = net_to_matrix(net, gene_names)
+            
+        # Evaluate network
+        all_scores = evaluate_network_for_group(
+            net_matrix, n_features_theta_min, n_features_theta_median, n_features_theta_max,
+            X, groups, gene_names, tf_names, par['reg_type'], par['num_workers']
+        )
+        detailed_scores.extend(all_scores)
+    
+    # Combine all detailed scores
+    detailed_df = pd.concat(detailed_scores, ignore_index=True)
+    
+    # Compute mean scores per theta
+    mean_scores = detailed_df.groupby('theta')['r2'].mean().to_frame().T.reset_index(drop=True)
 
-        if (n_features_theta_min!=0).any()==False:
-            score_static_min = np.nan
-        else:
-            print(f'Static approach (theta=0):', flush=True)
-            score_static_min = static_approach(net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
-        print(f'Static approach (theta=.5):', flush=True)
-        score_static_median = static_approach(net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
-        print(f'Static approach (theta=1):', flush=True)
-        score_static_max = static_approach(net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, par['reg_type'], n_jobs=par['num_workers'])
-        
-    results = {
-        'r2-theta-0.0': [float(score_static_min)],
-        'r2-theta-0.5': [float(score_static_median)],
-        'r2-theta-1.0': [float(score_static_max)],
-        'r2_raw': [float(score_raw)],
-    }
-
-    df_results = pd.DataFrame(results)
-
-    return df_results
+    return detailed_df, mean_scores

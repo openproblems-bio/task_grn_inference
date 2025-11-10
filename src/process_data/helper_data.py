@@ -347,13 +347,46 @@ def qc_perturbation_effect_func(adata, n_jobs=-1):
     return adata
 
 
-def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, split_func, 
-                                    qc_group='perturbation', 
-                                    qc_perturbation_effect=True,
-                                    group='perturbation',
-                                    save_data=True,
-                                    cell_count_t=10):
-
+def process_single_cell_data(adata, covariates, add_metadata, save_name, split_func,
+                            qc_group='perturbation',
+                            qc_perturbation_effect=True,
+                            group='perturbation',
+                            save_data=True,
+                            cell_count_t=10):
+    """
+    Process single-cell perturbation data: normalization, QC, splitting, and saving.
+    
+    Saves:
+    - Full processed single-cell data to: resources/processed_data/{save_name}_sc.h5ad
+    - Train/test group identifiers to: resources/processed_data/{save_name}_groups.npz
+    
+    Parameters
+    ----------
+    adata : AnnData
+        Input single-cell AnnData object
+    covariates : list
+        List of covariate columns for pseudobulking
+    add_metadata : callable
+        Function to add metadata to AnnData objects
+    save_name : str
+        Prefix for saved file names
+    split_func : callable
+        Function to split data into train/test groups
+    qc_group : str
+        Column name for QC grouping (default: 'perturbation')
+    qc_perturbation_effect : bool
+        Whether to perform QC on perturbation effects (default: True)
+    group : str
+        Column name for train/test splitting (default: 'perturbation')
+    save_data : bool
+        Whether to save processed data (default: True)
+    cell_count_t : int
+        Minimum cell count threshold (default: 10)
+        
+    Returns
+    -------
+    None
+    """
     del adata.obsp 
     del adata.varm
     del adata.uns
@@ -371,8 +404,7 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
 
     expected_cols = np.unique(['perturbation_type', 'perturbation', 'is_control'] + covariates)
     assert all(col in adata.obs.columns for col in expected_cols), "Expected columns not found in adata.obs"
-    print('Processing large perturbation data...', flush=True)
-    print('Pseudobulking data...', flush=True)
+    print('Processing single-cell perturbation data...', flush=True)
     print('Covariates:', covariates, flush=True)
 
     if qc_perturbation_effect:
@@ -388,10 +420,18 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     print('Splitting data...', flush=True)
     train_group, test_group = split_func(adata)
     
-    # - adata train sc full
+    # Save train/test groups
+    if save_data:
+        np.savez(f'resources/processed_data/{save_name}_groups.npz', 
+                 train_group=train_group, 
+                 test_group=test_group,
+                 group_col=group)
+        print(f'Saved train/test groups to: resources/processed_data/{save_name}_groups.npz', flush=True)
+    
+    # Process train sc
     print('Processing adata train sc ...', flush=True)
     adata_train_sc = adata[adata.obs[group].isin(train_group)].copy()
-    assert adata_train_sc.obs['is_control'].sum()> 0, "No control data found in training set"
+    assert adata_train_sc.obs['is_control'].sum() > 0, "No control data found in training set"
     assert adata_train_sc.shape[0] > 0, "No training data found after splitting"
     adata_train_sc = add_metadata(adata_train_sc)
     print('Shape of adata_train_sc: ', adata_train_sc.shape, flush=True)
@@ -400,25 +440,68 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     del adata_train_sc
     gc.collect()
 
+    # Process test sc
     print('Processing adata test sc ...', flush=True)
     adata_test_sc = adata[adata.obs[group].isin(test_group)].copy()
     print('Shape of adata_test_sc: ', adata_test_sc.shape, flush=True)
-    assert adata_test_sc.obs['is_control'].sum()> 0, "No control data found in test set"
+    assert adata_test_sc.obs['is_control'].sum() > 0, "No control data found in test set"
     assert adata_test_sc.shape[0] > 0, "No test data found after splitting"
     adata_test_sc = add_metadata(adata_test_sc)
     if save_data:
-        adata_test_sc.write( f'resources/processed_data/{save_name}_evaluation_sc.h5ad', compression='gzip')
+        adata_test_sc.write(f'resources/processed_data/{save_name}_evaluation_sc.h5ad', compression='gzip')
     del adata_test_sc
     gc.collect()
 
+    # Process full sc
     print('Processing adata sc ...', flush=True)
     adata = add_metadata(adata)
     if save_data:
         adata.write(f'resources/processed_data/{save_name}_sc.h5ad', compression='gzip')
+        print(f'Saved processed sc data to: resources/processed_data/{save_name}_sc.h5ad', flush=True)
     
+    print('Single-cell data processing completed successfully!', flush=True)
 
-    print('Processing adata bulk ...', flush=True)
-    adata_bulk = bulkify_main(adata, covariates=covariates)
+def process_pseudobulk_data(save_name, covariates, add_metadata,
+                            group='perturbation',
+                            save_data=True,
+                            cell_count_t=10):
+    """
+    Process pseudobulk data from saved single-cell input: pseudobulking, normalization, splitting, and saving.
+    
+    Reads:
+    - Single-cell data from: resources/processed_data/{save_name}_sc.h5ad
+    - Train/test groups from: resources/processed_data/{save_name}_groups.npz
+    
+    Parameters
+    ----------
+    save_name : str
+        Prefix for saved file names (must match the one used in process_single_cell_data)
+    covariates : list
+        List of covariate columns for pseudobulking
+    add_metadata : callable
+        Function to add metadata to AnnData objects
+    group : str
+        Column name for train/test splitting (default: 'perturbation')
+    save_data : bool
+        Whether to save processed data (default: True)
+    cell_count_t : int
+        Minimum cell count threshold for pseudobulking (default: 10)
+        
+    Returns
+    -------
+    None
+    """
+    print('Loading processed single-cell data...', flush=True)
+    adata = sc.read_h5ad(f'resources/processed_data/{save_name}_sc.h5ad')
+    
+    print('Loading train/test groups...', flush=True)
+    groups_data = np.load(f'resources/processed_data/{save_name}_groups.npz', allow_pickle=True)
+    train_group = groups_data['train_group']
+    test_group = groups_data['test_group']
+    group = str(groups_data['group_col'])
+    
+    print('Processing pseudobulk data...', flush=True)
+    adata_bulk = bulkify_main(adata, covariates=covariates, cell_count_t=cell_count_t)
     adata_bulk = adata_bulk.copy()
     print('Shape of adata_bulk: ', adata_bulk.shape, flush=True)
     del adata
@@ -431,6 +514,7 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     if save_data:
         adata_bulk.write(f'resources/extended_data/{save_name}_bulk.h5ad', compression='gzip')
 
+    # Process bulk test
     print('Process adata bulk test...', flush=True)
     adata_test_bulk = adata_bulk[adata_bulk.obs[group].isin(test_group)].copy()
     assert adata_test_bulk.shape[0] > 0, "No test data found after splitting"
@@ -438,7 +522,10 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     adata_test_bulk = add_metadata(adata_test_bulk)
     if save_data:
         adata_test_bulk.write(f'resources/grn_benchmark/evaluation_data/{save_name}_bulk.h5ad', compression='gzip')
+    del adata_test_bulk
+    gc.collect()
     
+    # Process bulk train
     print('Process adata bulk train...', flush=True)
     adata_train_bulk = adata_bulk[adata_bulk.obs[group].isin(train_group)].copy()
     assert adata_train_bulk.shape[0] > 0, "No training bulk data found after splitting"
@@ -446,6 +533,76 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
     adata_train_bulk = add_metadata(adata_train_bulk)
     if save_data:
         adata_train_bulk.write(f'resources/grn_benchmark/inference_data/{save_name}_rna.h5ad', compression='gzip')
+    del adata_train_bulk
+    gc.collect()
+    
+    print('Pseudobulk data processing completed successfully!', flush=True)
+
+
+def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, split_func, 
+                                    qc_group='perturbation', 
+                                    qc_perturbation_effect=True,
+                                    group='perturbation',
+                                    save_data=True,
+                                    cell_count_t=10):
+    """
+    Wrapper function to process large perturbation datasets (single-cell and pseudobulk).
+    
+    This function orchestrates the complete processing pipeline by calling:
+    1. process_single_cell_data: handles QC, normalization, splitting, and saving of single-cell data
+    2. process_pseudobulk_data: loads saved sc data and handles pseudobulking, normalization, and saving
+    
+    Parameters
+    ----------
+    adata : AnnData
+        Input single-cell AnnData object
+    covariates : list
+        List of covariate columns for pseudobulking
+    add_metadata : callable
+        Function to add metadata to AnnData objects
+    save_name : str
+        Prefix for saved file names
+    split_func : callable
+        Function to split data into train/test groups
+    qc_group : str
+        Column name for QC grouping (default: 'perturbation')
+    qc_perturbation_effect : bool
+        Whether to perform QC on perturbation effects (default: True)
+    group : str
+        Column name for train/test splitting (default: 'perturbation')
+    save_data : bool
+        Whether to save processed data (default: True)
+    cell_count_t : int
+        Minimum cell count threshold (default: 10)
+        
+    Returns
+    -------
+    None
+    """
+    if True:
+        # Process single-cell data (saves to disk)
+        process_single_cell_data(
+            adata=adata,
+            covariates=covariates,
+            add_metadata=add_metadata,
+            save_name=save_name,
+            split_func=split_func,
+            qc_group=qc_group,
+            qc_perturbation_effect=qc_perturbation_effect,
+            group=group,
+            save_data=save_data,
+            cell_count_t=cell_count_t
+        )
+    if True:
+        # Process pseudobulk data (loads from disk)
+        process_pseudobulk_data(
+            save_name=save_name,
+            covariates=covariates,
+            add_metadata=add_metadata,
+            group=group,
+            save_data=save_data,
+            cell_count_t=cell_count_t
+        )
     
     print('Data processing completed successfully!', flush=True)
 
@@ -463,3 +620,28 @@ def bulkify_func(adata, cell_count_t=10, covariates=['cell_type', 'donor_id', 'a
     adata_bulk = adata_bulk[adata_bulk.obs['cell_count']>=cell_count_t]
     return adata_bulk
 
+
+def split_control_groups(adata, perturbation_col='perturbation', control_flag_col='is_control', new_col='perturbation_split'):
+    obs = adata.obs.copy()
+
+    # 1. Compute cell counts for each non-control perturbation
+    pert_counts = obs[~obs[control_flag_col]][perturbation_col].value_counts()
+    median_size = int(np.median(pert_counts.values))
+    print(f"Median perturbation size: {median_size}")
+
+    # 2. Identify control cells
+    control_idx = obs[obs[control_flag_col]].index
+    n_controls = len(control_idx)
+    n_groups = int(np.ceil(n_controls / median_size))
+
+    # 3. Create subgroup IDs for control cells
+    control_groups = [f"control_{i}" for i in range(n_groups)]
+    group_assignments = np.repeat(control_groups, median_size)[:n_controls]
+
+    # 4. Assign the new grouping column
+    obs[new_col] = obs[perturbation_col].astype(str)
+    obs.loc[control_idx, new_col] = group_assignments
+
+    # 5. Update adata
+    adata.obs[new_col] = obs[new_col]
+    return adata
