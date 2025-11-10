@@ -19,8 +19,8 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Run GRN Inference" href="inference.html" />
-    <link rel="prev" title="Documentation for Gene Regulatory Network Inference Benchmark (geneRNIB)" href="index.html" /> 
+    <link rel="next" title="GRN Inference" href="inference.html" />
+    <link rel="prev" title="geneRNIB: A living benchmark for gene regulatory network inference" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -50,9 +50,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#downloading-the-results">Downloading the results</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="inference.html">Run GRN Inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inference.html">GRN Inference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="evaluation.html">GRN evaluation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="extending.html">Adding GRN inference methods, metrics, and datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extending.html">Extending</a></li>
 <li class="toctree-l1"><a class="reference internal" href="leaderboard.html">Leaderboard</a></li>
 </ul>
 
@@ -82,32 +82,18 @@
              
   <section id="datasets">
 <h1>Datasets<a class="headerlink" href="#datasets" title="Link to this heading"></a></h1>
-<p>The list of datasets integrated into geneRNIB is provided below with their perturbation signatures as well as the type of perturbation used in each dataset.
-.. image:: images/datasets.png</p>
-<blockquote>
-<div><dl class="field-list simple">
-<dt class="field-odd">width<span class="colon">:</span></dt>
-<dd class="field-odd"><p>80%</p>
-</dd>
-<dt class="field-even">align<span class="colon">:</span></dt>
-<dd class="field-even"><p>center</p>
-</dd>
-</dl>
-</div></blockquote>
+<p>The list of datasets integrated into geneRNIB is provided below with their perturbation signatures as well as the type of perturbation used in each dataset.</p>
+<a class="reference internal image-reference" href="_images/datasets.png"><img alt="_images/datasets.png" class="align-center" src="_images/datasets.png" style="width: 80%;" /></a>
 <hr class="docutils" />
 <p>All datasets provide RNA data, while the <cite>OPSCA</cite> and <cite>IBD</cite> datasets also includes scATAC data.</p>
-<p>You need <cite>awscli</cite> to download the datasets.
-.. code-block:: bash</p>
-<blockquote>
-<div><p>pip install awscli</p>
-</div></blockquote>
+<p>You need <cite>awscli</cite> to download the datasets.</p>
 <section id="downloading-the-main-datasets">
 <h2>Downloading the main datasets<a class="headerlink" href="#downloading-the-main-datasets" title="Link to this heading"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>aws<span class="w"> </span>s3<span class="w"> </span>sync<span class="w"> </span>s3://openproblems-data/resources/grn/grn_benchmark<span class="w"> </span>resources/grn_benchmark/<span class="w"> </span>--no-sign-request
 </pre></div>
 </div>
 <p>This command downloads the data to <cite>resources/grn_benchmark/</cite>, which is the default directory for geneRNIB for further GRN inference and evaluation.</p>
-<p>Additionally, you will find the <cite>resources/grn_benchmark/prior/</cite> folder, which contains supplementary files such as the list of known transcription factors (TFs).
+<p>Additionally, you will find the <cite>resources/grn_benchmark/prior/</cite> folder, which contains supplementary files such as the list of known TFs.
 Files containing <cite>consensus</cite> tags are used in the evaluation metrics to standardize comparisons.</p>
 </section>
 <section id="downloading-the-extended-datasets">
@@ -142,8 +128,8 @@ These files are used for the <cite>positive control</cite> method, which incorpo
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Documentation for Gene Regulatory Network Inference Benchmark (geneRNIB)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="inference.html" class="btn btn-neutral float-right" title="Run GRN Inference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="geneRNIB: A living benchmark for gene regulatory network inference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="inference.html" class="btn btn-neutral float-right" title="GRN Inference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

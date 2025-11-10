@@ -73,8 +73,8 @@ DATASETS_CELLTYPES = {
 
 DATASETS_METRICS_EXPERIMENTAL = {
     'replogle': ['regression', 'ws_distance', 'sem', 'tf_recovery', 'tf_binding'],
-    'adamson': ['regression', 'ws_distance', 'sem', 'tf_recovery', 'tf_binding'],
-    'norman': ['regression', 'ws_distance', 'sem', 'tf_recovery', 'tf_binding'],
+    'adamson': ['regression', 'ws_distance', 'sem', 'tf_binding'],
+    'norman': ['regression', 'ws_distance', 'sem', 'tf_binding'],
     'nakatake': ['regression', 'sem'],
     'op': ['regression',  'sem',  'tf_binding', 'replica_consistency'],
     '300BCG': ['regression', 'sem',  'tf_binding', 'replica_consistency'],
@@ -86,8 +86,8 @@ DATASETS_METRICS_EXPERIMENTAL = {
 
 DATASETS_METRICS = {
     'replogle': ['regression', 'ws_distance', 'tf_recovery'],
-    'adamson': ['regression', 'ws_distance', 'tf_recovery'],
-    'norman': ['regression', 'ws_distance', 'tf_recovery'],
+    'adamson': ['regression', 'ws_distance'],
+    'norman': ['regression', 'ws_distance'],
     'nakatake': ['regression'],
     'op': ['regression'],
     '300BCG': ['regression'],

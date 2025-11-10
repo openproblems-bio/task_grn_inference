@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Adding GRN inference methods, metrics, and datasets &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
+  <title>Extending &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
@@ -44,9 +44,9 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="dataset.html">Datasets</a></li>
-<li class="toctree-l1"><a class="reference internal" href="inference.html">Run GRN Inference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="inference.html">GRN Inference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="evaluation.html">GRN evaluation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Adding GRN inference methods, metrics, and datasets</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Extending</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#add-a-grn-inference-method">Add a GRN inference method</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#add-a-grn-evaluation-metric">Add a GRN evaluation metric</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#add-a-grn-inference-and-evalaution-dataset">Add a GRN inference and evalaution dataset</a></li>
@@ -69,7 +69,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Adding GRN inference methods, metrics, and datasets</li>
+      <li class="breadcrumb-item active">Extending</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/extending.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -79,23 +79,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="adding-grn-inference-methods-metrics-and-datasets">
-<h1>Adding GRN inference methods, metrics, and datasets<a class="headerlink" href="#adding-grn-inference-methods-metrics-and-datasets" title="Link to this heading"></a></h1>
-<p>In this section, we provide instructions on how to add new GRN inference methods, metrics, and datasets to the geneRNIB platform. Installing geneRNIB is a prerequisite for integrating new features.</p>
+  <section id="extending">
+<h1>Extending<a class="headerlink" href="#extending" title="Link to this heading"></a></h1>
+<p>In this section, we provide instructions on how to add new GRN inference methods, metrics, and datasets to the geneRNIB platform.
+Installing geneRNIB is a prerequisite for integrating new features.</p>
 <section id="add-a-grn-inference-method">
 <h2>Add a GRN inference method<a class="headerlink" href="#add-a-grn-inference-method" title="Link to this heading"></a></h2>
-<p>Examples of GRN inference methods include GRNBoost2, CellOracle, and SCENIC. The list of integrated GRN inference methods can be found on the geneRNIB platform, <cite>src/methods</cite>, which are examples of how to integrate new methods for both R and Python.</p>
+<p>Examples of GRN inference methods include GRNBoost2, CellOracle, and SCENIC.
+The list of integrated GRN inference methods can be found on the geneRNIB platform, <cite>src/methods</cite>, which are examples of how to integrate new methods for both R and Python.</p>
 <p>Each method requires a <cite>config.vsh</cite> file together
 with a <cite>script.py</cite>. Additionally, the method can have extra files to store and organize the code, such as <cite>helper</cite>, which are stored in the same folder and called by the <cite>script.py</cite>.</p>
 <p>The overlook of <cite>config.vsh</cite> is as follows. However, refer to the <cite>src/methods/</cite> folder for the updated formatting.</p>
 <div class="literal-block-wrapper docutils container" id="id1">
 <div class="code-block-caption"><span class="caption-text">Example of a <cite>config.vsh</cite> file</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">__merge__</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/src/api/comp_method.yaml</span><span class="w"> </span><span class="c1"># merge with the common method schema</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">__merge__</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/src/api/comp_method.yaml</span><span class="w"> </span><span class="c1"># merge with the common method scheme</span>
 
-<span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">method_name</span>
+<span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">method_name</span><span class="w"> </span><span class="c1"># unique id for your method</span>
 <span class="w"> </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;grn_methods&quot;</span>
 <span class="w"> </span><span class="nt">info</span><span class="p">:</span>
-<span class="w"> </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pretty method name</span>
+<span class="w"> </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">pretty method name</span><span class="w"> </span><span class="c1"># e.g. &quot;GRNBoost2&quot;</span>
 <span class="w"> </span><span class="nt">summary</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;summary</span><span class="nv"> </span><span class="s">of</span><span class="nv"> </span><span class="s">your</span><span class="nv"> </span><span class="s">method&quot;</span>
 <span class="w"> </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
 <span class="w">    </span><span class="no">more about your method</span>
@@ -107,7 +109,7 @@ with a <cite>script.py</cite>. Additionally, the method can have extra files to 
 
 <span class="w"> </span><span class="nt">engines</span><span class="p">:</span>
 <span class="w">     </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker</span>
-<span class="w">         </span><span class="l l-Scalar l-Scalar-Plain">image</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/openproblems-bio/base_python:1.0.4</span><span class="w"> </span><span class="c1"># or base_R, which are base images with some essentials installed. or your own image</span>
+<span class="w">         </span><span class="l l-Scalar l-Scalar-Plain">image</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/openproblems-bio/base_python:1.0.4</span><span class="w"> </span><span class="c1"># a base docker image</span>
 <span class="w">         </span><span class="nt">__merge__</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">/src/api/base_requirements.yaml</span><span class="w"> </span><span class="c1"># merge with the base requirements schema required for the pipeline</span>
 <span class="w">         </span><span class="nt">setup</span><span class="p">:</span>
 <span class="w">         </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python</span>
@@ -117,7 +119,7 @@ with a <cite>script.py</cite>. Additionally, the method can have extra files to 
 <span class="w">     </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">executable</span>
 <span class="w">     </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nextflow</span>
 <span class="w">         </span><span class="l l-Scalar l-Scalar-Plain">directives</span><span class="p p-Indicator">:</span>
-<span class="w">         </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">midtime</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">midmem</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">midcpu</span><span class="p p-Indicator">]</span><span class="w"> </span><span class="c1"># expected resources. see _viash.yaml for their definition</span>
+<span class="w">         </span><span class="nt">label</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">midtime</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">midmem</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">midcpu</span><span class="p p-Indicator">]</span><span class="w"> </span><span class="c1"># expected resources. see scripts/labels_tw.config for their definition</span>
 </pre></div>
 </div>
 </div>
@@ -177,11 +179,37 @@ See additional Viash commands in the <a class="reference external" href="https:/
 </section>
 <section id="add-a-grn-evaluation-metric">
 <h2>Add a GRN evaluation metric<a class="headerlink" href="#add-a-grn-evaluation-metric" title="Link to this heading"></a></h2>
-<p>Under development …</p>
+<p>Similar to method integration, metrics also follow similar file formatting. See folder <cite>src/metrics/</cite> for examples.
+While new metrics could use different evaluation datasets, the current files for evaluation are located in <cite>resources/grn_benchmark/evaluation_data</cite>.
+There are three formats of datasets; single cell, (pseudo)bulk, and differential expression (de).
+The choice of the dataset depends on the evaluation metric.</p>
+<p>A few tips:</p>
+<ul class="simple">
+<li><p>use <cite>read_prediction</cite> from from <cite>src/utils/util</cite> to read the inferred GRNs and do checking the format.</p></li>
+<li><p>the metric should output a score which has to be a h5ad file. In Python, this can be done:</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">util</span> <span class="kn">import</span> <span class="n">format_save_score</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+    <span class="s1">&#39;metric_key_1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metric_value_1</span><span class="p">],</span>  <span class="c1"># submetric 1</span>
+    <span class="s1">&#39;metric_key_2&#39;</span><span class="p">:</span> <span class="p">[</span><span class="n">metric_value_2</span><span class="p">],</span>  <span class="c1"># submetric 2</span>
+<span class="p">})</span>
+<span class="n">method_id</span> <span class="o">=</span> <span class="s1">&#39;name of GRN method&#39;</span>
+<span class="n">dataset_id</span> <span class="o">=</span> <span class="s1">&#39;name of dataset used for GRN inference&#39;</span>
+<span class="n">score_file</span> <span class="o">=</span> <span class="s1">&#39;output/score.h5ad&#39;</span>
+
+<span class="n">format_save_score</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">method_id</span><span class="p">,</span> <span class="n">dataset_id</span><span class="p">,</span> <span class="n">score_file</span><span class="p">)</span>
+</pre></div>
+</div>
 </section>
 <section id="add-a-grn-inference-and-evalaution-dataset">
 <h2>Add a GRN inference and evalaution dataset<a class="headerlink" href="#add-a-grn-inference-and-evalaution-dataset" title="Link to this heading"></a></h2>
-<p>Under development …</p>
+<p>Here we explain how to integrate new datasets. All datasets are in h5ad, and the example structure of a inference or evaluation dataset can be found in <cite>resources/grn_benchmark/</cite>.
+The inference datasets are in <cite>resources/grn_benchmark/inference_data/</cite> and the evaluation datasets are in <cite>resources/grn_benchmark/evaluation_data/</cite>.
+Each dataset should have a unique <cite>dataset_id</cite>, stored in <cite>.uns[‘dataset_id’]</cite>, that will be used to identify it in the platform.
+In addition, there should be additional information stored in <cite>.uns</cite>, such as the description, reference, and normalization type.
+Also, the normalized values should be stores in <cite>layers</cite> with the name of normalization method, e.g. lognorm.</p>
 </section>
 </section>
 
