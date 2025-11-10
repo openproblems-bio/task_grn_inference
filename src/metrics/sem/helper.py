@@ -380,7 +380,10 @@ def main(par):
     np.fill_diagonal(A, 0)
 
     # Check whether the inferred GRN contains signed predictions
-    use_signs = np.any(A < 0)
+    if False:
+        use_signs = np.any(A < 0)
+    else:
+        use_signs = False
 
     # Center and scale dataset
     scaler = StandardScaler()
@@ -415,11 +418,6 @@ def main(par):
     reg_mask = np.asarray(A != 0).any(axis=1)
     ieg_mask = np.asarray([gene_name in IEG for gene_name in gene_names], dtype=bool)
     is_reporter = np.logical_or(reg_mask, ieg_mask)
-    #if np.mean(is_reporter) < 0.5 * len(is_reporter):
-    #    idx = np.where(~is_reporter)[0]
-    #    np.random.shuffle(idx)
-    #    idx = idx[:int(0.5 * len(is_reporter) - np.sum(is_reporter))]
-    #    is_reporter[idx] = True
     print(f"Proportion of reporter genes: {np.mean(is_reporter)}")
     print(f"Use regulatory modes/signs: {use_signs}")
 
@@ -467,7 +465,7 @@ def main(par):
         print(f"Final score: {score}")
 
         results = {
-            'sem_precision': [float(np.mean(scores)/( np.mean(scores_baseline) + 1e-6))],
+            'sem_precision': [float(np.log2(np.mean(scores) / (np.mean(scores_baseline) + 1e-6)))],
             'sem_balanced': [float(score)]
         }
 

@@ -17,11 +17,11 @@ mkdir -p "$save_dir"
 
 # datasets to process
 datasets=('op' 'parsebioscience' "300BCG"   "adamson"  "replogle" "xaira_HEK293T" "xaira_HCT116" "nakatake" "norman" ) #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
-datasets=('op'  ) #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
+datasets=('xaira_HEK293T'  ) #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
 
 # methods to process
 methods=( "pearson_corr" "positive_control" "negative_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
-methods=( "celloracle" )
+methods=( "pearson_corr" )
 
 # temporary file to collect CSV rows
 combined_csv="${save_dir}/reg2_scores.csv"
