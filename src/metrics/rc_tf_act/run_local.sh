@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=replica_consistency
+#SBATCH --job-name=rc_tf_act
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
@@ -12,24 +12,31 @@
 
 set -euo pipefail
 
-datasets=( "ibd" "parsebioscience" "300BCG" "op")
-methods=( "pearson_corr" "negative_control" "positive_control"  "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
-# methods=("negative_control" "pearson_corr" "positive_control")
-
-# temporary file to collect CSV rows
-save_dir='output/replica_consistency/'
+save_dir="output/rc_tf_act"
 mkdir -p "$save_dir"
+
+# Datasets to process (only those with rc_tf_ac grouping defined)
+datasets=('300BCG'  'parsebioscience'  'op')
+# datasets=('op' )
+# Methods to process
+methods=("grnboost" "pearson_corr" "negative_control" "positive_control" "ppcor" "portia" "scenic" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
+# methods=("grnboost")
+# Combined CSV for all results
+combined_csv="${save_dir}/rc_tf_act_scores.csv"
+echo "dataset,method,metric,value" > "$combined_csv"
 
 for dataset in "${datasets[@]}"; do
     echo -e "\n\nProcessing dataset: $dataset\n"
+    
+    # Create separate CSV file for each dataset
+    dataset_csv="${save_dir}/rc_tf_act_scores_${dataset}.csv"
+    echo "dataset,method,metric,value" > "$dataset_csv"
 
     evaluation_data="resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad"
-    # Create separate CSV file for each dataset
-    dataset_csv="${save_dir}/replica_consistency_scores_${dataset}.csv"
-    echo "dataset,method,metric,value" > "$dataset_csv"
+
     for method in "${methods[@]}"; do
         prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
-        score="${save_dir}/sem_${dataset}_${method}.h5ad"
+        score="${save_dir}/rc_tf_act_${dataset}_${method}.h5ad"
 
         if [[ ! -f "$prediction" ]]; then
             echo "File not found: $prediction, skipping..."
@@ -37,11 +44,12 @@ for dataset in "${datasets[@]}"; do
         fi
 
         echo -e "\nProcessing method: $method\n"
-        python src/metrics/replica_consistency/script.py \
+        python src/metrics/rc_tf_act/script.py \
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
-            --score "$score"
-
+            --score "$score" \
+            --min_targets 5
+        
         # Extract metrics from the .h5ad and append to CSV
         python -u - <<EOF
 import anndata as ad
@@ -54,12 +62,13 @@ if "metric_values" in adata.uns:
     df = pd.DataFrame({"metric": metric_names, "value": metric_values})
     df["dataset"] = "${dataset}"
     df["method"] = "${method}"
-    df = df[["dataset", "method", "metric", "value"]]  # Reorder columns to match header
+    df = df[["dataset", "method", "metric", "value"]]  # Reorder columns
     df.to_csv("${dataset_csv}", mode="a", header=False, index=False)
+    df.to_csv("${combined_csv}", mode="a", header=False, index=False)
 EOF
 
     done
     echo -e "\nResults for dataset $dataset collected in: $dataset_csv"
 done
 
-echo -e "\nAll dataset results saved in separate CSV files in: $save_dir"
+echo -e "\nAll results saved in: $combined_csv"

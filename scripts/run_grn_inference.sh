@@ -70,6 +70,7 @@ param_list:
 HERE
 fi
 
+
 # --- Function to append dataset block ---
 append_entry() {
   local dataset="$1"
@@ -114,26 +115,23 @@ HERE
   fi
 }
 
-if [[ "$DATASET" =~ ^(replogle|parsescience|xaira_HEK293T|xaira_HCT116)$ ]]; then
-  # methods="[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic]"
-  methods="[geneformer, scgpt, spearman_corr]"
+if [[ "$DATASET" =~ ^(replogle|parsebioscience|xaira_HEK293T|xaira_HCT116)$ ]]; then
+  methods="[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, geneformer, scgpt, spearman_corr]"
   append_entry "$DATASET" "$methods" 
   append_entry "$DATASET" "[scprint]" "true"
+  
   echo $methods 
 elif [ "$DATASET" = "op" ] || [ "$DATASET" = "ibd" ]; then
-  methods="[geneformer, scgpt, spearman_corr]"
-  # append_entry "$DATASET" "[pearson_corr, spearman_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint, geneformer, scgpt, figr, scenicplus, celloracle, granie, scglue]"
+  append_entry "$DATASET" "[pearson_corr, spearman_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint, geneformer, scgpt, figr, scenicplus, celloracle, granie, scglue]"
   append_entry "$DATASET" "$methods" 
   echo $methods 
 
 else
-  # methods="[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint]"
-  methods="[geneformer, scgpt, spearman_corr]"
+  methods="[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint, geneformer, scgpt, spearman_corr]"
   append_entry "$DATASET" "$methods"
   echo $methods
 fi
-# append_entry "$DATASET" "[pearson_corr, negative_control, positive_control, scprint, portia, scgpt]"
-# append_entry "$DATASET" "[scenicplus, figr, celloracle]"
+
 
 if [ "$RUN_TEST" = true ]; then
   labels_config="scripts/configs/labels_tw_test.config"
@@ -172,7 +170,6 @@ HERE
   #     --params-file ${param_file} \
   #     --labels ${RUN_ID} \
   #     --config $labels_config
-
   echo "Launching task_grn_inference on aws compute..."
   tw launch https://github.com/openproblems-bio/task_grn_inference \
     --revision build/main \

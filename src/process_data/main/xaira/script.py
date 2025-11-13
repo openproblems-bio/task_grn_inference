@@ -15,7 +15,7 @@ meta = {
 }
 sys.path.append(meta["resources_dir"])
 
-from helper_data import wrapper_large_perturbation_data, split_data_gene_perturbation
+from helper_data import wrapper_large_perturbation_data, split_data_gene_perturbation, split_control_groups
 
 par = {
     'run_test': args.run_test    
@@ -81,7 +81,11 @@ for ref_cell_type in ref_cell_types:
     
     adata.obs = adata.obs.rename({'gene_target':'perturbation'}, axis=1)[['perturbation', 'is_control', 'perturbation_type', 'sample']]
 
+    adata = split_control_groups(adata, perturbation_col='perturbation', control_flag_col='is_control', new_col='control_split')
+
     # - 
     wrapper_large_perturbation_data(adata, split_func=split_data_gene_perturbation, save_name=f'xaira_{ref_cell_type}', 
-                    add_metadata=add_metadata(ref_cell_type), covariates=['perturbation'], cell_count_t=cell_count_t)
+                    add_metadata=add_metadata(ref_cell_type), 
+                    covariates=['perturbation', 'control_split'], 
+                    cell_count_t=cell_count_t)
     

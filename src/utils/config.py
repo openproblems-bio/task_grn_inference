@@ -8,18 +8,21 @@ DATASET_GROUPS = {
         "loose_match": ["plate_name", "donor_id", "cell_type"],
         'anchors': ['donor_id', 'plate_name'], # Anchors are preanalytical/technical variables (cell type should not be an anchor)
         "cv": ["perturbation", "cell_type"],
+        "rc_tf_ac": ["perturbation", "cell_type"]
     },
     "parsebioscience": {
         "match": ["donor_id", "cell_type", "well"],
         "loose_match": ["donor_id", "cell_type"],
         'anchors': ["donor_id"],
         "cv": ["perturbation", "cell_type"],
+        "rc_tf_ac": ["perturbation", "cell_type"]
     },
     "300BCG": {
         "match": ["donor_id", "cell_type"],
         "loose_match": ["cell_type"],  
         'anchors': ["donor_id"],
         "cv": ["perturbation", "cell_type"],
+        "rc_tf_ac": ["perturbation", "cell_type"]
     },
     "ibd": {
         'anchors': ['donor_id'],

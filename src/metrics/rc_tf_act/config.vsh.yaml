@@ -1,10 +1,10 @@
 __merge__: ../../api/comp_metric.yaml
 
-name: sem
+name: rc_tf_act
 namespace: "metrics"
 info:
-  label: SEM
-  summary: Structural equation based metric
+  label: Replica Consistency TF Activity
+  summary: Replica consistency of TF activity scores
 
 resources:
   - type: python_script
@@ -17,11 +17,12 @@ resources:
 
 engines:
   - type: docker
-    image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
+    image: python:3.10
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages: []
+        packages:
+          - decoupler
         
 runners:
   - type: executable

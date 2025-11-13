@@ -60,7 +60,7 @@ def evaluate_grn(
         #consistency_scores = is_positive * C_min + is_negative * (-C_max)
         #C_mean = np.mean(C, axis=0)
     else:
-        consistency_scores = 1 - 0.5 * (C_max - C_min)
+        consistency_scores = 1 - 2 * (C_max - C_min)
     
     # Filter TFs if specified (keep the TFs with the most target genes)
     if n_tfs is None:
@@ -113,7 +113,54 @@ def evaluate_grn(
 
     return np.array(scores)
 
-def evaluate_setting(C: np.ndarray, A: np.ndarray, setting_name: str, **kwargs) -> float:
+def create_random_geneset_baseline(A: np.ndarray, n_random_sets: int = 10, random_seed: int = 42) -> np.ndarray:
+    """
+    Create a baseline by replacing each TF's targets with random gene sets of the same size.
+    This provides a better null model than shuffling the network structure.
+    
+    Parameters:
+    -----------
+    A : np.ndarray
+        Original adjacency matrix (n_genes × n_genes)
+    n_random_sets : int
+        Number of random gene sets to generate per TF (will be averaged)
+    random_seed : int
+        Random seed for reproducibility
+        
+    Returns:
+    --------
+    A_baseline : np.ndarray
+        Matrix with same shape, where each TF has random targets of the same size
+    """
+    np.random.seed(random_seed)
+    n_genes = A.shape[0]
+    A_baseline = np.zeros_like(A)
+    
+    # For each TF (each row with outgoing edges)
+    for i in range(n_genes):
+        target_idx = np.where(A[i, :] != 0)[0]
+        n_targets = len(target_idx)
+        
+        if n_targets > 0:
+            # Get original weights
+            original_weights = A[i, target_idx]
+            
+            # Sample random targets (excluding self-regulation)
+            available_genes = np.setdiff1d(np.arange(n_genes), [i])
+            
+            # Make sure we have enough genes to sample from
+            n_to_sample = min(n_targets, len(available_genes))
+            if n_to_sample > 0:
+                random_targets = np.random.choice(available_genes, size=n_to_sample, replace=False)
+                
+                # Assign the original weights to random targets
+                # Use the strongest weights for consistency
+                sorted_weights = np.sort(np.abs(original_weights))[::-1][:n_to_sample]
+                A_baseline[i, random_targets] = sorted_weights * np.sign(original_weights[:n_to_sample])
+    
+    return A_baseline
+
+def evaluate_setting(C: np.ndarray, A: np.ndarray, setting_name: str, use_random_baseline: bool = True, **kwargs) -> float:
     # Whether or not to take into account the regulatory modes (enhancer/inhibitor)
     signed = kwargs.get("signed", True)
 
@@ -121,11 +168,19 @@ def evaluate_setting(C: np.ndarray, A: np.ndarray, setting_name: str, **kwargs) 
     scores = evaluate_grn(C, A, **kwargs)
 
     # Create baseline model
-    try:
-        A_baseline = create_grn_baseline(A)
-    except:
-        print("Failed to create baseline GRN. Using zero baseline.")
-        raise ValueError("Failed to create baseline GRN.")
+    print(f"\nCreating baseline...")
+    if use_random_baseline:
+        print("Using random gene set baseline (same size as original targets)")
+        A_baseline = create_random_geneset_baseline(A, n_random_sets=1, random_seed=42)
+        print(f"Baseline - Num edges: {np.sum(A_baseline != 0)}")
+    else:
+        print("Using network shuffling baseline (preserves degree distribution)")
+        try:
+            A_baseline = create_grn_baseline(A)
+            print(f"Baseline - Num edges: {np.sum(A_baseline != 0)}")
+        except:
+            print("Failed to create baseline GRN. Using zero baseline.")
+            raise ValueError("Failed to create baseline GRN.")
 
     # Evaluate baseline GRN
     scores_baseline = evaluate_grn(C, A_baseline, **kwargs)
@@ -201,7 +256,7 @@ def main(par):
     gene_names = gene_names[gene_mask]
 
     # Whether or not to take into account the regulatory modes (enhancer/inhibitor)
-    signed = np.any(A < 0)
+    signed = False
 
     # Remove self-regulations
     np.fill_diagonal(A, 0)
@@ -225,7 +280,8 @@ def main(par):
         C = np.asarray(C)
 
         tftg_results.append(evaluate_setting(
-            C, A, "tftg",
+            C, A, "TF→TG (regulatory links)",
+            use_random_baseline=True,  # Use random gene set baseline
             tf_tg=True,
             tg_tg=False,
             n_tfs=100,
@@ -234,7 +290,8 @@ def main(par):
         ))
 
         tgtg_results.append(evaluate_setting(
-            C, A, "tgtg",
+            C, A, "TG↔TG (target co-regulation)",
+            use_random_baseline=True,  # Use random gene set baseline
             tf_tg=False,
             tg_tg=True,
             n_tfs=100, 
