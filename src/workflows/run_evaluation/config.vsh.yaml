@@ -120,9 +120,10 @@ dependencies:
   - name: metrics/ws_distance
   - name: metrics/tf_recovery
   - name: metrics/tf_binding
-  - name: metrics/replica_consistency
+  # - name: metrics/replica_consistency
+  - name: metrics/rc_tf_act
   - name: metrics/sem
-  - name: metrics/all_metrics
+  # - name: metrics/all_metrics
   - name: utils/extract_uns_metadata
     repository: openproblems
 

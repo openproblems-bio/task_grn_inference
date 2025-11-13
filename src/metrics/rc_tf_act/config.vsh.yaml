@@ -21,8 +21,7 @@ engines:
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages:
-          - decoupler
+        packages: [ decoupler==2.1.1]
         
 runners:
   - type: executable
