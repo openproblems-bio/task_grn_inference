@@ -17,10 +17,10 @@ mkdir -p "$save_dir"
 
 # datasets to process
 datasets=( "replogle" "xaira_HEK293T" "xaira_HCT116" "nakatake" "norman" "adamson" 'parsebioscience' 'op' "300BCG") #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
-
+datasets=( "op" "300BCG" "parsebioscience" "ibd" )
 # methods to process
 methods=( "pearson_corr" "positive_control" "negative_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
-# methods=( "pearson_corr" "positive_control" "negative_control")
+# methods=( "grnboost")
 
 # temporary file to collect CSV rows
 combined_csv="${save_dir}/vc_scores.csv"
@@ -31,6 +31,7 @@ for dataset in "${datasets[@]}"; do
     echo -e "\n\nProcessing dataset: $dataset\n"
 
     evaluation_data="resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad"
+    # evaluation_data="resources/extended_data/replogle_train_sc.h5ad"
 
     for method in "${methods[@]}"; do
         prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
@@ -42,10 +43,10 @@ for dataset in "${datasets[@]}"; do
         fi
 
         # echo -e "\nProcessing method: $method\n"
-        # python src/metrics/vc/script.py \
-        #     --prediction "$prediction" \
-        #     --evaluation_data "$evaluation_data" \
-        #     --score "$score"
+        python src/metrics/vc/script.py \
+            --prediction "$prediction" \
+            --evaluation_data "$evaluation_data" \
+            --score "$score"
 
         python -u - <<EOF
 import anndata as ad

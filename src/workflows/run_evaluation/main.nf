@@ -19,7 +19,8 @@ workflow run_wf {
     tf_recovery,
     tf_binding,
     rc_tf_act,
-    sem
+    sem,
+    vc
   ]
     
   /***************************

@@ -27,6 +27,6 @@ aws s3 sync  resources/extended_data/ s3://openproblems-data/resources/grn/exten
 # aws s3 sync resources/results/experiment  s3://openproblems-data/resources/grn/results/experiment --delete 
 # aws s3 sync resources_test  s3://openproblems-data/resources_test/grn/ --delete 
 # aws s3 sync  resources/grn_benchmark/ground_truth s3://openproblems-data/resources/grn/grn_benchmark/ground_truth 
-# aws s3 sync  resources/grn_benchmark/ s3://openproblems-data/resources/grn/grn_benchmark/ --delete
+aws s3 sync  resources/grn_benchmark/ s3://openproblems-data/resources/grn/grn_benchmark/ --delete
 
 # aws s3 sync   s3://openproblems-data/resources/grn/grn_benchmark/ground_truth resources/grn_benchmark/ground_truth --no-sign-request

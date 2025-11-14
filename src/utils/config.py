@@ -26,6 +26,9 @@ DATASET_GROUPS = {
     },
     "ibd": {
         'anchors': ['donor_id'],
+        "match": ["donor_id", "cell_type"],
+        "loose_match": ["donor_id", "cell_type"],
+        "cv": ["perturbation", "cell_type"],
     },
     "replogle": {
         "match": ["perturbation"],
@@ -88,16 +91,16 @@ DATASETS_METRICS_EXPERIMENTAL = {
 }
 
 DATASETS_METRICS = {
-    'replogle': ['regression', 'ws_distance', 'tf_recovery'],
-    'adamson': ['regression', 'ws_distance'],
-    'norman': ['regression', 'ws_distance'],
+    'replogle': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding'],
+    'adamson': ['regression', 'ws_distance', 'tf_binding'],
+    'norman': ['regression', 'ws_distance', 'tf_binding'],
     'nakatake': ['regression'],
-    'op': ['regression'],
-    '300BCG': ['regression'],
-    'ibd': ['regression'],
-    'parsebioscience': ['regression'],
-    'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery'],
-    'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery'],
+    'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding'],
+    '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding'],
+    'ibd': ['regression', 'vc', 'tf_binding'],
+    'parsebioscience': ['regression', 'vc', 'rc_tf_act', 'tf_binding'],
+    'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding'],
+    'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding'],
 }
 
 METRICS_DATASETS = {}
