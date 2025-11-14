@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name=vc
+#SBATCH --job-name=rc
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
-#SBATCH --time=10:00:00
+#SBATCH --time=30:00:00
 #SBATCH --mem=250GB
 #SBATCH --partition=cpu
 #SBATCH --mail-type=END,FAIL      
@@ -12,41 +12,38 @@
 
 set -euo pipefail
 
-save_dir="output/vc"
-mkdir -p "$save_dir"
-
-# datasets to process
-datasets=( "replogle" "xaira_HEK293T" "xaira_HCT116" "nakatake" "norman" "adamson" 'parsebioscience' 'op' "300BCG") #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
-
-# methods to process
-methods=( "pearson_corr" "positive_control" "negative_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
-# methods=( "pearson_corr" "positive_control" "negative_control")
+# datasets=( "ibd" "parsebioscience" "300BCG" "op")
+datasets=('op') 
+methods=( "pearson_corr" "negative_control" "positive_control"  "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
+# methods=("grnboost")
 
 # temporary file to collect CSV rows
-combined_csv="${save_dir}/vc_scores.csv"
-echo "dataset,method,metric,value" > "$combined_csv"
-
+save_dir='output/rc/'
+mkdir -p "$save_dir"
 
 for dataset in "${datasets[@]}"; do
     echo -e "\n\nProcessing dataset: $dataset\n"
 
     evaluation_data="resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad"
-
+    # Create separate CSV file for each dataset
+    dataset_csv="${save_dir}/rc_scores_${dataset}.csv"
+    echo "dataset,method,metric,value" > "$dataset_csv"
     for method in "${methods[@]}"; do
         prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
-        score="${save_dir}/vc_${dataset}_${method}.h5ad"
+        score="${save_dir}/sem_${dataset}_${method}.h5ad"
 
         if [[ ! -f "$prediction" ]]; then
             echo "File not found: $prediction, skipping..."
             continue
         fi
 
-        # echo -e "\nProcessing method: $method\n"
-        # python src/metrics/vc/script.py \
-        #     --prediction "$prediction" \
-        #     --evaluation_data "$evaluation_data" \
-        #     --score "$score"
+        echo -e "\nProcessing method: $method\n"
+        python src/metrics/rc/script.py \
+            --prediction "$prediction" \
+            --evaluation_data "$evaluation_data" \
+            --score "$score"
 
+        # Extract metrics from the .h5ad and append to CSV
         python -u - <<EOF
 import anndata as ad
 import pandas as pd
@@ -59,10 +56,11 @@ if "metric_values" in adata.uns:
     df["dataset"] = "${dataset}"
     df["method"] = "${method}"
     df = df[["dataset", "method", "metric", "value"]]  # Reorder columns to match header
-    df.to_csv("${combined_csv}", mode="a", header=False, index=False)
+    df.to_csv("${dataset_csv}", mode="a", header=False, index=False)
 EOF
 
     done
+    echo -e "\nResults for dataset $dataset collected in: $dataset_csv"
 done
 
-echo -e "\nAll results collected in: $combined_csv"
+echo -e "\nAll dataset results saved in separate CSV files in: $save_dir"

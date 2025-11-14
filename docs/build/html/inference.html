@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Run GRN Inference &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
+  <title>GRN Inference &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=80d5e7a1" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
 
@@ -44,12 +44,13 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="dataset.html">Datasets</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Run GRN Inference</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#grn-inference-without-method-integration">GRN Inference Without Method Integration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GRN Inference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#grn-inference-using-integrated-methods">GRN inference using integrated methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#grn-inference-without-method-integration">GRN inference without method integration</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="evaluation.html">GRN evaluation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="extending.html">Adding GRN inference methods, metrics, and datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extending.html">Extending</a></li>
 <li class="toctree-l1"><a class="reference internal" href="leaderboard.html">Leaderboard</a></li>
 </ul>
 
@@ -67,7 +68,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
-      <li class="breadcrumb-item active">Run GRN Inference</li>
+      <li class="breadcrumb-item active">GRN Inference</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/inference.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -77,30 +78,35 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
              
-  <section id="run-grn-inference">
-<h1>Run GRN Inference<a class="headerlink" href="#run-grn-inference" title="Link to this heading"></a></h1>
-<section id="grn-inference-without-method-integration">
-<h2>GRN Inference Without Method Integration<a class="headerlink" href="#grn-inference-without-method-integration" title="Link to this heading"></a></h2>
-<p>In this section, we explain how to access datasets and infer gene regulatory networks (GRNs) using your method without integrating it into geneRNIB.</p>
-<p>### 1. Download the Inference Datasets
-The inference datasets can be downloaded and stored in the <cite>resources/grn_benchmark/inference_data</cite> directory using the following command:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>aws<span class="w"> </span>s3<span class="w"> </span>sync<span class="w"> </span>s3://openproblems-data/resources/grn/grn_benchmark/inference_data<span class="w"> </span>resources/grn_benchmark/inference_data<span class="w"> </span>--no-sign-request
+  <section id="grn-inference">
+<h1>GRN Inference<a class="headerlink" href="#grn-inference" title="Link to this heading"></a></h1>
+<section id="grn-inference-using-integrated-methods">
+<h2>GRN inference using integrated methods<a class="headerlink" href="#grn-inference-using-integrated-methods" title="Link to this heading"></a></h2>
+<p>To infer a GRN for a given dataset (e.g. op) using our integration methods, after installation of geneRNBI, run the following command (e.g. Pearson correlation):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>viash<span class="w"> </span>run<span class="w"> </span>src/methods/pearson_corr/config.vsh.yaml<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--rna<span class="w"> </span>resources_test/grn_benchmark/inference_data/op_rna.h5ad<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--prediction<span class="w"> </span>output/net.h5ad<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--tf_all<span class="w"> </span>resources_test/grn_benchmark/prior/tf_all.csv
 </pre></div>
 </div>
-<p>### 2. GRN Inference Guidelines
-When performing GRN inference, please consider the following:</p>
+<p>See <cite>src/methods/</cite> for the list of currently integrated methods.</p>
+</section>
+<section id="grn-inference-without-method-integration">
+<h2>GRN inference without method integration<a class="headerlink" href="#grn-inference-without-method-integration" title="Link to this heading"></a></h2>
+<p>Download the inference datasets from the <cite>dataset</cite> page. For each dataset, perform GRN inference using your algorithm. Consider the following:</p>
 <ul>
 <li><p>We evaluate only the <strong>top TF-gene pairs</strong>, currently limited to <strong>50,000 edges</strong>, ranked by their assigned weight.</p></li>
 <li><p>The inferred network should follow this format:</p>
-<p><strong>Columns:</strong>
-- <cite>source</cite>: Transcription factor (TF)
-- <cite>target</cite>: Target gene
-- <cite>weight</cite>: Regulatory importance/likelihood score</p>
+<p><strong>Columns:</strong></p>
+<ul class="simple">
+<li><p><cite>source</cite>: Transcription factor (TF)</p></li>
+<li><p><cite>target</cite>: Target gene</p></li>
+<li><p><cite>weight</cite>: Regulatory importance/likelihood score</p></li>
+</ul>
 </li>
 </ul>
-<p>### 3. Saving the Inferred Network
-Since geneRNIB works with <strong>AnnData</strong>, your inferred network should be saved in this format.</p>
-<p>#### <strong>Python Example: Saving a Network with AnnData</strong>
+<p>Since geneRNIB works with <strong>AnnData</strong>, your inferred network should be saved in this format.
+See <cite>resources/grn_benchmark/prior/collectri.h5ad</cite> for an example of the expected format.
 If your network is a pandas DataFrame with three columns (<cite>source</cite>, <cite>target</cite>, <cite>weight</cite>), you can save it as follows:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">anndata</span> <span class="k">as</span> <span class="nn">ad</span>
 
@@ -109,8 +115,8 @@ If your network is a pandas DataFrame with three columns (<cite>source</cite>, <
 <span class="n">output</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span>
     <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">uns</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;method_id&quot;</span><span class="p">:</span> <span class="s2">&quot;grnboost2&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dataset_id&quot;</span><span class="p">:</span> <span class="s2">&quot;norman&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;method_id&quot;</span><span class="p">:</span> <span class="s2">&quot;your_method_name&quot;</span><span class="p">,</span> <span class="c1"># e.g. &quot;grnboost2&quot;</span>
+        <span class="s2">&quot;dataset_id&quot;</span><span class="p">:</span> <span class="s2">&quot;dataset_name&quot;</span><span class="p">,</span>  <span class="c1">#e.g. &quot;replogle&quot;</span>
         <span class="s2">&quot;prediction&quot;</span><span class="p">:</span> <span class="n">net</span><span class="p">[[</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">]]</span>
     <span class="p">}</span>
 <span class="p">)</span>
@@ -118,8 +124,7 @@ If your network is a pandas DataFrame with three columns (<cite>source</cite>, <
 <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;save_to_file.h5ad&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>#### <strong>R Example: Saving a Network with AnnData</strong>
-For R, use the following approach:</p>
+<p>For R, use the following approach:</p>
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">zellkonverter</span><span class="p">)</span>
 
 <span class="n">net</span><span class="o">$</span><span class="n">weight</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.character</span><span class="p">(</span><span class="n">net</span><span class="o">$</span><span class="n">weight</span><span class="p">)</span>
@@ -127,8 +132,8 @@ For R, use the following approach:</p>
 <span class="n">output</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">AnnData</span><span class="p">(</span>
 <span class="w">    </span><span class="n">X</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">matrix</span><span class="p">(</span><span class="n">nrow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">ncol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">),</span>
 <span class="w">    </span><span class="n">uns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span>
-<span class="w">        </span><span class="n">method_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;grnboost2&quot;</span><span class="p">,</span>
-<span class="w">        </span><span class="n">dataset_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;norman&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="n">method_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;your_method_name&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1"># e.g. &quot;grnboost2&quot;</span>
+<span class="w">        </span><span class="n">dataset_id</span><span class="w"> </span><span class="o">=</span><span class="s">&quot;dataset_name&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1"># e.g. &quot;replogle&quot;</span>
 <span class="w">        </span><span class="n">prediction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">net</span><span class="p">[,</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;source&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;target&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;weight&quot;</span><span class="p">)]</span>
 <span class="w">    </span><span class="p">)</span>
 <span class="p">)</span>
@@ -136,8 +141,7 @@ For R, use the following approach:</p>
 <span class="n">output</span><span class="o">$</span><span class="nf">write_h5ad</span><span class="p">(</span><span class="s">&quot;save_to_file.h5ad&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">compression</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;gzip&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>### Next Steps
-Once you have inferred GRNs for one or more datasets, proceed to the next section to run the evaluation.</p>
+<p>Once you have inferred GRNs for one or more datasets, proceed to the next section to run the evaluation.</p>
 </section>
 </section>
 

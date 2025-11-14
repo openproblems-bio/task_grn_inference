@@ -37,7 +37,6 @@ def calculate_ulm_score(tf_mat, tf_grn, min_targets=3):
     pval = adata.obsm['padj_ulm'].iloc[0, 0]
 
     
-    
     return act, pval
 
 def create_random_network(tf, n_targets, all_genes):

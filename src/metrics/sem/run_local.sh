@@ -16,10 +16,11 @@ save_dir="output/sem"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=('replogle') #"300BCG" "ibd" 'parsebioscience'
+datasets=('op' 'replogle' "300BCG" "ibd" 'parsebioscience' ) #"300BCG" "ibd" 'parsebioscience'
+datasets=('op')
 # methods to process
 methods=("grnboost" "pearson_corr" "negative_control" "positive_control" "ppcor" "portia" "scenic" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
-methods=("pearson_corr")
+methods=("grnboost")
 # temporary file to collect CSV rows
 combined_csv="${save_dir}/sem_scores.csv"
 echo "dataset,method,metric,value" > "$combined_csv"

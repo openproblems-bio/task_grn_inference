@@ -19,9 +19,9 @@ set -e
 
 # echo "Processing opsca"
 # python src/process_data/main/opsca/script.py 
-echo "Processing replogle"
+# echo "Processing replogle"
 # python src/process_data/main/replogle/script.py  #--run_test  #--run_test
-# echo "Processing xaira"
+echo "Processing xaira"
 python src/process_data/main/xaira/script.py    #--run_test
 
 

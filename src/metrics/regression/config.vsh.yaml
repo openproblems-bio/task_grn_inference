@@ -40,18 +40,6 @@ resources:
   - path: helper.py
   - path: /src/utils/util.py
     dest: util.py
-  - path: /src/metrics/regression/helper.py
-    dest: helper_regression.py
-  - path: /src/metrics/ws_distance/helper.py
-    dest: helper_ws_distance.py
-  - path: /src/metrics/sem/helper.py
-    dest: helper_sem.py
-  - path: /src/metrics/tf_recovery/helper.py
-    dest: helper_tf_recovery.py
-  - path: /src/metrics/tf_binding/helper.py
-    dest: helper_tf_binding.py
-  - path: /src/metrics/replica_consistency/helper.py
-    dest: helper_replica_consistency.py
 
 
 engines:

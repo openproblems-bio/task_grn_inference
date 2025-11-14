@@ -145,7 +145,7 @@ append_entry() {
     
 HERE
   # Additional fields for specific datasets
-  if [[ "$dataset" =~ ^(norman|replogle|adamson|xaira_HCT116|xaira_HEK293T)$ ]]; then
+  if [[ "$dataset" =~ ^(replogle|xaira_HCT116|xaira_HEK293T)$ ]]; then
     cat >> "$param_local" << HERE
     ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
     ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv

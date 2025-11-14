@@ -13,19 +13,15 @@ argument_parser = argparse.ArgumentParser(description='Process Replogle data for
 argument_parser.add_argument('--run_test', action='store_true', help='Run in test mode with a subset of data.')
 args = argument_parser.parse_args() 
 
-
-
-## VIASH START
 par =  {'run_test': args.run_test}
-## VIASH END
-
 meta = {
-    'resources_dir': 'src/process_data/'
+    'resources_dir': 'src/process_data/',
+    'utils_dir': 'src/utils/'
 }
 sys.path.append(meta["resources_dir"])
+sys.path.append(meta["utils_dir"])
 
 from helper_data import wrapper_large_perturbation_data
-
 
 def split_data_perturbation(adata: ad.AnnData, train_share=.5):
     obs = adata.obs
@@ -97,48 +93,65 @@ def format_adata(adata):
     adata.obs['perturbation_type'] = 'cytokine'
     return adata
 def main():
-    print('Loading data of parsebioscience', flush=True)
-    adata = ad.read_h5ad('/vol/projects/CIIM/perturbation_data/Parse_10M_PBMC_cytokines.h5ad', backed='r')
-    group_keys = ['cell_type', 'cytokine', 'donor', 'bc1_well']
-    for key in group_keys:
-        adata.obs[key] = adata.obs[key].astype('str')
-
-    adata.obs['group'] = adata.obs[group_keys].astype(str).agg('_'.join, axis=1)
-
-    if par['run_test']:  # to test
-       
-        print('Using test data', flush=True)
-        # Select one cell per group
-        cell_indices = adata.obs.groupby('group').apply(lambda x: x.index[0]).values
-
-        # Create a new AnnData object in memory (small)
-        adata_subset = adata[cell_indices, :].to_memory()    
-        adata = adata_subset
-        cell_count_t = 1
-        
-    else:
-        print('Using full data', flush=True)
-        adata = adata.to_memory()
-        cell_count_t = 10
-    # QC
-    min_genes = 10
-    min_cell = adata.obs['bc1_well'].nunique()*10
-
-    adata = adata[(adata.obs['gene_count']>min_genes) & (adata.obs['gene_count']<5000), adata.var['n_cells']>min_cell]
-
-    # format the adata
-    adata = format_adata(adata)
-
-
-    # send to main function
-    wrapper_large_perturbation_data(adata, split_func=split_data_perturbation,
-        covariates=['cell_type_minor', 'perturbation', 'donor_id', 'well'], 
-        add_metadata=add_metadata,
-        save_name='parsebioscience',
-        qc_perturbation_effect=False
+    if True:
+        print('Loading data of parsebioscience', flush=True)
+        adata = ad.read_h5ad('/vol/projects/CIIM/perturbation_data/Parse_10M_PBMC_cytokines.h5ad', backed='r')
+        group_keys = ['cell_type', 'cytokine', 'donor', 'bc1_well']
+        for key in group_keys:
+            adata.obs[key] = adata.obs[key].astype('str')
+        adata.obs['group'] = adata.obs[group_keys].astype(str).agg('_'.join, axis=1)
+        if par['run_test']: 
+            print('Using test data', flush=True)
+            cell_indices = adata.obs.groupby('group').apply(lambda x: x.index[0]).values
+            adata_subset = adata[cell_indices, :].to_memory()    
+            adata = adata_subset
+            cell_count_t = 1
+        else:
+            print('Using full data', flush=True)
+            adata = adata.to_memory()
+            cell_count_t = 10
+        min_genes = 10
+        min_cell = adata.obs['bc1_well'].nunique()*10
+        adata = adata[(adata.obs['gene_count']>min_genes) & (adata.obs['gene_count']<5000), adata.var['n_cells']>min_cell]
+        adata = format_adata(adata)
+        wrapper_large_perturbation_data(adata, split_func=split_data_perturbation,
+            covariates=['cell_type_minor', 'perturbation', 'donor_id', 'well'], 
+            add_metadata=add_metadata,
+            save_name='parsebioscience',
+            qc_perturbation_effect=False
+            )
+    if True:
+        print('Loading processed data of parsebioscience for HVG selection', flush=True)
+        print('Reading gene annotation', flush=True)
+        from util import read_gene_annotation
+        df = read_gene_annotation('resources/supp_data/gencode.v47.annotation.gtf.gz')
+        annotated_genes = df['gene_name'].unique().tolist()
+        print('Process inference data', flush=True)
+        adata = ad.read_h5ad('resources/grn_benchmark/inference_data/parsebioscience_rna.h5ad')
+        adata.X = adata.layers["lognorm"]
+        adata = adata[:, [gene for gene in adata.var_names if gene in annotated_genes]]
+        # Find top 15,000 highly variable genes
+        sc.pp.highly_variable_genes(
+            adata,
+            n_top_genes=15000,
+            flavor="seurat_v3",
+            subset=True
         )
-
-
+        selected_genes = adata.var_names.tolist()
+        adata.write_h5ad('resources/grn_benchmark/inference_data/parsebioscience_rna.h5ad', compression='gzip')
+        print('process evaluation data', flush=True)
+        adata = ad.read_h5ad('resources/grn_benchmark/evaluation_data/parsebioscience_bulk.h5ad')
+        adata.X = adata.layers["lognorm"]
+        adata = adata[:, [gene for gene in selected_genes if gene in adata.var_names]]  
+        adata.write_h5ad('resources/grn_benchmark/evaluation_data/parsebioscience_bulk.h5ad', compression='gzip')
+        print('process sc training data', flush=True)
+        adata = ad.read_h5ad('resources/extended_data/parsebioscience_train_sc.h5ad')
+        adata = adata[:, [gene for gene in selected_genes if gene in adata.var_names]]
+        adata.write_h5ad('resources/extended_data/parsebioscience_train_sc.h5ad', compression='gzip')
+        print('Process bulk adata', flush=True)
+        adata = ad.read_h5ad('resources/extended_data/parsebioscience_bulk.h5ad')
+        adata = adata[:, [gene for gene in selected_genes if gene in adata.var_names]]
+        adata.write_h5ad('resources/extended_data/parsebioscience_bulk.h5ad', compression='gzip')
 if __name__ == '__main__':
     main()
 

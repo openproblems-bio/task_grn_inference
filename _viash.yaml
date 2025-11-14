@@ -16,6 +16,9 @@ label: GRN Inference
 summary: |
   Article: [geneRNIB: a living benchmark for gene regulatory network inference](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1)
 
+  Leaderboard: 
+  [Leaderboard](https://genernib-documentation.readthedocs.io/en/latest/leaderboard.html)
+
   Documentation: 
   [geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)
 

@@ -324,6 +324,7 @@ def evaluate_grn(
     coefficients = np.array(coefficients)
     #return np.nan_to_num(coefficients, nan=0)
     return coefficients
+    
 
 
 def main(par):
