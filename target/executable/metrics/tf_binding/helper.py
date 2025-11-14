@@ -41,6 +41,12 @@ def main_sub(par):
         if k == 0:
             continue
         
+        # Calculate expected precision by random chance
+        precision_random = k / n_targets
+        
+        # Calculate maximum achievable precision (all k targets are available)
+        precision_max = 1.0  # Best case: all top-k predictions are correct
+        
         if tf in prediction['source'].unique():
             pred_edges = prediction[prediction['source'] == tf]
             
@@ -49,26 +55,41 @@ def main_sub(par):
             tp_n = len(gt_targets & top_k_t)  
             top_k_t_n = len(top_k_t)  # Actual number returned (might be less than k)          
             
-            # Calculate precision and recall scores
-            precision_score = tp_n / top_k_t_n if top_k_t_n > 0 else 0.0             
-            precision_baseline = k / n_targets
+            # Calculate raw precision
+            precision_raw = tp_n / top_k_t_n if top_k_t_n > 0 else 0.0
+            
+            # Calculate normalized precision: (observed - random) / (max - random)
+            # This gives: 0 = random performance, 1 = perfect performance, negative = worse than random
+            precision_normalized = (precision_raw - precision_random) / (precision_max - precision_random)
+            
             
         else:
-            precision_score = 0.0
+            # TF not in prediction: assign 0 score
+            precision_raw = 0.0
+            precision_normalized = 0.0
         
+
         scores_model.append({
             'source': tf,
-            'precision_score': precision_score,
+            'precision_raw': precision_raw,
+            'precision_random': precision_random,
+            'precision_normalized': precision_normalized,
             'n_targets_pos': k,
             'is_predicted': tf in prediction['source'].unique()
         })
 
     scores_df = pd.DataFrame(scores_model)
+    
+    # Calculate different aggregations
     available_tfs = scores_df[scores_df['is_predicted'] == True]
-    precision_available = available_tfs['precision_score'].mean() if len(available_tfs) > 0 else 0.0
     
-    precision_all = scores_df['precision_score'].mean()
+    # Raw scores (backward compatibility)
+    precision_raw_available = available_tfs['precision_raw'].mean() if len(available_tfs) > 0 else 0.0
+    precision_raw_all = scores_df['precision_raw'].mean()
     
+    # Normalized scores (new approach)
+    precision_norm_available = available_tfs['precision_normalized'].mean() if len(available_tfs) > 0 else 0.0
+    precision_norm_all = scores_df['precision_normalized'].mean()
     
     # Calculate TF coverage statistics
     n_tfs_in_gt = len(tfs_in_gt)
@@ -79,9 +100,10 @@ def main_sub(par):
     n_tfs_evaluated = len(tfs_evaluated)
     
     summary_df = pd.DataFrame([{
-        'tfb_grn': precision_available,
-        'tfb_all': precision_all,
-
+        'tfb_grn_raw': precision_raw_available,
+        'tfb_all_raw': precision_raw_all,
+        'tfb_grn_norm': precision_norm_available,
+        'tfb_all_norm': precision_norm_all,
         'n_tfs_in_gt': n_tfs_in_gt,
         'n_tfs_to_evaluate': n_tfs_to_evaluate,
         'n_tfs_in_grn': n_tfs_in_grn,
@@ -106,13 +128,20 @@ def main(par):
     weights = result_df['n_tfs_to_evaluate'].values
     total_weight = weights.sum()
     
-    tfb_grn_weighted = (result_df['tfb_grn'] * weights).sum() / total_weight
-    tfb_all_weighted = (result_df['tfb_all'] * weights).sum() / total_weight
+    # Raw scores (backward compatibility)
+    tfb_grn_raw_weighted = (result_df['tfb_grn_raw'] * weights).sum() / total_weight
+    tfb_all_raw_weighted = (result_df['tfb_all_raw'] * weights).sum() / total_weight
+    
+    # Normalized scores (new approach)
+    tfb_grn_norm_weighted = (result_df['tfb_grn_norm'] * weights).sum() / total_weight
+    tfb_all_norm_weighted = (result_df['tfb_all_norm'] * weights).sum() / total_weight
     
     
     result_df = pd.DataFrame([{
-        'tfb_grn': tfb_grn_weighted,
-        'tfb_all': tfb_all_weighted
+        'tfb_grn': tfb_grn_raw_weighted,  # Keep for backward compatibility
+        'tfb_all': tfb_all_raw_weighted,  # Keep for backward compatibility
+        'tfb_grn_norm': tfb_grn_norm_weighted,  # New normalized score
+        'tfb_all_norm': tfb_all_norm_weighted   # New normalized score
     }])
     
     return result_df

@@ -101,9 +101,11 @@ def bulkify_main(adata, cell_count_t=10, covariates=['cell_type', 'donor_id', 'a
 
 def split_data_gene_perturbation(adata: ad.AnnData, train_share=.5):
     tf_all = np.loadtxt('resources/grn_benchmark/prior/tf_all.csv', dtype=str)
-    obs = adata.obs
-    obs['is_tf'] = obs['perturbation'].isin(tf_all)
     
+    # Create is_tf column directly on adata.obs to avoid view/copy issues
+    adata.obs['is_tf'] = adata.obs['perturbation'].isin(tf_all)
+    
+    obs = adata.obs
     unique_perts = obs['perturbation'].unique()
     tf_perturbs = obs[obs['is_tf']]['perturbation'].unique()
     non_tf_perturbs = np.setdiff1d(unique_perts, tf_perturbs)

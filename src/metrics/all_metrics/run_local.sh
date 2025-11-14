@@ -55,6 +55,21 @@ done
 if [[ -n "$layer" ]]; then
   echo "Layer is set to: $layer"
 fi
+if [[ -n "$reg_type" ]]; then
+  echo "Regression type is set to: $reg_type"
+fi
+if [[ -n "$num_workers" ]]; then
+  echo "Number of workers is set to: $num_workers"
+fi
+if [[ -n "$dataset" ]]; then
+  echo "Dataset is set to: $dataset"
+fi
+if [[ -n "$prediction" ]]; then
+  echo "Prediction file is set to: $prediction"
+fi
+if [[ -n "$score" ]]; then
+  echo "Score file is set to: $score"
+fi
 
 # # Check required args
 # if [[ -z "${dataset:-}" || -z "${prediction:-}" || -z "${score:-}" ]]; then

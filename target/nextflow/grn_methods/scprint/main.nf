@@ -3557,14 +3557,14 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scprint",
     "viash_version" : "0.9.4",
-    "git_commit" : "d57df342a097cf8e96df7a10db9ce8e886880bcc",
+    "git_commit" : "6e8d3f64dddb383b25ac903893149a5b9c6206b7",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
     "name" : "task_grn_inference",
     "version" : "build_main",
     "label" : "GRN Inference",
-    "summary" : "Article: [geneRNIB: a living benchmark for gene regulatory network inference](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1)\n\nDocumentation: \n[geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)\n\nIf you use this framework, please cite\n\n```\n  @article{nourisa2025genernib,\n    title={geneRNIB: a living benchmark for gene regulatory network inference},\n    author={Nourisa, Jalil and Passemiers, Antoine and Stock, Marco and Zeller-Plumhoff, Berit and Cannoodt, Robrecht and Arnold, Christian and Tong, Alexander and Hartford, Jason and Scialdone, Antonio and Moreau, Yves and others},\n    journal={bioRxiv},\n    pages={2025--02},\n    year={2025},\n    publisher={Cold Spring Harbor Laboratory}\n  }\n```\n",
+    "summary" : "Article: [geneRNIB: a living benchmark for gene regulatory network inference](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1)\n\nLeaderboard: \n[Leaderboard](https://genernib-documentation.readthedocs.io/en/latest/leaderboard.html)\n\nDocumentation: \n[geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)\n\nIf you use this framework, please cite\n\n```\n  @article{nourisa2025genernib,\n    title={geneRNIB: a living benchmark for gene regulatory network inference},\n    author={Nourisa, Jalil and Passemiers, Antoine and Stock, Marco and Zeller-Plumhoff, Berit and Cannoodt, Robrecht and Arnold, Christian and Tong, Alexander and Hartford, Jason and Scialdone, Antonio and Moreau, Yves and others},\n    journal={bioRxiv},\n    pages={2025--02},\n    year={2025},\n    publisher={Cold Spring Harbor Laboratory}\n  }\n```\n",
     "description" : "\ngeneRNIB is a living benchmark platform for GRN inference. This platform\nprovides curated datasets for GRN inference and evaluation, standardized\nevaluation protocols and metrics, computational infrastructure, and a\ndynamically updated leaderboard to track state-of-the-art methods. It\nruns novel GRNs in the cloud, offers competition scores, and stores them\nfor future comparisons, reflecting new developments over time.\n\nThe platform supports the integration of new inference methods, datasets\nand protocols. When a new feature is added, previously evaluated GRNs\nare re-assessed, and the leaderboard is updated accordingly. The aim is\nto evaluate both the accuracy and completeness of inferred GRNs. It is\ndesigned for both single-modality and multi-omics GRN inference.\n",
     "info" : {
       "image" : "thumbnail.svg",

@@ -16,13 +16,12 @@ save_dir="output/tf_binding"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=(  'replogle' 'norman'  'adamson'  "300BCG" "ibd" 'parsebioscience' 'op' ) #'xaira_HCT116'
-# datasets=( 'xaira_HEK293T') 
+datasets=(  'replogle' 'norman'  'adamson'  "300BCG" "ibd" 'parsebioscience' 'op' 'xaira_HCT116' 'xaira_HEK293T' ) #'xaira_HCT116'
+# datasets=(  'replogle'  ) #'xaira_HCT116'
 resources_dir="resources"
-# methods to process - focus on granie for debugging
-
 methods=(  "pearson_corr" "negative_control" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie" "scgpt" "geneformer")
-# methods=( "pearson_corr" "negative_control" "positive_control" )
+# methods=( "grnboost" )
+
 for dataset in "${datasets[@]}"; do
     echo -e "\n\nProcessing dataset: $dataset\n"
 

@@ -50,6 +50,7 @@ for key, value in vars(args).items():
 
 if __name__ == "__main__":
     
+    
     output = main_sem(par)
     
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']

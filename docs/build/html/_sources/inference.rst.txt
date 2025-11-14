@@ -1,33 +1,35 @@
-Run GRN Inference
+GRN Inference
 =================
 
-GRN Inference Without Method Integration
+GRN inference using integrated methods
 ----------------------------------------
-
-In this section, we explain how to access datasets and infer gene regulatory networks (GRNs) using your method without integrating it into geneRNIB.
-
-### 1. Download the Inference Datasets  
-The inference datasets can be downloaded and stored in the `resources/grn_benchmark/inference_data` directory using the following command:
+To infer a GRN for a given dataset (e.g. op) using our integration methods, after installation of geneRNBI, run the following command (e.g. Pearson correlation):
 
 .. code-block:: bash
 
-   aws s3 sync s3://openproblems-data/resources/grn/grn_benchmark/inference_data resources/grn_benchmark/inference_data --no-sign-request
+  viash run src/methods/pearson_corr/config.vsh.yaml -- \
+    --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \
+    --prediction output/net.h5ad \
+    --tf_all resources_test/grn_benchmark/prior/tf_all.csv
 
-### 2. GRN Inference Guidelines  
-When performing GRN inference, please consider the following:  
+See `src/methods/` for the list of currently integrated methods.
+
+
+GRN inference without method integration
+----------------------------------------
+Download the inference datasets from the `dataset` page. For each dataset, perform GRN inference using your algorithm. Consider the following:  
 
 - We evaluate only the **top TF-gene pairs**, currently limited to **50,000 edges**, ranked by their assigned weight.  
 - The inferred network should follow this format:  
 
   **Columns:**  
+  
   - `source`: Transcription factor (TF)  
   - `target`: Target gene  
   - `weight`: Regulatory importance/likelihood score  
 
-### 3. Saving the Inferred Network  
 Since geneRNIB works with **AnnData**, your inferred network should be saved in this format.
-
-#### **Python Example: Saving a Network with AnnData**  
+See `resources/grn_benchmark/prior/collectri.h5ad` for an example of the expected format.
 If your network is a pandas DataFrame with three columns (`source`, `target`, `weight`), you can save it as follows:
 
 .. code-block:: python
@@ -39,15 +41,14 @@ If your network is a pandas DataFrame with three columns (`source`, `target`, `w
    output = ad.AnnData(
        X=None,
        uns={
-           "method_id": "grnboost2",
-           "dataset_id": "norman",
+           "method_id": "your_method_name", # e.g. "grnboost2"
+           "dataset_id": "dataset_name",  #e.g. "replogle"
            "prediction": net[["source", "target", "weight"]]
        }
    )
 
    output.write("save_to_file.h5ad")
 
-#### **R Example: Saving a Network with AnnData**  
 For R, use the following approach:
 
 .. code-block:: r
@@ -59,13 +60,12 @@ For R, use the following approach:
    output <- AnnData(
        X = matrix(nrow = 0, ncol = 0),
        uns = list(
-           method_id = "grnboost2",
-           dataset_id = "norman",
+           method_id = "your_method_name", # e.g. "grnboost2"
+           dataset_id ="dataset_name",  # e.g. "replogle"
            prediction = net[, c("source", "target", "weight")]
        )
    )
 
    output$write_h5ad("save_to_file.h5ad", compression = "gzip")
 
-### Next Steps  
 Once you have inferred GRNs for one or more datasets, proceed to the next section to run the evaluation.

@@ -218,13 +218,13 @@ dependencies:
 - name: "metrics/tf_binding"
   repository:
     type: "local"
-- name: "metrics/replica_consistency"
+- name: "metrics/vc"
+  repository:
+    type: "local"
+- name: "metrics/rc_tf_act"
   repository:
     type: "local"
 - name: "metrics/sem"
-  repository:
-    type: "local"
-- name: "metrics/all_metrics"
   repository:
     type: "local"
 - name: "utils/extract_uns_metadata"
@@ -278,22 +278,23 @@ build_info:
   output: "target/executable/workflows/run_grn_evaluation"
   executable: "target/executable/workflows/run_grn_evaluation/run_grn_evaluation"
   viash_version: "0.9.4"
-  git_commit: "d57df342a097cf8e96df7a10db9ce8e886880bcc"
+  git_commit: "6e8d3f64dddb383b25ac903893149a5b9c6206b7"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
   dependencies:
   - "target/nextflow/metrics/regression"
   - "target/nextflow/metrics/ws_distance"
   - "target/nextflow/metrics/tf_recovery"
   - "target/nextflow/metrics/tf_binding"
-  - "target/nextflow/metrics/replica_consistency"
+  - "target/nextflow/metrics/vc"
+  - "target/nextflow/metrics/rc_tf_act"
   - "target/nextflow/metrics/sem"
-  - "target/nextflow/metrics/all_metrics"
   - "target/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata"
 package_config:
   name: "task_grn_inference"
   version: "build_main"
   label: "GRN Inference"
   summary: "Article: [geneRNIB: a living benchmark for gene regulatory network inference](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1)\n\
+    \nLeaderboard: \n[Leaderboard](https://genernib-documentation.readthedocs.io/en/latest/leaderboard.html)\n\
     \nDocumentation: \n[geneRNBI-doc](https://genernib-documentation.readthedocs.io/en/latest/)\n\
     \nIf you use this framework, please cite\n\n```\n  @article{nourisa2025genernib,\n\
     \    title={geneRNIB: a living benchmark for gene regulatory network inference},\n\

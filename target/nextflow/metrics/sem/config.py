@@ -8,21 +8,27 @@ DATASET_GROUPS = {
         "loose_match": ["plate_name", "donor_id", "cell_type"],
         'anchors': ['donor_id', 'plate_name'], # Anchors are preanalytical/technical variables (cell type should not be an anchor)
         "cv": ["perturbation", "cell_type"],
+        "rc_tf_ac": ["perturbation", "cell_type"]
     },
     "parsebioscience": {
         "match": ["donor_id", "cell_type", "well"],
         "loose_match": ["donor_id", "cell_type"],
         'anchors': ["donor_id"],
         "cv": ["perturbation", "cell_type"],
+        "rc_tf_ac": ["perturbation", "cell_type"]
     },
     "300BCG": {
         "match": ["donor_id", "cell_type"],
         "loose_match": ["cell_type"],  
         'anchors': ["donor_id"],
         "cv": ["perturbation", "cell_type"],
+        "rc_tf_ac": ["perturbation", "cell_type"]
     },
     "ibd": {
         'anchors': ['donor_id'],
+        "match": ["donor_id", "cell_type"],
+        "loose_match": ["donor_id", "cell_type"],
+        "cv": ["perturbation", "cell_type"],
     },
     "replogle": {
         "match": ["perturbation"],
@@ -73,8 +79,8 @@ DATASETS_CELLTYPES = {
 
 DATASETS_METRICS_EXPERIMENTAL = {
     'replogle': ['regression', 'ws_distance', 'sem', 'tf_recovery', 'tf_binding'],
-    'adamson': ['regression', 'ws_distance', 'sem', 'tf_recovery', 'tf_binding'],
-    'norman': ['regression', 'ws_distance', 'sem', 'tf_recovery', 'tf_binding'],
+    'adamson': ['regression', 'ws_distance', 'sem', 'tf_binding'],
+    'norman': ['regression', 'ws_distance', 'sem', 'tf_binding'],
     'nakatake': ['regression', 'sem'],
     'op': ['regression',  'sem',  'tf_binding', 'replica_consistency'],
     '300BCG': ['regression', 'sem',  'tf_binding', 'replica_consistency'],
@@ -85,16 +91,16 @@ DATASETS_METRICS_EXPERIMENTAL = {
 }
 
 DATASETS_METRICS = {
-    'replogle': ['regression', 'ws_distance', 'tf_recovery'],
-    'adamson': ['regression', 'ws_distance', 'tf_recovery'],
-    'norman': ['regression', 'ws_distance', 'tf_recovery'],
+    'replogle': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding'],
+    'adamson': ['regression', 'ws_distance', 'tf_binding'],
+    'norman': ['regression', 'ws_distance', 'tf_binding'],
     'nakatake': ['regression'],
-    'op': ['regression'],
-    '300BCG': ['regression'],
-    'ibd': ['regression'],
-    'parsebioscience': ['regression'],
-    'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery'],
-    'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery'],
+    'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding'],
+    '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding'],
+    'ibd': ['regression', 'vc', 'tf_binding'],
+    'parsebioscience': ['regression', 'vc', 'rc_tf_act', 'tf_binding'],
+    'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding'],
+    'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding'],
 }
 
 METRICS_DATASETS = {}

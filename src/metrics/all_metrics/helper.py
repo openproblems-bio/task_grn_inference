@@ -34,11 +34,16 @@ try:
 except:
     from tf_binding.helper import main as main_tf_binding
 
-
 try:
-    from replica_consistency_helper import main as main_replica_consistency
+    from rc_tf_act_helper import main as main_rc_tf_act
 except:
-    from replica_consistency.helper import main as main_replica_consistency
+    from rc_tf_act.helper import main as main_rc_tf_act
+
+
+# try:
+#     from replica_consistency_helper import main as main_replica_consistency
+# except:
+#     from replica_consistency.helper import main as main_replica_consistency
 
 from config import DATASETS_METRICS
 
@@ -88,11 +93,23 @@ def ws_distance_metric(par, dataset_id):
             return output
     return None
 
+def vc_metric(par, dataset_id):
+    if dataset_id in DATASETS_METRICS:
+        if 'vc' in DATASETS_METRICS[dataset_id]:
+            output = main_vc(par)
+            return output
+    return None
+def rc_tf_act_metric(par, dataset_id):
+    if dataset_id in DATASETS_METRICS:
+        if 'rc_tf_act' in DATASETS_METRICS[dataset_id]:
+            output = main_rc_tf_act(par)
+            return output
+    return None
 
 def main(par):
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     rr_store = []
-    metrics = [reg_metric, ws_distance_metric, sem_metric, tf_rec_metric, replica_consistency_metric, tf_binding_metric]
+    metrics = [reg_metric, ws_distance_metric, tf_rec_metric, rc_tf_act_metric, tf_binding_metric, vc_metric]
     # metrics = [tf_binding_metric, sem_metric, replica_consistency_metric]
 
     for metric in metrics:
