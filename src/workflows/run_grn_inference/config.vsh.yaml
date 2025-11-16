@@ -96,7 +96,7 @@ dependencies:
   - name: grn_methods/portia
   - name: grn_methods/grnboost
   - name: grn_methods/scenic
-  - name: grn_methods/ppcor 
+  # - name: grn_methods/ppcor 
   - name: grn_methods/scprint 
   - name: grn_methods/scgpt
   - name: grn_methods/geneformer

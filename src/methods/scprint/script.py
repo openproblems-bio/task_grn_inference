@@ -89,7 +89,10 @@ adata = preprocessor(adata)
 if adata[0].X.sum() != int(adata[0].X.sum()):
     print("WARNING: you are not using count data")
     print("reverting logp1")
-    adata.X = csr_matrix(np.power(adata.X.todense(), 2) - 1)
+    if issparse(adata.X):
+        adata.X = csr_matrix(np.expm1(adata.X.toarray()))
+    else:
+        adata.X = csr_matrix(np.expm1(adata.X))
 
 
 model_checkpoint_file = par["model"]

@@ -40,6 +40,12 @@ except:
     from rc_tf_act.helper import main as main_rc_tf_act
 
 
+try:
+    from vc_helper import main as main_vc
+except:
+    from vc.helper import main as main_vc
+
+
 # try:
 #     from replica_consistency_helper import main as main_replica_consistency
 # except:

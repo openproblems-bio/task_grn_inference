@@ -5,7 +5,7 @@ methods = [
   negative_control, 
   positive_control, 
   portia, 
-  ppcor, 
+  // ppcor, 
   scenic, 
   scenicplus, 
   scprint, 
