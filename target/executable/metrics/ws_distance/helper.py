@@ -49,8 +49,9 @@ def main(par):
                 ws_distance['tf'] = tf
                 ws_distance['theta'] = 'ws_raw'
                 scores_raw.append(ws_distance)
-        scores_raw = pd.concat(scores_raw).reset_index(drop=True)
-        scores_model.append(scores_raw)
+        if len(scores_raw)>0:
+            scores_raw = pd.concat(scores_raw).reset_index(drop=True)
+            scores_model.append(scores_raw)
     for theta in consensus['theta'].unique():
         print('Processing theta:', theta, flush=True)
         consensus_theta = consensus[consensus['theta'] == theta]

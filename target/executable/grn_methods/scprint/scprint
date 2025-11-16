@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   python -c 'from scdataloader.utils import populate_my_ontology; populate_my_ontology()'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-11-14T11:50:31Z"
+LABEL org.opencontainers.image.created="2025-11-16T06:37:37Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="6e8d3f64dddb383b25ac903893149a5b9c6206b7"
+LABEL org.opencontainers.image.revision="7664bc2a3ebd945b5e691261529bbc3370c31809"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1520,7 +1520,10 @@ adata = preprocessor(adata)
 if adata[0].X.sum() != int(adata[0].X.sum()):
     print("WARNING: you are not using count data")
     print("reverting logp1")
-    adata.X = csr_matrix(np.power(adata.X.todense(), 2) - 1)
+    if issparse(adata.X):
+        adata.X = csr_matrix(np.expm1(adata.X.toarray()))
+    else:
+        adata.X = csr_matrix(np.expm1(adata.X))
 
 
 model_checkpoint_file = par["model"]

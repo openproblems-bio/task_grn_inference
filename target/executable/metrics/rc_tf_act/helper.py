@@ -329,11 +329,6 @@ def main(par):
     dataset_id = adata.uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     
-    # Check if dataset supports this metric
-    if 'rc_tf_ac' not in DATASET_GROUPS.get(dataset_id, {}):
-        raise ValueError(f"Dataset {dataset_id} does not support rc_tf_act metric. "
-                        f"Missing 'rc_tf_ac' in DATASET_GROUPS configuration.")
-    
     # Manage layer
     layer = manage_layer(adata, par)
     X = adata.layers[layer]
@@ -359,8 +354,8 @@ def main(par):
     # Configuration for three scores: precision, balanced, recall
     # Each uses different TF set size and edges per TF
     score_configs = [
-        {'name': 'precision', 'n_tfs': 10, 'n_edges_per_tf': 50},
-        {'name': 'balanced', 'n_tfs': 100, 'n_edges_per_tf': 100},
+        {'name': 'precision', 'n_tfs': 20, 'n_edges_per_tf': 100},
+        {'name': 'balanced', 'n_tfs': 100, 'n_edges_per_tf': 200},
         {'name': 'recall', 'n_tfs': 300, 'n_edges_per_tf': 1000}
     ]
     

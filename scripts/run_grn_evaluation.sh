@@ -145,10 +145,13 @@ append_entry() {
     
 HERE
   # Additional fields for specific datasets
-  if [[ "$dataset" =~ ^(replogle|xaira_HCT116|xaira_HEK293T)$ ]]; then
+  if [[ "$dataset" =~ ^(replogle|xaira_HCT116|xaira_HEK293T|norman|adamson)$ ]]; then
     cat >> "$param_local" << HERE
     ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
     ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv
+HERE
+  if [[ "$dataset" =~ ^(replogle|xaira_HCT116|xaira_HEK293T)$ ]]; then
+    cat >> "$param_local" << HERE
     evaluation_data_de: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_de.h5ad
 HERE
   fi
@@ -159,6 +162,7 @@ HERE
     ground_truth_chipatlas: ${resources_dir}/grn_benchmark/ground_truth/${cell_type}_chipatlas.csv
     ground_truth_remap: ${resources_dir}/grn_benchmark/ground_truth/${cell_type}_remap.csv
 HERE
+  fi
   fi
 }
 

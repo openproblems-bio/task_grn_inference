@@ -2,6 +2,9 @@
 This file centralizes the grouping specifications used across metrics.
 """
 
+METHODS = ['pearson_corr', 'negative_control', 'positive_control', 'grnboost', 'ppcor', 'portia', 'scenic', 'geneformer', 'scgpt', 'spearman_corr', 'scenicplus', 'celloracle', 'figr', 'granie', 'scglue', 'scprint']
+
+
 DATASET_GROUPS = {
     "op": {
         "match": ["plate_name", "donor_id", "cell_type", "well"],
@@ -62,6 +65,8 @@ DATASET_GROUPS = {
     },
 
 }
+
+DATASETS = list(DATASET_GROUPS.keys())
 
 DATASETS_CELLTYPES = {
     "replogle": "K562",

@@ -3436,7 +3436,7 @@ meta = [
       "directives" : {
         "label" : [
           "midtime",
-          "midmem",
+          "highmem",
           "midcpu",
           "biggpu"
         ],
@@ -3491,7 +3491,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scgpt",
     "viash_version" : "0.9.4",
-    "git_commit" : "6e8d3f64dddb383b25ac903893149a5b9c6206b7",
+    "git_commit" : "7664bc2a3ebd945b5e691261529bbc3370c31809",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3707,7 +3707,10 @@ if __name__ == "__main__":
     if adata[0].X.sum() != int(adata[0].X.sum()):
         print("WARNING: you are not using count data")
         print("reverting logp1")
-        adata.X = csr_matrix(np.power(adata.X.todense(), 2) - 1)
+        if issparse(adata.X):
+            adata.X = csr_matrix(np.expm1(adata.X.toarray()))
+        else:
+            adata.X = csr_matrix(np.expm1(adata.X))
 
     adata.var["symbol"] = adata.var.index
     if "gene_id" not in adata.var.columns:
@@ -3755,8 +3758,14 @@ if __name__ == "__main__":
     for i, cell_type in enumerate(adata.obs["cell_type"].unique()):
         print(cell_type)
         subadata = adata[adata.obs["cell_type"] == cell_type]
+        # Handle both sparse and dense matrices
+        gene_sums = subadata.X.sum(0)
+        if hasattr(gene_sums, 'A1'):
+            gene_sums = gene_sums.A1
+        else:
+            gene_sums = np.asarray(gene_sums).ravel()
         subadata = subadata[
-            : par["max_cells"], subadata.X.sum(0).A1.argsort()[::-1][: par["num_genes"]]
+            : par["max_cells"], gene_sums.argsort()[::-1][: par["num_genes"]]
         ]
         subadata, net = generate_grn(
             model,
@@ -4183,7 +4192,7 @@ meta["defaults"] = [
   },
   "label" : [
     "midtime",
-    "midmem",
+    "highmem",
     "midcpu",
     "biggpu"
   ],

@@ -752,7 +752,6 @@ VIASH_DEP_METRICS_WS_DISTANCE="$VIASH_META_RESOURCES_DIR/../../../nextflow/metri
 VIASH_DEP_GRN_METHODS_PORTIA="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/portia/main.nf"
 VIASH_DEP_GRN_METHODS_GRNBOOST="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/grnboost/main.nf"
 VIASH_DEP_GRN_METHODS_SCENIC="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/scenic/main.nf"
-VIASH_DEP_GRN_METHODS_PPCOR="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/ppcor/main.nf"
 VIASH_DEP_GRN_METHODS_SCPRINT="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/scprint/main.nf"
 VIASH_DEP_GRN_METHODS_SCGPT="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/scgpt/main.nf"
 VIASH_DEP_GRN_METHODS_GENEFORMER="$VIASH_META_RESOURCES_DIR/../../../nextflow/grn_methods/geneformer/main.nf"
@@ -793,7 +792,7 @@ methods = [
   negative_control, 
   positive_control, 
   portia, 
-  ppcor, 
+  // ppcor, 
   scenic, 
   scenicplus, 
   scprint, 

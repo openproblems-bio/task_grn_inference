@@ -3269,12 +3269,6 @@ meta = [
       }
     },
     {
-      "name" : "grn_methods/ppcor",
-      "repository" : {
-        "type" : "local"
-      }
-    },
-    {
       "name" : "grn_methods/scprint",
       "repository" : {
         "type" : "local"
@@ -3420,7 +3414,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_inference",
     "viash_version" : "0.9.4",
-    "git_commit" : "6e8d3f64dddb383b25ac903893149a5b9c6206b7",
+    "git_commit" : "7664bc2a3ebd945b5e691261529bbc3370c31809",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3535,7 +3529,6 @@ include { extract_uns_metadata } from "${meta.root_dir}/dependencies/github/open
 include { portia } from "${meta.resources_dir}/../../../nextflow/grn_methods/portia/main.nf"
 include { grnboost } from "${meta.resources_dir}/../../../nextflow/grn_methods/grnboost/main.nf"
 include { scenic } from "${meta.resources_dir}/../../../nextflow/grn_methods/scenic/main.nf"
-include { ppcor } from "${meta.resources_dir}/../../../nextflow/grn_methods/ppcor/main.nf"
 include { scprint } from "${meta.resources_dir}/../../../nextflow/grn_methods/scprint/main.nf"
 include { scgpt } from "${meta.resources_dir}/../../../nextflow/grn_methods/scgpt/main.nf"
 include { geneformer } from "${meta.resources_dir}/../../../nextflow/grn_methods/geneformer/main.nf"
@@ -3559,7 +3552,7 @@ methods = [
   negative_control, 
   positive_control, 
   portia, 
-  ppcor, 
+  // ppcor, 
   scenic, 
   scenicplus, 
   scprint, 
