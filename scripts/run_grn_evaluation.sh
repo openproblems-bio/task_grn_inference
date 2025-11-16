@@ -150,19 +150,20 @@ HERE
     ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
     ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv
 HERE
-  if [[ "$dataset" =~ ^(replogle|xaira_HCT116|xaira_HEK293T)$ ]]; then
-    cat >> "$param_local" << HERE
+    if [[ "$dataset" =~ ^(replogle|xaira_HCT116|xaira_HEK293T)$ ]]; then
+      cat >> "$param_local" << HERE
     evaluation_data_de: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_de.h5ad
 HERE
+    fi
   fi
 
+  # Add ground truth files for all datasets except nakatake
   if [[ "$dataset" != "nakatake" ]]; then
     cat >> "$param_local" << HERE
     ground_truth_unibind: ${resources_dir}/grn_benchmark/ground_truth/${cell_type}_unibind.csv
     ground_truth_chipatlas: ${resources_dir}/grn_benchmark/ground_truth/${cell_type}_chipatlas.csv
     ground_truth_remap: ${resources_dir}/grn_benchmark/ground_truth/${cell_type}_remap.csv
 HERE
-  fi
   fi
 }
 
@@ -180,7 +181,6 @@ else
       "granie"
       "figr"
       "grnboost"
-      "ppcor"
       "portia"
       "scenic"
       "scprint"
@@ -204,7 +204,6 @@ else
   printf '%s\n' "${available_methods[@]}" | sort -u
 
 fi
-
 
 # Append final fields
 if [ "$RUN_LOCAL" = true ]; then
