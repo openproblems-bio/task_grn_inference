@@ -116,18 +116,18 @@ HERE
 }
 
 if [[ "$DATASET" =~ ^(replogle|parsebioscience|xaira_HEK293T|xaira_HCT116)$ ]]; then
-  methods="[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, geneformer, scgpt, spearman_corr]"
+  methods="[pearson_corr, negative_control, positive_control, grnboost, portia, scenic, geneformer, scgpt, spearman_corr]"
   append_entry "$DATASET" "$methods" 
   append_entry "$DATASET" "[scprint]" "true"
   
   echo $methods 
 elif [ "$DATASET" = "op" ] || [ "$DATASET" = "ibd" ]; then
-  append_entry "$DATASET" "[pearson_corr, spearman_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint, geneformer, scgpt, figr, scenicplus, celloracle, granie, scglue]"
+  methods="[pearson_corr, spearman_corr, negative_control, positive_control, grnboost, portia, scenic, scprint, geneformer, scgpt, figr, scenicplus, celloracle, granie, scglue]" 
   append_entry "$DATASET" "$methods" 
   echo $methods 
 
 else
-  methods="[pearson_corr, negative_control, positive_control, grnboost, ppcor, portia, scenic, scprint, geneformer, scgpt, spearman_corr]"
+  methods="[pearson_corr, negative_control, positive_control, grnboost, portia, scenic, scprint, geneformer, scgpt, spearman_corr]"
   append_entry "$DATASET" "$methods"
   echo $methods
 fi
