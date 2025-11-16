@@ -456,9 +456,9 @@ RUN pip install --upgrade pip && \
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics sem"
-LABEL org.opencontainers.image.created="2025-11-16T06:37:35Z"
+LABEL org.opencontainers.image.created="2025-11-16T09:02:01Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="7664bc2a3ebd945b5e691261529bbc3370c31809"
+LABEL org.opencontainers.image.revision="00c145b1218ccea5d1e0293b01a2819492266bec"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

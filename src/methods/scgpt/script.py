@@ -68,6 +68,7 @@ if __name__ == "__main__":
     if adata[0].X.sum() != int(adata[0].X.sum()):
         print("WARNING: you are not using count data")
         print("reverting logp1")
+        from scipy.sparse import issparse
         if issparse(adata.X):
             adata.X = csr_matrix(np.expm1(adata.X.toarray()))
         else:

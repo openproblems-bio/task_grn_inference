@@ -3557,7 +3557,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scprint",
     "viash_version" : "0.9.4",
-    "git_commit" : "7664bc2a3ebd945b5e691261529bbc3370c31809",
+    "git_commit" : "00c145b1218ccea5d1e0293b01a2819492266bec",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3795,6 +3795,7 @@ adata = preprocessor(adata)
 if adata[0].X.sum() != int(adata[0].X.sum()):
     print("WARNING: you are not using count data")
     print("reverting logp1")
+    from scipy.sparse import issparse
     if issparse(adata.X):
         adata.X = csr_matrix(np.expm1(adata.X.toarray()))
     else:

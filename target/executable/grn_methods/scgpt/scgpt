@@ -453,9 +453,9 @@ pip install ipykernel pandas scanpy numba "numpy<1.24" torchtext==0.17.0 scib "s
 cd scGPT && pip install -e . --no-deps
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scgpt"
-LABEL org.opencontainers.image.created="2025-11-16T06:37:35Z"
+LABEL org.opencontainers.image.created="2025-11-16T09:02:01Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="7664bc2a3ebd945b5e691261529bbc3370c31809"
+LABEL org.opencontainers.image.revision="00c145b1218ccea5d1e0293b01a2819492266bec"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1418,6 +1418,7 @@ if __name__ == "__main__":
     if adata[0].X.sum() != int(adata[0].X.sum()):
         print("WARNING: you are not using count data")
         print("reverting logp1")
+        from scipy.sparse import issparse
         if issparse(adata.X):
             adata.X = csr_matrix(np.expm1(adata.X.toarray()))
         else:
