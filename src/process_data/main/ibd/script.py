@@ -165,11 +165,11 @@ adata_rna_bulk.layers['lognorm'] = adata_rna_bulk.X.copy()
 adata_rna_bulk = add_metadata(adata_rna_bulk)
 
 
-
-adata_train_rna.write(f'resources/grn_benchmark/inference_data/ibd_rna.h5ad')
-adata_train_atac.write(f'resources/grn_benchmark/inference_data/ibd_atac.h5ad')
-adata_test_rna_bulk.write(f'resources/grn_benchmark/evaluation_data/ibd_bulk.h5ad')
-adata_test_rna.write(f'resources/processed_data/ibd_sc.h5ad')
-adata_rna_bulk.write(f'resources/extended_data/ibd_bulk.h5ad')
+for disease in ['CD', 'UC']:
+    adata_train_rna[adata_train_rna.obs['disease']==disease].write(f'resources/grn_benchmark/inference_data/ibd_{disease}_rna.h5ad')
+    adata_train_atac[adata_train_atac.obs['disease']==disease].write(f'resources/grn_benchmark/inference_data/ibd_{disease}_atac.h5ad')
+    adata_test_rna_bulk[adata_test_rna_bulk.obs['disease']==disease].write(f'resources/grn_benchmark/evaluation_data/ibd_{disease}_bulk.h5ad')
+    adata_test_rna[adata_test_rna.obs['disease']==disease].write(f'resources/processed_data/ibd_{disease}_sc.h5ad')
+    adata_rna_bulk[adata_rna_bulk.obs['disease']==disease].write(f'resources/extended_data/ibd_{disease}_bulk.h5ad')
 
 print('Done')

@@ -21,11 +21,11 @@ set -e
 # python src/process_data/main/opsca/script.py 
 # echo "Processing replogle"
 # python src/process_data/main/replogle/script.py  #--run_test  #--run_test
-echo "Processing xaira"
-python src/process_data/main/xaira/script.py    #--run_test
+# echo "Processing xaira"
+# python src/process_data/main/xaira/script.py    #--run_test
 
 
 # echo "Processing 300BCG"
 # python src/process_data/main/300BCG/script.py 
-# echo "Processing IBD"
-# python src/process_data/main/ibd/script.py 
+echo "Processing IBD"
+python src/process_data/main/ibd/script.py 

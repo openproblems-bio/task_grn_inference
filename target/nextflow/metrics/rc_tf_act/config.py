@@ -2,8 +2,7 @@
 This file centralizes the grouping specifications used across metrics.
 """
 
-METHODS = ['pearson_corr', 'negative_control', 'positive_control', 'grnboost', 'ppcor', 'portia', 'scenic', 'geneformer', 'scgpt', 'spearman_corr', 'scenicplus', 'celloracle', 'figr', 'granie', 'scglue', 'scprint']
-
+METHODS = ['positive_control', 'pearson_corr', 'grnboost', 'ppcor', 'portia', 'scenic', 'geneformer', 'scgpt', 'ppcor', 'scenicplus', 'celloracle', 'figr', 'granie', 'scglue', 'scprint',  'negative_control']
 
 DATASET_GROUPS = {
     "op": {
@@ -27,7 +26,13 @@ DATASET_GROUPS = {
         "cv": ["perturbation", "cell_type"],
         "rc_tf_ac": ["perturbation", "cell_type"]
     },
-    "ibd": {
+    "ibd_UC": {
+        'anchors': ['donor_id'],
+        "match": ["donor_id", "cell_type"],
+        "loose_match": ["donor_id", "cell_type"],
+        "cv": ["perturbation", "cell_type"],
+    },
+    "ibd_CD": {
         'anchors': ['donor_id'],
         "match": ["donor_id", "cell_type"],
         "loose_match": ["donor_id", "cell_type"],
@@ -77,35 +82,23 @@ DATASETS_CELLTYPES = {
     "op": "PBMC",
     "parsebioscience": "PBMC",
     "300BCG": "PBMC",
-    "ibd": "PBMC",
+    "ibd_UC": "PBMC",
+    "ibd_CD": "PBMC",
     "nakatake": ""
 }
 
-
-DATASETS_METRICS_EXPERIMENTAL = {
-    'replogle': ['regression', 'ws_distance', 'sem', 'tf_recovery', 'tf_binding'],
-    'adamson': ['regression', 'ws_distance', 'sem', 'tf_binding'],
-    'norman': ['regression', 'ws_distance', 'sem', 'tf_binding'],
-    'nakatake': ['regression', 'sem'],
-    'op': ['regression',  'sem',  'tf_binding', 'replica_consistency'],
-    '300BCG': ['regression', 'sem',  'tf_binding', 'replica_consistency'],
-    'ibd': ['regression', 'sem',  'tf_binding', 'replica_consistency'],
-    'parsebioscience': ['regression','sem', 'tf_binding', 'replica_consistency'],
-    'xaira_HEK293T': ['regression', 'ws_distance', 'sem', 'tf_recovery', 'tf_binding'],
-    'xaira_HCT116': ['regression', 'ws_distance', 'sem', 'tf_recovery', 'tf_binding'],
-}
-
 DATASETS_METRICS = {
-    'replogle': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding'],
-    'adamson': ['regression', 'ws_distance', 'tf_binding'],
-    'norman': ['regression', 'ws_distance', 'tf_binding'],
-    'nakatake': ['regression'],
-    'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding'],
-    '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding'],
-    'ibd': ['regression', 'vc', 'tf_binding'],
-    'parsebioscience': ['regression', 'vc', 'rc_tf_act', 'tf_binding'],
-    'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding'],
-    'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding'],
+    'replogle': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem'],
+    'adamson': ['regression', 'ws_distance', 'tf_binding', 'sem'],
+    'norman': ['regression', 'ws_distance', 'tf_binding', 'sem'],
+    'nakatake': ['regression', 'sem'],
+    'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression'],
+    '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression'],
+    'ibd_UC': ['regression', 'vc', 'tf_binding', 'sem', 'anchor_regression'],
+    'ibd_CD': ['regression', 'vc', 'tf_binding', 'sem', 'anchor_regression'],
+    'parsebioscience': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression'],
+    'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem'],
+    'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem'],
 }
 
 METRICS_DATASETS = {}
@@ -113,6 +106,18 @@ for dataset, metrics in DATASETS_METRICS.items():
     for metric in metrics:
         METRICS_DATASETS.setdefault(metric, []).append(dataset)
 
+ORDERED_METRICS = [
+        'r2-theta-0.1', 'r2-theta-0.5', 'r2-theta-1.0',
+       'ws-theta-0.0', 'ws-theta-0.5', 'ws-theta-1.0', 
+       'vc', 
+       'sem_precision', 'sem_balanced', 
+       'rc_precision', 'rc_balanced', 'rc_recall',
+       't_rec_precision', 't_rec_recall', 
+       'rc_tf_act_precision', 'rc_tf_act_balanced', 'rc_tf_act_recall',
+       'anchor_regression',
+       'tfb_grn_norm', 'tfb_all_norm'
+       ]
+ORDERED_METRICS_C = [c for c in ORDERED_METRICS if c not in ['tfb_grn_norm', 'tfb_all_norm']]
 
 def generate_config_env(output_path='src/utils/dataset_config.env'):
     """Generate a simple env-style config file with dataset-specific configurations."""

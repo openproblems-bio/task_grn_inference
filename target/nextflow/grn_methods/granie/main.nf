@@ -3654,7 +3654,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/granie",
     "viash_version" : "0.9.4",
-    "git_commit" : "00c145b1218ccea5d1e0293b01a2819492266bec",
+    "git_commit" : "9a10267fac4edd9f508ea288cabb715a467af81e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3922,7 +3922,7 @@ print('Donwnloading resources finished')
 if (par\\$forceRerun | !file.exists(file_seurat)) {
  # read rna 
   adata <- anndata::read_h5ad(par\\$rna)
-  dataset_id = adata\\$dataset_id
+  dataset_id <- adata\\$uns\\$dataset_id
 
   rna <- t(adata\\$X)  # Transpose to match R's column-major order
   rna <- Matrix(rna)
@@ -3988,11 +3988,21 @@ print('Seurat object created for atac')
   stopifnot(identical(colnames(seurat_object), colnames(seurat_object[["RNA"]])))
   stopifnot(identical(colnames(seurat_object), colnames(seurat_object[["peaks"]])))
   
+  # Save dataset_id in Seurat object metadata
+  seurat_object@misc\\$dataset_id <- dataset_id
   qs::qsave(seurat_object, paste0(par\\$temp_dir, "seurat_granie.qs" ) )
     
 } else {
 
   seurat_object = qs::qread(file_seurat)
+  # Retrieve dataset_id from Seurat object if it was saved previously
+  if (!is.null(seurat_object@misc\\$dataset_id)) {
+    dataset_id <- seurat_object@misc\\$dataset_id
+  } else {
+    # If not found in Seurat object, read from original RNA file
+    adata <- anndata::read_h5ad(par\\$rna)
+    dataset_id <- adata\\$uns\\$dataset_id
+  }
   
 }
 
@@ -4096,6 +4106,8 @@ if (!is.data.frame(net)) {
 }
 
 
+cat("Dataset ID being saved:", dataset_id, "\\\\n")
+
 output <- AnnData(
   X = matrix(nrow = 0, ncol = 0),
   uns = list(
@@ -4106,6 +4118,7 @@ output <- AnnData(
 )
 
 print(output)
+cat("Checking output\\$uns\\$dataset_id:", output\\$uns\\$dataset_id, "\\\\n")
 output\\$write_h5ad(par\\$prediction, compression = "gzip")
 VIASHMAIN
 Rscript "$tempscript"

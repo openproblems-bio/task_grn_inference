@@ -1,4 +1,6 @@
 from typing import Dict, List, Tuple
+import os
+import random
 import numpy as np
 import pandas as pd
 import anndata as ad
@@ -10,6 +12,18 @@ warnings.filterwarnings("ignore")
 
 from util import read_prediction, manage_layer, create_grn_baseline
 from config import DATASET_GROUPS
+
+# Set environment variables for deterministic NumPy operations
+os.environ['PYTHONHASHSEED'] = '0'
+os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['NUMEXPR_NUM_THREADS'] = '1'
+
+# Set seeds for reproducibility
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
 
 
 def calculate_tf_degree_centrality(net: pd.DataFrame) -> pd.DataFrame:
@@ -27,11 +41,12 @@ def calculate_tf_degree_centrality(net: pd.DataFrame) -> pd.DataFrame:
         DataFrame with columns: tf, degree, rank
     """
     # Count number of targets per TF (out-degree)
-    tf_degrees = net.groupby('source').size().reset_index(name='degree')
+    tf_degrees = net.groupby('source', sort=True).size().reset_index(name='degree')  # sort=True for determinism
     tf_degrees.columns = ['tf', 'degree']
     
     # Rank TFs by degree (higher degree = lower rank number)
-    tf_degrees = tf_degrees.sort_values('degree', ascending=False).reset_index(drop=True)
+    # Use stable sort for deterministic ordering when degrees are equal
+    tf_degrees = tf_degrees.sort_values('degree', ascending=False, kind='stable').reset_index(drop=True)
     tf_degrees['rank'] = tf_degrees.index + 1
     
     return tf_degrees
@@ -68,9 +83,9 @@ def select_top_tfs_and_edges(net: pd.DataFrame, n_tfs: int, n_edges_per_tf: int)
     net_subset = []
     for tf in top_tfs:
         tf_edges = net_filtered[net_filtered['source'] == tf].copy()
-        # Sort by absolute weight
+        # Sort by absolute weight (stable sort for determinism)
         tf_edges['abs_weight'] = tf_edges['weight'].abs()
-        tf_edges = tf_edges.sort_values('abs_weight', ascending=False)
+        tf_edges = tf_edges.sort_values('abs_weight', ascending=False, kind='stable')
         # Take top edges
         # tf_edges = tf_edges.head(n_edges_per_tf)
         tf_edges = tf_edges.drop(columns=['abs_weight'])
@@ -133,6 +148,8 @@ def calculate_tf_activities(X: np.ndarray, gene_names: np.ndarray, net: pd.DataF
     net_filtered = net[net['target'].isin(gene_names)].copy()
     
     # Run ULM with correct API (dc.mt.ulm modifies adata in place)
+    # Note: ULM is deterministic (simple linear regression), but we set seed for safety
+    np.random.seed(SEED)
     dc.mt.ulm(
         adata,
         net_filtered,
@@ -186,11 +203,14 @@ def calculate_activity_dispersion(activities: np.ndarray, groups: np.ndarray, tf
     n_tfs = activities.shape[1]
     tf_dispersions = []
     
+    # Sort groups for deterministic iteration order
+    unique_groups = np.sort(np.unique(groups))
+    
     for tf_idx in range(n_tfs):
         tf_activities = activities[:, tf_idx]
         group_dispersions = []
         
-        for group_id in np.unique(groups):
+        for group_id in unique_groups:
             group_mask = (groups == group_id)
             group_activities = tf_activities[group_mask]
             
@@ -256,7 +276,13 @@ def calculate_standardized_scores(
         Mean consistency score (padded with zeros if needed)
     """
     # Sort TFs by consistency score (descending)
-    tf_scores_sorted = tf_scores_df.sort_values('consistency', ascending=False, na_position='last')
+    # Use stable sort and secondary sort key (tf name) for determinism
+    tf_scores_sorted = tf_scores_df.sort_values(
+        ['consistency', 'tf'], 
+        ascending=[False, True],  # Higher consistency first, then alphabetically by TF
+        na_position='last',
+        kind='stable'
+    )
     
     # Get top N TFs (or all if fewer than N)
     top_tfs = tf_scores_sorted.head(n_tfs)
@@ -354,8 +380,8 @@ def main(par):
     # Configuration for three scores: precision, balanced, recall
     # Each uses different TF set size and edges per TF
     score_configs = [
-        {'name': 'precision', 'n_tfs': 20, 'n_edges_per_tf': 100},
-        {'name': 'balanced', 'n_tfs': 100, 'n_edges_per_tf': 200},
+        # {'name': 'precision', 'n_tfs': 10, 'n_edges_per_tf': 20},
+        {'name': 'balanced', 'n_tfs': 100, 'n_edges_per_tf': 100},
         {'name': 'recall', 'n_tfs': 300, 'n_edges_per_tf': 1000}
     ]
     
@@ -376,7 +402,7 @@ def main(par):
         
         # Filter to minimum targets
         min_targets = par.get('min_targets', 5)
-        tf_counts = net['source'].value_counts()
+        tf_counts = net['source'].value_counts(sort=True)  # sort=True for determinism
         tfs_to_keep = tf_counts[tf_counts >= min_targets].index
         net = net[net['source'].isin(tfs_to_keep)]
         print(f"After filtering (min_targets={min_targets}): {len(net)} edges across {len(net['source'].unique())} TFs")

@@ -104,7 +104,7 @@ print('Donwnloading resources finished')
 if (par$forceRerun | !file.exists(file_seurat)) {
  # read rna 
   adata <- anndata::read_h5ad(par$rna)
-  dataset_id = adata$dataset_id
+  dataset_id <- adata$uns$dataset_id
 
   rna <- t(adata$X)  # Transpose to match R's column-major order
   rna <- Matrix(rna)
@@ -170,11 +170,21 @@ print('Seurat object created for atac')
   stopifnot(identical(colnames(seurat_object), colnames(seurat_object[["RNA"]])))
   stopifnot(identical(colnames(seurat_object), colnames(seurat_object[["peaks"]])))
   
+  # Save dataset_id in Seurat object metadata
+  seurat_object@misc$dataset_id <- dataset_id
   qs::qsave(seurat_object, paste0(par$temp_dir, "seurat_granie.qs" ) )
     
 } else {
 
   seurat_object = qs::qread(file_seurat)
+  # Retrieve dataset_id from Seurat object if it was saved previously
+  if (!is.null(seurat_object@misc$dataset_id)) {
+    dataset_id <- seurat_object@misc$dataset_id
+  } else {
+    # If not found in Seurat object, read from original RNA file
+    adata <- anndata::read_h5ad(par$rna)
+    dataset_id <- adata$uns$dataset_id
+  }
   
 }
 
@@ -278,6 +288,8 @@ if (!is.data.frame(net)) {
 }
 
 
+cat("Dataset ID being saved:", dataset_id, "\n")
+
 output <- AnnData(
   X = matrix(nrow = 0, ncol = 0),
   uns = list(
@@ -288,5 +300,6 @@ output <- AnnData(
 )
 
 print(output)
+cat("Checking output$uns$dataset_id:", output$uns$dataset_id, "\n")
 output$write_h5ad(par$prediction, compression = "gzip")
 

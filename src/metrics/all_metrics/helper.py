@@ -22,6 +22,12 @@ try:
 except:
     from sem.helper import main as main_sem
 
+try:
+    from ar_helper import main as main_ar
+except:
+    from ar.helper import main as main_ar
+
+
 
 try:
     from tf_recovery_helper import main as main_tf_rec
@@ -38,6 +44,11 @@ try:
     from rc_tf_act_helper import main as main_rc_tf_act
 except:
     from rc_tf_act.helper import main as main_rc_tf_act
+
+try:
+    from rc_helper import main as main_rc
+except:
+    from rc.helper import main as main_rc
 
 
 try:
@@ -112,10 +123,24 @@ def rc_tf_act_metric(par, dataset_id):
             return output
     return None
 
+def rc_metric(par, dataset_id):
+    if dataset_id in DATASETS_METRICS:
+        if 'rc' in DATASETS_METRICS[dataset_id]:
+            output = main_rc(par)
+            return output
+    return None
+
+def ar_metric(par, dataset_id):
+    if dataset_id in DATASETS_METRICS:
+        if 'anchor_regression' in DATASETS_METRICS[dataset_id]:
+            output = main_ar(par)
+            return output
+    return None
+
 def main(par):
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     rr_store = []
-    metrics = [reg_metric, ws_distance_metric, tf_rec_metric, rc_tf_act_metric, tf_binding_metric, vc_metric]
+    metrics = [reg_metric, ws_distance_metric, sem_metric, tf_rec_metric, rc_tf_act_metric, tf_binding_metric, vc_metric, rc_metric, ar_metric]
     # metrics = [tf_binding_metric, sem_metric, replica_consistency_metric]
 
     for metric in metrics:
