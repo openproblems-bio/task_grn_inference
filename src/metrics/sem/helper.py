@@ -19,21 +19,31 @@ from sklearn.model_selection import GroupShuffleSplit, KFold
 
 
 os.environ['CUBLAS_WORKSPACE_CONFIG'] = ':4096:8' # For reproducibility purposes (on GPU)
+# Additional environment variables for determinism
+os.environ['TF_DETERMINISTIC_OPS'] = '1'
+os.environ['PYTHONHASHSEED'] = '0'
+
+# Force NumPy to use single thread for determinism
+os.environ['OMP_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['NUMEXPR_NUM_THREADS'] = '1'
+
 DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
 NUMPY_DTYPE = np.float32
 
 # Hyper-parameters
 MAX_N_ITER = 500
 
-# For reproducibility purposes
-seed = 0xCADD
+# For reproducibility purposes - use consistent seed
+seed = 42  # Changed to standard seed
 os.environ['PYTHONHASHSEED'] = str(seed)
 random.seed(seed)
 np.random.seed(seed)
 torch.manual_seed(seed)
 torch.cuda.manual_seed(seed)
 torch.cuda.manual_seed_all(seed)
-torch.use_deterministic_algorithms(True)
+torch.use_deterministic_algorithms(True, warn_only=True)  # warn_only to avoid crashes
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = False
 
@@ -211,7 +221,7 @@ def regression_based_grn_inference(X: np.ndarray, base: np.ndarray, signed: bool
     n_genes = X.shape[1]
     A = np.zeros((n_genes, n_genes), dtype=X.dtype)
     for j in tqdm.tqdm(range(n_genes)):
-        model = ElasticNet(alpha=0.001, fit_intercept=False, random_state=seed)
+        model = ElasticNet(alpha=0.001, fit_intercept=False, random_state=seed)  # Use global seed
         if not np.any(mask[:, j]):
             continue  # If gene has no regulator, skip it.
         model.fit(X[:, mask[:, j]], X[:, j])
@@ -269,10 +279,13 @@ def evaluate_grn(
     
     # Set manual seed again before optimizer initialization for determinism
     torch.manual_seed(seed)
+    np.random.seed(seed)
+    random.seed(seed)
+    
     optimizer = torch.optim.Adam([A], lr=learning_rate)
-    scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode='min', patience=5,
-        min_lr=1e-5, cooldown=3, factor=0.8
+    # Use StepLR instead of ReduceLROnPlateau for determinism
+    scheduler = torch.optim.lr_scheduler.StepLR(
+        optimizer, step_size=20, gamma=0.8
     )
     best_loss = np.inf
     best_A_eff = A_eff.detach()
@@ -296,7 +309,7 @@ def evaluate_grn(
 
         loss.backward()
         optimizer.step()
-        scheduler.step(loss.item())
+        scheduler.step()  # Changed from scheduler.step(loss.item())
         # pbar.set_description(str(loss.item()))
     A = best_A_eff
     mask = mask.detach().cpu().numpy().astype(bool)
@@ -404,11 +417,11 @@ def main(par):
     # Create a split between training and test sets.
     # Make sure that no compound ends up in both sets.
     try:
-        splitter = GroupShuffleSplit(test_size=0.5, n_splits=2, random_state=0xCAFE)
+        splitter = GroupShuffleSplit(test_size=0.5, n_splits=2, random_state=seed)  # Use consistent seed
         train_idx, _ = next(splitter.split(delta_X, groups=cv_groups))
     except ValueError:
         print("Group k-fold failed. Using k-fold CV instead.")
-        splitter = KFold(n_splits=2, random_state=0xCAFE, shuffle=True)
+        splitter = KFold(n_splits=2, random_state=seed, shuffle=True)  # Use consistent seed
         train_idx, _ = next(splitter.split(delta_X))
     is_train = np.zeros(len(delta_X), dtype=bool)
     is_train[train_idx] = True

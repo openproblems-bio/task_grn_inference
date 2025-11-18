@@ -30,13 +30,31 @@ tf_names <- scan(par$tf_all, what = "", sep = "\n")
 ad <- anndata::read_h5ad(par$rna)
 dataset_id = ad$uns$dataset_id
 
-layer <- par$layer
-
+# Determine which layer to use
 if (dataset_id %in% c("nakatake", "norman", "adamson")) {
   layer <- "X_norm"
+} else if (!is.null(par$layer)) {
+  layer <- par$layer
+} else {
+  # Default to using X if no layer specified
+  layer <- NULL
 }
 
-inputExpr <- ad$layers[[layer]]
+# Get expression data
+if (is.null(layer)) {
+  inputExpr <- ad$X
+} else {
+  inputExpr <- ad$layers[[layer]]
+  # If the specified layer doesn't exist, throw error
+  if (is.null(inputExpr)) {
+    stop(paste0("Error in dataset '", dataset_id, "': Layer '", layer, "' not found in AnnData object."))
+  }
+}
+
+# Additional check to ensure we have data
+if (is.null(inputExpr)) {
+  stop(paste0("Error in dataset '", dataset_id, "': Could not extract expression data from AnnData object. Both X and specified layer are NULL."))
+}
 
 geneNames <- colnames(inputExpr)
 colnames(inputExpr) <- c(geneNames)

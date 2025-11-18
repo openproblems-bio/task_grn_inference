@@ -304,7 +304,7 @@ def main(par):
     tgtg_score = np.mean([score for score_lift, score in tgtg_results])
     tgtg_score_lift = np.mean([score_lift for score_lift, score in tgtg_results])
     # final_score = (tftg_score + tgtg_score + tftg_tgtg_score) / 3.0
-    if False:
+    if True:
         replica_consistency_precision = np.mean([tftg_score_lift, tgtg_score_lift])
         replica_consistency_balanced = np.mean([tftg_score, tgtg_score])
     else:
@@ -317,8 +317,8 @@ def main(par):
         # 'tftg_score_lift': [tftg_score_lift],
         # 'tgtg': [tgtg_score],
         # 'tgtg_score_lift': [tgtg_score_lift],
-        'replica_consistency_precision': [replica_consistency_precision],
-        'replica_consistency_balanced': [replica_consistency_balanced],
+        'rc_precision': [replica_consistency_precision],
+        'rc_balanced': [replica_consistency_balanced],
     })
     print(results)
     
