@@ -92,7 +92,7 @@ DATASETS_METRICS = {
     'adamson': ['regression', 'ws_distance', 'tf_binding', 'sem'],
     'norman': ['regression', 'ws_distance', 'tf_binding', 'sem'],
     'nakatake': ['regression', 'sem'],
-    'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression'],
+    'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression', 'regression_r'],
     '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression'],
     'ibd_UC': ['regression', 'vc', 'tf_binding', 'sem', 'anchor_regression'],
     'ibd_CD': ['regression', 'vc', 'tf_binding', 'sem', 'anchor_regression'],
@@ -107,7 +107,7 @@ for dataset, metrics in DATASETS_METRICS.items():
         METRICS_DATASETS.setdefault(metric, []).append(dataset)
 
 ORDERED_METRICS = [
-        'r2-theta-0.1', 'r2-theta-0.5', 'r2-theta-1.0',
+       'r2-theta-0.1', 'r2-theta-0.5', 'r2-theta-1.0',
        'ws-theta-0.0', 'ws-theta-0.5', 'ws-theta-1.0', 
        'vc', 
        'sem_precision', 'sem_balanced', 
@@ -115,6 +115,7 @@ ORDERED_METRICS = [
        't_rec_precision', 't_rec_recall', 
        'rc_tf_act_precision', 'rc_tf_act_balanced', 'rc_tf_act_recall',
        'anchor_regression',
+       'regression_r',
        'tfb_grn_norm', 'tfb_all_norm'
        ]
 ORDERED_METRICS_C = [c for c in ORDERED_METRICS if c not in ['tfb_grn_norm', 'tfb_all_norm']]

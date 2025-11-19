@@ -1,0 +1,104 @@
+__merge__: ../../api/comp_metric.yaml
+
+name: pathway_annotation
+namespace: "metrics"
+info:
+  label: Pathway Annotation Fidelity
+  summary: Evaluates GRN quality based on pathway enrichment of TF targets
+  description: |
+    Evaluates how well a GRN model represents known biology by testing whether 
+    predicted TF targets are enriched for coherent biological pathways.
+    Uses MSigDB Hallmark pathways for over-representation analysis.
+    
+    For each TF, the metric:
+    1. Extracts predicted targets from the GRN
+    2. Performs Fisher's exact test for pathway enrichment
+    3. Calculates enrichment scores normalized against random expectation
+    4. Aggregates across all TFs to produce overall fidelity scores
+    
+    Returns multiple metrics:
+    - pf_grn: Mean pathway fidelity for TFs present in the GRN
+    - pf_all: Mean pathway fidelity for all TFs (missing TFs get 0 score)
+    - pf_spec: Specificity score (penalizes non-specific enrichment)
+    - coverage_pct: Percentage of TFs with significant pathway enrichment
+
+arguments:
+  - name: "--pathway_file"
+    type: file
+    required: false
+    default: "/home/jnourisa/projs/ongoing/ciim/input/prior/h.all.v2024.1.Hs.symbols.gmt"
+    description: Path to GMT file containing pathway definitions (e.g., MSigDB Hallmark)
+  
+  - name: "--fdr_threshold"
+    type: double
+    required: false
+    default: 0.05
+    description: FDR threshold for significant pathway enrichment
+  
+  - name: "--min_pathway_size"
+    type: integer
+    required: false
+    default: 5
+    description: Minimum number of genes in a pathway to be considered
+  
+  - name: "--max_pathway_size"
+    type: integer
+    required: false
+    default: 500
+    description: Maximum number of genes in a pathway to be considered
+  
+  - name: "--min_targets"
+    type: integer
+    required: false
+    default: 10
+    description: Minimum number of targets for a TF to be evaluated
+  
+  - name: "--max_targets"
+    type: integer
+    required: false
+    default: 100
+    description: Maximum number of targets per TF (top K by absolute edge weight). Handles network density variation.
+  
+  - name: "--run_gene_set_recovery"
+    type: boolean
+    required: false
+    default: true
+    description: Run ULM-based gene set recovery metric
+  
+  - name: "--ulm_activity_threshold"
+    type: double
+    required: false
+    default: 0.0
+    description: Minimum activity score for pathway to be considered active
+  
+  - name: "--ulm_pvalue_threshold"
+    type: double
+    required: false
+    default: 0.01
+    description: P-value threshold for pathway activity significance
+  
+  - name: "--ulm_baseline_method"
+    type: string
+    required: false
+    default: "zero_centered"
+    description: "Method for determining pathway activity baseline (zero_centered, permutation, or random_genesets)"
+  
+resources:
+  - type: python_script
+    path: script.py
+  - path: /src/utils/util.py
+    dest: util.py
+  - path: helper.py
+  
+engines:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    __merge__: /src/api/base_requirements.yaml
+    setup:
+      - type: python
+        packages: [numpy==1.26.4, scipy==1.13.0, tqdm, decoupler==1.7.0 ]
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [ midtime, midmem, midcpu ]
