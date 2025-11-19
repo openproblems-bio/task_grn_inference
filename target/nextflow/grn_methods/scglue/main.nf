@@ -3433,8 +3433,8 @@ meta = [
       "id" : "nextflow",
       "directives" : {
         "label" : [
-          "oneweektime",
-          "midmem",
+          "onedaytime",
+          "highmem",
           "highcpu",
           "gpu"
         ],
@@ -3491,7 +3491,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scglue",
     "viash_version" : "0.9.4",
-    "git_commit" : "9a10267fac4edd9f508ea288cabb715a467af81e",
+    "git_commit" : "a646e1081174239761d408b911566abfa8b71d71",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -4076,8 +4076,8 @@ meta["defaults"] = [
     "tag" : "build_main"
   },
   "label" : [
-    "oneweektime",
-    "midmem",
+    "onedaytime",
+    "highmem",
     "highcpu",
     "gpu"
   ],

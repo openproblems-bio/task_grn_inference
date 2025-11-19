@@ -108,7 +108,7 @@ append_entry() {
     temp_dir: $dataset
 HERE
 
-  if [[ "$dataset" =~ ^(op|opsca|ibd)$ ]]; then
+  if [[ "$dataset" =~ ^(op|opsca|ibd_CD|ibd_UC)$ ]]; then
     cat >> "$param_local" << HERE
     atac: ${resources_dir}/grn_benchmark/inference_data/${dataset}_atac.h5ad
 HERE
@@ -121,7 +121,7 @@ if [[ "$DATASET" =~ ^(replogle|parsebioscience|xaira_HEK293T|xaira_HCT116)$ ]]; 
   append_entry "$DATASET" "[scprint]" "true"
   
   echo $methods 
-elif [ "$DATASET" = "op" ] || [ "$DATASET" = "ibd" ]; then
+elif [ "$DATASET" = "op" ] || [ "$DATASET" = "ibd_CD" ] || [ "$DATASET" = "ibd_UC" ]; then
   methods="[pearson_corr, spearman_corr, negative_control, positive_control, grnboost, portia, scenic, scprint, geneformer, scgpt, figr, scenicplus, celloracle, granie, scglue]" 
   append_entry "$DATASET" "$methods" 
   echo $methods 

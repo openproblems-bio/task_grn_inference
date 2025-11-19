@@ -39,4 +39,13 @@ def run_grn(par):
       str(par['expression_data']),
       par['tf_all']
   ]
-  subprocess.run(command, check=True)
+  try:
+    result = subprocess.run(command, check=True, capture_output=True, text=True)
+    print(result.stdout)
+  except subprocess.CalledProcessError as e:
+    print(f"Error running pyscenic grn command")
+    print(f"Command: {' '.join(command)}")
+    print(f"Exit code: {e.returncode}")
+    print(f"STDOUT:\n{e.stdout}")
+    print(f"STDERR:\n{e.stderr}")
+    raise RuntimeError(f"pyscenic grn failed with exit code {e.returncode}. See error details above.") from e
