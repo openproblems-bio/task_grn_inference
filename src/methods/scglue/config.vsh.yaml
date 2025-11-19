@@ -52,4 +52,4 @@ runners:
   - type: executable
   - type: nextflow
     directives:
-      label: [oneweektime, midmem, highcpu, gpu]
+      label: [onedaytime, highmem, highcpu, gpu]

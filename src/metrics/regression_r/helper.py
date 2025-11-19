@@ -52,8 +52,8 @@ def compute_residual_correlations(
         y_test: np.ndarray,
         Z_test: np.ndarray
 ) -> np.ndarray:
-    model = xgboost.XGBRegressor(n_estimators=10)
-    #model = Ridge(alpha=10)
+    model = xgboost.XGBRegressor(n_estimators=10, random_state=seed)
+    #model = Ridge(alpha=10, random_state=seed)
     model.fit(X_train, y_train)
     y_hat = model.predict(X_test)
     residuals = y_test - y_hat
@@ -126,11 +126,12 @@ def main(par):
     np.fill_diagonal(A, 0)
     print(f"Evaluating {X.shape[1]} genes with {np.sum(A != 0)} regulatory links")
 
-    # Create baseline model
+    # Create baseline model with reproducible shuffling
     A_baseline = np.copy(A)
+    rng = np.random.RandomState(seed)
     for j in range(A.shape[1]):
-        np.random.shuffle(A_baseline[:j, j])
-        np.random.shuffle(A_baseline[j+1:, j])
+        rng.shuffle(A_baseline[:j, j])
+        rng.shuffle(A_baseline[j+1:, j])
     assert np.any(A_baseline != A)
 
     scores, baseline_scores = [], []

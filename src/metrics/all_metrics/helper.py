@@ -12,6 +12,7 @@ try:
 except:
     from regression.helper import main as main_reg
 
+
 try:
     from ws_helper import main as main_ws_distance
 except:
@@ -49,6 +50,11 @@ try:
     from rc_helper import main as main_rc
 except:
     from rc.helper import main as main_rc
+
+try:
+    from regression_r_helper import main as main_rr
+except:
+    from regression_r.helper import main as main_rr
 
 
 try:
@@ -134,6 +140,13 @@ def ar_metric(par, dataset_id):
     if dataset_id in DATASETS_METRICS:
         if 'anchor_regression' in DATASETS_METRICS[dataset_id]:
             output = main_ar(par)
+            return output
+    return None
+
+def reg_r_metric(par, dataset_id):
+    if dataset_id in DATASETS_METRICS:
+        if 'regression_r' in DATASETS_METRICS[dataset_id]:
+            output = main_rr(par)
             return output
     return None
 
