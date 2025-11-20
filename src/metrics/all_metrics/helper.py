@@ -153,7 +153,7 @@ def reg_r_metric(par, dataset_id):
 def main(par):
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     rr_store = []
-    metrics = [reg_metric, ws_distance_metric, sem_metric, tf_rec_metric, rc_tf_act_metric, tf_binding_metric, vc_metric, rc_metric, ar_metric]
+    metrics = [reg_metric, ws_distance_metric, sem_metric, tf_rec_metric, rc_tf_act_metric, vc_metric, ar_metric]
     # metrics = [tf_binding_metric, sem_metric, replica_consistency_metric]
 
     for metric in metrics:

@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=rc_global
+#SBATCH --job-name=rc
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
@@ -12,35 +12,31 @@
 
 set -euo pipefail
 
-# Global GRN evaluation - only op and 300BCG datasets
-datasets=('op' '300BCG')
+# datasets=( "ibd" "parsebioscience" "300BCG" "op")
+datasets=('op') 
+methods=( "pearson_corr" "negative_control" "positive_control"  "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
+# methods=("grnboost")
 
 # temporary file to collect CSV rows
-save_dir='output/rc_global/'
+save_dir='output/rc/'
 mkdir -p "$save_dir"
 
-# Global GRN files location
-global_grn_dir="resources/results/experiment/global_grns"
+# Create summary CSV file
+summary_csv="${save_dir}/summary.csv"
+echo "dataset,method,metric,value" > "$summary_csv"
 
 for dataset in "${datasets[@]}"; do
     echo -e "\n\nProcessing dataset: $dataset\n"
 
     evaluation_data="resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad"
-    # Create separate CSV file for each dataset
-    dataset_csv="${save_dir}/rc_scores_${dataset}.csv"
-    echo "dataset,method,metric,value" > "$dataset_csv"
-    
-    for prediction in ${global_grn_dir}/${dataset}.*.h5ad; do
+    for method in "${methods[@]}"; do
+        prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
+        score="${save_dir}/sem_${dataset}_${method}.h5ad"
+
         if [[ ! -f "$prediction" ]]; then
-            echo "  No global GRN files found for dataset $dataset"
+            echo "File not found: $prediction, skipping..."
             continue
         fi
-        
-        # Extract method name from filename
-        filename=$(basename "$prediction")
-        method=$(echo "$filename" | sed "s/${dataset}\.//" | sed 's/\.h5ad$//' | sed 's/\.csv$//')
-        
-        score="${save_dir}/rc_${dataset}_${method//[:\/]/_}.h5ad"
 
         echo -e "\nProcessing method: $method\n"
         python src/metrics/rc/script.py \
@@ -59,14 +55,12 @@ if "metric_values" in adata.uns:
     metric_values = adata.uns["metric_values"]
     df = pd.DataFrame({"metric": metric_names, "value": metric_values})
     df["dataset"] = "${dataset}"
-    method_clean = "${method}".replace(',', ';')
-    df["method"] = method_clean
-    df = df[["dataset", "method", "metric", "value"]]
-    df.to_csv("${dataset_csv}", mode="a", header=False, index=False)
+    df["method"] = "${method}"
+    df = df[["dataset", "method", "metric", "value"]]  # Reorder columns to match header
+    df.to_csv("${summary_csv}", mode="a", header=False, index=False)
 EOF
 
     done
-    echo -e "\nResults for dataset $dataset collected in: $dataset_csv"
 done
 
-echo -e "\nAll dataset results saved in separate CSV files in: $save_dir"
+echo -e "\nAll results saved in: $summary_csv"

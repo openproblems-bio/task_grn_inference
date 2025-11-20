@@ -73,7 +73,10 @@ def parse_pathway_args(par):
     
     # Pathway-specific arguments
     parser.add_argument('--pathway_file', type=str, 
-                       default='/vol/projects/jnourisa/prior/h.all.v2024.1.Hs.symbols.gmt')
+                       default='/vol/projects/jnourisa/prior/h.all.v2024.1.Hs.symbols.gmt',
+                       help='Single pathway file (GMT format). Use --pathway_files for multiple.')
+    parser.add_argument('--pathway_files', type=str,
+                       help='Multiple pathway files as comma-separated name:path pairs (e.g., "hallmark:file1.gmt,kegg:file2.gmt")')
     parser.add_argument('--fdr_threshold', type=float, default=0.05)
     parser.add_argument('--min_pathway_size', type=int, default=5)
     parser.add_argument('--max_pathway_size', type=int, default=500)
@@ -91,10 +94,21 @@ def parse_pathway_args(par):
     parser.add_argument('--ulm_baseline_method', type=str, default='zero_centered',
                        choices=['zero_centered', 'permutation', 'random_genesets'],
                        help='Method for determining pathway activity baseline')
+    parser.add_argument('--n_workers', type=int, default=None,
+                       help='Number of parallel workers for gene set recovery')
     
     args = parser.parse_args()
+    
+    # Parse pathway_files if provided
+    if args.pathway_files:
+        pathway_files_dict = {}
+        for pair in args.pathway_files.split(','):
+            name, path = pair.split(':')
+            pathway_files_dict[name] = path
+        par['pathway_files'] = pathway_files_dict
+    
     for k, v in vars(args).items():
-        if v is not None:
+        if v is not None and k != 'pathway_files':  # Don't overwrite if already set
             par[k] = v
     return par
 

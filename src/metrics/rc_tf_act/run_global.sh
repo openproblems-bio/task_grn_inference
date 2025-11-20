@@ -15,18 +15,20 @@ set -euo pipefail
 # Global GRN evaluation - only op and 300BCG datasets
 datasets=('op' '300BCG')
 
-save_dir='output/rc_tf_act_global/'
+save_dir='output/rc_tf_act'
 mkdir -p "$save_dir"
 
 # Global GRN files location
 global_grn_dir="resources/results/experiment/global_grns"
 
+# Create summary CSV file
+summary_csv="${save_dir}/summary_global.csv"
+echo "dataset,method,metric,value" > "$summary_csv"
+
 for dataset in "${datasets[@]}"; do
     echo -e "\n\nProcessing dataset: $dataset\n"
 
     evaluation_data="resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad"
-    dataset_csv="${save_dir}/rc_tf_act_scores_${dataset}.csv"
-    echo "dataset,method,metric,value" > "$dataset_csv"
     
     for prediction in ${global_grn_dir}/${dataset}.*.h5ad; do
         if [[ ! -f "$prediction" ]]; then
@@ -58,11 +60,10 @@ if "metric_values" in adata.uns:
     method_clean = "${method}".replace(',', ';')
     df["method"] = method_clean
     df = df[["dataset", "method", "metric", "value"]]
-    df.to_csv("${dataset_csv}", mode="a", header=False, index=False)
+    df.to_csv("${summary_csv}", mode="a", header=False, index=False)
 EOF
 
     done
-    echo -e "\nResults for dataset $dataset collected in: $dataset_csv"
 done
 
-echo -e "\nAll dataset results saved in separate CSV files in: $save_dir"
+echo -e "\nAll results saved in: $summary_csv"

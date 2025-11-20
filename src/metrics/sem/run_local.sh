@@ -21,15 +21,13 @@ datasets=('op')
 # methods to process
 methods=("grnboost" "pearson_corr" "negative_control" "positive_control" "ppcor" "portia" "scenic" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
 methods=("grnboost")
-# temporary file to collect CSV rows
-combined_csv="${save_dir}/sem_scores.csv"
-echo "dataset,method,metric,value" > "$combined_csv"
+
+# Create summary CSV file
+summary_csv="${save_dir}/summary.csv"
+echo "dataset,method,metric,value" > "$summary_csv"
 
 for dataset in "${datasets[@]}"; do
     echo -e "\n\nProcessing dataset: $dataset\n"
-    # Create separate CSV file for each dataset
-    dataset_csv="${save_dir}/sem_scores_${dataset}.csv"
-    echo "dataset,method,metric,value" > "$dataset_csv"
 
     evaluation_data="resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad"
 
@@ -60,11 +58,10 @@ if "metric_values" in adata.uns:
     df["dataset"] = "${dataset}"
     df["method"] = "${method}"
     df = df[["dataset", "method", "metric", "value"]]  # Reorder columns to match header
-    df.to_csv("${dataset_csv}", mode="a", header=False, index=False)
+    df.to_csv("${summary_csv}", mode="a", header=False, index=False)
 EOF
 
     done
-    echo -e "\nResults for dataset $dataset collected in: $dataset_csv"
 done
 
-echo -e "\nAll dataset results saved in separate CSV files in: $save_dir"
+echo -e "\nAll results saved in: $summary_csv"
