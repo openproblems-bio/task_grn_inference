@@ -37,9 +37,8 @@ def main(par):
     consensus = []
     for tf, row in edges_count.iterrows():
         row_nozero = row[row!=0] 
-        consensus.append({'source':tf, 'theta':'ws-theta-0.0', 'value':int(np.quantile(row_nozero, 0.1))})
-        consensus.append({'source':tf, 'theta':'ws-theta-0.5', 'value':int(np.quantile(row_nozero, 0.5))})
-        consensus.append({'source':tf, 'theta':'ws-theta-1.0', 'value':int(np.quantile(row_nozero, 1))})
+        consensus.append({'source':tf, 'theta': 0.25, 'value':int(np.quantile(row_nozero, 0.25))})
+        consensus.append({'source':tf, 'theta': 0.75, 'value':int(np.quantile(row_nozero, 0.75))})
     consensus = pd.DataFrame(consensus)
     # - save 
     print('saving the consensus to ', par['ws_consensus'])

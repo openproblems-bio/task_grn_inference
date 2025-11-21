@@ -34,7 +34,7 @@ def main(par):
     assert len(grns) > 0, "No GRNs were loaded. Check the models directory and the models specified."
 
     # Compute consensus number of putative regulators for each gene (and for each theta value)
-    thetas = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1]
+    thetas = [0, 0.25, 0.5, 0.75, 1]
     n_tfs = {}
     for theta in thetas:
         n_tfs[theta] = np.round(np.quantile(np.sum(grns != 0, axis=1), theta, axis=0)).astype(int)
