@@ -12,17 +12,17 @@
 
 set -euo pipefail
 
-save_dir="output/anchor_regression"
+save_dir="output/ar"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=( 'op' "300BCG" 'parsebioscience') #"300BCG" "ibd" 'parsebioscience'
+datasets=( "300BCG" 'parsebioscience' 'op' 'ibd_UC' 'ibd_UCD' ) #"300BCG" "ibd" 'parsebioscience'
 # methods to process
 methods=("pearson_corr" "positive_control" "negative_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
 
-# temporary file to collect CSV rows
-combined_csv="${save_dir}/anchor_regression_scores.csv"
-echo "dataset,method,metric,value" > "$combined_csv"
+# Create summary CSV file
+summary_csv="${save_dir}/summary.csv"
+echo "dataset,method,metric,value" > "$summary_csv"
 
 for dataset in "${datasets[@]}"; do
     echo -e "\n\nProcessing dataset: $dataset\n"
@@ -39,12 +39,28 @@ for dataset in "${datasets[@]}"; do
         fi
 
         echo -e "\nProcessing method: $method\n"
-        python src/metrics/anchor_regression/script.py \
+        python src/metrics/ar/script.py \
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
             --score "$score"
 
+        # Extract metrics from the .h5ad and append to CSV
+        python -u - <<EOF
+import anndata as ad
+import pandas as pd
+
+adata = ad.read_h5ad("${score}")
+if "metric_values" in adata.uns:
+    metric_names = adata.uns["metric_ids"]
+    metric_values = adata.uns["metric_values"]
+    df = pd.DataFrame({"metric": metric_names, "value": metric_values})
+    df["dataset"] = "${dataset}"
+    df["method"] = "${method}"
+    df = df[["dataset", "method", "metric", "value"]]
+    df.to_csv("${summary_csv}", mode="a", header=False, index=False)
+EOF
+
     done
 done
 
-echo -e "\nAll results collected in: $combined_csv"
+echo -e "\nAll results saved in: $summary_csv"

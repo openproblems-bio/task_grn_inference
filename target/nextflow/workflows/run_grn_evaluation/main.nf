@@ -3185,36 +3185,6 @@ meta = [
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--ground_truth_unibind",
-          "must_exist" : false,
-          "create_parent" : true,
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--ground_truth_chipatlas",
-          "must_exist" : false,
-          "create_parent" : true,
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--ground_truth_remap",
-          "must_exist" : false,
-          "create_parent" : true,
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
         }
       ]
     },
@@ -3301,12 +3271,6 @@ meta = [
       }
     },
     {
-      "name" : "metrics/tf_binding",
-      "repository" : {
-        "type" : "local"
-      }
-    },
-    {
       "name" : "metrics/vc",
       "repository" : {
         "type" : "local"
@@ -3320,6 +3284,12 @@ meta = [
     },
     {
       "name" : "metrics/sem",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "metrics/ar",
       "repository" : {
         "type" : "local"
       }
@@ -3397,7 +3367,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.4",
-    "git_commit" : "a646e1081174239761d408b911566abfa8b71d71",
+    "git_commit" : "b3eab2ec6bc2db0c58d010534f39d812da004c7e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3509,10 +3479,10 @@ meta["root_dir"] = getRootDir()
 include { regression } from "${meta.resources_dir}/../../../nextflow/metrics/regression/main.nf"
 include { ws_distance } from "${meta.resources_dir}/../../../nextflow/metrics/ws_distance/main.nf"
 include { tf_recovery } from "${meta.resources_dir}/../../../nextflow/metrics/tf_recovery/main.nf"
-include { tf_binding } from "${meta.resources_dir}/../../../nextflow/metrics/tf_binding/main.nf"
 include { vc } from "${meta.resources_dir}/../../../nextflow/metrics/vc/main.nf"
 include { rc_tf_act } from "${meta.resources_dir}/../../../nextflow/metrics/rc_tf_act/main.nf"
 include { sem } from "${meta.resources_dir}/../../../nextflow/metrics/sem/main.nf"
+include { ar } from "${meta.resources_dir}/../../../nextflow/metrics/ar/main.nf"
 include { extract_uns_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
 
 // inner workflow
@@ -3536,7 +3506,7 @@ workflow run_wf {
     regression,
     ws_distance,
     tf_recovery,
-    tf_binding,
+    ar,
     rc_tf_act,
     sem,
     vc

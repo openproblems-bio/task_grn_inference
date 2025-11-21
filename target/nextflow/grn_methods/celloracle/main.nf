@@ -3353,7 +3353,7 @@ meta = [
     },
     {
       "type" : "file",
-      "path" : "main.py"
+      "path" : "helper.py"
     }
   ],
   "label" : "celloracle",
@@ -3481,7 +3481,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/celloracle",
     "viash_version" : "0.9.4",
-    "git_commit" : "a646e1081174239761d408b911566abfa8b71d71",
+    "git_commit" : "b3eab2ec6bc2db0c58d010534f39d812da004c7e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3665,7 +3665,7 @@ except: # for local run
     meta = {'resources_dir': './'}
     sys.path.append(meta["resources_dir"])
 
-from main import main 
+from helper import main 
 os.makedirs(par['temp_dir'], exist_ok=True)
 
  

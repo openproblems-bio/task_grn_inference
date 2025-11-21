@@ -3,6 +3,12 @@ import anndata as ad
 import sys
 import os
 import requests
+
+# Fix OpenBLAS threading issue
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '1'
+
 ## VIASH START
 par = {
   "rna": "resources/grn_benchmark/inference_data/op_rna.h5ad",
@@ -37,7 +43,7 @@ except:
     }
     sys.path.append(meta["util_dir"])
     sys.path.append(meta["resources_dir"])
-from main import main 
+from helper import main 
 from util import parse_args, process_links
 par = parse_args(par)
 
