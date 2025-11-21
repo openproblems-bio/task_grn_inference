@@ -123,25 +123,27 @@ def main(par):
         df['gt'] = gt
         rr_store.append(df)
     result_df = pd.concat(rr_store, ignore_index=True)
-    
-    # Weighted average across all ground truth sources
-    weights = result_df['n_tfs_to_evaluate'].values
-    total_weight = weights.sum()
-    
-    # Raw scores (backward compatibility)
-    tfb_grn_raw_weighted = (result_df['tfb_grn_raw'] * weights).sum() / total_weight
-    tfb_all_raw_weighted = (result_df['tfb_all_raw'] * weights).sum() / total_weight
-    
-    # Normalized scores (new approach)
-    tfb_grn_norm_weighted = (result_df['tfb_grn_norm'] * weights).sum() / total_weight
-    tfb_all_norm_weighted = (result_df['tfb_all_norm'] * weights).sum() / total_weight
-    
-    
-    result_df = pd.DataFrame([{
-        'tfb_grn': tfb_grn_raw_weighted,  # Keep for backward compatibility
-        'tfb_all': tfb_all_raw_weighted,  # Keep for backward compatibility
-        'tfb_grn_norm': tfb_grn_norm_weighted,  # New normalized score
-        'tfb_all_norm': tfb_all_norm_weighted   # New normalized score
-    }])
+    if False:
+        # Weighted average across all ground truth sources
+        weights = result_df['n_tfs_to_evaluate'].values
+        total_weight = weights.sum()
+        
+        # Raw scores (backward compatibility)
+        tfb_grn_raw_weighted = (result_df['tfb_grn_raw'] * weights).sum() / total_weight
+        tfb_all_raw_weighted = (result_df['tfb_all_raw'] * weights).sum() / total_weight
+        
+        # Normalized scores (new approach)
+        tfb_grn_norm_weighted = (result_df['tfb_grn_norm'] * weights).sum() / total_weight
+        tfb_all_norm_weighted = (result_df['tfb_all_norm'] * weights).sum() / total_weight
+        
+        
+        result_df = pd.DataFrame([{
+            'tfb_grn': tfb_grn_raw_weighted,  # Keep for backward compatibility
+            'tfb_all': tfb_all_raw_weighted,  # Keep for backward compatibility
+            'tfb_grn_norm': tfb_grn_norm_weighted,  # New normalized score
+            'tfb_all_norm': tfb_all_norm_weighted   # New normalized score
+        }])
+    else:
+        pass
     
     return result_df

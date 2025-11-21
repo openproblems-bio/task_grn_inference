@@ -1,10 +1,16 @@
 import sys
+import os
+
+# Fix OpenBLAS threading issue - must be set before importing numpy/scipy
+os.environ['OPENBLAS_NUM_THREADS'] = '1'
+os.environ['MKL_NUM_THREADS'] = '1'
+os.environ['OMP_NUM_THREADS'] = '1'
+
 import anndata as ad
 import networkx as nx
 import scanpy as sc
 import scglue
 from matplotlib import rcParams
-import os 
 import subprocess
 import pandas as pd
 import numpy as np
@@ -13,6 +19,7 @@ import requests
 import torch
 
 from util import download_annotation
+
 
 def download_motifs(par):
     if not os.path.exists(par['motif_file']):

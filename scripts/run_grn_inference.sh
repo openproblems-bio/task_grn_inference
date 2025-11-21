@@ -117,12 +117,15 @@ HERE
 
 if [[ "$DATASET" =~ ^(replogle|parsebioscience|xaira_HEK293T|xaira_HCT116)$ ]]; then
   methods="[pearson_corr, negative_control, positive_control, grnboost, portia, scenic, geneformer, scgpt, spearman_corr]"
+  # methods="[grnboost, scenic]"
   append_entry "$DATASET" "$methods" 
   append_entry "$DATASET" "[scprint]" "true"
   
   echo $methods 
 elif [ "$DATASET" = "op" ] || [ "$DATASET" = "ibd_CD" ] || [ "$DATASET" = "ibd_UC" ]; then
   methods="[pearson_corr, spearman_corr, negative_control, positive_control, grnboost, portia, scenic, scprint, geneformer, scgpt, figr, scenicplus, celloracle, granie, scglue]" 
+  methods="[celloracle]" 
+
   append_entry "$DATASET" "$methods" 
   echo $methods 
 
@@ -138,6 +141,7 @@ if [ "$RUN_TEST" = true ]; then
 else
   labels_config="scripts/configs/labels_tw.config"
 fi
+echo "Labels config: $labels_config"
 # --- Final configuration ---
 if [ "$RUN_LOCAL" = true ]; then
   cat >> "$param_local" << HERE

@@ -9,6 +9,9 @@ from scipy.stats import fisher_exact, ttest_1samp
 from typing import Dict, List, Tuple, Set
 import sys
 import os
+import requests
+from multiprocessing import Pool, cpu_count
+from functools import partial
 
 from util import read_prediction, read_gmt
 
@@ -18,6 +21,69 @@ import decoupler as dc
 # For reproducibility
 SEED = 42
 np.random.seed(SEED)
+
+
+def get_enrichr_library(library_name: str) -> Dict[str, List[str]]:
+    """
+    Download gene sets from Enrichr.
+    
+    Parameters
+    ----------
+    library_name : str
+        Name of the Enrichr library (e.g., 'MSigDB_Hallmark_2020', 'KEGG_2021_Human')
+    
+    Returns
+    -------
+    Dict[str, List[str]]
+        Dictionary mapping pathway names to gene lists
+    """
+    url = f'https://maayanlab.cloud/Enrichr/geneSetLibrary?mode=text&libraryName={library_name}'
+    response = requests.get(url)
+    
+    if response.status_code != 200:
+        raise ValueError(f"Failed to download {library_name}: {response.status_code}")
+    
+    gene_sets = {}
+    for line in response.text.strip().split('\n'):
+        if not line:
+            continue
+        parts = line.split('\t')
+        if len(parts) < 3:
+            continue
+        term = parts[0]
+        genes = [g for g in parts[2:] if g]  # Filter empty strings
+        if genes:  # Only add if there are genes
+            gene_sets[term] = genes
+    
+    return gene_sets
+
+
+def convert_enrichr_to_pathways(gene_sets: Dict[str, List[str]], 
+                                min_size: int = 5, 
+                                max_size: int = 500) -> Dict[str, Set[str]]:
+    """
+    Convert Enrichr gene sets to pathway dictionary with size filtering.
+    
+    Parameters
+    ----------
+    gene_sets : Dict[str, List[str]]
+        Gene sets from Enrichr
+    min_size : int
+        Minimum pathway size
+    max_size : int
+        Maximum pathway size
+    
+    Returns
+    -------
+    Dict[str, Set[str]]
+        Filtered pathway dictionary
+    """
+    pathways = {}
+    for name, genes in gene_sets.items():
+        gene_set = set(genes)
+        if min_size <= len(gene_set) <= max_size:
+            pathways[name] = gene_set
+    return pathways
 
 
 def get_canonical_pathways(pathway_file: str) -> pd.DataFrame:
@@ -510,12 +576,67 @@ def identify_active_pathways_ulm(
     return active_pathways
 
 
+def _test_pathway_enrichment_worker(pathway_item: Tuple[str, Set[str]], 
+                                     tfs_data: Dict[str, Set[str]], 
+                                     all_genes: Set[str],
+                                     fdr_threshold: float,
+                                     n_pathways: int) -> Tuple[str, Dict]:
+    """
+    Worker function for parallel pathway enrichment testing.
+    
+    Parameters
+    ----------
+    pathway_item : Tuple[str, Set[str]]
+        (pathway_name, pathway_genes)
+    tfs_data : Dict[str, Set[str]]
+        Dictionary mapping TF names to their target gene sets
+    all_genes : Set[str]
+        Background genes
+    fdr_threshold : float
+        FDR threshold
+    n_pathways : int
+        Total number of pathways for Bonferroni correction
+    
+    Returns
+    -------
+    Tuple[str, Dict]
+        (pathway_name, enrichment_result)
+    """
+    pathway_name, pathway_genes = pathway_item
+    
+    min_pvalue = 1.0
+    enriched_tfs = []
+    
+    for tf, tf_targets in tfs_data.items():
+        if len(tf_targets) < 10:  # Skip TFs with too few targets
+            continue
+        
+        # Fisher's exact test
+        odds_ratio, p_value = fishers_exact_test(tf_targets, pathway_genes, all_genes)
+        
+        if p_value < min_pvalue:
+            min_pvalue = p_value
+        
+        if p_value < fdr_threshold / n_pathways:  # Bonferroni correction
+            enriched_tfs.append((tf, p_value))
+    
+    result = {
+        'is_enriched': len(enriched_tfs) > 0,
+        'min_pvalue': min_pvalue,
+        'enriched_tfs': enriched_tfs,
+        'n_tfs': len(enriched_tfs)
+    }
+    
+    return pathway_name, result
+
+
 def calculate_gene_set_recovery(
     prediction: pd.DataFrame,
     pathways: Dict[str, Set[str]],
     active_pathways: Dict[str, Dict],
     all_genes: Set[str],
-    fdr_threshold: float = 0.01
+    fdr_threshold: float = 0.01,
+    n_workers: int = None
 ) -> Dict:
     """
     Calculate gene set recovery metrics (precision, recall, F1).
@@ -537,6 +658,8 @@ def calculate_gene_set_recovery(
         Background genes
     fdr_threshold : float
         FDR threshold for enrichment
+    n_workers : int, optional
+        Number of parallel workers (default: use all CPUs)
     
     Returns
     -------
@@ -553,44 +676,56 @@ def calculate_gene_set_recovery(
             'pathway_details': List[Dict]
         }
     """
-    print("\n  [Gene Set Recovery] Testing pathway enrichment in GRN...")
+    if n_workers is None:
+        n_workers = cpu_count()
     
-    # Get all TFs in GRN
-    tfs_in_grn = prediction['source'].unique()
+    print(f"\n  [Gene Set Recovery] Testing pathway enrichment in GRN (using {n_workers} workers)...")
     
-    # Test each pathway for enrichment in ANY TF's targets
+    # Get all TFs in GRN and prepare their target sets
+    print("  [Gene Set Recovery] Preparing TF target sets...")
+    tfs_data = {}
+    for tf in prediction['source'].unique():
+        tf_targets = set(prediction[prediction['source'] == tf]['target'])
+        tf_targets = tf_targets & all_genes
+        if len(tf_targets) >= 10:  # Only include TFs with enough targets
+            tfs_data[tf] = tf_targets
+    
+    print(f"  [Gene Set Recovery] Testing {len(pathways)} pathways with {len(tfs_data)} TFs...")
+    
+    # Filter pathways to only those in active_pathways
+    pathways_to_test = [(name, genes) for name, genes in pathways.items() 
+                        if name in active_pathways]
+    
+    # Parallel pathway enrichment testing
     pathway_enrichment = {}
     
-    for pathway_name, pathway_genes in tqdm(pathways.items(), desc="  Testing pathways"):
-        if pathway_name not in active_pathways:
-            continue  # Skip pathways not tested by ULM
+    if len(pathways_to_test) > 10 and n_workers > 1:
+        # Use parallel processing for large pathway sets
+        worker_fn = partial(_test_pathway_enrichment_worker,
+                           tfs_data=tfs_data,
+                           all_genes=all_genes,
+                           fdr_threshold=fdr_threshold,
+                           n_pathways=len(pathways))
         
-        # Test if ANY TF in the GRN is enriched for this pathway
-        min_pvalue = 1.0
-        enriched_tfs = []
+        with Pool(processes=n_workers) as pool:
+            results = list(tqdm(
+                pool.imap(worker_fn, pathways_to_test),
+                total=len(pathways_to_test),
+                desc="  Testing pathways"
+            ))
         
-        for tf in tfs_in_grn:
-            tf_targets = set(prediction[prediction['source'] == tf]['target'])
-            tf_targets = tf_targets & all_genes
-            
-            if len(tf_targets) < 10:  # Skip TFs with too few targets
-                continue
-            
-            # Fisher's exact test
-            odds_ratio, p_value = fishers_exact_test(tf_targets, pathway_genes, all_genes)
-            
-            if p_value < min_pvalue:
-                min_pvalue = p_value
-            
-            if p_value < fdr_threshold / len(pathways):  # Bonferroni correction
-                enriched_tfs.append((tf, p_value))
-        
-        pathway_enrichment[pathway_name] = {
-            'is_enriched': len(enriched_tfs) > 0,
-            'min_pvalue': min_pvalue,
-            'enriched_tfs': enriched_tfs,
-            'n_tfs': len(enriched_tfs)
-        }
+        pathway_enrichment = dict(results)
+    else:
+        # Serial processing for small sets
+        for pathway_name, pathway_genes in tqdm(pathways_to_test, desc="  Testing pathways"):
+            _, result = _test_pathway_enrichment_worker(
+                (pathway_name, pathway_genes),
+                tfs_data=tfs_data,
+                all_genes=all_genes,
+                fdr_threshold=fdr_threshold,
+                n_pathways=len(pathways)
+            )
+            pathway_enrichment[pathway_name] = result
     
     # Calculate TP, FP, FN
     TP = 0
@@ -657,7 +792,12 @@ def calculate_gene_set_recovery(
 
 
 def main(par: dict) -> pd.DataFrame:
-
+    """
+    Main function to calculate annotation metrics.
+    
+    If pathway_files is provided (list of paths), calculate metrics for each.
+    Otherwise, use single pathway_file.
+    """
     
     # Load data
     print("\n[1/5] Loading data...")
@@ -672,145 +812,112 @@ def main(par: dict) -> pd.DataFrame:
     tf_all = np.loadtxt(par['tf_all'], dtype=str, delimiter=',', skiprows=1)
     print(f"  - Total TFs: {len(tf_all)}")
     
-    # Load pathways
-    print("\n[2/5] Loading pathways...")
-    pathway_file = par.get('pathway_file', '/home/jnourisa/projs/ongoing/ciim/input/prior/h.all.v2024.1.Hs.symbols.gmt')
+    # Determine which pathway files to process
+    pathway_files_dict = par.get('pathway_files', None)
+    if pathway_files_dict is None:
+        # Single pathway file (backward compatibility)
+        pathway_file = par.get('pathway_file', '/home/jnourisa/projs/ongoing/ciim/input/prior/h.all.v2024.1.Hs.symbols.gmt')
+        pathway_files_dict = {'default': pathway_file}
+    
+    # Load and process each pathway file
+    print(f"\n[2/5] Loading {len(pathway_files_dict)} pathway database(s)...")
     min_pw_size = par.get('min_pathway_size', 5)
     max_pw_size = par.get('max_pathway_size', 500)
     
-    pathways = load_pathways_as_sets(pathway_file, min_pw_size, max_pw_size)
-    print(f"  - Pathways loaded: {len(pathways)}")
-    print(f"  - Pathway size range: {min_pw_size}-{max_pw_size}")
+    all_results = []
     
-    # Parameters
-    fdr_threshold = par.get('fdr_threshold', 0.05)
-    min_targets = par.get('min_targets', 10)
-    max_targets = par.get('max_targets', 100)  # Top K edges by weight
-    
-    print(f"\n[3/5] Parameters:")
-    print(f"  - FDR threshold: {fdr_threshold}")
-    print(f"  - Min targets: {min_targets}")
-    print(f"  - Max targets (top K by weight): {max_targets}")
-    
-    # Calculate scores for each TF
-    print(f"\n[4/5] Calculating pathway enrichment for {len(tf_all)} TFs...")
-    tf_scores = []
-    
-    for tf in tqdm(tf_all, desc="Processing TFs"):
-        score_dict = calculate_tf_pathway_score(
-            tf=tf,
-            prediction=prediction,
-            pathways=pathways,
-            all_genes=all_genes,
-            fdr_threshold=fdr_threshold,
-            min_targets=min_targets,
-            max_targets=max_targets
-        )
-        tf_scores.append(score_dict)
-    
-    scores_df = pd.DataFrame(tf_scores)
-    
-    # Calculate aggregate metrics
-    print(f"\n[5/5] Calculating aggregate metrics...")
-    
-    # Filter to TFs that were evaluated (in GRN and have valid target count)
-    evaluated_tfs = scores_df[
-        (scores_df['is_predicted'] == True) & 
-        (~scores_df.get('skip_reason', pd.Series([None]*len(scores_df))).notna())
-    ]
-    
-    print(f"  - TFs in prediction: {scores_df['is_predicted'].sum()}")
-    print(f"  - TFs evaluated: {len(evaluated_tfs)}")
-    print(f"  - TFs with enrichment: {(evaluated_tfs['n_pathways_enriched'] > 0).sum()}")
-    
-    # Metrics for TFs in GRN only
-    pf_grn_raw = evaluated_tfs['score_raw'].mean() if len(evaluated_tfs) > 0 else 0.0
-    pf_grn_norm = evaluated_tfs['score_norm'].mean() if len(evaluated_tfs) > 0 else 0.0
-    pf_grn_spec = evaluated_tfs['specificity'].mean() if len(evaluated_tfs) > 0 else 0.0
-    
-    # Metrics for all TFs (missing TFs get 0)
-    pf_all_raw = scores_df['score_raw'].mean()
-    pf_all_norm = scores_df['score_norm'].mean()
-    pf_all_spec = scores_df['specificity'].mean()
-    
-    # Coverage: fraction of TFs with at least one enriched pathway
-    coverage = (evaluated_tfs['n_pathways_enriched'] > 0).sum() / len(evaluated_tfs) * 100 if len(evaluated_tfs) > 0 else 0.0
-    
-    # Initialize gene set recovery metrics
-    gs_results = None
-    
-    # Optionally run gene set recovery metric
-    if par.get('run_gene_set_recovery', False) and dc is not None:
-        print("\n" + "="*80)
-        print("GENE SET RECOVERY METRIC (ULM-based)")
-        print("="*80)
+    for geneset_name, pathway_file in pathway_files_dict.items():
+        print(f"\n{'='*80}")
+        print(f"Processing gene set: {geneset_name}")
+        print(f"{'='*80}")
         
-        # Identify active pathways using ULM
-        active_pathways = identify_active_pathways_ulm(
-            evaluation_data=evaluation_data,
-            pathways=pathways,
-            prediction=prediction,
-            min_targets=min_targets,
-            activity_threshold=par.get('ulm_activity_threshold', 0.0),
-            pvalue_threshold=par.get('ulm_pvalue_threshold', 0.01),
-            baseline_method=par.get('ulm_baseline_method', 'zero_centered')
-        )
+        pathways = load_pathways_as_sets(pathway_file, min_pw_size, max_pw_size)
+        print(f"  - Pathways loaded: {len(pathways)}")
+        print(f"  - Pathway size range: {min_pw_size}-{max_pw_size}")
         
-        # Calculate gene set recovery
-        gs_results = calculate_gene_set_recovery(
-            prediction=prediction,
-            pathways=pathways,
-            active_pathways=active_pathways,
-            all_genes=all_genes,
-            fdr_threshold=fdr_threshold
-        )
+        # Parameters
+        fdr_threshold = par.get('fdr_threshold', 0.05)
+        min_targets = par.get('min_targets', 10)
+        max_targets = par.get('max_targets', 100)
+        
+        # Run gene set recovery metric
+        if par.get('run_gene_set_recovery', False) and dc is not None:
+            print(f"\n  [Gene Set Recovery] Running for {geneset_name}...")
+            
+            # Identify active pathways using ULM
+            active_pathways = identify_active_pathways_ulm(
+                evaluation_data=evaluation_data,
+                pathways=pathways,
+                prediction=prediction,
+                min_targets=min_targets,
+                activity_threshold=par.get('ulm_activity_threshold', 0.0),
+                pvalue_threshold=par.get('ulm_pvalue_threshold', 0.01),
+                baseline_method=par.get('ulm_baseline_method', 'zero_centered')
+            )
+            
+            # Calculate gene set recovery
+            n_workers = par.get('n_workers', None)
+            gs_results = calculate_gene_set_recovery(
+                prediction=prediction,
+                pathways=pathways,
+                active_pathways=active_pathways,
+                all_genes=all_genes,
+                fdr_threshold=fdr_threshold,
+                n_workers=n_workers
+            )
+            
+            # Store results with gene set prefix
+            result_dict = {
+                f'{geneset_name}_gs_precision': gs_results['precision'],
+                f'{geneset_name}_gs_recall': gs_results['recall'],
+                f'{geneset_name}_gs_f1': gs_results['f1'],
+                f'{geneset_name}_gs_tp': gs_results['TP'],
+                f'{geneset_name}_gs_fp': gs_results['FP'],
+                f'{geneset_name}_gs_fn': gs_results['FN'],
+                f'{geneset_name}_gs_tn': gs_results['TN'],
+                f'{geneset_name}_gs_n_active': gs_results['n_active_pathways'],
+                f'{geneset_name}_gs_n_enriched': gs_results['n_enriched_pathways']
+            }
+            
+            all_results.append(result_dict)
+            
+            print(f"\n  [{geneset_name}] Results:")
+            print(f"    Precision: {gs_results['precision']:.4f}")
+            print(f"    Recall:    {gs_results['recall']:.4f}")
+            print(f"    F1 Score:  {gs_results['f1']:.4f}")
+        else:
+            # Gene set recovery not run
+            result_dict = {
+                f'{geneset_name}_gs_precision': 0.0,
+                f'{geneset_name}_gs_recall': 0.0,
+                f'{geneset_name}_gs_f1': 0.0,
+                f'{geneset_name}_gs_tp': 0,
+                f'{geneset_name}_gs_fp': 0,
+                f'{geneset_name}_gs_fn': 0,
+                f'{geneset_name}_gs_tn': 0,
+                f'{geneset_name}_gs_n_active': 0,
+                f'{geneset_name}_gs_n_enriched': 0
+            }
+            all_results.append(result_dict)
     
-    # Create summary DataFrame - only include gene set recovery metrics
-    summary_dict = {}
-    
-    # Add gene set recovery metrics if available
-    if gs_results is not None:
-        summary_dict.update({
-            'gs_precision': gs_results['precision'],
-            'gs_recall': gs_results['recall'],
-            'gs_f1': gs_results['f1'],
-            'gs_tp': gs_results['TP'],
-            'gs_fp': gs_results['FP'],
-            'gs_fn': gs_results['FN'],
-            'gs_tn': gs_results['TN'],
-            'gs_n_active': gs_results['n_active_pathways'],
-            'gs_n_enriched': gs_results['n_enriched_pathways']
-        })
-    else:
-        # If gene set recovery is not run, return empty metrics
-        summary_dict = {
-            'gs_precision': 0.0,
-            'gs_recall': 0.0,
-            'gs_f1': 0.0,
-            'gs_tp': 0,
-            'gs_fp': 0,
-            'gs_fn': 0,
-            'gs_tn': 0,
-            'gs_n_active': 0,
-            'gs_n_enriched': 0
-        }
-    
-    summary_df = pd.DataFrame([summary_dict])
-    
+    # Merge all results into single dictionary
     print("\n" + "="*80)
     print("FINAL RESULTS:")
     print("="*80)
     
-    if gs_results is not None:
-        print("\n[Gene Set Recovery Metric (ULM-based)]")
-        print(f"  Precision: {gs_results['precision']:.4f}")
-        print(f"  Recall:    {gs_results['recall']:.4f}")
-        print(f"  F1 Score:  {gs_results['f1']:.4f}")
-        print(f"  Active pathways: {gs_results['n_active_pathways']}")
-        print(f"  Recovered (TP):  {gs_results['TP']}")
-    else:
-        print("\n  Gene set recovery metric not run (set --run_gene_set_recovery flag)")
+    final_dict = {}
+    for result in all_results:
+        final_dict.update(result)
+    
+    # Print summary for each gene set
+    for geneset_name in pathway_files_dict.keys():
+        print(f"\n[{geneset_name}]")
+        if f'{geneset_name}_gs_f1' in final_dict:
+            print(f"  Precision: {final_dict[f'{geneset_name}_gs_precision']:.4f}")
+            print(f"  Recall:    {final_dict[f'{geneset_name}_gs_recall']:.4f}")
+            print(f"  F1 Score:  {final_dict[f'{geneset_name}_gs_f1']:.4f}")
     
     print("="*80 + "\n")
     
+    summary_df = pd.DataFrame([final_dict])
     return summary_df

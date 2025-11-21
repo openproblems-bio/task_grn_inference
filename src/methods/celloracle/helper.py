@@ -10,6 +10,7 @@ from celloracle import motif_analysis as ma
 import genomepy
 import scanpy as sc
 
+
 def base_grn(par) -> None:
     print("Reading atac data")
     atac = ad.read_h5ad(par["atac"])

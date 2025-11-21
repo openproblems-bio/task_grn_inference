@@ -12,7 +12,7 @@
 
 set -euo pipefail
 
-save_dir="output/vc_v2_global"
+save_dir="output/vc_v2"
 mkdir -p "$save_dir"
 
 datasets=( "op" "300BCG" )
@@ -20,8 +20,9 @@ datasets=( "op" "300BCG" )
 # Global GRN files location
 global_grn_dir="resources/results/experiment/global_grns"
 
-combined_csv="${save_dir}/vc_v2_scores.csv"
-echo "dataset,method,metric,value" > "$combined_csv"
+# Create summary CSV file
+summary_csv="${save_dir}/summary_global.csv"
+echo "dataset,method,metric,value" > "$summary_csv"
 
 for dataset in "${datasets[@]}"; do
     echo -e "\n\nProcessing dataset: $dataset\n"
@@ -57,10 +58,10 @@ if "metric_values" in adata.uns:
     method_clean = "${method}".replace(',', ';')
     df["method"] = method_clean
     df = df[["dataset", "method", "metric", "value"]]
-    df.to_csv("${combined_csv}", mode="a", header=False, index=False)
+    df.to_csv("${summary_csv}", mode="a", header=False, index=False)
 EOF
 
     done
 done
 
-echo -e "\nAll results saved in: $combined_csv"
+echo -e "\nAll results saved in: $summary_csv"

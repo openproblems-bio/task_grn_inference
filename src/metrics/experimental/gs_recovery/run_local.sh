@@ -12,7 +12,7 @@
 
 set -euo pipefail
 
-save_dir="output/pathway_annotation"
+save_dir="output/annotation"
 mkdir -p "$save_dir"
 
 # Pathway file location
@@ -26,16 +26,16 @@ resources_dir="resources"
 methods=( "pearson_corr" "negative_control" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie" "scgpt" "geneformer" )
 # methods=( "pearson_corr" "grnboost" )  # Test subset
 
+# Create summary CSV file
+summary_csv="${save_dir}/summary.csv"
+echo "dataset,method,metric,value" > "$summary_csv"
+
 for dataset in "${datasets[@]}"; do
     echo -e "\n\n=========================================="
     echo "Processing dataset: $dataset"
     echo "==========================================" 
 
     evaluation_data="resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad"
-
-    # Create separate CSV file for each dataset
-    dataset_csv="${save_dir}/pathway_annotation_scores_${dataset}.csv"
-    echo "dataset,method,metric,value" > "$dataset_csv"
 
     for method in "${methods[@]}"; do
         echo -e "\n  Processing method: $method"
@@ -79,7 +79,7 @@ try:
 except Exception as e:
     print(f'Error reading scores: {e}', file=sys.stderr)
     sys.exit(1)
-" >> "$dataset_csv"
+" >> "$summary_csv"
             echo "    Scores appended to CSV"
         else
             echo "    Warning: Score file not created"
@@ -87,9 +87,8 @@ except Exception as e:
 
     done  # end methods loop
 
-    echo -e "\nResults for dataset $dataset saved to: $dataset_csv"
 done  # end datasets loop
 
 echo -e "\n=========================================="
-echo "All results saved in: $save_dir"
+echo "All results saved in: $summary_csv"
 echo "=========================================="

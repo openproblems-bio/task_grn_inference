@@ -12,7 +12,7 @@
 
 set -euo pipefail
 
-save_dir="output/recovery"
+save_dir="output/tf_recovery"
 mkdir -p "$save_dir"
 
 # datasets to process
@@ -23,9 +23,9 @@ datasets=("replogle" "xaira_HEK293T" "xaira_HCT116" ) #"300BCG" "ibd" 'parsebios
 methods=( "pearson_corr" "positive_control" "negative_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
 # methods=( "pearson_corr" "positive_control" )
 
-# temporary file to collect CSV rows
-combined_csv="${save_dir}/recovery_scores.csv"
-echo "dataset,method,metric,value" > "$combined_csv"
+# Create summary CSV file
+summary_csv="${save_dir}/summary.csv"
+echo "dataset,method,metric,value" > "$summary_csv"
 
 
 for dataset in "${datasets[@]}"; do
@@ -61,10 +61,10 @@ if "metric_values" in adata.uns:
     df["dataset"] = "${dataset}"
     df["method"] = "${method}"
     df = df[["dataset", "method", "metric", "value"]]  # Reorder columns to match header
-    df.to_csv("${combined_csv}", mode="a", header=False, index=False)
+    df.to_csv("${summary_csv}", mode="a", header=False, index=False)
 EOF
 
     done
 done
 
-echo -e "\nAll results collected in: $combined_csv"
+echo -e "\nAll results saved in: $summary_csv"
