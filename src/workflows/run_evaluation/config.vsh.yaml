@@ -119,12 +119,10 @@ dependencies:
   - name: metrics/regression 
   - name: metrics/ws_distance
   - name: metrics/tf_recovery
-  # - name: metrics/tf_binding
   - name: metrics/vc
   - name: metrics/rc_tf_act
   - name: metrics/sem
   - name: metrics/ar
-  # - name: metrics/all_metrics
   - name: utils/extract_uns_metadata
     repository: openproblems
 

@@ -88,18 +88,19 @@ DATASETS_CELLTYPES = {
 }
 
 DATASETS_METRICS = {
-    'replogle': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem'],
-    'adamson': ['regression', 'ws_distance', 'tf_binding', 'sem'],
-    'norman': ['regression', 'ws_distance', 'tf_binding', 'sem'],
-    'nakatake': ['regression', 'sem'],
-    'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression'],
-    '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression'],
-    'ibd_UC': ['regression', 'vc', 'tf_binding', 'sem', 'anchor_regression'],
-    'ibd_CD': ['regression', 'vc', 'tf_binding', 'sem', 'anchor_regression'],
-    'parsebioscience': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression'],
-    'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem'],
-    'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem'],
+    'replogle': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
+    'adamson': ['regression', 'ws_distance', 'tf_binding', 'sem', 'gs_recovery'],
+    'norman': ['regression', 'ws_distance', 'tf_binding', 'sem', 'gs_recovery'],
+    'nakatake': ['regression', 'sem', 'gs_recovery'],
+    'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression', 'gs_recovery'],
+    '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression', 'gs_recovery'],
+    'ibd_UC': ['regression', 'vc', 'tf_binding', 'sem', 'anchor_regression', 'gs_recovery'],
+    'ibd_CD': ['regression', 'vc', 'tf_binding', 'sem', 'anchor_regression', 'gs_recovery'],
+    'parsebioscience': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression', 'gs_recovery'],
+    'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
+    'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
 }
+
 
 METRICS_DATASETS = {}
 for dataset, metrics in DATASETS_METRICS.items():
@@ -107,17 +108,16 @@ for dataset, metrics in DATASETS_METRICS.items():
         METRICS_DATASETS.setdefault(metric, []).append(dataset)
 
 ORDERED_METRICS = [
-       'r2-theta-0.1', 'r2-theta-0.5', 'r2-theta-1.0',
-       'ws-theta-0.0', 'ws-theta-0.5', 'ws-theta-1.0', 
+       'r2_precision', 'r2_recall', 
+       'ws_precision', 'ws_recall', 
        'vc', 
-       'sem_precision', 'sem_balanced', 
-       'rc_precision', 'rc_balanced', 'rc_recall',
+       'sem', 
        't_rec_precision', 't_rec_recall', 
-       'rc_tf_act_precision', 'rc_tf_act_balanced', 'rc_tf_act_recall',
-       'anchor_regression',
-       'tfb_grn_norm', 'tfb_all_norm'
+       'tfb_precision', 'tfb_recall', 
+       'rc_tf_act',
+       'anchor_regression'
        ]
-ORDERED_METRICS_C = [c for c in ORDERED_METRICS if c not in ['tfb_grn_norm', 'tfb_all_norm']]
+# ORDERED_METRICS_C = [c for c in ORDERED_METRICS]
 
 def generate_config_env(output_path='src/utils/dataset_config.env'):
     """Generate a simple env-style config file with dataset-specific configurations."""

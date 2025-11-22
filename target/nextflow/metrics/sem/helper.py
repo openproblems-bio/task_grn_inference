@@ -480,7 +480,7 @@ def main(par):
 
         results = {
             'sem_precision': [float(np.log2(np.mean(scores) / (np.mean(scores_baseline) + 1e-6)))],
-            'sem_balanced': [float(score)]
+            'sem': [float(score)]
         }
 
         df_results = pd.DataFrame(results)

@@ -16,21 +16,24 @@ save_dir="output/tf_binding"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=(  'replogle' 'norman'  'adamson'  "300BCG" "ibd" 'parsebioscience' 'op' 'xaira_HCT116' 'xaira_HEK293T' ) #'xaira_HCT116'
+datasets=(  'replogle' 'norman'  'adamson'  "300BCG" 'ibd_uc' 'ibd_cd' 'parsebioscience' 'op' 'xaira_HCT116' 'xaira_HEK293T' ) #'xaira_HCT116'
 # datasets=(  'replogle'  ) #'xaira_HCT116'
 resources_dir="resources"
 methods=(  "pearson_corr" "negative_control" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie" "scgpt" "geneformer")
 # methods=( "grnboost" )
 
 
-# Create summary CSV file
+# Create summary CSV file with header - will be written by first Python call
 summary_csv="${save_dir}/summary.csv"
-echo "dataset,method,gt_source,metric,value" > "$summary_csv"
+# Header will be dynamically created from metric names
+echo -n "" > "$summary_csv"
+first_run=true
 
 for dataset in "${datasets[@]}"; do
     echo -e "\n\nProcessing dataset: $dataset\n"
 
     evaluation_data="resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad"
+
 
     for method in "${methods[@]}"; do
         echo -e "\n  $method  \n"
@@ -62,31 +65,21 @@ print(DATASETS_CELLTYPES.get('$dataset', ''))
 import anndata as ad
 import pandas as pd
 import numpy as np
+import os
 
 adata = ad.read_h5ad("${score}")
 if "metric_values" in adata.uns:
     metric_names = adata.uns["metric_ids"]
     metric_values = adata.uns["metric_values"]
-    gt_sources = adata.uns.get("gt_sources", [])
     
-    # Check if metric_values is 2D array (multiple rows) or 1D (single row)
-    if isinstance(metric_values, np.ndarray) and metric_values.ndim == 2:
-        # Multiple rows (one per ground truth source)
-        for row_idx, row_values in enumerate(metric_values):
-            df = pd.DataFrame({"metric": metric_names, "value": row_values})
-            df["dataset"] = "${dataset}"
-            df["method"] = "${method}"
-            df["gt_source"] = gt_sources[row_idx] if row_idx < len(gt_sources) else ""
-            df = df[["dataset", "method", "gt_source", "metric", "value"]]
-            df.to_csv("${summary_csv}", mode="a", header=False, index=False)
-    else:
-        # Single row (legacy format)
-        df = pd.DataFrame({"metric": metric_names, "value": metric_values})
-        df["dataset"] = "${dataset}"
-        df["method"] = "${method}"
-        df["gt_source"] = gt_sources[0] if len(gt_sources) > 0 else ""
-        df = df[["dataset", "method", "gt_source", "metric", "value"]]
-        df.to_csv("${summary_csv}", mode="a", header=False, index=False)
+    # Single row format - transpose the metrics into columns
+    df = pd.DataFrame([metric_values], columns=metric_names)
+    df.insert(0, "dataset", "${dataset}")
+    df.insert(1, "method", "${method}")
+    
+    # Write header if file is empty
+    write_header = not os.path.exists("${summary_csv}") or os.path.getsize("${summary_csv}") == 0
+    df.to_csv("${summary_csv}", mode="a", header=write_header, index=False)
 EOF
 
     done  # end methods loop

@@ -84,4 +84,28 @@ def main(par):
     
     scores_model = pd.concat(scores_model).reset_index(drop=True)
     mean_scores = scores_model.groupby('theta')['ws_distance_pc'].mean().to_frame().T.reset_index(drop=True)
+    
+    # Rename theta columns to precision/recall
+    column_mapping = {
+        0.25: 'ws_precision',
+        0.75: 'ws_recall',
+        'ws_raw': 'ws_raw'
+    }
+    
+    # Rename columns if they exist
+    new_columns = {}
+    for old_col in mean_scores.columns:
+        if old_col in column_mapping:
+            new_columns[old_col] = column_mapping[old_col]
+        else:
+            new_columns[old_col] = old_col
+    mean_scores = mean_scores.rename(columns=new_columns)
+    
+    # Calculate F1 score
+    if 'ws_precision' in mean_scores.columns and 'ws_recall' in mean_scores.columns:
+        precision = mean_scores['ws_precision'].values[0]
+        recall = mean_scores['ws_recall'].values[0]
+        f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+        mean_scores['ws_f1'] = f1
+    
     return scores_model, mean_scores

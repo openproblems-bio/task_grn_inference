@@ -159,6 +159,16 @@ def main(par):
         't_rec_precision': [results['in_net']['t_stat']],
         't_rec_recall': [results['all']['t_stat']]
     })
+    
+    # Calculate F1 score
+    precision = results['in_net']['t_stat']
+    recall = results['all']['t_stat']
+    # Normalize to [0,1] range first (assuming t-stats are positive)
+    precision_norm = max(0, precision)
+    recall_norm = max(0, recall)
+    f1 = 2 * (precision_norm * recall_norm) / (precision_norm + recall_norm) if (precision_norm + recall_norm) > 0 else 0
+    df['t_rec_f1'] = f1
+    
     print(f"\n=== Final Results ===")
     print(df)
     return df

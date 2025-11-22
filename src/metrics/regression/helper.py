@@ -299,9 +299,8 @@ def evaluate_static_approach(
 
 def evaluate_network_for_group(
         net_matrix: np.ndarray,
-        n_features_theta_min: np.ndarray,
-        n_features_theta_median: np.ndarray,
-        n_features_theta_max: np.ndarray,
+        n_features_theta_025: np.ndarray,
+        n_features_theta_075: np.ndarray,
         X: np.ndarray,
         groups: np.ndarray,
         gene_names: np.ndarray,
@@ -313,15 +312,12 @@ def evaluate_network_for_group(
     detailed_scores = []
     
     # Evaluate with different theta values
-    assert n_features_theta_min.sum() > 0, "No gene has regulators with theta=0.1"
+    assert n_features_theta_025.sum() > 0, "No gene has regulators with theta=0.25"
     detailed_scores.append(evaluate_static_approach(
-        net_matrix, n_features_theta_min, X, groups, gene_names, tf_names, reg_type, n_jobs, theta='r2-theta-0.1'
+        net_matrix, n_features_theta_025, X, groups, gene_names, tf_names, reg_type, n_jobs, theta='r2_precision'
     ))
     detailed_scores.append(evaluate_static_approach(
-        net_matrix, n_features_theta_median, X, groups, gene_names, tf_names, reg_type, n_jobs, theta='r2-theta-0.5'
-    ))
-    detailed_scores.append(evaluate_static_approach(
-        net_matrix, n_features_theta_max, X, groups, gene_names, tf_names, reg_type, n_jobs, theta='r2-theta-1.0'
+        net_matrix, n_features_theta_075, X, groups, gene_names, tf_names, reg_type, n_jobs, theta='r2_recall'
     ))
     
     # Evaluate with raw approach
@@ -345,9 +341,8 @@ def main(par: Dict[str, Any]) -> Tuple[pd.DataFrame, pd.DataFrame]:
         data = json.load(f)
     print(len(data), len(gene_names))
     
-    n_features_theta_min = np.asarray([data[gene_name]['0.1'] for gene_name in gene_names], dtype=int)
-    n_features_theta_median = np.asarray([data[gene_name]['0.5'] for gene_name in gene_names], dtype=int)
-    n_features_theta_max = np.asarray([data[gene_name]['1'] for gene_name in gene_names], dtype=int)
+    n_features_theta_025 = np.asarray([data[gene_name]['0.25'] for gene_name in gene_names], dtype=int)
+    n_features_theta_075 = np.asarray([data[gene_name]['0.75'] for gene_name in gene_names], dtype=int)
     n_genes = len(gene_names)
     
     net = read_prediction(par)
@@ -389,7 +384,7 @@ def main(par: Dict[str, Any]) -> Tuple[pd.DataFrame, pd.DataFrame]:
             
             # Evaluate network for this group
             group_scores = evaluate_network_for_group(
-                net_matrix_group, n_features_theta_min, n_features_theta_median, n_features_theta_max,
+                net_matrix_group, n_features_theta_025, n_features_theta_075,
                 X_group, groups_group, gene_names, tf_names, par['reg_type'], par['num_workers']
             )
             detailed_scores.extend(group_scores)
@@ -400,7 +395,7 @@ def main(par: Dict[str, Any]) -> Tuple[pd.DataFrame, pd.DataFrame]:
             
         # Evaluate network
         all_scores = evaluate_network_for_group(
-            net_matrix, n_features_theta_min, n_features_theta_median, n_features_theta_max,
+            net_matrix, n_features_theta_025, n_features_theta_075,
             X, groups, gene_names, tf_names, par['reg_type'], par['num_workers']
         )
         detailed_scores.extend(all_scores)
@@ -410,5 +405,12 @@ def main(par: Dict[str, Any]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     
     # Compute mean scores per theta
     mean_scores = detailed_df.groupby('theta')['r2'].mean().to_frame().T.reset_index(drop=True)
+    
+    # Calculate F1 score
+    if 'r2_precision' in mean_scores.columns and 'r2_recall' in mean_scores.columns:
+        precision = mean_scores['r2_precision'].values[0]
+        recall = mean_scores['r2_recall'].values[0]
+        f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+        mean_scores['r2_f1'] = f1
 
     return detailed_df, mean_scores
