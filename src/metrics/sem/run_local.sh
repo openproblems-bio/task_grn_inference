@@ -16,11 +16,11 @@ save_dir="output/sem"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=('op' 'replogle' "300BCG" "ibd" 'parsebioscience' ) #"300BCG" "ibd" 'parsebioscience'
-datasets=('op')
+datasets=('op' 'replogle' "300BCG" 'ibd_uc' 'ibd_cd' 'parsebioscience' ) #"300BCG" "ibd" 'parsebioscience'
+# datasets=('op')
 # methods to process
 methods=("grnboost" "pearson_corr" "negative_control" "positive_control" "ppcor" "portia" "scenic" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
-methods=("grnboost")
+# methods=("grnboost")
 
 # Create summary CSV file
 summary_csv="${save_dir}/summary.csv"

@@ -335,16 +335,16 @@ def evaluate_grn(
         DataFrame with TF-level scores
     """
     # Calculate TF activities
-    print(f"Calculating TF activities for {len(net['source'].unique())} TFs...")
+    # print(f"Calculating TF activities for {len(net['source'].unique())} TFs...")
     activities, tf_names = calculate_tf_activities(X, gene_names, net, min_targets=min_targets)
     
     # Calculate dispersion
-    print(f"Calculating activity dispersion across {len(np.unique(groups))} groups...")
+    # print(f"Calculating activity dispersion across {len(np.unique(groups))} groups...")
     dispersions, consistency_scores, tf_scores_df = calculate_activity_dispersion(activities, groups, tf_names)
     
     # Print statistics
     valid_consistency = consistency_scores[~np.isnan(consistency_scores)]
-    print(f"Consistency - Mean: {np.mean(valid_consistency):.3f} ± {np.std(valid_consistency):.3f}, Median: {np.median(valid_consistency):.3f}")
+    # print(f"Consistency - Mean: {np.mean(valid_consistency):.3f} ± {np.std(valid_consistency):.3f}, Median: {np.median(valid_consistency):.3f}")
     
     return dispersions, consistency_scores, tf_scores_df
 
@@ -366,7 +366,7 @@ def main(par):
     
     # Get grouping variables (perturbation × celltype × donor)
     grouping_vars = DATASET_GROUPS[dataset_id]['rc_tf_ac']
-    print(f"Grouping by: {grouping_vars}")
+    # print(f"Grouping by: {grouping_vars}")
     
     # Create groups for perturbation × celltype combinations
     # We want to measure consistency across donors within each perturbation × celltype
@@ -374,42 +374,45 @@ def main(par):
     groups = combine_multi_index(*group_vars)
     
     # Load predicted GRN
-    print("Loading predicted GRN...")
+    # print("Loading predicted GRN...")
     net_full = read_prediction(par)
     
-    # Configuration for three scores: precision, balanced, recall
-    # Each uses different TF set size and edges per TF
+    # Configuration for 10 different selections
+    # Start with 10 TFs and 10 target genes, increment to 300 TFs and 300 genes
+    # Linearly spaced configurations
+    n_configs = 10
+    tf_counts = np.linspace(10, 300, n_configs, dtype=int)
+    target_counts = np.linspace(10, 300, n_configs, dtype=int)
+    
     score_configs = [
-        # {'name': 'precision', 'n_tfs': 10, 'n_edges_per_tf': 20},
-        {'name': 'balanced', 'n_tfs': 100, 'n_edges_per_tf': 100},
-        {'name': 'recall', 'n_tfs': 300, 'n_edges_per_tf': 1000}
+        {'n_tfs': int(n_tf), 'n_edges_per_tf': int(n_edges)} 
+        for n_tf, n_edges in zip(tf_counts, target_counts)
     ]
     
-    results = {}
+    consistency_scores_all = []
     
-    for config in score_configs:
-        score_name = config['name']
+    for idx, config in enumerate(score_configs):
         n_tfs = config['n_tfs']
         n_edges_per_tf = config['n_edges_per_tf']
         
-        print("\n" + "="*60)
-        print(f"Evaluating {score_name.upper()}: Top {n_tfs} TFs (with top {n_edges_per_tf} edges each)")
-        print("="*60)
+        # print("\n" + "="*60)
+        # print(f"Configuration {idx+1}/{n_configs}: Top {n_tfs} TFs (with top {n_edges_per_tf} edges each)")
+        # print("="*60)
         
         # Select top TFs and edges
         net = select_top_tfs_and_edges(net_full, n_tfs, n_edges_per_tf)
-        print(f"Selected {len(net)} edges across {len(net['source'].unique())} TFs")
+        # print(f"Selected {len(net)} edges across {len(net['source'].unique())} TFs")
         
         # Filter to minimum targets
         min_targets = par.get('min_targets', 5)
-        tf_counts = net['source'].value_counts(sort=True)  # sort=True for determinism
-        tfs_to_keep = tf_counts[tf_counts >= min_targets].index
+        tf_counts_check = net['source'].value_counts(sort=True)  # sort=True for determinism
+        tfs_to_keep = tf_counts_check[tf_counts_check >= min_targets].index
         net = net[net['source'].isin(tfs_to_keep)]
-        print(f"After filtering (min_targets={min_targets}): {len(net)} edges across {len(net['source'].unique())} TFs")
+        # print(f"After filtering (min_targets={min_targets}): {len(net)} edges across {len(net['source'].unique())} TFs")
         
         if len(net) == 0:
             print(f"Warning: No TFs with at least {min_targets} targets")
-            results[f'rc_tf_act_{score_name}'] = 0.0
+            consistency_scores_all.append(0.0)
             continue
         
         # Evaluate GRN
@@ -418,14 +421,18 @@ def main(par):
         # Calculate score (mean consistency with padding)
         score = calculate_standardized_scores(tf_scores_df, n_tfs)
         
-        print(f"\n{score_name.upper()} Score: {score:.4f}")
-        results[f'rc_tf_act_{score_name}'] = score
+        # print(f"Consistency Score: {score:.4f}")
+        consistency_scores_all.append(score)
     
-    results_df = pd.DataFrame([results])
+    # Calculate average across all configurations
+    rc_tf_act_score = np.mean(consistency_scores_all)
     
-    print("\n" + "="*60)
-    print("Final Summary:")
-    print("="*60)
+    results_df = pd.DataFrame([{'rc_tf_act': rc_tf_act_score}])
+    
+    # print("\n" + "="*60)
+    # print("Final Summary:")
+    # print("="*60)
+    # print(f"rc_tf_act (average across {n_configs} configurations): {rc_tf_act_score:.4f}")
     print(results_df.to_string(index=False))
     
     return results_df

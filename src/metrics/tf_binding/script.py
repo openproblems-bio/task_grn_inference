@@ -41,28 +41,5 @@ if __name__ == "__main__":
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     
-    # Custom save for multiple rows
-    print('Write output to file', flush=True)
-    if not isinstance(output, pd.DataFrame):
-        raise ValueError("Expected 'output' to be a pandas DataFrame.")
-
-    # Separate 'gt' column from metric columns
-    gt_sources = output['gt'].tolist() if 'gt' in output.columns else []
-    metric_cols = [col for col in output.columns if col != 'gt']
-    
-    metric_ids = metric_cols
-    metric_values = output[metric_cols].to_numpy().astype(str)  # Only metric columns
-
-    adata = ad.AnnData(
-        X=np.empty((0, 0)),
-        uns={
-            "dataset_id": dataset_id,
-            "method_id": method_id,
-            "metric_ids": metric_ids,
-            "metric_values": metric_values,  # store as 2D numpy array of strings
-            "gt_sources": gt_sources  # store ground truth sources separately
-        }
-    )
-
-    adata.write_h5ad(par['score'], compression='gzip')
+    score_adata = format_save_score(output, dataset_id, method_id, par['score'])
     print('Completed', flush=True)

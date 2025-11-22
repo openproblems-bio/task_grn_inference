@@ -124,7 +124,7 @@ if [[ "$DATASET" =~ ^(replogle|parsebioscience|xaira_HEK293T|xaira_HCT116)$ ]]; 
   echo $methods 
 elif [ "$DATASET" = "op" ] || [ "$DATASET" = "ibd_CD" ] || [ "$DATASET" = "ibd_UC" ]; then
   methods="[pearson_corr, spearman_corr, negative_control, positive_control, grnboost, portia, scenic, scprint, geneformer, scgpt, figr, scenicplus, celloracle, granie, scglue]" 
-  methods="[celloracle]" 
+  methods="[celloracle, scglue]" 
 
   append_entry "$DATASET" "$methods" 
   echo $methods 

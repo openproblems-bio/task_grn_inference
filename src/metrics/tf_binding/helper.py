@@ -123,27 +123,36 @@ def main(par):
         df['gt'] = gt
         rr_store.append(df)
     result_df = pd.concat(rr_store, ignore_index=True)
-    if False:
-        # Weighted average across all ground truth sources
-        weights = result_df['n_tfs_to_evaluate'].values
-        total_weight = weights.sum()
-        
-        # Raw scores (backward compatibility)
-        tfb_grn_raw_weighted = (result_df['tfb_grn_raw'] * weights).sum() / total_weight
-        tfb_all_raw_weighted = (result_df['tfb_all_raw'] * weights).sum() / total_weight
-        
-        # Normalized scores (new approach)
-        tfb_grn_norm_weighted = (result_df['tfb_grn_norm'] * weights).sum() / total_weight
-        tfb_all_norm_weighted = (result_df['tfb_all_norm'] * weights).sum() / total_weight
-        
-        
-        result_df = pd.DataFrame([{
-            'tfb_grn': tfb_grn_raw_weighted,  # Keep for backward compatibility
-            'tfb_all': tfb_all_raw_weighted,  # Keep for backward compatibility
-            'tfb_grn_norm': tfb_grn_norm_weighted,  # New normalized score
-            'tfb_all_norm': tfb_all_norm_weighted   # New normalized score
-        }])
-    else:
-        pass
+    
+    # Weighted average across all ground truth sources
+    weights = result_df['n_tfs_to_evaluate'].values
+    total_weight = weights.sum()
+    
+    # Normalized scores (precision and recall)
+    tfb_precision_weighted = (result_df['tfb_grn_norm'] * weights).sum() / total_weight
+    tfb_recall_weighted = (result_df['tfb_all_norm'] * weights).sum() / total_weight
+    
+    # Calculate F1 score
+    tfb_f1 = 2 * (tfb_precision_weighted * tfb_recall_weighted) / (tfb_precision_weighted + tfb_recall_weighted) if (tfb_precision_weighted + tfb_recall_weighted) > 0 else 0
+    
+    # Create single-row result with weighted averages and GT-specific scores
+    final_result = {
+        'tfb_precision': tfb_precision_weighted,
+        'tfb_recall': tfb_recall_weighted,
+        'tfb_f1': tfb_f1
+    }
+    
+    # Add GT-specific scores
+    for _, row in result_df.iterrows():
+        gt = row['gt']
+        final_result[f'{gt}_tfb_precision'] = row['tfb_grn_norm']
+        final_result[f'{gt}_tfb_recall'] = row['tfb_all_norm']
+        # Calculate F1 for each GT
+        precision = row['tfb_grn_norm']
+        recall = row['tfb_all_norm']
+        f1_gt = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+        final_result[f'{gt}_tfb_f1'] = f1_gt
+    
+    result_df = pd.DataFrame([final_result])
     
     return result_df
