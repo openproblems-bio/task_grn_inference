@@ -141,17 +141,16 @@ def main(par):
         'tfb_recall': tfb_recall_weighted,
         'tfb_f1': tfb_f1
     }
-    
-    # Add GT-specific scores
-    for _, row in result_df.iterrows():
-        gt = row['gt']
-        final_result[f'{gt}_tfb_precision'] = row['tfb_grn_norm']
-        final_result[f'{gt}_tfb_recall'] = row['tfb_all_norm']
-        # Calculate F1 for each GT
-        precision = row['tfb_grn_norm']
-        recall = row['tfb_all_norm']
-        f1_gt = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-        final_result[f'{gt}_tfb_f1'] = f1_gt
+    if par['output_detailed_metrics']:
+        for _, row in result_df.iterrows():
+            gt = row['gt']
+            final_result[f'{gt}_tfb_precision'] = row['tfb_grn_norm']
+            final_result[f'{gt}_tfb_recall'] = row['tfb_all_norm']
+            # Calculate F1 for each GT
+            precision = row['tfb_grn_norm']
+            recall = row['tfb_all_norm']
+            f1_gt = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+            final_result[f'{gt}_tfb_f1'] = f1_gt
     
     result_df = pd.DataFrame([final_result])
     

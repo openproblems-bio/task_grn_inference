@@ -456,9 +456,9 @@ RUN pip install --upgrade pip && \
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component methods spearman_corr"
-LABEL org.opencontainers.image.created="2025-11-23T06:39:00Z"
+LABEL org.opencontainers.image.created="2025-11-23T19:23:48Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="dffb351697d76d88d66e4eb5d7a620fc52f057c9"
+LABEL org.opencontainers.image.revision="a8477836400f81d57164b4cc9cb1bfa2daa68e7a"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

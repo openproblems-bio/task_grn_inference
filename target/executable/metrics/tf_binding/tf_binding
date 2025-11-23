@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics tf_binding"
-LABEL org.opencontainers.image.created="2025-11-23T06:38:59Z"
+LABEL org.opencontainers.image.created="2025-11-23T19:23:47Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="dffb351697d76d88d66e4eb5d7a620fc52f057c9"
+LABEL org.opencontainers.image.revision="a8477836400f81d57164b4cc9cb1bfa2daa68e7a"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -627,6 +627,11 @@ function ViashHelp {
   echo "    --ground_truth_remap"
   echo "        type: file"
   echo "        example: resources_test/grn_benchmark/ground_truth/PBMC.csv"
+  echo ""
+  echo "    --output_detailed_metrics"
+  echo "        type: boolean"
+  echo "        default: false"
+  echo "        Whether to output detailed per-geneset metrics or only summary metrics"
   echo ""
   echo "Viash built in Computational Requirements:"
   echo "    ---cpus=INT"
@@ -808,6 +813,17 @@ while [[ $# -gt 0 ]]; do
         --ground_truth_remap=*)
             [ -n "$VIASH_PAR_GROUND_TRUTH_REMAP" ] && ViashError Bad arguments for option \'--ground_truth_remap=*\': \'$VIASH_PAR_GROUND_TRUTH_REMAP\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_GROUND_TRUTH_REMAP=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --output_detailed_metrics)
+            [ -n "$VIASH_PAR_OUTPUT_DETAILED_METRICS" ] && ViashError Bad arguments for option \'--output_detailed_metrics\': \'$VIASH_PAR_OUTPUT_DETAILED_METRICS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_OUTPUT_DETAILED_METRICS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --output_detailed_metrics. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --output_detailed_metrics=*)
+            [ -n "$VIASH_PAR_OUTPUT_DETAILED_METRICS" ] && ViashError Bad arguments for option \'--output_detailed_metrics=*\': \'$VIASH_PAR_OUTPUT_DETAILED_METRICS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_OUTPUT_DETAILED_METRICS=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---engine)
@@ -1023,6 +1039,9 @@ fi
 if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
   VIASH_PAR_NUM_WORKERS="20"
 fi
+if [ -z ${VIASH_PAR_OUTPUT_DETAILED_METRICS+x} ]; then
+  VIASH_PAR_OUTPUT_DETAILED_METRICS="false"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -e "$VIASH_PAR_PREDICTION" ]; then
@@ -1056,6 +1075,12 @@ fi
 if [[ -n "$VIASH_PAR_NUM_WORKERS" ]]; then
   if ! [[ "$VIASH_PAR_NUM_WORKERS" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--num_workers' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_OUTPUT_DETAILED_METRICS" ]]; then
+  if ! [[ "$VIASH_PAR_OUTPUT_DETAILED_METRICS" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--output_detailed_metrics' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1265,7 +1290,8 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'ground_truth_unibind': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_UNIBIND+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_UNIBIND//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'ground_truth_chipatlas': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_CHIPATLAS+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_CHIPATLAS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'ground_truth_remap': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_REMAP+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_REMAP//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'ground_truth_remap': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_REMAP+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_REMAP//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'output_detailed_metrics': $( if [ ! -z ${VIASH_PAR_OUTPUT_DETAILED_METRICS+x} ]; then echo "r'${VIASH_PAR_OUTPUT_DETAILED_METRICS//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),

@@ -99,8 +99,7 @@ def parse_args(par):
     parser.add_argument('--geneset_go_bp_2023', type=str, help='GO BP 2023 geneset GMT file')
     parser.add_argument('--geneset_bioplanet_2019', type=str, help='BioPlanet 2019 geneset GMT file')
     parser.add_argument('--geneset_wikipathways_2019', type=str, help='WikiPathways 2019 geneset GMT file')
-
-   
+    parser.add_argument('--output_detailed_metrics', action='store_true', default=True, help='Output detailed metrics')
     
     args = parser.parse_args()
     for k, v in vars(args).items():

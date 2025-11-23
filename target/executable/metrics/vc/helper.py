@@ -247,24 +247,15 @@ class GRNLayer(torch.nn.Module):
             A = self.A_weights * self.A_mask
         
         if self.inverse:
-            # For inverse transformation, use iterative solve to avoid memory issues
-            # Solve (I - alpha * A.t()) * y = x for y
             ia = self.I - self.alpha * A.t()
-            
-            # Add small regularization to diagonal for numerical stability
             ia = ia + 1e-6 * self.I
-            
-            # Use solve instead of inversion to save memory
             try:
-                # Solve ia * y.t() = x.t() for y.t(), then transpose
                 result = torch.linalg.solve(ia, x.t()).t()
                 return result
             except torch.linalg.LinAlgError:
-                # Fallback: simple linear transformation without inversion
                 print("Warning: Matrix solve failed, using simplified GRN transformation")
                 return torch.mm(x, A)
         else:
-            # Forward transformation: apply GRN directly
             return torch.mm(x, A.t())
 
 
@@ -385,7 +376,6 @@ def evaluate(A, train_data_loader, test_data_loader, n_perturbations: int) -> Tu
         for x, pert, y in train_data_loader:
             x, pert, y = x.to(DEVICE), pert.to(DEVICE), y.to(DEVICE)
             optimizer.zero_grad()
-            # Model now predicts full perturbed expression directly
             y_hat = model(x, pert)
             loss = torch.mean(torch.square(y - y_hat))
             loss.backward()
@@ -410,9 +400,7 @@ def evaluate(A, train_data_loader, test_data_loader, n_perturbations: int) -> Tu
         model.train()
     ss_res = best_ss_res
 
-    # Final evaluation with PDS
     model.eval()
-
     ss_tot = 0
 
     with torch.no_grad():
@@ -427,9 +415,7 @@ def evaluate(A, train_data_loader, test_data_loader, n_perturbations: int) -> Tu
     return best_ss_res, ss_tot
 
 
-
 def main(par):
-    # Load evaluation data
     adata = ad.read_h5ad(par['evaluation_data'])
     assert 'is_control' in adata.obs.columns, "'is_control' column is required in the dataset for perturbation evaluation"
     assert adata.obs['is_control'].sum() > 0, "'is_control' column must contain at least one True value for control samples"

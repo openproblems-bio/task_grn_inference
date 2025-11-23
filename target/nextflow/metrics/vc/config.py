@@ -108,7 +108,7 @@ for dataset, metrics in DATASETS_METRICS.items():
         METRICS_DATASETS.setdefault(metric, []).append(dataset)
 
 ORDERED_METRICS = [
-       'r2_precision', 'r2_recall', 'r2_f1',
+       'r_precision', 'r_recall', 'r_f1',
        'ws_precision', 'ws_recall', 'ws_f1',
        'vc', 
        'sem', 

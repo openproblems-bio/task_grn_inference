@@ -792,7 +792,20 @@ def main(par: dict) -> pd.DataFrame:
     """
     
     # Load data
-    print("\n[1/5] Loading data...")
+    pathway_files = {}
+    geneset_mapping = {
+        'geneset_hallmark_2020': 'hallmark_2020',
+        'geneset_kegg_2021': 'kegg_2021',
+        'geneset_reactome_2022': 'reactome_2022',
+        'geneset_go_bp_2023': 'go_bp_2023',
+        'geneset_bioplanet_2019': 'bioplanet_2019',
+        'geneset_wikipathways_2019': 'wikipathways_2019',
+    }
+    
+    for arg_name, geneset_name in geneset_mapping.items():
+        pathway_files[geneset_name] = par[arg_name]
+    
+    par['pathway_files'] = pathway_files
     evaluation_data = ad.read_h5ad(par['evaluation_data'], backed='r')
     all_genes = set(evaluation_data.var_names.tolist())
     prediction = read_prediction(par)
@@ -846,21 +859,25 @@ def main(par: dict) -> pd.DataFrame:
         all_results.append(result_dict)
        
     
-    final_dict = {}
+    detailed_dict = {}
     for result in all_results:
         geneset_name = result['geneset_name']
-        final_dict[f'{geneset_name}_gs_precision'] = result['precision']
-        final_dict[f'{geneset_name}_gs_recall'] = result['recall']
-        final_dict[f'{geneset_name}_gs_f1'] = result['f1']
-        final_dict[f'{geneset_name}_gs_n_active'] = result['n_active_pathways']
+        detailed_dict[f'{geneset_name}_gs_precision'] = result['precision']
+        detailed_dict[f'{geneset_name}_gs_recall'] = result['recall']
+        detailed_dict[f'{geneset_name}_gs_f1'] = result['f1']
+        detailed_dict[f'{geneset_name}_gs_n_active'] = result['n_active_pathways']
     
     # Calculate mean across all gene sets
+    short_dict = {}
     if all_results:
-        final_dict['gs_precision'] = np.mean([r['precision'] for r in all_results])
-        final_dict['gs_recall'] = np.mean([r['recall'] for r in all_results])
-        final_dict['gs_f1'] = np.mean([r['f1'] for r in all_results])
-        final_dict['gs_n_active'] = np.mean([r['n_active_pathways'] for r in all_results])
-    
+        short_dict['gs_precision'] = np.mean([r['precision'] for r in all_results])
+        short_dict['gs_recall'] = np.mean([r['recall'] for r in all_results])
+        short_dict['gs_f1'] = np.mean([r['f1'] for r in all_results])
+        short_dict['gs_n_active'] = np.mean([r['n_active_pathways'] for r in all_results])
+    if par['output_detailed_metrics']:
+        final_dict = {**short_dict, **detailed_dict}
+    else:
+        final_dict = short_dict
     summary_df = pd.DataFrame([final_dict])
     print(summary_df)
     return summary_df

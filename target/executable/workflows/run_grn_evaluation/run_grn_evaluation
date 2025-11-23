@@ -926,7 +926,7 @@ VIASH_DEP_METRICS_TF_RECOVERY="$VIASH_META_RESOURCES_DIR/../../../nextflow/metri
 VIASH_DEP_METRICS_VC="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/vc/main.nf"
 VIASH_DEP_METRICS_RC_TF_ACT="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/rc_tf_act/main.nf"
 VIASH_DEP_METRICS_SEM="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/sem/main.nf"
-VIASH_DEP_METRICS_AR="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/ar/main.nf"
+VIASH_DEP_METRICS_ANCHOR_REGRESSION="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/anchor_regression/main.nf"
 VIASH_DEP_METRICS_TF_BINDING="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/tf_binding/main.nf"
 VIASH_DEP_METRICS_GS_RECOVERY="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/gs_recovery/main.nf"
 VIASH_DEP_UTILS_EXTRACT_UNS_METADATA="$VIASH_TARGET_DIR/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
@@ -968,7 +968,7 @@ workflow run_wf {
     regression,
     ws_distance,
     tf_recovery,
-    ar,
+    anchor_regression,
     rc_tf_act,
     sem,
     vc,

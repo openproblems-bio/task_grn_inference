@@ -3459,6 +3459,18 @@ meta = [
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
+        },
+        {
+          "type" : "boolean",
+          "name" : "--output_detailed_metrics",
+          "description" : "Whether to output detailed per-geneset metrics or only summary metrics",
+          "default" : [
+            false
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
         }
       ]
     }
@@ -3611,7 +3623,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/tf_binding",
     "viash_version" : "0.9.4",
-    "git_commit" : "dffb351697d76d88d66e4eb5d7a620fc52f057c9",
+    "git_commit" : "a8477836400f81d57164b4cc9cb1bfa2daa68e7a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3748,7 +3760,8 @@ par = {
   'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'ground_truth_unibind': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_UNIBIND+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_UNIBIND//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'ground_truth_chipatlas': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_CHIPATLAS+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_CHIPATLAS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'ground_truth_remap': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_REMAP+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_REMAP//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'ground_truth_remap': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_REMAP+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_REMAP//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'output_detailed_metrics': $( if [ ! -z ${VIASH_PAR_OUTPUT_DETAILED_METRICS+x} ]; then echo "r'${VIASH_PAR_OUTPUT_DETAILED_METRICS//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),

@@ -10,7 +10,7 @@ import os
 from regression.helper import main as regression
 from ws_distance.helper import main as ws_distance
 from sem.helper import main as sem
-from ar.helper import main as ar
+from anchor_regression.helper import main as ar
 from tf_recovery.helper import main as tf_recovery
 from tf_binding.helper import main as tf_binding
 from rc_tf_act.helper import main as rc_tf_act
@@ -19,7 +19,6 @@ from gs_recovery.helper import main as gs_recovery
 
 from config import DATASETS_METRICS
 
-# Create a mapping from metric name (string) to function
 METRIC_FUNCTIONS = {
     'regression': regression,
     'ws_distance': ws_distance,
@@ -36,6 +35,7 @@ def main(par):
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     rr_store = []
     metrics = DATASETS_METRICS[dataset_id]
+    # metrics = ['gs_recovery', 'tf_binding']
 
     for metric_name in metrics:
         print(f"Computing metric: {metric_name}")
@@ -43,7 +43,6 @@ def main(par):
         if metric_func is None:
             print(f"Warning: No function found for metric '{metric_name}'")
             continue
-       
         
         rr = metric_func(par)
 

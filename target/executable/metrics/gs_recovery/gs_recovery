@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "decoupler==2.1.1"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics gs_recovery"
-LABEL org.opencontainers.image.created="2025-11-23T06:38:59Z"
+LABEL org.opencontainers.image.created="2025-11-23T19:23:47Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="dffb351697d76d88d66e4eb5d7a620fc52f057c9"
+LABEL org.opencontainers.image.revision="a8477836400f81d57164b4cc9cb1bfa2daa68e7a"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -687,6 +687,11 @@ function ViashHelp {
   echo "        default: zero_centered"
   echo "        Method for determining pathway activity baseline (zero_centered,"
   echo "        permutation, or random_genesets)"
+  echo ""
+  echo "    --output_detailed_metrics"
+  echo "        type: boolean"
+  echo "        default: false"
+  echo "        Whether to output detailed per-geneset metrics or only summary metrics"
   echo ""
   echo "Viash built in Computational Requirements:"
   echo "    ---cpus=INT"
@@ -991,6 +996,17 @@ while [[ $# -gt 0 ]]; do
             VIASH_PAR_ULM_BASELINE_METHOD=$(ViashRemoveFlags "$1")
             shift 1
             ;;
+        --output_detailed_metrics)
+            [ -n "$VIASH_PAR_OUTPUT_DETAILED_METRICS" ] && ViashError Bad arguments for option \'--output_detailed_metrics\': \'$VIASH_PAR_OUTPUT_DETAILED_METRICS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_OUTPUT_DETAILED_METRICS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --output_detailed_metrics. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --output_detailed_metrics=*)
+            [ -n "$VIASH_PAR_OUTPUT_DETAILED_METRICS" ] && ViashError Bad arguments for option \'--output_detailed_metrics=*\': \'$VIASH_PAR_OUTPUT_DETAILED_METRICS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_OUTPUT_DETAILED_METRICS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
         ---engine)
             VIASH_ENGINE_ID="$2"
             shift 2
@@ -1228,6 +1244,9 @@ fi
 if [ -z ${VIASH_PAR_ULM_BASELINE_METHOD+x} ]; then
   VIASH_PAR_ULM_BASELINE_METHOD="zero_centered"
 fi
+if [ -z ${VIASH_PAR_OUTPUT_DETAILED_METRICS+x} ]; then
+  VIASH_PAR_OUTPUT_DETAILED_METRICS="false"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -e "$VIASH_PAR_PREDICTION" ]; then
@@ -1327,6 +1346,12 @@ fi
 if [[ -n "$VIASH_PAR_ULM_PVALUE_THRESHOLD" ]]; then
   if ! [[ "$VIASH_PAR_ULM_PVALUE_THRESHOLD" =~ ^[-+]?(\.[0-9]+|[0-9]+(\.[0-9]*)?)([eE][-+]?[0-9]+)?$ ]]; then
     ViashError '--ulm_pvalue_threshold' has to be a double. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_OUTPUT_DETAILED_METRICS" ]]; then
+  if ! [[ "$VIASH_PAR_OUTPUT_DETAILED_METRICS" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
+    ViashError '--output_detailed_metrics' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1560,7 +1585,8 @@ par = {
   'max_targets': $( if [ ! -z ${VIASH_PAR_MAX_TARGETS+x} ]; then echo "int(r'${VIASH_PAR_MAX_TARGETS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'ulm_activity_threshold': $( if [ ! -z ${VIASH_PAR_ULM_ACTIVITY_THRESHOLD+x} ]; then echo "float(r'${VIASH_PAR_ULM_ACTIVITY_THRESHOLD//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'ulm_pvalue_threshold': $( if [ ! -z ${VIASH_PAR_ULM_PVALUE_THRESHOLD+x} ]; then echo "float(r'${VIASH_PAR_ULM_PVALUE_THRESHOLD//\'/\'\"\'\"r\'}')"; else echo None; fi ),
-  'ulm_baseline_method': $( if [ ! -z ${VIASH_PAR_ULM_BASELINE_METHOD+x} ]; then echo "r'${VIASH_PAR_ULM_BASELINE_METHOD//\'/\'\"\'\"r\'}'"; else echo None; fi )
+  'ulm_baseline_method': $( if [ ! -z ${VIASH_PAR_ULM_BASELINE_METHOD+x} ]; then echo "r'${VIASH_PAR_ULM_BASELINE_METHOD//\'/\'\"\'\"r\'}'"; else echo None; fi ),
+  'output_detailed_metrics': $( if [ ! -z ${VIASH_PAR_OUTPUT_DETAILED_METRICS+x} ]; then echo "r'${VIASH_PAR_OUTPUT_DETAILED_METRICS//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1605,21 +1631,6 @@ par = parse_args(par)
 
 
 if __name__ == "__main__":
-    # Collect geneset files from par dictionary
-    pathway_files = {}
-    geneset_mapping = {
-        'geneset_hallmark_2020': 'hallmark_2020',
-        'geneset_kegg_2021': 'kegg_2021',
-        'geneset_reactome_2022': 'reactome_2022',
-        'geneset_go_bp_2023': 'go_bp_2023',
-        'geneset_bioplanet_2019': 'bioplanet_2019',
-        'geneset_wikipathways_2019': 'wikipathways_2019',
-    }
-    
-    for arg_name, geneset_name in geneset_mapping.items():
-        pathway_files[geneset_name] = par[arg_name]
-    
-    par['pathway_files'] = pathway_files
     
     output = main_helper(par)
     print(output)

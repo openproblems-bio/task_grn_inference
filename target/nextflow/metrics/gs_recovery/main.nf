@@ -3600,6 +3600,18 @@ meta = [
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
+        },
+        {
+          "type" : "boolean",
+          "name" : "--output_detailed_metrics",
+          "description" : "Whether to output detailed per-geneset metrics or only summary metrics",
+          "default" : [
+            false
+          ],
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
         }
       ]
     }
@@ -3751,7 +3763,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/gs_recovery",
     "viash_version" : "0.9.4",
-    "git_commit" : "dffb351697d76d88d66e4eb5d7a620fc52f057c9",
+    "git_commit" : "a8477836400f81d57164b4cc9cb1bfa2daa68e7a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3900,7 +3912,8 @@ par = {
   'max_targets': $( if [ ! -z ${VIASH_PAR_MAX_TARGETS+x} ]; then echo "int(r'${VIASH_PAR_MAX_TARGETS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'ulm_activity_threshold': $( if [ ! -z ${VIASH_PAR_ULM_ACTIVITY_THRESHOLD+x} ]; then echo "float(r'${VIASH_PAR_ULM_ACTIVITY_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'ulm_pvalue_threshold': $( if [ ! -z ${VIASH_PAR_ULM_PVALUE_THRESHOLD+x} ]; then echo "float(r'${VIASH_PAR_ULM_PVALUE_THRESHOLD//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'ulm_baseline_method': $( if [ ! -z ${VIASH_PAR_ULM_BASELINE_METHOD+x} ]; then echo "r'${VIASH_PAR_ULM_BASELINE_METHOD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi )
+  'ulm_baseline_method': $( if [ ! -z ${VIASH_PAR_ULM_BASELINE_METHOD+x} ]; then echo "r'${VIASH_PAR_ULM_BASELINE_METHOD//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
+  'output_detailed_metrics': $( if [ ! -z ${VIASH_PAR_OUTPUT_DETAILED_METRICS+x} ]; then echo "r'${VIASH_PAR_OUTPUT_DETAILED_METRICS//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
@@ -3945,21 +3958,6 @@ par = parse_args(par)
 
 
 if __name__ == "__main__":
-    # Collect geneset files from par dictionary
-    pathway_files = {}
-    geneset_mapping = {
-        'geneset_hallmark_2020': 'hallmark_2020',
-        'geneset_kegg_2021': 'kegg_2021',
-        'geneset_reactome_2022': 'reactome_2022',
-        'geneset_go_bp_2023': 'go_bp_2023',
-        'geneset_bioplanet_2019': 'bioplanet_2019',
-        'geneset_wikipathways_2019': 'wikipathways_2019',
-    }
-    
-    for arg_name, geneset_name in geneset_mapping.items():
-        pathway_files[geneset_name] = par[arg_name]
-    
-    par['pathway_files'] = pathway_files
     
     output = main_helper(par)
     print(output)
