@@ -16,7 +16,7 @@ save_dir="output/ar"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=( "300BCG" 'parsebioscience' 'op' 'ibd_UC' 'ibd_UCD' ) #"300BCG" "ibd" 'parsebioscience'
+datasets=( "300BCG" 'parsebioscience' 'op' 'ibd_uc' 'ibd_ucD' ) #"300BCG" "ibd" 'parsebioscience'
 # methods to process
 methods=("pearson_corr" "positive_control" "negative_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
 

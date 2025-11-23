@@ -123,6 +123,8 @@ dependencies:
   - name: metrics/rc_tf_act
   - name: metrics/sem
   - name: metrics/ar
+  - name: metrics/tf_binding
+  - name: metrics/gs_recovery
   - name: utils/extract_uns_metadata
     repository: openproblems
 

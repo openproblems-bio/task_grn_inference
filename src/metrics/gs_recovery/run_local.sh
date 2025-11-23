@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=pathway_annotation
+#SBATCH --job-name=pathway_gs_recovery
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
@@ -12,23 +12,32 @@
 
 set -euo pipefail
 
-save_dir="output/annotation"
+save_dir="output/gs_recovery"
 mkdir -p "$save_dir"
 
-# Pathway file location
-pathway_file="/vol/projects/jnourisa/prior/h.all.v2024.1.Hs.symbols.gmt"
+# Pathway files - define individual paths
+resources_dir="resources"
+pathway_dir="${resources_dir}/grn_benchmark/prior/pathways"
 
+geneset_hallmark_2020="${pathway_dir}/hallmark_2020.gmt"
+geneset_kegg_2021="${pathway_dir}/kegg_2021.gmt"
+geneset_reactome_2022="${pathway_dir}/reactome_2022.gmt"
+geneset_go_bp_2023="${pathway_dir}/go_bp_2023.gmt"
+geneset_bioplanet_2019="${pathway_dir}/bioplanet_2019.gmt"
+geneset_wikipathways_2019="${pathway_dir}/wikipathways_2019.gmt"
+
+# datasets to process
+datasets=( 'op' 'replogle' 'norman' 'adamson' "300BCG" "ibd" 'parsebioscience' 'xaira_HCT116' 'xaira_HEK293T' )
 # datasets to process
 datasets=( 'op' 'replogle' 'norman' 'adamson' "300BCG" "ibd" 'parsebioscience' 'xaira_HCT116' 'xaira_HEK293T' )
 # datasets=( 'op' )  # Test with single dataset first
 
-resources_dir="resources"
 methods=( "pearson_corr" "negative_control" "positive_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie" "scgpt" "geneformer" )
 # methods=( "pearson_corr" "grnboost" )  # Test subset
 
-# Create summary CSV file
+# Create summary CSV file with dynamic header
 summary_csv="${save_dir}/summary.csv"
-echo "dataset,method,metric,value" > "$summary_csv"
+echo -n "" > "$summary_csv"  # Will write header dynamically from first result
 
 for dataset in "${datasets[@]}"; do
     echo -e "\n\n=========================================="
@@ -48,38 +57,45 @@ for dataset in "${datasets[@]}"; do
             continue
         fi
 
-        # Run pathway annotation metric
-        python src/metrics/experimental/annotation/script.py \
+        # Run pathway gs_recovery metric
+        python src/metrics/gs_recovery/script.py \
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
             --tf_all ${resources_dir}/grn_benchmark/prior/tf_all.csv \
-            --pathway_file "$pathway_file" \
-            --score "$score" \
-            --fdr_threshold 0.05 \
-            --min_targets 10 \
-            --max_targets 100 \
-            --run_gene_set_recovery \
-            --ulm_activity_threshold 0.0 \
-            --ulm_pvalue_threshold 0.01 \
-            --ulm_baseline_method zero_centered
+            --geneset_hallmark_2020 "$geneset_hallmark_2020" \
+            --geneset_kegg_2021 "$geneset_kegg_2021" \
+            --geneset_reactome_2022 "$geneset_reactome_2022" \
+            --geneset_go_bp_2023 "$geneset_go_bp_2023" \
+            --geneset_bioplanet_2019 "$geneset_bioplanet_2019" \
+            --geneset_wikipathways_2019 "$geneset_wikipathways_2019" \
+            --score "$score" 
 
-        # Read the scores from the h5ad file and append to CSV
+        # Read the scores from the h5ad file and append to CSV (single-row format)
         if [[ -f "$score" ]]; then
             python -c "
 import anndata as ad
+import pandas as pd
 import sys
+import os
 
 try:
     adata = ad.read_h5ad('$score')
     metric_ids = adata.uns.get('metric_ids', [])
     metric_values = adata.uns.get('metric_values', [])
     
-    for metric_id, metric_value in zip(metric_ids, metric_values):
-        print(f'$dataset,$method,{metric_id},{metric_value}')
+    # Create single-row DataFrame
+    df = pd.DataFrame([metric_values], columns=metric_ids)
+    df.insert(0, 'dataset', '$dataset')
+    df.insert(1, 'method', '$method')
+    
+    # Write header if file is empty
+    write_header = not os.path.exists('$summary_csv') or os.path.getsize('$summary_csv') == 0
+    df.to_csv('$summary_csv', mode='a', header=write_header, index=False)
+    
 except Exception as e:
     print(f'Error reading scores: {e}', file=sys.stderr)
     sys.exit(1)
-" >> "$summary_csv"
+" 
             echo "    Scores appended to CSV"
         else
             echo "    Warning: Score file not created"

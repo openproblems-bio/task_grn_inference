@@ -314,10 +314,10 @@ def evaluate_network_for_group(
     # Evaluate with different theta values
     assert n_features_theta_025.sum() > 0, "No gene has regulators with theta=0.25"
     detailed_scores.append(evaluate_static_approach(
-        net_matrix, n_features_theta_025, X, groups, gene_names, tf_names, reg_type, n_jobs, theta='r2_precision'
+        net_matrix, n_features_theta_025, X, groups, gene_names, tf_names, reg_type, n_jobs, theta='r_precision'
     ))
     detailed_scores.append(evaluate_static_approach(
-        net_matrix, n_features_theta_075, X, groups, gene_names, tf_names, reg_type, n_jobs, theta='r2_recall'
+        net_matrix, n_features_theta_075, X, groups, gene_names, tf_names, reg_type, n_jobs, theta='r_recall'
     ))
     
     # Evaluate with raw approach
@@ -407,10 +407,10 @@ def main(par: Dict[str, Any]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     mean_scores = detailed_df.groupby('theta')['r2'].mean().to_frame().T.reset_index(drop=True)
     
     # Calculate F1 score
-    if 'r2_precision' in mean_scores.columns and 'r2_recall' in mean_scores.columns:
-        precision = mean_scores['r2_precision'].values[0]
-        recall = mean_scores['r2_recall'].values[0]
+    if 'r_precision' in mean_scores.columns and 'r_recall' in mean_scores.columns:
+        precision = mean_scores['r_precision'].values[0]
+        recall = mean_scores['r_recall'].values[0]
         f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-        mean_scores['r2_f1'] = f1
+        mean_scores['r_f1'] = f1
 
     return detailed_df, mean_scores
