@@ -12,31 +12,37 @@ arguments:
     type: file
     required: false
     description: Hallmark 2020 geneset GMT file
+    example: resources_test/grn_benchmark/prior/pathways/reactome_2022.gmt
   
   - name: "--geneset_kegg_2021"
     type: file
     required: false
     description: KEGG 2021 geneset GMT file
+    example: resources_test/grn_benchmark/prior/pathways/reactome_2022.gmt
   
   - name: "--geneset_reactome_2022"
     type: file
     required: false
     description: Reactome 2022 geneset GMT file
+    example: resources_test/grn_benchmark/prior/pathways/reactome_2022.gmt
   
   - name: "--geneset_go_bp_2023"
     type: file
     required: false
     description: GO Biological Process 2023 geneset GMT file
+    example: resources_test/grn_benchmark/prior/pathways/reactome_2022.gmt
   
   - name: "--geneset_bioplanet_2019"
     type: file
     required: false
     description: BioPlanet 2019 geneset GMT file
+    example: resources_test/grn_benchmark/prior/pathways/reactome_2022.gmt
   
   - name: "--geneset_wikipathways_2019"
     type: file
     required: false
     description: WikiPathways 2019 geneset GMT file
+    example: resources_test/grn_benchmark/prior/pathways/reactome_2022.gmt
   
   - name: "--fdr_threshold"
     type: double
@@ -99,7 +105,7 @@ engines:
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages: [numpy==1.26.4, scipy==1.13.0, tqdm, decoupler==1.7.0 ]
+        packages: [decoupler==2.1.1]
 runners:
   - type: executable
   - type: nextflow

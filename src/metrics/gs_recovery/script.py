@@ -54,11 +54,9 @@ if __name__ == "__main__":
     }
     
     for arg_name, geneset_name in geneset_mapping.items():
-        if arg_name in par and par[arg_name] is not None:
-            pathway_files[geneset_name] = par[arg_name]
+        pathway_files[geneset_name] = par[arg_name]
     
-    if pathway_files:
-        par['pathway_files'] = pathway_files
+    par['pathway_files'] = pathway_files
     
     output = main_helper(par)
     print(output)

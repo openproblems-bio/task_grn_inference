@@ -32,6 +32,22 @@ info:
       min: -Inf
       max: 1
       maximize: true
+arguments:
+  - name: --apply_tf
+    type: boolean 
+    required: false
+    default: true
+  - name: --regulators_consensus
+    type: file
+    direction: input
+    must_exist: false
+    required: false
+    example: resources_test/grn_benchmark/prior/regulators_consensus_op.json
+  - name: --reg_type
+    type: string
+    direction: input
+    default: ridge
+    description: name of regression to use
 
   
 resources:

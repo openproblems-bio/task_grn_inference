@@ -14,7 +14,6 @@ par = {
     # 'evaluation_data_sc': f'resources/grn_benchmark/evaluation_data/replogle_sc.h5ad',
     'ws_consensus': f'resources/grn_benchmark/prior/ws_consensus_replogle.csv',
     'ws_distance_background': f'resources/grn_benchmark/prior/ws_distance_background_replogle.csv',
-    'silent_missing_dependencies': False
 }
 ## VIASH END
 try:
