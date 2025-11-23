@@ -194,7 +194,6 @@ Arguments:
 | `--ground_truth_remap` | `file` | (*Optional*) NA. |
 | `--ws_consensus` | `file` | (*Optional*) NA. |
 | `--ws_distance_background` | `file` | (*Optional*) NA. |
-| `--silent_missing_dependencies` | `boolean` | (*Optional*) NA. Default: `TRUE`. |
 
 </div>
 

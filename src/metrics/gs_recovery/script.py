@@ -21,9 +21,6 @@ par = {
     'max_pathway_size': 500,
     'min_targets': 10,
     'max_targets': 100,  # Top K edges by absolute weight
-    'run_gene_set_recovery': True,  # Enable ULM-based gene set recovery
-    'ulm_activity_threshold': 0.0,
-    'ulm_pvalue_threshold': 0.01,
     'ulm_baseline_method': 'zero_centered'
 }
 ## VIASH END
@@ -40,82 +37,27 @@ except:
 from helper import main as main_helper
 from util import format_save_score, parse_args
 
-# Custom argument parser for pathway-specific parameters
-def parse_pathway_args(par):
-    """Parse pathway-specific arguments and add them to par dict"""
-    parser = argparse.ArgumentParser()
-    
-    # Standard arguments (from util.parse_args)
-    parser.add_argument('--rna', type=str)
-    parser.add_argument('--rna_all', type=str)
-    parser.add_argument('--atac', type=str)
-    parser.add_argument('--prediction', type=str)
-    parser.add_argument('--score', type=str)
-    parser.add_argument('--layer', type=str)
-    parser.add_argument('--temp_dir', type=str)
-    parser.add_argument('--tf_all', type=str)
-    parser.add_argument('--skeleton', type=str)
-    parser.add_argument('--apply_skeleton', action='store_true')
-    parser.add_argument('--apply_tf', action='store_true')
-    parser.add_argument('--max_n_links', type=int)
-    parser.add_argument('--reg_type', type=str)
-    parser.add_argument('--num_workers', type=int)
-    parser.add_argument('--regulators_consensus', type=str)
-    parser.add_argument('--evaluation_data', type=str)
-    parser.add_argument('--ws_consensus', type=str)
-    parser.add_argument('--ws_distance_background', type=str)
-    parser.add_argument('--group_specific', type=str)
-    parser.add_argument('--evaluation_data_de', type=str)
-    parser.add_argument('--evaluation_data_sc', type=str)
-    parser.add_argument('--ground_truth_unibind', type=str)
-    parser.add_argument('--ground_truth_chipatlas', type=str)
-    parser.add_argument('--ground_truth_remap', type=str)
-    
-    # Pathway-specific arguments
-    parser.add_argument('--pathway_file', type=str, 
-                       default='/vol/projects/jnourisa/prior/h.all.v2024.1.Hs.symbols.gmt',
-                       help='Single pathway file (GMT format). Use --pathway_files for multiple.')
-    parser.add_argument('--pathway_files', type=str,
-                       help='Multiple pathway files as comma-separated name:path pairs (e.g., "hallmark:file1.gmt,kegg:file2.gmt")')
-    parser.add_argument('--fdr_threshold', type=float, default=0.05)
-    parser.add_argument('--min_pathway_size', type=int, default=5)
-    parser.add_argument('--max_pathway_size', type=int, default=500)
-    parser.add_argument('--min_targets', type=int, default=10)
-    parser.add_argument('--max_targets', type=int, default=100,
-                       help='Maximum targets per TF (top K by absolute edge weight)')
-    
-    # Gene set recovery arguments (ULM-based)
-    parser.add_argument('--run_gene_set_recovery', action='store_true',
-                       help='Run ULM-based gene set recovery metric')
-    parser.add_argument('--ulm_activity_threshold', type=float, default=0.0,
-                       help='Minimum activity score for pathway to be considered active')
-    parser.add_argument('--ulm_pvalue_threshold', type=float, default=0.01,
-                       help='P-value threshold for pathway activity significance')
-    parser.add_argument('--ulm_baseline_method', type=str, default='zero_centered',
-                       choices=['zero_centered', 'permutation', 'random_genesets'],
-                       help='Method for determining pathway activity baseline')
-    parser.add_argument('--n_workers', type=int, default=None,
-                       help='Number of parallel workers for gene set recovery')
-    
-    args = parser.parse_args()
-    
-    # Parse pathway_files if provided
-    if args.pathway_files:
-        pathway_files_dict = {}
-        for pair in args.pathway_files.split(','):
-            name, path = pair.split(':')
-            pathway_files_dict[name] = path
-        par['pathway_files'] = pathway_files_dict
-    
-    for k, v in vars(args).items():
-        if v is not None and k != 'pathway_files':  # Don't overwrite if already set
-            par[k] = v
-    return par
 
-args = parse_pathway_args(par)
+par = parse_args(par)
 
 
 if __name__ == "__main__":
+    # Collect geneset files from par dictionary
+    pathway_files = {}
+    geneset_mapping = {
+        'geneset_hallmark_2020': 'hallmark_2020',
+        'geneset_kegg_2021': 'kegg_2021',
+        'geneset_reactome_2022': 'reactome_2022',
+        'geneset_go_bp_2023': 'go_bp_2023',
+        'geneset_bioplanet_2019': 'bioplanet_2019',
+        'geneset_wikipathways_2019': 'wikipathways_2019',
+    }
+    
+    for arg_name, geneset_name in geneset_mapping.items():
+        pathway_files[geneset_name] = par[arg_name]
+    
+    par['pathway_files'] = pathway_files
+    
     output = main_helper(par)
     print(output)
 

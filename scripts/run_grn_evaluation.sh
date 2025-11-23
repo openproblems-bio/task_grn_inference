@@ -142,10 +142,16 @@ append_entry() {
     apply_tf: ${apply_tf}
     reg_type: ${reg_type}
     layer: $layer_
+    geneset_hallmark_2020: ${resources_dir}/grn_benchmark/prior/pathways/hallmark_2020.gmt
+    geneset_kegg_2021: ${resources_dir}/grn_benchmark/prior/pathways/kegg_2021.gmt
+    geneset_reactome_2022: ${resources_dir}/grn_benchmark/prior/pathways/reactome_2022.gmt
+    geneset_go_bp_2023: ${resources_dir}/grn_benchmark/prior/pathways/go_bp_2023.gmt
+    geneset_bioplanet_2019: ${resources_dir}/grn_benchmark/prior/pathways/bioplanet_2019.gmt
+    geneset_wikipathways_2019: ${resources_dir}/grn_benchmark/prior/pathways/wikipathways_2019.gmt
     
 HERE
   # Additional fields for specific datasets
-  if [[ "$dataset" =~ ^(replogle|xaira_HCT116|xaira_HEK293T|norman|adamson)$ ]]; then
+  if [[ "$dataset" =~ ^(replogle|xaira_HCT116|xaira_HEK293T|norman)$ ]]; then
     cat >> "$param_local" << HERE
     ws_consensus: ${resources_dir}/grn_benchmark/prior/ws_consensus_${dataset}.csv
     ws_distance_background: ${resources_dir}/grn_benchmark/prior/ws_distance_background_${dataset}.csv

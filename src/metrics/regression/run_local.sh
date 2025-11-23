@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=reg2_v2
+#SBATCH --job-name=regression
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
@@ -16,7 +16,7 @@ save_dir="output/regression"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=('op' 'parsebioscience' "300BCG"   "adamson"  "replogle" "xaira_HEK293T" "xaira_HCT116" "nakatake" "norman"  'ibd_uc' 'ibd_cd') #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
+datasets=('ibd_uc' 'ibd_cd' 'op' 'parsebioscience' "300BCG"   "adamson"  "replogle" "xaira_HEK293T" "xaira_HCT116" "nakatake" "norman"  ) #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
 # datasets=('xaira_HEK293T'  ) #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
 
 # methods to process

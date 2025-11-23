@@ -636,7 +636,7 @@ def calculate_gene_set_recovery(
     active_pathways: Dict[str, Dict],
     all_genes: Set[str],
     fdr_threshold: float = 0.01,
-    n_workers: int = None
+    max_workers: int = None
 ) -> Dict:
     """
     Calculate gene set recovery metrics (precision, recall, F1).
@@ -658,7 +658,7 @@ def calculate_gene_set_recovery(
         Background genes
     fdr_threshold : float
         FDR threshold for enrichment
-    n_workers : int, optional
+    max_workers : int, optional
         Number of parallel workers (default: use all CPUs)
     
     Returns
@@ -676,10 +676,10 @@ def calculate_gene_set_recovery(
             'pathway_details': List[Dict]
         }
     """
-    if n_workers is None:
-        n_workers = cpu_count()
+    if max_workers is None:
+        max_workers = cpu_count()
     
-    print(f"\n  [Gene Set Recovery] Testing pathway enrichment in GRN (using {n_workers} workers)...")
+    print(f"\n  [Gene Set Recovery] Testing pathway enrichment in GRN (using {max_workers} workers)...")
     
     # Get all TFs in GRN and prepare their target sets
     print("  [Gene Set Recovery] Preparing TF target sets...")
@@ -699,7 +699,7 @@ def calculate_gene_set_recovery(
     # Parallel pathway enrichment testing
     pathway_enrichment = {}
     
-    if len(pathways_to_test) > 10 and n_workers > 1:
+    if len(pathways_to_test) > 10 and max_workers > 1:
         # Use parallel processing for large pathway sets
         worker_fn = partial(_test_pathway_enrichment_worker,
                            tfs_data=tfs_data,
@@ -707,7 +707,7 @@ def calculate_gene_set_recovery(
                            fdr_threshold=fdr_threshold,
                            n_pathways=len(pathways))
         
-        with Pool(processes=n_workers) as pool:
+        with Pool(processes=max_workers) as pool:
             results = list(tqdm(
                 pool.imap(worker_fn, pathways_to_test),
                 total=len(pathways_to_test),
@@ -768,14 +768,6 @@ def calculate_gene_set_recovery(
     recall = TP / (TP + FN) if (TP + FN) > 0 else 0.0
     f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0.0
     
-    print(f"\n  [Gene Set Recovery] Results:")
-    print(f"    TP (recovered active pathways): {TP}")
-    print(f"    FP (enriched but not active):   {FP}")
-    print(f"    FN (active but not enriched):   {FN}")
-    print(f"    TN (neither):                    {TN}")
-    print(f"    Precision: {precision:.4f}")
-    print(f"    Recall:    {recall:.4f}")
-    print(f"    F1 Score:  {f1:.4f}")
     
     return {
         'TP': TP,
@@ -803,121 +795,72 @@ def main(par: dict) -> pd.DataFrame:
     print("\n[1/5] Loading data...")
     evaluation_data = ad.read_h5ad(par['evaluation_data'], backed='r')
     all_genes = set(evaluation_data.var_names.tolist())
-    print(f"  - Background genes: {len(all_genes)}")
-    
     prediction = read_prediction(par)
-    print(f"  - Predicted edges: {len(prediction)}")
-    print(f"  - Predicted TFs: {len(prediction['source'].unique())}")
-    
     tf_all = np.loadtxt(par['tf_all'], dtype=str, delimiter=',', skiprows=1)
-    print(f"  - Total TFs: {len(tf_all)}")
-    
-    # Determine which pathway files to process
-    pathway_files_dict = par.get('pathway_files', None)
-    if pathway_files_dict is None:
-        # Single pathway file (backward compatibility)
-        pathway_file = par.get('pathway_file', '/home/jnourisa/projs/ongoing/ciim/input/prior/h.all.v2024.1.Hs.symbols.gmt')
-        pathway_files_dict = {'default': pathway_file}
-    
-    # Load and process each pathway file
-    print(f"\n[2/5] Loading {len(pathway_files_dict)} pathway database(s)...")
+    pathway_files_dict = par['pathway_files']
     min_pw_size = par.get('min_pathway_size', 5)
     max_pw_size = par.get('max_pathway_size', 500)
     
     all_results = []
     
     for geneset_name, pathway_file in pathway_files_dict.items():
-        print(f"\n{'='*80}")
-        print(f"Processing gene set: {geneset_name}")
-        print(f"{'='*80}")
-        
         pathways = load_pathways_as_sets(pathway_file, min_pw_size, max_pw_size)
-        print(f"  - Pathways loaded: {len(pathways)}")
-        print(f"  - Pathway size range: {min_pw_size}-{max_pw_size}")
-        
         # Parameters
         fdr_threshold = par.get('fdr_threshold', 0.05)
         min_targets = par.get('min_targets', 10)
         max_targets = par.get('max_targets', 100)
+        print(f"\n  [Gene Set Recovery] Running for {geneset_name}...")
         
-        # Run gene set recovery metric
-        if par.get('run_gene_set_recovery', False) and dc is not None:
-            print(f"\n  [Gene Set Recovery] Running for {geneset_name}...")
-            
-            # Identify active pathways using ULM
-            active_pathways = identify_active_pathways_ulm(
-                evaluation_data=evaluation_data,
-                pathways=pathways,
-                prediction=prediction,
-                min_targets=min_targets,
-                activity_threshold=par.get('ulm_activity_threshold', 0.0),
-                pvalue_threshold=par.get('ulm_pvalue_threshold', 0.01),
-                baseline_method=par.get('ulm_baseline_method', 'zero_centered')
-            )
-            
-            # Calculate gene set recovery
-            n_workers = par.get('n_workers', None)
-            gs_results = calculate_gene_set_recovery(
-                prediction=prediction,
-                pathways=pathways,
-                active_pathways=active_pathways,
-                all_genes=all_genes,
-                fdr_threshold=fdr_threshold,
-                n_workers=n_workers
-            )
-            
-            # Store results with gene set prefix
-            result_dict = {
-                f'{geneset_name}_gs_precision': gs_results['precision'],
-                f'{geneset_name}_gs_recall': gs_results['recall'],
-                f'{geneset_name}_gs_f1': gs_results['f1'],
-                f'{geneset_name}_gs_tp': gs_results['TP'],
-                f'{geneset_name}_gs_fp': gs_results['FP'],
-                f'{geneset_name}_gs_fn': gs_results['FN'],
-                f'{geneset_name}_gs_tn': gs_results['TN'],
-                f'{geneset_name}_gs_n_active': gs_results['n_active_pathways'],
-                f'{geneset_name}_gs_n_enriched': gs_results['n_enriched_pathways']
-            }
-            
-            all_results.append(result_dict)
-            
-            print(f"\n  [{geneset_name}] Results:")
-            print(f"    Precision: {gs_results['precision']:.4f}")
-            print(f"    Recall:    {gs_results['recall']:.4f}")
-            print(f"    F1 Score:  {gs_results['f1']:.4f}")
-        else:
-            # Gene set recovery not run
-            result_dict = {
-                f'{geneset_name}_gs_precision': 0.0,
-                f'{geneset_name}_gs_recall': 0.0,
-                f'{geneset_name}_gs_f1': 0.0,
-                f'{geneset_name}_gs_tp': 0,
-                f'{geneset_name}_gs_fp': 0,
-                f'{geneset_name}_gs_fn': 0,
-                f'{geneset_name}_gs_tn': 0,
-                f'{geneset_name}_gs_n_active': 0,
-                f'{geneset_name}_gs_n_enriched': 0
-            }
-            all_results.append(result_dict)
-    
-    # Merge all results into single dictionary
-    print("\n" + "="*80)
-    print("FINAL RESULTS:")
-    print("="*80)
+        # Identify active pathways using ULM
+        active_pathways = identify_active_pathways_ulm(
+            evaluation_data=evaluation_data,
+            pathways=pathways,
+            prediction=prediction,
+            min_targets=min_targets,
+            activity_threshold=par.get('ulm_activity_threshold', 0.0),
+            pvalue_threshold=par.get('ulm_pvalue_threshold', 0.01),
+            baseline_method=par.get('ulm_baseline_method', 'zero_centered')
+        )
+        
+        # Calculate gene set recovery
+        max_workers = par.get('max_workers', None)
+        gs_results = calculate_gene_set_recovery(
+            prediction=prediction,
+            pathways=pathways,
+            active_pathways=active_pathways,
+            all_genes=all_genes,
+            fdr_threshold=fdr_threshold,
+            max_workers=max_workers
+        )
+        
+        # Store results with gene set prefix
+        result_dict = {
+            'geneset_name': geneset_name,
+            'precision': gs_results['precision'],
+            'recall': gs_results['recall'],
+            'f1': gs_results['f1'],
+            'n_active_pathways': gs_results['n_active_pathways'],
+            'n_enriched_pathways': gs_results['n_enriched_pathways']
+        }
+        
+        all_results.append(result_dict)
+       
     
     final_dict = {}
     for result in all_results:
-        final_dict.update(result)
+        geneset_name = result['geneset_name']
+        final_dict[f'{geneset_name}_gs_precision'] = result['precision']
+        final_dict[f'{geneset_name}_gs_recall'] = result['recall']
+        final_dict[f'{geneset_name}_gs_f1'] = result['f1']
+        final_dict[f'{geneset_name}_gs_n_active'] = result['n_active_pathways']
     
-    # Print summary for each gene set
-    for geneset_name in pathway_files_dict.keys():
-        print(f"\n[{geneset_name}]")
-        if f'{geneset_name}_gs_f1' in final_dict:
-            print(f"  Precision: {final_dict[f'{geneset_name}_gs_precision']:.4f}")
-            print(f"  Recall:    {final_dict[f'{geneset_name}_gs_recall']:.4f}")
-            print(f"  F1 Score:  {final_dict[f'{geneset_name}_gs_f1']:.4f}")
-    
-    print("="*80 + "\n")
+    # Calculate mean across all gene sets
+    if all_results:
+        final_dict['gs_precision'] = np.mean([r['precision'] for r in all_results])
+        final_dict['gs_recall'] = np.mean([r['recall'] for r in all_results])
+        final_dict['gs_f1'] = np.mean([r['f1'] for r in all_results])
+        final_dict['gs_n_active'] = np.mean([r['n_active_pathways'] for r in all_results])
     
     summary_df = pd.DataFrame([final_dict])
+    print(summary_df)
     return summary_df
