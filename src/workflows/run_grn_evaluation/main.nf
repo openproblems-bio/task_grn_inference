@@ -62,7 +62,13 @@ workflow run_wf {
         layer: "layer",
         ground_truth_unibind: "ground_truth_unibind",
         ground_truth_chipatlas: "ground_truth_chipatlas",
-        ground_truth_remap: "ground_truth_remap"
+        ground_truth_remap: "ground_truth_remap",
+        geneset_hallmark_2020: "geneset_hallmark_2020",
+        geneset_kegg_2021: "geneset_kegg_2021",
+        geneset_reactome_2022: "geneset_reactome_2022",
+        geneset_go_bp_2023: "geneset_go_bp_2023",
+        geneset_bioplanet_2019: "geneset_bioplanet_2019",
+        geneset_wikipathways_2019: "geneset_wikipathways_2019"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->
