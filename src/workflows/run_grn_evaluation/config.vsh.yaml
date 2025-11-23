@@ -71,23 +71,46 @@ argument_groups:
         must_exist: false
         required: false
         example: resources_test/grn_benchmark/prior/ws_distance_background_norman.csv
-      # - name: --ground_truth_unibind
-      #   type: file
-      #   direction: input
-      #   must_exist: false
-      #   required: false
-      # - name: --ground_truth_chipatlas
-      #   type: file
-      #   direction: input
-      #   must_exist: false
-      #   required: false
-      # - name: --ground_truth_remap
-      #   type: file
-      #   direction: input
-      #   must_exist: false
-      #   required: false
-      
-      
+      - name: --ground_truth_unibind
+        type: file
+        direction: input
+        must_exist: false
+        required: false
+      - name: --ground_truth_chipatlas
+        type: file
+        direction: input
+        must_exist: false
+        required: false
+      - name: --ground_truth_remap
+        type: file
+        direction: input
+        must_exist: false
+        required: false
+      - name: --geneset_hallmark_2020
+        type: file
+        required: false
+        description: Hallmark 2020 geneset GMT file      
+      - name: --geneset_kegg_2021
+        type: file
+        required: false
+        description: KEGG 2021 geneset GMT file      
+      - name: --geneset_reactome_2022
+        type: file
+        required: false
+        description: Reactome 2022 geneset GMT file      
+      - name: --geneset_go_bp_2023
+        type: file
+        required: false
+        description: GO Biological Process 2023 geneset GMT file      
+      - name: --geneset_bioplanet_2019
+        type: file
+        required: false
+        description: BioPlanet 2019 geneset GMT file      
+      - name: --geneset_wikipathways_2019
+        type: file
+        required: false
+        description: WikiPathways 2019 geneset GMT file
+
   - name: Outputs
     arguments:
       - name: "--scores"

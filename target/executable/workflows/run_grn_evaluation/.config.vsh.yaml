@@ -131,6 +131,93 @@ argument_groups:
     direction: "input"
     multiple: false
     multiple_sep: ";"
+  - type: "file"
+    name: "--ground_truth_unibind"
+    info: null
+    must_exist: false
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--ground_truth_chipatlas"
+    info: null
+    must_exist: false
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--ground_truth_remap"
+    info: null
+    must_exist: false
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--geneset_hallmark_2020"
+    description: "Hallmark 2020 geneset GMT file"
+    info: null
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--geneset_kegg_2021"
+    description: "KEGG 2021 geneset GMT file"
+    info: null
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--geneset_reactome_2022"
+    description: "Reactome 2022 geneset GMT file"
+    info: null
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--geneset_go_bp_2023"
+    description: "GO Biological Process 2023 geneset GMT file"
+    info: null
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--geneset_bioplanet_2019"
+    description: "BioPlanet 2019 geneset GMT file"
+    info: null
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
+  - type: "file"
+    name: "--geneset_wikipathways_2019"
+    description: "WikiPathways 2019 geneset GMT file"
+    info: null
+    must_exist: true
+    create_parent: true
+    required: false
+    direction: "input"
+    multiple: false
+    multiple_sep: ";"
 - name: "Outputs"
   arguments:
   - type: "file"
@@ -251,13 +338,13 @@ runners:
   debug: false
   container: "docker"
 build_info:
-  config: "src/workflows/run_evaluation/config.vsh.yaml"
+  config: "src/workflows/run_grn_evaluation/config.vsh.yaml"
   runner: "executable"
   engine: "native"
   output: "target/executable/workflows/run_grn_evaluation"
   executable: "target/executable/workflows/run_grn_evaluation/run_grn_evaluation"
   viash_version: "0.9.4"
-  git_commit: "d9ec3a16a5b15bf955ef1b07fd042eec9cf11858"
+  git_commit: "dffb351697d76d88d66e4eb5d7a620fc52f057c9"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
   dependencies:
   - "target/nextflow/metrics/regression"

@@ -3185,6 +3185,102 @@ meta = [
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--ground_truth_unibind",
+          "must_exist" : false,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--ground_truth_chipatlas",
+          "must_exist" : false,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--ground_truth_remap",
+          "must_exist" : false,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--geneset_hallmark_2020",
+          "description" : "Hallmark 2020 geneset GMT file",
+          "must_exist" : true,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--geneset_kegg_2021",
+          "description" : "KEGG 2021 geneset GMT file",
+          "must_exist" : true,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--geneset_reactome_2022",
+          "description" : "Reactome 2022 geneset GMT file",
+          "must_exist" : true,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--geneset_go_bp_2023",
+          "description" : "GO Biological Process 2023 geneset GMT file",
+          "must_exist" : true,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--geneset_bioplanet_2019",
+          "description" : "BioPlanet 2019 geneset GMT file",
+          "must_exist" : true,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
+        },
+        {
+          "type" : "file",
+          "name" : "--geneset_wikipathways_2019",
+          "description" : "WikiPathways 2019 geneset GMT file",
+          "must_exist" : true,
+          "create_parent" : true,
+          "required" : false,
+          "direction" : "input",
+          "multiple" : false,
+          "multiple_sep" : ";"
         }
       ]
     },
@@ -3374,12 +3470,12 @@ meta = [
     }
   ],
   "build_info" : {
-    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/workflows/run_evaluation/config.vsh.yaml",
+    "config" : "/home/runner/work/task_grn_inference/task_grn_inference/src/workflows/run_grn_evaluation/config.vsh.yaml",
     "runner" : "nextflow",
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.4",
-    "git_commit" : "d9ec3a16a5b15bf955ef1b07fd042eec9cf11858",
+    "git_commit" : "dffb351697d76d88d66e4eb5d7a620fc52f057c9",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3565,7 +3661,13 @@ workflow run_wf {
         layer: "layer",
         ground_truth_unibind: "ground_truth_unibind",
         ground_truth_chipatlas: "ground_truth_chipatlas",
-        ground_truth_remap: "ground_truth_remap"
+        ground_truth_remap: "ground_truth_remap",
+        geneset_hallmark_2020: "geneset_hallmark_2020",
+        geneset_kegg_2021: "geneset_kegg_2021",
+        geneset_reactome_2022: "geneset_reactome_2022",
+        geneset_go_bp_2023: "geneset_go_bp_2023",
+        geneset_bioplanet_2019: "geneset_bioplanet_2019",
+        geneset_wikipathways_2019: "geneset_wikipathways_2019"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->

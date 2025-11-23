@@ -232,6 +232,39 @@ function ViashHelp {
   echo "        example:"
   echo "resources_test/grn_benchmark/prior/ws_distance_background_norman.csv"
   echo ""
+  echo "    --ground_truth_unibind"
+  echo "        type: file"
+  echo ""
+  echo "    --ground_truth_chipatlas"
+  echo "        type: file"
+  echo ""
+  echo "    --ground_truth_remap"
+  echo "        type: file"
+  echo ""
+  echo "    --geneset_hallmark_2020"
+  echo "        type: file, file must exist"
+  echo "        Hallmark 2020 geneset GMT file"
+  echo ""
+  echo "    --geneset_kegg_2021"
+  echo "        type: file, file must exist"
+  echo "        KEGG 2021 geneset GMT file"
+  echo ""
+  echo "    --geneset_reactome_2022"
+  echo "        type: file, file must exist"
+  echo "        Reactome 2022 geneset GMT file"
+  echo ""
+  echo "    --geneset_go_bp_2023"
+  echo "        type: file, file must exist"
+  echo "        GO Biological Process 2023 geneset GMT file"
+  echo ""
+  echo "    --geneset_bioplanet_2019"
+  echo "        type: file, file must exist"
+  echo "        BioPlanet 2019 geneset GMT file"
+  echo ""
+  echo "    --geneset_wikipathways_2019"
+  echo "        type: file, file must exist"
+  echo "        WikiPathways 2019 geneset GMT file"
+  echo ""
   echo "Outputs:"
   echo "    --scores"
   echo "        type: file, required parameter, output, file must exist"
@@ -424,6 +457,105 @@ while [[ $# -gt 0 ]]; do
         --ws_distance_background=*)
             [ -n "$VIASH_PAR_WS_DISTANCE_BACKGROUND" ] && ViashError Bad arguments for option \'--ws_distance_background=*\': \'$VIASH_PAR_WS_DISTANCE_BACKGROUND\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_WS_DISTANCE_BACKGROUND=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --ground_truth_unibind)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_UNIBIND" ] && ViashError Bad arguments for option \'--ground_truth_unibind\': \'$VIASH_PAR_GROUND_TRUTH_UNIBIND\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_UNIBIND="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ground_truth_unibind. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --ground_truth_unibind=*)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_UNIBIND" ] && ViashError Bad arguments for option \'--ground_truth_unibind=*\': \'$VIASH_PAR_GROUND_TRUTH_UNIBIND\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_UNIBIND=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --ground_truth_chipatlas)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS" ] && ViashError Bad arguments for option \'--ground_truth_chipatlas\': \'$VIASH_PAR_GROUND_TRUTH_CHIPATLAS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_CHIPATLAS="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ground_truth_chipatlas. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --ground_truth_chipatlas=*)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS" ] && ViashError Bad arguments for option \'--ground_truth_chipatlas=*\': \'$VIASH_PAR_GROUND_TRUTH_CHIPATLAS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_CHIPATLAS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --ground_truth_remap)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_REMAP" ] && ViashError Bad arguments for option \'--ground_truth_remap\': \'$VIASH_PAR_GROUND_TRUTH_REMAP\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_REMAP="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ground_truth_remap. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --ground_truth_remap=*)
+            [ -n "$VIASH_PAR_GROUND_TRUTH_REMAP" ] && ViashError Bad arguments for option \'--ground_truth_remap=*\': \'$VIASH_PAR_GROUND_TRUTH_REMAP\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GROUND_TRUTH_REMAP=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --geneset_hallmark_2020)
+            [ -n "$VIASH_PAR_GENESET_HALLMARK_2020" ] && ViashError Bad arguments for option \'--geneset_hallmark_2020\': \'$VIASH_PAR_GENESET_HALLMARK_2020\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GENESET_HALLMARK_2020="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --geneset_hallmark_2020. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --geneset_hallmark_2020=*)
+            [ -n "$VIASH_PAR_GENESET_HALLMARK_2020" ] && ViashError Bad arguments for option \'--geneset_hallmark_2020=*\': \'$VIASH_PAR_GENESET_HALLMARK_2020\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GENESET_HALLMARK_2020=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --geneset_kegg_2021)
+            [ -n "$VIASH_PAR_GENESET_KEGG_2021" ] && ViashError Bad arguments for option \'--geneset_kegg_2021\': \'$VIASH_PAR_GENESET_KEGG_2021\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GENESET_KEGG_2021="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --geneset_kegg_2021. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --geneset_kegg_2021=*)
+            [ -n "$VIASH_PAR_GENESET_KEGG_2021" ] && ViashError Bad arguments for option \'--geneset_kegg_2021=*\': \'$VIASH_PAR_GENESET_KEGG_2021\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GENESET_KEGG_2021=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --geneset_reactome_2022)
+            [ -n "$VIASH_PAR_GENESET_REACTOME_2022" ] && ViashError Bad arguments for option \'--geneset_reactome_2022\': \'$VIASH_PAR_GENESET_REACTOME_2022\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GENESET_REACTOME_2022="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --geneset_reactome_2022. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --geneset_reactome_2022=*)
+            [ -n "$VIASH_PAR_GENESET_REACTOME_2022" ] && ViashError Bad arguments for option \'--geneset_reactome_2022=*\': \'$VIASH_PAR_GENESET_REACTOME_2022\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GENESET_REACTOME_2022=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --geneset_go_bp_2023)
+            [ -n "$VIASH_PAR_GENESET_GO_BP_2023" ] && ViashError Bad arguments for option \'--geneset_go_bp_2023\': \'$VIASH_PAR_GENESET_GO_BP_2023\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GENESET_GO_BP_2023="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --geneset_go_bp_2023. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --geneset_go_bp_2023=*)
+            [ -n "$VIASH_PAR_GENESET_GO_BP_2023" ] && ViashError Bad arguments for option \'--geneset_go_bp_2023=*\': \'$VIASH_PAR_GENESET_GO_BP_2023\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GENESET_GO_BP_2023=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --geneset_bioplanet_2019)
+            [ -n "$VIASH_PAR_GENESET_BIOPLANET_2019" ] && ViashError Bad arguments for option \'--geneset_bioplanet_2019\': \'$VIASH_PAR_GENESET_BIOPLANET_2019\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GENESET_BIOPLANET_2019="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --geneset_bioplanet_2019. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --geneset_bioplanet_2019=*)
+            [ -n "$VIASH_PAR_GENESET_BIOPLANET_2019" ] && ViashError Bad arguments for option \'--geneset_bioplanet_2019=*\': \'$VIASH_PAR_GENESET_BIOPLANET_2019\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GENESET_BIOPLANET_2019=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --geneset_wikipathways_2019)
+            [ -n "$VIASH_PAR_GENESET_WIKIPATHWAYS_2019" ] && ViashError Bad arguments for option \'--geneset_wikipathways_2019\': \'$VIASH_PAR_GENESET_WIKIPATHWAYS_2019\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GENESET_WIKIPATHWAYS_2019="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --geneset_wikipathways_2019. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --geneset_wikipathways_2019=*)
+            [ -n "$VIASH_PAR_GENESET_WIKIPATHWAYS_2019" ] && ViashError Bad arguments for option \'--geneset_wikipathways_2019=*\': \'$VIASH_PAR_GENESET_WIKIPATHWAYS_2019\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_GENESET_WIKIPATHWAYS_2019=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         --scores)
@@ -652,6 +784,30 @@ if [ ! -z "$VIASH_PAR_TF_ALL" ] && [ ! -e "$VIASH_PAR_TF_ALL" ]; then
   ViashError "Input file '$VIASH_PAR_TF_ALL' does not exist."
   exit 1
 fi
+if [ ! -z "$VIASH_PAR_GENESET_HALLMARK_2020" ] && [ ! -e "$VIASH_PAR_GENESET_HALLMARK_2020" ]; then
+  ViashError "Input file '$VIASH_PAR_GENESET_HALLMARK_2020' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_GENESET_KEGG_2021" ] && [ ! -e "$VIASH_PAR_GENESET_KEGG_2021" ]; then
+  ViashError "Input file '$VIASH_PAR_GENESET_KEGG_2021' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_GENESET_REACTOME_2022" ] && [ ! -e "$VIASH_PAR_GENESET_REACTOME_2022" ]; then
+  ViashError "Input file '$VIASH_PAR_GENESET_REACTOME_2022' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_GENESET_GO_BP_2023" ] && [ ! -e "$VIASH_PAR_GENESET_GO_BP_2023" ]; then
+  ViashError "Input file '$VIASH_PAR_GENESET_GO_BP_2023' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_GENESET_BIOPLANET_2019" ] && [ ! -e "$VIASH_PAR_GENESET_BIOPLANET_2019" ]; then
+  ViashError "Input file '$VIASH_PAR_GENESET_BIOPLANET_2019' does not exist."
+  exit 1
+fi
+if [ ! -z "$VIASH_PAR_GENESET_WIKIPATHWAYS_2019" ] && [ ! -e "$VIASH_PAR_GENESET_WIKIPATHWAYS_2019" ]; then
+  ViashError "Input file '$VIASH_PAR_GENESET_WIKIPATHWAYS_2019' does not exist."
+  exit 1
+fi
 
 # check whether parameters values are of the right type
 if [[ -n "$VIASH_PAR_SUBSAMPLE" ]]; then
@@ -857,7 +1013,13 @@ workflow run_wf {
         layer: "layer",
         ground_truth_unibind: "ground_truth_unibind",
         ground_truth_chipatlas: "ground_truth_chipatlas",
-        ground_truth_remap: "ground_truth_remap"
+        ground_truth_remap: "ground_truth_remap",
+        geneset_hallmark_2020: "geneset_hallmark_2020",
+        geneset_kegg_2021: "geneset_kegg_2021",
+        geneset_reactome_2022: "geneset_reactome_2022",
+        geneset_go_bp_2023: "geneset_go_bp_2023",
+        geneset_bioplanet_2019: "geneset_bioplanet_2019",
+        geneset_wikipathways_2019: "geneset_wikipathways_2019"
       ],
       // use 'toState' to publish that component's outputs to the overall state
       toState: { id, output, state, comp ->

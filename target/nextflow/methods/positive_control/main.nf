@@ -3412,7 +3412,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/methods/positive_control",
     "viash_version" : "0.9.4",
-    "git_commit" : "d9ec3a16a5b15bf955ef1b07fd042eec9cf11858",
+    "git_commit" : "dffb351697d76d88d66e4eb5d7a620fc52f057c9",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
