@@ -26,13 +26,13 @@ DATASET_GROUPS = {
         "cv": ["perturbation", "cell_type"],
         "rc_tf_ac": ["perturbation", "cell_type"]
     },
-    "ibd_UC": {
+    "ibd_uc": {
         'anchors': ['donor_id'],
         "match": ["donor_id", "cell_type"],
         "loose_match": ["donor_id", "cell_type"],
         "cv": ["perturbation", "cell_type"],
     },
-    "ibd_CD": {
+    "ibd_cd": {
         'anchors': ['donor_id'],
         "match": ["donor_id", "cell_type"],
         "loose_match": ["donor_id", "cell_type"],
@@ -82,20 +82,20 @@ DATASETS_CELLTYPES = {
     "op": "PBMC",
     "parsebioscience": "PBMC",
     "300BCG": "PBMC",
-    "ibd_UC": "PBMC",
-    "ibd_CD": "PBMC",
+    "ibd_uc": "PBMC",
+    "ibd_cd": "PBMC",
     "nakatake": ""
 }
 
 DATASETS_METRICS = {
     'replogle': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
-    'adamson': ['regression', 'ws_distance', 'tf_binding', 'sem', 'gs_recovery'],
+    'adamson': ['regression',  'tf_binding', 'sem', 'gs_recovery'],
     'norman': ['regression', 'ws_distance', 'tf_binding', 'sem', 'gs_recovery'],
     'nakatake': ['regression', 'sem', 'gs_recovery'],
     'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression', 'gs_recovery'],
     '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression', 'gs_recovery'],
-    'ibd_UC': ['regression', 'vc', 'tf_binding', 'sem', 'anchor_regression', 'gs_recovery'],
-    'ibd_CD': ['regression', 'vc', 'tf_binding', 'sem', 'anchor_regression', 'gs_recovery'],
+    'ibd_uc': ['regression', 'vc', 'tf_binding', 'sem', 'anchor_regression', 'gs_recovery'],
+    'ibd_cd': ['regression', 'vc', 'tf_binding', 'sem', 'anchor_regression', 'gs_recovery'],
     'parsebioscience': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression', 'gs_recovery'],
     'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
     'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
@@ -108,14 +108,16 @@ for dataset, metrics in DATASETS_METRICS.items():
         METRICS_DATASETS.setdefault(metric, []).append(dataset)
 
 ORDERED_METRICS = [
-       'r2_precision', 'r2_recall', 
-       'ws_precision', 'ws_recall', 
+       'r2_precision', 'r2_recall', 'r2_f1',
+       'ws_precision', 'ws_recall', 'ws_f1',
        'vc', 
        'sem', 
-       't_rec_precision', 't_rec_recall', 
-       'tfb_precision', 'tfb_recall', 
+       't_rec_precision', 't_rec_recall', 't_rec_f1',
+       'tfb_precision', 'tfb_recall',  'tfb_f1',
        'rc_tf_act',
-       'anchor_regression'
+       'anchor_regression',
+       'gs_precision', 'gs_recall', 'gs_f1',
+       'tf_binding_precision', 'tf_binding_recall', 'tf_binding_f1'
        ]
 # ORDERED_METRICS_C = [c for c in ORDERED_METRICS]
 

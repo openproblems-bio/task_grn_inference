@@ -3295,6 +3295,18 @@ meta = [
       }
     },
     {
+      "name" : "metrics/tf_binding",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
+      "name" : "metrics/gs_recovery",
+      "repository" : {
+        "type" : "local"
+      }
+    },
+    {
       "name" : "utils/extract_uns_metadata",
       "repository" : {
         "type" : "github",
@@ -3367,7 +3379,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.4",
-    "git_commit" : "98d4676cd00d1c8a8c0cad95410cccd9b8e62c62",
+    "git_commit" : "d9ec3a16a5b15bf955ef1b07fd042eec9cf11858",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3483,6 +3495,8 @@ include { vc } from "${meta.resources_dir}/../../../nextflow/metrics/vc/main.nf"
 include { rc_tf_act } from "${meta.resources_dir}/../../../nextflow/metrics/rc_tf_act/main.nf"
 include { sem } from "${meta.resources_dir}/../../../nextflow/metrics/sem/main.nf"
 include { ar } from "${meta.resources_dir}/../../../nextflow/metrics/ar/main.nf"
+include { tf_binding } from "${meta.resources_dir}/../../../nextflow/metrics/tf_binding/main.nf"
+include { gs_recovery } from "${meta.resources_dir}/../../../nextflow/metrics/gs_recovery/main.nf"
 include { extract_uns_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
 
 // inner workflow
@@ -3509,7 +3523,9 @@ workflow run_wf {
     ar,
     rc_tf_act,
     sem,
-    vc
+    vc,
+    tf_binding,
+    gs_recovery
   ]
     
   /***************************

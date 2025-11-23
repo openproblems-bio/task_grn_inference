@@ -8,6 +8,25 @@ info:
   description: |
     Calculates TF binding scores for a given GRN and dataset
   
+arguments: 
+  - name: --ground_truth_unibind
+    type: file
+    direction: input
+    must_exist: false
+    required: false
+    example: resources_test/grn_benchmark/ground_truth/PBMC.csv 
+  - name: --ground_truth_chipatlas
+    type: file
+    direction: input
+    must_exist: false
+    required: false
+    example: resources_test/grn_benchmark/ground_truth/PBMC.csv 
+  - name: --ground_truth_remap
+    type: file
+    direction: input
+    must_exist: false
+    required: false
+    example: resources_test/grn_benchmark/ground_truth/PBMC.csv 
   
 
   

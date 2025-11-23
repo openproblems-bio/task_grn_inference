@@ -3420,118 +3420,6 @@ meta = [
           "direction" : "input",
           "multiple" : false,
           "multiple_sep" : ";"
-        },
-        {
-          "type" : "boolean",
-          "name" : "--apply_tf",
-          "default" : [
-            true
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--regulators_consensus",
-          "example" : [
-            "resources_test/grn_benchmark/prior/regulators_consensus_op.json"
-          ],
-          "must_exist" : false,
-          "create_parent" : true,
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "string",
-          "name" : "--reg_type",
-          "description" : "name of regression to use",
-          "default" : [
-            "ridge"
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--ground_truth_unibind",
-          "example" : [
-            "resources_test/grn_benchmark/ground_truth/PBMC.csv"
-          ],
-          "must_exist" : false,
-          "create_parent" : true,
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--ground_truth_chipatlas",
-          "example" : [
-            "resources_test/grn_benchmark/ground_truth/PBMC.csv"
-          ],
-          "must_exist" : false,
-          "create_parent" : true,
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--ground_truth_remap",
-          "example" : [
-            "resources_test/grn_benchmark/ground_truth/PBMC.csv"
-          ],
-          "must_exist" : false,
-          "create_parent" : true,
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--ws_consensus",
-          "example" : [
-            "resources_test/grn_benchmark/prior/ws_consensus_norman.csv"
-          ],
-          "must_exist" : false,
-          "create_parent" : true,
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "file",
-          "name" : "--ws_distance_background",
-          "example" : [
-            "resources_test/grn_benchmark/prior/ws_distance_background_norman.csv"
-          ],
-          "must_exist" : false,
-          "create_parent" : true,
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
-        },
-        {
-          "type" : "boolean",
-          "name" : "--silent_missing_dependencies",
-          "default" : [
-            true
-          ],
-          "required" : false,
-          "direction" : "input",
-          "multiple" : false,
-          "multiple_sep" : ";"
         }
       ]
     }
@@ -3688,7 +3576,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/rc_tf_act",
     "viash_version" : "0.9.4",
-    "git_commit" : "98d4676cd00d1c8a8c0cad95410cccd9b8e62c62",
+    "git_commit" : "d9ec3a16a5b15bf955ef1b07fd042eec9cf11858",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3822,16 +3710,7 @@ par = {
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi ),
-  'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi ),
-  'regulators_consensus': $( if [ ! -z ${VIASH_PAR_REGULATORS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_REGULATORS_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'ground_truth_unibind': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_UNIBIND+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_UNIBIND//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'ground_truth_chipatlas': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_CHIPATLAS+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_CHIPATLAS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'ground_truth_remap': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_REMAP+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_REMAP//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'ws_consensus': $( if [ ! -z ${VIASH_PAR_WS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_WS_CONSENSUS//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'ws_distance_background': $( if [ ! -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then echo "r'${VIASH_PAR_WS_DISTANCE_BACKGROUND//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),
-  'silent_missing_dependencies': $( if [ ! -z ${VIASH_PAR_SILENT_MISSING_DEPENDENCIES+x} ]; then echo "r'${VIASH_PAR_SILENT_MISSING_DEPENDENCIES//\\'/\\'\\"\\'\\"r\\'}'.lower() == 'true'"; else echo None; fi )
+  'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\\'/\\'\\"\\'\\"r\\'}')"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\\'/\\'\\"\\'\\"r\\'}'"; else echo None; fi ),

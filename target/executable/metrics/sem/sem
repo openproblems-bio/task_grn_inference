@@ -456,9 +456,9 @@ RUN pip install --upgrade pip && \
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics sem"
-LABEL org.opencontainers.image.created="2025-11-22T05:00:05Z"
+LABEL org.opencontainers.image.created="2025-11-23T06:06:05Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="98d4676cd00d1c8a8c0cad95410cccd9b8e62c62"
+LABEL org.opencontainers.image.revision="d9ec3a16a5b15bf955ef1b07fd042eec9cf11858"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -615,44 +615,6 @@ function ViashHelp {
   echo "        type: integer"
   echo "        default: 20"
   echo ""
-  echo "    --apply_tf"
-  echo "        type: boolean"
-  echo "        default: true"
-  echo ""
-  echo "    --regulators_consensus"
-  echo "        type: file"
-  echo "        example: resources_test/grn_benchmark/prior/regulators_consensus_op.json"
-  echo ""
-  echo "    --reg_type"
-  echo "        type: string"
-  echo "        default: ridge"
-  echo "        name of regression to use"
-  echo ""
-  echo "    --ground_truth_unibind"
-  echo "        type: file"
-  echo "        example: resources_test/grn_benchmark/ground_truth/PBMC.csv"
-  echo ""
-  echo "    --ground_truth_chipatlas"
-  echo "        type: file"
-  echo "        example: resources_test/grn_benchmark/ground_truth/PBMC.csv"
-  echo ""
-  echo "    --ground_truth_remap"
-  echo "        type: file"
-  echo "        example: resources_test/grn_benchmark/ground_truth/PBMC.csv"
-  echo ""
-  echo "    --ws_consensus"
-  echo "        type: file"
-  echo "        example: resources_test/grn_benchmark/prior/ws_consensus_norman.csv"
-  echo ""
-  echo "    --ws_distance_background"
-  echo "        type: file"
-  echo "        example:"
-  echo "resources_test/grn_benchmark/prior/ws_distance_background_norman.csv"
-  echo ""
-  echo "    --silent_missing_dependencies"
-  echo "        type: boolean"
-  echo "        default: true"
-  echo ""
   echo "Viash built in Computational Requirements:"
   echo "    ---cpus=INT"
   echo "        Number of CPUs to use"
@@ -800,105 +762,6 @@ while [[ $# -gt 0 ]]; do
         --num_workers=*)
             [ -n "$VIASH_PAR_NUM_WORKERS" ] && ViashError Bad arguments for option \'--num_workers=*\': \'$VIASH_PAR_NUM_WORKERS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_NUM_WORKERS=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --apply_tf)
-            [ -n "$VIASH_PAR_APPLY_TF" ] && ViashError Bad arguments for option \'--apply_tf\': \'$VIASH_PAR_APPLY_TF\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_APPLY_TF="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --apply_tf. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --apply_tf=*)
-            [ -n "$VIASH_PAR_APPLY_TF" ] && ViashError Bad arguments for option \'--apply_tf=*\': \'$VIASH_PAR_APPLY_TF\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_APPLY_TF=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --regulators_consensus)
-            [ -n "$VIASH_PAR_REGULATORS_CONSENSUS" ] && ViashError Bad arguments for option \'--regulators_consensus\': \'$VIASH_PAR_REGULATORS_CONSENSUS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_REGULATORS_CONSENSUS="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --regulators_consensus. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --regulators_consensus=*)
-            [ -n "$VIASH_PAR_REGULATORS_CONSENSUS" ] && ViashError Bad arguments for option \'--regulators_consensus=*\': \'$VIASH_PAR_REGULATORS_CONSENSUS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_REGULATORS_CONSENSUS=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --reg_type)
-            [ -n "$VIASH_PAR_REG_TYPE" ] && ViashError Bad arguments for option \'--reg_type\': \'$VIASH_PAR_REG_TYPE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_REG_TYPE="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --reg_type. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --reg_type=*)
-            [ -n "$VIASH_PAR_REG_TYPE" ] && ViashError Bad arguments for option \'--reg_type=*\': \'$VIASH_PAR_REG_TYPE\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_REG_TYPE=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --ground_truth_unibind)
-            [ -n "$VIASH_PAR_GROUND_TRUTH_UNIBIND" ] && ViashError Bad arguments for option \'--ground_truth_unibind\': \'$VIASH_PAR_GROUND_TRUTH_UNIBIND\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_GROUND_TRUTH_UNIBIND="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ground_truth_unibind. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --ground_truth_unibind=*)
-            [ -n "$VIASH_PAR_GROUND_TRUTH_UNIBIND" ] && ViashError Bad arguments for option \'--ground_truth_unibind=*\': \'$VIASH_PAR_GROUND_TRUTH_UNIBIND\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_GROUND_TRUTH_UNIBIND=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --ground_truth_chipatlas)
-            [ -n "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS" ] && ViashError Bad arguments for option \'--ground_truth_chipatlas\': \'$VIASH_PAR_GROUND_TRUTH_CHIPATLAS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_GROUND_TRUTH_CHIPATLAS="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ground_truth_chipatlas. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --ground_truth_chipatlas=*)
-            [ -n "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS" ] && ViashError Bad arguments for option \'--ground_truth_chipatlas=*\': \'$VIASH_PAR_GROUND_TRUTH_CHIPATLAS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_GROUND_TRUTH_CHIPATLAS=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --ground_truth_remap)
-            [ -n "$VIASH_PAR_GROUND_TRUTH_REMAP" ] && ViashError Bad arguments for option \'--ground_truth_remap\': \'$VIASH_PAR_GROUND_TRUTH_REMAP\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_GROUND_TRUTH_REMAP="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ground_truth_remap. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --ground_truth_remap=*)
-            [ -n "$VIASH_PAR_GROUND_TRUTH_REMAP" ] && ViashError Bad arguments for option \'--ground_truth_remap=*\': \'$VIASH_PAR_GROUND_TRUTH_REMAP\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_GROUND_TRUTH_REMAP=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --ws_consensus)
-            [ -n "$VIASH_PAR_WS_CONSENSUS" ] && ViashError Bad arguments for option \'--ws_consensus\': \'$VIASH_PAR_WS_CONSENSUS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_WS_CONSENSUS="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ws_consensus. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --ws_consensus=*)
-            [ -n "$VIASH_PAR_WS_CONSENSUS" ] && ViashError Bad arguments for option \'--ws_consensus=*\': \'$VIASH_PAR_WS_CONSENSUS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_WS_CONSENSUS=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --ws_distance_background)
-            [ -n "$VIASH_PAR_WS_DISTANCE_BACKGROUND" ] && ViashError Bad arguments for option \'--ws_distance_background\': \'$VIASH_PAR_WS_DISTANCE_BACKGROUND\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_WS_DISTANCE_BACKGROUND="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --ws_distance_background. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --ws_distance_background=*)
-            [ -n "$VIASH_PAR_WS_DISTANCE_BACKGROUND" ] && ViashError Bad arguments for option \'--ws_distance_background=*\': \'$VIASH_PAR_WS_DISTANCE_BACKGROUND\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_WS_DISTANCE_BACKGROUND=$(ViashRemoveFlags "$1")
-            shift 1
-            ;;
-        --silent_missing_dependencies)
-            [ -n "$VIASH_PAR_SILENT_MISSING_DEPENDENCIES" ] && ViashError Bad arguments for option \'--silent_missing_dependencies\': \'$VIASH_PAR_SILENT_MISSING_DEPENDENCIES\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_SILENT_MISSING_DEPENDENCIES="$2"
-            [ $# -lt 2 ] && ViashError Not enough arguments passed to --silent_missing_dependencies. Use "--help" to get more information on the parameters. && exit 1
-            shift 2
-            ;;
-        --silent_missing_dependencies=*)
-            [ -n "$VIASH_PAR_SILENT_MISSING_DEPENDENCIES" ] && ViashError Bad arguments for option \'--silent_missing_dependencies=*\': \'$VIASH_PAR_SILENT_MISSING_DEPENDENCIES\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
-            VIASH_PAR_SILENT_MISSING_DEPENDENCIES=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---engine)
@@ -1114,15 +977,6 @@ fi
 if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
   VIASH_PAR_NUM_WORKERS="20"
 fi
-if [ -z ${VIASH_PAR_APPLY_TF+x} ]; then
-  VIASH_PAR_APPLY_TF="true"
-fi
-if [ -z ${VIASH_PAR_REG_TYPE+x} ]; then
-  VIASH_PAR_REG_TYPE="ridge"
-fi
-if [ -z ${VIASH_PAR_SILENT_MISSING_DEPENDENCIES+x} ]; then
-  VIASH_PAR_SILENT_MISSING_DEPENDENCIES="true"
-fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -e "$VIASH_PAR_PREDICTION" ]; then
@@ -1156,18 +1010,6 @@ fi
 if [[ -n "$VIASH_PAR_NUM_WORKERS" ]]; then
   if ! [[ "$VIASH_PAR_NUM_WORKERS" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--num_workers' has to be an integer. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_APPLY_TF" ]]; then
-  if ! [[ "$VIASH_PAR_APPLY_TF" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--apply_tf' has to be a boolean. Use "--help" to get more information on the parameters.
-    exit 1
-  fi
-fi
-if [[ -n "$VIASH_PAR_SILENT_MISSING_DEPENDENCIES" ]]; then
-  if ! [[ "$VIASH_PAR_SILENT_MISSING_DEPENDENCIES" =~ ^(true|True|TRUE|false|False|FALSE|yes|Yes|YES|no|No|NO)$ ]]; then
-    ViashError '--silent_missing_dependencies' has to be a boolean. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1277,30 +1119,6 @@ if [ ! -z "$VIASH_PAR_TF_ALL" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_TF_ALL")" )
   VIASH_PAR_TF_ALL=$(ViashDockerAutodetectMount "$VIASH_PAR_TF_ALL")
 fi
-if [ ! -z "$VIASH_PAR_REGULATORS_CONSENSUS" ]; then
-  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_REGULATORS_CONSENSUS")" )
-  VIASH_PAR_REGULATORS_CONSENSUS=$(ViashDockerAutodetectMount "$VIASH_PAR_REGULATORS_CONSENSUS")
-fi
-if [ ! -z "$VIASH_PAR_GROUND_TRUTH_UNIBIND" ]; then
-  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_GROUND_TRUTH_UNIBIND")" )
-  VIASH_PAR_GROUND_TRUTH_UNIBIND=$(ViashDockerAutodetectMount "$VIASH_PAR_GROUND_TRUTH_UNIBIND")
-fi
-if [ ! -z "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS" ]; then
-  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS")" )
-  VIASH_PAR_GROUND_TRUTH_CHIPATLAS=$(ViashDockerAutodetectMount "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS")
-fi
-if [ ! -z "$VIASH_PAR_GROUND_TRUTH_REMAP" ]; then
-  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_GROUND_TRUTH_REMAP")" )
-  VIASH_PAR_GROUND_TRUTH_REMAP=$(ViashDockerAutodetectMount "$VIASH_PAR_GROUND_TRUTH_REMAP")
-fi
-if [ ! -z "$VIASH_PAR_WS_CONSENSUS" ]; then
-  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_WS_CONSENSUS")" )
-  VIASH_PAR_WS_CONSENSUS=$(ViashDockerAutodetectMount "$VIASH_PAR_WS_CONSENSUS")
-fi
-if [ ! -z "$VIASH_PAR_WS_DISTANCE_BACKGROUND" ]; then
-  VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_PAR_WS_DISTANCE_BACKGROUND")" )
-  VIASH_PAR_WS_DISTANCE_BACKGROUND=$(ViashDockerAutodetectMount "$VIASH_PAR_WS_DISTANCE_BACKGROUND")
-fi
 if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
   VIASH_DIRECTORY_MOUNTS+=( "$(ViashDockerAutodetectMountArg "$VIASH_META_RESOURCES_DIR")" )
   VIASH_META_RESOURCES_DIR=$(ViashDockerAutodetectMount "$VIASH_META_RESOURCES_DIR")
@@ -1386,16 +1204,7 @@ par = {
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
-  'apply_tf': $( if [ ! -z ${VIASH_PAR_APPLY_TF+x} ]; then echo "r'${VIASH_PAR_APPLY_TF//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi ),
-  'regulators_consensus': $( if [ ! -z ${VIASH_PAR_REGULATORS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_REGULATORS_CONSENSUS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'reg_type': $( if [ ! -z ${VIASH_PAR_REG_TYPE+x} ]; then echo "r'${VIASH_PAR_REG_TYPE//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'ground_truth_unibind': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_UNIBIND+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_UNIBIND//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'ground_truth_chipatlas': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_CHIPATLAS+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_CHIPATLAS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'ground_truth_remap': $( if [ ! -z ${VIASH_PAR_GROUND_TRUTH_REMAP+x} ]; then echo "r'${VIASH_PAR_GROUND_TRUTH_REMAP//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'ws_consensus': $( if [ ! -z ${VIASH_PAR_WS_CONSENSUS+x} ]; then echo "r'${VIASH_PAR_WS_CONSENSUS//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'ws_distance_background': $( if [ ! -z ${VIASH_PAR_WS_DISTANCE_BACKGROUND+x} ]; then echo "r'${VIASH_PAR_WS_DISTANCE_BACKGROUND//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'silent_missing_dependencies': $( if [ ! -z ${VIASH_PAR_SILENT_MISSING_DEPENDENCIES+x} ]; then echo "r'${VIASH_PAR_SILENT_MISSING_DEPENDENCIES//\'/\'\"\'\"r\'}'.lower() == 'true'"; else echo None; fi )
+  'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),
@@ -1487,24 +1296,6 @@ if [[ "$VIASH_ENGINE_TYPE" == "docker" ]]; then
   fi
   if [ ! -z "$VIASH_PAR_TF_ALL" ]; then
     VIASH_PAR_TF_ALL=$(ViashDockerStripAutomount "$VIASH_PAR_TF_ALL")
-  fi
-  if [ ! -z "$VIASH_PAR_REGULATORS_CONSENSUS" ]; then
-    VIASH_PAR_REGULATORS_CONSENSUS=$(ViashDockerStripAutomount "$VIASH_PAR_REGULATORS_CONSENSUS")
-  fi
-  if [ ! -z "$VIASH_PAR_GROUND_TRUTH_UNIBIND" ]; then
-    VIASH_PAR_GROUND_TRUTH_UNIBIND=$(ViashDockerStripAutomount "$VIASH_PAR_GROUND_TRUTH_UNIBIND")
-  fi
-  if [ ! -z "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS" ]; then
-    VIASH_PAR_GROUND_TRUTH_CHIPATLAS=$(ViashDockerStripAutomount "$VIASH_PAR_GROUND_TRUTH_CHIPATLAS")
-  fi
-  if [ ! -z "$VIASH_PAR_GROUND_TRUTH_REMAP" ]; then
-    VIASH_PAR_GROUND_TRUTH_REMAP=$(ViashDockerStripAutomount "$VIASH_PAR_GROUND_TRUTH_REMAP")
-  fi
-  if [ ! -z "$VIASH_PAR_WS_CONSENSUS" ]; then
-    VIASH_PAR_WS_CONSENSUS=$(ViashDockerStripAutomount "$VIASH_PAR_WS_CONSENSUS")
-  fi
-  if [ ! -z "$VIASH_PAR_WS_DISTANCE_BACKGROUND" ]; then
-    VIASH_PAR_WS_DISTANCE_BACKGROUND=$(ViashDockerStripAutomount "$VIASH_PAR_WS_DISTANCE_BACKGROUND")
   fi
   if [ ! -z "$VIASH_META_RESOURCES_DIR" ]; then
     VIASH_META_RESOURCES_DIR=$(ViashDockerStripAutomount "$VIASH_META_RESOURCES_DIR")

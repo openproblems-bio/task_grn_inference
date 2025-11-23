@@ -1,4 +1,4 @@
-run_type='bash'
+run_type='sbatch'
 
 metrics=(
     rc_tf_act 
@@ -7,7 +7,7 @@ metrics=(
     ar
     rc_tf_act
     tf_binding
-    vs
+    vc
     ws_distance
     sem
     gs_recovery

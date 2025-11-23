@@ -15,8 +15,15 @@ set -euo pipefail
 save_dir="resources/results/experiment/gs_recovery"
 mkdir -p "$save_dir"
 
-# Pathway files location
+# Pathway files - define individual paths
 pathway_dir="resources/grn_benchmark/prior/pathways"
+
+geneset_hallmark_2020="${pathway_dir}/hallmark_2020.gmt"
+geneset_kegg_2021="${pathway_dir}/kegg_2021.gmt"
+geneset_reactome_2022="${pathway_dir}/reactome_2022.gmt"
+geneset_go_bp_2023="${pathway_dir}/go_bp_2023.gmt"
+geneset_bioplanet_2019="${pathway_dir}/bioplanet_2019.gmt"
+geneset_wikipathways_2019="${pathway_dir}/wikipathways_2019.gmt"
 
 datasets=( 'op' )
 
@@ -25,9 +32,10 @@ resources_dir="resources"
 # Global GRN files location
 global_grn_dir="resources/results/experiment/global_grns"
 
-# Create summary CSV file
+# Create summary CSV file with dynamic header
 summary_csv="${save_dir}/summary_global.csv"
-echo "dataset,method,metric,value" > "$summary_csv"
+echo -n "" > "$summary_csv"  # Will write header dynamically from first result
+
 
 for dataset in "${datasets[@]}"; do
     echo -e "\n\n=========================================="
@@ -53,40 +61,25 @@ for dataset in "${datasets[@]}"; do
         mkdir -p "${save_dir}/tmp"
         score="${save_dir}/tmp/${dataset}_${method//[:\/]/_}.h5ad"
 
-        # Build pathway files argument (comma-separated list of geneset_name:file_path)
-        pathway_files_arg=""
-        for geneset_file in ${pathway_dir}/*.gmt; do
-            if [[ -f "$geneset_file" ]]; then
-                geneset_name=$(basename "$geneset_file" .gmt)
-                if [[ -z "$pathway_files_arg" ]]; then
-                    pathway_files_arg="${geneset_name}:${geneset_file}"
-                else
-                    pathway_files_arg="${pathway_files_arg},${geneset_name}:${geneset_file}"
-                fi
-            fi
-        done
-
         # Run pathway gs_recovery metric
         python src/metrics/experimental/gs_recovery/script.py \
             --prediction "$prediction_file" \
             --evaluation_data "$evaluation_data" \
             --tf_all ${resources_dir}/grn_benchmark/prior/tf_all.csv \
-            --pathway_files "$pathway_files_arg" \
-            --score "$score" \
-            --fdr_threshold 0.05 \
-            --min_targets 10 \
-            --max_targets 100 \
-            --run_gene_set_recovery \
-            --ulm_activity_threshold 0.0 \
-            --ulm_pvalue_threshold 0.01 \
-            --ulm_baseline_method zero_centered \
-            --n_workers 20
-
-        # Read the scores from the h5ad file and append to CSV
+            --geneset_hallmark_2020 "$geneset_hallmark_2020" \
+            --geneset_kegg_2021 "$geneset_kegg_2021" \
+            --geneset_reactome_2022 "$geneset_reactome_2022" \
+            --geneset_go_bp_2023 "$geneset_go_bp_2023" \
+            --geneset_bioplanet_2019 "$geneset_bioplanet_2019" \
+            --geneset_wikipathways_2019 "$geneset_wikipathways_2019" \
+            --score "$score" 
+        # Read the scores from the h5ad file and append to CSV (single-row format)
         if [[ -f "$score" ]]; then
             python -c "
 import anndata as ad
+import pandas as pd
 import sys
+import os
 
 try:
     adata = ad.read_h5ad('$score')
@@ -95,12 +88,19 @@ try:
     
     method_clean = '$method'.replace(',', ';')  # Replace commas in method name
     
-    for metric_id, metric_value in zip(metric_ids, metric_values):
-        print(f'$dataset,{method_clean},{metric_id},{metric_value}')
+    # Create single-row DataFrame
+    df = pd.DataFrame([metric_values], columns=metric_ids)
+    df.insert(0, 'dataset', '$dataset')
+    df.insert(1, 'method', method_clean)
+    
+    # Write header if file is empty
+    write_header = not os.path.exists('$summary_csv') or os.path.getsize('$summary_csv') == 0
+    df.to_csv('$summary_csv', mode='a', header=write_header, index=False)
+    
 except Exception as e:
     print(f'Error reading scores: {e}', file=sys.stderr)
     sys.exit(1)
-" >> "$summary_csv"
+" 
             echo "    Scores appended to CSV"
         else
             echo "    Warning: Score file not created"

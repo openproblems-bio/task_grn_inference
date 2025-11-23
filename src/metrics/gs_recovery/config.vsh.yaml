@@ -1,33 +1,48 @@
 __merge__: ../../api/comp_metric.yaml
 
-name: pathway_annotation
+name: gs_recovery
 namespace: "metrics"
 info:
   label: Pathway Annotation Fidelity
   summary: Evaluates GRN quality based on pathway enrichment of TF targets
-  description: |
-    Evaluates how well a GRN model represents known biology by testing whether 
-    predicted TF targets are enriched for coherent biological pathways.
-    Uses MSigDB Hallmark pathways for over-representation analysis.
-    
-    For each TF, the metric:
-    1. Extracts predicted targets from the GRN
-    2. Performs Fisher's exact test for pathway enrichment
-    3. Calculates enrichment scores normalized against random expectation
-    4. Aggregates across all TFs to produce overall fidelity scores
-    
-    Returns multiple metrics:
-    - pf_grn: Mean pathway fidelity for TFs present in the GRN
-    - pf_all: Mean pathway fidelity for all TFs (missing TFs get 0 score)
-    - pf_spec: Specificity score (penalizes non-specific enrichment)
-    - coverage_pct: Percentage of TFs with significant pathway enrichment
 
 arguments:
-  - name: "--pathway_file"
+  # Individual geneset file arguments
+  - name: "--geneset_hallmark_2020"
     type: file
     required: false
-    default: "/home/jnourisa/projs/ongoing/ciim/input/prior/h.all.v2024.1.Hs.symbols.gmt"
-    description: Path to GMT file containing pathway definitions (e.g., MSigDB Hallmark)
+    description: Hallmark 2020 geneset GMT file
+    example: resources_test/grn_benchmark/prior/pathways/reactome_2022.gmt
+  
+  - name: "--geneset_kegg_2021"
+    type: file
+    required: false
+    description: KEGG 2021 geneset GMT file
+    example: resources_test/grn_benchmark/prior/pathways/reactome_2022.gmt
+  
+  - name: "--geneset_reactome_2022"
+    type: file
+    required: false
+    description: Reactome 2022 geneset GMT file
+    example: resources_test/grn_benchmark/prior/pathways/reactome_2022.gmt
+  
+  - name: "--geneset_go_bp_2023"
+    type: file
+    required: false
+    description: GO Biological Process 2023 geneset GMT file
+    example: resources_test/grn_benchmark/prior/pathways/reactome_2022.gmt
+  
+  - name: "--geneset_bioplanet_2019"
+    type: file
+    required: false
+    description: BioPlanet 2019 geneset GMT file
+    example: resources_test/grn_benchmark/prior/pathways/reactome_2022.gmt
+  
+  - name: "--geneset_wikipathways_2019"
+    type: file
+    required: false
+    description: WikiPathways 2019 geneset GMT file
+    example: resources_test/grn_benchmark/prior/pathways/reactome_2022.gmt
   
   - name: "--fdr_threshold"
     type: double
@@ -58,13 +73,7 @@ arguments:
     required: false
     default: 100
     description: Maximum number of targets per TF (top K by absolute edge weight). Handles network density variation.
-  
-  - name: "--run_gene_set_recovery"
-    type: boolean
-    required: false
-    default: true
-    description: Run ULM-based gene set recovery metric
-  
+
   - name: "--ulm_activity_threshold"
     type: double
     required: false
@@ -96,7 +105,7 @@ engines:
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
-        packages: [numpy==1.26.4, scipy==1.13.0, tqdm, decoupler==1.7.0 ]
+        packages: [decoupler==2.1.1]
 runners:
   - type: executable
   - type: nextflow
