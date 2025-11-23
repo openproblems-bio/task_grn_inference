@@ -91,6 +91,12 @@ arguments:
     required: false
     default: "zero_centered"
     description: "Method for determining pathway activity baseline (zero_centered, permutation, or random_genesets)"
+    
+  - name: "--output_detailed_metrics"
+    type: boolean
+    required: false
+    default: false
+    description: Whether to output detailed per-geneset metrics or only summary metrics
   
 resources:
   - type: python_script

@@ -928,11 +928,6 @@ class EmbExtractor:
                 plot_heatmap(embs, emb_dims, label, output_file, kwargs_dict)
 
 
-def parse_args(par):
-    """Parse arguments - placeholder function"""
-    return par
-
-
 def efficient_melting(matrix, gene_names, symmetric=False):
     """Convert matrix to long format"""
     import pandas as pd

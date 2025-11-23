@@ -27,6 +27,11 @@ arguments:
     must_exist: false
     required: false
     example: resources_test/grn_benchmark/ground_truth/PBMC.csv 
+  - name: --output_detailed_metrics
+    type: boolean
+    required: false
+    default: false
+    description: Whether to output detailed per-geneset metrics or only summary metrics
   
 
   

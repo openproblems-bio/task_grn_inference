@@ -17,7 +17,7 @@ workflow run_wf {
     regression,
     ws_distance,
     tf_recovery,
-    ar,
+    anchor_regression,
     rc_tf_act,
     sem,
     vc,

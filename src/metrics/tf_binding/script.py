@@ -15,7 +15,8 @@ par = {
     'num_workers': 20,
     'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',    
     'score': 'output/score.h5ad',
-    'genes_n': 5000
+    'genes_n': 5000,
+    'output_detailed_metrics': True
 }
 ## VIASH END
 
