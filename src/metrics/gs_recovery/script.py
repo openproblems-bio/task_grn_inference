@@ -21,7 +21,8 @@ par = {
     'max_pathway_size': 500,
     'min_targets': 10,
     'max_targets': 100,  # Top K edges by absolute weight
-    'ulm_baseline_method': 'zero_centered'
+    'ulm_baseline_method': 'zero_centered',
+    'output_detailed_metrics': True
 }
 ## VIASH END
 
@@ -42,21 +43,6 @@ par = parse_args(par)
 
 
 if __name__ == "__main__":
-    # Collect geneset files from par dictionary
-    pathway_files = {}
-    geneset_mapping = {
-        'geneset_hallmark_2020': 'hallmark_2020',
-        'geneset_kegg_2021': 'kegg_2021',
-        'geneset_reactome_2022': 'reactome_2022',
-        'geneset_go_bp_2023': 'go_bp_2023',
-        'geneset_bioplanet_2019': 'bioplanet_2019',
-        'geneset_wikipathways_2019': 'wikipathways_2019',
-    }
-    
-    for arg_name, geneset_name in geneset_mapping.items():
-        pathway_files[geneset_name] = par[arg_name]
-    
-    par['pathway_files'] = pathway_files
     
     output = main_helper(par)
     print(output)

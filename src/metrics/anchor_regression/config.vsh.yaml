@@ -1,6 +1,6 @@
 __merge__: ../../api/comp_metric.yaml
 
-name: ar
+name: anchor_regression
 namespace: "metrics"
 info:
   label: Anchor Regression
