@@ -19,10 +19,11 @@ par = {
     'output_detailed_metrics': True
 }
 ## VIASH END
-
+local_run = False
 try:
     sys.path.append(meta["resources_dir"])
 except:
+    local_run=True
     meta = {
     "resources_dir":'src/metrics/experimental/tf_binding/',
     "util_dir": 'src/utils',
@@ -32,15 +33,15 @@ except:
 from helper import main as main 
 from util import format_save_score, parse_args
 
-args = parse_args(par)
+if local_run:
+    par = parse_args(par)
 
 
 if __name__ == "__main__":
-    output = main(par)
-    print(output)
+    df = main(par)
 
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     
-    score_adata = format_save_score(output, dataset_id, method_id, par['score'])
+    format_save_score(df, dataset_id, method_id, par['score'])
     print('Completed', flush=True)

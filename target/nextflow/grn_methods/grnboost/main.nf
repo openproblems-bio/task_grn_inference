@@ -3468,7 +3468,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/grnboost",
     "viash_version" : "0.9.4",
-    "git_commit" : "d5b6714abced1411374eb0cab96466b1f721f83b",
+    "git_commit" : "f17e9e139ba92e688ddb34a03795a049067a8814",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

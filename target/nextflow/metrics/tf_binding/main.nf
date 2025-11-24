@@ -3634,7 +3634,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/tf_binding",
     "viash_version" : "0.9.4",
-    "git_commit" : "d5b6714abced1411374eb0cab96466b1f721f83b",
+    "git_commit" : "f17e9e139ba92e688ddb34a03795a049067a8814",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3800,10 +3800,11 @@ dep = {
 }
 
 ## VIASH END
-
+local_run = False
 try:
     sys.path.append(meta["resources_dir"])
 except:
+    local_run=True
     meta = {
     "resources_dir":'src/metrics/experimental/tf_binding/',
     "util_dir": 'src/utils',
@@ -3813,17 +3814,17 @@ except:
 from helper import main as main 
 from util import format_save_score, parse_args
 
-args = parse_args(par)
+if local_run:
+    par = parse_args(par)
 
 
 if __name__ == "__main__":
-    output = main(par)
-    print(output)
+    df = main(par)
 
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     
-    score_adata = format_save_score(output, dataset_id, method_id, par['score'])
+    format_save_score(df, dataset_id, method_id, par['score'])
     print('Completed', flush=True)
 VIASHMAIN
 python -B "$tempscript"
