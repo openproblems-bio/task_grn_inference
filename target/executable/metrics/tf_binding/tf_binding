@@ -457,7 +457,7 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics tf_binding"
-LABEL org.opencontainers.image.created="2025-11-24T14:54:00Z"
+LABEL org.opencontainers.image.created="2025-11-24T14:59:11Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
 LABEL org.opencontainers.image.revision="f17e9e139ba92e688ddb34a03795a049067a8814"
 LABEL org.opencontainers.image.version="build_main"
