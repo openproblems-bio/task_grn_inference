@@ -54,6 +54,10 @@ def sum_by(adata: ad.AnnData, col: str, unique_mapping: bool = True) -> ad.AnnDa
     sum_adata.obs.index.name = col
     sum_adata.obs = sum_adata.obs.reset_index()
     sum_adata.obs.index = sum_adata.obs.index.astype("str")
+    
+    # Add cell_count column
+    cell_count_df = adata.obs.groupby(col).size().reset_index(name='cell_count')
+    sum_adata.obs = sum_adata.obs.merge(cell_count_df, on=col, how='left')
 
     return sum_adata
 

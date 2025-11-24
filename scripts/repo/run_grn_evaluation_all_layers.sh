@@ -9,7 +9,7 @@ publish_dir="s3://openproblems-data/resources/grn/results/${RUN_ID}"
 grn_models_folder="${resources_dir}/grn_models"
 
 subsample=-2
-max_workers=10
+num_workers=10
 
 param_file="./params/${RUN_ID}.yaml"
 
@@ -38,7 +38,7 @@ append_entry() {
     reg_type: $reg_type
     method_id: $1
     subsample: $subsample
-    max_workers: $max_workers
+    num_workers: $num_workers
     consensus: ${resources_dir}/prior/consensus-num-regulators.json
     ${2:+tf_all: ${resources_dir}/prior/tf_all.csv}
     ${3:+prediction: ${grn_models_folder}/$1.csv}

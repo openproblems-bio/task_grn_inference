@@ -38,9 +38,7 @@ except:
 from helper import main as main_helper
 from util import format_save_score, parse_args
 
-
 par = parse_args(par)
-
 
 if __name__ == "__main__":
     

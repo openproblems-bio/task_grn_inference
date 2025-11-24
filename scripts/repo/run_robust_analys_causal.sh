@@ -7,7 +7,7 @@ publish_dir="${resources_dir}/results/${RUN_ID}"
 
 reg_type=ridge
 subsample=-2
-max_workers=10
+num_workers=10
 layer=(scgen_pearson)
 metric_ids="[regression_1]"
 
@@ -26,7 +26,7 @@ cat >> $param_file << HERE
     method_id: baseline_corr_causal
     layer: ${layer}
     subsample: $subsample
-    max_workers: $max_workers
+    num_workers: $num_workers
     consensus: ${resources_dir}/prior/consensus-num-regulators.json
     tf_all: ${resources_dir}/prior/tf_all.csv
     causal: True
@@ -42,7 +42,7 @@ append_entry() {
     method_id: baseline_corr-${1}
     layer: ${layer}
     subsample: $subsample
-    max_workers: $max_workers
+    num_workers: $num_workers
     consensus: ${resources_dir}/prior/consensus-num-regulators.json
     tf_all: ${resources_dir}/prior/tf_all.csv
     causal: False

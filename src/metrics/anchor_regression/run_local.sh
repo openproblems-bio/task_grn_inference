@@ -16,7 +16,7 @@ save_dir="output/ar"
 mkdir -p "$save_dir"
 
 # datasets to process
-datasets=( "300BCG" 'parsebioscience' 'op' 'ibd_uc' 'ibd_ucD' ) #"300BCG" "ibd" 'parsebioscience'
+datasets=( 'op'  "300BCG" 'parsebioscience' 'ibd_uc' 'ibd_cd' ) #"300BCG" "ibd" 'parsebioscience'
 # methods to process
 methods=("pearson_corr" "positive_control" "negative_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
 
@@ -39,7 +39,7 @@ for dataset in "${datasets[@]}"; do
         fi
 
         echo -e "\nProcessing method: $method\n"
-        python src/metrics/ar/script.py \
+        python src/metrics/anchor_regression/script.py \
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
             --score "$score"

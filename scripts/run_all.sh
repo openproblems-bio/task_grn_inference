@@ -1,7 +1,7 @@
 set -e
 
 # datasets=( 'replogle' 'op' 'nakatake' 'adamson' 'norman'  'xaira_HEK293T' 'xaira_HCT116'  'parsebioscience' 'ibd_uc' 'ibd_cd' '300BCG' ) #'replogle' 'op' 'nakatake' 'adamson' 'norman'  'xaira_HEK293T' 'xaira_HCT116'  'parsebioscience' 'ibd_uc' 'ibd_cd'  '300BCG') #
-datasets=( 'op' 'replogle'   ) #'replogle' 'op' 'nakatake' 'adamson' 'norman'  'xaira_HEK293T' 'xaira_HCT116'  'parsebioscience' 'ibd_uc' 'ibd_cd' '300BCG') #
+datasets=( 'op'  ) #'replogle' 'op' 'nakatake' 'adamson' 'norman'  'xaira_HEK293T' 'xaira_HCT116'  'parsebioscience' 'ibd_uc' 'ibd_cd' '300BCG') #
 run_local=false # set to true to run locally, false to run on AWS
 
 run_grn_inference=false

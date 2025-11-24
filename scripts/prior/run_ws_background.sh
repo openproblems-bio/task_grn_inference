@@ -25,5 +25,5 @@ for dataset in "${datasets[@]}"; do
         --background_distance "resources/grn_benchmark/prior/ws_distance_background_${dataset}.csv" \
         --tf_all "resources/grn_benchmark/prior/tf_all.csv" \
         --evaluation_data_sc "resources/processed_data/${dataset}_evaluation_sc.h5ad" \
-        --max_workers 100 
+        --num_workers 100 
 done

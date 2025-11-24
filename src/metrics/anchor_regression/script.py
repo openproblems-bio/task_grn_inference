@@ -17,15 +17,6 @@ par = {
     'genes_n': 5000
 }
 ## VIASH END
-
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument('--prediction', type=str, help='Path to the predicted GRN in h5ad format')
-parser.add_argument('--evaluation_data', type=str, help='Path to the evaluation data in h5ad format')
-parser.add_argument('--score', type=str)
-parser.add_argument('--layer', type=str, default='lognorm', help='Layer in the h5ad file to use')
-parser.add_argument('--num_workers', type=int, default=20, help='Number of workers to use')
-
 try:
     sys.path.append(meta["resources_dir"])
 except:
@@ -38,14 +29,9 @@ except:
     sys.path.append(meta["util_dir"])
     sys.path.append(meta["helper_dir"])
 from helper import main as main_anchor 
-from util import format_save_score
+from util import format_save_score, parse_args
 
-
-
-args = parser.parse_args()
-for key, value in vars(args).items():
-    if value is not None:
-        par[key] = value
+par = parse_args(par)
 
 if __name__ == "__main__":
     output = main_anchor(par)

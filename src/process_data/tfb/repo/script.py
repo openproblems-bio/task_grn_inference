@@ -144,12 +144,12 @@ def _process_tf(tf, peaks_df, tss_file):
         return []
     return [{'source': tf, 'target': g} for g in genes]
 
-def build_grn(peaks_df, tss_file, genome='hg38', max_workers=None):
+def build_grn(peaks_df, tss_file, genome='hg38', num_workers=None):
     tfs = peaks_df['tf'].unique()
     rows = []
 
     # Use ProcessPoolExecutor for parallel processing
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+    with ProcessPoolExecutor(num_workers=num_workers) as executor:
         futures = {executor.submit(_process_tf, tf, peaks_df, tss_file): tf for tf in tfs}
         for future in tqdm(as_completed(futures), total=len(futures)):
             result = future.result()
@@ -181,7 +181,7 @@ if __name__ == '__main__':
                 print(f'Original number of peaks: {len(peaks_df)}', flush=True)
                 peaks_df = peaks_df[peaks_df['score'] > 50]
                 print(f'Number of peaks after filtering: {len(peaks_df)}', flush=True)
-            grn = build_grn(peaks_df, tss_local_path, genome=genome, max_workers=10)
+            grn = build_grn(peaks_df, tss_local_path, genome=genome, num_workers=10)
             grn.to_csv(output_csv_path, index=False)
     
     if True: # remap

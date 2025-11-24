@@ -69,7 +69,7 @@ def process_tfb_datasets_for_cell_type(cell_type, base_dir=None):
         tss_file = os.path.join(base_dir, "resources", "supp_data", "tss_h38.bed")
         output_dir = os.path.join(base_dir, "resources", "grn_benchmark", "ground_truth")
     
-    max_workers = 10  # Reduce workers to avoid memory issues
+    num_workers = 10  # Reduce workers to avoid memory issues
     
     cell_type_lower = cell_type.lower()
     cell_type_upper = cell_type.upper()
@@ -108,7 +108,7 @@ def process_tfb_datasets_for_cell_type(cell_type, base_dir=None):
         
         # Build GRN
         print("Building GRN...")
-        grn = build_grn(peaks_df, tss_file, max_workers=max_workers)
+        grn = build_grn(peaks_df, tss_file, num_workers=num_workers)
         
         # Save results
         output_file = f"{output_dir}/{cell_type_upper}_{dataset['name']}.csv"
