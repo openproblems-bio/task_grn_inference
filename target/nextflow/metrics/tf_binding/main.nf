@@ -3634,7 +3634,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/tf_binding",
     "viash_version" : "0.9.4",
-    "git_commit" : "f17e9e139ba92e688ddb34a03795a049067a8814",
+    "git_commit" : "6fd7390c0b2ffd4039997ad413e479a09cd40966",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3824,7 +3824,7 @@ if __name__ == "__main__":
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     
-    format_save_score(df, dataset_id, method_id, par['score'])
+    format_save_score(df, method_id, dataset_id, par['score'])
     print('Completed', flush=True)
 VIASHMAIN
 python -B "$tempscript"

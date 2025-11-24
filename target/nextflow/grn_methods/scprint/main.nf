@@ -3557,7 +3557,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scprint",
     "viash_version" : "0.9.4",
-    "git_commit" : "f17e9e139ba92e688ddb34a03795a049067a8814",
+    "git_commit" : "6fd7390c0b2ffd4039997ad413e479a09cd40966",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
