@@ -93,6 +93,7 @@ DATASETS_METRICS = {
     'norman': ['regression', 'ws_distance', 'tf_binding', 'sem', 'gs_recovery'],
     'nakatake': ['regression', 'sem', 'gs_recovery'],
     'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
+    # 'op': ['regression', 'tf_binding', 'gs_recovery'],
     '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
     'ibd_uc': ['regression', 'vc', 'tf_binding', 'sem',  'gs_recovery'],
     'ibd_cd': ['regression', 'vc', 'tf_binding', 'sem',  'gs_recovery'],
