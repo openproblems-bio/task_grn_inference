@@ -44,6 +44,10 @@ arguments:
     type: integer
     direction: input
     default: 20
+  - name: --n_top_genes
+    type: integer
+    direction: input
+    default: 3000
 
 test_resources:
   - type: python_script

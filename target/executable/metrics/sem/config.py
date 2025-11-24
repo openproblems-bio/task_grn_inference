@@ -92,11 +92,11 @@ DATASETS_METRICS = {
     'adamson': ['regression',  'tf_binding', 'sem', 'gs_recovery'],
     'norman': ['regression', 'ws_distance', 'tf_binding', 'sem', 'gs_recovery'],
     'nakatake': ['regression', 'sem', 'gs_recovery'],
-    'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression', 'gs_recovery'],
-    '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression', 'gs_recovery'],
-    'ibd_uc': ['regression', 'vc', 'tf_binding', 'sem', 'anchor_regression', 'gs_recovery'],
-    'ibd_cd': ['regression', 'vc', 'tf_binding', 'sem', 'anchor_regression', 'gs_recovery'],
-    'parsebioscience': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem', 'rc', 'anchor_regression', 'gs_recovery'],
+    'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
+    '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
+    'ibd_uc': ['regression', 'vc', 'tf_binding', 'sem',  'gs_recovery'],
+    'ibd_cd': ['regression', 'vc', 'tf_binding', 'sem',  'gs_recovery'],
+    'parsebioscience': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
     'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
     'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
 }
@@ -107,19 +107,92 @@ for dataset, metrics in DATASETS_METRICS.items():
     for metric in metrics:
         METRICS_DATASETS.setdefault(metric, []).append(dataset)
 
-ORDERED_METRICS = [
+METRICS = [
        'r_precision', 'r_recall', 'r_f1',
        'ws_precision', 'ws_recall', 'ws_f1',
        'vc', 
        'sem', 
        't_rec_precision', 't_rec_recall', 't_rec_f1',
-       'tfb_precision', 'tfb_recall',  'tfb_f1',
+       
        'rc_tf_act',
-       'anchor_regression',
+       
+       'anchor_regression_raw',
+       
+       'tfb_precision', 'tfb_recall',  'tfb_f1',
        'gs_precision', 'gs_recall', 'gs_f1',
-       'tf_binding_precision', 'tf_binding_recall', 'tf_binding_f1'
        ]
-# ORDERED_METRICS_C = [c for c in ORDERED_METRICS]
+    
+FINAL_METRICS = [
+       'r_precision', 'r_recall', 
+       'ws_precision', 'ws_recall', 
+       'vc', 
+       'sem', 
+       't_rec_precision', 't_rec_recall', 
+        
+       'rc_tf_act',
+       
+       'anchor_regression_raw',
+       'tfb_f1', 
+       'gs_f1', 
+       ]
+
+surrogate_names = {
+    'scprint': 'scPRINT',
+    'collectri': 'CollectRI',
+    'scenicplus':'Scenic+', 
+    'celloracle':'CellOracle', 
+    'figr':'FigR',
+    'grnboost2':'GRNBoost2',
+    'grnboost':'GRNBoost2',
+    'ppcor':'PPCOR',
+    'portia':'Portia',
+    'baseline':'Baseline',
+    'cov_net': 'Pearson cov',
+    'granie':'GRaNIE',
+    'scglue':'scGLUE',
+    'pearson_corr': 'Pearson Corr.',
+    'scenic': 'Scenic',
+    'positive_control':'Positive Ctrl',
+    'negative_control':'Negative Ctrl',
+    'scgpt': 'scGPT',
+    'spearman_corr': 'Spearman Corr.',
+
+    'regression': 'Regression',
+    'tf_recovery': 'TF Recovery',
+    'r_precision': "R (precision)", 
+    'r_recall': "R (recall)", 
+    'r_f1': "R (F1)",
+    'r_raw': "R (raw)",
+    'ws_precision': "WS (precision)", 
+    'ws_recall': "WS (recall)", 
+    'ws_f1': "WS (F1)",
+    'ws_raw': "WS (raw)",
+    'sem': 'SEM',
+    't_rec_precision': 'TF recovery (precision)',
+    't_rec_recall': 'TF recovery (recall)',
+    't_rec_f1': 'TF recovery (F1)',
+    'rc_tf_act': 'Replica consistency',
+    'anchor_regression': 'Anchor regression',
+    'vc': 'Virtual cell',
+    'tfb_precision': 'TF binding (precision)',
+    'tfb_recall': 'TF binding (recall)',
+    'tfb_f1': 'TF binding',
+    'gs_precision': 'GS (precision)',
+    'gs_recall': 'GS (recall)',
+    'gs_f1': 'Gene sets',
+
+    'op':'OPSCA',
+    'nakatake': 'Nakatake', 
+    'norman': 'Norman', 
+    'adamson':'Adamson', 
+    'replogle': 'Replogle',
+    'xaira_HCT116': 'Xaira:HCT116',
+    'xaira_HEK293T': 'Xaira:HEK293T',
+    'parsebioscience': 'ParseBioscience',
+    'ibd_uc': 'IBD:UC',
+    'ibd_cd': 'IBD:CD',
+    '300BCG': '300BCG'
+    }
 
 def generate_config_env(output_path='src/utils/dataset_config.env'):
     """Generate a simple env-style config file with dataset-specific configurations."""

@@ -20,9 +20,9 @@ def set_global_seed(seed):
     lightgbm.LGBMRegressor().set_params(random_state=seed)
 
 class lightgbm_wrapper:
-    def __init__(self, params, max_workers=None):
+    def __init__(self, params, num_workers=None):
         self.params =  params
-        self.max_workers = max_workers
+        self.num_workers = num_workers
         
     def fit(self, X_train, Y_train):
         self.n_sample = Y_train.shape[1]
@@ -33,7 +33,7 @@ class lightgbm_wrapper:
             regr.fit(X_train, Y_train[:, i])
             self.regr_samples[i] = regr
         
-        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+        with ThreadPoolExecutor(num_workers=self.num_workers) as executor:
             executor.map(fit_sample, range(self.n_sample))
             
     def predict(self, X_test):
@@ -41,7 +41,7 @@ class lightgbm_wrapper:
             regr = self.regr_samples[i]
             return regr.predict(X_test)
         
-        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+        with ThreadPoolExecutor(num_workers=self.num_workers) as executor:
             y_pred_list = list(executor.map(predict_sample, range(self.n_sample)))
         
         return np.stack(y_pred_list, axis=1)
@@ -125,11 +125,11 @@ def cross_validation(net, prturb_adata, par:dict):
                     n_estimators=100, min_samples_leaf=2, min_child_samples=1, 
                     feature_fraction=0.05, verbosity=-1
         )
-        regr = lightgbm_wrapper(params, max_workers=par['num_workers'])
+        regr = lightgbm_wrapper(params, num_workers=par['num_workers'])
     elif reg_type=='RF':
         params = dict(boosting_type='rf',random_state=32, n_estimators=100,  
         feature_fraction=0.05, verbosity=-1)
-        regr = lightgbm_wrapper(params, max_workers=par['num_workers'])
+        regr = lightgbm_wrapper(params, num_workers=par['num_workers'])
     else:
         raise ValueError(f"{reg_type} is not defined.")  
     reg_models = []

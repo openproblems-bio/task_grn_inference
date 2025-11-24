@@ -495,7 +495,7 @@ def main(par):
     print(f"Using {len(gene_names)} genes present in the GRN")
     
     # Additional memory-aware gene filtering for very large GRNs
-    MAX_GENES_FOR_MEMORY = 3000  # Reduced further to avoid memory issues
+    MAX_GENES_FOR_MEMORY = par['n_top_genes']  # Reduced further to avoid memory issues
     if len(gene_names) > MAX_GENES_FOR_MEMORY:
         print(f"Too many genes ({len(gene_names)}) for memory. Selecting top {MAX_GENES_FOR_MEMORY} by GRN connectivity.")
         

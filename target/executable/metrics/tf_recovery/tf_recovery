@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "decoupler==2.1.1"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics tf_recovery"
-LABEL org.opencontainers.image.created="2025-11-23T19:23:47Z"
+LABEL org.opencontainers.image.created="2025-11-24T11:40:03Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="a8477836400f81d57164b4cc9cb1bfa2daa68e7a"
+LABEL org.opencontainers.image.revision="d5b6714abced1411374eb0cab96466b1f721f83b"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -616,6 +616,10 @@ function ViashHelp {
   echo "        type: integer"
   echo "        default: 20"
   echo ""
+  echo "    --n_top_genes"
+  echo "        type: integer"
+  echo "        default: 3000"
+  echo ""
   echo "Viash built in Computational Requirements:"
   echo "    ---cpus=INT"
   echo "        Number of CPUs to use"
@@ -763,6 +767,17 @@ while [[ $# -gt 0 ]]; do
         --num_workers=*)
             [ -n "$VIASH_PAR_NUM_WORKERS" ] && ViashError Bad arguments for option \'--num_workers=*\': \'$VIASH_PAR_NUM_WORKERS\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
             VIASH_PAR_NUM_WORKERS=$(ViashRemoveFlags "$1")
+            shift 1
+            ;;
+        --n_top_genes)
+            [ -n "$VIASH_PAR_N_TOP_GENES" ] && ViashError Bad arguments for option \'--n_top_genes\': \'$VIASH_PAR_N_TOP_GENES\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_N_TOP_GENES="$2"
+            [ $# -lt 2 ] && ViashError Not enough arguments passed to --n_top_genes. Use "--help" to get more information on the parameters. && exit 1
+            shift 2
+            ;;
+        --n_top_genes=*)
+            [ -n "$VIASH_PAR_N_TOP_GENES" ] && ViashError Bad arguments for option \'--n_top_genes=*\': \'$VIASH_PAR_N_TOP_GENES\' \& \'$2\' - you should provide exactly one argument for this option. && exit 1
+            VIASH_PAR_N_TOP_GENES=$(ViashRemoveFlags "$1")
             shift 1
             ;;
         ---engine)
@@ -978,6 +993,9 @@ fi
 if [ -z ${VIASH_PAR_NUM_WORKERS+x} ]; then
   VIASH_PAR_NUM_WORKERS="20"
 fi
+if [ -z ${VIASH_PAR_N_TOP_GENES+x} ]; then
+  VIASH_PAR_N_TOP_GENES="3000"
+fi
 
 # check whether required files exist
 if [ ! -z "$VIASH_PAR_PREDICTION" ] && [ ! -e "$VIASH_PAR_PREDICTION" ]; then
@@ -1011,6 +1029,12 @@ fi
 if [[ -n "$VIASH_PAR_NUM_WORKERS" ]]; then
   if ! [[ "$VIASH_PAR_NUM_WORKERS" =~ ^[-+]?[0-9]+$ ]]; then
     ViashError '--num_workers' has to be an integer. Use "--help" to get more information on the parameters.
+    exit 1
+  fi
+fi
+if [[ -n "$VIASH_PAR_N_TOP_GENES" ]]; then
+  if ! [[ "$VIASH_PAR_N_TOP_GENES" =~ ^[-+]?[0-9]+$ ]]; then
+    ViashError '--n_top_genes' has to be an integer. Use "--help" to get more information on the parameters.
     exit 1
   fi
 fi
@@ -1205,7 +1229,8 @@ par = {
   'layer': $( if [ ! -z ${VIASH_PAR_LAYER+x} ]; then echo "r'${VIASH_PAR_LAYER//\'/\'\"\'\"r\'}'"; else echo None; fi ),
   'max_n_links': $( if [ ! -z ${VIASH_PAR_MAX_N_LINKS+x} ]; then echo "int(r'${VIASH_PAR_MAX_N_LINKS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
   'tf_all': $( if [ ! -z ${VIASH_PAR_TF_ALL+x} ]; then echo "r'${VIASH_PAR_TF_ALL//\'/\'\"\'\"r\'}'"; else echo None; fi ),
-  'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi )
+  'num_workers': $( if [ ! -z ${VIASH_PAR_NUM_WORKERS+x} ]; then echo "int(r'${VIASH_PAR_NUM_WORKERS//\'/\'\"\'\"r\'}')"; else echo None; fi ),
+  'n_top_genes': $( if [ ! -z ${VIASH_PAR_N_TOP_GENES+x} ]; then echo "int(r'${VIASH_PAR_N_TOP_GENES//\'/\'\"\'\"r\'}')"; else echo None; fi )
 }
 meta = {
   'name': $( if [ ! -z ${VIASH_META_NAME+x} ]; then echo "r'${VIASH_META_NAME//\'/\'\"\'\"r\'}'"; else echo None; fi ),

@@ -112,18 +112,37 @@ def compute_stabilities(
         y: np.ndarray,
         Z: np.ndarray,
         is_selected: np.ndarray,
-        eps: float = 1e-50
+        eps: float = 1e-50,
+        W1=None,
+        W2=None
 ) -> float:
-
-    theta0 = np.abs(anchor_regression(X, Z, y, gamma=1))
-    theta0 /= np.sum(theta0)
-    theta = np.abs(anchor_regression(X, Z, y, gamma=1.2))
-    theta /= np.sum(theta)
-    s1 = theta[is_selected] * theta0[is_selected]
-    s2 = theta[~is_selected] * theta0[~is_selected]
-
-    s1 = np.mean(s1)
-    s2 = np.mean(s2)
+    """Compute stability score with optional pre-computed whitening transforms."""
+    
+    # Use pre-computed whitening transforms if available
+    if W1 is None:
+        W1 = get_whitening_transform(Z, gamma=1.0)
+    if W2 is None:
+        W2 = get_whitening_transform(Z, gamma=1.2)
+    
+    # Compute anchor regression coefficients for both gamma values
+    X_t1 = W1 @ X
+    y_t1 = W1 @ y
+    sigma_xx1 = X_t1.T @ X_t1 / X_t1.shape[0]
+    sigma_xy1 = X_t1.T @ y_t1 / y_t1.shape[0]
+    theta0 = np.linalg.solve(sigma_xx1 + 1e-6 * np.eye(X_t1.shape[1]), sigma_xy1)
+    theta0 = np.abs(theta0.ravel())
+    theta0 /= np.sum(theta0) + eps
+    
+    X_t2 = W2 @ X
+    y_t2 = W2 @ y
+    sigma_xx2 = X_t2.T @ X_t2 / X_t2.shape[0]
+    sigma_xy2 = X_t2.T @ y_t2 / y_t2.shape[0]
+    theta = np.linalg.solve(sigma_xx2 + 1e-6 * np.eye(X_t2.shape[1]), sigma_xy2)
+    theta = np.abs(theta.ravel())
+    theta /= np.sum(theta) + eps
+    
+    s1 = np.mean(theta[is_selected] * theta0[is_selected])
+    s2 = np.mean(theta[~is_selected] * theta0[~is_selected])
 
     stability = (s1 - s2) / (s1 + s2 + eps)
 
@@ -135,7 +154,9 @@ def evaluate_gene_stability(
         Z: np.ndarray,
         A: np.ndarray,
         j: int,
-        eps: float = 1e-50
+        eps: float = 1e-50,
+        W1=None,
+        W2=None
 ) -> float:
     """Evaluate stability of regulatory relationships for a single target gene.
     
@@ -145,6 +166,8 @@ def evaluate_gene_stability(
         A: GRN adjacency matrix (n_genes, n_genes).
         j: Target gene index.
         eps: Small epsilon for numerical stability.
+        W1: Pre-computed whitening transform for gamma=1.0 (optional).
+        W2: Pre-computed whitening transform for gamma=1.2 (optional).
         
     Returns:
         Stability score for gene j.
@@ -158,18 +181,13 @@ def evaluate_gene_stability(
     mask = np.ones(X.shape[1], dtype=bool)
     mask[j] = False
 
-    return compute_stabilities(X[:, mask], X[:, j], Z, is_selected[mask])
+    return compute_stabilities(X[:, mask], X[:, j], Z, is_selected[mask], eps=eps, W1=W1, W2=W2)
 
 
 def main(par):
-    """Main anchor regression evaluation function."""
-
-    # Load evaluation data
     adata = ad.read_h5ad(par['evaluation_data'])
     dataset_id = adata.uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
-
-    # Manage layer
     layer = manage_layer(adata, par)
     X = adata.layers[layer]
     if isinstance(X, csr_matrix):
@@ -182,22 +200,21 @@ def main(par):
     # Get dataset-specific anchor variables
     if dataset_id not in DATASET_GROUPS:
         raise ValueError(f"Dataset {dataset_id} not found in DATASET_GROUPS")
-    anchor_cols = DATASET_GROUPS[dataset_id].get('anchors', ['donor_id', 'plate_name'])
+    anchor_cols = DATASET_GROUPS[dataset_id]['anchors']
     print(f"Using anchor variables: {anchor_cols}")
+    
+    # Validate anchor columns exist in adata.obs
+    missing_cols = [col for col in anchor_cols if col not in adata.obs.columns]
+    if missing_cols:
+        raise ValueError(f"Anchor columns {missing_cols} not found in adata.obs. Available columns: {adata.obs.columns.tolist()}")
 
     # Encode anchor variables
     anchor_variables = encode_obs_cols(adata, anchor_cols)
-    anchor_encoded = combine_multi_index(*anchor_variables)
-
-    # Get CV groups
-    if "cell_type" in adata.obs:
-        cv_groups = LabelEncoder().fit_transform(adata.obs["cell_type"].values)
-    else:
-        np.random.randint(0, 5)
-        cv_groups = np.random.shuffle()
     
     if len(anchor_variables) == 0:
-        raise ValueError(f"No anchor variables found in dataset for columns: {anchor_cols}")
+        raise ValueError(f"No anchor variables could be encoded from columns: {anchor_cols}")
+    
+    anchor_encoded = combine_multi_index(*anchor_variables)
     
     # One-hot encode anchor variables
     Z = OneHotEncoder(drop="first", sparse_output=False, dtype=np.float32).fit_transform(anchor_encoded.reshape(-1, 1))
@@ -241,33 +258,63 @@ def main(par):
     # Center and scale dataset
     scaler = StandardScaler()
     X = scaler.fit_transform(X)
+    
+    # Pre-compute whitening transforms (shared across all genes)
+    print("Pre-computing whitening transforms...")
+    W1 = get_whitening_transform(Z, gamma=1.0)
+    W2 = get_whitening_transform(Z, gamma=1.2)
 
     # Create baseline model
     A_baseline = create_grn_baseline(A)
 
-    # Compute gene stabilities
-    scores, scores_baseline = [], []
-    for j in tqdm.tqdm(range(X.shape[1]), desc="Evaluating gene stability"):
-        scores.append(evaluate_gene_stability(X, Z, A, j))
-        scores_baseline.append(evaluate_gene_stability(X, Z, A_baseline, j))
-    scores = np.array(scores)
-    scores_baseline = np.array(scores_baseline)
+    # Compute gene stabilities in parallel
+    def eval_gene(j):
+        return (evaluate_gene_stability(X, Z, A, j, W1=W1, W2=W2),
+                evaluate_gene_stability(X, Z, A_baseline, j, W1=W1, W2=W2))
+    
+    n_jobs = par['num_workers']
+    from joblib import Parallel, delayed
+    
+    results = Parallel(n_jobs=n_jobs, backend='loky')(
+        delayed(eval_gene)(j) for j in tqdm.tqdm(range(X.shape[1]), desc="Evaluating gene stability")
+    )
+    
+    scores = np.array([r[0] for r in results])
+    scores_baseline = np.array([r[1] for r in results])
 
     # Skip NaNs
     mask = ~np.logical_or(np.isnan(scores), np.isnan(scores_baseline))
     scores = scores[mask]
     scores_baseline = scores_baseline[mask]
+    
+    if len(scores) < 10:
+        raise ValueError(f"Too few valid genes ({len(scores)}) for anchor regression evaluation")
 
     # Calculate final score
     p_value = wilcoxon(scores, scores_baseline).pvalue
     p_value = np.clip(p_value, 1e-300, 1)
-    final_score = -np.log10(p_value)
-    print(f"Method: {method_id}")
-    print(f"Anchor Regression Score: {final_score:.6f}")
+    
+    # Calculate raw score (mean difference)
+    raw_score = float(np.mean(scores) - np.mean(scores_baseline))
+    
+    # Set to 0 if not significant (p >= 0.05)
+    if p_value >= 0.05:
+        final_score = 0.0
+        print(f"Method: {method_id}")
+        print(f"p-value: {p_value:.6f} (not significant, p >= 0.05)")
+        print(f"Anchor Regression Score: {final_score:.6f} (set to 0)")
+        print(f"Anchor Regression Raw Score: {raw_score:.6f}")
+    else:
+        final_score = -np.log10(p_value)
+        print(f"Method: {method_id}")
+        print(f"p-value: {p_value:.6f} (significant)")
+        print(f"Anchor Regression Score: {final_score:.6f}")
+        print(f"Anchor Regression Raw Score: {raw_score:.6f}")
 
     # Return results as DataFrame
     results = {
-        'anchor_regression': [final_score]
+        'anchor_regression': [final_score],
+        'anchor_regression_raw': [raw_score]
     }
 
     df_results = pd.DataFrame(results)

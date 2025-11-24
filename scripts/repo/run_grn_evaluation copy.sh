@@ -12,7 +12,7 @@ publish_dir="${resources_dir}/results/${RUN_ID}"
 grn_models_folder="${resources_dir}/grn_models"
 
 subsample=-2
-max_workers=10
+num_workers=10
 layer=scgen_pearson
 metric_ids="[regression_1, regression]"
 
@@ -44,7 +44,7 @@ append_entry() {
     reg_type: $reg_type
     method_id: $1
     subsample: $subsample
-    max_workers: $max_workers
+    num_workers: $num_workers
     tf_all: ${resources_dir}/prior/tf_all.csv
     layer: ${layer}
     consensus: ${resources_dir}/prior/consensus-num-regulators.json
@@ -61,7 +61,7 @@ append_entry_control() {
     reg_type: $reg_type
     method_id: $1
     subsample: $subsample
-    max_workers: $max_workers
+    num_workers: $num_workers
     tf_all: ${resources_dir}/prior/tf_all.csv
     layer: ${layer}
     consensus: ${resources_dir}/prior/consensus-num-regulators.json

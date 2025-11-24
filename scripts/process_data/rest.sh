@@ -13,9 +13,9 @@
 
 set -e
 
-# python src/process_data/main/adamson/script.py 
+python src/process_data/main/adamson/script.py 
 # python src/process_data/main/nakatake/script.py 
-# python src/process_data/main/norman/script.py
+python src/process_data/main/norman/script.py
 
 # echo "Processing opsca"
 # python src/process_data/main/opsca/script.py 
@@ -27,5 +27,5 @@ set -e
 
 # echo "Processing 300BCG"
 # python src/process_data/main/300BCG/script.py 
-echo "Processing IBD"
-python src/process_data/main/ibd/script.py 
+# echo "Processing IBD"
+# python src/process_data/main/ibd/script.py 

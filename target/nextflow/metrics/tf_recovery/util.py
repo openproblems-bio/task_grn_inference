@@ -93,14 +93,16 @@ def parse_args(par):
     parser.add_argument('--ground_truth_unibind', type=str)
     parser.add_argument('--ground_truth_chipatlas', type=str)
     parser.add_argument('--ground_truth_remap', type=str)
-    parser.add_argument('--geneset_hallmark_2020', type=str, help='Hallmark 2020 geneset GMT file')
-    parser.add_argument('--geneset_kegg_2021', type=str, help='KEGG 2021 geneset GMT file')
-    parser.add_argument('--geneset_reactome_2022', type=str, help='Reactome 2022 geneset GMT file')
-    parser.add_argument('--geneset_go_bp_2023', type=str, help='GO BP 2023 geneset GMT file')
-    parser.add_argument('--geneset_bioplanet_2019', type=str, help='BioPlanet 2019 geneset GMT file')
-    parser.add_argument('--geneset_wikipathways_2019', type=str, help='WikiPathways 2019 geneset GMT file')
+    parser.add_argument('--geneset_hallmark_2020', type=str, default='resources/grn_benchmark/prior/pathways/hallmark_2020.gmt', help='Hallmark 2020 geneset GMT file')
+    parser.add_argument('--geneset_kegg_2021', type=str, default='resources/grn_benchmark/prior/pathways/kegg_2021.gmt', help='KEGG 2021 geneset GMT file')
+    parser.add_argument('--geneset_reactome_2022', type=str, default='resources/grn_benchmark/prior/pathways/reactome_2022.gmt', help='Reactome 2022 geneset GMT file')
+    parser.add_argument('--geneset_go_bp_2023', type=str, default='resources/grn_benchmark/prior/pathways/go_bp_2023.gmt', help='GO BP 2023 geneset GMT file')
+    parser.add_argument('--geneset_bioplanet_2019', type=str, default='resources/grn_benchmark/prior/pathways/bioplanet_2019.gmt', help='BioPlanet 2019 geneset GMT file')
+    parser.add_argument('--geneset_wikipathways_2019', type=str, default='resources/grn_benchmark/prior/pathways/wikipathways_2019.gmt', help='WikiPathways 2019 geneset GMT file')
     parser.add_argument('--output_detailed_metrics', action='store_true', default=True, help='Output detailed metrics')
     
+    
+    parser.add_argument('--n_top_genes', type=int, default=3000)
     args = parser.parse_args()
     for k, v in vars(args).items():
         if v is not None:
