@@ -457,7 +457,7 @@ RUN Rscript -e 'options(warn = 2); if (!requireNamespace("BiocManager", quietly 
   Rscript -e 'options(warn = 2); if (!requireNamespace("aws.s3", quietly = TRUE)) BiocManager::install("aws.s3")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods figr"
-LABEL org.opencontainers.image.created="2025-11-24T13:34:31Z"
+LABEL org.opencontainers.image.created="2025-11-24T14:54:01Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
 LABEL org.opencontainers.image.revision="f17e9e139ba92e688ddb34a03795a049067a8814"
 LABEL org.opencontainers.image.version="build_main"
