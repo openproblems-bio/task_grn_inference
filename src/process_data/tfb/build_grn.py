@@ -102,13 +102,13 @@ def _process_tf(tf, peaks_df, tss_file):
         return []
     return [{'source': tf, 'target': g} for g in genes]
 
-def build_grn(peaks_df, tss_file, genome='hg38', max_workers=None):
+def build_grn(peaks_df, tss_file, genome='hg38', num_workers=None):
     """Build Gene Regulatory Network from peaks and TSS data."""
     tfs = peaks_df['tf'].unique()
     rows = []
 
     # Use ProcessPoolExecutor for parallel processing
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+    with ProcessPoolExecutor(num_workers=num_workers) as executor:
         futures = {executor.submit(_process_tf, tf, peaks_df, tss_file): tf for tf in tfs}
         for future in tqdm(as_completed(futures), total=len(futures)):
             result = future.result()
@@ -225,7 +225,7 @@ def main():
         
         print("2. Building GRNs from ChIP-Atlas data...")
         chip_atlas_results = build_grn_from_chip_atlas_data(
-            chip_atlas_data, args.tss_file, args.output_dir, args.max_workers
+            chip_atlas_data, args.tss_file, args.output_dir, args.num_workers
         )
         print_grn_summary(chip_atlas_results, "ChIP-Atlas")
         results.update(chip_atlas_results)
@@ -238,7 +238,7 @@ def main():
         
         print("4. Building GRNs from ReMap data...")
         remap_results = build_grn_from_remap_data(
-            remap_data, args.tss_file, args.output_dir, args.max_workers
+            remap_data, args.tss_file, args.output_dir, args.num_workers
         )
         print_grn_summary(remap_results, "ReMap")
         results.update(remap_results)
@@ -253,11 +253,11 @@ def main():
         
         if args.source == 'chip_atlas':
             individual_results = build_grn_from_chip_atlas_data(
-                prepared_data, args.tss_file, args.output_dir, args.max_workers
+                prepared_data, args.tss_file, args.output_dir, args.num_workers
             )
         else:  # remap
             individual_results = build_grn_from_remap_data(
-                prepared_data, args.tss_file, args.output_dir, args.max_workers
+                prepared_data, args.tss_file, args.output_dir, args.num_workers
             )
         
         print_grn_summary(individual_results, f"Individual {args.source}")

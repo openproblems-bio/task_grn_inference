@@ -383,7 +383,7 @@ def main(par):
     gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
     in_degrees = np.sum(A != 0, axis=0)
     out_degrees = np.sum(A != 0, axis=1)
-    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-5000]
+    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-par['n_top_genes']]
     gene_mask[idx] = False
     X = X[:, gene_mask]
     X = X.toarray() if isinstance(X, csr_matrix) else X
@@ -474,8 +474,17 @@ def main(par):
         
         eps = 1e-300  # very small number to avoid log(0)
         pval_clipped = max(res.pvalue, eps)
-        # Compute final score
-        score = -np.log10(pval_clipped)
+        
+        # Set to 0 if not significant (p >= 0.05)
+        if res.pvalue >= 0.05:
+            score = 0.0
+            print(f"p-value: {res.pvalue:.6f} (not significant, p >= 0.05)")
+            print(f"SEM score set to 0")
+        else:
+            # Compute final score
+            score = -np.log10(pval_clipped)
+            print(f"p-value: {res.pvalue:.6f} (significant)")
+        
         print(f"Final score: {score}")
 
         results = {

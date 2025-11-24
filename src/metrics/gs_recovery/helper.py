@@ -636,7 +636,7 @@ def calculate_gene_set_recovery(
     active_pathways: Dict[str, Dict],
     all_genes: Set[str],
     fdr_threshold: float = 0.01,
-    max_workers: int = None
+    num_workers: int = None
 ) -> Dict:
     """
     Calculate gene set recovery metrics (precision, recall, F1).
@@ -658,7 +658,7 @@ def calculate_gene_set_recovery(
         Background genes
     fdr_threshold : float
         FDR threshold for enrichment
-    max_workers : int, optional
+    num_workers : int, optional
         Number of parallel workers (default: use all CPUs)
     
     Returns
@@ -676,10 +676,10 @@ def calculate_gene_set_recovery(
             'pathway_details': List[Dict]
         }
     """
-    if max_workers is None:
-        max_workers = cpu_count()
+    if num_workers is None:
+        num_workers = cpu_count()
     
-    print(f"\n  [Gene Set Recovery] Testing pathway enrichment in GRN (using {max_workers} workers)...")
+    print(f"\n  [Gene Set Recovery] Testing pathway enrichment in GRN (using {num_workers} workers)...")
     
     # Get all TFs in GRN and prepare their target sets
     print("  [Gene Set Recovery] Preparing TF target sets...")
@@ -699,7 +699,7 @@ def calculate_gene_set_recovery(
     # Parallel pathway enrichment testing
     pathway_enrichment = {}
     
-    if len(pathways_to_test) > 10 and max_workers > 1:
+    if len(pathways_to_test) > 10 and num_workers > 1:
         # Use parallel processing for large pathway sets
         worker_fn = partial(_test_pathway_enrichment_worker,
                            tfs_data=tfs_data,
@@ -707,7 +707,7 @@ def calculate_gene_set_recovery(
                            fdr_threshold=fdr_threshold,
                            n_pathways=len(pathways))
         
-        with Pool(processes=max_workers) as pool:
+        with Pool(processes=num_workers) as pool:
             results = list(tqdm(
                 pool.imap(worker_fn, pathways_to_test),
                 total=len(pathways_to_test),
@@ -836,14 +836,14 @@ def main(par: dict) -> pd.DataFrame:
         )
         
         # Calculate gene set recovery
-        max_workers = par.get('max_workers', None)
+        num_workers = par.get('num_workers', None)
         gs_results = calculate_gene_set_recovery(
             prediction=prediction,
             pathways=pathways,
             active_pathways=active_pathways,
             all_genes=all_genes,
             fdr_threshold=fdr_threshold,
-            max_workers=max_workers
+            num_workers=num_workers
         )
         
         # Store results with gene set prefix
@@ -874,10 +874,9 @@ def main(par: dict) -> pd.DataFrame:
         short_dict['gs_recall'] = np.mean([r['recall'] for r in all_results])
         short_dict['gs_f1'] = np.mean([r['f1'] for r in all_results])
         short_dict['gs_n_active'] = np.mean([r['n_active_pathways'] for r in all_results])
-    if par['output_detailed_metrics']:
+    if par.get('output_detailed_metrics', False):
         final_dict = {**short_dict, **detailed_dict}
     else:
         final_dict = short_dict
     summary_df = pd.DataFrame([final_dict])
-    print(summary_df)
     return summary_df

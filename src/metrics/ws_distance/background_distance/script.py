@@ -76,7 +76,7 @@ arg.add_argument('--evaluation_data_sc', type=str, help='Path to the evaluation 
 arg.add_argument('--background_distance', type=str, help='Path to save the background distance results')
 arg.add_argument('--tf_all', type=str, help='Path to the file containing all transcription factors')
 arg.add_argument('--layer', type=str, default='X_norm', help='Layer to use for the analysis')
-arg.add_argument('--max_workers', type=int, default=100, help='Maximum number of workers for multiprocessing')
+arg.add_argument('--num_workers', type=int, default=100, help='Maximum number of workers for multiprocessing')
 args = arg.parse_args()
 par = args.__dict__
 
@@ -101,7 +101,7 @@ def main(par):
     tf_all = np.loadtxt(par['tf_all'], dtype=str)
     available_tfs = np.intersect1d(obs_perturbation, tf_all)
 
-    num_workers = min(par['max_workers'], len(available_tfs))
+    num_workers = min(par['num_workers'], len(available_tfs))
 
     # Use multiprocessing with a progress tracker
     with mp.Manager() as manager:

@@ -10,7 +10,7 @@ import os
 from regression.helper import main as regression
 from ws_distance.helper import main as ws_distance
 from sem.helper import main as sem
-from anchor_regression.helper import main as ar
+from anchor_regression.helper import main as anchor_regression
 from tf_recovery.helper import main as tf_recovery
 from tf_binding.helper import main as tf_binding
 from rc_tf_act.helper import main as rc_tf_act
@@ -23,7 +23,7 @@ METRIC_FUNCTIONS = {
     'regression': regression,
     'ws_distance': ws_distance,
     'sem': sem,
-    'ar': ar,
+    'anchor_regression': anchor_regression,
     'tf_recovery': tf_recovery,
     'tf_binding': tf_binding,
     'rc_tf_act': rc_tf_act,
@@ -35,6 +35,7 @@ def main(par):
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     rr_store = []
     metrics = DATASETS_METRICS[dataset_id]
+    print(f"Computing metrics for dataset {dataset_id}: {metrics}")
     # metrics = ['gs_recovery', 'tf_binding']
 
     for metric_name in metrics:

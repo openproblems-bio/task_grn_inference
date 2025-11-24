@@ -8,8 +8,9 @@ RUN_LOCAL="true"
 RUN_TEST=false
 PREDICTION="none"
 SAVE_DIR="none"
-BUILD_IMAGES=false
+BUILD_IMAGES=true
 reg_type="ridge"
+num_workers=4
 
 
 # Parse arguments
@@ -43,6 +44,10 @@ for arg in "$@"; do
             reg_type="${arg#*=}"
             shift
             ;;
+        --num_workers=*)
+            num_workers="${arg#*=}"
+            shift
+            ;;
         *)
             echo "Unknown argument: $arg"
             exit 1
@@ -63,8 +68,6 @@ if [ -z "${DATASET:-}" ]; then
     exit 1
 fi
 
-
-num_workers=10
 RUN_ID="${DATASET}_evaluation"
 models_folder="${DATASET}/"
 apply_tf=true
@@ -132,6 +135,7 @@ append_entry() {
   else
       layer_=$layer
   fi
+
   cat >> "$param_local" << HERE
   - id: ${grn_name}_${dataset}
     metric_ids: ${metric_ids}
@@ -139,6 +143,7 @@ append_entry() {
     tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
     regulators_consensus: ${resources_dir}/grn_benchmark/prior/regulators_consensus_${dataset}.json
     prediction: ${prediction}
+    num_workers: ${num_workers}
     apply_tf: ${apply_tf}
     reg_type: ${reg_type}
     layer: $layer_
@@ -229,7 +234,7 @@ HERE
     -profile docker \
     -with-trace \
     -params-file ${param_local} \
-    # -c common/nextflow_helpers/labels_ci.config
+    -c common/nextflow_helpers/labels_ci.config
 else
   cat >> "$param_file" << HERE
 output_state: "state.yaml"
