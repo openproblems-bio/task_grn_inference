@@ -49,3 +49,4 @@ if __name__ == "__main__":
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']
     format_save_score(output, method_id, dataset_id, par['score'])
+    print(par['score'])
