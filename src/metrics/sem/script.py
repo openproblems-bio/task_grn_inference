@@ -18,18 +18,11 @@ par = {
     'genes_n': 5000
 }
 ## VIASH END
-
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument('--prediction', type=str, help='Path to the predicted GRN in h5ad format')
-parser.add_argument('--evaluation_data', type=str, help='Path to the evaluation data in h5ad format')
-parser.add_argument('--score', type=str)
-parser.add_argument('--layer', type=str, default='lognorm', help='Layer in the h5ad file to use')
-parser.add_argument('--num_workers', type=int, default=20, help='Number of workers to use')
-
+run_local = False
 try:
     sys.path.append(meta["resources_dir"])
 except:
+    run_local=True
     meta = {
     "resources_dir":'src/metrics/sem/',
     "util_dir": 'src/utils',
@@ -39,14 +32,11 @@ except:
     sys.path.append(meta["util_dir"])
     sys.path.append(meta["helper_dir"])
 from helper import main as main_sem 
-from util import format_save_score
+from util import format_save_score, parse_args
 
+if run_local:
+    par = parse_args(par)
 
-
-args = parser.parse_args()
-for key, value in vars(args).items():
-    if value is not None:
-        par[key] = value
 
 if __name__ == "__main__":
     

@@ -450,9 +450,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scenicplus"
-LABEL org.opencontainers.image.created="2025-11-24T17:53:44Z"
+LABEL org.opencontainers.image.created="2025-11-26T06:25:49Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="6fd7390c0b2ffd4039997ad413e479a09cd40966"
+LABEL org.opencontainers.image.revision="a434c71144549350b74ccef62527aef990dccad3"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

@@ -93,7 +93,6 @@ DATASETS_METRICS = {
     'norman': ['regression', 'ws_distance', 'tf_binding', 'sem', 'gs_recovery'],
     'nakatake': ['regression', 'sem', 'gs_recovery'],
     'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
-    # 'op': ['regression', 'tf_binding', 'gs_recovery'],
     '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
     'ibd_uc': ['regression', 'vc', 'tf_binding', 'sem',  'gs_recovery'],
     'ibd_cd': ['regression', 'vc', 'tf_binding', 'sem',  'gs_recovery'],
@@ -111,28 +110,21 @@ for dataset, metrics in DATASETS_METRICS.items():
 METRICS = [
        'r_precision', 'r_recall', 'r_f1',
        'ws_precision', 'ws_recall', 'ws_f1',
-       'vc', 
-       'sem', 
+       'vc', 'vc_raw', 'vc_precision', 
+       'sem', 'sem_precision', 'sem_raw',
        't_rec_precision', 't_rec_recall', 't_rec_f1',
-       
-       'rc_tf_act',
-       
-       'anchor_regression_raw',
-       
+       'rc_tf_act',       
        'tfb_precision', 'tfb_recall',  'tfb_f1',
        'gs_precision', 'gs_recall', 'gs_f1',
        ]
     
 FINAL_METRICS = [
        'r_precision', 'r_recall', 
-       'ws_precision', 'ws_recall', 
        'vc', 
-       'sem', 
+       'sem',
+       'ws_precision', 'ws_recall', 
        't_rec_precision', 't_rec_recall', 
-        
        'rc_tf_act',
-       
-       'anchor_regression_raw',
        'tfb_f1', 
        'gs_f1', 
        ]

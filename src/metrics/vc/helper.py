@@ -486,44 +486,41 @@ def main(par):
             j = gene_dict[target]
             A[i, j] = float(weight)
 
-    # Only consider the genes that are actually present in the inferred GRN
-    gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
-    X = X[:, gene_mask]
-    A = A[gene_mask, :][:, gene_mask]
-    gene_names = gene_names[gene_mask]
-
-    print(f"Using {len(gene_names)} genes present in the GRN")
-    
-    # Additional memory-aware gene filtering for very large GRNs
-    MAX_GENES_FOR_MEMORY = par['n_top_genes']  # Reduced further to avoid memory issues
-    if len(gene_names) > MAX_GENES_FOR_MEMORY:
-        print(f"Too many genes ({len(gene_names)}) for memory. Selecting top {MAX_GENES_FOR_MEMORY} by GRN connectivity.")
+    # Gene filtering based on n_top_genes parameter
+    if par['n_top_genes'] == -1:
+        # Use all genes from evaluation data
+        # A already has zeros for genes without GRN connections
+        print(f"Using all {len(gene_names)} genes from evaluation data (including those without GRN connections)")
+    else:
+        # Filter to genes present in the inferred GRN
+        gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
         
-        # Select genes with highest connectivity in the GRN
-        gene_connectivity = np.sum(np.abs(A), axis=0) + np.sum(np.abs(A), axis=1)
-        top_gene_indices = np.argsort(gene_connectivity)[-MAX_GENES_FOR_MEMORY:]
+        # Additional memory-aware gene filtering for very large GRNs
+        MAX_GENES_FOR_MEMORY = par['n_top_genes']
+        if np.sum(gene_mask) > MAX_GENES_FOR_MEMORY:
+            print(f"Too many genes with GRN connections ({np.sum(gene_mask)}) for memory. Selecting top {MAX_GENES_FOR_MEMORY} by GRN connectivity.")
+            
+            # Select genes with highest connectivity in the GRN
+            gene_connectivity = np.sum(np.abs(A), axis=0) + np.sum(np.abs(A), axis=1)
+            # Set connectivity to 0 for genes not in mask
+            gene_connectivity[~gene_mask] = 0
+            top_gene_indices = np.argsort(gene_connectivity)[-MAX_GENES_FOR_MEMORY:]
+            gene_mask = np.zeros(len(gene_names), dtype=bool)
+            gene_mask[top_gene_indices] = True
         
-        X = X[:, top_gene_indices]
-        A = A[top_gene_indices, :][:, top_gene_indices]
-        gene_names = gene_names[top_gene_indices]
+        # Apply the gene mask
+        X = X[:, gene_mask]
+        A = A[gene_mask, :][:, gene_mask]
+        gene_names = gene_names[gene_mask]
         
-        print(f"Final: Using {len(gene_names)} most connected genes for evaluation")
+        print(f"Using {len(gene_names)} genes (filtered by GRN connectivity)")
 
     # Remove self-regulations
     np.fill_diagonal(A, 0)
 
-    # Create baseline model
-    A_baseline = np.copy(A)
-    for j in range(A.shape[1]):
-        np.random.shuffle(A[:j, j])
-        np.random.shuffle(A[j+1:, j])
-    assert np.any(A_baseline != A)
-
     # Mapping between gene expression profiles and their matched negative controls
-
     control_map, _ = create_control_matching(are_controls, match_groups)
     loose_control_map, _ = create_control_matching(are_controls, loose_match_groups)
-
 
     ss_res = 0
     ss_tot = 0
@@ -561,22 +558,26 @@ def main(par):
         test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=512)
 
         # Evaluate inferred GRN
+        print(f"\n======== Fold {i+1}: Evaluate inferred GRN ========")
         res = evaluate(A, train_data_loader, test_data_loader, n_perturbations)
         ss_res = ss_res + res[0]
         ss_tot = ss_tot + res[1]
 
-        # Evaluate baseline GRN (shuffled target genes)
-        #ss_tot = ss_tot + evaluate(A_baseline, train_data_loader, test_data_loader, n_perturbations)
-
     r2 = 1 - ss_res / ss_tot
 
-    final_score = np.mean(np.clip(r2, 0, 1))
-    print(f"Method: {method_id}")
-    print(f"R2: {final_score}")
+    # Compute scores per gene
+    r2_per_gene = np.clip(r2, 0, 1)
+    
+    # Final score is mean R2 across genes
+    final_score = np.mean(r2_per_gene)
+    
+    print(f"\nMethod: {method_id}")
+    print(f"R2 (mean): {final_score:.4f}")
+    print(f"R2 (min): {np.min(r2_per_gene):.4f}")
+    print(f"R2 (max): {np.max(r2_per_gene):.4f}")
 
     results = {
         'vc': [float(final_score)]
-
     }
 
     df_results = pd.DataFrame(results)

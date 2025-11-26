@@ -383,7 +383,9 @@ def main(par):
     gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
     in_degrees = np.sum(A != 0, axis=0)
     out_degrees = np.sum(A != 0, axis=1)
-    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-par['n_top_genes']]
+    # n_genes = par['n_top_genes']
+    n_genes = 3000
+    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-n_genes]
     gene_mask[idx] = False
     X = X[:, gene_mask]
     X = X.toarray() if isinstance(X, csr_matrix) else X
@@ -445,52 +447,67 @@ def main(par):
     # Evaluate inferred GRN
     print("\n======== Evaluate inferred GRN ========")
     scores = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A, signed=use_signs)
-
-    # Evaluate baseline GRN
-    print("\n======== Evaluate shuffled GRN ========")
-    scores_baseline = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
-
-    # Keep only the genes for which both GRNs got a score
-    mask = ~np.logical_or(np.isnan(scores), np.isnan(scores_baseline))
-    scores = scores[mask]
-    scores_baseline = scores_baseline[mask]
-
-    rr_all = {}
-    # Perform rank test between actual scores and baseline
-    rr_all['spearman'] = float(np.mean(scores))
-    rr_all['spearman_shuffled'] = float(np.mean(scores_baseline))
-    if len(scores) == 0:
+    
+    # Keep only valid scores (non-NaN)
+    valid_scores = scores[~np.isnan(scores)]
+    
+    if len(valid_scores) == 0:
         # No valid genes to evaluate
-        df_results = pd.DataFrame({'sem_precision': [np.nan], 'sem_balanced': [np.nan]})
-    elif np.all(scores - scores_baseline == 0):
-        # Identical performance (suspicious - likely an error)
-        print("WARNING: Identical scores detected - possible evaluation error!")
-        df_results = pd.DataFrame({'sem_precision': [1.0], 'sem_balanced': [0.0]})
+        print("WARNING: No valid genes to evaluate!")
+        results = {'sem': [0.0]}
     else:
-        res = wilcoxon(scores - scores_baseline, zero_method='wilcox', alternative='greater')
-        rr_all['Wilcoxon pvalue'] = float(res.pvalue)
+        # Final score is mean of valid R² scores
+        final_score = float(np.mean(valid_scores))
+        
+        print(f"\nMethod: {method_id}")
+        print(f"SEM score (mean R²): {final_score:.4f}")
+        print(f"Valid genes evaluated: {len(valid_scores)}/{len(scores)}")
+        print(f"SEM score (min): {np.min(valid_scores):.4f}")
+        print(f"SEM score (max): {np.max(valid_scores):.4f}")
+        
+        results = {'sem': [float(final_score)]}
+    
+    # Evaluate baseline GRN
+    if False:
+        print("\n======== Evaluate shuffled GRN ========")
+        scores_baseline = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
 
-        print(rr_all)
-        
-        eps = 1e-300  # very small number to avoid log(0)
-        pval_clipped = max(res.pvalue, eps)
-        
-        # Set to 0 if not significant (p >= 0.05)
-        if res.pvalue >= 0.05:
-            score = 0.0
-            print(f"p-value: {res.pvalue:.6f} (not significant, p >= 0.05)")
-            print(f"SEM score set to 0")
+        # Keep only the genes for which both GRNs got a score
+        mask = ~np.logical_or(np.isnan(scores), np.isnan(scores_baseline))
+        scores = scores[mask]
+        scores_baseline = scores_baseline[mask]
+
+        rr_all = {}
+        # Perform rank test between actual scores and baseline
+        rr_all['spearman'] = float(np.mean(scores))
+        rr_all['spearman_shuffled'] = float(np.mean(scores_baseline))
+        if len(scores) == 0:
+            raise ValueError("No valid scores to compare between inferred GRN and baseline GRN.")
+        elif np.all(scores - scores_baseline == 0):
+            # Identical performance (suspicious - likely an error)
+            raise ValueError("Identical performance between inferred GRN and baseline GRN - likely an error.")
         else:
-            # Compute final score
-            score = -np.log10(pval_clipped)
-            print(f"p-value: {res.pvalue:.6f} (significant)")
-        
-        print(f"Final score: {score}")
+            res = wilcoxon(scores - scores_baseline, zero_method='wilcox', alternative='greater')
+            rr_all['Wilcoxon pvalue'] = float(res.pvalue)
 
-        results = {
-            'sem_precision': [float(np.log2(np.mean(scores) / (np.mean(scores_baseline) + 1e-6)))],
-            'sem': [float(score)]
-        }
+            print(rr_all)
+            
+            eps = 1e-300  # very small number to avoid log(0)
+            pval_clipped = max(res.pvalue, eps)
+            
+            # Set to 0 if not significant (p >= 0.05)
+            if res.pvalue >= 0.05:
+                score = 0.0
+                print(f"p-value: {res.pvalue:.6f} (not significant, p >= 0.05)")
+                print(f"SEM score set to 0")
+            else:
+                # Compute final score
+                score = -np.log10(pval_clipped)
+                print(f"p-value: {res.pvalue:.6f} (significant)")
+            
+            print(f"Final score: {score}")
+        results['sem_precision'] = [float(np.log2(np.mean(scores) / (np.mean(scores_baseline) + 1e-6)))]
+        results['sem_n'] = [float(score)]
 
-        df_results = pd.DataFrame(results)
+    df_results = pd.DataFrame(results)
     return df_results

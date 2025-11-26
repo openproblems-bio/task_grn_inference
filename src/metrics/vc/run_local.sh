@@ -17,7 +17,7 @@ mkdir -p "$save_dir"
 
 # datasets to process
 datasets=( "replogle" "xaira_HEK293T" "xaira_HCT116" "nakatake" "norman" "adamson" 'parsebioscience' 'op' "300BCG" 'ibd_uc' 'ibd_cd') #"300BCG" "ibd" 'parsebioscience', 'xaira_HEK293T'
-# datasets=( "op" "300BCG" "parsebioscience" "ibd" )
+datasets=( "op" "300BCG" "parsebioscience" "ibd" )
 # methods to process
 methods=( "pearson_corr" "positive_control" "negative_control" "ppcor" "portia" "scenic" "grnboost" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")
 # methods=( "grnboost")
