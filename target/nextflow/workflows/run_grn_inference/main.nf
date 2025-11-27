@@ -3148,7 +3148,7 @@ meta = [
           "name" : "--scores",
           "description" : "A yaml file containing the scores of each of the methods",
           "default" : [
-            "score_uns.yaml"
+            "score.yaml"
           ],
           "must_exist" : true,
           "create_parent" : true,
@@ -3174,7 +3174,7 @@ meta = [
           "type" : "file",
           "name" : "--metric_configs",
           "default" : [
-            "metric_configs.yaml"
+            "metric.yaml"
           ],
           "must_exist" : true,
           "create_parent" : true,
@@ -3187,7 +3187,7 @@ meta = [
           "type" : "file",
           "name" : "--dataset_uns",
           "default" : [
-            "dataset_uns.yaml"
+            "dataset.yaml"
           ],
           "must_exist" : true,
           "create_parent" : true,
@@ -3414,7 +3414,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_inference",
     "viash_version" : "0.9.4",
-    "git_commit" : "a434c71144549350b74ccef62527aef990dccad3",
+    "git_commit" : "d6b578f3865fc96aa03eafa48e8cc34c4e09e1ce",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

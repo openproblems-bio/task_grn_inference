@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import torch
 import anndata as ad
+import scanpy as sc
 import tqdm
 from scipy.sparse import csr_matrix
 from scipy.stats import ttest_rel, spearmanr, pearsonr, wilcoxon
@@ -378,22 +379,32 @@ def main(par):
             j = gene_dict[target]
             A[i, j] = float(weight)
 
-    # Only consider the genes that are actually present in the inferred GRN,
-    # and keep only the most-connected genes (for speed).
-    gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
+    # Compute HVGs from full evaluation data (for HVG-based evaluation)
+    print("\n======== Computing HVGs from full evaluation data ========")
+    n_top_hvg = par['n_top_genes']
+    sc.pp.highly_variable_genes(adata, n_top_genes=n_top_hvg, flavor='seurat', layer=layer)
+    hvg_mask_full = adata.var['highly_variable'].values
+    hvg_genes = gene_names[hvg_mask_full]
+    print(f"Total HVGs identified: {hvg_mask_full.sum()}")
+
+    # For GRN-based evaluation: keep only most-connected genes in the GRN
+    print("\n======== Filtering genes for GRN-based evaluation ========")
+    gene_mask_grn = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
     in_degrees = np.sum(A != 0, axis=0)
     out_degrees = np.sum(A != 0, axis=1)
-    # n_genes = par['n_top_genes']
-    n_genes = 3000
-    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-n_genes]
-    gene_mask[idx] = False
-    X = X[:, gene_mask]
-    X = X.toarray() if isinstance(X, csr_matrix) else X
-    A = A[gene_mask, :][:, gene_mask]
-    gene_names = gene_names[gene_mask]
+    n_genes_grn = par['n_top_genes']
+    idx = np.argsort(np.maximum(out_degrees, in_degrees))[:-n_genes_grn]
+    gene_mask_grn[idx] = False
+    
+    X_grn = X[:, gene_mask_grn]
+    X_grn = X_grn.toarray() if isinstance(X_grn, csr_matrix) else X_grn
+    A_grn = A[gene_mask_grn, :][:, gene_mask_grn]
+    gene_names_grn = gene_names[gene_mask_grn]
+    print(f"Genes for GRN-based evaluation: {len(gene_names_grn)}")
 
     # Remove self-regulations
     np.fill_diagonal(A, 0)
+    np.fill_diagonal(A_grn, 0)
 
     # Check whether the inferred GRN contains signed predictions
     if False:
@@ -401,17 +412,30 @@ def main(par):
     else:
         use_signs = False
 
-    # Center and scale dataset
-    scaler = StandardScaler()
-    scaler.fit(X[are_controls, :])  # Use controls only to infer statistics (to avoid data leakage)
-    X = scaler.transform(X)
+    # Center and scale dataset for GRN-based evaluation
+    scaler_grn = StandardScaler()
+    X_grn_controls = X_grn[are_controls, :]
+    scaler_grn.fit(X_grn_controls)
+    X_grn_scaled = scaler_grn.transform(X_grn)
+    X_grn_controls_scaled = X_grn_scaled[are_controls, :]
+    delta_X_grn = compute_perturbations(X_grn_scaled, are_controls, match_groups, loose_match_groups)
+    delta_X_grn = delta_X_grn[~are_controls, :]
 
-    # Get negative controls
-    X_controls = X[are_controls, :]
-    delta_X = compute_perturbations(X, are_controls, match_groups, loose_match_groups)
+    # Center and scale dataset for HVG-based evaluation (use all HVG genes, even if not in GRN)
+    X_hvg = X[:, hvg_mask_full]
+    X_hvg = X_hvg.toarray() if isinstance(X_hvg, csr_matrix) else X_hvg
+    A_hvg = A[hvg_mask_full, :][:, hvg_mask_full]
+    gene_names_hvg = gene_names[hvg_mask_full]
+    scaler_hvg = StandardScaler()
+    X_hvg_controls = X_hvg[are_controls, :]
+    scaler_hvg.fit(X_hvg_controls)
+    X_hvg_scaled = scaler_hvg.transform(X_hvg)
+    X_hvg_controls_scaled = X_hvg_scaled[are_controls, :]
+    delta_X_hvg = compute_perturbations(X_hvg_scaled, are_controls, match_groups, loose_match_groups)
+    delta_X_hvg = delta_X_hvg[~are_controls, :]
+    print(f"Genes for HVG-based evaluation: {len(gene_names_hvg)}")
 
     # Remove negative controls from downstream analysis
-    delta_X = delta_X[~are_controls, :]
     cv_groups = cv_groups[~are_controls]
     match_groups = match_groups[~are_controls]
     loose_match_groups = loose_match_groups[~are_controls]
@@ -420,94 +444,76 @@ def main(par):
     # Make sure that no compound ends up in both sets.
     try:
         splitter = GroupShuffleSplit(test_size=0.5, n_splits=2, random_state=seed)  # Use consistent seed
-        train_idx, _ = next(splitter.split(delta_X, groups=cv_groups))
+        train_idx, _ = next(splitter.split(delta_X_grn, groups=cv_groups))
     except ValueError:
         print("Group k-fold failed. Using k-fold CV instead.")
         splitter = KFold(n_splits=2, random_state=seed, shuffle=True)  # Use consistent seed
-        train_idx, _ = next(splitter.split(delta_X))
-    is_train = np.zeros(len(delta_X), dtype=bool)
+        train_idx, _ = next(splitter.split(delta_X_grn))
+    is_train = np.zeros(len(delta_X_grn), dtype=bool)
     is_train[train_idx] = True
 
-    # Create a split between genes: reporter genes and evaluation genes.
-    # All TFs and IEGs should be included in the reporter gene set.
-    n_genes = A.shape[1]
-    reg_mask = np.asarray(A != 0).any(axis=1)
-    ieg_mask = np.asarray([gene_name in IEG for gene_name in gene_names], dtype=bool)
-    is_reporter = np.logical_or(reg_mask, ieg_mask)
-    print(f"Proportion of reporter genes: {np.mean(is_reporter)}")
-    print(f"Use regulatory modes/signs: {use_signs}")
+    # ========== GRN-based evaluation ==========
+    print("\n======== Evaluate inferred GRN (GRN-based: most connected genes) ========")
+    n_genes_grn = A_grn.shape[1]
+    reg_mask_grn = np.asarray(A_grn != 0).any(axis=1)
+    ieg_mask_grn = np.asarray([gene_name in IEG for gene_name in gene_names_grn], dtype=bool)
+    is_reporter_grn = np.logical_or(reg_mask_grn, ieg_mask_grn)
+    print(f"Proportion of reporter genes (GRN): {np.mean(is_reporter_grn)}")
 
-    # Create baseline model
-    try:
-        A_baseline = create_grn_baseline(A)
-    except:
-        print("Failed to create baseline GRN. Using zero baseline.")
-        raise ValueError("Failed to create baseline GRN.")
 
-    # Evaluate inferred GRN
-    print("\n======== Evaluate inferred GRN ========")
-    scores = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A, signed=use_signs)
-    
-    # Keep only valid scores (non-NaN)
-    valid_scores = scores[~np.isnan(scores)]
-    
-    if len(valid_scores) == 0:
-        # No valid genes to evaluate
-        print("WARNING: No valid genes to evaluate!")
-        results = {'sem': [0.0]}
+    scores_grn = evaluate_grn(X_grn_controls_scaled, delta_X_grn, is_train, is_reporter_grn, A_grn, signed=use_signs)
+    valid_scores_grn = scores_grn[~np.isnan(scores_grn)]
+
+    if len(valid_scores_grn) == 0:
+        print("WARNING: No valid genes to evaluate for GRN-based!")
+        sem_grn_score = 0.0
     else:
-        # Final score is mean of valid R² scores
-        final_score = float(np.mean(valid_scores))
-        
-        print(f"\nMethod: {method_id}")
-        print(f"SEM score (mean R²): {final_score:.4f}")
-        print(f"Valid genes evaluated: {len(valid_scores)}/{len(scores)}")
-        print(f"SEM score (min): {np.min(valid_scores):.4f}")
-        print(f"SEM score (max): {np.max(valid_scores):.4f}")
-        
-        results = {'sem': [float(final_score)]}
+        sem_grn_score = float(np.mean(valid_scores_grn))
+        print(f"SEM GRN score (mean R²): {sem_grn_score:.4f}")
+        print(f"Valid genes evaluated: {len(valid_scores_grn)}/{len(scores_grn)}")
+        print(f"SEM GRN score (min): {np.min(valid_scores_grn):.4f}")
+        print(f"SEM GRN score (max): {np.max(valid_scores_grn):.4f}")
+
+    # ========== HVG-based evaluation ==========
+    print("\n======== Evaluate inferred GRN (HVG-based: highly variable genes) ========")
+    n_genes_hvg = A_hvg.shape[1]
+    reg_mask_hvg = np.asarray(A_hvg != 0).any(axis=1)
+    ieg_mask_hvg = np.asarray([gene_name in IEG for gene_name in gene_names_hvg], dtype=bool)
+    is_reporter_hvg = np.logical_or(reg_mask_hvg, ieg_mask_hvg)
+    print(f"Proportion of reporter genes (HVG): {np.mean(is_reporter_hvg)}")
+
+    scores_hvg = evaluate_grn(X_hvg_controls_scaled, delta_X_hvg, is_train, is_reporter_hvg, A_hvg, signed=use_signs)
     
-    # Evaluate baseline GRN
-    if False:
-        print("\n======== Evaluate shuffled GRN ========")
-        scores_baseline = evaluate_grn(X_controls, delta_X, is_train, is_reporter, A_baseline, signed=use_signs)
-
-        # Keep only the genes for which both GRNs got a score
-        mask = ~np.logical_or(np.isnan(scores), np.isnan(scores_baseline))
-        scores = scores[mask]
-        scores_baseline = scores_baseline[mask]
-
-        rr_all = {}
-        # Perform rank test between actual scores and baseline
-        rr_all['spearman'] = float(np.mean(scores))
-        rr_all['spearman_shuffled'] = float(np.mean(scores_baseline))
-        if len(scores) == 0:
-            raise ValueError("No valid scores to compare between inferred GRN and baseline GRN.")
-        elif np.all(scores - scores_baseline == 0):
-            # Identical performance (suspicious - likely an error)
-            raise ValueError("Identical performance between inferred GRN and baseline GRN - likely an error.")
-        else:
-            res = wilcoxon(scores - scores_baseline, zero_method='wilcox', alternative='greater')
-            rr_all['Wilcoxon pvalue'] = float(res.pvalue)
-
-            print(rr_all)
-            
-            eps = 1e-300  # very small number to avoid log(0)
-            pval_clipped = max(res.pvalue, eps)
-            
-            # Set to 0 if not significant (p >= 0.05)
-            if res.pvalue >= 0.05:
-                score = 0.0
-                print(f"p-value: {res.pvalue:.6f} (not significant, p >= 0.05)")
-                print(f"SEM score set to 0")
-            else:
-                # Compute final score
-                score = -np.log10(pval_clipped)
-                print(f"p-value: {res.pvalue:.6f} (significant)")
-            
-            print(f"Final score: {score}")
-        results['sem_precision'] = [float(np.log2(np.mean(scores) / (np.mean(scores_baseline) + 1e-6)))]
-        results['sem_n'] = [float(score)]
+    # For HVGs: genes with no GRN connections get score of 0 (penalize missing connections)
+    has_parent_hvg = (np.asarray(A_hvg != 0).any(axis=0))
+    eval_mask_hvg = ~is_reporter_hvg
+    scores_hvg_penalized = scores_hvg.copy()
+    for j in range(len(scores_hvg_penalized)):
+        if eval_mask_hvg[j]:
+            if not has_parent_hvg[j]:  # Gene has no connections in GRN
+                scores_hvg_penalized[j] = 0.0  # Penalize by setting score to 0
+            elif np.isnan(scores_hvg_penalized[j]):
+                scores_hvg_penalized[j] = 0.0  # Also set NaN to 0
+    
+    valid_scores_hvg = scores_hvg_penalized[eval_mask_hvg]
+    
+    if len(valid_scores_hvg) == 0:
+        print("WARNING: No valid HVG genes to evaluate!")
+        sem_hvg_score = 0.0
+    else:
+        sem_hvg_score = float(np.mean(valid_scores_hvg))
+        n_missing = np.sum(~has_parent_hvg[eval_mask_hvg])
+        print(f"SEM HVG score (mean R²): {sem_hvg_score:.4f}")
+        print(f"HVG genes evaluated: {len(valid_scores_hvg)}")
+        print(f"HVG genes missing in GRN (penalized with 0): {n_missing}")
+        print(f"SEM HVG score (min): {np.min(valid_scores_hvg):.4f}")
+        print(f"SEM HVG score (max): {np.max(valid_scores_hvg):.4f}")
+    
+    results = {
+        'sem_grn': [float(sem_grn_score)],
+        'sem_hvg': [float(sem_hvg_score)],
+        'sem': [float((sem_grn_score + sem_hvg_score) / 2)]
+    }
 
     df_results = pd.DataFrame(results)
     return df_results

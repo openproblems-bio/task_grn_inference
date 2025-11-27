@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "decoupler==2.1.1"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics tf_recovery"
-LABEL org.opencontainers.image.created="2025-11-26T06:25:48Z"
+LABEL org.opencontainers.image.created="2025-11-27T17:59:07Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="a434c71144549350b74ccef62527aef990dccad3"
+LABEL org.opencontainers.image.revision="d6b578f3865fc96aa03eafa48e8cc34c4e09e1ce"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

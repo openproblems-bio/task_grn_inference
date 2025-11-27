@@ -63,11 +63,11 @@ DATASET_GROUPS = {
         "loose_match": ["perturbation"],
         "cv": ["perturbation"],
     },
-     "adamson": {
-        "match": ["perturbation"],
-        "loose_match": ["perturbation"],
-        "cv": ["perturbation"],
-    },
+    #  "adamson": {
+    #     "match": ["perturbation"],
+    #     "loose_match": ["perturbation"],
+    #     "cv": ["perturbation"],
+    # },
 
 }
 
@@ -76,7 +76,7 @@ DATASETS = list(DATASET_GROUPS.keys())
 DATASETS_CELLTYPES = {
     "replogle": "K562",
     "norman": "K562",
-    "adamson": "K562",
+    # "adamson": "K562",
     "xaira_HEK293T": "HEK293T",
     "xaira_HCT116": "HCT116",
     "op": "PBMC",
@@ -89,13 +89,13 @@ DATASETS_CELLTYPES = {
 
 DATASETS_METRICS = {
     'replogle': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
-    'adamson': ['regression',  'tf_binding', 'sem', 'gs_recovery'],
+    # 'adamson': ['regression',  'tf_binding', 'sem', 'gs_recovery'],
     'norman': ['regression', 'ws_distance', 'tf_binding', 'sem', 'gs_recovery'],
     'nakatake': ['regression', 'sem', 'gs_recovery'],
     'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
     '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
-    'ibd_uc': ['regression', 'vc', 'tf_binding', 'sem',  'gs_recovery'],
-    'ibd_cd': ['regression', 'vc', 'tf_binding', 'sem',  'gs_recovery'],
+    'ibd_uc': ['regression', 'tf_binding', 'gs_recovery'],
+    'ibd_cd': ['regression', 'tf_binding', 'gs_recovery'],
     'parsebioscience': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
     'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
     'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
@@ -177,7 +177,7 @@ surrogate_names = {
     'op':'OPSCA',
     'nakatake': 'Nakatake', 
     'norman': 'Norman', 
-    'adamson':'Adamson', 
+    # 'adamson':'Adamson', 
     'replogle': 'Replogle',
     'xaira_HCT116': 'Xaira:HCT116',
     'xaira_HEK293T': 'Xaira:HEK293T',
