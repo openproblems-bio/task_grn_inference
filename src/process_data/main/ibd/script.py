@@ -19,7 +19,6 @@ def add_metadata(adata):
     adata.uns['dataset_description'] = 'IBD multiome of PBMC (scRNA+scATAC) with 38 donors, 2 disease of UC and CD, 3 perturbation of RPMI, LPS, S. enterica'
     adata.uns['data_reference'] = "Not published"
     adata.uns['data_url'] = ''
-    adata.uns['dataset_id'] = 'ibd'
     adata.uns['dataset_name'] = 'IBD'
     adata.uns['dataset_organism'] = 'human'
     adata.uns['normalization_id'] = 'lognorm'
@@ -30,7 +29,7 @@ def parse_donor_id(s):
     m = re.match(r'^[A-Za-z](\d+)([MF])([A-Z]+)(\d+)$', s)
     ID = int(m.group(1))
     sex = 'Male' if m.group(2)=='M' else 'Female'
-    disease = m.group(3)
+    disease = m.group(3).lower()
     condition_map = {'1':'RPMI','2':'LPS','3':'S. enterica'}
     condition = condition_map.get(m.group(4), m.group(4))
     return pd.Series([ID, sex, disease, condition])
@@ -164,12 +163,33 @@ adata_rna_bulk = normalize_func(adata_rna_bulk)
 adata_rna_bulk.layers['lognorm'] = adata_rna_bulk.X.copy()
 adata_rna_bulk = add_metadata(adata_rna_bulk)
 
+# Ensure disease column is lowercase in all datasets
+adata_train_rna.obs['disease'] = adata_train_rna.obs['disease'].str.lower()
+adata_train_atac.obs['disease'] = adata_train_atac.obs['disease'].str.lower()
+adata_test_rna.obs['disease'] = adata_test_rna.obs['disease'].str.lower()
+adata_test_rna_bulk.obs['disease'] = adata_test_rna_bulk.obs['disease'].str.lower()
+adata_rna_bulk.obs['disease'] = adata_rna_bulk.obs['disease'].str.lower()
 
-for disease in ['CD', 'UC']:
-    adata_train_rna[adata_train_rna.obs['disease']==disease].write(f'resources/grn_benchmark/inference_data/ibd_{disease}_rna.h5ad')
-    adata_train_atac[adata_train_atac.obs['disease']==disease].write(f'resources/grn_benchmark/inference_data/ibd_{disease}_atac.h5ad')
-    adata_test_rna_bulk[adata_test_rna_bulk.obs['disease']==disease].write(f'resources/grn_benchmark/evaluation_data/ibd_{disease}_bulk.h5ad')
-    adata_test_rna[adata_test_rna.obs['disease']==disease].write(f'resources/processed_data/ibd_{disease}_sc.h5ad')
-    adata_rna_bulk[adata_rna_bulk.obs['disease']==disease].write(f'resources/extended_data/ibd_{disease}_bulk.h5ad')
+for disease in ['cd', 'uc']:
+    adata_train_rna_d = adata_train_rna[adata_train_rna.obs['disease']==disease]
+    
+    adata_train_rna_d.uns['dataset_id'] = f'ibd_{disease.lower()}'
+    adata_train_rna_d.write(f'resources/grn_benchmark/inference_data/ibd_{disease}_rna.h5ad')
+    adata_train_atac_d = adata_train_atac[adata_train_atac.obs['disease']==disease]
+    adata_train_atac_d.uns['dataset_id'] = f'ibd_{disease.lower()}'
+    adata_train_atac_d.write(f'resources/grn_benchmark/inference_data/ibd_{disease}_atac.h5ad')
+
+    adata_test_rna_bulk_d = adata_test_rna_bulk[adata_test_rna_bulk.obs['disease']==disease]
+    adata_test_rna_bulk_d.uns['dataset_id'] = f'ibd_{disease.lower()}'
+    adata_test_rna_bulk_d.write(f'resources/grn_benchmark/evaluation_data/ibd_{disease}_bulk.h5ad')
+
+
+    adata_test_rna_d = adata_test_rna[adata_test_rna.obs['disease']==disease]
+    adata_test_rna_d.uns['dataset_id'] = f'ibd_{disease.lower()}'
+    adata_test_rna_d.write(f'resources/processed_data/ibd_{disease}_sc.h5ad')
+
+    adata_rna_bulk_d = adata_rna_bulk[adata_rna_bulk.obs['disease']==disease]
+    adata_rna_bulk_d.uns['dataset_id'] = f'ibd_{disease.lower()}'
+    adata_rna_bulk_d.write(f'resources/extended_data/ibd_{disease}_bulk.h5ad')
 
 print('Done')

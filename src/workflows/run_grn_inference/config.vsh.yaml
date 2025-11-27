@@ -58,7 +58,7 @@ argument_groups:
         required: true
         direction: output
         description: A yaml file containing the scores of each of the methods
-        default: score_uns.yaml
+        default: score.yaml
       - name: "--method_configs"
         type: file
         required: true
@@ -68,12 +68,12 @@ argument_groups:
         type: file
         required: true
         direction: output
-        default: metric_configs.yaml
+        default: metric.yaml
       - name: "--dataset_uns"
         type: file
         required: true
         direction: output
-        default: dataset_uns.yaml
+        default: dataset.yaml
       - name: "--task_info"
         type: file
         required: true

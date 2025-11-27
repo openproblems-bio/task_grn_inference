@@ -12,6 +12,7 @@ from sklearn.model_selection import GroupKFold
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from torch.utils.data import Dataset
 import anndata as ad
+import scanpy as sc
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -428,13 +429,13 @@ def main(par):
     par['loose_match'] = DATASET_GROUPS[dataset_id]['loose_match']
 
     layer = manage_layer(adata, par)
-    X = adata.layers[layer]
-    if isinstance(X, csr_matrix):
-        X = X.toarray()
-    X = X.astype(np.float32)
+    X_full = adata.layers[layer]
+    if isinstance(X_full, csr_matrix):
+        X_full = X_full.toarray()
+    X_full = X_full.astype(np.float32)
     
-    gene_names = adata.var_names
-    gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names)}
+    gene_names_full = adata.var_names
+    gene_dict = {gene_name: i for i, gene_name in enumerate(gene_names_full)}
 
     # Get sample info
     perturbations = None
@@ -479,60 +480,66 @@ def main(par):
     targets = net["target"].to_numpy()
     weights = net["weight"].to_numpy()
 
-    A = np.zeros((len(gene_names), len(gene_names)), dtype=X.dtype)
+    A_full = np.zeros((len(gene_names_full), len(gene_names_full)), dtype=X_full.dtype)
     for source, target, weight in zip(sources, targets, weights):
         if (source in gene_dict) and (target in gene_dict):
             i = gene_dict[source]
             j = gene_dict[target]
-            A[i, j] = float(weight)
+            A_full[i, j] = float(weight)
 
-    # Gene filtering based on n_top_genes parameter
-    if par['n_top_genes'] == -1:
-        # Use all genes from evaluation data
-        # A already has zeros for genes without GRN connections
-        print(f"Using all {len(gene_names)} genes from evaluation data (including those without GRN connections)")
-    else:
-        # Filter to genes present in the inferred GRN
-        gene_mask = np.logical_or(np.any(A, axis=1), np.any(A, axis=0))
-        
-        # Additional memory-aware gene filtering for very large GRNs
-        MAX_GENES_FOR_MEMORY = par['n_top_genes']
-        if np.sum(gene_mask) > MAX_GENES_FOR_MEMORY:
-            print(f"Too many genes with GRN connections ({np.sum(gene_mask)}) for memory. Selecting top {MAX_GENES_FOR_MEMORY} by GRN connectivity.")
-            
-            # Select genes with highest connectivity in the GRN
-            gene_connectivity = np.sum(np.abs(A), axis=0) + np.sum(np.abs(A), axis=1)
-            # Set connectivity to 0 for genes not in mask
-            gene_connectivity[~gene_mask] = 0
-            top_gene_indices = np.argsort(gene_connectivity)[-MAX_GENES_FOR_MEMORY:]
-            gene_mask = np.zeros(len(gene_names), dtype=bool)
-            gene_mask[top_gene_indices] = True
-        
-        # Apply the gene mask
-        X = X[:, gene_mask]
-        A = A[gene_mask, :][:, gene_mask]
-        gene_names = gene_names[gene_mask]
-        
-        print(f"Using {len(gene_names)} genes (filtered by GRN connectivity)")
+    # Compute HVGs from full evaluation data (for HVG-based evaluation)
+    print("\n======== Computing HVGs from full evaluation data ========")
+    n_top_hvg = par['n_top_genes']
+    sc.pp.highly_variable_genes(adata, n_top_genes=n_top_hvg, flavor='seurat', layer=layer)
+    hvg_mask_full = adata.var['highly_variable'].values
+    print(f"Total HVGs identified: {hvg_mask_full.sum()}")
+
+    # For GRN-based evaluation: keep only most-connected genes in the GRN
+    print("\n======== Filtering genes for GRN-based evaluation ========")
+    gene_mask_grn = np.logical_or(np.any(A_full, axis=1), np.any(A_full, axis=0))
+    in_degrees = np.sum(A_full != 0, axis=0)
+    out_degrees = np.sum(A_full != 0, axis=1)
+    n_genes_grn = par['n_top_genes']
+    
+    # Select top n_genes_grn by connectivity
+    gene_connectivity = in_degrees + out_degrees
+    # Only consider genes that are in the GRN
+    gene_connectivity_masked = np.where(gene_mask_grn, gene_connectivity, -1)
+    top_gene_indices_grn = np.argsort(gene_connectivity_masked)[-n_genes_grn:]
+    gene_mask_grn_filtered = np.zeros(len(gene_names_full), dtype=bool)
+    gene_mask_grn_filtered[top_gene_indices_grn] = True
+    
+    X_grn = X_full[:, gene_mask_grn_filtered]
+    A_grn = A_full[gene_mask_grn_filtered, :][:, gene_mask_grn_filtered]
+    gene_names_grn = gene_names_full[gene_mask_grn_filtered]
+    print(f"Genes for GRN-based evaluation: {len(gene_names_grn)}")
+
+    # For HVG-based evaluation: use HVGs
+    X_hvg = X_full[:, hvg_mask_full]
+    A_hvg = A_full[hvg_mask_full, :][:, hvg_mask_full]
+    gene_names_hvg = gene_names_full[hvg_mask_full]
+    print(f"Genes for HVG-based evaluation: {len(gene_names_hvg)}")
 
     # Remove self-regulations
-    np.fill_diagonal(A, 0)
+    np.fill_diagonal(A_grn, 0)
+    np.fill_diagonal(A_hvg, 0)
 
     # Mapping between gene expression profiles and their matched negative controls
     control_map, _ = create_control_matching(are_controls, match_groups)
     loose_control_map, _ = create_control_matching(are_controls, loose_match_groups)
 
-    ss_res = 0
-    ss_tot = 0
     cv = GroupKFold(n_splits=5)
+
+    # ========== GRN-based evaluation ==========
+    print("\n======== Evaluate inferred GRN (GRN-based: most connected genes) ========")
+    ss_res_grn = 0
+    ss_tot_grn = 0
     
-    results = []
-    
-    for i, (train_index, test_index) in enumerate(cv.split(X, X, cv_groups)):
+    for i, (train_index, test_index) in enumerate(cv.split(X_grn, X_grn, cv_groups)):
         # Center and scale dataset
         scaler = StandardScaler()
-        scaler.fit(X[train_index, :])
-        X_standardized = scaler.transform(X)
+        scaler.fit(X_grn[train_index, :])
+        X_standardized = scaler.transform(X_grn)
 
         # Create data loaders
         n_perturbations = int(np.max(perturbations) + 1)
@@ -558,26 +565,66 @@ def main(par):
         test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=512)
 
         # Evaluate inferred GRN
-        print(f"\n======== Fold {i+1}: Evaluate inferred GRN ========")
-        res = evaluate(A, train_data_loader, test_data_loader, n_perturbations)
-        ss_res = ss_res + res[0]
-        ss_tot = ss_tot + res[1]
+        res = evaluate(A_grn, train_data_loader, test_data_loader, n_perturbations)
+        ss_res_grn = ss_res_grn + res[0]
+        ss_tot_grn = ss_tot_grn + res[1]
 
-    r2 = 1 - ss_res / ss_tot
+    r2_grn = 1 - ss_res_grn / ss_tot_grn
+    vc_grn_score = float(np.mean(np.clip(r2_grn, 0, 1)))
+    print(f"VC GRN score (mean R²): {vc_grn_score:.4f}")
 
-    # Compute scores per gene
-    r2_per_gene = np.clip(r2, 0, 1)
+    # ========== HVG-based evaluation ==========
+    print("\n======== Evaluate inferred GRN (HVG-based: highly variable genes) ========")
+    ss_res_hvg = 0
+    ss_tot_hvg = 0
     
-    # Final score is mean R2 across genes
-    final_score = np.mean(r2_per_gene)
-    
+    for i, (train_index, test_index) in enumerate(cv.split(X_hvg, X_hvg, cv_groups)):
+        # Center and scale dataset
+        scaler = StandardScaler()
+        scaler.fit(X_hvg[train_index, :])
+        X_standardized = scaler.transform(X_hvg)
+
+        # Create data loaders
+        n_perturbations = int(np.max(perturbations) + 1)
+        train_dataset = PerturbationDataset(
+            X_standardized,
+            train_index,
+            match_groups,
+            control_map,
+            loose_match_groups,
+            loose_control_map,
+            perturbations
+        )
+        train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=512)
+        test_dataset = PerturbationDataset(
+            X_standardized,
+            test_index,
+            match_groups,
+            control_map,
+            loose_match_groups,
+            loose_control_map,
+            perturbations
+        )
+        test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=512)
+
+        # Evaluate inferred GRN
+        res = evaluate(A_hvg, train_data_loader, test_data_loader, n_perturbations)
+        ss_res_hvg = ss_res_hvg + res[0]
+        ss_tot_hvg = ss_tot_hvg + res[1]
+
+    r2_hvg = 1 - ss_res_hvg / ss_tot_hvg
+    vc_hvg_score = float(np.mean(np.clip(r2_hvg, 0, 1)))
+    print(f"VC HVG score (mean R²): {vc_hvg_score:.4f}")
+
     print(f"\nMethod: {method_id}")
-    print(f"R2 (mean): {final_score:.4f}")
-    print(f"R2 (min): {np.min(r2_per_gene):.4f}")
-    print(f"R2 (max): {np.max(r2_per_gene):.4f}")
+    print(f"VC GRN: {vc_grn_score:.4f}")
+    print(f"VC HVG: {vc_hvg_score:.4f}")
+    print(f"VC (average): {(vc_grn_score + vc_hvg_score) / 2:.4f}")
 
     results = {
-        'vc': [float(final_score)]
+        'vc_grn': [vc_grn_score],
+        'vc_hvg': [vc_hvg_score],
+        'vc': [float((vc_grn_score + vc_hvg_score) / 2)]
     }
 
     df_results = pd.DataFrame(results)
