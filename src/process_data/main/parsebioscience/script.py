@@ -25,22 +25,15 @@ from helper_data import wrapper_large_perturbation_data
 
 def split_data_perturbation(adata: ad.AnnData, train_share=.5):
     obs = adata.obs
-    
     unique_perts = obs['perturbation'].unique()
-
     control_perturbs = obs[obs['is_control']]['perturbation'].unique()
     n_train_perts = int(len(unique_perts) * train_share)
-
-    # sample for train
     np.random.seed(32)
     train_perturbs = np.random.choice(unique_perts, size=n_train_perts, replace=False)
     test_perturbs = np.setdiff1d(unique_perts, train_perturbs)
-
     train_perturbs = np.concatenate([train_perturbs, control_perturbs])
     test_perturbs = np.concatenate([test_perturbs, control_perturbs])
-
     print(f"Train total: {len(train_perturbs)}, Test total: {len(test_perturbs)}")
-
     return train_perturbs.astype(str), test_perturbs.astype(str)
     
 def add_metadata(adata):
@@ -61,7 +54,6 @@ def add_metadata(adata):
     adata.uns['normalization_id'] = 'lognorm'
     return adata
 def format_adata(adata):
-    # format
     adata.obs['is_control'] = adata.obs['treatment'] == 'PBS'
     adata.obs = adata.obs[['group', 'cell_type', 'cytokine', 'donor', 'is_control']]
     adata.obs = adata.obs.rename({'donor': 'donor_id'}, axis=1)
@@ -91,6 +83,26 @@ def format_adata(adata):
     adata.obs['well'] = adata.obs['group'].str.split('_').str[-1]
     adata.obs.rename(columns={'cytokine': 'perturbation'}, inplace=True)
     adata.obs['perturbation_type'] = 'cytokine'
+
+
+    # Create age mapping from the donor information
+    donor_age_map = {
+        'Donor1': 75,
+        'Donor2': 34,
+        'Donor3': 68,
+        'Donor4': 59,
+        'Donor5': 41,
+        'Donor6': 38,
+        'Donor7': 45,
+        'Donor8': 52,
+        'Donor9': 38,
+        'Donor10': 42,
+        'Donor11': 46,
+        'Donor12': 36
+    }
+
+    # Map the age to obs based on donor_id
+    adata.obs['age'] = adata.obs['donor_id'].map(donor_age_map)
     return adata
 def main():
     if True:
@@ -115,13 +127,12 @@ def main():
         adata = adata[(adata.obs['gene_count']>min_genes) & (adata.obs['gene_count']<5000), adata.var['n_cells']>min_cell]
         adata = format_adata(adata)
         wrapper_large_perturbation_data(adata, split_func=split_data_perturbation,
-            covariates=['cell_type_minor', 'perturbation', 'donor_id', 'well'], 
+            covariates=['perturbation', 'donor_id', 'cell_type', 'well'], 
             add_metadata=add_metadata,
             save_name='parsebioscience',
             qc_perturbation_effect=False
             )
     if True:
-        print('Loading processed data of parsebioscience for HVG selection', flush=True)
         print('Reading gene annotation', flush=True)
         from util import read_gene_annotation
         df = read_gene_annotation('resources/supp_data/gencode.v47.annotation.gtf.gz')

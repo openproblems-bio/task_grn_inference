@@ -14,4 +14,4 @@
 set -e
 
 echo "Processing bioscience"
-python src/process_data/main/parse_bioscience/script.py  #--run_test
+python src/process_data/main/parsebioscience/script.py  #--run_test

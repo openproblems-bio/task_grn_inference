@@ -98,7 +98,8 @@ def bulkify_main(adata, cell_count_t=10, covariates=['cell_type', 'donor_id', 'a
     adata.obs['sum_by'] = adata.obs['sum_by'].astype('category')
     adata_bulk = sum_by(adata, 'sum_by', unique_mapping=True)
     cell_count_df = adata.obs.groupby('sum_by').size().reset_index(name='cell_count')
-    adata_bulk.obs = adata_bulk.obs.merge(cell_count_df, on='sum_by')
+    # Use map instead of merge to preserve the obs structure
+    adata_bulk.obs['cell_count'] = adata_bulk.obs['sum_by'].map(cell_count_df.set_index('sum_by')['cell_count'])
     adata_bulk = adata_bulk[adata_bulk.obs['cell_count']>=cell_count_t]
     adata_bulk.X = np.nan_to_num(adata_bulk.X, nan=0)
     return adata_bulk
