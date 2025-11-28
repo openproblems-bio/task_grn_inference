@@ -90,7 +90,7 @@ DATASETS_CELLTYPES = {
 DATASETS_METRICS = {
     'replogle': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
     # 'adamson': ['regression',  'tf_binding', 'sem', 'gs_recovery'],
-    'norman': ['regression', 'ws_distance', 'tf_binding', 'sem', 'gs_recovery'],
+    'norman': ['regression', 'ws_distance', 'tf_binding', 'gs_recovery'],
     'nakatake': ['regression', 'sem', 'gs_recovery'],
     'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
     '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
@@ -158,6 +158,7 @@ surrogate_names = {
     'r_raw': "R (raw)",
     'ws_precision': "WS (precision)", 
     'ws_recall': "WS (recall)", 
+    'ws_distance': "WS distance", 
     'ws_f1': "WS (F1)",
     'ws_raw': "WS (raw)",
     'sem': 'SEM',
@@ -173,6 +174,7 @@ surrogate_names = {
     'gs_precision': 'GS (precision)',
     'gs_recall': 'GS (recall)',
     'gs_f1': 'Gene sets',
+    'gs_recovery': 'Gene sets recovery',
 
     'op':'OPSCA',
     'nakatake': 'Nakatake', 

@@ -4,10 +4,10 @@ set -e
 
 run_prefix='sbatch' #bash
 DATASETS=('op' 'adamson' 'replogle' 'norman' 'nakatake' 'parsebioscience'  '300BCG' 'xaira_HCT116' 'xaira_HEK293T') #'op' 'adamson' 'replogle' 'norman' 'nakatake' 'parsebioscience'  '300BCG' 'xaira_HCT116' 'xaira_HEK293T' 'ibd_uc' 'ibd_cd'
-DATASETS=('ibd_uc' 'ibd_cd') 
+DATASETS=('parsebioscience') #'op' 'adamson' 'replogle' 'norman' 'nakatake' 'parsebioscience'  '300BCG' 'xaira_HCT116' 'xaira_HEK293T' 'ibd_uc' 'ibd_cd'
 
 # METHODS=('negative_control' 'positive_control' 'pearson_corr' 'portia' 'ppcor' 'grnboost' 'scenic'  'scenicplus' 'scglue' 'figr' 'granie')
-METHODS=( 'ppcor' ) #'negative_control' 'positive_control' 'pearson_corr' 'portia' 'ppcor' 'grnboost' 'scenic'  'scenicplus' 'scglue' 'figr' 'granie'
+METHODS=( 'scenic' 'grnboost') #'negative_control' 'positive_control' 'pearson_corr' 'portia' 'ppcor' 'grnboost' 'scenic'  'scenicplus' 'scglue' 'figr' 'granie'
 
 methods_dir='src/methods/'
 ctr_methods_dir='src/methods/'
