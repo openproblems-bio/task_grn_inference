@@ -37,17 +37,17 @@ The individual performance of the methods on each dataset is summarized below.
 ----
 
 .. image:: images/raw_scores_parsebioscience.png
-   :width: 60%
+   :width: 90%
    :align: center
 ----
 
 .. image:: images/raw_scores_ibd_uc.png
-   :width: 40%
+   :width: 60%
    :align: center
 ----
 
 .. image:: images/raw_scores_ibd_cd.png
-   :width: 40%
+   :width: 60%
    :align: center
 ----
 

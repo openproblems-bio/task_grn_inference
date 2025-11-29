@@ -621,6 +621,7 @@ def main(par):
     print(f"VC HVG: {vc_hvg_score:.4f}")
     print(f"VC (average): {(vc_grn_score + vc_hvg_score) / 2:.4f}")
 
+    # add baseline grn that has same target genes -> assumption: cetrain genes are easy to predict 
     results = {
         'vc_grn': [vc_grn_score],
         'vc_hvg': [vc_hvg_score],

@@ -12,7 +12,7 @@ set -euo pipefail
 
 # Configuration
 DATASET="op"
-METHOD="grnboost"
+METHOD="pearson_corr"
 OUTPUT_DIR="output/vc/robustness"
 
 # Input files

@@ -21,7 +21,7 @@ sys.path.append('src/metrics/vc')
 sys.path.append('src/utils')
 
 from helper import main as main_vc
-from util import process_links
+from util import process_links, parse_args
 
 
 def permute_grn(prediction: pd.DataFrame, degree: float, noise_type: str) -> pd.DataFrame:
@@ -316,6 +316,7 @@ if __name__ == '__main__':
                        help='Path to evaluation data h5ad file')
     parser.add_argument('--output_dir', type=str, required=True,
                        help='Output directory for results')
+    parser.add_argument('--n_top_genes', type=int, default=3000)
     parser.add_argument('--degrees', type=float, nargs='+',
                        default=[0.0, 0.2, 0.5, 1.0],
                        help='Permutation degrees (0.0 to 1.0)')
@@ -332,7 +333,8 @@ if __name__ == '__main__':
         'output_dir': args.output_dir,
         'degrees': args.degrees,
         'noise_types': args.noise_types,
-        'score': f"{args.output_dir}/vc_score.h5ad"
+        'score': f"{args.output_dir}/vc_score.h5ad",
+        'n_top_genes': args.n_top_genes
     }
     
     # Run analysis

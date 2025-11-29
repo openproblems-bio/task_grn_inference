@@ -110,7 +110,7 @@ for dataset, metrics in DATASETS_METRICS.items():
 METRICS = [
        'r_precision', 'r_recall', 'r_f1',
        'ws_precision', 'ws_recall', 'ws_f1',
-       'vc', 'vc_raw', 'vc_precision', 
+       'vc', 'vc_grn', 'vc_raw', 'vc_precision', 
        'sem', 'sem_precision', 'sem_raw',
        't_rec_precision', 't_rec_recall', 't_rec_f1',
        'rc_tf_act',       
