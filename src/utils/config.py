@@ -149,6 +149,7 @@ surrogate_names = {
     'negative_control':'Negative Ctrl',
     'scgpt': 'scGPT',
     'spearman_corr': 'Spearman Corr.',
+    'geneformer': 'GeneFormer',
 
     'regression': 'Regression',
     'tf_recovery': 'TF Recovery',

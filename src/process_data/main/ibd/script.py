@@ -191,5 +191,7 @@ for disease in ['cd', 'uc']:
     adata_rna_bulk_d = adata_rna_bulk[adata_rna_bulk.obs['disease']==disease]
     adata_rna_bulk_d.uns['dataset_id'] = f'ibd_{disease.lower()}'
     adata_rna_bulk_d.write(f'resources/extended_data/ibd_{disease}_bulk.h5ad')
+adata_rna_bulk.uns['dataset_id'] = f'ibd'
+adata_rna_bulk.write(f'resources/extended_data/ibd_bulk.h5ad')
 
 print('Done')
