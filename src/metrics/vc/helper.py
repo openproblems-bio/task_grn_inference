@@ -492,8 +492,7 @@ def main(par):
     gene_mask_grn = np.logical_or(np.any(A_full, axis=1), np.any(A_full, axis=0))
     in_degrees = np.sum(A_full != 0, axis=0)
     out_degrees = np.sum(A_full != 0, axis=1)
-    #n_genes_grn = par['n_top_genes']
-    n_genes_grn = 800
+    n_genes_grn = par['n_top_genes']
     
     # Subset genes
     gene_connectivity = in_degrees + out_degrees
