@@ -10,21 +10,22 @@ This script:
 
 import os
 import sys
+from typing import List
+
 import pandas as pd
 import numpy as np
 import anndata as ad
 import matplotlib.pyplot as plt
-import seaborn as sns
 
 # Add paths
 sys.path.append('src/metrics/vc')
 sys.path.append('src/utils')
 
 from helper import main as main_vc
-from util import process_links, parse_args
+from util import process_links, parse_args, shuffle_grn
 
 
-def permute_grn(prediction: pd.DataFrame, degree: float, noise_type: str) -> pd.DataFrame:
+def permute_grn(prediction: pd.DataFrame, gene_names_full: List[str], degree: float, noise_type: str) -> pd.DataFrame:
     """
     Permute GRN with different noise types.
     
@@ -32,6 +33,8 @@ def permute_grn(prediction: pd.DataFrame, degree: float, noise_type: str) -> pd.
     -----------
     prediction : pd.DataFrame
         GRN with columns: source, target, weight
+    gene_names_full : List[str]
+        All the genes listed in the evaluation dataset.
     degree : float
         Fraction of perturbation (0.0 to 1.0)
     noise_type : str
@@ -70,35 +73,7 @@ def permute_grn(prediction: pd.DataFrame, degree: float, noise_type: str) -> pd.
     elif noise_type == 'net':
         # Shuffle network structure
         if degree > 0:
-            # Group by target and source
-            prediction = prediction.groupby(['target', 'source'], as_index=False)['weight'].mean()
-            
-            # Create pivot table
-            pivot_df = prediction.pivot(index='target', columns='source', values='weight')
-            pivot_df.fillna(0, inplace=True)
-            
-            # Flatten and shuffle
-            matrix_flattened = pivot_df.values.flatten()
-            n_elements = len(matrix_flattened)
-            n_shuffle = int(n_elements * degree)
-            
-            if n_shuffle > 0:
-                shuffle_indices = np.random.choice(n_elements, n_shuffle, replace=False)
-                shuffle_values = matrix_flattened[shuffle_indices].copy()
-                np.random.shuffle(shuffle_values)
-                matrix_flattened[shuffle_indices] = shuffle_values
-            
-            # Reshape back
-            pivot_df_shuffled = pd.DataFrame(
-                matrix_flattened.reshape(pivot_df.shape),
-                index=pivot_df.index,
-                columns=pivot_df.columns
-            )
-            
-            # Convert back to edge list
-            flat_df = pivot_df_shuffled.reset_index()
-            prediction = flat_df.melt(id_vars='target', var_name='source', value_name='weight')
-            prediction = prediction[prediction['weight'] != 0].reset_index(drop=True)
+            prediction = shuffle_grn(prediction, gene_names_full, degree)
     
     else:
         raise ValueError(f"Unknown noise_type: {noise_type}")
@@ -132,9 +107,13 @@ def evaluate_permuted_grn(par, degree, noise_type, seed=42):
     net = ad.read_h5ad(par['prediction'])
     prediction = pd.DataFrame(net.uns['prediction'])
     prediction = process_links(prediction, par={'max_n_links': 50_000})
+
+    # Set of all genes
+    adata = ad.read_h5ad(par['evaluation_data'])
+    gene_names_full = list(adata.var_names)
     
     # Permute network
-    prediction_permuted = permute_grn(prediction, degree, noise_type)
+    prediction_permuted = permute_grn(prediction, gene_names_full, degree, noise_type)
     
     # Create temporary file with permuted GRN
     temp_file = f"{par['output_dir']}/tmp_permuted_{noise_type}_{int(degree*100)}.h5ad"

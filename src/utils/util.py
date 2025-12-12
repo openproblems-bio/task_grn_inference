@@ -1,3 +1,5 @@
+import random
+
 import pandas as pd
 import anndata as ad
 import numpy as np
@@ -565,3 +567,29 @@ def create_grn_baseline(A):
     
     return B
 
+
+def shuffle_grn(prediction: pd.DataFrame, all_gene_names: List[str], degree: float) -> pd.DataFrame:
+    weights_dict = {}
+    tg_dict = {}
+    for tf_name, tg_name, weight in zip(prediction["source"], prediction["target"], prediction["weight"]):
+        if tf_name not in weights_dict:
+            weights_dict[tf_name] = []
+            tg_dict[tf_name] = []
+        tg_dict[tf_name].append(tg_name)
+        weights_dict[tf_name].append(weight)
+    tf_names, tg_names, weights = [], [], []
+    for tf_name, values in weights_dict.items():
+        complementary_tg_names = set(all_gene_names) - set(tg_dict[tf_name])
+        idx = np.arange(0, len(tg_dict[tf_name]))
+        np.random.shuffle(idx)
+        for i in idx:
+            if (random.random() < degree) and (len(complementary_tg_names) > 0):
+                tg_name = random.choice(list(complementary_tg_names))
+                complementary_tg_names.discard(tg_name)
+            else:
+                tg_name = tg_dict[tf_name][i]
+            weight = weights_dict[tf_name][i]
+            tf_names.append(tf_name)
+            tg_names.append(tg_name)
+            weights.append(weight)
+    return pd.DataFrame({"source": tf_names, "target": tg_names, "weight": weights})

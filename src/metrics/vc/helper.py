@@ -487,42 +487,31 @@ def main(par):
             j = gene_dict[target]
             A_full[i, j] = float(weight)
 
-    # Compute HVGs from full evaluation data (for HVG-based evaluation)
-    print("\n======== Computing HVGs from full evaluation data ========")
-    n_top_hvg = par['n_top_genes']
-    sc.pp.highly_variable_genes(adata, n_top_genes=n_top_hvg, flavor='seurat', layer=layer)
-    hvg_mask_full = adata.var['highly_variable'].values
-    print(f"Total HVGs identified: {hvg_mask_full.sum()}")
-
     # For GRN-based evaluation: keep only most-connected genes in the GRN
     print("\n======== Filtering genes for GRN-based evaluation ========")
     gene_mask_grn = np.logical_or(np.any(A_full, axis=1), np.any(A_full, axis=0))
     in_degrees = np.sum(A_full != 0, axis=0)
     out_degrees = np.sum(A_full != 0, axis=1)
-    n_genes_grn = par['n_top_genes']
+    #n_genes_grn = par['n_top_genes']
+    n_genes_grn = 800
     
-    # Select top n_genes_grn by connectivity
+    # Subset genes
     gene_connectivity = in_degrees + out_degrees
-    # Only consider genes that are in the GRN
     gene_connectivity_masked = np.where(gene_mask_grn, gene_connectivity, -1)
     top_gene_indices_grn = np.argsort(gene_connectivity_masked)[-n_genes_grn:]
     gene_mask_grn_filtered = np.zeros(len(gene_names_full), dtype=bool)
     gene_mask_grn_filtered[top_gene_indices_grn] = True
+    #gene_mask_grn_filtered = np.zeros(X_full.shape[1], dtype=bool)
+    #gene_mask_grn_filtered[:n_genes_grn] = 1
+    #np.random.shuffle(gene_mask_grn_filtered)
     
     X_grn = X_full[:, gene_mask_grn_filtered]
     A_grn = A_full[gene_mask_grn_filtered, :][:, gene_mask_grn_filtered]
     gene_names_grn = gene_names_full[gene_mask_grn_filtered]
     print(f"Genes for GRN-based evaluation: {len(gene_names_grn)}")
 
-    # For HVG-based evaluation: use HVGs
-    X_hvg = X_full[:, hvg_mask_full]
-    A_hvg = A_full[hvg_mask_full, :][:, hvg_mask_full]
-    gene_names_hvg = gene_names_full[hvg_mask_full]
-    print(f"Genes for HVG-based evaluation: {len(gene_names_hvg)}")
-
     # Remove self-regulations
     np.fill_diagonal(A_grn, 0)
-    np.fill_diagonal(A_hvg, 0)
 
     # Mapping between gene expression profiles and their matched negative controls
     control_map, _ = create_control_matching(are_controls, match_groups)
@@ -573,59 +562,13 @@ def main(par):
     vc_grn_score = float(np.mean(np.clip(r2_grn, 0, 1)))
     print(f"VC GRN score (mean R²): {vc_grn_score:.4f}")
 
-    # ========== HVG-based evaluation ==========
-    print("\n======== Evaluate inferred GRN (HVG-based: highly variable genes) ========")
-    ss_res_hvg = 0
-    ss_tot_hvg = 0
-    
-    for i, (train_index, test_index) in enumerate(cv.split(X_hvg, X_hvg, cv_groups)):
-        # Center and scale dataset
-        scaler = StandardScaler()
-        scaler.fit(X_hvg[train_index, :])
-        X_standardized = scaler.transform(X_hvg)
-
-        # Create data loaders
-        n_perturbations = int(np.max(perturbations) + 1)
-        train_dataset = PerturbationDataset(
-            X_standardized,
-            train_index,
-            match_groups,
-            control_map,
-            loose_match_groups,
-            loose_control_map,
-            perturbations
-        )
-        train_data_loader = torch.utils.data.DataLoader(train_dataset, batch_size=512)
-        test_dataset = PerturbationDataset(
-            X_standardized,
-            test_index,
-            match_groups,
-            control_map,
-            loose_match_groups,
-            loose_control_map,
-            perturbations
-        )
-        test_data_loader = torch.utils.data.DataLoader(test_dataset, batch_size=512)
-
-        # Evaluate inferred GRN
-        res = evaluate(A_hvg, train_data_loader, test_data_loader, n_perturbations)
-        ss_res_hvg = ss_res_hvg + res[0]
-        ss_tot_hvg = ss_tot_hvg + res[1]
-
-    r2_hvg = 1 - ss_res_hvg / ss_tot_hvg
-    vc_hvg_score = float(np.mean(np.clip(r2_hvg, 0, 1)))
-    print(f"VC HVG score (mean R²): {vc_hvg_score:.4f}")
-
     print(f"\nMethod: {method_id}")
     print(f"VC GRN: {vc_grn_score:.4f}")
-    print(f"VC HVG: {vc_hvg_score:.4f}")
-    print(f"VC (average): {(vc_grn_score + vc_hvg_score) / 2:.4f}")
 
     # add baseline grn that has same target genes -> assumption: cetrain genes are easy to predict 
     results = {
         'vc_grn': [vc_grn_score],
-        'vc_hvg': [vc_hvg_score],
-        'vc': [float((vc_grn_score + vc_hvg_score) / 2)]
+        'vc': [vc_grn_score]
     }
 
     df_results = pd.DataFrame(results)
