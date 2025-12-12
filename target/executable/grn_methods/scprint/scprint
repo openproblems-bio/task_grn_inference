@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   python -c 'from scdataloader.utils import populate_my_ontology; populate_my_ontology()'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scprint"
-LABEL org.opencontainers.image.created="2025-11-27T17:59:09Z"
+LABEL org.opencontainers.image.created="2025-12-12T01:11:58Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="d6b578f3865fc96aa03eafa48e8cc34c4e09e1ce"
+LABEL org.opencontainers.image.revision="227f15ec13d6685c7db26dfd9dfa07ad2e4cfb47"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -647,7 +647,7 @@ function ViashHelp {
   echo ""
   echo "    --model_name"
   echo "        type: string"
-  echo "        default: v2-medium"
+  echo "        default: medium-v1.5"
   echo ""
   echo "    --model"
   echo "        type: file, file must exist"
@@ -1156,7 +1156,7 @@ if [ -z ${VIASH_PAR_DOWNLOAD_CHECKPOINT+x} ]; then
   VIASH_PAR_DOWNLOAD_CHECKPOINT="true"
 fi
 if [ -z ${VIASH_PAR_MODEL_NAME+x} ]; then
-  VIASH_PAR_MODEL_NAME="v2-medium"
+  VIASH_PAR_MODEL_NAME="medium-v1.5"
 fi
 if [ -z ${VIASH_PAR_HOW+x} ]; then
   VIASH_PAR_HOW="most var across"

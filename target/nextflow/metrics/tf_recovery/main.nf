@@ -3582,7 +3582,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/tf_recovery",
     "viash_version" : "0.9.4",
-    "git_commit" : "d6b578f3865fc96aa03eafa48e8cc34c4e09e1ce",
+    "git_commit" : "227f15ec13d6685c7db26dfd9dfa07ad2e4cfb47",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
