@@ -119,11 +119,14 @@ METRICS = [
        ]
     
 FINAL_METRICS = [
-       'r_precision', 'r_recall', 
+       'r_precision', 
+       'r_recall', 
        'vc', 
        'sem',
-       'ws_precision', 'ws_recall', 
-       't_rec_precision', 't_rec_recall', 
+       'ws_precision', 
+       'ws_recall', 
+       't_rec_precision', 
+       't_rec_recall', 
        'rc_tf_act',
        'tfb_f1', 
        'gs_f1', 
@@ -153,10 +156,10 @@ surrogate_names = {
 
     'regression': 'Regression',
     'tf_recovery': 'TF Recovery',
-    'r_precision': "R (precision)", 
-    'r_recall': "R (recall)", 
-    'r_f1': "R (F1)",
-    'r_raw': "R (raw)",
+    'r_precision': "Regression (precision)", 
+    'r_recall': "Regression (recall)", 
+    'r_f1': "Regression (F1)",
+    'r_raw': "Regression (raw)",
     'ws_precision': "WS (precision)", 
     'ws_recall': "WS (recall)", 
     'ws_distance': "WS distance", 
@@ -174,7 +177,7 @@ surrogate_names = {
     'tfb_f1': 'TF binding',
     'gs_precision': 'GS (precision)',
     'gs_recall': 'GS (recall)',
-    'gs_f1': 'Gene sets',
+    'gs_f1': 'Gene sets recovery',
     'gs_recovery': 'Gene sets recovery',
 
     'op':'OPSCA',
