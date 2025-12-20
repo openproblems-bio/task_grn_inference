@@ -510,8 +510,8 @@ def main(par):
         print(f"SEM HVG score (max): {np.max(valid_scores_hvg):.4f}")
     
     results = {
-        'sem_grn': [float(sem_grn_score)],
-        'sem_hvg': [float(sem_hvg_score)],
+        # 'sem_grn': [float(sem_grn_score)],
+        # 'sem_hvg': [float(sem_hvg_score)],
         'sem': [float((sem_grn_score + sem_hvg_score) / 2)]
     }
 

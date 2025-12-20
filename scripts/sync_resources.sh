@@ -29,7 +29,7 @@ set -e
 # aws s3 sync  s3://openproblems-data/resources/grn/grn_benchmark/ground_truth resources_test/grn_benchmark/ground_truth
 # aws s3 sync  resources/grn_benchmark/ground_truth s3://openproblems-data/resources/grn/grn_benchmark/ground_truth 
 # aws s3 sync  resources/grn_benchmark/ s3://openproblems-data/resources/grn/grn_benchmark/ --delete
-aws s3 sync  resources/results/ibd_uc s3://openproblems-data/resources/grn/results/ibd_uc 
-aws s3 sync  resources/results/ibd_cd s3://openproblems-data/resources/grn/results/ibd_cd 
+aws s3 sync  resources/results/ s3://openproblems-data/resources/grn/results/ 
+# aws s3 sync  resources/results/ibd_cd s3://openproblems-data/resources/grn/results/ibd_cd 
 
 # aws s3 sync   s3://openproblems-data/resources/grn/grn_benchmark/ground_truth resources/grn_benchmark/ground_truth --no-sign-request

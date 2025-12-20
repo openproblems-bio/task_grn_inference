@@ -31,12 +31,14 @@ DATASET_GROUPS = {
         "match": ["donor_id", "cell_type"],
         "loose_match": ["donor_id", "cell_type"],
         "cv": ["perturbation", "cell_type"],
+        "rc_tf_ac": ["perturbation", "cell_type"]
     },
     "ibd_cd": {
         'anchors': ['donor_id'],
         "match": ["donor_id", "cell_type"],
         "loose_match": ["donor_id", "cell_type"],
         "cv": ["perturbation", "cell_type"],
+        "rc_tf_ac": ["perturbation", "cell_type"]
     },
     "replogle": {
         "match": ["perturbation"],
@@ -88,17 +90,17 @@ DATASETS_CELLTYPES = {
 }
 
 DATASETS_METRICS = {
-    'replogle': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
+    'replogle': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery', 'vc'],
     # 'adamson': ['regression',  'tf_binding', 'sem', 'gs_recovery'],
-    'norman': ['regression', 'ws_distance', 'tf_binding', 'gs_recovery'],
-    'nakatake': ['regression', 'sem', 'gs_recovery'],
+    'norman': ['regression', 'ws_distance', 'tf_binding', 'gs_recovery', 'vc'],
+    'nakatake': ['regression', 'sem', 'gs_recovery', 'vc'],
     'op': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
     '300BCG': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
-    'ibd_uc': ['regression', 'tf_binding', 'gs_recovery'],
-    'ibd_cd': ['regression', 'tf_binding', 'gs_recovery'],
+    'ibd_uc': ['regression', 'tf_binding', 'gs_recovery', 'rc_tf_act'],
+    'ibd_cd': ['regression', 'tf_binding', 'gs_recovery', 'rc_tf_act'],
     'parsebioscience': ['regression', 'vc', 'rc_tf_act', 'tf_binding', 'sem',  'gs_recovery'],
-    'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
-    'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery'],
+    'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery', 'vc'],
+    'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery', 'vc'],
 }
 
 
@@ -108,14 +110,18 @@ for dataset, metrics in DATASETS_METRICS.items():
         METRICS_DATASETS.setdefault(metric, []).append(dataset)
 
 METRICS = [
-       'r_precision', 'r_recall', 'r_f1',
-       'ws_precision', 'ws_recall', 'ws_f1',
-       'vc', 'vc_grn', 'vc_raw', 'vc_precision', 
-       'sem', 'sem_precision', 'sem_raw',
-       't_rec_precision', 't_rec_recall', 't_rec_f1',
+       'r_precision', 'r_recall', 
+       'ws_precision', 'ws_recall', 
+       'vc', 
+       'sem', 
+    #    'sem_raw',
+       't_rec_precision', 't_rec_recall', 
+    #    't_rec_f1',
        'rc_tf_act',       
-       'tfb_precision', 'tfb_recall',  'tfb_f1',
-       'gs_precision', 'gs_recall', 'gs_f1',
+    #    'tfb_precision', 'tfb_recall',  
+       'tfb_f1',
+    #    'gs_precision', 'gs_recall', 
+       'gs_f1',
        ]
     
 FINAL_METRICS = [
@@ -125,13 +131,40 @@ FINAL_METRICS = [
        'sem',
        'ws_precision', 
        'ws_recall', 
-       't_rec_precision', 
-       't_rec_recall', 
-       'rc_tf_act',
-       'tfb_f1', 
-       'gs_f1', 
+    #    'tfb_f1', 
+    #    'gs_f1', 
        ]
-
+METRIC_THRESHOLDS = {
+    # Regression metrics: R2-based, meaningful if > 0.1
+    'r_precision': 0.1,
+    'r_recall': 0.1,
+    
+    # Wasserstein distance metrics: precision/recall based, meaningful if > 0.05
+    'ws_precision': 0.5,
+    'ws_recall': 0.5,
+    
+    # Virtual cell: r2 scores
+    'vc': 0.1,
+    
+    # SEM (Structural Equation Modeling): goodness of fit (0-1), meaningful if > 0.4
+    'sem': 0.1,
+    
+    # TF recovery metrics: t-statistics from paired t-test, meaningful if > 2.0 (p<0.05)
+    't_rec_precision': 2.0,
+    't_rec_recall': 2.0,
+    
+    # Replica consistency (RC) for TF activity: consistency score (0-1) based on MAD, meaningful if > 0.3
+    # Measures consistency of TF activity across biological replicates (1=perfect, 0=no consistency)
+    'rc_tf_act': 0.3,
+    
+    # TF binding F1: F1 for TF-target binding, meaningful if > 0.05
+    # Based on ChIP-seq or other binding data
+    'tfb_f1': 0.05,
+    
+    # Gene set recovery F1: F1 for gene set enrichment, meaningful if > 0.1
+    # Tests if predicted regulators recover known gene sets
+    'gs_f1': 0.1,
+}
 surrogate_names = {
     'scprint': 'scPRINT',
     'collectri': 'CollectRI',
@@ -175,6 +208,7 @@ surrogate_names = {
     'tfb_precision': 'TF binding (precision)',
     'tfb_recall': 'TF binding (recall)',
     'tfb_f1': 'TF binding',
+    'tf_binding': 'TF binding',
     'gs_precision': 'GS (precision)',
     'gs_recall': 'GS (recall)',
     'gs_f1': 'Gene sets recovery',

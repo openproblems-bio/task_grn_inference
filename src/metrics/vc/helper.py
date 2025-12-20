@@ -624,8 +624,8 @@ def main(par):
 
     # add baseline grn that has same target genes -> assumption: cetrain genes are easy to predict 
     results = {
-        'vc_grn': [vc_grn_score],
-        'vc_hvg': [vc_hvg_score],
+        # 'vc_grn': [vc_grn_score],
+        # 'vc_hvg': [vc_hvg_score],
         'vc': [float((vc_grn_score + vc_hvg_score) / 2)]
     }
 
