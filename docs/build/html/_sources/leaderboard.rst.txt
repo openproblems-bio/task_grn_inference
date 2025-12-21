@@ -1,14 +1,14 @@
 
 Leaderboard
 =================
-.. The overal comparitive performance of the integrated GRN inference methods is summarized in the leaderboard below. 
+The overal comparitive performance of the integrated GRN inference methods is summarized in the leaderboard below. It should be noted that not all metrics count towards the final score, as some metrics did not pass the applicability criteria. See `here <evaluation.html>`_ for more details on the metrics applicability.
   
-.. .. image:: images/leaderboard.png
-..    :width: 90%
-..    :align: center
-.. ----
+.. image:: images/summary_figure.png
+   :width: 100%
+   :align: center
+----
 
-The individual performance of the methods on each dataset is summarized below.
+The individual performance of the methods on each dataset is summarized below. 
 
 .. image:: images/raw_scores_op.png
    :width: 70%
@@ -16,7 +16,7 @@ The individual performance of the methods on each dataset is summarized below.
 ----
 
 .. image:: images/raw_scores_nakatake.png
-   :width: 60%
+   :width: 70%
    :align: center
 ----
 
@@ -25,10 +25,6 @@ The individual performance of the methods on each dataset is summarized below.
    :align: center
 ----
 
-.. image:: images/raw_scores_adamson.png
-   :width: 70%
-   :align: center
-----
 
 .. image:: images/raw_scores_replogle.png
    :width: 70%
@@ -45,8 +41,13 @@ The individual performance of the methods on each dataset is summarized below.
    :align: center
 ----
 
-.. image:: images/raw_scores_ibd.png
-   :width: 90%
+.. image:: images/raw_scores_ibd_uc.png
+   :width: 70%
+   :align: center
+----
+
+.. image:: images/raw_scores_ibd_cd.png
+   :width: 70%
    :align: center
 ----
 

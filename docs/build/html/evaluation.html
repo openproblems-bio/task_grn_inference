@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GRN evaluation &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
@@ -46,8 +46,8 @@
 <li class="toctree-l1"><a class="reference internal" href="dataset.html">Datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="inference.html">GRN Inference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">GRN evaluation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#running-grn-evaluation-using-standard-pipeline">Running GRN evaluation using standard pipeline</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#running-grn-evaluation-without-docker">Running GRN evaluation without docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-grn-evaluation-using-standard-pipeline">Running GRN evaluation using standard pipeline</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="extending.html">Extending</a></li>
@@ -81,11 +81,14 @@
   <section id="grn-evaluation">
 <h1>GRN evaluation<a class="headerlink" href="#grn-evaluation" title="Link to this heading"></a></h1>
 <p>The evaluation metrics used in geneRNIB are summarized below.</p>
-<a class="reference internal image-reference" href="_images/metrics.png"><img alt="_images/metrics.png" class="align-center" src="_images/metrics.png" style="width: 90%;" /></a>
+<a class="reference internal image-reference" href="_images/metrics.png"><img alt="_images/metrics.png" class="align-center" src="_images/metrics.png" style="width: 90%;" />
+</a>
 <hr class="docutils" />
-<a class="reference internal image-reference" href="_images/datasets_metrics.png"><img alt="_images/datasets_metrics.png" class="align-center" src="_images/datasets_metrics.png" style="width: 90%;" /></a>
+<a class="reference internal image-reference" href="_images/metric_quality_evaluation.png"><img alt="_images/metric_quality_evaluation.png" class="align-center" src="_images/metric_quality_evaluation.png" style="width: 100%;" />
+</a>
 <hr class="docutils" />
-<p>For a detailed description of each metric, refer to the geneRNIB paper.</p>
+<p>For a detailed description of each metric, refer to the geneRNIB paper. Not all the metrics were applicable to all datasets, as shown in the table. In addition, only those datasets with * passed the applicability criteria for a given metric, which includes minimal variability and performance threshold set for each metric.
+In addition, not all metrics passed the additional criteria for inclusion in the final score calculation, as explained in the paper, and marked with ** in the table. This includes context specificity and robustness in stability analysis.</p>
 <p>The evaluation metrics expect the inferred network to be in the form of an AnnData object with specific format as explained here.
 It should be noted that the metric currently evaluate only the <strong>top TF-gene pairs</strong>, currently limited to <strong>50,000 edges</strong>, ranked by their assigned weight.</p>
 <p>The inferred network should have a tabular format with the following columns:</p>
@@ -97,17 +100,6 @@ It should be noted that the metric currently evaluate only the <strong>top TF-ge
 </ul>
 </div></blockquote>
 <p>See <cite>resources/grn_benchmark/prior/collectri.h5ad</cite> for an example of the expected format.</p>
-<section id="running-grn-evaluation-using-standard-pipeline">
-<h2>Running GRN evaluation using standard pipeline<a class="headerlink" href="#running-grn-evaluation-using-standard-pipeline" title="Link to this heading"></a></h2>
-<p>To run the evalution for a given GRN and dataset, use the following command:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
-<span class="pre">bash</span> <span class="pre">scripts/run_grn_evaluation.sh</span> <span class="pre">--prediction=&lt;inferred</span> <span class="pre">GRN</span> <span class="pre">(e.g.collectri.h5ad)&gt;</span> <span class="pre">--save_dir=&lt;e.g.output/&gt;</span> <span class="pre">--dataset=&lt;e.g.</span> <span class="pre">replogle&gt;</span> <span class="pre">--build_images=&lt;true</span> <span class="pre">or</span> <span class="pre">false.</span> <span class="pre">true</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">first</span> <span class="pre">time</span> <span class="pre">running&gt;</span>
-<span class="pre">`</span></code></p>
-<p>example command:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
-<span class="pre">bash</span> <span class="pre">scripts/run_grn_evaluation.sh</span> <span class="pre">--prediction=resources/grn_models/op/collectri.h5ad</span> <span class="pre">--save_dir=output/</span> <span class="pre">--dataset=op</span> <span class="pre">--build_images=true</span>
-<span class="pre">`</span></code></p>
-</section>
 <section id="running-grn-evaluation-without-docker">
 <h2>Running GRN evaluation without docker<a class="headerlink" href="#running-grn-evaluation-without-docker" title="Link to this heading"></a></h2>
 <p>Considering that Docker is not supported by certtain systems, you can run the evaluation without Docker by following these steps:</p>
@@ -117,6 +109,22 @@ It should be noted that the metric currently evaluate only the <strong>top TF-ge
 <p>example command:</p>
 <p><code class="docutils literal notranslate"><span class="pre">`bash</span>
 <span class="pre">bash</span> <span class="pre">src/metrics/all_metrics/run_local.sh</span> <span class="pre">--dataset</span> <span class="pre">op</span> <span class="pre">--prediction=resources/grn_models/op/collectri.h5ad</span> <span class="pre">--score=output_score_file.h5ad</span> <span class="pre">--num_workers=20</span>
+<span class="pre">`</span></code></p>
+<p>If you are evaluating a new GRN model, which is not part of geneRNIB, make you to generate the consensus prior file for the dataset you are evaluating on.</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">bash</span> <span class="pre">scripts/prior/run_consensus.sh</span> <span class="pre">--dataset</span> <span class="pre">op</span> <span class="pre">--new_model</span> <span class="pre">{new_grn_model_file.h5ad}</span>
+<span class="pre">`</span></code></p>
+<p>This will add your model to the previous ones and create the new consensus prior file needed for evaluation.</p>
+</section>
+<section id="running-grn-evaluation-using-standard-pipeline">
+<h2>Running GRN evaluation using standard pipeline<a class="headerlink" href="#running-grn-evaluation-using-standard-pipeline" title="Link to this heading"></a></h2>
+<p>To run the evalution for a given GRN and dataset, use the following command:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">bash</span> <span class="pre">scripts/run_grn_evaluation.sh</span> <span class="pre">--prediction=&lt;inferred</span> <span class="pre">GRN</span> <span class="pre">(e.g.collectri.h5ad)&gt;</span> <span class="pre">--save_dir=&lt;e.g.output/&gt;</span> <span class="pre">--dataset=&lt;e.g.</span> <span class="pre">replogle&gt;</span> <span class="pre">--build_images=&lt;true</span> <span class="pre">or</span> <span class="pre">false.</span> <span class="pre">true</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">first</span> <span class="pre">time</span> <span class="pre">running&gt;</span>
+<span class="pre">`</span></code></p>
+<p>example command:</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">bash</span> <span class="pre">scripts/run_grn_evaluation.sh</span> <span class="pre">--prediction=resources/grn_models/op/collectri.h5ad</span> <span class="pre">--save_dir=output/</span> <span class="pre">--dataset=op</span> <span class="pre">--build_images=true</span>
 <span class="pre">`</span></code></p>
 </section>
 </section>

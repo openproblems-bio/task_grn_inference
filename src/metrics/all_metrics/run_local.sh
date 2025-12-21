@@ -5,7 +5,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
 #SBATCH --time=2:00:00
-#SBATCH --mem=120GB
+#SBATCH --mem=60GB
 #SBATCH --partition=gpu
 #SBATCH --gres=gpu:1
 #SBATCH --mail-type=END,FAIL      
@@ -77,7 +77,7 @@ fi
 #   exit 1
 # fi
 
-source src/utils/dataset_config.env
+source src/utils/config.env
 cell_type_var="CELLTYPE_${dataset}"
 cell_type="${!cell_type_var}"
 
