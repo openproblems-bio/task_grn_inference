@@ -13,21 +13,55 @@
 
 set -e
 
-DATASET=$1
+DATASET=""
+NEW_MODEL_PATH=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --dataset)
+      DATASET="$2"
+      shift 2
+      ;;
+    --new_model)
+      NEW_MODEL_PATH="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown option: $1"
+      echo "Usage: sbatch run_consensus.sh --dataset <dataset> [--new_model <path>]"
+      exit 1
+      ;;
+  esac
+done
+
 if [ -z "$DATASET" ]; then
-  echo "Usage: sbatch run_consensus.sh <dataset>"
+  echo "Usage: sbatch run_consensus.sh --dataset <dataset> [--new_model <path>]"
   exit 1
 fi
 
 models_dir="resources/results/$DATASET"
 models=("pearson_corr" "positive_control" "portia" "ppcor" "scenic" "scprint" "grnboost" "scenicplus" "scglue" "granie" "figr" "celloracle" "scgpt" "geneformer" "spearman_corr")
+python src/utils/config.py
+source src/utils/config.env
+METHODS=(${METHODS//,/ })
+
 predictions=()
-for model in "${models[@]}"; do
+for model in "${METHODS[@]}"; do
     file="${models_dir}/${DATASET}.${model}.${model}.prediction.h5ad"
     if [ -e "$file" ]; then
         predictions+=("$file")
     fi
 done
+
+if [ -n "$NEW_MODEL_PATH" ]; then
+    if [ -e "$NEW_MODEL_PATH" ]; then
+        echo "Adding new model: $NEW_MODEL_PATH"
+        predictions+=("$NEW_MODEL_PATH")
+    else
+        echo "Warning: New model path does not exist: $NEW_MODEL_PATH"
+    fi
+fi
+
 printf '%s\n' "${predictions[@]}"
 
 echo "Running consensus for Regression"

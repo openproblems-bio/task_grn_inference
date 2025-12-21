@@ -3385,12 +3385,6 @@ meta = [
       }
     },
     {
-      "name" : "metrics/anchor_regression",
-      "repository" : {
-        "type" : "local"
-      }
-    },
-    {
       "name" : "metrics/tf_binding",
       "repository" : {
         "type" : "local"
@@ -3475,7 +3469,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.4",
-    "git_commit" : "227f15ec13d6685c7db26dfd9dfa07ad2e4cfb47",
+    "git_commit" : "7d52e0e2489aeaa2e7d7df055a2495809a2b2e2b",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3590,7 +3584,6 @@ include { tf_recovery } from "${meta.resources_dir}/../../../nextflow/metrics/tf
 include { vc } from "${meta.resources_dir}/../../../nextflow/metrics/vc/main.nf"
 include { rc_tf_act } from "${meta.resources_dir}/../../../nextflow/metrics/rc_tf_act/main.nf"
 include { sem } from "${meta.resources_dir}/../../../nextflow/metrics/sem/main.nf"
-include { anchor_regression } from "${meta.resources_dir}/../../../nextflow/metrics/anchor_regression/main.nf"
 include { tf_binding } from "${meta.resources_dir}/../../../nextflow/metrics/tf_binding/main.nf"
 include { gs_recovery } from "${meta.resources_dir}/../../../nextflow/metrics/gs_recovery/main.nf"
 include { extract_uns_metadata } from "${meta.root_dir}/dependencies/github/openproblems-bio/openproblems/build/main/nextflow/utils/extract_uns_metadata/main.nf"
@@ -3616,7 +3609,7 @@ workflow run_wf {
     regression,
     ws_distance,
     tf_recovery,
-    anchor_regression,
+    // anchor_regression,
     rc_tf_act,
     sem,
     vc,

@@ -14,9 +14,9 @@ set -euo pipefail
 
 save_dir="output/rc_tf_act"
 mkdir -p "$save_dir"
-
+    
 # Datasets to process (only those with rc_tf_ac grouping defined)
-datasets=('300BCG'  'parsebioscience'  'op')
+datasets=('ibd_uc')
 # datasets=('op' )
 # Methods to process
 methods=("grnboost" "pearson_corr" "negative_control" "positive_control" "ppcor" "portia" "scenic" "scprint" "scenicplus" "celloracle" "scglue" "figr" "granie")

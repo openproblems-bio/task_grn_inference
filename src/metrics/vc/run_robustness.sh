@@ -12,7 +12,7 @@ set -euo pipefail
 
 # Configuration
 DATASET="op"
-METHOD="grnboost"
+METHOD="pearson_corr"
 OUTPUT_DIR="output/vc/robustness"
 
 # Input files
@@ -36,7 +36,7 @@ python src/metrics/vc/analyze_robustness.py \
     --prediction "${PREDICTION}" \
     --evaluation_data "${EVALUATION_DATA}" \
     --output_dir "${OUTPUT_DIR}" \
-    --degrees 0.0 0.2 0.5 1.0 \
+    --degrees 0.0 0.5 1.0 \
     --noise_types net
 
 echo ""

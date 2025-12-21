@@ -336,10 +336,23 @@ def main(par: Dict[str, Any]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     # Load data
     prturb_adata = ad.read_h5ad(par['evaluation_data'])
     layer = manage_layer(prturb_adata, par)
-    gene_names = prturb_adata.var.index.to_numpy()
+    all_gene_names = prturb_adata.var.index.to_numpy()
     with open(par['regulators_consensus'], 'r') as f:
         data = json.load(f)
-    print(len(data), len(gene_names))
+    
+    # Filter genes to only include those in consensus
+    gene_names = np.array([gene for gene in all_gene_names if gene in data])
+    missing_genes = set(all_gene_names) - set(gene_names)
+    
+    if len(missing_genes) > 0:
+        print(f"Warning: {len(missing_genes)} genes not in consensus data and will be omitted from evaluation")
+        print(f"Missing genes: {sorted(list(missing_genes))[:10]}..." if len(missing_genes) > 10 else f"Missing genes: {sorted(list(missing_genes))}")
+        
+        # Filter the adata to only include genes in consensus
+        gene_mask = prturb_adata.var.index.isin(gene_names)
+        prturb_adata = prturb_adata[:, gene_mask]
+        
+    print(f"Evaluating {len(gene_names)} genes (consensus data available for all)")
     
     n_features_theta_025 = np.asarray([data[gene_name]['0.25'] for gene_name in gene_names], dtype=int)
     n_features_theta_075 = np.asarray([data[gene_name]['0.75'] for gene_name in gene_names], dtype=int)
