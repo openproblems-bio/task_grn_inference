@@ -87,7 +87,8 @@
 <a class="reference internal image-reference" href="_images/metric_quality_evaluation.png"><img alt="_images/metric_quality_evaluation.png" class="align-center" src="_images/metric_quality_evaluation.png" style="width: 100%;" />
 </a>
 <hr class="docutils" />
-<p>For a detailed description of each metric, refer to the geneRNIB paper. Not all the metrics were applicable to all datasets, as shown in the table. In addition, only those datasets with * passed the applicability criteria for a given metric, which includes minimal variability and performance threshold set for each metric.
+<p>For a detailed description of each metric, refer to the geneRNIB paper. To map the naming conventions used in the code and this table, refer to <cite>surrogate_names</cite> in <cite>config.py</cite> file in the <cite>src/utils/</cite> directory.
+Not all the metrics were applicable to all datasets, as shown in the table. In addition, only those datasets with * passed the applicability criteria for a given metric, which includes minimal variability and performance threshold set for each metric.
 In addition, not all metrics passed the additional criteria for inclusion in the final score calculation, as explained in the paper, and marked with ** in the table. This includes context specificity and robustness in stability analysis.</p>
 <p>The evaluation metrics expect the inferred network to be in the form of an AnnData object with specific format as explained here.
 It should be noted that the metric currently evaluate only the <strong>top TF-gene pairs</strong>, currently limited to <strong>50,000 edges</strong>, ranked by their assigned weight.</p>
