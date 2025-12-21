@@ -1,17 +1,19 @@
 set -e
 
-# datasets=( 'replogle' 'op' 'nakatake' 'norman'  'xaira_HEK293T' 'xaira_HCT116'  'parsebioscience' 'ibd_uc' 'ibd_cd' '300BCG' ) #'replogle' 'op' 'nakatake' 'norman'  'xaira_HEK293T' 'xaira_HCT116'  'parsebioscience' 'ibd_uc' 'ibd_cd'  '300BCG') #
-datasets=( 'op'  ) #'replogle' 'op' 'nakatake' 'norman'  'xaira_HEK293T' 'xaira_HCT116'  'parsebioscience' 'ibd_uc' 'ibd_cd' '300BCG') #
-run_local=false # set to true to run locally, false to run on AWS
+python src/utils/config.py
+source src/utils/config.env
+DATASETS=(${DATASETS//,/ })
 
-run_grn_inference=false
-run_grn_evaluation=true
-run_download=false
+run_local=false
+run_grn_inference=false #arg
+run_consensus=true
+run_grn_evaluation=true #arg
+run_sync=false
 
 num_workers=20
 
 
-for dataset in "${datasets[@]}"; do
+for dataset in "${DATASETS[@]}"; do
     trace_file="resources/results/$dataset/trace.txt"
 
     if [ "$run_grn_inference" = true ]; then
@@ -48,12 +50,14 @@ for dataset in "${datasets[@]}"; do
         # fi 
         
 
-        if [ "$run_local" = false ]; then
-            echo "Downloading inference results from AWS"
-            aws s3 sync  s3://openproblems-data/resources/grn/results/$dataset resources/results/$dataset 
+        # if [ "$run_local" = false ]; then
+        #     echo "Downloading inference results from AWS"
+        #     aws s3 sync  s3://openproblems-data/resources/grn/results/$dataset resources/results/$dataset 
+        # fi
+        if [ "$run_consensus" = true ]; then
+            echo "Running consensus for dataset: $dataset"
+            bash scripts/prior/run_consensus.sh --dataset $dataset # run consensus for Regression and ws distance -> needs to be run after adding each method and dataset
         fi
-        echo "Running consensus for dataset: $dataset"
-        bash scripts/prior/run_consensus.sh $dataset # run consensus for Regression and ws distance -> needs to be run after adding each method and dataset
         
         if [ "$run_local" = false ]; then
             echo "Syncing prior results to AWS"
@@ -64,7 +68,7 @@ for dataset in "${datasets[@]}"; do
         bash scripts/run_grn_evaluation.sh --dataset=$dataset --run_local=$run_local --build_images=false --num_workers=$num_workers
     fi
 
-    if [ "$run_download" = true ]; then
+    if [ "$run_sync" = true ]; then
         if [ "$run_local" = false ]; then
             echo "Downloading evaluation results from AWS"
             aws s3 sync  s3://openproblems-data/resources/grn/results/$dataset resources/results/$dataset 

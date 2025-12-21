@@ -82,34 +82,12 @@ mkdir -p "$TEMP_DIR"
 
 # Generate and source dataset configuration
 echo "Generating dataset configuration..."
-python src/utils/config.py --output src/utils/dataset_config.env
-source src/utils/dataset_config.env
+python src/utils/config.py 
+source src/utils/config.env
 
 # Get list of datasets from config
-DATASETS=($(python -c "from src.utils.config import DATASET_GROUPS; print(' '.join(DATASET_GROUPS.keys()))"))
-# DATASETS=('norman')
-
-echo "Datasets to evaluate: ${DATASETS[@]}"
-
-# Method names to check
-GRN_METHODS=(
-    "positive_control"
-    "pearson_corr"
-    "negative_control"
-    "spearman_corr"
-    "scglue"
-    "scenicplus"
-    "celloracle"
-    "granie"
-    "figr"
-    "grnboost"
-    "portia"
-    "scenic"
-    "scprint"
-    "geneformer"
-    "scgpt"
-    "ppcor"
-)
+DATASETS=(${DATASETS//,/ })
+METHODS=(${METHODS//,/ })
 
 # Function to submit a metric evaluation job
 submit_metric_job() {
@@ -256,78 +234,7 @@ EOF
 # Function to run consensus for a dataset
 run_consensus() {
     local dataset=$1
-    
-    echo ""
-    echo "=========================================="
-    echo "Running Consensus for Dataset: $dataset"
-    echo "=========================================="
-    
-    # Build list of available predictions
-    local models_dir="resources/results/${dataset}"
-    local predictions=()
-    
-    for method in "${GRN_METHODS[@]}"; do
-        local file="${models_dir}/${dataset}.${method}.${method}.prediction.h5ad"
-        if [[ -f "$file" ]]; then
-            predictions+=("$file")
-            echo "  Found: ${method}"
-        fi
-    done
-    
-    if [[ ${#predictions[@]} -eq 0 ]]; then
-        echo "  [WARNING] No prediction files found for ${dataset}"
-        return
-    fi
-    
-    echo "  Total predictions: ${#predictions[@]}"
-    
-    # Run Regression consensus
-    echo ""
-    echo "Running Regression consensus..."
-    python src/metrics/regression/consensus/script.py \
-        --dataset "$dataset" \
-        --regulators_consensus "resources/grn_benchmark/prior/regulators_consensus_${dataset}.json" \
-        --evaluation_data "resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad" \
-        --predictions "${predictions[@]}"
-    
-    # Run WS Distance consensus (only for applicable datasets)
-    local applicable_datasets=("norman" "adamson" "replogle" "xaira_HEK293T" "xaira_HCT116")
-    local skip=true
-    
-    for d in "${applicable_datasets[@]}"; do
-        if [[ "$dataset" == "$d" ]]; then
-            skip=false
-            break
-        fi
-    done
-    
-    if $skip; then
-        echo ""
-        echo "Skipping WS Distance consensus for ${dataset} (not applicable)"
-    else
-        echo ""
-        echo "Running WS Distance consensus..."
-        
-        # Extract model names for ws consensus
-        local models=()
-        for method in "${GRN_METHODS[@]}"; do
-            local file="${models_dir}/${dataset}.${method}.${method}.prediction.h5ad"
-            if [[ -f "$file" ]]; then
-                models+=("$method")
-            fi
-        done
-        
-        python src/metrics/ws_distance/consensus/script.py \
-            --dataset "$dataset" \
-            --models_dir "$models_dir" \
-            --ws_consensus "resources/grn_benchmark/prior/ws_consensus_${dataset}.csv" \
-            --tf_all "resources/grn_benchmark/prior/tf_all.csv" \
-            --evaluation_data_sc "resources/processed_data/${dataset}_evaluation_sc.h5ad" \
-            --models "${models[@]}"
-    fi
-    
-    echo ""
-    echo "Consensus completed for ${dataset}"
+    bash scripts/prior/run_consensus.sh --dataset "$dataset"
 }
 
 # Main execution
@@ -359,12 +266,11 @@ if [[ "$RUN_METRICS" == "true" ]]; then
         # echo "Looking in: $models_folder"
         
         # Check each method for this dataset
-        for method in "${GRN_METHODS[@]}"; do
+        for method in "${METHODS[@]}"; do
             prediction_file="${models_folder}/${dataset}.${method}.${method}.prediction.h5ad"
             
             if [[ -f "$prediction_file" ]]; then
                 submit_metric_job "$dataset" "$method" "$prediction_file"
-                # echo "  Submitting job: ${dataset}_${method}"
                 ((job_count++))
             else
                 echo "  [NOT FOUND] ${prediction_file}"

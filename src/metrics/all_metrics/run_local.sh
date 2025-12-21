@@ -77,7 +77,7 @@ fi
 #   exit 1
 # fi
 
-source src/utils/dataset_config.env
+source src/utils/config.env
 cell_type_var="CELLTYPE_${dataset}"
 cell_type="${!cell_type_var}"
 

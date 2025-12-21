@@ -4,6 +4,88 @@ This file centralizes the grouping specifications used across metrics.
 
 METHODS = ['positive_control', 'pearson_corr', 'grnboost', 'ppcor', 'portia', 'scenic', 'geneformer', 'scgpt', 'ppcor', 'scenicplus', 'celloracle', 'figr', 'granie', 'scglue', 'scprint',  'negative_control']
 
+
+
+DATASET_INFO = {
+        "op": {
+            "cell_type": "PBMC",
+            "perturbation_type": "Drugs",
+            "Inference data": " sc",
+            'Measurement time': "24 hours",
+            "Modality": 'Multiomics'
+        },
+        "ibd_uc": {
+            "cell_type": "PBMC",
+            "perturbation_type": "Chemicals/ bacteria",
+            "Inference data": "sc",
+            'Measurement time': "24 hours",
+            "Modality": 'Multiomics'
+        },
+        "ibd_cd": {
+            "cell_type": "PBMC",
+            "perturbation_type": "Chemicals/ bacteria",
+            "Inference data": "sc",
+            'Measurement time': "24 hours",
+            "Modality": 'Multiomics'
+        },
+        "300BCG": {
+            "cell_type": "PBMC",
+            "perturbation_type": "Chemicals",
+            "Inference data": "sc",
+            'Measurement time': 'T0 and 3 months',
+            "Modality": 'Transcriptmoics'
+        },
+        "parsebioscience": {
+            "cell_type": "PBMC",
+            "perturbation_type": "Cytokines",
+            "Inference data": " sc/bulk",
+            'Measurement time': "24 hours",
+            "Modality": 'Transcriptmoics'
+        },
+        "xaira_HEK293T": {
+            "cell_type": "HEK293T",
+            "perturbation_type": "Knockout",
+            "Inference data": " sc/bulk",
+            'Measurement time': "7 days",
+            "Modality": 'Transcriptmoics'
+        },
+        "xaira_HCT116": {
+            "cell_type": "HCT116",
+            "perturbation_type": "Knockout",
+            "Inference data": " sc/bulk",
+            'Measurement time': "7 days",
+            "Modality": 'Transcriptmoics'
+        },
+        "replogle": {
+            "cell_type": "K562",
+            "perturbation_type": "Knockout",
+            "Inference data": " sc/bulk",
+            'Measurement time': "7 days",
+            "Modality": 'Transcriptmoics'
+        },
+        "nakatake": {
+            "cell_type": "SEES3 (PSC)",
+            "perturbation_type": "Overexpression",
+            "Inference data": "bulk",
+            'Measurement time': "2 days",
+            "Modality": 'Transcriptmoics'
+        },
+        "norman": {
+            "cell_type": "K562",
+            "perturbation_type": "Activation",
+            "Inference data": "sc",
+            'Measurement time': "7 days",
+            "Modality": 'Transcriptmoics'
+        },
+        "adamson": {
+            "cell_type": "K562",
+            "perturbation_type": "Knockout",
+            "Inference data": "sc",
+            'Measurement time': "7 days",
+            "Modality": 'Transcriptmoics'
+        },
+    }
+
 DATASET_GROUPS = {
     "op": {
         "match": ["plate_name", "donor_id", "cell_type", "well"],
@@ -227,15 +309,22 @@ surrogate_names = {
     '300BCG': '300BCG'
     }
 
-def generate_config_env(output_path='src/utils/dataset_config.env'):
+def generate_config_env(output_path='src/utils/config.env'):
     """Generate a simple env-style config file with dataset-specific configurations."""
     
     with open(output_path, 'w') as f:
         f.write("# Auto-generated dataset configuration\n")
         f.write("# Format: DATASET_VARIABLE=value\n\n")
         
+        # Global lists
+        f.write("# Global lists (comma-separated)\n")
+        f.write(f'METHODS="{",".join(METHODS)}"\n')
+        f.write(f'METRICS="{",".join(METRICS)}"\n')
+        f.write(f'DATASETS="{",".join(DATASETS)}"\n')
+        f.write(f'FINAL_METRICS="{",".join(FINAL_METRICS)}"\n')
+        
         # Cell types
-        f.write("# Cell types\n")
+        f.write("\n# Cell types\n")
         for dataset, cell_type in DATASETS_CELLTYPES.items():
             var_name = f"CELLTYPE_{dataset}"
             f.write(f'{var_name}="{cell_type}"\n')
@@ -254,7 +343,7 @@ def generate_config_env(output_path='src/utils/dataset_config.env'):
 if __name__ == '__main__':
     import argparse
     parser = argparse.ArgumentParser(description='Generate dataset configuration')
-    parser.add_argument('--output', type=str, default='src/utils/dataset_config.env',
+    parser.add_argument('--output', type=str, default='src/utils/config.env',
                        help='Output path for the config file')
     args = parser.parse_args()
     

@@ -106,8 +106,8 @@ param_aws="s3://openproblems-data/resources/grn/results/params/${RUN_ID}_param_l
 
 # Generate and source config file
 echo "Generating dataset configuration..."
-python src/utils/config.py --output src/utils/dataset_config.env
-source src/utils/dataset_config.env
+python src/utils/config.py 
+source src/utils/config.env
 
 
 if [ "$RUN_LOCAL" = true ]; then
@@ -181,29 +181,13 @@ HERE
 if [ "$PREDICTION" != "none" ]; then
   append_entry "single_run" $PREDICTION "$DATASET"
 else
-  grn_names=(
-      "positive_control"
-      "pearson_corr"
-      "negative_control"
-      "spearman_corr"
-      "scglue"
-      "scenicplus"
-      "celloracle"
-      "granie"
-      "figr"
-      "grnboost"
-      "portia"
-      "scenic"
-      "scprint"
-      "geneformer"
-      "scgpt"
-  )
+  METHODS =(${METHODS//,/ })
   grn_models_folder="${resources_dir}/results/${models_folder}/"
   grn_models_folder_local="./resources/results/${models_folder}/" # just to control the hetergenity of the models for different datasets
 
   # Iterate over GRN models
   available_methods=()
-  for grn_name in "${grn_names[@]}"; do
+  for grn_name in "${METHODS[@]}"; do
     prediction_file="${grn_models_folder_local}/${DATASET}.${grn_name}.${grn_name}.prediction.h5ad"
     if [[ -f "${prediction_file}" ]]; then
       prediction_file=${grn_models_folder}/${DATASET}.${grn_name}.${grn_name}.prediction.h5ad
