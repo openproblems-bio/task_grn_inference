@@ -66,7 +66,7 @@ def normalize_func(adata, log_norm=True, pearson_residual=False, target_sum=1e4)
     import scipy.sparse as sp
     counts = adata.layers['counts'].copy() if 'counts' in adata.layers else adata.X.copy()
     adata.layers['counts'] = sp.csr_matrix(counts) if not sp.issparse(counts) else counts
-    assert sp.issparse(counts), "Counts matrix must be sparse."
+    assert sp.issparse(adata.layers['counts']), "Counts matrix must be sparse."
     print("min:", counts.min(), "max:", counts.max(), "mean:", counts.mean()) 
 
     if pearson_residual:

@@ -2,32 +2,83 @@
 # Local GRN Evaluation Script
 # This script evaluates all GRN predictions for all datasets using local SLURM jobs
 # 
-# Usage:
-#   bash src/local_workflows/run_evaluation.sh --output_dir <dir> --run_metrics true --process_results false
-#   After all jobs complete:
-#   bash src/local_workflows/run_evaluation.sh --output_dir <dir> --run_metrics false --process_results true
-
+# set -e
 # Default parameters
+RUN_CONSENSUS=false
 RUN_METRICS=false
-PROCESS_RESULTS=true
-OUTPUT_DIR="output/evaluation"
+PROCESS_RESULTS=false
+TEMP_DIR="output/evaluation"
+RESULTS_FILE="resources/results/all_scores.csv"
+
+
 LAYER="lognorm"
 NUM_WORKERS=20
+
+# get the arguments
+while [[ $# -gt 0 ]]; do
+    key="$1"
+
+    case $key in
+        --run_consensus)
+        RUN_CONSENSUS=true
+        shift
+        ;;
+        --no_run_consensus)
+        RUN_CONSENSUS=false
+        shift
+        ;;
+        --run_metrics)
+        RUN_METRICS=true
+        shift
+        ;;
+        --no_run_metrics)
+        RUN_METRICS=false
+        shift
+        ;;
+        --process_results)
+        PROCESS_RESULTS=true
+        shift
+        ;;
+        --no_process_results)
+        PROCESS_RESULTS=false
+        shift
+        ;;
+        --temp_dir)
+        TEMP_DIR="$2"
+        shift
+        shift
+        ;;
+        --results_file)
+        RESULTS_FILE="$2"
+        shift
+        shift
+        ;;
+        --num_workers)
+        NUM_WORKERS="$2"
+        shift
+        shift
+        ;;
+        *)
+        echo "Unknown option: $key"
+        exit 1
+        ;;
+    esac
+done
 
 
 echo "=========================================="
 echo "GRN Evaluation Configuration"
 echo "=========================================="
-echo "Output directory: $OUTPUT_DIR"
+echo "Run consensus: $RUN_CONSENSUS"
 echo "Run metrics: $RUN_METRICS"
+echo "Output directory: $TEMP_DIR"
+echo "Results file: $RESULTS_FILE"
 echo "Process results: $PROCESS_RESULTS"
 echo "Number of workers: $NUM_WORKERS"
 echo "=========================================="
 
 # Create output directory
-mkdir -p "$OUTPUT_DIR"
-mkdir -p "$OUTPUT_DIR/scores"
-mkdir -p "$OUTPUT_DIR/logs"
+mkdir -p "$TEMP_DIR"
 
 # Generate and source dataset configuration
 echo "Generating dataset configuration..."
@@ -36,6 +87,7 @@ source src/utils/dataset_config.env
 
 # Get list of datasets from config
 DATASETS=($(python -c "from src.utils.config import DATASET_GROUPS; print(' '.join(DATASET_GROUPS.keys()))"))
+# DATASETS=('norman')
 
 echo "Datasets to evaluate: ${DATASETS[@]}"
 
@@ -66,7 +118,7 @@ submit_metric_job() {
     local prediction_file=$3
     
     local job_name="${dataset}_${method}"
-    local score_file="${OUTPUT_DIR}/scores/${dataset}_${method}_score.h5ad"
+    local score_file="${TEMP_DIR}/${dataset}_${method}_score.h5ad"
     
     # Skip if score file already exists
     if [[ -f "$score_file" ]]; then
@@ -76,10 +128,9 @@ submit_metric_job() {
     
     echo "  Submitting job: ${job_name}"
     
+    
     sbatch \
         --job-name="${job_name}" \
-        --output="${OUTPUT_DIR}/logs/${job_name}_%j.out" \
-        --error="${OUTPUT_DIR}/logs/${job_name}_%j.err" \
         src/metrics/all_metrics/run_local.sh \
         --dataset "${dataset}" \
         --prediction "${prediction_file}" \
@@ -94,21 +145,30 @@ process_all_results() {
     echo "Processing Results"
     echo "=========================================="
     
-    local results_file="${OUTPUT_DIR}/all_scores.csv"
+    local results_file="${RESULTS_FILE}"
+    
+    # Get list of datasets for parsing
+    local datasets_list=$(python -c "from src.utils.config import DATASET_GROUPS; print(','.join(DATASET_GROUPS.keys()))")
     
     # Create Python script to aggregate results
-    python << 'EOF'
+    python - "$TEMP_DIR" "$RESULTS_FILE" "$datasets_list" << 'EOF'
 import sys
 import os
 import pandas as pd
 import anndata as ad
 from pathlib import Path
 
-output_dir = sys.argv[1]
-scores_dir = Path(output_dir) / "scores"
-results_file = Path(output_dir) / "all_scores.csv"
+temp_dir = sys.argv[1]
+results_file = sys.argv[2]
+datasets_str = sys.argv[3]
+scores_dir = Path(temp_dir)
+
+# Parse datasets list
+known_datasets = datasets_str.split(',')
 
 print(f"Looking for score files in: {scores_dir}")
+print(f"Will save results to: {results_file}")
+print(f"Known datasets: {known_datasets[:5]}...")
 
 all_results = []
 
@@ -117,13 +177,24 @@ for score_file in scores_dir.glob("*_score.h5ad"):
     try:
         # Parse filename: {dataset}_{method}_score.h5ad
         filename = score_file.stem  # Remove .h5ad
-        parts = filename.replace("_score", "").rsplit("_", 1)
         
-        if len(parts) != 2:
+        # Remove _score suffix
+        if filename.endswith('_score'):
+            filename = filename[:-6]  # Remove last 6 characters '_score'
+        
+        # Try to match against known datasets - find which dataset this file belongs to
+        dataset = None
+        method = None
+        
+        for ds in known_datasets:
+            if filename.startswith(ds + '_'):
+                dataset = ds
+                method = filename[len(ds) + 1:]  # Everything after dataset_
+                break
+        
+        if not dataset or not method:
             print(f"Warning: Could not parse filename {score_file.name}")
             continue
-        
-        dataset, method = parts
         
         # Load score file
         adata = ad.read_h5ad(score_file)
@@ -135,11 +206,17 @@ for score_file in scores_dir.glob("*_score.h5ad"):
             
             # Create row for each metric
             for metric_id, metric_value in zip(metric_ids, metric_values):
+                # Convert metric_value to float if it's a string
+                try:
+                    score_value = float(metric_value) if isinstance(metric_value, str) else metric_value
+                except (ValueError, TypeError):
+                    score_value = metric_value
+                
                 all_results.append({
                     'dataset': dataset,
                     'method': method,
                     'metric': metric_id,
-                    'score': metric_value
+                    'score': score_value
                 })
             
             print(f"Processed: {dataset} - {method} ({len(metric_ids)} metrics)")
@@ -160,7 +237,9 @@ if all_results:
         values='score'
     ).reset_index()
     
-    # Save results
+    # Save results (create directory if needed)
+    results_path = Path(results_file)
+    results_path.parent.mkdir(parents=True, exist_ok=True)
     df_wide.to_csv(results_file, index=False)
     print(f"\n{'='*50}")
     print(f"Results saved to: {results_file}")
@@ -171,13 +250,98 @@ if all_results:
     print(f"{'='*50}")
 else:
     print("No results found to process!")
-
 EOF
+}
+
+# Function to run consensus for a dataset
+run_consensus() {
+    local dataset=$1
     
-    python -c "$(cat)" "$OUTPUT_DIR"
+    echo ""
+    echo "=========================================="
+    echo "Running Consensus for Dataset: $dataset"
+    echo "=========================================="
+    
+    # Build list of available predictions
+    local models_dir="resources/results/${dataset}"
+    local predictions=()
+    
+    for method in "${GRN_METHODS[@]}"; do
+        local file="${models_dir}/${dataset}.${method}.${method}.prediction.h5ad"
+        if [[ -f "$file" ]]; then
+            predictions+=("$file")
+            echo "  Found: ${method}"
+        fi
+    done
+    
+    if [[ ${#predictions[@]} -eq 0 ]]; then
+        echo "  [WARNING] No prediction files found for ${dataset}"
+        return
+    fi
+    
+    echo "  Total predictions: ${#predictions[@]}"
+    
+    # Run Regression consensus
+    echo ""
+    echo "Running Regression consensus..."
+    python src/metrics/regression/consensus/script.py \
+        --dataset "$dataset" \
+        --regulators_consensus "resources/grn_benchmark/prior/regulators_consensus_${dataset}.json" \
+        --evaluation_data "resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad" \
+        --predictions "${predictions[@]}"
+    
+    # Run WS Distance consensus (only for applicable datasets)
+    local applicable_datasets=("norman" "adamson" "replogle" "xaira_HEK293T" "xaira_HCT116")
+    local skip=true
+    
+    for d in "${applicable_datasets[@]}"; do
+        if [[ "$dataset" == "$d" ]]; then
+            skip=false
+            break
+        fi
+    done
+    
+    if $skip; then
+        echo ""
+        echo "Skipping WS Distance consensus for ${dataset} (not applicable)"
+    else
+        echo ""
+        echo "Running WS Distance consensus..."
+        
+        # Extract model names for ws consensus
+        local models=()
+        for method in "${GRN_METHODS[@]}"; do
+            local file="${models_dir}/${dataset}.${method}.${method}.prediction.h5ad"
+            if [[ -f "$file" ]]; then
+                models+=("$method")
+            fi
+        done
+        
+        python src/metrics/ws_distance/consensus/script.py \
+            --dataset "$dataset" \
+            --models_dir "$models_dir" \
+            --ws_consensus "resources/grn_benchmark/prior/ws_consensus_${dataset}.csv" \
+            --tf_all "resources/grn_benchmark/prior/tf_all.csv" \
+            --evaluation_data_sc "resources/processed_data/${dataset}_evaluation_sc.h5ad" \
+            --models "${models[@]}"
+    fi
+    
+    echo ""
+    echo "Consensus completed for ${dataset}"
 }
 
 # Main execution
+if [[ "$RUN_CONSENSUS" == "true" ]]; then
+    echo ""
+    echo "=========================================="
+    echo "Running Consensus for All Datasets"
+    echo "=========================================="
+    
+    for dataset in "${DATASETS[@]}"; do
+        run_consensus "$dataset"
+    done
+fi
+
 if [[ "$RUN_METRICS" == "true" ]]; then
     echo ""
     echo "=========================================="
@@ -208,19 +372,6 @@ if [[ "$RUN_METRICS" == "true" ]]; then
         done
     done
     
-    echo ""
-    echo "=========================================="
-    echo "Summary"
-    echo "=========================================="
-    echo "Total jobs submitted: $job_count"
-    echo "Output directory: $OUTPUT_DIR"
-    echo ""
-    echo "Monitor jobs with: squeue -u \$USER"
-    echo "Check logs in: $OUTPUT_DIR/logs/"
-    echo ""
-    echo "Once all jobs complete, run:"
-    echo "  bash $0 --output_dir=$OUTPUT_DIR --run_metrics=false --process_results=true"
-    echo "=========================================="
 fi
 
 if [[ "$PROCESS_RESULTS" == "true" ]]; then

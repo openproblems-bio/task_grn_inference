@@ -29,6 +29,7 @@ except:
     sys.path.append(meta["resources_dir"])
 
 from helper_data import sum_by
+from helper_data import wrapper_large_perturbation_data, split_data_gene_perturbation, split_control_groups 
 
 
 def add_metadata(adata):
@@ -39,7 +40,7 @@ def add_metadata(adata):
     adata.uns['dataset_id'] = 'norman'
     adata.uns['dataset_name'] = 'Norman'
     adata.uns['dataset_organism'] = 'human'
-    adata.uns['normalization_id'] = 'X_norm'
+    adata.uns['normalization_id'] = 'lognorm'
     return adata
 
 if __name__ == '__main__':
@@ -62,48 +63,80 @@ if __name__ == '__main__':
     adata.var.index = adata.var.index.astype(str)
     adata.obs = adata.obs[['perturbation', 'is_control', 'perturbation_type']]
 
-    # preprocess  
-    sc.pp.filter_cells(adata, min_genes=100)
-    sc.pp.filter_genes(adata, min_cells=10)
+    # preprocess 
+    if False: 
+        sc.pp.filter_cells(adata, min_genes=100)
+        sc.pp.filter_genes(adata, min_cells=10)
 
-    # - 
-    adata.layers['X_norm'] = adata.X.copy()
+        # - 
+        adata.layers['X_norm'] = adata.X.copy()
 
-    # - split to inference and evaluation datasets
-    ctr_pertb = adata[adata.obs['is_control']].obs['perturbation'].unique()
-    non_ctr_pertubs =adata[~adata.obs['is_control']].obs['perturbation'].unique()
-    train_perturbs, test_perturbs = train_test_split(non_ctr_pertubs, test_size=.5, random_state=32)
-    train_perturbs = np.concatenate([train_perturbs, ctr_pertb]) # add control perturbations to test set for ws_distance
-    test_perturbs = np.concatenate([test_perturbs, ctr_pertb]) 
+        # - split to inference and evaluation datasets
+        ctr_pertb = adata[adata.obs['is_control']].obs['perturbation'].unique()
+        non_ctr_pertubs =adata[~adata.obs['is_control']].obs['perturbation'].unique()
+        train_perturbs, test_perturbs = train_test_split(non_ctr_pertubs, test_size=.5, random_state=32)
+        train_perturbs = np.concatenate([train_perturbs, ctr_pertb]) # add control perturbations to test set for ws_distance
+        test_perturbs = np.concatenate([test_perturbs, ctr_pertb]) 
 
-    adata_train_sc = adata[adata.obs['perturbation'].isin(train_perturbs)] 
-    adata_test_sc = adata[adata.obs['perturbation'].isin(test_perturbs)] 
+        adata_train_sc = adata[adata.obs['perturbation'].isin(train_perturbs)] 
+        adata_test_sc = adata[adata.obs['perturbation'].isin(test_perturbs)] 
 
 
-    # - filter genes and cells 
-    sc.pp.filter_cells(adata_train_sc, min_genes=100)
-    sc.pp.filter_genes(adata_train_sc, min_cells=10)
+        # - filter genes and cells 
+        sc.pp.filter_cells(adata_train_sc, min_genes=100)
+        sc.pp.filter_genes(adata_train_sc, min_cells=10)
 
-    sc.pp.filter_cells(adata_test_sc, min_genes=100)
-    sc.pp.filter_genes(adata_test_sc, min_cells=10)
+        sc.pp.filter_cells(adata_test_sc, min_genes=100)
+        sc.pp.filter_genes(adata_test_sc, min_cells=10)
 
-    # - pseudo bulk
-    adata_bulk = sum_by(adata, unique_mapping=True, col='perturbation') 
-    norman_test_bulk = sum_by(adata_test_sc, unique_mapping=True, col='perturbation') # summing over X_norm 
+        # - pseudo bulk
+        adata_bulk = sum_by(adata, unique_mapping=True, col='perturbation') 
+        norman_test_bulk = sum_by(adata_test_sc, unique_mapping=True, col='perturbation') # summing over X_norm 
 
-    # - normalize evaluation data
-    norman_test_bulk.layers['X_norm'] = norman_test_bulk.X.copy()
-    adata_train_sc.layers['X_norm'] = adata_train_sc.X.copy()
-    adata_bulk.layers['X_norm'] = adata_bulk.X.copy()
+        # - normalize evaluation data (proper log normalization to avoid overflow)
+        # For pseudobulk data, normalize and log transform
+        sc.pp.normalize_total(norman_test_bulk, target_sum=1e4)
+        sc.pp.log1p(norman_test_bulk)
+        norman_test_bulk.layers['X_norm'] = norman_test_bulk.X.copy()
+        
+        sc.pp.normalize_total(adata_bulk, target_sum=1e4)
+        sc.pp.log1p(adata_bulk)
+        adata_bulk.layers['X_norm'] = adata_bulk.X.copy()
+        
+        # For single-cell data, just copy (already filtered and should be reasonable)
+        adata_train_sc.layers['X_norm'] = adata_train_sc.X.copy()
+        adata_test_sc.layers['X_norm'] = adata_test_sc.X.copy()
 
-    # - add metadata
-    adata_bulk = add_metadata(adata_bulk)
-    norman_test_bulk = add_metadata(norman_test_bulk)
-    adata_test_sc = add_metadata(adata_test_sc)
-    adata_train_sc = add_metadata(adata_train_sc)
-    # - save 
-    print('saving...')
-    adata_bulk.write(par['norman_bulk'])
-    adata_test_sc.write(par['norman_test_sc'])
-    norman_test_bulk.write(par['norman_test_bulk'])
-    adata_train_sc.write(par['norman_train_sc'])
+        # - clean infinity values from all layers
+        for adata_obj, name in [(norman_test_bulk, 'norman_test_bulk'), 
+                                (adata_train_sc, 'adata_train_sc'), 
+                                (adata_bulk, 'adata_bulk'),
+                                (adata_test_sc, 'adata_test_sc')]:
+            for layer_name in adata_obj.layers.keys():
+                layer_data = adata_obj.layers[layer_name]
+                if csr_matrix is not None and isinstance(layer_data, csr_matrix):
+                    layer_data = layer_data.toarray()
+                if np.any(np.isinf(layer_data)):
+                    print(f"Warning: Found {np.sum(np.isinf(layer_data))} infinity values in {name}.layers['{layer_name}']. Replacing with 0.")
+                    layer_data[np.isinf(layer_data)] = 0
+                    adata_obj.layers[layer_name] = csr_matrix(layer_data) if isinstance(adata_obj.layers[layer_name], csr_matrix) else layer_data
+
+        # - add metadata
+        adata_bulk = add_metadata(adata_bulk)
+        norman_test_bulk = add_metadata(norman_test_bulk)
+        adata_test_sc = add_metadata(adata_test_sc)
+        adata_train_sc = add_metadata(adata_train_sc)
+        # - save 
+        print('saving...')
+        adata_bulk.write(par['norman_bulk'])
+        adata_test_sc.write(par['norman_test_sc'])
+        norman_test_bulk.write(par['norman_test_bulk'])
+        adata_train_sc.write(par['norman_train_sc'])
+    else:
+        adata = split_control_groups(adata, perturbation_col='perturbation', control_flag_col='is_control', new_col='control_split')
+
+        wrapper_large_perturbation_data(adata, split_func=split_data_gene_perturbation,
+            covariates=['perturbation', 'control_split'], 
+            qc_perturbation_effect=False,
+            add_metadata=add_metadata,
+            save_name='norman')
