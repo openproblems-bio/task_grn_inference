@@ -1,13 +1,16 @@
 Datasets
 ========
-The list of datasets integrated into geneRNIB is provided below with their perturbation signatures as well as the type of perturbation used in each dataset.
+The list of datasets integrated into geneRNIB is provided below:
 
 .. image:: images/datasets.png
-   :width: 80%
+   :width: 50%
    :align: center
 ----
 
-All datasets provide RNA data, while the `OPSCA` and `IBD` datasets also includes scATAC data. 
+.. image:: images/table_datasets_summary.png
+   :width: 100%
+   :align: center
+----
 
 You need `awscli` to download the datasets. 
 

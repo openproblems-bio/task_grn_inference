@@ -23,8 +23,8 @@ while [[ $# -gt 0 ]]; do
         RUN_CONSENSUS=true
         shift
         ;;
-        --no_run_consensus)
-        RUN_CONSENSUS=false
+        --run_consensus)
+        RUN_CONSENSUS=true
         shift
         ;;
         --run_metrics)
