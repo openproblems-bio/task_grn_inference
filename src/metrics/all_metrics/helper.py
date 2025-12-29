@@ -13,7 +13,7 @@ from sem.helper import main as sem
 # from anchor_regression.helper import main as anchor_regression
 from tf_recovery.helper import main as tf_recovery
 from tf_binding.helper import main as tf_binding
-from rc_tf_act.helper import main as rc_tf_act
+from replicate_consistency.helper import main as replicate_consistency
 from vc.helper import main as vc
 from gs_recovery.helper import main as gs_recovery
 
@@ -26,7 +26,7 @@ METRIC_FUNCTIONS = {
     # 'anchor_regression': anchor_regression,
     'tf_recovery': tf_recovery,
     'tf_binding': tf_binding,
-    'rc_tf_act': rc_tf_act,
+    'replicate_consistency': replicate_consistency,
     'vc': vc,
     'gs_recovery': gs_recovery,
 }
