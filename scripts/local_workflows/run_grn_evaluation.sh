@@ -4,8 +4,8 @@
 # 
 # set -e
 # Default parameters
-RUN_CONSENSUS=false
-RUN_METRICS=false
+RUN_CONSENSUS=true
+RUN_METRICS=true
 PROCESS_RESULTS=false
 TEMP_DIR="output/evaluation"
 RESULTS_FILE="resources/results/all_scores.csv"

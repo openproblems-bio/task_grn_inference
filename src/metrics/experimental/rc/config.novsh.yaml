@@ -1,9 +1,9 @@
 __merge__: ../../api/comp_metric.yaml
 
-name: replica_consistency
+name: replicate_consistency
 namespace: "metrics"
 info:
-  label: Replica consistency
+  label: Replicate consistency
   summary: Calculates replica consistency scores
 
   

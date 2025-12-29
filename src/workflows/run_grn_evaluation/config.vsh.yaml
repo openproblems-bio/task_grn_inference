@@ -143,7 +143,7 @@ dependencies:
   - name: metrics/ws_distance
   - name: metrics/tf_recovery
   - name: metrics/vc
-  - name: metrics/rc_tf_act
+  - name: metrics/replicate_consistency
   - name: metrics/sem
   # - name: metrics/anchor_regression
   - name: metrics/tf_binding
