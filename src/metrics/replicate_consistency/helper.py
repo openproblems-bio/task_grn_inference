@@ -425,14 +425,14 @@ def main(par):
         consistency_scores_all.append(score)
     
     # Calculate average across all configurations
-    rc_tf_act_score = np.mean(consistency_scores_all)
+    replicate_consistency_score = np.mean(consistency_scores_all)
     
-    results_df = pd.DataFrame([{'rc_tf_act': rc_tf_act_score}])
+    results_df = pd.DataFrame([{'replicate_consistency': replicate_consistency_score}])
     
     # print("\n" + "="*60)
     # print("Final Summary:")
     # print("="*60)
-    # print(f"rc_tf_act (average across {n_configs} configurations): {rc_tf_act_score:.4f}")
+    # print(f"replicate_consistency (average across {n_configs} configurations): {replicate_consistency_score:.4f}")
     print(results_df.to_string(index=False))
     
     return results_df

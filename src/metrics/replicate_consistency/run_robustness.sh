@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=rc_tf_act_robustness
+#SBATCH --job-name=replicate_consistency_robustness
 #SBATCH --output=logs/robustness_%j.out
 #SBATCH --error=logs/robustness_%j.err
 #SBATCH --ntasks=1
@@ -13,7 +13,7 @@ set -euo pipefail
 # Configuration
 DATASET="op"
 METHOD="grnboost"
-OUTPUT_DIR="output/rc_tf_act/robustness"
+OUTPUT_DIR="output/replicate_consistency/robustness"
 
 # Input files
 PREDICTION="resources/results/${DATASET}/${DATASET}.${METHOD}.${METHOD}.prediction.h5ad"
@@ -32,7 +32,7 @@ echo "Output directory: ${OUTPUT_DIR}"
 echo ""
 
 # Run robustness analysis with different permutation types and degrees
-python src/metrics/rc_tf_act/analyze_robustness.py \
+python src/metrics/replicate_consistency/analyze_robustness.py \
     --prediction "${PREDICTION}" \
     --evaluation_data "${EVALUATION_DATA}" \
     --output_dir "${OUTPUT_DIR}" \

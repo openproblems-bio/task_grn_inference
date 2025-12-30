@@ -31,15 +31,15 @@ try:
     sys.path.append(meta["resources_dir"])
 except:
     meta = {
-        "resources_dir": 'src/metrics/rc_tf_act/',
+        "resources_dir": 'src/metrics/replicate_consistency/',
         "util_dir": 'src/utils',
-        'helper_dir': 'src/metrics/rc_tf_act/'
+        'helper_dir': 'src/metrics/replicate_consistency/'
     }
     sys.path.append(meta["resources_dir"])
     sys.path.append(meta["util_dir"])
     sys.path.append(meta["helper_dir"])
 
-from helper import main as main_rc_tf_act
+from helper import main as main_replicate_consistency
 from util import format_save_score
 
 
@@ -49,7 +49,7 @@ for key, value in vars(args).items():
         par[key] = value
 
 if __name__ == "__main__":
-    output = main_rc_tf_act(par)
+    output = main_replicate_consistency(par)
     
     dataset_id = ad.read_h5ad(par['evaluation_data'], backed='r').uns['dataset_id']
     method_id = ad.read_h5ad(par['prediction'], backed='r').uns['method_id']

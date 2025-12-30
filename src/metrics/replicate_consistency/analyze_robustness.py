@@ -1,10 +1,10 @@
 """
-Analyze robustness of rc_tf_act metric by permuting GRN directions at different intensities.
+Analyze robustness of replicate_consistency metric by permuting GRN directions at different intensities.
 
 This script:
 1. Loads a GRN prediction
 2. Permutes edge directions at different intensities (0%, 20%, 50%, 100%)
-3. Evaluates rc_tf_act metric for each permutation
+3. Evaluates replicate_consistency metric for each permutation
 4. Analyzes how the metric changes with increasing permutation
 """
 
@@ -17,10 +17,10 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 # Add paths
-sys.path.append('src/metrics/rc_tf_act')
+sys.path.append('src/metrics/replicate_consistency')
 sys.path.append('src/utils')
 
-from helper import main as main_rc_tf_act
+from helper import main as main_replicate_consistency
 from util import process_links
 
 
@@ -108,7 +108,7 @@ def permute_grn(prediction: pd.DataFrame, degree: float, noise_type: str) -> pd.
 
 def evaluate_permuted_grn(par, degree, noise_type, seed=42):
     """
-    Evaluate rc_tf_act metric on permuted GRN.
+    Evaluate replicate_consistency metric on permuted GRN.
     
     Parameters:
     -----------
@@ -155,7 +155,7 @@ def evaluate_permuted_grn(par, degree, noise_type, seed=42):
     par_eval['prediction'] = temp_file
     
     try:
-        scores = main_rc_tf_act(par_eval)
+        scores = main_replicate_consistency(par_eval)
         results = {
             'noise_type': noise_type,
             'degree': degree * 100,  # Convert to percentage
@@ -172,9 +172,9 @@ def evaluate_permuted_grn(par, degree, noise_type, seed=42):
         results = {
             'noise_type': noise_type,
             'degree': degree * 100,
-            'rc_tf_act_precision': np.nan,
-            'rc_tf_act_balanced': np.nan,
-            'rc_tf_act_recall': np.nan,
+            'replicate_consistency_precision': np.nan,
+            'replicate_consistency_balanced': np.nan,
+            'replicate_consistency_recall': np.nan,
             'n_edges': len(prediction),
             'n_edges_permuted': int(len(prediction) * degree)
         }
@@ -230,10 +230,10 @@ def analyze_robustness(par):
             results = evaluate_permuted_grn(par, degree, noise_type)
             all_results.append(results)
             # Print scores
-            if 'rc_tf_act_precision' in results:
-                print(f"  Precision: {results['rc_tf_act_precision']:.4f}, "
-                      f"Balanced: {results['rc_tf_act_balanced']:.4f}, "
-                      f"Recall: {results['rc_tf_act_recall']:.4f}")
+            if 'replicate_consistency_precision' in results:
+                print(f"  Precision: {results['replicate_consistency_precision']:.4f}, "
+                      f"Balanced: {results['replicate_consistency_balanced']:.4f}, "
+                      f"Recall: {results['replicate_consistency_recall']:.4f}")
     
     # Convert to DataFrame
     df_results = pd.DataFrame(all_results)
@@ -260,7 +260,7 @@ def analyze_robustness(par):
         if len(df_noise) >= 2:
             print(f"\n{noise_type}:")
             for metric in ['precision', 'balanced', 'recall']:
-                metric_col = f'rc_tf_act_{metric}'
+                metric_col = f'replicate_consistency_{metric}'
                 if metric_col in df_noise.columns:
                     drop = df_noise[metric_col].iloc[0] - df_noise[metric_col].iloc[-1]
                     print(f"  {metric.capitalize()} drop (0% → 100%): {drop:.4f}")
@@ -294,7 +294,7 @@ def create_robustness_plot(df_results, output_dir):
     
     for col_idx, metric in enumerate(metrics):
         ax = axes[col_idx]
-        metric_col = f'rc_tf_act_{metric}'
+        metric_col = f'replicate_consistency_{metric}'
         
         if metric_col in df_results.columns:
             for noise_type in noise_types:
@@ -321,7 +321,7 @@ def create_robustness_plot(df_results, output_dir):
 if __name__ == '__main__':
     import argparse
     
-    parser = argparse.ArgumentParser(description='Analyze rc_tf_act metric robustness')
+    parser = argparse.ArgumentParser(description='Analyze replicate_consistency metric robustness')
     parser.add_argument('--prediction', type=str, required=True,
                        help='Path to GRN prediction h5ad file')
     parser.add_argument('--evaluation_data', type=str, required=True,
