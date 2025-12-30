@@ -6,7 +6,7 @@
 # Default parameters
 RUN_CONSENSUS=false
 RUN_METRICS=false
-PROCESS_RESULTS=false
+PROCESS_RESULTS=true
 TEMP_DIR="output/evaluation"
 RESULTS_FILE="resources/results/all_scores.csv"
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=rc_tf_act_global
+#SBATCH --job-name=replicate_consistency_global
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
@@ -15,7 +15,7 @@ set -euo pipefail
 # Global GRN evaluation - only op and 300BCG datasets
 datasets=('op' '300BCG')
 
-save_dir='output/rc_tf_act'
+save_dir='output/replicate_consistency'
 mkdir -p "$save_dir"
 
 # Global GRN files location
@@ -39,10 +39,10 @@ for dataset in "${datasets[@]}"; do
         filename=$(basename "$prediction")
         method=$(echo "$filename" | sed "s/${dataset}\.//" | sed 's/\.h5ad$//' | sed 's/\.csv$//')
         
-        score="${save_dir}/rc_tf_act_${dataset}_${method//[:\/]/_}.h5ad"
+        score="${save_dir}/replicate_consistency_${dataset}_${method//[:\/]/_}.h5ad"
 
         echo -e "\nProcessing method: $method\n"
-        python src/metrics/rc_tf_act/script.py \
+        python src/metrics/replicate_consistency/script.py \
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
             --score "$score"

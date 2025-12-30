@@ -1,6 +1,6 @@
 __merge__: ../../api/comp_metric.yaml
 
-name: rc_tf_act
+name: replicate_consistency
 namespace: "metrics"
 info:
   label: Replica Consistency TF Activity

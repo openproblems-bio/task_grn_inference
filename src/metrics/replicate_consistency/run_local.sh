@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=rc_tf_act
+#SBATCH --job-name=replicate_consistency
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
@@ -12,7 +12,7 @@
 
 set -euo pipefail
 
-save_dir="output/rc_tf_act"
+save_dir="output/replicate_consistency"
 mkdir -p "$save_dir"
     
 # Datasets to process (only those with rc_tf_ac grouping defined)
@@ -33,7 +33,7 @@ for dataset in "${datasets[@]}"; do
 
     for method in "${methods[@]}"; do
         prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
-        score="${save_dir}/rc_tf_act_${dataset}_${method}.h5ad"
+        score="${save_dir}/replicate_consistency_${dataset}_${method}.h5ad"
 
         if [[ ! -f "$prediction" ]]; then
             echo "File not found: $prediction, skipping..."
@@ -41,7 +41,7 @@ for dataset in "${datasets[@]}"; do
         fi
 
         echo -e "\nProcessing method: $method\n"
-        python src/metrics/rc_tf_act/script.py \
+        python src/metrics/replicate_consistency/script.py \
             --prediction "$prediction" \
             --evaluation_data "$evaluation_data" \
             --score "$score" \

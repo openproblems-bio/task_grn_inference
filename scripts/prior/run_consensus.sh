@@ -67,7 +67,7 @@ printf '%s\n' "${predictions[@]}"
 echo "Running consensus for Regression"
 datasets=(${DATASET})
 for dataset in "${datasets[@]}"; do
-    echo "Running reg2 consensus for dataset: $dataset"
+    echo "Running regression consensus for dataset: $dataset"
     
     python src/metrics/regression/consensus/script.py \
         --dataset "$dataset" \
