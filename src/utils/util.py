@@ -124,6 +124,7 @@ def verbose_tqdm(iterable, desc, level, verbose_level):
 def basic_qc(
     adata, min_genes_per_cell=200, max_genes_per_cell=5000, min_cells_per_gene=10
 ):
+
     mt = adata.var_names.str.startswith("MT-")
     print("shape before ", adata.shape)
     # 1. stats
@@ -135,6 +136,10 @@ def basic_qc(
     high_gene_filter = n_genes_by_counts > max_genes_per_cell
     # mt_filter = mt_frac > max_mt_frac
 
+    if False:
+        print(
+            f"Cells  after filtering for low_gene: {(~low_gene_filter).sum()}, high_gene: {(~high_gene_filter).sum()}", flush=True
+        )
     # 2. Filter cells
     # print(f'Number of cells removed: below min gene {low_gene_filter.sum()}, exceed max gene {high_gene_filter.sum()}')
     mask_cells = (~low_gene_filter) & (~high_gene_filter)

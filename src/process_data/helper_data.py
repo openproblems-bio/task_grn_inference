@@ -622,8 +622,7 @@ def bulkify_func(adata, cell_count_t=10, covariates=['cell_type', 'donor_id', 'a
     # adata.obs['sum_by'] = '_' + adata.obs['cell_type'].astype(str) + '_' + adata.obs['donor_id'].astype(str) + '_' + adata.obs['age'].astype(str) 
     adata.obs['sum_by'] = adata.obs['sum_by'].astype('category')
     adata_bulk = sum_by(adata, 'sum_by', unique_mapping=True)
-    cell_count_df = adata.obs.groupby('sum_by').size().reset_index(name='cell_count')
-    adata_bulk.obs = adata_bulk.obs.merge(cell_count_df, on='sum_by')
+    # cell_count is already added by sum_by function
     adata_bulk = adata_bulk[adata_bulk.obs['cell_count']>=cell_count_t]
     return adata_bulk
 
