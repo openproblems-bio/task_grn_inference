@@ -67,7 +67,7 @@ def normalize_func(adata, log_norm=True, pearson_residual=False, target_sum=1e4)
     counts = adata.layers['counts'].copy() if 'counts' in adata.layers else adata.X.copy()
     adata.layers['counts'] = sp.csr_matrix(counts) if not sp.issparse(counts) else counts
     assert sp.issparse(adata.layers['counts']), "Counts matrix must be sparse."
-    print("min:", counts.min(), "max:", counts.max(), "mean:", counts.mean()) 
+    # print("min:", counts.min(), "max:", counts.max(), "mean:", counts.mean()) 
 
     if pearson_residual:
         sc.experimental.pp.normalize_pearson_residuals(adata)
@@ -621,9 +621,14 @@ def bulkify_func(adata, cell_count_t=10, covariates=['cell_type', 'donor_id', 'a
         adata.obs['sum_by'] += '_' + adata.obs[covariate].astype(str)
     # adata.obs['sum_by'] = '_' + adata.obs['cell_type'].astype(str) + '_' + adata.obs['donor_id'].astype(str) + '_' + adata.obs['age'].astype(str) 
     adata.obs['sum_by'] = adata.obs['sum_by'].astype('category')
+
     adata_bulk = sum_by(adata, 'sum_by', unique_mapping=True)
+
     cell_count_df = adata.obs.groupby('sum_by').size().reset_index(name='cell_count')
+    if 'cell_count' in adata_bulk.obs:
+        adata_bulk.obs.drop('cell_count', axis=1, inplace=True)
     adata_bulk.obs = adata_bulk.obs.merge(cell_count_df, on='sum_by')
+
     adata_bulk = adata_bulk[adata_bulk.obs['cell_count']>=cell_count_t]
     return adata_bulk
 

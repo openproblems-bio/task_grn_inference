@@ -54,8 +54,6 @@ for dataset in ["replogle", "xaira_HEK293T", "xaira_HCT116"]:
     adata.X = adata.layers[layer]
     adata.X = adata.X.toarray() if not isinstance(adata.X, np.ndarray) else adata.X
 
-
-
     def wrapper_de_analysis(adata):
         # Cache control subset
         ctrl = adata[adata.obs['is_control']].copy()
