@@ -16,7 +16,6 @@ datasets_raw/
 state*
 trace*
 tw*
-__init__*
 .ipynb_checkpoints
 __pycache__/
 
