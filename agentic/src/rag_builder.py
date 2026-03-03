@@ -42,11 +42,30 @@ from llama_index.core import (
     SimpleDirectoryReader,
     StorageContext,
     load_index_from_storage,
+    Settings,
 )
+
+
+def _configure_embed_model():
+    """Set LlamaIndex embedding model to match the configured LLM provider.
+
+    - openai    → OpenAI text-embedding-3-small
+    - anthropic → local HuggingFace BAAI/bge-small-en-v1.5
+      (Anthropic has no embedding API, so we use a local model)
+    """
+    from config import LLM_PROVIDER
+    if LLM_PROVIDER.lower() == "openai":
+        from llama_index.embeddings.openai import OpenAIEmbedding
+        Settings.embed_model = OpenAIEmbedding(model="text-embedding-3-small")
+    else:
+        from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+        Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
 
 
 def _build_index(source_dir: Path, persist_dir: Path, label: str, **reader_kwargs) -> VectorStoreIndex:
     """Shared helper: load from cache or build from source_dir."""
+    _configure_embed_model()
+
     if not source_dir.exists():
         raise ValueError(f"{label} folder not found at {source_dir}")
 
