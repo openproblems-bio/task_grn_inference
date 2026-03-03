@@ -62,6 +62,12 @@ def _configure_embed_model():
         Settings.embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
 
 
+def _embed_model_tag() -> str:
+    """Return a short string identifying the current embed model."""
+    from config import LLM_PROVIDER
+    return "openai:text-embedding-3-small" if LLM_PROVIDER.lower() == "openai" else "hf:BAAI/bge-small-en-v1.5"
+
+
 def _build_index(source_dir: Path, persist_dir: Path, label: str, **reader_kwargs) -> VectorStoreIndex:
     """Shared helper: load from cache or build from source_dir."""
     _configure_embed_model()
@@ -70,9 +76,17 @@ def _build_index(source_dir: Path, persist_dir: Path, label: str, **reader_kwarg
         raise ValueError(f"{label} folder not found at {source_dir}")
 
     if persist_dir and persist_dir.exists():
-        print(f"Loading cached {label} index from {persist_dir}")
-        storage_context = StorageContext.from_defaults(persist_dir=str(persist_dir))
-        return load_index_from_storage(storage_context)
+        import json, shutil
+        meta_file = persist_dir / "embed_model.json"
+        cached_tag = json.loads(meta_file.read_text())["model"] if meta_file.exists() else None
+        current_tag = _embed_model_tag()
+        if cached_tag != current_tag:
+            print(f"Embed model changed ({cached_tag} → {current_tag}), rebuilding {label} index …")
+            shutil.rmtree(persist_dir)
+        else:
+            print(f"Loading cached {label} index from {persist_dir}")
+            storage_context = StorageContext.from_defaults(persist_dir=str(persist_dir))
+            return load_index_from_storage(storage_context)
 
     print(f"Building {label} index from {source_dir}")
     documents = SimpleDirectoryReader(str(source_dir), **reader_kwargs).load_data()
@@ -86,8 +100,10 @@ def _build_index(source_dir: Path, persist_dir: Path, label: str, **reader_kwarg
         raise
 
     if persist_dir:
+        import json
         persist_dir.mkdir(parents=True, exist_ok=True)
         index.storage_context.persist(persist_dir=str(persist_dir))
+        (persist_dir / "embed_model.json").write_text(json.dumps({"model": _embed_model_tag()}))
         print(f"  {label.capitalize()} index persisted to {persist_dir}")
 
     return index
