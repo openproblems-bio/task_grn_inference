@@ -1,8 +1,9 @@
 """
 GeneRNBI orchestrating agent — powered by Biomni A1.
 
-Two tools:
-  - search_docs:        RAG over agentic/docs/ (API spec, datasets, integration guide)
+Three tools:
+  - search_docs:        RAG over docs/source/ (API spec, datasets, integration guide)
+  - search_viash:       RAG over viash.io/guide + /reference (Viash/Docker/Nextflow)
   - search_manuscript:  RAG over the benchmark manuscript PDF (paper content)
 """
 
@@ -17,6 +18,7 @@ from rag_builder import (
     _missing_key_error,
     get_or_build_docs_index,
     get_or_build_manuscript_index,
+    get_or_build_viash_index,
 )
 
 _SOURCE_MAP = {"openai": "OpenAI", "anthropic": "Anthropic"}
@@ -58,6 +60,27 @@ _SEARCH_MANUSCRIPT_SCHEMA = {
             "name": "query",
             "type": "str",
             "description": "Question about the manuscript content.",
+            "default": None,
+        }
+    ],
+    "optional_parameters": [],
+}
+
+_SEARCH_VIASH_SCHEMA = {
+    "name": "search_viash",
+    "description": (
+        "Search the official Viash documentation (viash.io/guide and viash.io/reference) "
+        "for information about Viash component configuration, Docker engine setup, "
+        "Nextflow runner, argument types, resources, test benches, and CLI commands. "
+        "Use this tool when the user has a Viash, Docker, or Nextflow related question "
+        "during integration or troubleshooting — especially for config.vsh.yaml syntax, "
+        "engine/runner setup, or Viash CLI usage."
+    ),
+    "required_parameters": [
+        {
+            "name": "query",
+            "type": "str",
+            "description": "Question about Viash, Docker, or Nextflow.",
             "default": None,
         }
     ],
@@ -123,6 +146,32 @@ def _build_docs_search_fn(index, li_llm):
     return _search
 
 
+def _build_viash_search_fn(index, li_llm):
+    """Direct retriever for viash.io docs — returns top chunks with source URLs."""
+    retriever = index.as_retriever(similarity_top_k=8)
+
+    def _search(query: str) -> str:
+        try:
+            nodes = retriever.retrieve(query)
+            if not nodes:
+                result = "No relevant content found in viash.io docs."
+            else:
+                parts = []
+                for node in nodes:
+                    url = node.metadata.get("url", "")
+                    header = f"[Source: {url}]\n" if url else ""
+                    parts.append(header + node.get_content())
+                result = "\n\n---\n\n".join(parts)
+            print(result)
+            return result
+        except Exception as e:
+            err = f"Error searching viash docs: {e}"
+            print(err)
+            return err
+
+    return _search
+
+
 def _build_manuscript_search_fn(index, li_llm, n_subqueries: int = 3):
     """Parallel multi-query search for manuscript (large PDF, sub-query expansion helps)."""
     from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -180,9 +229,11 @@ You are the GeneRNBI Assistant — the primary interface for the GeneRNBI GRN be
 STRICT RULES — FOLLOW THESE EXACTLY
 ══════════════════════════════════════════════════════
 
-1. You have EXACTLY TWO tools: search_docs and search_manuscript.
-   - ALWAYS call search_docs FIRST for ANY question about datasets, methods,
-     metrics, file formats, or integration.
+1. You have EXACTLY THREE tools: search_docs, search_viash, and search_manuscript.
+   - ALWAYS call search_docs FIRST for questions about datasets, methods, metrics,
+     file formats, or benchmark integration.
+   - Call search_viash for any Viash config syntax, Docker, or Nextflow question —
+     especially during integration troubleshooting.
    - ONLY call search_manuscript when the user asks about the paper's findings,
      results, or scientific motivation.
 
@@ -199,13 +250,20 @@ STRICT RULES — FOLLOW THESE EXACTLY
 TOOL USAGE
 ══════════════════════════════════════════════════════
 
-search_docs  — Use for ALL technical questions:
+search_docs  — Use for ALL technical questions about this benchmark:
   • Datasets available (names, formats, which metrics apply)
   • How to add a new method or metric (file structure, config.vsh.yaml format)
-  • Viash component format (arguments, types, directions, __merge__ field)
   • API spec and file formats (h5ad, csv, gmt, etc.)
   • Which GRN methods and metrics are currently available
   Usage:  result = search_docs('your question'); print(result)
+
+search_viash  — Use for Viash/Docker/Nextflow questions:
+  • config.vsh.yaml syntax (engines, runners, resources, arguments)
+  • Docker engine setup (pythonRequirements, aptRequirements, etc.)
+  • Nextflow runner configuration
+  • Viash CLI commands and troubleshooting
+  • Any error involving Viash, Docker image builds, or Nextflow pipelines
+  Usage:  result = search_viash('your question'); print(result)
 
 search_manuscript  — ONLY for paper-level content:
   • Experimental results and benchmarking findings
@@ -226,7 +284,7 @@ def initialize_agent(
     model_id: str = None,
     llm_provider: str = None,
 ):
-    """Build indices and return an A1 orchestrator with two RAG tools."""
+    """Build indices and return an A1 orchestrator with three RAG tools."""
     load_dotenv()
 
     provider = (llm_provider or LLM_PROVIDER).lower()
@@ -249,6 +307,9 @@ def initialize_agent(
 
     print("Building docs index...")
     docs_index = get_or_build_docs_index(docs_dir, use_cache=use_cache)
+
+    print("Building viash.io index...")
+    viash_index = get_or_build_viash_index(use_cache=use_cache)
 
     print("Building manuscript index...")
     manuscript_index = get_or_build_manuscript_index(data_dir, use_cache=use_cache)
@@ -278,11 +339,20 @@ def initialize_agent(
     search_docs_fn = _build_docs_search_fn(docs_index, _li_llm)
     search_docs_fn.__doc__ = (
         "Search GeneRNBI documentation for integration guides, API formats, "
-        "Viash component structure, dataset info, and framework usage.\n\n"
+        "dataset info, and framework usage.\n\n"
         "Args:\n    query (str): Any technical or integration question.\n\n"
         "Returns:\n    str: Answer from the documentation."
     )
     search_docs_fn.__name__ = "search_docs"
+
+    search_viash_fn = _build_viash_search_fn(viash_index, _li_llm)
+    search_viash_fn.__doc__ = (
+        "Search viash.io documentation for Viash config syntax, Docker engine setup, "
+        "Nextflow runner configuration, argument types, and Viash CLI usage.\n\n"
+        "Args:\n    query (str): Question about Viash, Docker, or Nextflow.\n\n"
+        "Returns:\n    str: Answer from viash.io docs."
+    )
+    search_viash_fn.__name__ = "search_viash"
 
     search_manuscript_fn = _build_manuscript_search_fn(manuscript_index, _li_llm)
     search_manuscript_fn.__doc__ = (
@@ -294,6 +364,7 @@ def initialize_agent(
     search_manuscript_fn.__name__ = "search_manuscript"
 
     _register_tool(a1, search_docs_fn, _SEARCH_DOCS_SCHEMA)
+    _register_tool(a1, search_viash_fn, _SEARCH_VIASH_SCHEMA)
     _register_tool(a1, search_manuscript_fn, _SEARCH_MANUSCRIPT_SCHEMA)
 
     a1.configure()
