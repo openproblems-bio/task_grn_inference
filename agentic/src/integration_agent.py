@@ -177,7 +177,7 @@ def create_integration_agent(
     else:
         raise ValueError(f"Unsupported LLM provider: {llm_provider}")
 
-    docs_engine = docs_index.as_query_engine(similarity_top_k=5)
+    docs_engine = docs_index.as_query_engine(similarity_top_k=5, llm=llm)
 
     def search_docs(query: str) -> str:
         """Search GeneRNBI/benchmark documentation for pipeline usage,

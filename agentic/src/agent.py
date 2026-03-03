@@ -90,14 +90,15 @@ def _register_tool(a1, fn, schema: dict):
 
 
 
-def _build_search_manuscript_fn(manuscript_index, llm_complete_fn):
+def _build_search_manuscript_fn(manuscript_index, li_llm):
     """Return a sync search_manuscript callable bound to the given index."""
     from llama_index.core.response_synthesizers import get_response_synthesizer
     from llama_index.core.prompts import PromptTemplate
 
     base_engine = manuscript_index.as_query_engine(
         similarity_top_k=15,
-        response_synthesizer=get_response_synthesizer(response_mode="tree_summarize"),
+        llm=li_llm,
+        response_synthesizer=get_response_synthesizer(response_mode="tree_summarize", llm=li_llm),
     )
 
     _EXPAND_TMPL = PromptTemplate(
@@ -122,7 +123,7 @@ def _build_search_manuscript_fn(manuscript_index, llm_complete_fn):
             str: Comprehensive answer drawn from the manuscript.
         """
         try:
-            expansion = llm_complete_fn(_EXPAND_TMPL.format(question=query))
+            expansion = li_llm.complete(_EXPAND_TMPL.format(question=query)).text
             sub_questions = [q.strip() for q in expansion.strip().splitlines() if q.strip()]
             queries = [query] + sub_questions[:5]
 
@@ -235,13 +236,10 @@ def initialize_agent(
         from llama_index.llms.anthropic import Anthropic as LIAnthropic
         _li_llm = LIAnthropic(model=model)
 
-    def _llm_complete(prompt_str: str) -> str:
-        return _li_llm.complete(prompt_str).text
-
     # Register tools — clear default biomni tools first to keep system prompt compact
     print("Registering tools...")
     a1.module2api = {}  # remove all biomni built-in tools
-    search_fn = _build_search_manuscript_fn(manuscript_index, _llm_complete)
+    search_fn = _build_search_manuscript_fn(manuscript_index, _li_llm)
     integration_fn = _build_call_integration_agent_fn(integration_ag)
 
     _register_tool(a1, search_fn, _SEARCH_MANUSCRIPT_SCHEMA)
