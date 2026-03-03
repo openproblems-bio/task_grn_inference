@@ -241,8 +241,9 @@ def initialize_agent(
         _missing_key_error()
 
     agentic_root = Path(__file__).parent.parent
+    repo_root = agentic_root.parent
     if docs_dir is None:
-        docs_dir = agentic_root / "docs"
+        docs_dir = repo_root / "docs" / "source"
     if data_dir is None:
         data_dir = agentic_root / "data"
 
