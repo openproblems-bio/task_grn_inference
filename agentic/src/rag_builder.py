@@ -1,6 +1,7 @@
 """
-Build and manage the manuscript RAG index.
+Build and manage RAG indices.
 
+  - docs index:       indexes agentic/docs/ (markdown documentation)
   - manuscript index: indexes agentic/data/ (PDF manuscript)
 """
 
@@ -106,6 +107,12 @@ def _build_index(source_dir: Path, persist_dir: Path, label: str, **reader_kwarg
         print(f"  {label.capitalize()} index persisted to {persist_dir}")
 
     return index
+
+
+def get_or_build_docs_index(docs_dir: Path, use_cache: bool = True) -> VectorStoreIndex:
+    """Build or load the docs index (agentic/docs/)."""
+    persist_dir = Path(__file__).parent.parent / ".index_cache" / "docs" if use_cache else None
+    return _build_index(docs_dir, persist_dir, label="docs", recursive=True)
 
 
 def get_or_build_manuscript_index(data_dir: Path, use_cache: bool = True) -> VectorStoreIndex:
