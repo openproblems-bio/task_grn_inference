@@ -223,7 +223,17 @@ RULE 2 — IMPLEMENTATION TASKS: CREATE REAL FILES ON DISK.
     a) Call search_docs first to get the exact file conventions.
     b) Write script.py to disk using Python open() or pathlib.
     c) Write config.vsh.yaml to disk using Python open() or pathlib.
-    d) Run the viash test command via subprocess or os.system.
+    d) Run viash commands using subprocess.run() — NEVER os.system().
+       ALWAYS capture output so you can see errors:
+         import subprocess
+         result = subprocess.run(
+             ["viash", "test", "path/to/config.vsh.yaml"],
+             capture_output=True, text=True
+         )
+         print(result.stdout)
+         print(result.stderr)
+       Read the output. If it contains "ERROR" or "failed", report the error.
+       NEVER claim success if the output contains an error message.
   Do NOT just print code. Do NOT just describe steps. CREATE the files.
 
 RULE 3 — USE EXACTLY THE GENERNIBI FORMAT (from search_docs output).
@@ -234,6 +244,11 @@ RULE 3 — USE EXACTLY THE GENERNIBI FORMAT (from search_docs output).
 RULE 4 — NEVER SKIP STEPS.
   If you are asked to "write and run" something, you must do both:
   create the files AND execute viash test.
+
+RULE 5 — REPORT FAILURES HONESTLY.
+  If a command fails (Docker not running, missing file, import error, etc.),
+  say exactly what failed and why. Never claim "tested successfully" if there
+  was an error in the output.
 
 ══════════════════════════════════════════════════════
 KNOWN FILE TEMPLATES (use these as starting points)
