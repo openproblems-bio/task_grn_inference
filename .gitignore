@@ -30,3 +30,8 @@ work
 # IDE related
 .idea
 .vscode
+
+# agentic secrets
+agentic/.env
+agentic/.index_cache/
+agentic/.biomni_data/

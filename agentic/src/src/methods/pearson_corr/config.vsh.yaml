@@ -1,0 +1,29 @@
+
+__merge__: /src/api/comp_method.yaml
+
+name: pearson_corr
+namespace: "grn_methods"
+info:
+  label: "Pearson Correlation"
+  summary: "Infer gene regulatory networks using Pearson correlation."
+  description: |
+    This method uses Pearson correlation to infer gene regulatory networks by calculating the correlation between expression levels of transcription factors and target genes.
+  documentation_url: # optional
+
+resources:
+  - type: python_script
+    path: script.py
+
+engines:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    __merge__: /src/api/base_requirements.yaml
+    setup:
+      - type: python
+        packages: [ numpy, pandas, anndata ]
+
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [midtime, midmem, midcpu]
