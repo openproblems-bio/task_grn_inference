@@ -1,10 +1,9 @@
 """
 GeneRNBI orchestrating agent — powered by Biomni A1.
 
-Three tools:
-  - search_docs:        RAG over docs/source/ (API spec, datasets, integration guide)
-  - search_viash:       RAG over viash.io/guide + /reference (Viash/Docker/Nextflow)
-  - search_manuscript:  RAG over the benchmark manuscript PDF (paper content)
+Two tools:
+  - search_docs:   RAG over docs/source/ (API spec, datasets, integration guide)
+  - search_viash:  Live page fetch from viash.io/guide + /reference (no pre-indexing)
 """
 
 import os
@@ -17,8 +16,6 @@ from config import LLM_PROVIDER, MODEL_ID
 from rag_builder import (
     _missing_key_error,
     get_or_build_docs_index,
-    get_or_build_manuscript_index,
-    get_or_build_viash_index,
 )
 
 _SOURCE_MAP = {"openai": "OpenAI", "anthropic": "Anthropic"}
@@ -46,25 +43,6 @@ _SEARCH_DOCS_SCHEMA = {
     "optional_parameters": [],
 }
 
-_SEARCH_MANUSCRIPT_SCHEMA = {
-    "name": "search_manuscript",
-    "description": (
-        "Search the GeneRNBI benchmark manuscript PDF for paper-level content: "
-        "experimental results, biological motivation, method comparisons, design "
-        "decisions, and conclusions. "
-        "Use this tool ONLY when search_docs cannot answer — i.e. when the question "
-        "explicitly concerns the paper's findings or scientific rationale."
-    ),
-    "required_parameters": [
-        {
-            "name": "query",
-            "type": "str",
-            "description": "Question about the manuscript content.",
-            "default": None,
-        }
-    ],
-    "optional_parameters": [],
-}
 
 _SEARCH_VIASH_SCHEMA = {
     "name": "search_viash",
@@ -120,12 +98,8 @@ def _register_tool(a1, fn, schema: dict):
 
 # ─── Tool implementations ─────────────────────────────────────────────────────
 
-def _build_docs_search_fn(index, li_llm):
-    """Direct retriever for docs — returns raw chunks without LLM synthesis.
-    
-    Since docs are small (2 files, ~430 lines), returning the top chunks verbatim
-    gives more accurate, detailed answers than LLM synthesis which tends to summarize.
-    """
+def _build_docs_search_fn(index):
+    """Direct retriever for docs — returns raw chunks without LLM synthesis."""
     retriever = index.as_retriever(similarity_top_k=10)
 
     def _search(query: str) -> str:
@@ -146,131 +120,202 @@ def _build_docs_search_fn(index, li_llm):
     return _search
 
 
-def _build_viash_search_fn(index, li_llm):
-    """Direct retriever for viash.io docs — returns top chunks with source URLs."""
-    retriever = index.as_retriever(similarity_top_k=8)
+def _build_viash_live_search_fn():
+    """Live search on viash.io — fetches pages on the fly, no pre-indexing.
+
+    On each call:
+      1. Fetches the viash.io sitemap (cached in memory after first call).
+      2. Scores guide/reference URLs by keyword overlap with the query.
+      3. Fetches and returns the text of the top matching pages.
+    """
+    import re
+    import requests
+    from bs4 import BeautifulSoup
+
+    _cache = {"urls": None}
+
+    def _get_urls():
+        if _cache["urls"] is not None:
+            return _cache["urls"]
+        try:
+            r = requests.get("https://viash.io/sitemap.xml", timeout=15)
+            r.raise_for_status()
+            all_urls = re.findall(r"<loc>(.*?)</loc>", r.text)
+            urls = [
+                u for u in all_urls
+                if any(x in u for x in ["/guide/", "/reference/", "/faq"])
+                and "/deprecated/" not in u
+            ]
+            _cache["urls"] = urls
+            return urls
+        except Exception as e:
+            return []
+
+    def _fetch_page(session, url):
+        try:
+            resp = session.get(url, timeout=10)
+            if not resp.ok:
+                return None
+            soup = BeautifulSoup(resp.text, "html.parser")
+            for tag in soup.find_all(["nav", "header", "footer", "aside", "script", "style"]):
+                tag.decompose()
+            main = (
+                soup.find("main")
+                or soup.find("article")
+                or soup.find("div", class_=re.compile(r"content|prose|doc"))
+            )
+            text = (main or soup).get_text(separator="\n", strip=True)
+            return text if len(text) >= 100 else None
+        except Exception:
+            return None
 
     def _search(query: str) -> str:
         try:
-            nodes = retriever.retrieve(query)
-            if not nodes:
-                result = "No relevant content found in viash.io docs."
-            else:
-                parts = []
-                for node in nodes:
-                    url = node.metadata.get("url", "")
-                    header = f"[Source: {url}]\n" if url else ""
-                    parts.append(header + node.get_content())
-                result = "\n\n---\n\n".join(parts)
+            keywords = [w for w in re.split(r"\W+", query.lower()) if len(w) > 2]
+            urls = _get_urls()
+            if not urls:
+                return "Could not fetch viash.io sitemap. Check your internet connection."
+
+            scored = sorted(
+                urls,
+                key=lambda u: sum(1 for kw in keywords if kw in u.lower()),
+                reverse=True,
+            )
+
+            session = requests.Session()
+            session.headers["User-Agent"] = "Mozilla/5.0 (viash-docs-searcher)"
+            parts = []
+            for url in scored:
+                text = _fetch_page(session, url)
+                if text:
+                    parts.append(f"[Source: {url}]\n{text[:3000]}")
+                if len(parts) >= 3:
+                    break
+
+            result = "\n\n---\n\n".join(parts) if parts else "No relevant viash.io pages found."
             print(result)
             return result
         except Exception as e:
-            err = f"Error searching viash docs: {e}"
+            err = f"Error searching viash.io: {e}"
             print(err)
             return err
 
     return _search
 
-
-def _build_manuscript_search_fn(index, li_llm, n_subqueries: int = 3):
-    """Parallel multi-query search for manuscript (large PDF, sub-query expansion helps)."""
-    from concurrent.futures import ThreadPoolExecutor, as_completed
-    from llama_index.core.prompts import PromptTemplate
-
-    query_engine = index.as_query_engine(
-        similarity_top_k=8,
-        llm=li_llm,
-        response_mode="compact",
-    )
-
-    _EXPAND_TMPL = PromptTemplate(
-        f"Break the following question into exactly {n_subqueries} precise, "
-        "non-overlapping sub-questions that together give a complete answer.\n"
-        "Return ONLY the sub-questions, one per line, no numbering or prefixes.\n\n"
-        "Question: {question}\n\nSub-questions:"
-    )
-
-    def _search(query: str) -> str:
-        try:
-            expansion = li_llm.complete(_EXPAND_TMPL.format(question=query)).text
-            sub_questions = [q.strip() for q in expansion.strip().splitlines() if q.strip()][:n_subqueries]
-
-            def _query(q):
-                return (q, str(query_engine.query(q)))
-
-            parts: list = []
-            seen: set = set()
-            with ThreadPoolExecutor(max_workers=n_subqueries) as pool:
-                futures = {pool.submit(_query, q): q for q in sub_questions}
-                for future in as_completed(futures):
-                    q, resp = future.result()
-                    key = resp[:120]
-                    if key not in seen:
-                        seen.add(key)
-                        parts.append(f"[{q}]\n{resp}")
-
-            result = "\n\n---\n\n".join(parts) if parts else "No relevant content found."
-            print(result)
-            return result
-        except Exception as e:
-            err = f"Error searching manuscript: {e}"
-            print(err)
-            return err
-
-    return _search
 
 
 # ─── System prompt ────────────────────────────────────────────────────────────
 
 _SYSTEM_PROMPT_PREFIX = """\
-You are the GeneRNBI Assistant — the primary interface for the GeneRNBI GRN benchmark framework.
+You are the GeneRNBI Assistant — expert on the GeneRNBI GRN benchmarking framework.
 
 ══════════════════════════════════════════════════════
-STRICT RULES — FOLLOW THESE EXACTLY
+ABSOLUTE RULES — NEVER BREAK THESE
 ══════════════════════════════════════════════════════
 
-1. You have EXACTLY THREE tools: search_docs, search_viash, and search_manuscript.
-   - ALWAYS call search_docs FIRST for questions about datasets, methods, metrics,
-     file formats, or benchmark integration.
-   - Call search_viash for any Viash config syntax, Docker, or Nextflow question —
-     especially during integration troubleshooting.
-   - ONLY call search_manuscript when the user asks about the paper's findings,
-     results, or scientific motivation.
+RULE 1 — TOOLS FIRST, ALWAYS.
+  Before writing ANY code, file, or answer, you MUST call search_docs.
+  If the question involves Viash, Docker, or Nextflow, also call search_viash.
+  Only use what the tools return. Never answer from memory.
 
-2. NEVER use os, sys, glob, subprocess, pathlib, or any Python library to answer.
-   Do NOT list files, read files, or access the filesystem.
+RULE 2 — IMPLEMENTATION TASKS: CREATE REAL FILES ON DISK.
+  When asked to write a method, you MUST:
+    a) Call search_docs first to get the exact file conventions.
+    b) Write script.py to disk using Python open() or pathlib.
+    c) Write config.vsh.yaml to disk using Python open() or pathlib.
+    d) Run the viash test command via subprocess or os.system.
+  Do NOT just print code. Do NOT just describe steps. CREATE the files.
 
-3. NEVER answer from memory. ALWAYS call a tool first.
+RULE 3 — USE EXACTLY THE GENERNIBI FORMAT (from search_docs output).
+  The correct config.vsh.yaml format uses:
+    __merge__, name, namespace, info, resources, engines, runners
+  NOT "version/components" — that is wrong and will fail.
 
-4. For EVERY question, your FIRST action must be:
-     result = search_docs('...your query...'); print(result)
-   Then synthesise the answer from the tool output.
+RULE 4 — NEVER SKIP STEPS.
+  If you are asked to "write and run" something, you must do both:
+  create the files AND execute viash test.
+
+══════════════════════════════════════════════════════
+KNOWN FILE TEMPLATES (use these as starting points)
+══════════════════════════════════════════════════════
+
+## config.vsh.yaml (GeneRNBI method format):
+```yaml
+__merge__: /src/api/comp_method.yaml
+
+name: method_name
+namespace: "grn_methods"
+info:
+  label: "Method Name"
+  summary: "Short description"
+resources:
+  - type: python_script
+    path: script.py
+engines:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    __merge__: /src/api/base_requirements.yaml
+    setup:
+      - type: python
+        packages: [ numpy, pandas, scipy, anndata ]
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [midtime, midmem, midcpu]
+```
+
+## script.py (GeneRNBI method format):
+```python
+import sys
+import anndata as ad
+import numpy as np
+import pandas as pd
+
+## VIASH START
+par = {
+    'rna': 'resources_test/grn_benchmark/rna_op.h5ad',
+    'tf_all': 'resources_test/grn_benchmark/prior/tf_all.csv',
+    'prediction': 'output/prediction.h5ad'
+}
+## VIASH END
+
+rna = ad.read_h5ad(par['rna'])
+tf_all = np.loadtxt(par['tf_all'], dtype=str)
+
+# <<< YOUR METHOD HERE >>>
+
+net['weight'] = net['weight'].astype(str)
+output = ad.AnnData(
+    X=None,
+    uns={
+        'method_id': 'method_name',
+        'dataset_id': rna.uns.get('dataset_id', 'unknown'),
+        'prediction': net[['source', 'target', 'weight']]
+    }
+)
+output.write(par['prediction'])
+```
+
+## viash test command:
+```bash
+viash test src/methods/your_method/config.vsh.yaml
+```
 
 ══════════════════════════════════════════════════════
 TOOL USAGE
 ══════════════════════════════════════════════════════
 
-search_docs  — Use for ALL technical questions about this benchmark:
-  • Datasets available (names, formats, which metrics apply)
-  • How to add a new method or metric (file structure, config.vsh.yaml format)
-  • API spec and file formats (h5ad, csv, gmt, etc.)
-  • Which GRN methods and metrics are currently available
+search_docs  — ALWAYS call this first for any GeneRNBI question:
+  • File structure, config.vsh.yaml format, script.py conventions
+  • Datasets, metrics, API formats
   Usage:  result = search_docs('your question'); print(result)
 
-search_viash  — Use for Viash/Docker/Nextflow questions:
-  • config.vsh.yaml syntax (engines, runners, resources, arguments)
-  • Docker engine setup (pythonRequirements, aptRequirements, etc.)
-  • Nextflow runner configuration
-  • Viash CLI commands and troubleshooting
-  • Any error involving Viash, Docker image builds, or Nextflow pipelines
+search_viash  — Call this for Viash/Docker/Nextflow details:
+  • config.vsh.yaml engine/runner syntax
+  • Docker setup, apt/python packages
+  • viash CLI commands (viash test, viash run, viash build)
   Usage:  result = search_viash('your question'); print(result)
-
-search_manuscript  — ONLY for paper-level content:
-  • Experimental results and benchmarking findings
-  • Biological motivation and scientific rationale
-  • Performance comparisons between methods
-  • Design decisions and conclusions in the paper
-  Usage:  result = search_manuscript('your question'); print(result)
 
 """
 
@@ -279,12 +324,11 @@ search_manuscript  — ONLY for paper-level content:
 
 def initialize_agent(
     docs_dir: Optional[Path] = None,
-    data_dir: Optional[Path] = None,
     use_cache: bool = True,
     model_id: str = None,
     llm_provider: str = None,
 ):
-    """Build indices and return an A1 orchestrator with three RAG tools."""
+    """Build docs index and return an A1 orchestrator with two tools."""
     load_dotenv()
 
     provider = (llm_provider or LLM_PROVIDER).lower()
@@ -302,26 +346,11 @@ def initialize_agent(
     repo_root = agentic_root.parent
     if docs_dir is None:
         docs_dir = repo_root / "docs" / "source"
-    if data_dir is None:
-        data_dir = agentic_root / "data"
 
     print("Building docs index...")
     docs_index = get_or_build_docs_index(docs_dir, use_cache=use_cache)
 
-    print("Building viash.io index...")
-    viash_index = get_or_build_viash_index(use_cache=use_cache)
-
-    print("Building manuscript index...")
-    manuscript_index = get_or_build_manuscript_index(data_dir, use_cache=use_cache)
-
-    # LlamaIndex LLM for query engines and sub-query expansion
-    if provider == "openai":
-        from llama_index.llms.openai import OpenAI as LIOpenAI
-        _li_llm = LIOpenAI(model=model)
-    else:
-        from llama_index.llms.anthropic import Anthropic as LIAnthropic
-        _li_llm = LIAnthropic(model=model)
-
+    # LlamaIndex LLM no longer needed — all tools use direct retrieval, no synthesis
     print("Creating A1 orchestrator...")
     from biomni.agent.a1 import A1
 
@@ -336,7 +365,7 @@ def initialize_agent(
     print("Registering tools...")
     a1.module2api = {}
 
-    search_docs_fn = _build_docs_search_fn(docs_index, _li_llm)
+    search_docs_fn = _build_docs_search_fn(docs_index)
     search_docs_fn.__doc__ = (
         "Search GeneRNBI documentation for integration guides, API formats, "
         "dataset info, and framework usage.\n\n"
@@ -345,7 +374,7 @@ def initialize_agent(
     )
     search_docs_fn.__name__ = "search_docs"
 
-    search_viash_fn = _build_viash_search_fn(viash_index, _li_llm)
+    search_viash_fn = _build_viash_live_search_fn()
     search_viash_fn.__doc__ = (
         "Search viash.io documentation for Viash config syntax, Docker engine setup, "
         "Nextflow runner configuration, argument types, and Viash CLI usage.\n\n"
@@ -354,18 +383,10 @@ def initialize_agent(
     )
     search_viash_fn.__name__ = "search_viash"
 
-    search_manuscript_fn = _build_manuscript_search_fn(manuscript_index, _li_llm)
-    search_manuscript_fn.__doc__ = (
-        "Search the GeneRNBI benchmark manuscript for paper-level content: "
-        "results, motivation, comparisons, design decisions, conclusions.\n\n"
-        "Args:\n    query (str): Question about the manuscript content.\n\n"
-        "Returns:\n    str: Answer from the manuscript."
-    )
-    search_manuscript_fn.__name__ = "search_manuscript"
+    search_manuscript_fn = None  # removed
 
     _register_tool(a1, search_docs_fn, _SEARCH_DOCS_SCHEMA)
     _register_tool(a1, search_viash_fn, _SEARCH_VIASH_SCHEMA)
-    _register_tool(a1, search_manuscript_fn, _SEARCH_MANUSCRIPT_SCHEMA)
 
     a1.configure()
     a1._inject_custom_functions_to_repl()
