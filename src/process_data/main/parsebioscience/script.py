@@ -101,6 +101,7 @@ def format_adata(adata):
         'Donor12': 36
     }
 
+
     # Map the age to obs based on donor_id
     adata.obs['age'] = adata.obs['donor_id'].map(donor_age_map)
     return adata
