@@ -15,29 +15,23 @@ agentic/
 ├── docs/                # Documentation files indexed by the agent
 │   ├── README.md
 │   └── METRIC_EVALUATION_README.md
+├── singularity/
+│   ├── agentic.def      # Singularity definition file
+│   └── build_and_push.sh# Build image and push to S3
 ├── run.sh               # Convenience shell script
 └── .env.template        # API key template (do NOT commit a filled .env)
 ```
 
 ## Setup
+create conda env genernbi_agentic --->
+#TODO: this needs fixing based on the new biomni requitements.
 
-### 1. Conda environment
-
-The agent requires the `llamaindex` conda environment:
-
-```bash
-conda activate llamaindex
-```
-
-If you don't have it, install dependencies into any Python 3.10+ environment:
 
 ```bash
 pip install llama-index-core llama-index-llms-openai llama-index-llms-anthropic python-dotenv
 ```
 
 ### 2. API key
-
-> **Keys must never be committed to the repo.** The `.env` file is gitignored.
 
 First, get your API key:
 
@@ -98,6 +92,57 @@ bash run.sh "What layer name does the evaluation script expect?"
 # or:
 cd src && python run.py "How do I integrate a new GRN method?"
 ```
+
+## Container (Singularity / Apptainer)
+
+A pre-built Singularity image is available on S3 and includes all required
+dependencies (Biomni A1, LlamaIndex, OpenAI / Anthropic clients, HuggingFace
+embeddings).
+
+### Download
+
+```bash
+aws s3 cp s3://openproblems-data/resources/grn/images/agentic.sif . --no-sign-request
+```
+
+### Run
+
+**Interactive mode:**
+```bash
+export OPENAI_API_KEY=sk-...       # or ANTHROPIC_API_KEY for Anthropic
+singularity run \
+    --bind /path/to/task_grn_inference/agentic:/agentic \
+    agentic.sif
+```
+
+**Single-query mode:**
+```bash
+export OPENAI_API_KEY=sk-...
+singularity run \
+    --bind /path/to/task_grn_inference/agentic:/agentic \
+    agentic.sif "How do I integrate a new GRN method?"
+```
+
+**Via `run.sh` (convenience wrapper):**
+```bash
+export OPENAI_API_KEY=sk-...
+USE_SINGULARITY=1 bash run.sh "How do I integrate a new GRN method?"
+# Override image path if needed:
+SINGULARITY_IMAGE=/path/to/agentic.sif USE_SINGULARITY=1 bash run.sh
+```
+
+The `--bind` mount maps the `agentic/` directory to `/agentic` inside the
+container so the agent can find its `docs/`, `data/`, and source files.
+
+### Build the image yourself
+
+```bash
+cd agentic/singularity
+bash build_and_push.sh              # build + upload to S3
+bash build_and_push.sh --build-only # build only
+```
+
+---
 
 ## Extending the knowledge base
 
