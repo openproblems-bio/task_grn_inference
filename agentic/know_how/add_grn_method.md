@@ -24,8 +24,6 @@ Every GRN inference method in GeneRNBI lives under `src/methods/<method_name>/` 
 - `config.vsh.yaml` — Viash component configuration
 - `script.py` (or `script.R`) — the inference logic
 
-IMPORTANT: Always create files in `src/methods/<method_name>/`, NOT in the current directory.
-
 ---
 
 ## Step 1: Create the directory
@@ -42,6 +40,15 @@ mkdir -p src/methods/pearson_corr
 ---
 
 ## Step 2: Write `script.py`
+
+**IMPORTANT — always write files using bash, not Python open().**
+Writing Python source code that contains docstrings (`"""`) inside a Python `open()` call causes syntax errors (quote conflicts). Always use a bash heredoc instead:
+
+```bash
+cat > /absolute/path/to/script.py << 'PYEOF'
+<file content here>
+PYEOF
+```
 
 The script MUST follow this exact structure. The `## VIASH START` / `## VIASH END` block is mandatory — Viash replaces it at runtime with the actual CLI parameters.
 
@@ -83,10 +90,17 @@ output = ad.AnnData(
         'prediction': net[['source', 'target', 'weight']]
     }
 )
-import os; os.makedirs(os.path.dirname(par['prediction']), exist_ok=True)
-output.write(par['prediction'])
+out_dir = os.path.dirname(par['prediction'])
+if out_dir:
+    os.makedirs(out_dir, exist_ok=True)
+output.write_h5ad(par['prediction'])
 print(f"Saved {len(net)} edges to {par['prediction']}")
 ```
+
+**Critical rules for `script.py`:**
+- Use `output.write_h5ad(par['prediction'])` — NOT `output.write()`
+- Guard `makedirs` against empty string: `if out_dir: os.makedirs(out_dir, exist_ok=True)`
+- All inference logic must run at module level (not inside `if __name__ == '__main__':`), so Viash can execute it directly
 
 ### Pearson correlation example (complete script.py):
 
@@ -141,8 +155,11 @@ output = ad.AnnData(
         'prediction': net[['source', 'target', 'weight']]
     }
 )
-import os; os.makedirs(os.path.dirname(par['prediction']), exist_ok=True)
-output.write(par['prediction'])
+import os
+out_dir = os.path.dirname(par['prediction'])
+if out_dir:
+    os.makedirs(out_dir, exist_ok=True)
+output.write_h5ad(par['prediction'])
 print(f"Saved {len(net)} edges to {par['prediction']}")
 ```
 
@@ -264,7 +281,7 @@ viash run src/methods/pearson_corr/config.vsh.yaml -- \
 
 | Error | Cause | Fix |
 |-------|-------|-----|
-| `Cannot connect to Docker daemon` | Docker not running | Start Docker or use `viash run` (executable runner) instead of `viash test` |
+| `Cannot connect to Docker daemon` | Docker not running | Start Docker Desktop (macOS/Windows) or `sudo systemctl start docker` (Linux), then verify with `docker info` |
 | `__merge__ file not found` | Running from wrong directory | Always run viash commands from the repo root |
 | `KeyError: dataset_id` | h5ad missing metadata | Use `rna.uns.get('dataset_id', 'unknown')` |
 | `Empty prediction` | TF filter removed all rows | Check `tf_all` path and that gene names match `rna.var_names` |

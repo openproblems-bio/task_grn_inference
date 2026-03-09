@@ -1,8 +1,7 @@
 """
 GeneRNBI orchestrating agent — powered by Biomni A1.
 
-Two tools (registered via a1.add_tool() — standard Biomni API):
-  - search_docs:   RAG over docs/source/ (API spec, datasets, integration guide)
+One tool (registered via a1.add_tool() — standard Biomni API):
   - search_viash:  Live page fetch from viash.io/guide + /reference (no pre-indexing)
 
 Know-how documents in agentic/know_how/ are injected into A1's know_how_loader
@@ -12,54 +11,20 @@ so configure() includes them in the system prompt automatically.
 import os
 import re
 from pathlib import Path
-from typing import Optional
 
 from dotenv import load_dotenv
 
 from config import LLM_PROVIDER, MODEL_ID
-from rag_builder import (
-    _missing_key_error,
-    get_or_build_docs_index,
-)
+from rag_builder import _missing_key_error
 
-_SOURCE_MAP = {"openai": "OpenAI", "anthropic": "Anthropic"}
+_SOURCE_MAP = {"openai": "OpenAI", "anthropic": "Anthropic", "openrouter": "OpenAI"}
 
 # Module-level state — set by initialize_agent() before add_tool() calls so
 # that inspect.getsource() on the top-level functions works cleanly.
-_DOCS_RETRIEVER = None
 _VIASH_URL_CACHE: dict = {"urls": None}
 
 
 # ─── Tool functions (module-level so inspect.getsource captures them correctly) ──
-
-def search_docs(query: str) -> str:
-    """Search the GeneRNBI documentation for information about integrating new
-    methods, metrics, or datasets; the API format for Viash components
-    (config.vsh.yaml, script.py structure, argument types, file formats);
-    dataset descriptions; and any other framework usage or integration question.
-    Use this tool FIRST for all technical and integration questions.
-
-    Args:
-        query (str): Any question about framework usage, integration, or API structure.
-
-    Returns:
-        str: Relevant documentation content.
-    """
-    global _DOCS_RETRIEVER
-    try:
-        nodes = _DOCS_RETRIEVER.retrieve(query)
-        if not nodes:
-            result = "No relevant content found in docs."
-        else:
-            parts = [node.get_content() for node in nodes]
-            result = "\n\n---\n\n".join(parts)
-        print(result)
-        return result
-    except Exception as e:
-        err = f"Error searching docs: {e}"
-        print(err)
-        return err
-
 
 def search_viash(query: str) -> str:
     """Search the official Viash documentation (viash.io/guide and viash.io/reference)
@@ -147,13 +112,10 @@ def search_viash(query: str) -> str:
 # ─── Main initializer ─────────────────────────────────────────────────────────
 
 def initialize_agent(
-    docs_dir: Optional[Path] = None,
-    use_cache: bool = True,
     model_id: str = None,
     llm_provider: str = None,
 ):
-    """Build docs index and return an A1 orchestrator with two tools and know-how docs."""
-    global _DOCS_RETRIEVER
+    """Return an A1 orchestrator with one tool and know-how docs injected."""
 
     load_dotenv()
 
@@ -161,21 +123,20 @@ def initialize_agent(
     model = model_id or MODEL_ID
     source = _SOURCE_MAP.get(provider)
     if source is None:
-        raise ValueError(f"Unsupported provider '{provider}'. Choose 'openai' or 'anthropic'.")
+        raise ValueError(f"Unsupported provider '{provider}'. Choose 'openai', 'anthropic', or 'openrouter'.")
 
     if provider == "openai" and not os.environ.get("OPENAI_API_KEY"):
-        _missing_key_error()
+        _missing_key_error("OPENAI_API_KEY")
     elif provider == "anthropic" and not os.environ.get("ANTHROPIC_API_KEY"):
-        _missing_key_error()
+        _missing_key_error("ANTHROPIC_API_KEY")
+    elif provider == "openrouter":
+        if not os.environ.get("OPENROUTER_API_KEY"):
+            _missing_key_error("OPENROUTER_API_KEY")
+        # Redirect the OpenAI SDK (used by Biomni A1) to OpenRouter's endpoint
+        os.environ["OPENAI_API_KEY"] = os.environ["OPENROUTER_API_KEY"]
+        os.environ["OPENAI_BASE_URL"] = "https://openrouter.ai/api/v1"
 
     agentic_root = Path(__file__).parent.parent
-    repo_root = agentic_root.parent
-    if docs_dir is None:
-        docs_dir = repo_root / "docs" / "source"
-
-    print("Building docs index...")
-    docs_index = get_or_build_docs_index(docs_dir, use_cache=use_cache)
-    _DOCS_RETRIEVER = docs_index.as_retriever(similarity_top_k=10)
 
     print("Creating A1 orchestrator...")
     from biomni.agent.a1 import A1
@@ -186,6 +147,7 @@ def initialize_agent(
         source=source,
         use_tool_retriever=False,
         expected_data_lake_files=[],
+        max_tokens=8192,
     )
 
     # Inject know-how docs into A1's know_how_loader so configure() includes them
@@ -211,11 +173,58 @@ def initialize_agent(
                 print(f"Warning: could not load {md_path.name}: {e}")
         print(f"Injected {n_loaded} know-how doc(s) into A1")
 
-    # Register tools via the standard Biomni add_tool() API.
-    # Module-level functions ensure inspect.getsource() captures them cleanly.
+    # Register search_viash by injecting schema directly — avoids an LLM call
+    # that function_to_api_schema() would otherwise make during add_tool().
     print("Registering tools...")
-    a1.add_tool(search_docs)
-    a1.add_tool(search_viash)
+    _search_viash_schema = {
+        "name": "search_viash",
+        "module": "agent",
+        "description": (
+            "Search the official Viash documentation (viash.io/guide and viash.io/reference) "
+            "for information about Viash component configuration, Docker engine setup, "
+            "Nextflow runner, argument types, resources, test benches, and CLI commands."
+        ),
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "query": {
+                    "type": "string",
+                    "description": "Question about Viash, Docker, or Nextflow.",
+                }
+            },
+            "required": ["query"],
+        },
+        "required_parameters": ["query"],
+    }
+    import sys as _sys
+    import types as _types
+    _mod = _types.ModuleType("agent")
+    _mod.search_viash = search_viash
+    _sys.modules["agent"] = _mod
+    if a1.use_tool_retriever:
+        a1.tool_registry.register_tool(_search_viash_schema)
+        print("Tool 'search_viash' registered via direct schema injection")
+    else:
+        # Inject directly into module2api — avoids the LLM call in add_tool()
+        if "agent" not in a1.module2api:
+            a1.module2api["agent"] = []
+        a1.module2api["agent"].append(_search_viash_schema)
+        print("Tool 'search_viash' injected directly into module2api")
+
+    # Prepend routing instructions so A1 consults know-how context before tools.
+    routing_prefix = (
+        "## GRN Benchmark Assistant — Routing Rules\n\n"
+        "You are an assistant for the `task_grn_inference` GRN benchmarking framework.\n"
+        "Your system prompt already contains know-how documents covering: available GRN methods, "
+        "datasets, evaluation metrics, output format, how to add a new method, and Viash commands.\n\n"
+        "ROUTING RULES (follow strictly):\n"
+        "1. For questions about GRN methods, datasets, evaluation, adding a method, or output format: "
+        "answer DIRECTLY from the know-how context in your system prompt. Do NOT call search_viash.\n"
+        "2. Only call search_viash when the user asks about Viash/Docker/Nextflow syntax or config "
+        "details that are NOT already covered in the know-how docs.\n"
+        "3. Never hallucinate. If the know-how docs don't cover something, say so.\n\n"
+    )
+    a1.system_prompt = routing_prefix + a1.system_prompt
 
     print("A1 agent ready!")
     return a1

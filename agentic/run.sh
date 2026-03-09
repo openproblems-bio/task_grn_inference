@@ -10,6 +10,9 @@
 #   2. Shell export:          export OPENAI_API_KEY=sk-...  then  bash run.sh
 #   3. .env file:             cp .env.template .env  and fill in your key
 #
+# To override the default conda env, set CONDA_ENV:
+#   CONDA_ENV=my_env bash run.sh [question]
+#
 # To use the Singularity image instead of the conda env, set:
 #   USE_SINGULARITY=1 bash run.sh [question]
 # and optionally override the image path:
@@ -36,7 +39,7 @@ if [[ "${USE_SINGULARITY:-0}" == "1" ]]; then
 fi
 
 # ─── Conda mode (default) ─────────────────────────────────────────────────────
-CONDA_ENV="genernbi_agentic"
+CONDA_ENV="${CONDA_ENV:-genernbi_agentic}"
 
 if command -v conda &>/dev/null; then
     eval "$(conda shell.bash hook)"
@@ -44,4 +47,16 @@ if command -v conda &>/dev/null; then
 fi
 
 cd "$SCRIPT_DIR/src"
-python run.py "$@"
+
+# If first argument is "test", run the QA test suite instead
+if [[ "${1:-}" == "test" ]]; then
+    shift
+    if [[ "${1:-}" == "--exec" ]]; then
+        shift
+        python "$SCRIPT_DIR/tests/run_execution_tests.py" "$@"
+    else
+        python "$SCRIPT_DIR/tests/run_qa_tests.py" "$@"
+    fi
+else
+    python run.py "$@"
+fi

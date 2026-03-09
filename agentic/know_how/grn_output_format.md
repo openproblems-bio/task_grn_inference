@@ -58,15 +58,20 @@ output.write(par['prediction'])
 
 ## Evaluation Metrics
 
-GeneRNBI uses multiple metrics organized in three categories. Not all metrics apply to all datasets.
+GeneRNBI uses the following metrics. Not all metrics apply to all datasets (see `src/utils/config.env`).
 
-| Category | Metric | Description |
-|----------|--------|-------------|
-| **Regression** | `regression_1` | How well TF activity predicts perturbation response |
-| **Regression** | `regression_2` | Variant of regression with different normalization |
-| **Classification** | `auroc` | Area under ROC for ChIP-seq validation |
-| **Classification** | `auprc` | Area under precision-recall curve |
-| **Network** | `connectedness` | Structural network properties |
+| Metric key | Description |
+|------------|-------------|
+| `regression` | How well TF weights predict perturbation response |
+| `gs_recovery` | Recovery of gold-standard TF-target pairs |
+| `tf_binding` | Overlap with ChIP-seq / UniBind / ChIP-Atlas / ReMap |
+| `ws_distance` | Wasserstein distance-based score |
+| `vc` | Variance consistency across datasets |
+| `sem` | Structural equation model score |
+| `replicate_consistency` | Consistency across biological replicates |
+| `tf_recovery` | Recovery of known TF regulatory programs |
+
+Final score uses: `r_precision`, `r_recall`, `vc`, `sem`, `ws_precision`, `ws_recall`.
 
 ---
 
@@ -83,16 +88,18 @@ bash src/metrics/all_metrics/run_local.sh \
 
 ### With Docker (full pipeline):
 ```bash
-viash run src/metrics/all_metrics/config.vsh.yaml -- \
-    --dataset op \
-    --prediction output/net.h5ad \
-    --score output/score.h5ad
+bash scripts/run_grn_evaluation.sh \
+    --prediction=output/net.h5ad \
+    --save_dir=output/ \
+    --dataset=op \
+    --build_images=false \
+    --run_local=true
 ```
 
 ### Available datasets for evaluation:
-- `op` — Open Problems perturbation dataset
-- `norman` — Norman et al. CRISPR screen
-- `replogle` — Replogle et al. genome-wide Perturb-seq
+`op`, `parsebioscience`, `300BCG`, `ibd_uc`, `ibd_cd`, `replogle`, `norman`, `xaira_HEK293T`, `xaira_HCT116`, `nakatake`
+
+See `src/utils/config.env` for per-dataset metric lists and cell types.
 
 ---
 
@@ -106,7 +113,8 @@ print(score.uns)  # contains all metric scores as a dict
 
 ---
 
-## Example: Checking Your Output is Valid
+## Example: Checking Your Output is Valid -> no sub cell type within inferred GRN
+This is applicable only for inferred GRNs that are not cell type specific -> for example, one GRN for PBMC.
 
 ```python
 import anndata as ad
@@ -126,4 +134,29 @@ assert net['weight'].dtype == object, "weight must be string dtype"
 
 print(f"Valid prediction: {len(net)} edges")
 print(net.head())
+
+
+```
+## Example: Checking Your Output is Valid -> sub cell type within inferred GRN
+This is applicable only for inferred GRNs that are cell type specific -> for example, one GRN for each subtype of PBMC, e.g. CD8T, CD4T.
+
+```python
+import anndata as ad
+import numpy as np
+
+pred = ad.read_h5ad('output/prediction.h5ad')
+
+# Check required fields
+assert 'method_id' in pred.uns
+assert 'dataset_id' in pred.uns
+assert 'prediction' in pred.uns
+
+net = pred.uns['prediction']
+assert set(net.columns) >= {'source', 'target', 'weight', 'cell_type'}
+assert net['weight'].dtype == object, "weight must be string dtype"
+
+print(f"Valid prediction: {len(net)} edges")
+print(net.head())
+
+
 ```

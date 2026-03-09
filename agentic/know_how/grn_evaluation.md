@@ -67,31 +67,44 @@ bash src/metrics/all_metrics/run_local.sh \
   --dataset op \
   --prediction output/prediction.h5ad \
   --score output/score.h5ad \
-  --num_workers 4
+  --num_workers 4 \
+  --layer lognorm \
+  --reg_type ridge
 ```
 
-Supported datasets: `op`, `norman`, `replogle`, and others (see `resources/grn_benchmark/`).
+Supported `--dataset` values: see table below. `--layer` (default: `lognorm`) and `--reg_type` (default: `ridge`) are optional.
 
 ---
 
-## Running Evaluation (with Docker / full pipeline)
+## Running Evaluation (full pipeline)
 
 ```bash
-viash run src/metrics/all_metrics/config.vsh.yaml -- \
-  --dataset op \
-  --prediction output/prediction.h5ad \
-  --score output/score.h5ad
+bash scripts/run_grn_evaluation.sh \
+  --prediction=output/prediction.h5ad \
+  --save_dir=output/ \
+  --dataset=op \
+  --build_images=false \
+  --run_local=true
 ```
 
 ---
 
 ## Available Datasets
 
-| Dataset | Type | Notes |
-|---------|------|-------|
-| `op` | Perturbation (pseudobulk) | Main benchmark dataset |
-| `norman` | Perturbation | CRISPR screen |
-| `replogle` | Perturbation | Large-scale screen |
+All dataset names accepted by `--dataset`:
+
+| Dataset | Cell type |
+|---------|-----------|
+| `op` | PBMC |
+| `parsebioscience` | PBMC |
+| `300BCG` | PBMC |
+| `ibd_uc` | PBMC |
+| `ibd_cd` | PBMC |
+| `replogle` | K562 |
+| `norman` | K562 |
+| `xaira_HEK293T` | HEK293T |
+| `xaira_HCT116` | HCT116 |
+| `nakatake` | — |
 
 Download with:
 ```bash
@@ -104,12 +117,21 @@ aws s3 sync s3://openproblems-data/resources_test/grn/grn_benchmark resources_te
 
 ## Evaluation Metrics
 
-Metrics are grouped into categories. Not all metrics apply to all datasets.
+Metric names used in `config.env` and score output:
 
-- **AUROC / AUPRC**: Rank-based metrics against curated TF-target reference networks (e.g. CollecTRI)
-- **Regression-based**: How well TF weights predict target gene expression changes under perturbation
-- **Stability**: Consistency across subsampled datasets
-- **Context specificity**: Whether the network captures cell-type-specific regulation
+| Metric key | Description |
+|------------|-------------|
+| `regression` | How well TF weights predict perturbation response |
+| `gs_recovery` | Recovery of gold-standard TF-target pairs |
+| `tf_binding` | Overlap with ChIP-seq / UniBind / ChIP-Atlas / ReMap |
+| `ws_distance` | Wasserstein distance-based score |
+| `vc` | Variance consistency across datasets |
+| `sem` | Structural equation model score |
+| `replicate_consistency` | Consistency across biological replicates |
+| `tf_recovery` | Recovery of known TF regulatory programs |
+
+Final score metrics: `r_precision`, `r_recall`, `vc`, `sem`, `ws_precision`, `ws_recall`.
+Not all metrics apply to all datasets — see `src/utils/config.env` for per-dataset metric lists.
 
 See `src/metrics/` for individual metric implementations.
 

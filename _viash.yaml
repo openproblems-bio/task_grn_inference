@@ -60,19 +60,20 @@ info:
       Install Docker, Java, and Viash using
       [these instructions](https://openproblems.bio/documentation/fundamentals/requirements).
 
-      ## Download resources
+      ## Set up the repository
       ```bash
       git clone --recursive git@github.com:openproblems-bio/task_grn_inference.git
 
       cd task_grn_inference
       ```
-      To interact with the framework,download the resources containing necessary inferene and evaluation datasets. 
+      To interact with the framework, download the resources containing necessary inference and evaluation datasets. 
 
       ```bash
       pip install awscli
       aws s3 sync  s3://openproblems-data/resources/grn/grn_benchmark resources/grn_benchmark  --no-sign-request
 
       ```
+      Of note, you can also use the `resources_test` for testing purposes, which is a subset of the full resources.
 
 
       ## Run a GRN inference method 
@@ -108,6 +109,19 @@ info:
 
       Run `scripts/run_all.sh` for the entire pipeline. Due to resource intensive nature of the task, we have splitted the pipeline into two steps of GRN inference and evaluation.
 
+      ## Agentic AI assistance
+
+      Considering the advancement in agentic AI, we recommend users to point their AI agent to the
+      `README` and the `agentic/know_how/` docs to get assistance with setting up the framework,
+      troubleshooting, and integrating new components. We have provided specific know-how files for
+      each subtask. If you encounter a problem not covered by the current content, please raise an
+      issue so we can add it to `troubleshooting.md`. We have successfully tested different
+      functionalities of geneRNBI using `claude-sonnet-4.6`. This is doable with both
+      [GitHub Copilot CLI](https://githubnext.com/projects/copilot-cli) (much cheaper) as well as
+      [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview),
+      among other options.
+
+      
 
 
 authors:
