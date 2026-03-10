@@ -18,10 +18,21 @@ def main_sub(par):
 
     evaluation_data = ad.read_h5ad(par['evaluation_data'], backed='r')
     genes = evaluation_data.var_names.tolist()
-    n_targets = len(genes)
     prediction = read_prediction(par)
     assert prediction.shape[0] > 0, 'No links found in the network'
     tf_all = np.loadtxt(par['tf_all'], dtype=str, delimiter=',', skiprows=1)
+
+    # Detect if GRN targets are all TFs (i.e. reversed GRN after TF-source filtering
+    # leaves only TF→TF edges).  In that case:
+    #   - use n_tfs as the background denominator (not n_genes)
+    #   - restrict gt_targets to TF genes only so comparison is TF→TF vs TF→TF
+    tf_all_set = set(tf_all)
+    pred_targets_unique = set(prediction['target'].astype(str))
+    targets_are_tfs = pred_targets_unique.issubset(tf_all_set)
+    if targets_are_tfs:
+        n_targets = len(tf_all_set & set(genes))  # TFs present in the gene universe
+    else:
+        n_targets = len(genes)
     true_graph = pd.read_csv(par['ground_truth'])
     if not {'source', 'target'}.issubset(set(true_graph.columns)):
         raise ValueError("ground_truth must have columns: 'source', 'target'")
@@ -37,6 +48,9 @@ def main_sub(par):
         true_edges = true_graph[true_graph['source'] == tf]
         gt_targets = set(true_edges['target'].astype(str))
         gt_targets = set(gt_targets) & set(genes)
+        # When GRN has TF→TF edges only, restrict ground truth targets to TF genes too
+        if targets_are_tfs:
+            gt_targets = gt_targets & tf_all_set
         k = len(gt_targets)  # Number of true targets for this TF
         if k == 0:
             continue

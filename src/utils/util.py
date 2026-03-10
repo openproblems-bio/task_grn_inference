@@ -207,6 +207,13 @@ def process_links(net, par):
         net = pd.concat(net_store)
         net = net.reset_index(drop=True)
         print_verbose(f"Final network shape after group-specific processing: {net.shape}")
+    # Filter sources to TFs only if tf_all is provided (consistent across all metrics).
+    # This ensures non-TF sources (e.g. in reversed GRNs) are excluded everywhere.
+    if par.get('tf_all') and par.get('apply_tf', True):
+        tf_all = np.loadtxt(par['tf_all'], dtype=str, delimiter=',', skiprows=1)
+        before = len(net)
+        net = net[net['source'].isin(tf_all)]
+        print_verbose(f"Network shape after TF-source filter: {net.shape} (removed {before - len(net)} non-TF edges)")
     # print(net)
     return net
 

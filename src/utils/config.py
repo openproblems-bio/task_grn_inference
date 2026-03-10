@@ -175,7 +175,7 @@ DATASETS_METRICS = {
     'replogle': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery', 'vc'],
     # 'adamson': ['regression',  'tf_binding', 'sem', 'gs_recovery'],
     'norman': ['regression', 'ws_distance', 'tf_binding', 'gs_recovery', 'vc'],
-    'nakatake': ['regression', 'sem', 'gs_recovery', 'vc'],
+    'nakatake': ['regression', 'gs_recovery', 'vc'],  # sem removed: only 5 control samples, scores below threshold
     'op': ['regression', 'vc', 'replicate_consistency', 'tf_binding', 'sem',  'gs_recovery'],
     '300BCG': ['regression', 'vc', 'replicate_consistency', 'tf_binding', 'sem',  'gs_recovery'],
     'ibd_uc': ['regression', 'tf_binding', 'gs_recovery', 'replicate_consistency'],

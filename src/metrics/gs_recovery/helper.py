@@ -810,6 +810,16 @@ def main(par: dict) -> pd.DataFrame:
     all_genes = set(evaluation_data.var_names.tolist())
     prediction = read_prediction(par)
     tf_all = np.loadtxt(par['tf_all'], dtype=str, delimiter=',', skiprows=1)
+
+    # Detect if GRN targets are all TFs (e.g. reversed GRN: gene→TF).
+    # Fisher's exact test uses all_genes as background; when targets are only TFs,
+    # this deflates the random baseline and produces spurious enrichments because TFs
+    # cluster in specific pathways.  Fix: use n_tfs as background when targets are all TFs.
+    tf_all_set = set(tf_all)
+    pred_targets_unique = set(prediction['target'].astype(str))
+    if pred_targets_unique.issubset(tf_all_set):
+        all_genes = tf_all_set & all_genes  # restrict background to TFs in gene universe
+
     pathway_files_dict = par['pathway_files']
     min_pw_size = par.get('min_pathway_size', 5)
     max_pw_size = par.get('max_pathway_size', 500)
