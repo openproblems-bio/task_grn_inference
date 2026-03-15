@@ -35,7 +35,7 @@ for dataset in "${datasets[@]}"; do
 
     for method in "${methods[@]}"; do
         prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
-        score="${save_dir}/reg2_${dataset}_${method}.h5ad"
+        score="${save_dir}/regression_${dataset}_${method}.h5ad"
 
         if [[ ! -f "$prediction" ]]; then
             echo "File not found: $prediction, skipping..."

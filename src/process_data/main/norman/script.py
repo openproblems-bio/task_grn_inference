@@ -41,6 +41,7 @@ def add_metadata(adata):
     adata.uns['dataset_name'] = 'Norman'
     adata.uns['dataset_organism'] = 'human'
     adata.uns['normalization_id'] = 'lognorm'
+    adata.uns['perturbation_type'] = 'activation'
     return adata
 
 if __name__ == '__main__':

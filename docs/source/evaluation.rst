@@ -15,7 +15,8 @@ The evaluation metrics used in geneRNIB are summarized below.
 ----
 
 
-For a detailed description of each metric, refer to the geneRNIB paper. Not all the metrics were applicable to all datasets, as shown in the table. In addition, only those datasets with * passed the applicability criteria for a given metric, which includes minimal variability and performance threshold set for each metric.
+For a detailed description of each metric, refer to the geneRNIB paper. To map the naming conventions used in the code and this table, refer to `surrogate_names` in `config.py` file in the `src/utils/` directory.
+Not all the metrics were applicable to all datasets, as shown in the table. In addition, only those datasets with * passed the applicability criteria for a given metric, which includes minimal variability and performance threshold set for each metric.
 In addition, not all metrics passed the additional criteria for inclusion in the final score calculation, as explained in the paper, and marked with ** in the table. This includes context specificity and robustness in stability analysis. 
 
 The evaluation metrics expect the inferred network to be in the form of an AnnData object with specific format as explained here. 

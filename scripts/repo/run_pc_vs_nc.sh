@@ -4,7 +4,7 @@
 
 subsamples=(-2 -3 -4)
 
-RUN_ID="robust_analy_reg2_$1"
+RUN_ID="robust_analy_regression_$1"
 # resources_dir="resources"
 resources_dir="s3://openproblems-data/resources/grn"
 
