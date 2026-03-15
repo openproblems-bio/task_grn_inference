@@ -15,8 +15,16 @@ method="scenic"
 # Import argument parsing functionality
 source "src/utils/parse_args.sh"
 
-# Parse command line arguments
-parse_arguments "$@"
+# Parse command line arguments (temp_dir handled separately)
+temp_dir=""
+filtered_args=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --temp_dir) temp_dir="$2"; shift 2 ;;
+        *) filtered_args+=("$1"); shift ;;
+    esac
+done
+parse_arguments "${filtered_args[@]}"
 
 # Pass arguments to Python script
 python_args="--prediction $prediction"
@@ -25,6 +33,9 @@ if [ ! -z "$rna" ]; then
 fi
 if [ ! -z "$layer" ]; then
     python_args="$python_args --layer $layer"
+fi
+if [ ! -z "$temp_dir" ]; then
+    python_args="$python_args --temp_dir $temp_dir"
 fi
 
 singularity run ../../images/scenic python src/methods/${method}/script.py $python_args

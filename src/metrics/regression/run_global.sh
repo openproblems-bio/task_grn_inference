@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=reg2_global
+#SBATCH --job-name=regression_global
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
@@ -40,7 +40,7 @@ for dataset in "${datasets[@]}"; do
         filename=$(basename "$prediction")
         method=$(echo "$filename" | sed "s/${dataset}\.//" | sed 's/\.h5ad$//' | sed 's/\.csv$//')
         
-        score="${save_dir}/reg2_${dataset}_${method//[:\/]/_}.h5ad"
+        score="${save_dir}/regression_${dataset}_${method//[:\/]/_}.h5ad"
 
         echo -e "\nProcessing method: $method\n"
         python src/metrics/regression/script.py \

@@ -6,10 +6,8 @@
 #SBATCH --cpus-per-task=20
 #SBATCH --time=2:00:00
 #SBATCH --mem=60GB
-#SBATCH --partition=gpu
-#SBATCH --gres=gpu:1
-#SBATCH --mail-type=END,FAIL      
-#SBATCH --mail-user=jalil.nourisa@gmail.com   
+#SBATCH --partition=cpu
+#SBATCH --mem=80GB
 
 set -euo pipefail
 

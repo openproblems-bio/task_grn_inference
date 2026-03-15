@@ -20,14 +20,14 @@ except:
 from util import manage_layer
 
 
-for dataset in ["replogle", "xaira_HEK293T", "xaira_HCT116"]:
+for dataset in ["replogle", "xaira_HEK293T", "xaira_HCT116", "norman"]:
     single_cell_file = f'resources/processed_data/{dataset}_evaluation_sc.h5ad'
 
     if not os.path.exists(single_cell_file):
         print(f"Skipping {dataset}, file not found.")
         continue
     else:
-        print(f'------ {dataset} ------ ')
+        print(f'------ {dataset} ------ ', flush=True)
 
     # load data
     adata = sc.read_h5ad(single_cell_file, backed='r')
@@ -54,13 +54,10 @@ for dataset in ["replogle", "xaira_HEK293T", "xaira_HCT116"]:
     adata.X = adata.layers[layer]
     adata.X = adata.X.toarray() if not isinstance(adata.X, np.ndarray) else adata.X
 
-
-
     def wrapper_de_analysis(adata):
         # Cache control subset
         ctrl = adata[adata.obs['is_control']].copy()
         assert ctrl.n_obs > 0, "No control cells found!"
-
         # Prepare mapping from TF -> indices in adata
         idx_dict = {}
         for tf in tf_all:
@@ -71,7 +68,6 @@ for dataset in ["replogle", "xaira_HEK293T", "xaira_HCT116"]:
                 'pert_idx': np.where(pert_mask)[0],
                 'ctrl_idx': np.where(adata.obs['is_control'])[0]
             }
-
         def compute_de_for_tf_indices(tf, idx_dict, X, obs_index, var):
             pert_idx = idx_dict['pert_idx']
             ctrl_idx = idx_dict['ctrl_idx']
@@ -85,7 +81,6 @@ for dataset in ["replogle", "xaira_HEK293T", "xaira_HCT116"]:
                 var=var.copy()
             )
             adata_sub.obs['group'] = adata_sub.obs['group'].astype('category')
-
             sc.tl.rank_genes_groups(
                 adata_sub,
                 groupby='group',

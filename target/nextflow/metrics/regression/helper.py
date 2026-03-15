@@ -101,8 +101,11 @@ def cross_validate_gene(
         j: int,
         n_features: int = 10,
         random_state: int = 0xCAFE,
-        n_jobs: int = 10
+        n_jobs: int = 10,
+        n_jobs_model: int = None
 ) -> Dict[str, float]:
+    # When called from a parallel outer loop, use n_jobs_model=1 to avoid nested oversubscription
+    model_jobs = n_jobs_model if n_jobs_model is not None else n_jobs
     
     results = {'r2': 0.0, 'avg-r2': 0.0}
     
@@ -121,7 +124,7 @@ def cross_validate_gene(
     X_ = X[:, selected_features]
     y_ = X[:, j]
     
-    return perform_cross_validation(reg_type, X_, y_, groups, random_state, n_jobs)
+    return perform_cross_validation(reg_type, X_, y_, groups, random_state, model_jobs)
 
 
 def cross_validate(
@@ -149,7 +152,7 @@ def cross_validate(
     with tqdm_joblib(tqdm(total=n_genes, desc=f"{reg_type} CV")):
         results = Parallel(n_jobs=n_jobs, backend="loky")(
             delayed(cross_validate_gene)(
-                reg_type, X, groups, grn, j, int(n_features[j]), n_jobs
+                reg_type, X, groups, grn, j, int(n_features[j]), n_jobs_model=1
             )
             for j in range(n_genes) if n_features[j] > 0
         )
@@ -195,8 +198,10 @@ def cross_validate_gene_raw(
         gene_names: np.ndarray,
         tf_names: Set[str],
         random_state: int = 0xCAFE,
-        n_jobs: int = 10
+        n_jobs: int = 10,
+        n_jobs_model: int = None
 ) -> Dict[str, float]:
+    model_jobs = n_jobs_model if n_jobs_model is not None else n_jobs
     
     results = {'r2': 0.0, 'avg-r2': 0.0}
     
@@ -216,7 +221,7 @@ def cross_validate_gene_raw(
     X_ = X[:, selected_features]
     y_ = X[:, j]
     
-    return perform_cross_validation(reg_type, X_, y_, groups, random_state, n_jobs)
+    return perform_cross_validation(reg_type, X_, y_, groups, random_state, model_jobs)
 
 
 def raw_approach(
@@ -262,7 +267,7 @@ def raw_approach(
     with tqdm_joblib(tqdm(total=len(genes_to_evaluate), desc=f"{reg_type} CV (raw)")):
         results = Parallel(n_jobs=n_jobs, backend="loky")(
             delayed(cross_validate_gene_raw)(
-                reg_type, X, groups, grn_filtered, j, gene_names, tf_names, SEED, n_jobs
+                reg_type, X, groups, grn_filtered, j, gene_names, tf_names, SEED, n_jobs_model=1
             )
             for j in genes_to_evaluate
         )

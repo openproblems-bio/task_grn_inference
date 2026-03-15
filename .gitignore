@@ -15,7 +15,6 @@ datasets_raw/
 state*
 trace*
 tw*
-__init__*
 .ipynb_checkpoints
 __pycache__/
 
@@ -30,3 +29,8 @@ work
 # IDE related
 .idea
 .vscode
+
+# agentic secrets
+agentic/.env
+agentic/.index_cache/
+agentic/.biomni_data/

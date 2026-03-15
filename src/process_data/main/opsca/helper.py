@@ -70,9 +70,9 @@ def preprocess_sc(par):
     del sc_counts.obsm 
     sc_counts.var_names_make_unique()
     # merge cell types
-    CELL_TYPES = ['NK cells', 'T cells CD4+', 'T cells CD8+', 'T regulatory cells', 'B cells', 'Myeloid cells']
+    MAJOR_CTS = ['NK cells', 'T cells CD4+', 'T cells CD8+', 'T regulatory cells', 'B cells', 'Myeloid cells']
     T_cell_types = ['T regulatory cells', 'T cells CD8+', 'T cells CD4+']
-    cell_type_map = {cell_type: 'T cells' if cell_type in T_cell_types else cell_type for cell_type in CELL_TYPES}
+    cell_type_map = {cell_type: 'T cells' if cell_type in T_cell_types else cell_type for cell_type in MAJOR_CTS}
     sc_counts.obs['cell_type'] = sc_counts.obs['cell_type'].map(cell_type_map)
     sc_counts.obs['cell_type'].unique()
 

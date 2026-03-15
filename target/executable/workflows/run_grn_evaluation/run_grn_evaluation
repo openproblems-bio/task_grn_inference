@@ -924,7 +924,7 @@ VIASH_DEP_METRICS_REGRESSION="$VIASH_META_RESOURCES_DIR/../../../nextflow/metric
 VIASH_DEP_METRICS_WS_DISTANCE="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/ws_distance/main.nf"
 VIASH_DEP_METRICS_TF_RECOVERY="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/tf_recovery/main.nf"
 VIASH_DEP_METRICS_VC="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/vc/main.nf"
-VIASH_DEP_METRICS_RC_TF_ACT="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/rc_tf_act/main.nf"
+VIASH_DEP_METRICS_REPLICATE_CONSISTENCY="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/replicate_consistency/main.nf"
 VIASH_DEP_METRICS_SEM="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/sem/main.nf"
 VIASH_DEP_METRICS_TF_BINDING="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/tf_binding/main.nf"
 VIASH_DEP_METRICS_GS_RECOVERY="$VIASH_META_RESOURCES_DIR/../../../nextflow/metrics/gs_recovery/main.nf"
@@ -968,7 +968,7 @@ workflow run_wf {
     ws_distance,
     tf_recovery,
     // anchor_regression,
-    rc_tf_act,
+    replicate_consistency,
     sem,
     vc,
     tf_binding,

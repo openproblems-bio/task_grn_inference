@@ -124,6 +124,7 @@ def verbose_tqdm(iterable, desc, level, verbose_level):
 def basic_qc(
     adata, min_genes_per_cell=200, max_genes_per_cell=5000, min_cells_per_gene=10
 ):
+
     mt = adata.var_names.str.startswith("MT-")
     print("shape before ", adata.shape)
     # 1. stats
@@ -135,6 +136,10 @@ def basic_qc(
     high_gene_filter = n_genes_by_counts > max_genes_per_cell
     # mt_filter = mt_frac > max_mt_frac
 
+    if False:
+        print(
+            f"Cells  after filtering for low_gene: {(~low_gene_filter).sum()}, high_gene: {(~high_gene_filter).sum()}", flush=True
+        )
     # 2. Filter cells
     # print(f'Number of cells removed: below min gene {low_gene_filter.sum()}, exceed max gene {high_gene_filter.sum()}')
     mask_cells = (~low_gene_filter) & (~high_gene_filter)
@@ -148,14 +153,19 @@ def basic_qc(
 
 
 def process_links(net, par):
-    import numpy as np
-    print('Original net shape: ', net.shape)
+    def print_verbose(message):
+        if verbose > 0:
+            print(message)
+    verbose = 1
+    if 'verbose' in par:
+        verbose = par['verbose']
+
+    print_verbose('Original net shape: ' + str(net.shape))
     if 'cell_type' in net.columns:
-        print('Prediction contains cell type specific links. ')
+        print_verbose('Prediction contains cell type specific links. ')
     net_org = net.copy()
     cols = ["source", "target", "weight"]
     supp_cols = []
-
 
     if 'group_specific' in par and par['group_specific'] is not None:
         if par['group_specific'] in net.columns:
@@ -166,11 +176,7 @@ def process_links(net, par):
         flipped = net.rename(columns={"source": "target", "target": "source"})
         merged = net.merge(flipped, on=cols, how="inner")
         if not merged.empty:
-            print("Warning: The network contains at least one symmetric link.")
-        # Remove duplicates
-        # net = net.drop_duplicates(subset=cols)
-        
-        # Remove self-loops
+            print_verbose("Warning: The network contains at least one symmetric link.")
         net["source"] = net["source"].astype(str)
         net["target"] = net["target"].astype(str)
         net = net[net["source"] != net["target"]]
@@ -179,28 +185,35 @@ def process_links(net, par):
         net["weight"] = pd.to_numeric(net["weight"], errors='coerce')
         net = net.groupby(["source", "target"], as_index=False)["weight"].mean()
         
-        print(f"Network shape after cleaning: {net.shape}")
+        print_verbose(f"Network shape after cleaning: {net.shape}")
         # Limit the number of links
         max_links = par.get("max_n_links", 50000)
         # sort by absolute weight descending
         net = net.reindex(net["weight"].abs().sort_values(ascending=False).index).head(max_links)
-        print(f"Network shape applying max_n_links: {net.shape}")
+        print_verbose(f"Network shape applying max_n_links: {net.shape}")
         return net
-    print('Supplementary columns for grouping:', supp_cols)
+    print_verbose('Supplementary columns for grouping: ' + str(supp_cols))
     if len(supp_cols) == 0:
         net = per_group_process(net)
     else:
-        print('Processing group-specific networks for:', supp_cols)
+        print_verbose('Processing group-specific networks for: ' + str(supp_cols))
         net_store = []
         for sup_col in supp_cols:
-            print(f"Processing group: {sup_col}")
+            print_verbose(f"Processing group: {sup_col}")
             net = net_org[net_org[par['group_specific']] == sup_col]
             net = per_group_process(net)
             net[par['group_specific']] = sup_col
             net_store.append(net)
         net = pd.concat(net_store)
         net = net.reset_index(drop=True)
-        print(f"Final network shape after group-specific processing: {net.shape}")
+        print_verbose(f"Final network shape after group-specific processing: {net.shape}")
+    # Filter sources to TFs only if tf_all is provided (consistent across all metrics).
+    # This ensures non-TF sources (e.g. in reversed GRNs) are excluded everywhere.
+    if par.get('tf_all') and par.get('apply_tf', True):
+        tf_all = np.loadtxt(par['tf_all'], dtype=str, delimiter=',', skiprows=1)
+        before = len(net)
+        net = net[net['source'].isin(tf_all)]
+        print_verbose(f"Network shape after TF-source filter: {net.shape} (removed {before - len(net)} non-TF edges)")
     # print(net)
     return net
 

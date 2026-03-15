@@ -2,7 +2,7 @@
 #!/bin/bash
 set -e
 
-run_prefix='sbatch' #bash
+run_prefix=${run_prefix:-'sbatch'}
 python src/utils/config.py
 source src/utils/config.env
 

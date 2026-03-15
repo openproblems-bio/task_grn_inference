@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GRN evaluation &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
@@ -81,13 +81,12 @@
   <section id="grn-evaluation">
 <h1>GRN evaluation<a class="headerlink" href="#grn-evaluation" title="Link to this heading"></a></h1>
 <p>The evaluation metrics used in geneRNIB are summarized below.</p>
-<a class="reference internal image-reference" href="_images/metrics.png"><img alt="_images/metrics.png" class="align-center" src="_images/metrics.png" style="width: 90%;" />
-</a>
+<a class="reference internal image-reference" href="_images/metrics.png"><img alt="_images/metrics.png" class="align-center" src="_images/metrics.png" style="width: 90%;" /></a>
 <hr class="docutils" />
-<a class="reference internal image-reference" href="_images/metric_quality_evaluation.png"><img alt="_images/metric_quality_evaluation.png" class="align-center" src="_images/metric_quality_evaluation.png" style="width: 100%;" />
-</a>
+<a class="reference internal image-reference" href="_images/metric_quality_evaluation.png"><img alt="_images/metric_quality_evaluation.png" class="align-center" src="_images/metric_quality_evaluation.png" style="width: 100%;" /></a>
 <hr class="docutils" />
-<p>For a detailed description of each metric, refer to the geneRNIB paper. Not all the metrics were applicable to all datasets, as shown in the table. In addition, only those datasets with * passed the applicability criteria for a given metric, which includes minimal variability and performance threshold set for each metric.
+<p>For a detailed description of each metric, refer to the geneRNIB paper. To map the naming conventions used in the code and this table, refer to <cite>surrogate_names</cite> in <cite>config.py</cite> file in the <cite>src/utils/</cite> directory.
+Not all the metrics were applicable to all datasets, as shown in the table. In addition, only those datasets with * passed the applicability criteria for a given metric, which includes minimal variability and performance threshold set for each metric.
 In addition, not all metrics passed the additional criteria for inclusion in the final score calculation, as explained in the paper, and marked with ** in the table. This includes context specificity and robustness in stability analysis.</p>
 <p>The evaluation metrics expect the inferred network to be in the form of an AnnData object with specific format as explained here.
 It should be noted that the metric currently evaluate only the <strong>top TF-gene pairs</strong>, currently limited to <strong>50,000 edges</strong>, ranked by their assigned weight.</p>

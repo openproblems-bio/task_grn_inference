@@ -3373,7 +3373,7 @@ meta = [
       }
     },
     {
-      "name" : "metrics/rc_tf_act",
+      "name" : "metrics/replicate_consistency",
       "repository" : {
         "type" : "local"
       }
@@ -3469,7 +3469,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_evaluation",
     "viash_version" : "0.9.4",
-    "git_commit" : "7d52e0e2489aeaa2e7d7df055a2495809a2b2e2b",
+    "git_commit" : "9c0d30718b1d70a00102eabdb026172df6a3441a",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3487,7 +3487,7 @@ meta = [
           "dest" : "resources_test"
         }
       ],
-      "readme" : "## Installation\nInstall Docker, Java, and Viash using\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements).\n\n## Download resources\n```bash\ngit clone --recursive git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\nTo interact with the framework,download the resources containing necessary inferene and evaluation datasets. \n\n```bash\npip install awscli\naws s3 sync  s3://openproblems-data/resources/grn/grn_benchmark resources/grn_benchmark  --no-sign-request\n\n```\n\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:\n\n```bash\nviash run src/methods/pearson_corr/config.vsh.yaml -- \\\\\n            --rna resources/grn_benchmark/inference_data/op_rna.h5ad \\\\\n            --tf_all resources/grn_benchmark/prior/tf_all.csv \\\\ \n            --prediction output/net.h5ad\n```\n\n## Evaluate a GRN model\n\n```bash\nbash scripts/run_grn_evaluation.sh \\\\\n            --prediction=output/net.h5ad \\\\\n            --dataset=op \\\\ \n            --build_images=true \\\\ \n            --save_dir=output \n```\n`build_images` only needed for the first run.\n\nThis outputs the scores into `output/score_uns.yaml`. \n\n\n## Add a GRN inference method, evaluation metric, or dataset\n\nTo add a new component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n\n## Run the entire pipline\n\nRun `scripts/run_all.sh` for the entire pipeline. Due to resource intensive nature of the task, we have splitted the pipeline into two steps of GRN inference and evaluation.\n"
+      "readme" : "## Installation\nInstall Docker, Java, and Viash using\n[these instructions](https://openproblems.bio/documentation/fundamentals/requirements).\n\n## Set up the repository\n```bash\ngit clone --recursive git@github.com:openproblems-bio/task_grn_inference.git\n\ncd task_grn_inference\n```\nTo interact with the framework, download the resources containing necessary inference and evaluation datasets. \n\n```bash\npip install awscli\naws s3 sync  s3://openproblems-data/resources/grn/grn_benchmark resources/grn_benchmark  --no-sign-request\n\n```\nOf note, you can also use the `resources_test` for testing purposes, which is a subset of the full resources.\n\n\n## Run a GRN inference method \n\nTo infer a GRN for a given dataset (e.g. `op`) using simple Pearson correlation:\n\n```bash\nviash run src/methods/pearson_corr/config.vsh.yaml -- \\\\\n            --rna resources/grn_benchmark/inference_data/op_rna.h5ad \\\\\n            --tf_all resources/grn_benchmark/prior/tf_all.csv \\\\ \n            --prediction output/net.h5ad\n```\n\n## Evaluate a GRN model\n\n```bash\nbash scripts/run_grn_evaluation.sh \\\\\n            --prediction=output/net.h5ad \\\\\n            --dataset=op \\\\ \n            --build_images=true \\\\ \n            --save_dir=output \n```\n`build_images` only needed for the first run.\n\nThis outputs the scores into `output/score_uns.yaml`. \n\n\n## Add a GRN inference method, evaluation metric, or dataset\n\nTo add a new component to the repository, follow the [Documentation](https://genernib-documentation.readthedocs.io/en/latest/).\n\n## Run the entire pipline\n\nRun `scripts/run_all.sh` for the entire pipeline. Due to resource intensive nature of the task, we have splitted the pipeline into two steps of GRN inference and evaluation.\n\n## Agentic AI assistance\n\nConsidering the advancement in agentic AI, we recommend users to point their AI agent to the\n`README` and the `agentic/know_how/` docs to get assistance with setting up the framework,\ntroubleshooting, and integrating new components. We have provided specific know-how files for\neach subtask. If you encounter a problem not covered by the current content, please raise an\nissue so we can add it to `troubleshooting.md`. We have successfully tested different\nfunctionalities of geneRNBI using `claude-sonnet-4.6`. This is doable with both\n[GitHub Copilot CLI](https://githubnext.com/projects/copilot-cli) (much cheaper) as well as\n[Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview),\namong other options.\n"
     },
     "repositories" : [
       {
@@ -3582,7 +3582,7 @@ include { regression } from "${meta.resources_dir}/../../../nextflow/metrics/reg
 include { ws_distance } from "${meta.resources_dir}/../../../nextflow/metrics/ws_distance/main.nf"
 include { tf_recovery } from "${meta.resources_dir}/../../../nextflow/metrics/tf_recovery/main.nf"
 include { vc } from "${meta.resources_dir}/../../../nextflow/metrics/vc/main.nf"
-include { rc_tf_act } from "${meta.resources_dir}/../../../nextflow/metrics/rc_tf_act/main.nf"
+include { replicate_consistency } from "${meta.resources_dir}/../../../nextflow/metrics/replicate_consistency/main.nf"
 include { sem } from "${meta.resources_dir}/../../../nextflow/metrics/sem/main.nf"
 include { tf_binding } from "${meta.resources_dir}/../../../nextflow/metrics/tf_binding/main.nf"
 include { gs_recovery } from "${meta.resources_dir}/../../../nextflow/metrics/gs_recovery/main.nf"
@@ -3610,7 +3610,7 @@ workflow run_wf {
     ws_distance,
     tf_recovery,
     // anchor_regression,
-    rc_tf_act,
+    replicate_consistency,
     sem,
     vc,
     tf_binding,
