@@ -20,8 +20,7 @@ except:
 from util import manage_layer
 
 
-for dataset in ["replogle", "xaira_HEK293T", "xaira_HCT116"]:
-# for dataset in ["norman"]:
+for dataset in ["replogle", "xaira_HEK293T", "xaira_HCT116", "norman"]:
     single_cell_file = f'resources/processed_data/{dataset}_evaluation_sc.h5ad'
 
     if not os.path.exists(single_cell_file):

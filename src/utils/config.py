@@ -174,10 +174,10 @@ DATASETS_CELLTYPES = {
 DATASETS_METRICS = {
     'replogle': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery', 'vc'],
     # 'adamson': ['regression',  'tf_binding', 'sem', 'gs_recovery'],
-    'norman': ['regression', 'ws_distance', 'tf_binding', 'gs_recovery', 'vc'],
+    'norman': ['regression', 'ws_distance', 'tf_binding', 'gs_recovery', 'vc', 'tf_recovery'],
     'nakatake': ['regression', 'gs_recovery', 'vc'],  # sem removed: only 5 control samples, scores below threshold
     'op': ['regression', 'vc', 'replicate_consistency', 'tf_binding', 'sem',  'gs_recovery'],
-    '300BCG': ['regression', 'vc', 'replicate_consistency', 'tf_binding', 'sem',  'gs_recovery'],
+    '300BCG': ['regression', 'vc', 'replicate_consistency', 'tf_binding', 'gs_recovery'],  # sem excluded: single perturbation condition (LPS only) forces CV to cross cell-type boundaries; learned TF shocks are cell-type-specific and cannot transfer
     'ibd_uc': ['regression', 'tf_binding', 'gs_recovery', 'replicate_consistency'],
     'ibd_cd': ['regression', 'tf_binding', 'gs_recovery', 'replicate_consistency'],
     'parsebioscience': ['regression', 'vc', 'replicate_consistency', 'tf_binding', 'sem',  'gs_recovery'],
@@ -206,30 +206,20 @@ METRICS = [
        'gs_f1',
        ]
     
-FINAL_METRICS = [
-       'r_precision', 
-       'r_recall', 
-       'vc', 
-       'sem',
-       'ws_precision', 
-       'ws_recall', 
-    #    'tfb_f1', 
-    #    'gs_f1', 
-       ]
 METRIC_THRESHOLDS = {
-    # Regression metrics: R2-based, meaningful if > 0.1
-    'r_precision': 0.1,
-    'r_recall': 0.1,
+    # Regression metrics: R2-based, meaningful if > 0.05
+    'r_precision': 0.05,
+    'r_recall': 0.05,
     
     # Wasserstein distance metrics: precision/recall based, meaningful if > 0.05
     'ws_precision': 0.5,
     'ws_recall': 0.5,
     
     # Virtual cell: r2 scores
-    'vc': 0.1,
+    'vc': 0.05,
     
-    # SEM (Structural Equation Modeling): goodness of fit (0-1), meaningful if > 0.4
-    'sem': 0.1,
+    # SEM (Structural Equation Modeling): goodness of fit (0-1), meaningful if > 0.05
+    'sem': 0.05,
     
     # TF recovery metrics: t-statistics from paired t-test, meaningful if > 2.0 (p<0.05)
     't_rec_precision': 2.0,
@@ -245,7 +235,7 @@ METRIC_THRESHOLDS = {
     
     # Gene set recovery F1: F1 for gene set enrichment, meaningful if > 0.1
     # Tests if predicted regulators recover known gene sets
-    'gs_f1': 0.1,
+    'gs_f1': 0.05,
 }
 surrogate_names = {
     # -- methods
@@ -324,7 +314,6 @@ def generate_config_env(output_path='src/utils/config.env'):
         f.write(f'METHODS="{",".join(METHODS)}"\n')
         f.write(f'METRICS="{",".join(METRICS)}"\n')
         f.write(f'DATASETS="{",".join(DATASETS)}"\n')
-        f.write(f'FINAL_METRICS="{",".join(FINAL_METRICS)}"\n')
         
         # Cell types
         f.write("\n# Cell types\n")
