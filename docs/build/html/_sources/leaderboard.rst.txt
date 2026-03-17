@@ -16,17 +16,22 @@ The table below shows which metrics are applicable per dataset (✓ = applicable
    :align: center
 ----
 
-The individual performance of the methods on each dataset is summarized below. Metrics output multiple sub-metrics in the raw score files, where only a subset of them are used in the evaluation. They are listed in the table below.
+Metrics output multiple sub-metrics in the raw score files, where only a subset of them are used in the evaluation. 
+Also, their naming is different in the raw score files and in the leaderboard. 
+The table below shows the mapping between the raw score sub-metrics and the metrics used in the leaderboard.
+
+.. image:: images/raw_scores_op.png
+   :width: 70%
+   :align: center
+----
+
+The individual performance of the methods on each dataset is summarized below.
 
 .. image:: images/metrics_map.png
    :width: 45%
    :align: center
 ----
 
-.. image:: images/raw_scores_op.png
-   :width: 70%
-   :align: center
-----
 
 .. image:: images/raw_scores_nakatake.png
    :width: 70%
