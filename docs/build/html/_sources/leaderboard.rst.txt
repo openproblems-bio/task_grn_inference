@@ -1,7 +1,9 @@
 
 Leaderboard
 =================
-The overall comparative performance of the integrated GRN inference methods is summarized in the leaderboard below. Only metrics that pass the applicability criteria for a given dataset are used to rank the methods. The table below shows which metrics are applicable per dataset (✓ = applicable by configuration; ★ = also passes empirical quality criteria).
+The overall comparative performance of the integrated GRN inference methods is summarized in the leaderboard below. 
+Only metrics that pass the applicability criteria for a given dataset are used to rank the methods. 
+The table below shows which metrics are applicable per dataset (✓ = applicable by metric requirements; ★ = also passes quality criteria).
 
 .. image:: images/metric_applicability.png
    :width: 60%
