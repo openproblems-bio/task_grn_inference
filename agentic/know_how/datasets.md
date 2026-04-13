@@ -1,22 +1,21 @@
-# GeneRNBI Datasets
+# geneRNBI Datasets
 
----
 
-## Metadata
+There are **10 integrated datasets** in the benchmark.
 
-**Short Description**: S3 download commands for all GeneRNBI datasets (main, extended, raw, results) and test data.
+| Dataset | Display Name | Cell Type | Perturbation Type | Inference Data | Modality |
+|---------|-------------|-----------|-------------------|----------------|----------|
+| `op` | OPSCA | PBMC | Drugs | sc | Transcriptomics |
+| `parsebioscience` | ParseBioscience | PBMC | Cytokines | sc/bulk | Transcriptomics |
+| `300BCG` | 300BCG | PBMC | Chemicals | sc | Transcriptomics |
+| `ibd_uc` | IBD:UC | PBMC | Chemicals/bacteria | sc | Multiomics |
+| `ibd_cd` | IBD:CD | PBMC | Chemicals/bacteria | sc | Multiomics |
+| `replogle` | Replogle | K562 | Knockout | sc/bulk | Transcriptomics |
+| `norman` | Norman | K562 | Activation | sc | Transcriptomics |
+| `nakatake` | Nakatake | — | — | sc/bulk | Transcriptomics |
+| `xaira_HEK293T` | Xaira:HEK293T | HEK293T | Knockout | sc/bulk | Transcriptomics |
+| `xaira_HCT116` | Xaira:HCT116 | HCT116 | Knockout | sc/bulk | Transcriptomics |
 
-**Authors**: GeneRNBI Team
-
-**Version**: 1.0
-
-**Last Updated**: March 2026
-
-**License**: CC BY 4.0
-
-**Commercial Use**: ✅ Allowed
-
----
 
 ## Overview
 

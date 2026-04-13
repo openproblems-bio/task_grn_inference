@@ -9,6 +9,15 @@ The evaluation metrics used in geneRNIB are summarized below.
    :align: center
 ----
 
+Each metric has particular implementation requirements that limit its applicability to certain datasets. The datasets applicable to each metric are listed in the following table.
+
+In addition, to ensure that only informative metrics contribute to the benchmark, each metric is evaluated per dataset against two quality control criteria:
+
+1. **Performance threshold** — the best score across all methods must exceed a threshold, defined as the maximum of a global floor (metric-specific) and the negative control score for that dataset. This filters out metrics where no method achieves meaningful signal.
+2. **Variability** — the coefficient of variation (CV = range / mean) across methods must be ≥ 0.2. This filters out metrics that fail to discriminate between methods.
+
+A metric is retained for a given dataset only if it passes both criteria. Those that passed quality control are marked with a star (★) in the table below. Note that the quality control process is repeated after adding a new GRN inference method to reflect the updated performance comparison.
+
 .. image:: images/metric_quality_evaluation.png
    :width: 100%
    :align: center
@@ -16,8 +25,6 @@ The evaluation metrics used in geneRNIB are summarized below.
 
 
 For a detailed description of each metric, refer to the geneRNIB paper. To map the naming conventions used in the code and this table, refer to `surrogate_names` in `config.py` file in the `src/utils/` directory.
-Not all the metrics were applicable to all datasets, as shown in the table. In addition, only those datasets with * passed the applicability criteria for a given metric, which includes minimal variability and performance threshold set for each metric.
-In addition, not all metrics passed the additional criteria for inclusion in the final score calculation, as explained in the paper, and marked with ** in the table. This includes context specificity and robustness in stability analysis. 
 
 The evaluation metrics expect the inferred network to be in the form of an AnnData object with specific format as explained here. 
 It should be noted that the metric currently evaluate only the **top TF-gene pairs**, currently limited to **50,000 edges**, ranked by their assigned weight.  

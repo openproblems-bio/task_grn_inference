@@ -92,9 +92,8 @@ def format_adata(adata, data_type):
     adata.X = adata.X.astype(np.float32)
     return adata
 
-data_dir = '/vol/projects/CIIM/processed/multiome/IBD/'
-adata_rna = ad.read_h5ad(f'{data_dir}/rna.h5ad')
-adata_atac = ad.read_h5ad(f'{data_dir}/atac.h5ad')
+adata_rna = ad.read_h5ad('resources/datasets_raw/ibd_rna.h5ad')
+adata_atac = ad.read_h5ad('resources/datasets_raw/ibd_atac.h5ad')
 
 adata_rna = format_adata(adata_rna, data_type='rna')
 adata_rna.obs['group_col'] = adata_rna.obs['perturbation'].astype(str) + '_' + \

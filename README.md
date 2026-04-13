@@ -84,15 +84,14 @@ Run `scripts/run_all.sh` for the entire pipeline. Due to resource intensive natu
 
 ## Agentic AI assistance
 
-Considering the advancement in agentic AI, we recommend users to point their AI agent to the
-`README` and the `agentic/know_how/` docs to get assistance with setting up the framework,
-troubleshooting, and integrating new components. We have provided specific know-how files for
-each subtask. If you encounter a problem not covered by the current content, please raise an
-issue so we can add it to `troubleshooting.md`. We have successfully tested different
-functionalities of geneRNBI using `claude-sonnet-4.6`. This is doable with both
+We have created an instructions file for agentic AI to interact with the benchmark, run different functionalities of the framework, and assist with debugging and development. 
+Pls point your agent to `agentic/AGENT-instructions.md` to get started.
+
+We have successfully tested its functionalities on different using `claude-sonnet-4.6` and
 [GitHub Copilot CLI](https://githubnext.com/projects/copilot-cli) (much cheaper) as well as
-[Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview),
-among other options.
+[Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview).
+
+If you face a new issue, please report it to us and we will update the instructions file accordingly.
 
 ## Description
 
