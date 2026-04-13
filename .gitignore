@@ -15,6 +15,7 @@ local/
 datasets_raw/
 state*
 trace*
+temp/
 tw*
 .ipynb_checkpoints
 __pycache__/
