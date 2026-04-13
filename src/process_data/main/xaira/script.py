@@ -22,7 +22,7 @@ par = {
 }
 
 
-raw_dir = '/vol/projects/CIIM/PerturbationDataset/Perturb_seq_dataset_Xiara'
+raw_dir = 'resources/datasets_raw'
 
 ref_cell_types = ['HEK293T'] #'HEK293T', 'HCT116' #Human Embryonic Kidney 293T cells, Human Colorectal Carcinoma Cell Line 116
 
@@ -43,7 +43,7 @@ def add_metadata(cell_type):
 for ref_cell_type in ref_cell_types:
     print('Reading data for', ref_cell_type, flush=True)
     
-    adata = ad.read_h5ad(f'{raw_dir}/{ref_cell_type}_filtered_dual_guide_cells.h5ad', backed='r')
+    adata = ad.read_h5ad(f'{raw_dir}/xaira_{ref_cell_type}_raw.h5ad', backed='r')
     
     adata.obs['is_control'] =  adata.obs['gene_target'] == 'Non-Targeting'
     adata.obs['perturbation_type'] = 'knockdown'

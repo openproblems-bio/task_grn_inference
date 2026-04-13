@@ -24,7 +24,7 @@ def add_metadata(adata):
     return adata
 
 print('Reading data...', flush=True)
-adata = ad.read_h5ad('/vol/projects/CIIM/300BCG/300BCG_scRNA/bcg4-0712.h5ad')
+adata = ad.read_h5ad('resources/datasets_raw/300BCG.h5ad')
 
 def format_data(adata):
     adata.obs.rename({'stim': 'perturbation', 'ids': 'donor_id', 'clusters1': 'cell_type'}, axis=1, inplace=True)

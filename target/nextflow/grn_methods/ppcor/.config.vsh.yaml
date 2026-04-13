@@ -318,7 +318,7 @@ build_info:
   output: "target/nextflow/grn_methods/ppcor"
   executable: "target/nextflow/grn_methods/ppcor/main.nf"
   viash_version: "0.9.4"
-  git_commit: "9c0d30718b1d70a00102eabdb026172df6a3441a"
+  git_commit: "5bafb3063c0f6b2191f3b974f227e0e7b7eb3f14"
   git_remote: "https://github.com/openproblems-bio/task_grn_inference"
 package_config:
   name: "task_grn_inference"
@@ -371,16 +371,14 @@ package_config:
       \n## Run the entire pipline\n\nRun `scripts/run_all.sh` for the entire pipeline.\
       \ Due to resource intensive nature of the task, we have splitted the pipeline\
       \ into two steps of GRN inference and evaluation.\n\n## Agentic AI assistance\n\
-      \nConsidering the advancement in agentic AI, we recommend users to point their\
-      \ AI agent to the\n`README` and the `agentic/know_how/` docs to get assistance\
-      \ with setting up the framework,\ntroubleshooting, and integrating new components.\
-      \ We have provided specific know-how files for\neach subtask. If you encounter\
-      \ a problem not covered by the current content, please raise an\nissue so we\
-      \ can add it to `troubleshooting.md`. We have successfully tested different\n\
-      functionalities of geneRNBI using `claude-sonnet-4.6`. This is doable with both\n\
-      [GitHub Copilot CLI](https://githubnext.com/projects/copilot-cli) (much cheaper)\
-      \ as well as\n[Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview),\n\
-      among other options.\n"
+      \nWe have created an instructions file for agentic AI to interact with the benchmark,\
+      \ run different functionalities of the framework, and assist with debugging\
+      \ and development. \nPls point your agent to `agentic/AGENT-instructions.md`\
+      \ to get started.\n\nWe have successfully tested its functionalities on different\
+      \ using `claude-sonnet-4.6` and\n[GitHub Copilot CLI](https://githubnext.com/projects/copilot-cli)\
+      \ (much cheaper) as well as\n[Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview).\n\
+      \nIf you face a new issue, please report it to us and we will update the instructions\
+      \ file accordingly.\n"
   repositories:
   - type: "github"
     name: "openproblems"

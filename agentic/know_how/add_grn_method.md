@@ -1,26 +1,13 @@
-# How to Add a New GRN Inference Method to GeneRNBI
+# How to Add a New GRN Inference Method to geneRNBI
 
 ---
 
-## Metadata
+Step-by-step guide to integrating a new GRN inference method into the geneRNBI benchmark, including file structure, required format, and how to test with Viash.
 
-**Short Description**: Step-by-step guide to integrating a new GRN inference method into the GeneRNBI benchmark, including file structure, required format, and how to test with Viash.
-
-**Authors**: GeneRNBI Team
-
-**Version**: 1.0
-
-**Last Updated**: March 2026
-
-**License**: CC BY 4.0
-
-**Commercial Use**: ✅ Allowed
-
----
 
 ## Overview
 
-Every GRN inference method in GeneRNBI lives under `src/methods/<method_name>/` and consists of exactly two required files:
+Every GRN inference method in geneRNBI lives under `src/methods/<method_name>/` and consists of exactly at least two required files:
 - `config.vsh.yaml` — Viash component configuration
 - `script.py` (or `script.R`) — the inference logic
 
@@ -266,16 +253,6 @@ viash test src/methods/<method_name>/config.vsh.yaml
 
 ---
 
-## Step 6: Run inference manually (without Docker)
-
-```bash
-viash run src/methods/pearson_corr/config.vsh.yaml -- \
-    --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \
-    --prediction output/net.h5ad \
-    --tf_all resources_test/grn_benchmark/prior/tf_all.csv
-```
-
----
 
 ## Common Errors
 

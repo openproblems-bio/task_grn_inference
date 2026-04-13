@@ -108,7 +108,7 @@ def format_adata(adata):
 def main():
     if True:
         print('Loading data of parsebioscience', flush=True)
-        adata = ad.read_h5ad('/vol/projects/CIIM/perturbation_data/Parse_10M_PBMC_cytokines.h5ad', backed='r')
+        adata = ad.read_h5ad('resources/datasets_raw/parsebioscience.h5ad', backed='r')
         group_keys = ['cell_type', 'cytokine', 'donor', 'bc1_well']
         for key in group_keys:
             adata.obs[key] = adata.obs[key].astype('str')

@@ -447,17 +447,20 @@ def process_single_cell_data(adata, covariates, add_metadata, save_name, split_f
     del adata_train_sc
     gc.collect()
 
-    # Process test sc
-    print('Processing adata test sc ...', flush=True)
-    adata_test_sc = adata[adata.obs[group].isin(test_group)].copy()
-    print('Shape of adata_test_sc: ', adata_test_sc.shape, flush=True)
-    assert adata_test_sc.obs['is_control'].sum() > 0, "No control data found in test set"
-    assert adata_test_sc.shape[0] > 0, "No test data found after splitting"
-    adata_test_sc = add_metadata(adata_test_sc)
-    if save_data:
+    # Process test sc — only saved for datasets used by ws_distance metric
+    WS_DISTANCE_DATASETS = {'norman', 'adamson', 'replogle', 'xaira_HEK293T', 'xaira_HCT116'}
+    if save_data and save_name in WS_DISTANCE_DATASETS:
+        print('Processing adata test sc ...', flush=True)
+        adata_test_sc = adata[adata.obs[group].isin(test_group)].copy()
+        print('Shape of adata_test_sc: ', adata_test_sc.shape, flush=True)
+        assert adata_test_sc.obs['is_control'].sum() > 0, "No control data found in test set"
+        assert adata_test_sc.shape[0] > 0, "No test data found after splitting"
+        adata_test_sc = add_metadata(adata_test_sc)
         adata_test_sc.write(f'resources/processed_data/{save_name}_evaluation_sc.h5ad', compression='gzip')
-    del adata_test_sc
-    gc.collect()
+        del adata_test_sc
+        gc.collect()
+    else:
+        print(f'Skipping evaluation_sc for {save_name} (not used by ws_distance metric)', flush=True)
 
     # Process full sc
     print('Processing adata sc ...', flush=True)

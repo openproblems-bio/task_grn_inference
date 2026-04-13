@@ -578,3 +578,87 @@ def create_grn_baseline(A):
     
     return B
 
+
+
+def compute_overall_scores(scores_all, final_metrics, datasets):
+    """
+    Compute doubly-normalized overall scores for ranking GRN models.
+
+    Steps:
+      1. Per-dataset min-max normalization of each metric (negatives clipped to 0).
+      2. Average normalized scores across datasets per metric, then re-normalize to [0,1].
+      3. Average normalized scores across metrics per dataset, then re-normalize to [0,1].
+      4. overall_score = median over (applicability-filtered metric scores + per-dataset scores).
+
+    Parameters
+    ----------
+    scores_all : pd.DataFrame
+        Long-ish frame with columns ['dataset', 'model', <metric cols>...].
+    final_metrics : list of str
+        Metrics that passed applicability criteria (used for overall_score).
+    datasets : list of str
+        Known dataset names.
+
+    Returns
+    -------
+    df_scores : pd.DataFrame
+        Index = model name. Columns = per-metric scores + per-dataset scores + 'overall_score'.
+    """
+    all_metrics = [c for c in scores_all.columns if c not in ('dataset', 'model')]
+
+    def normalize_scores_per_dataset(df):
+        df = df.set_index('model')
+        original_missing = df.isna()
+        df[df < 0] = 0
+        for col in df.columns:
+            col_min, col_max = df[col].min(), df[col].max()
+            if col_max > col_min:
+                df[col] = (df[col] - col_min) / (col_max - col_min)
+            else:
+                df[col] = 0
+        df[original_missing] = float('nan')
+        return df
+
+    df_all_n = scores_all.groupby('dataset').apply(normalize_scores_per_dataset).reset_index()
+
+    # --- per-metric aggregation ---
+    df_metrics = (
+        df_all_n.groupby('model')
+        .apply(lambda df: df.drop('dataset', axis=1).mean(skipna=True))
+    )
+    for col in df_metrics.columns:
+        original_nans = df_metrics[col].isna()
+        col_min, col_max = df_metrics[col].min(), df_metrics[col].max()
+        if col_max > col_min:
+            df_metrics[col] = (df_metrics[col] - col_min) / (col_max - col_min)
+        else:
+            df_metrics[col] = 0
+        df_metrics.loc[original_nans, col] = float('nan')
+
+    # --- per-dataset aggregation ---
+    df_datasets = (
+        df_all_n.groupby('model')
+        .apply(lambda df: df.set_index('dataset')[all_metrics].T.mean(skipna=True))
+        .reset_index()
+    )
+    df_datasets = df_datasets.pivot(index='model', columns='dataset', values=0)
+    for col in df_datasets.columns:
+        original_nans = df_datasets[col].isna()
+        col_min, col_max = df_datasets[col].min(), df_datasets[col].max()
+        if col_max > col_min:
+            df_datasets[col] = (df_datasets[col] - col_min) / (col_max - col_min)
+        else:
+            df_datasets[col] = 0
+        df_datasets.loc[original_nans, col] = float('nan')
+
+    df_scores = pd.concat([df_metrics, df_datasets], axis=1)
+    df_scores = df_scores.dropna(axis=1, how='all')
+
+    if df_scores.index.duplicated().any():
+        df_scores = df_scores.groupby(df_scores.index).mean()
+
+    final_metrics_cols = [m for m in final_metrics if m in df_scores.columns]
+    dataset_cols = [c for c in df_scores.columns if c in datasets]
+    df_scores['overall_score'] = df_scores[final_metrics_cols + dataset_cols].median(axis=1, skipna=True)
+
+    return df_scores
