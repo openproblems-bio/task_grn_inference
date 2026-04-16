@@ -12,77 +12,88 @@ DATASET_INFO = {
             "perturbation_type": "Drugs",
             "Inference data": " sc",
             'Measurement time': "24 hours",
-            "Modality": 'Multiomics'
+            "Modality": 'Multiomics',
+            "has_raw_counts": True,
         },
         "ibd_uc": {
             "cell_type": "PBMC",
             "perturbation_type": "Chemicals/ bacteria",
             "Inference data": "sc",
             'Measurement time': "24 hours",
-            "Modality": 'Multiomics'
+            "Modality": 'Multiomics',
+            "has_raw_counts": True,
         },
         "ibd_cd": {
             "cell_type": "PBMC",
             "perturbation_type": "Chemicals/ bacteria",
             "Inference data": "sc",
             'Measurement time': "24 hours",
-            "Modality": 'Multiomics'
+            "Modality": 'Multiomics',
+            "has_raw_counts": True,
         },
         "300BCG": {
             "cell_type": "PBMC",
             "perturbation_type": "Chemicals",
             "Inference data": "sc",
             'Measurement time': 'T0 and 3 months',
-            "Modality": 'Transcriptmoics'
+            "Modality": 'Transcriptmoics',
+            "has_raw_counts": True,
         },
         "parsebioscience": {
             "cell_type": "PBMC",
             "perturbation_type": "Cytokines",
             "Inference data": " sc/bulk",
             'Measurement time': "24 hours",
-            "Modality": 'Transcriptmoics'
+            "Modality": 'Transcriptmoics',
+            "has_raw_counts": False,
         },
         "xaira_HEK293T": {
             "cell_type": "HEK293T",
             "perturbation_type": "Knockout",
             "Inference data": " sc/bulk",
             'Measurement time': "7 days",
-            "Modality": 'Transcriptmoics'
+            "Modality": 'Transcriptmoics',
+            "has_raw_counts": True,
         },
         "xaira_HCT116": {
             "cell_type": "HCT116",
             "perturbation_type": "Knockout",
             "Inference data": " sc/bulk",
             'Measurement time': "7 days",
-            "Modality": 'Transcriptmoics'
+            "Modality": 'Transcriptmoics',
+            "has_raw_counts": True,
         },
         "replogle": {
             "cell_type": "K562",
             "perturbation_type": "Knockout",
             "Inference data": " sc/bulk",
             'Measurement time': "7 days",
-            "Modality": 'Transcriptmoics'
+            "Modality": 'Transcriptmoics',
+            "has_raw_counts": True,
         },
         "nakatake": {
             "cell_type": "SEES3 (PSC)",
             "perturbation_type": "Overexpression",
             "Inference data": "bulk",
             'Measurement time': "2 days",
-            "Modality": 'Transcriptmoics'
+            "Modality": 'Transcriptmoics',
+            "has_raw_counts": False,
         },
         "norman": {
             "cell_type": "K562",
             "perturbation_type": "Activation",
             "Inference data": "sc",
             'Measurement time': "7 days",
-            "Modality": 'Transcriptmoics'
+            "Modality": 'Transcriptmoics',
+            "has_raw_counts": True,
         },
         "adamson": {
             "cell_type": "K562",
             "perturbation_type": "Knockout",
             "Inference data": "sc",
             'Measurement time': "7 days",
-            "Modality": 'Transcriptmoics'
+            "Modality": 'Transcriptmoics',
+            "has_raw_counts": True,
         },
     }
 

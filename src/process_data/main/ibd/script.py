@@ -1,4 +1,5 @@
 
+import gzip
 import pandas as pd
 import numpy as np
 import anndata as ad
@@ -6,13 +7,57 @@ import scanpy as sc
 import os
 import numpy as np
 import sys
+import argparse
+
 meta = {
     'resource_dir': './',
 }
 
+parser = argparse.ArgumentParser(add_help=False)
+parser.add_argument('--out_dir', type=str, default=None,
+                    help='Output directory override (for verification runs)')
+parser.add_argument('--annotation_file', type=str,
+                    default='resources/supp_data/gencode.v47.annotation.gtf.gz',
+                    help='Gencode GTF file for gene body interval annotation')
+args, _ = parser.parse_known_args()
+
+
+def add_interval_from_gtf(adata, gtf_path):
+    """
+    Parse a Gencode GTF to add interval (chr:start-end) column to adata.var.
+    Matches on gene_name. Uses gene-level entries for full gene body coordinates.
+    """
+    print(f'Parsing GTF: {gtf_path}', flush=True)
+    gene_coords = {}
+    open_fn = gzip.open if gtf_path.endswith('.gz') else open
+    with open_fn(gtf_path, 'rt') as f:
+        for line in f:
+            if line.startswith('#'):
+                continue
+            fields = line.strip().split('\t')
+            if len(fields) < 9 or fields[2] != 'gene':
+                continue
+            chrom, start, end = fields[0], fields[3], fields[4]
+            attrs = fields[8]
+            # extract gene_name value
+            gene_name = None
+            for attr in attrs.split(';'):
+                attr = attr.strip()
+                if attr.startswith('gene_name'):
+                    gene_name = attr.split(' ', 1)[1].strip().strip('"')
+                    break
+            if gene_name:
+                gene_coords[gene_name] = f'{chrom}:{start}-{end}'
+
+    adata.var['interval'] = adata.var_names.map(gene_coords)
+    n_mapped = adata.var['interval'].notna().sum()
+    print(f'Interval: mapped {n_mapped}/{adata.n_vars} genes', flush=True)
+    return adata
+
 
 sys.path.append(meta['resource_dir'])
 from src.process_data.helper_data import qc_perturbation, pseudobulk_sum_func, normalize_func
+
 
 def add_metadata(adata):
     adata.uns['dataset_summary'] = 'IBD multiome of PBMC (scRNA+scATAC) with 38 donors, 2 disease of UC and CD, 3 perturbation of RPMI, LPS, S. enterica'
@@ -125,6 +170,7 @@ print(f'Final RNA shape: {adata_rna.shape}')
 print(f'Final ATAC shape: {adata_atac.shape}')
 
 adata_rna = normalize_func(adata_rna)
+adata_rna = add_interval_from_gtf(adata_rna, args.annotation_file)
 
 
 def split_func(adata):
@@ -169,14 +215,17 @@ adata_test_rna.obs['disease'] = adata_test_rna.obs['disease'].str.lower()
 adata_test_rna_bulk.obs['disease'] = adata_test_rna_bulk.obs['disease'].str.lower()
 adata_rna_bulk.obs['disease'] = adata_rna_bulk.obs['disease'].str.lower()
 
+out_dir = args.out_dir if args.out_dir else 'resources/grn_benchmark/inference_data'
+os.makedirs(out_dir, exist_ok=True)
+
 for disease in ['cd', 'uc']:
     adata_train_rna_d = adata_train_rna[adata_train_rna.obs['disease']==disease]
     
     adata_train_rna_d.uns['dataset_id'] = f'ibd_{disease.lower()}'
-    adata_train_rna_d.write(f'resources/grn_benchmark/inference_data/ibd_{disease}_rna.h5ad')
+    adata_train_rna_d.write(f'{out_dir}/ibd_{disease}_rna.h5ad')
     adata_train_atac_d = adata_train_atac[adata_train_atac.obs['disease']==disease]
     adata_train_atac_d.uns['dataset_id'] = f'ibd_{disease.lower()}'
-    adata_train_atac_d.write(f'resources/grn_benchmark/inference_data/ibd_{disease}_atac.h5ad')
+    adata_train_atac_d.write(f'{out_dir}/ibd_{disease}_atac.h5ad')
 
     adata_test_rna_bulk_d = adata_test_rna_bulk[adata_test_rna_bulk.obs['disease']==disease]
     adata_test_rna_bulk_d.uns['dataset_id'] = f'ibd_{disease.lower()}'

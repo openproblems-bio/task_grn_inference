@@ -12,7 +12,14 @@ The list of datasets integrated into geneRNIB is provided below:
    :align: center
 ----
 
+The table above summarizes the key properties of each dataset. **Inference (samples)** and **Eval. (samples)** refer to the number of samples used for GRN inference and evaluation, respectively. **Inference (perturbs)** and **Eval. (perturbs)** indicate the number of unique perturbations in each split. The **Raw/Norm.** column indicates data availability: **Raw** refers to raw integer count, while **Norm.** refers to expression values (``lognorm`` or ``xnorm`` layer). Most datasets provide both; the raw counts enable alternative normalization strategies.
+
+Note that for the **ParseBioscience** dataset, the raw single-cell count data is available in the ``resources/extended_data/`` folder (``parsebioscience_train_sc.h5ad``; ~4.96M cells × 15,000 genes, 19 GB) but is not included in the main ``resources/grn_benchmark/`` folder due to its large file size. 
+
+----
+
 You need `awscli` to download the datasets. 
+
 
 .. code-block:: bash
    pip install awscli
