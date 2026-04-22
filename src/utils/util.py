@@ -88,6 +88,7 @@ def parse_args(par):
     parser.add_argument('--ws_consensus', type=str)
     parser.add_argument('--ws_distance_background', type=str)
     parser.add_argument('--group_specific', type=str)
+    parser.add_argument('--cv_groups', type=str, help='obs column to use as CV group labels (e.g. cell_type_orig)')
     parser.add_argument('--evaluation_data_de', type=str)
     parser.add_argument('--evaluation_data_sc', type=str)
     parser.add_argument('--ground_truth_unibind', type=str)

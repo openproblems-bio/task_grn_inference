@@ -364,12 +364,21 @@ def main(par: Dict[str, Any]) -> Tuple[pd.DataFrame, pd.DataFrame]:
     n_genes = len(gene_names)
     
     net = read_prediction(par)
-    
-    n_cells = prturb_adata.shape[0]
-    random_groups = np.random.choice(range(1, 5+1), size=n_cells, replace=True) # random sampling
-    groups = LabelEncoder().fit_transform(random_groups)
 
-    # Load and standardize perturbation data    
+    # Determine CV groups
+    if par.get('cv_groups'):
+        cv_col = par['cv_groups']
+        group_counts = prturb_adata.obs[cv_col].value_counts()
+        valid_groups = group_counts[group_counts >= 200].index
+        prturb_adata = prturb_adata[prturb_adata.obs[cv_col].isin(valid_groups)]
+        print(f"Using {len(valid_groups)} groups for cell-type CV: {sorted(valid_groups.tolist())}", flush=True)
+        groups = LabelEncoder().fit_transform(prturb_adata.obs[cv_col].values)
+    else:
+        n_cells = prturb_adata.shape[0]
+        random_groups = np.random.choice(range(1, 5+1), size=n_cells, replace=True)  # random sampling
+        groups = LabelEncoder().fit_transform(random_groups)
+
+    # Load and standardize perturbation data
     X = prturb_adata.layers[layer]
     X = RobustScaler(with_centering=False).fit_transform(X)
 

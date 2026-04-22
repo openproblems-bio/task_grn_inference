@@ -79,10 +79,21 @@ source src/utils/config.env
 cell_type_var="CELLTYPE_${dataset}"
 cell_type="${!cell_type_var}"
 
+# For datasets without pseudobulk (e.g. MSCIC), use _sc.h5ad instead of _bulk.h5ad
+if [[ -f "resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad" ]]; then
+  eval_data="resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad"
+else
+  eval_data="resources/grn_benchmark/evaluation_data/${dataset}_sc.h5ad"
+fi
+
+# CV groups for cell-type-based CV (datasets without perturbation data)
+cv_groups_var="CV_GROUPS_${dataset}"
+cv_groups="${!cv_groups_var}"
+
 # Run metrics
 python src/metrics/all_metrics/script.py \
   --prediction "${prediction}" \
-  --evaluation_data "resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad" \
+  --evaluation_data "${eval_data}" \
   --evaluation_data_sc "resources/grn_benchmark/evaluation_data/${dataset}_sc.h5ad" \
   --evaluation_data_de "resources/grn_benchmark/evaluation_data/${dataset}_de.h5ad" \
   --regulators_consensus "resources/grn_benchmark/prior/regulators_consensus_${dataset}.json" \
@@ -95,4 +106,5 @@ python src/metrics/all_metrics/script.py \
   --tf_all "resources/grn_benchmark/prior/tf_all.csv" \
   --ws_consensus "resources/grn_benchmark/prior/ws_consensus_${dataset}.csv" \
   --ws_distance_background "resources/grn_benchmark/prior/ws_distance_background_${dataset}.csv" \
+  ${cv_groups:+--cv_groups "$cv_groups"} \
   --score "${score}"

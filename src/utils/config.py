@@ -202,7 +202,12 @@ DATASETS_METRICS = {
     'parsebioscience': ['regression', 'vc', 'replicate_consistency', 'tf_binding', 'sem',  'gs_recovery'],
     'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery', 'vc'],
     'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery', 'vc'],
-    'MSCIC': ['replicate_consistency', 'tf_binding', 'gs_recovery'],
+    'MSCIC': ['replicate_consistency', 'tf_binding', 'gs_recovery', 'regression'],
+}
+
+# CV group column for datasets that use cell type as CV split (no perturbation data)
+DATASETS_CV_GROUPS = {
+    'MSCIC': 'cell_type_orig',
 }
 
 
@@ -341,8 +346,12 @@ def generate_config_env(output_path='src/utils/config.env'):
             var_name = f"CELLTYPE_{dataset}"
             f.write(f'{var_name}="{cell_type}"\n')
         
-        # Metrics
-        f.write("\n# Metrics (comma-separated)\n")
+        # CV groups (for datasets without perturbation data, e.g. MSCIC)
+        f.write("\n# CV group columns\n")
+        for dataset, cv_col in DATASETS_CV_GROUPS.items():
+            var_name = f"CV_GROUPS_{dataset}"
+            f.write(f'{var_name}="{cv_col}"\n')
+    
         for dataset, metrics in DATASETS_METRICS.items():
             var_name = f"METRICS_{dataset}"
             metrics_str = ",".join(metrics)
