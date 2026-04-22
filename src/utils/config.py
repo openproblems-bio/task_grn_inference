@@ -163,6 +163,13 @@ DATASET_GROUPS = {
     #     "loose_match": ["perturbation"],
     #     "cv": ["perturbation"],
     # },
+    "MSCIC": {
+        "match": ["donor_id", "cell_type"],
+        "loose_match": ["cell_type"],
+        "anchors": ["donor_id"],
+        "cv": ["cell_type"],
+        "rc_tf_ac": ["cell_type"],
+    },
 
 }
 
@@ -179,7 +186,8 @@ DATASETS_CELLTYPES = {
     "300BCG": "PBMC",
     "ibd_uc": "PBMC",
     "ibd_cd": "PBMC",
-    "nakatake": ""
+    "nakatake": "",
+    "MSCIC": "BMMC",
 }
 
 DATASETS_METRICS = {
@@ -194,6 +202,7 @@ DATASETS_METRICS = {
     'parsebioscience': ['regression', 'vc', 'replicate_consistency', 'tf_binding', 'sem',  'gs_recovery'],
     'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery', 'vc'],
     'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery', 'vc'],
+    'MSCIC': ['replicate_consistency', 'tf_binding', 'gs_recovery'],
 }
 
 

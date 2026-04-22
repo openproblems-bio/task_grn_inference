@@ -99,7 +99,7 @@ append_entry() {
   - id: ${group_id}
     method_ids: $methods
     rna: $rna_file
-    rna_all: ${resources_dir}/extended_data/${dataset}_bulk.h5ad
+    rna_all: ${resources_dir}/extended_data/${dataset}_rna_all.h5ad
     tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
     layer: $layer_
     num_workers: $num_workers

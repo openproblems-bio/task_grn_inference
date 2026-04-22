@@ -39,6 +39,14 @@ def main(par):
   gene_names = adata_rna.var_names
   X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X
 
+  # Subsample cells if too many
+  MAX_CELLS = 25000
+  if X.shape[0] > MAX_CELLS:
+      rng = np.random.default_rng(42)
+      idx = rng.choice(X.shape[0], MAX_CELLS, replace=False)
+      X = X[idx]
+      print(f"Subsampled to {MAX_CELLS} cells for portia")
+
   # Load list of putative TFs
   tfs = np.loadtxt(par['tf_all'], dtype=str)
   tf_names = [gene_name for gene_name in gene_names if (gene_name in tfs)]

@@ -27,7 +27,7 @@ run_func() {
     script="${methods_dir}${method}/run_local.sh"
 
     rna="${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad"
-    rna_all="${resources_dir}/extended_data/${dataset}_bulk.h5ad"
+    rna_all="${resources_dir}/extended_data/${dataset}_rna_all.h5ad"
     atac="${resources_dir}/grn_benchmark/inference_data/${dataset}_atac.h5ad"
     prediction="$predictions_dir/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
 

@@ -522,7 +522,7 @@ def process_pseudobulk_data(save_name, covariates, add_metadata,
     adata_bulk = normalize_func(adata_bulk, pearson_residual=False)
     adata_bulk = add_metadata(adata_bulk)
     if save_data:
-        adata_bulk.write(f'resources/extended_data/{save_name}_bulk.h5ad', compression='gzip')
+        adata_bulk.write(f'resources/extended_data/{save_name}_rna_all.h5ad', compression='gzip')
 
     # Process bulk test
     print('Process adata bulk test...', flush=True)

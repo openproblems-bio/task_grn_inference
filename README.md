@@ -128,7 +128,7 @@ flowchart TB
   file_prediction_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-grn-prediction'>GRN prediction</a>")
   comp_metric[/"<a href='https://github.com/openproblems-bio/task_grn_inference#component-type-metrics'>metrics</a>"/]
   file_score_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-score'>score</a>")
-  file_evaluation_bulk_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-perturbation-data--pseudo-bulk'>perturbation data (pseudo)bulk</a>")
+  file_evaluation_bulk_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-perturbation-data--pseudo-bulk'>perturbation data (full SC or pseudo-bulk)</a>")
   file_evaluation_de_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-perturbation-data-differential-expression'>perturbation data differential expression</a>")
   file_evaluation_sc_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-perturbation-data--sc-'>perturbation data (sc)</a>")
   file_rna_h5ad("<a href='https://github.com/openproblems-bio/task_grn_inference#file-format-gene-expression-data'>gene expression data</a>")
@@ -280,7 +280,7 @@ Data structure:
 
 </div>
 
-## File format: perturbation data (pseudo)bulk
+## File format: perturbation data (full SC or pseudo-bulk)
 
 Perturbation dataset for benchmarking
 

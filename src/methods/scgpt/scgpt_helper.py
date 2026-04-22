@@ -6,7 +6,10 @@ from pathlib import Path
 
 import numpy as np
 import torch
-import wandb
+try:
+    import wandb
+except ImportError:
+    wandb = None
 from einops import rearrange
 from scgpt import logger
 from scgpt.loss import masked_mse_loss
@@ -71,12 +74,12 @@ def prepare_model(
     )
 
     try:
-        model.load_state_dict(torch.load(model_file))
+        model.load_state_dict(torch.load(model_file, map_location=device))
         # print(f"Loading all model params from {model_file}")
     except:
         # only load params that are in the model and match the size
         model_dict = model.state_dict()
-        pretrained_dict = torch.load(model_file)
+        pretrained_dict = torch.load(model_file, map_location=device)
         pretrained_dict = {
             k: v
             for k, v in pretrained_dict.items()

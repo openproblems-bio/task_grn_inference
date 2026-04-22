@@ -4,9 +4,10 @@
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
-#SBATCH --time=25:00:00
-#SBATCH --mem=250GB
-#SBATCH --partition=cpu
+#SBATCH --time=10:00:00
+#SBATCH --mem=64GB
+#SBATCH --partition=gpu
+#SBATCH --gres=gpu:1
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com   
 

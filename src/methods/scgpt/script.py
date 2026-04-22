@@ -64,8 +64,10 @@ if __name__ == "__main__":
     if adata.layers is not None and "counts" in adata.layers:
         adata.X = adata.layers["counts"]
         del adata.layers["counts"]
-
-    if adata[0].X.sum() != int(adata[0].X.sum()):
+    elif adata.layers is not None and "lognorm" in adata.layers:
+        # X is already raw counts; lognorm stored in layers — skip expm1
+        print("lognorm layer found — X is already raw counts, skipping expm1")
+    elif adata[0].X.sum() != int(adata[0].X.sum()):
         print("WARNING: you are not using count data")
         print("reverting logp1")
         from scipy.sparse import issparse
@@ -76,8 +78,11 @@ if __name__ == "__main__":
 
     adata.var["symbol"] = adata.var.index
     if "gene_id" not in adata.var.columns:
-        from util import add_gene_id
-        adata = add_gene_id(adata)
+        if "gene_ids" in adata.var.columns:
+            adata.var["gene_id"] = adata.var["gene_ids"]
+        else:
+            from util import add_gene_id
+            adata = add_gene_id(adata)
     adata.var["ensembl_id"] = adata.var["gene_id"].values
     dataset_id = adata.uns["dataset_id"] if "dataset_id" in adata.uns else par["dataset_id"]
 

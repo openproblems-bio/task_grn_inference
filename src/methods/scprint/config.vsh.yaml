@@ -32,7 +32,7 @@ arguments:
   - name: --model_name
     type: string
     direction: input
-    default: "v2-medium"
+    default: "medium-v1.5"
   - name: --model
     type: file
     direction: input

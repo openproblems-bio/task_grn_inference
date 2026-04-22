@@ -72,7 +72,7 @@ for dataset in "${datasets[@]}"; do
     python src/metrics/regression/consensus/script.py \
         --dataset "$dataset" \
         --regulators_consensus "resources/grn_benchmark/prior/regulators_consensus_${dataset}.json" \
-        --evaluation_data "resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad" \
+        --evaluation_data "resources/grn_benchmark/inference_data/${dataset}_rna.h5ad" \
         --predictions "${predictions[@]}"
 done
 

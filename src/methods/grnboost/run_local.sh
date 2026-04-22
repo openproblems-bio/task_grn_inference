@@ -19,7 +19,7 @@ source "src/utils/parse_args.sh"
 parse_arguments "$@"
 
 # Pass arguments to Python script
-python_args="--rna $rna --prediction $prediction"
+python_args="--rna $rna --prediction $prediction --temp_dir /tmp/grnboost2_${SLURM_JOB_ID}"
 if [ ! -z "$layer" ]; then
     python_args="$python_args --layer $layer"
 fi

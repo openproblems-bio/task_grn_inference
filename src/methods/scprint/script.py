@@ -23,7 +23,7 @@ par = {
     "num_genes": 5000,
     "max_cells": 1000,
     "num_workers": 20,
-    "model_name": "v2-medium",
+    "model_name": "medium-v1.5",
     "model": None,
     "dataset_id": "op",
     "is_test": True,

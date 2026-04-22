@@ -1,12 +1,18 @@
 #!/bin/bash
-# Submit skeleton building jobs for all datasets.
-# Datasets with ATAC: op, ibd_uc, ibd_cd  (full ATAC+motif skeleton, needs GPU + ~48h)
-# Datasets without ATAC: use --no_atac (promoter/motif-only, CPU + ~4h)
+# Submit skeleton building jobs.
+#
+# Multiomics datasets (ATAC available): op, ibd_uc, ibd_cd
+#   → full ATAC+motif skeleton, dataset-specific, needs GPU + ~48h
+#
+# Non-ATAC datasets: ONE shared skeleton per gene-ID type (not per dataset)
+#   → skeleton_motif.csv         (gene_name: 300BCG, nakatake, norman,
+#                                  parsebioscience, replogle)
+#   → skeleton_motif_ensembl.csv (gene_id:  xaira_HEK293T, xaira_HCT116)
 #
 # Usage: bash src/process_data/skeleton/submit_all.sh
 
 REPO=/home/jnourisa/projs/ongoing/task_grn_inference
-SCRIPT=$REPO/src/process_data/skeleton/build_skeleton.py
+SCRIPT=$REPO/src/process_data/skeleton/skeleton_motif_only.py
 IMAGE=/home/jnourisa/projs/images/scglue
 LOGS=$REPO/logs
 
@@ -43,21 +49,21 @@ mkdir -p $LOGS
 # done
 
 # ---------------------------------------------------------------------------
-# Datasets without ATAC — motif-only skeleton
+# Shared motif-only skeleton — ONE file for ALL non-ATAC datasets
+#
+#   skeleton_motif.csv — built from tss_h38.bed (all protein-coding genes,
+#                        ~19k unique genes). Dataset-agnostic.
 # ---------------------------------------------------------------------------
-DATASETS_NO_ATAC=(300BCG nakatake norman parsebioscience replogle xaira_HEK293T xaira_HCT116)
 
-for ds in "${DATASETS_NO_ATAC[@]}"; do
-    OUT=$REPO/resources/grn_benchmark/prior/skeleton_${ds}.csv
-    if [ -f "$OUT" ]; then
-        echo "Skipping $ds — already exists: $OUT"
-        continue
-    fi
-    echo "Submitting motif-only skeleton for $ds"
+OUT_MOTIF=$REPO/resources/grn_benchmark/prior/skeleton_motif.csv
+if [ -f "$OUT_MOTIF" ]; then
+    echo "Skipping skeleton_motif.csv — already exists"
+else
+    echo "Submitting shared motif skeleton (protein-coding genes from tss_h38.bed)"
     sbatch \
-        --job-name=skel_${ds} \
-        --output=$LOGS/skel_${ds}_%j.out \
-        --error=$LOGS/skel_${ds}_%j.err \
+        --job-name=skel_motif \
+        --output=$LOGS/skel_motif_%j.out \
+        --error=$LOGS/skel_motif_%j.err \
         --time=4:00:00 \
         --mem=32G \
         --cpus-per-task=8 \
@@ -65,8 +71,8 @@ for ds in "${DATASETS_NO_ATAC[@]}"; do
         --wrap="singularity exec \
             --bind /home/jnourisa/projs:/home/jnourisa/projs \
             $IMAGE \
-            python3 $SCRIPT --dataset $ds --no_atac"
-done
+            python3 $SCRIPT"
+fi
 
 echo ""
 echo "Existing skeletons (already copied):"

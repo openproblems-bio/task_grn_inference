@@ -60,6 +60,14 @@ geneNames <- colnames(inputExpr)
 colnames(inputExpr) <- c(geneNames)
 X <- as.matrix(inputExpr)
 
+# Subsample cells if too many — pcor is O(n_cells^2) in memory
+MAX_CELLS <- 25000
+if (nrow(X) > MAX_CELLS) {
+  set.seed(42)
+  X <- X[sample(nrow(X), MAX_CELLS), ]
+  cat(sprintf("Subsampled to %d cells for ppcor\n", MAX_CELLS))
+}
+
 # Run GRN inference method
 pcorResults = pcor(x = X, method="pearson")
 
