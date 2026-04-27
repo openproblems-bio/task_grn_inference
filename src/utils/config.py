@@ -15,22 +15,22 @@ DATASET_INFO = {
             "Modality": 'Multiomics',
             "has_raw_counts": True,
         },
-        "ibd_uc": {
-            "cell_type": "PBMC",
-            "perturbation_type": "Chemicals/ bacteria",
-            "Inference data": "sc",
-            'Measurement time': "24 hours",
-            "Modality": 'Multiomics',
-            "has_raw_counts": True,
-        },
-        "ibd_cd": {
-            "cell_type": "PBMC",
-            "perturbation_type": "Chemicals/ bacteria",
-            "Inference data": "sc",
-            'Measurement time': "24 hours",
-            "Modality": 'Multiomics',
-            "has_raw_counts": True,
-        },
+        # "ibd_uc": {
+        #     "cell_type": "PBMC",
+        #     "perturbation_type": "Chemicals/ bacteria",
+        #     "Inference data": "sc",
+        #     'Measurement time': "24 hours",
+        #     "Modality": 'Multiomics',
+        #     "has_raw_counts": True,
+        # },
+        # "ibd_cd": {
+        #     "cell_type": "PBMC",
+        #     "perturbation_type": "Chemicals/ bacteria",
+        #     "Inference data": "sc",
+        #     'Measurement time': "24 hours",
+        #     "Modality": 'Multiomics',
+        #     "has_raw_counts": True,
+        # },
         "300BCG": {
             "cell_type": "PBMC",
             "perturbation_type": "Chemicals",
@@ -95,6 +95,19 @@ DATASET_INFO = {
             "Modality": 'Transcriptmoics',
             "has_raw_counts": True,
         },
+        "MSCIC": {
+            "cell_type": "BMMC",
+            "perturbation_type": "Observational",
+            "Inference data": "sc",
+            'Measurement time': "NA",
+            "Modality": 'Multiomics',
+            "n_donors": 10,
+            "has_raw_counts": True,
+            "n_inference_cells": 29284,
+            "n_eval_cells": 26444,
+            "technology": "10x Multiome (snRNA + snATAC)",
+            "source": "NeurIPS 2021 Open Problems (GSE194122)",
+        },
     }
 
 DATASET_GROUPS = {
@@ -119,20 +132,20 @@ DATASET_GROUPS = {
         "cv": ["perturbation", "cell_type"],
         "rc_tf_ac": ["perturbation", "cell_type"]
     },
-    "ibd_uc": {
-        'anchors': ['donor_id'],
-        "match": ["donor_id", "cell_type"],
-        "loose_match": ["donor_id", "cell_type"],
-        "cv": ["perturbation", "cell_type"],
-        "rc_tf_ac": ["perturbation", "cell_type"]
-    },
-    "ibd_cd": {
-        'anchors': ['donor_id'],
-        "match": ["donor_id", "cell_type"],
-        "loose_match": ["donor_id", "cell_type"],
-        "cv": ["perturbation", "cell_type"],
-        "rc_tf_ac": ["perturbation", "cell_type"]
-    },
+    # "ibd_uc": {
+    #     'anchors': ['donor_id'],
+    #     "match": ["donor_id", "cell_type"],
+    #     "loose_match": ["donor_id", "cell_type"],
+    #     "cv": ["perturbation", "cell_type"],
+    #     "rc_tf_ac": ["perturbation", "cell_type"]
+    # },
+    # "ibd_cd": {
+    #     'anchors': ['donor_id'],
+    #     "match": ["donor_id", "cell_type"],
+    #     "loose_match": ["donor_id", "cell_type"],
+    #     "cv": ["perturbation", "cell_type"],
+    #     "rc_tf_ac": ["perturbation", "cell_type"]
+    # },
     "replogle": {
         "match": ["perturbation"],
         "loose_match": ["perturbation"],
@@ -164,11 +177,11 @@ DATASET_GROUPS = {
     #     "cv": ["perturbation"],
     # },
     "MSCIC": {
-        "match": ["donor_id", "cell_type"],
-        "loose_match": ["cell_type"],
+        "match": ["donor_id", "cell_type_orig"],
+        "loose_match": ["cell_type_orig"],
         "anchors": ["donor_id"],
-        "cv": ["cell_type"],
-        "rc_tf_ac": ["cell_type"],
+        "cv": ["cell_type_orig"],
+        "rc_tf_ac": ["cell_type_orig"],
     },
 
 }
@@ -186,7 +199,7 @@ DATASETS_CELLTYPES = {
     "300BCG": "PBMC",
     "ibd_uc": "PBMC",
     "ibd_cd": "PBMC",
-    "nakatake": "",
+    "nakatake": "", #TODO: fix this
     "MSCIC": "BMMC",
 }
 
@@ -197,17 +210,19 @@ DATASETS_METRICS = {
     'nakatake': ['regression', 'gs_recovery', 'vc'],  # sem removed: only 5 control samples, scores below threshold
     'op': ['regression', 'vc', 'replicate_consistency', 'tf_binding', 'sem',  'gs_recovery'],
     '300BCG': ['regression', 'vc', 'replicate_consistency', 'tf_binding', 'gs_recovery'],  # sem excluded: single perturbation condition (LPS only) forces CV to cross cell-type boundaries; learned TF shocks are cell-type-specific and cannot transfer
-    'ibd_uc': ['regression', 'tf_binding', 'gs_recovery', 'replicate_consistency'],
-    'ibd_cd': ['regression', 'tf_binding', 'gs_recovery', 'replicate_consistency'],
+    # 'ibd_uc': ['regression', 'tf_binding', 'gs_recovery', 'replicate_consistency'],
+    # 'ibd_cd': ['regression', 'tf_binding', 'gs_recovery', 'replicate_consistency'],
     'parsebioscience': ['regression', 'vc', 'replicate_consistency', 'tf_binding', 'sem',  'gs_recovery'],
     'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery', 'vc'],
     'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery', 'vc'],
-    'MSCIC': ['replicate_consistency', 'tf_binding', 'gs_recovery', 'regression'],
+    'MSCIC': ['regression', 'gs_recovery', 'replicate_consistency'],
+    'MMP_multiome': ['regression'],
+    'MMP_dogma': ['regression'],
 }
 
-# CV group column for datasets that use cell type as CV split (no perturbation data)
+# CV group column for datasets that use cell type as CV split (no perturbation data). if not given, uses perturbation column by default
 DATASETS_CV_GROUPS = {
-    'MSCIC': 'cell_type_orig',
+    'MSCIC': 'donor_id',
 }
 
 
@@ -232,34 +247,31 @@ METRICS = [
        ]
     
 METRIC_THRESHOLDS = {
-    # Regression metrics: R2-based, meaningful if > 0.05
-    'r_precision': 0.05,
-    'r_recall': 0.05,
+    # Regression metrics: R2-based, meaningful if > 0.01
+    'r_precision': 0.01,
+    'r_recall': 0.01,
     
-    # Wasserstein distance metrics: precision/recall based, meaningful if > 0.05
+    # Wasserstein distance metrics: meaningful if > 0.5
     'ws_precision': 0.5,
     'ws_recall': 0.5,
     
-    # Virtual cell: r2 scores
-    'vc': 0.05,
+    # Virtual cell: R2-based, meaningful if > 0.01
+    'vc': 0.01,
     
-    # SEM (Structural Equation Modeling): goodness of fit (0-1), meaningful if > 0.05
-    'sem': 0.05,
+    # SEM (Structural Equation Modeling): R2-based, meaningful if > 0.01
+    'sem': 0.01,
     
-    # TF recovery metrics: t-statistics from paired t-test, meaningful if > 2.0 (p<0.05)
+    # TF recovery metrics: t-statistics, meaningful if > 2.0 (p<0.05)
     't_rec_precision': 2.0,
     't_rec_recall': 2.0,
     
-    # Replicate consistency (RC) for TF activity: consistency score (0-1) based on MAD, meaningful if > 0.3
-    # Measures consistency of TF activity across biological replicates (1=perfect, 0=no consistency)
+    # Replicate consistency: meaningful if > 0.3
     'replicate_consistency': 0.3,
     
-    # TF binding F1: F1 for TF-target binding, meaningful if > 0.05
-    # Based on ChIP-seq or other binding data
+    # TF binding F1: meaningful if > 0.05
     'tfb_f1': 0.05,
     
-    # Gene set recovery F1: F1 for gene set enrichment, meaningful if > 0.1
-    # Tests if predicted regulators recover known gene sets
+    # Gene set recovery F1: meaningful if > 0.05
     'gs_f1': 0.05,
 }
 surrogate_names = {
@@ -282,7 +294,7 @@ surrogate_names = {
     'positive_control':'Positive Ctrl',
     'negative_control':'Negative Ctrl',
     'scgpt': 'scGPT',
-    'spearman_corr': 'Spearman Corr.',
+    # 'spearman_corr': 'Spearman Corr.',  # excluded from analysis
     'geneformer': 'Geneformer',
 
     # -- metrics
@@ -324,7 +336,8 @@ surrogate_names = {
     'parsebioscience': 'ParseBioscience',
     'ibd_uc': 'IBD:UC',
     'ibd_cd': 'IBD:CD',
-    '300BCG': '300BCG'
+    '300BCG': '300BCG',
+    'MSCIC': 'MSCIC'
     }
 
 def generate_config_env(output_path='src/utils/config.env'):

@@ -132,7 +132,17 @@ def main(par):
 
     rr_store = []
     for gt in gts:
-        par['ground_truth'] = par[f'ground_truth_{gt}']
+        gt_file = par[f'ground_truth_{gt}']
+        par['ground_truth'] = gt_file
+        # Skip if ground truth file is empty (no edges)
+        try:
+            _gt_check = pd.read_csv(gt_file)
+            if _gt_check.shape[0] == 0:
+                print(f"Skipping {gt}: ground truth file has no edges ({gt_file})")
+                continue
+        except Exception:
+            print(f"Skipping {gt}: could not read ground truth file ({gt_file})")
+            continue
         df = main_sub(par)
         df['gt'] = gt
         rr_store.append(df)

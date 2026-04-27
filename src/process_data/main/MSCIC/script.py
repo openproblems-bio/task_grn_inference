@@ -7,9 +7,9 @@ Protocol: 10x Multiome (RNA + ATAC)
 Donors: 10 unique donors across 4 sites
 
 Split strategy:
-  - Evaluation: donor 15078 @ site2 + site4, donor 18303 @ site3
-                (multi-site replicates → drives replicate_consistency metric)
-  - Inference:  all remaining cells (~52k cells, 8 donor-site groups)
+  - Evaluation: donor 15078 @ site2 + site4, donor 18303 @ site3,
+                donor 19593 @ site4  (~26k eval cells)
+  - Inference:  all remaining cells (~43k cells, 6 donor-site groups)
 
 Outputs:
   - resources/grn_benchmark/inference_data/MSCIC_rna.h5ad
@@ -41,6 +41,7 @@ par = {
 EVAL_DONOR_SITE = {
     '15078': {'site2', 'site4'},
     '18303': {'site3'},
+    '19593': {'site4'},   # donor_7 added to increase eval size (~9876 cells)
 }
 
 # ── cell type harmonisation ────────────────────────────────────────────────────
@@ -126,8 +127,11 @@ def process_rna(rna_raw, donor_map):
     """Format RNA AnnData: raw counts in X, lognorm in layers['lognorm']."""
     rna = rna_raw.copy()
 
-    # ensure X holds raw integer counts
-    X = rna.X
+    # ensure X holds raw integer counts (raw file stores counts in layers['counts'])
+    if 'counts' in rna.layers:
+        X = rna.layers['counts']
+    else:
+        X = rna.X
     if issparse(X):
         X = X.toarray()
     rna.X = csr_matrix(X.astype(np.float32))

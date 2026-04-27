@@ -59,9 +59,15 @@ except NameError:
 def group_mapping(adata):
     adata.obs['donor_id'] = 'all_donors'
     adata.obs['donor_id'] = adata.obs['donor_id'].astype('category')
-    # SCENIC+ needs multiple cell type groups for pseudobulking/DAR; use CT_Major if available
-    if 'CT_Major' in adata.obs.columns:
-        adata.obs['cell_type'] = adata.obs['CT_Major'].astype(str)
+    # SCENIC+ needs multiple cell type groups for pseudobulking/DAR.
+    # If cell_type has only one unique value, fall back to other columns.
+    fallback_cols = ['CT_Major', 'cell_type_orig', 'louvain', 'leiden']
+    if adata.obs['cell_type'].nunique() <= 1:
+        for col in fallback_cols:
+            if col in adata.obs.columns and adata.obs[col].nunique() > 1:
+                print(f"group_mapping: cell_type has 1 unique value, using '{col}' instead.")
+                adata.obs['cell_type'] = adata.obs[col].astype(str)
+                break
     adata.obs['cell_type'] = adata.obs['cell_type'].astype('category')
     return adata
 def process_peak(par):

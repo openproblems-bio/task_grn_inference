@@ -581,15 +581,22 @@ def create_grn_baseline(A):
 
 
 
-def compute_overall_scores(scores_all, final_metrics, datasets):
+def compute_overall_scores(scores_all, final_metrics, datasets, modality_groups=None):
     """
-    Compute doubly-normalized overall scores for ranking GRN models.
+    Compute overall scores for ranking GRN models.
 
-    Steps:
+    Display columns (per-metric and per-dataset):
       1. Per-dataset min-max normalization of each metric (negatives clipped to 0).
       2. Average normalized scores across datasets per metric, then re-normalize to [0,1].
       3. Average normalized scores across metrics per dataset, then re-normalize to [0,1].
-      4. overall_score = median over (applicability-filtered metric scores + per-dataset scores).
+
+    Overall score (modality-balanced):
+      1. For each (dataset, metric) pair, rank methods by percentile (1 = best).
+      2. Per modality group, take the median percentile rank across applicable pairs.
+      3. overall_score = mean of modality medians (only over modalities where method has data).
+      This ensures multiomics and transcriptomics datasets contribute equally regardless
+      of how many datasets exist in each modality.
+      If modality_groups is None, falls back to a flat median across all (dataset, metric) pairs.
 
     Parameters
     ----------
@@ -599,6 +606,10 @@ def compute_overall_scores(scores_all, final_metrics, datasets):
         Metrics that passed applicability criteria (used for overall_score).
     datasets : list of str
         Known dataset names.
+    modality_groups : dict, optional
+        Mapping of modality name -> list of dataset names, e.g.
+        {'Multiomics': ['op', 'MSCIC'], 'Transcriptomics': ['norman', ...]}.
+        If provided, overall_score is the mean of per-modality median ranks.
 
     Returns
     -------
@@ -622,7 +633,7 @@ def compute_overall_scores(scores_all, final_metrics, datasets):
 
     df_all_n = scores_all.groupby('dataset').apply(normalize_scores_per_dataset).reset_index()
 
-    # --- per-metric aggregation ---
+    # --- per-metric aggregation (for display) ---
     df_metrics = (
         df_all_n.groupby('model')
         .apply(lambda df: df.drop('dataset', axis=1).mean(skipna=True))
@@ -636,7 +647,7 @@ def compute_overall_scores(scores_all, final_metrics, datasets):
             df_metrics[col] = 0
         df_metrics.loc[original_nans, col] = float('nan')
 
-    # --- per-dataset aggregation ---
+    # --- per-dataset aggregation (for display) ---
     df_datasets = (
         df_all_n.groupby('model')
         .apply(lambda df: df.set_index('dataset')[all_metrics].T.mean(skipna=True))
@@ -658,8 +669,47 @@ def compute_overall_scores(scores_all, final_metrics, datasets):
     if df_scores.index.duplicated().any():
         df_scores = df_scores.groupby(df_scores.index).mean()
 
-    final_metrics_cols = [m for m in final_metrics if m in df_scores.columns]
-    dataset_cols = [c for c in df_scores.columns if c in datasets]
-    df_scores['overall_score'] = df_scores[final_metrics_cols + dataset_cols].median(axis=1, skipna=True)
+    # --- overall_score: modality-balanced median percentile rank ---
+    def _median_pct_rank(dataset_list):
+        """Return per-method median percentile rank across (dataset x metric) pairs."""
+        records = []
+        sub = scores_all[scores_all['dataset'].isin(dataset_list)]
+        for dataset, grp in sub.groupby('dataset'):
+            grp = grp.set_index('model')
+            for metric in final_metrics:
+                if metric not in grp.columns:
+                    continue
+                col = grp[metric].dropna()
+                if col.empty:
+                    continue
+                for method, r in col.rank(ascending=True, pct=True).items():
+                    records.append({'model': method, 'rank': r})
+        if not records:
+            return pd.Series(dtype=float)
+        return pd.DataFrame(records).groupby('model')['rank'].median()
+
+    if modality_groups is not None:
+        # Step 1: median rank per modality group
+        modality_medians = {
+            mod: _median_pct_rank(ds_list)
+            for mod, ds_list in modality_groups.items()
+        }
+        # Step 2: mean across modalities where method has data
+        all_methods = set().union(*[s.index for s in modality_medians.values()])
+        overall = {}
+        for method in all_methods:
+            scores = [s[method] for s in modality_medians.values()
+                      if method in s.index and pd.notna(s[method])]
+            if scores:
+                overall[method] = sum(scores) / len(scores)
+        overall = pd.Series(overall)
+    else:
+        overall = _median_pct_rank([d for d in scores_all['dataset'].unique() if d in datasets])
+
+    # normalize to [0,1]
+    r_min, r_max = overall.min(), overall.max()
+    if r_max > r_min:
+        overall = (overall - r_min) / (r_max - r_min)
+    df_scores['overall_score'] = overall
 
     return df_scores
