@@ -345,31 +345,33 @@ def add_gene_id(adata):
     adata.var = merged.loc[valid_genes]
     return adata
 def fetch_gene_info():
-    from pybiomart import Server
+    import os, pandas as pd
+    cache = 'resources/grn_benchmark/prior/gene_info_biomart.csv'
+    if os.path.exists(cache):
+        return pd.read_csv(cache, index_col=0)
 
-    # Connect to Ensembl server
-    server = Server(host="http://www.ensembl.org")
-
-    # Select the dataset for human genes
-    dataset = server.marts["ENSEMBL_MART_ENSEMBL"].datasets["hsapiens_gene_ensembl"]
-
-    # Query relevant attributes
-    df = dataset.query(
-        attributes=[
-            "ensembl_gene_id",  # Ensembl Gene ID
-            "external_gene_name",  # Gene Name
-            "chromosome_name",  # Chromosome
-            "start_position",  # Start site
-            "end_position",  # End site
-        ]
-    )
-    df.columns = ["gene_id", "gene_name", "chr", "start", "end"]
-    # df = df[df['chr'].isin(['X', 'Y']+list(map(str, range(1, 23))))]
-    # - keep those genes with one mapping
-    df = df.groupby("gene_name").filter(lambda x: len(x) == 1)
-    df.set_index("gene_name", inplace=True)
-
-    return df
+    try:
+        from pybiomart import Server
+        server = Server(host="http://www.ensembl.org")
+        dataset = server.marts["ENSEMBL_MART_ENSEMBL"].datasets["hsapiens_gene_ensembl"]
+        df = dataset.query(attributes=["ensembl_gene_id", "external_gene_name",
+                                        "chromosome_name", "start_position", "end_position"])
+        df.columns = ["gene_id", "gene_name", "chr", "start", "end"]
+        df = df.groupby("gene_name").filter(lambda x: len(x) == 1)
+        df.set_index("gene_name", inplace=True)
+        return df
+    except Exception:
+        import mygene
+        mg = mygene.MyGeneInfo()
+        res = mg.query('_exists_:symbol AND taxid:9606',
+                       fields='symbol,ensembl.gene', species='human',
+                       size=20000, as_dataframe=True)
+        res = res[['symbol', 'ensembl.gene']].dropna()
+        res = res[res['ensembl.gene'].apply(lambda x: isinstance(x, str))]
+        res = res.drop_duplicates('symbol').set_index('symbol')
+        res.index.name = 'gene_name'
+        res.columns = ['gene_id']
+        return res
 
 def download_annotation(par):
     import os

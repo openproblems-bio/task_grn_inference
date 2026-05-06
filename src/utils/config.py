@@ -108,6 +108,30 @@ DATASET_INFO = {
             "technology": "10x Multiome (snRNA + snATAC)",
             "source": "NeurIPS 2021 Open Problems (GSE194122)",
         },
+        "soundlife": {
+            "cell_type": "CD4T",
+            "perturbation_type": "Observational",
+            "Inference data": "sc",
+            'Measurement time': "Year 1 Day 0 → Year 2 Day 0",
+            "Modality": 'Transcriptomics',
+            "n_donors": 10,
+            "has_raw_counts": True,
+            "n_inference_cells": 25000,
+            "n_eval_cells": 25000,
+            "source": "SoundLife flu-vaccination longitudinal cohort",
+        },
+        "soundlife_vaccine": {
+            "cell_type": "B",
+            "perturbation_type": "Vaccination",
+            "Inference data": "sc",
+            'Measurement time': "Year 1 Day 0+7 → Year 1+2 Day 90",
+            "Modality": 'Transcriptomics',
+            "n_donors": 10,
+            "has_raw_counts": True,
+            "n_inference_cells": 30151,
+            "n_eval_cells": 28447,
+            "source": "SoundLife flu-vaccination longitudinal cohort",
+        },
     }
 
 DATASET_GROUPS = {
@@ -177,11 +201,13 @@ DATASET_GROUPS = {
     #     "cv": ["perturbation"],
     # },
     "MSCIC": {
-        "match": ["donor_id", "cell_type_orig"],
-        "loose_match": ["cell_type_orig"],
-        "anchors": ["donor_id"],
-        "cv": ["cell_type_orig"],
-        "rc_tf_ac": ["cell_type_orig"],
+        'rc_tf_ac': ["cell_type"]
+    },
+    "soundlife": {
+        'rc_tf_ac':  ["cell_type"]
+    },
+    "soundlife_vaccine": {
+        'rc_tf_ac':  ["cell_type"]
     },
 
 }
@@ -201,6 +227,8 @@ DATASETS_CELLTYPES = {
     "ibd_cd": "PBMC",
     "nakatake": "", #TODO: fix this
     "MSCIC": "BMMC",
+    "soundlife": "PBMC",
+    "soundlife_vaccine": "PBMC",
 }
 
 DATASETS_METRICS = {
@@ -216,13 +244,15 @@ DATASETS_METRICS = {
     'xaira_HEK293T': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery', 'vc'],
     'xaira_HCT116': ['regression', 'ws_distance', 'tf_recovery', 'tf_binding', 'sem', 'gs_recovery', 'vc'],
     'MSCIC': ['regression', 'gs_recovery', 'replicate_consistency'],
-    'MMP_multiome': ['regression'],
-    'MMP_dogma': ['regression'],
+    'soundlife': ['regression', 'replicate_consistency', 'tf_binding', 'gs_recovery'],
+    'soundlife_vaccine': ['regression', 'replicate_consistency', 'tf_binding', 'gs_recovery']
 }
 
 # CV group column for datasets that use cell type as CV split (no perturbation data). if not given, uses perturbation column by default
 DATASETS_CV_GROUPS = {
     'MSCIC': 'donor_id',
+    'soundlife': 'donor_id',
+    'soundlife_vaccine': 'donor_id',
 }
 
 
@@ -247,9 +277,9 @@ METRICS = [
        ]
     
 METRIC_THRESHOLDS = {
-    # Regression metrics: R2-based, meaningful if > 0.01
-    'r_precision': 0.01,
-    'r_recall': 0.01,
+    # Regression metrics: R2-based, meaningful if > 0.001
+    'r_precision': 0.001,
+    'r_recall': 0.001,
     
     # Wasserstein distance metrics: meaningful if > 0.5
     'ws_precision': 0.5,
@@ -337,7 +367,9 @@ surrogate_names = {
     'ibd_uc': 'IBD:UC',
     'ibd_cd': 'IBD:CD',
     '300BCG': '300BCG',
-    'MSCIC': 'MSCIC'
+    'MSCIC': 'MSCIC',
+    'soundlife': 'SoundLife',
+    'soundlife_vaccine': 'SoundLife:Vaccine',
     }
 
 def generate_config_env(output_path='src/utils/config.env'):

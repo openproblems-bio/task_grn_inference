@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Datasets &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
@@ -83,9 +83,11 @@
   <section id="datasets">
 <h1>Datasets<a class="headerlink" href="#datasets" title="Link to this heading"></a></h1>
 <p>The list of datasets integrated into geneRNIB is provided below:</p>
-<a class="reference internal image-reference" href="_images/datasets.png"><img alt="_images/datasets.png" class="align-center" src="_images/datasets.png" style="width: 50%;" /></a>
+<a class="reference internal image-reference" href="_images/table_datasets_summary.png"><img alt="_images/table_datasets_summary.png" class="align-center" src="_images/table_datasets_summary.png" style="width: 100%;" />
+</a>
 <hr class="docutils" />
-<a class="reference internal image-reference" href="_images/table_datasets_summary.png"><img alt="_images/table_datasets_summary.png" class="align-center" src="_images/table_datasets_summary.png" style="width: 100%;" /></a>
+<p>The table above summarizes the key properties of each dataset. <strong>Inference (samples)</strong> and <strong>Eval. (samples)</strong> refer to the number of samples used for GRN inference and evaluation, respectively. <strong>Inference (perturbs)</strong> and <strong>Eval. (perturbs)</strong> indicate the number of unique perturbations in each split. The <strong>Raw/Norm.</strong> column indicates data availability: <strong>Raw</strong> refers to raw integer count, while <strong>Norm.</strong> refers to expression values (<code class="docutils literal notranslate"><span class="pre">lognorm</span></code> or <code class="docutils literal notranslate"><span class="pre">xnorm</span></code> layer). Most datasets provide both; the raw counts enable alternative normalization strategies.</p>
+<p>Note that for the <strong>ParseBioscience</strong> dataset, the raw single-cell count data is available in the <code class="docutils literal notranslate"><span class="pre">resources/extended_data/</span></code> folder (<code class="docutils literal notranslate"><span class="pre">parsebioscience_train_sc.h5ad</span></code>; ~4.96M cells × 15,000 genes, 19 GB) but is not included in the main <code class="docutils literal notranslate"><span class="pre">resources/grn_benchmark/</span></code> folder due to its large file size.</p>
 <hr class="docutils" />
 <p>You need <cite>awscli</cite> to download the datasets.</p>
 <section id="downloading-the-main-datasets">

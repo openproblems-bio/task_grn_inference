@@ -26,16 +26,19 @@ while [[ $# -gt 0 ]]; do
 done
 parse_arguments "${filtered_args[@]}"
 
+# Derive dataset-specific temp dir to avoid collisions between concurrent runs
+if [ -z "$temp_dir" ]; then
+    dataset=$(basename $(dirname $prediction))
+    temp_dir="output/${method}/${dataset}"
+fi
+
 # Pass arguments to Python script
-python_args="--prediction $prediction"
+python_args="--prediction $prediction --temp_dir $temp_dir"
 if [ ! -z "$rna" ]; then
     python_args="$python_args --rna $rna"
 fi
 if [ ! -z "$layer" ]; then
     python_args="$python_args --layer $layer"
-fi
-if [ ! -z "$temp_dir" ]; then
-    python_args="$python_args --temp_dir $temp_dir"
 fi
 
 singularity run ../../images/scenic python src/methods/${method}/script.py $python_args

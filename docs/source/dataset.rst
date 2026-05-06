@@ -2,10 +2,6 @@ Datasets
 ========
 The list of datasets integrated into geneRNIB is provided below:
 
-.. image:: images/datasets.png
-   :width: 50%
-   :align: center
-----
 
 .. image:: images/table_datasets_summary.png
    :width: 100%

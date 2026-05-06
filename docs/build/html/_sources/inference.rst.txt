@@ -3,7 +3,7 @@ GRN Inference
 
 GRN inference using integrated methods
 ----------------------------------------
-To infer a GRN for a given dataset (e.g. op) using our integration methods, after installation of geneRNBI, run the following command (e.g. Pearson correlation):
+To infer a GRN for a given dataset (e.g. op) using our integration methods, after installation of geneRNIB, run the following command (e.g. Pearson correlation):
 
 .. code-block:: bash
 

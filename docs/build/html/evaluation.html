@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GRN evaluation &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
@@ -81,7 +81,8 @@
   <section id="grn-evaluation">
 <h1>GRN evaluation<a class="headerlink" href="#grn-evaluation" title="Link to this heading"></a></h1>
 <p>The evaluation metrics used in geneRNIB are summarized below.</p>
-<a class="reference internal image-reference" href="_images/metrics.png"><img alt="_images/metrics.png" class="align-center" src="_images/metrics.png" style="width: 90%;" /></a>
+<a class="reference internal image-reference" href="_images/metrics.png"><img alt="_images/metrics.png" class="align-center" src="_images/metrics.png" style="width: 90%;" />
+</a>
 <hr class="docutils" />
 <p>Each metric has particular implementation requirements that limit its applicability to certain datasets. The datasets applicable to each metric are listed in the following table.</p>
 <p>In addition, to ensure that only informative metrics contribute to the benchmark, each metric is evaluated per dataset against two quality control criteria:</p>
@@ -90,7 +91,8 @@
 <li><p><strong>Variability</strong> — the coefficient of variation (CV = range / mean) across methods must be ≥ 0.2. This filters out metrics that fail to discriminate between methods.</p></li>
 </ol>
 <p>A metric is retained for a given dataset only if it passes both criteria. Those that passed quality control are marked with a star (★) in the table below. Note that the quality control process is repeated after adding a new GRN inference method to reflect the updated performance comparison.</p>
-<a class="reference internal image-reference" href="_images/metric_quality_evaluation.png"><img alt="_images/metric_quality_evaluation.png" class="align-center" src="_images/metric_quality_evaluation.png" style="width: 100%;" /></a>
+<a class="reference internal image-reference" href="_images/metric_quality_evaluation.png"><img alt="_images/metric_quality_evaluation.png" class="align-center" src="_images/metric_quality_evaluation.png" style="width: 100%;" />
+</a>
 <hr class="docutils" />
 <p>For a detailed description of each metric, refer to the geneRNIB paper. To map the naming conventions used in the code and this table, refer to <cite>surrogate_names</cite> in <cite>config.py</cite> file in the <cite>src/utils/</cite> directory.</p>
 <p>The evaluation metrics expect the inferred network to be in the form of an AnnData object with specific format as explained here.

@@ -4,10 +4,10 @@
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
-#SBATCH --time=10:00:00
-#SBATCH --mem=64GB
-#SBATCH --partition=gpu
-#SBATCH --gres=gpu:1
+#SBATCH --time=24:00:00
+#SBATCH --mem=128GB
+#SBATCH --partition=cpu
+#SBATCH --qos long
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com   
 
@@ -25,4 +25,4 @@ if [ ! -z "$layer" ]; then
     python_args="$python_args --layer $layer"
 fi
 
-singularity run --nv ../../images/geneformer python src/methods/${method}/script.py $python_args
+singularity run ../../images/geneformer python src/methods/${method}/script.py $python_args
