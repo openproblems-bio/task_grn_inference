@@ -33,7 +33,7 @@ if [ -z "$temp_dir" ]; then
 fi
 
 # Pass arguments to Python script
-python_args="--prediction $prediction --temp_dir $temp_dir"
+python_args="--prediction $prediction --temp_dir $temp_dir --tf_all ${tf_all:-resources/grn_benchmark/prior/tf_all.csv}"
 if [ ! -z "$rna" ]; then
     python_args="$python_args --rna $rna"
 fi
@@ -41,4 +41,4 @@ if [ ! -z "$layer" ]; then
     python_args="$python_args --layer $layer"
 fi
 
-singularity run ../../images/scenic python src/methods/${method}/script.py $python_args
+singularity run resources/singularity/scenic python src/methods/${method}/script.py $python_args

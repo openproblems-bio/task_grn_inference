@@ -2,7 +2,7 @@
 This file centralizes the grouping specifications used across metrics.
 """
 
-METHODS = ['positive_control', 'pearson_corr', 'grnboost', 'ppcor', 'portia', 'scenic', 'geneformer', 'scgpt', 'ppcor', 'scenicplus', 'celloracle', 'figr', 'granie', 'scglue', 'scprint',  'negative_control']
+METHODS = ['positive_control', 'pearson_corr', 'grnboost', 'ppcor', 'portia', 'scenic', 'geneformer', 'scgpt', 'scenicplus', 'celloracle', 'figr', 'granie', 'scglue', 'scprint', 'negative_control']
 
 
 
@@ -36,7 +36,7 @@ DATASET_INFO = {
             "perturbation_type": "Chemicals",
             "Inference data": "sc",
             'Measurement time': 'T0 and 3 months',
-            "Modality": 'Transcriptmoics',
+            "Modality": 'Transcriptomics',
             "has_raw_counts": True,
         },
         "parsebioscience": {
@@ -44,7 +44,7 @@ DATASET_INFO = {
             "perturbation_type": "Cytokines",
             "Inference data": " sc/bulk",
             'Measurement time': "24 hours",
-            "Modality": 'Transcriptmoics',
+            "Modality": 'Transcriptomics',
             "has_raw_counts": False,
         },
         "xaira_HEK293T": {
@@ -52,7 +52,7 @@ DATASET_INFO = {
             "perturbation_type": "Knockout",
             "Inference data": " sc/bulk",
             'Measurement time': "7 days",
-            "Modality": 'Transcriptmoics',
+            "Modality": 'Transcriptomics',
             "has_raw_counts": True,
         },
         "xaira_HCT116": {
@@ -60,7 +60,7 @@ DATASET_INFO = {
             "perturbation_type": "Knockout",
             "Inference data": " sc/bulk",
             'Measurement time': "7 days",
-            "Modality": 'Transcriptmoics',
+            "Modality": 'Transcriptomics',
             "has_raw_counts": True,
         },
         "replogle": {
@@ -68,7 +68,7 @@ DATASET_INFO = {
             "perturbation_type": "Knockout",
             "Inference data": " sc/bulk",
             'Measurement time': "7 days",
-            "Modality": 'Transcriptmoics',
+            "Modality": 'Transcriptomics',
             "has_raw_counts": True,
         },
         "nakatake": {
@@ -76,7 +76,7 @@ DATASET_INFO = {
             "perturbation_type": "Overexpression",
             "Inference data": "bulk",
             'Measurement time': "2 days",
-            "Modality": 'Transcriptmoics',
+            "Modality": 'Transcriptomics',
             "has_raw_counts": False,
         },
         "norman": {
@@ -84,7 +84,7 @@ DATASET_INFO = {
             "perturbation_type": "Activation",
             "Inference data": "sc",
             'Measurement time': "7 days",
-            "Modality": 'Transcriptmoics',
+            "Modality": 'Transcriptomics',
             "has_raw_counts": True,
         },
         "adamson": {
@@ -92,7 +92,7 @@ DATASET_INFO = {
             "perturbation_type": "Knockout",
             "Inference data": "sc",
             'Measurement time': "7 days",
-            "Modality": 'Transcriptmoics',
+            "Modality": 'Transcriptomics',
             "has_raw_counts": True,
         },
         "MSCIC": {
@@ -267,7 +267,7 @@ METRICS = [
        'vc', 
        'sem', 
     #    'sem_raw',
-       't_rec_precision', 't_rec_recall', 
+       't_rec_precision', 't_rec_recall',
     #    't_rec_f1',
        'replicate_consistency',       
     #    'tfb_precision', 'tfb_recall',  

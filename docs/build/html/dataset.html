@@ -90,6 +90,9 @@
 <p>Note that for the <strong>ParseBioscience</strong> dataset, the raw single-cell count data is available in the <code class="docutils literal notranslate"><span class="pre">resources/extended_data/</span></code> folder (<code class="docutils literal notranslate"><span class="pre">parsebioscience_train_sc.h5ad</span></code>; ~4.96M cells × 15,000 genes, 19 GB) but is not included in the main <code class="docutils literal notranslate"><span class="pre">resources/grn_benchmark/</span></code> folder due to its large file size.</p>
 <hr class="docutils" />
 <p>You need <cite>awscli</cite> to download the datasets.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>awscli
+</pre></div>
+</div>
 <section id="downloading-the-main-datasets">
 <h2>Downloading the main datasets<a class="headerlink" href="#downloading-the-main-datasets" title="Link to this heading"></a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>aws<span class="w"> </span>s3<span class="w"> </span>sync<span class="w"> </span>s3://openproblems-data/resources/grn/grn_benchmark<span class="w"> </span>resources/grn_benchmark/<span class="w"> </span>--no-sign-request
@@ -116,7 +119,7 @@ These files are used for the <cite>positive control</cite> method, which incorpo
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>aws<span class="w"> </span>s3<span class="w"> </span>sync<span class="w"> </span>s3://openproblems-data/resources/grn/datasets_raw/<span class="w"> </span>resources/datasets_raw/<span class="w"> </span>--no-sign-request
 </pre></div>
 </div>
-<p>We have not provided raw data for a few recent datasets due to very large file sizes. Pls contact us if you need the raw data for these datasets.</p>
+<p>We have not provided raw data for a few recent datasets due to very large file sizes. Please contact us if you need the raw data for these datasets.</p>
 </section>
 <section id="downloading-the-results">
 <h2>Downloading the results<a class="headerlink" href="#downloading-the-results" title="Link to this heading"></a></h2>

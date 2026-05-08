@@ -438,7 +438,7 @@ def main(par: Dict[str, Any]) -> Tuple[pd.DataFrame, pd.DataFrame]:
         precision = mean_scores['r_precision'].values[0]
         recall = mean_scores['r_recall'].values[0]
         f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
-        mean_scores['r_f1'] = f1
+        # mean_scores['r_f1'] = f1
 
     return detailed_df, mean_scores
 

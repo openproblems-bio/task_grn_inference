@@ -29,4 +29,4 @@ if [ ! -z "$layer" ]; then
 fi
 
 export SINGULARITYENV_RETICULATE_PYTHON=/usr/bin/python3
-singularity run ../../images/${method}.sif Rscript src/methods/${method}/script.R $r_args
+singularity run resources/singularity/${method} Rscript src/methods/${method}/script.R $r_args

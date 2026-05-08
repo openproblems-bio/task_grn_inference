@@ -18,6 +18,7 @@ You need `awscli` to download the datasets.
 
 
 .. code-block:: bash
+
    pip install awscli
 
 Downloading the main datasets
@@ -56,7 +57,7 @@ All previously mentioned datasets are processed versions. To access the raw, unp
 
    aws s3 sync s3://openproblems-data/resources/grn/datasets_raw/ resources/datasets_raw/ --no-sign-request
 
-We have not provided raw data for a few recent datasets due to very large file sizes. Pls contact us if you need the raw data for these datasets.
+We have not provided raw data for a few recent datasets due to very large file sizes. Please contact us if you need the raw data for these datasets.
 
 Downloading the results
 ---------------------------------------------

@@ -713,5 +713,72 @@ def compute_overall_scores(scores_all, final_metrics, datasets, modality_groups=
     if r_max > r_min:
         overall = (overall - r_min) / (r_max - r_min)
     df_scores['overall_score'] = overall
-
     return df_scores
+
+
+# ── Benchmark utilities ────────────────────────────────────────────────────────
+
+def plot_heatmap(scores, ax=None, name='', fmt='0.02f', cmap="viridis"):
+    import matplotlib.pyplot as plt
+    import seaborn
+
+    if ax is None:
+        _, ax = plt.subplots(1, 1, figsize=(4, 4))
+
+    scores = scores.apply(pd.to_numeric, errors='coerce')
+
+    def safe_normalize(x):
+        x_min, x_max = np.nanmin(x), np.nanmax(x)
+        if np.isnan(x_min) or np.isnan(x_max) or x_max == x_min:
+            return pd.Series([0.5] * len(x), index=x.index)
+        return (x - x_min) / (x_max - x_min)
+
+    scores_normalized = scores.apply(safe_normalize, axis=0).round(2)
+    seaborn.heatmap(scores_normalized, ax=ax, square=False, cbar=False,
+                    annot=True, fmt=fmt, vmin=0, vmax=1, cmap=cmap)
+
+    for text, (i, j) in zip(ax.texts, np.ndindex(scores.shape)):
+        value = scores.iloc[i, j]
+        if pd.isna(value):
+            text.set_text('NaN')
+        elif isinstance(value, (np.int64, int)):
+            text.set_text(f'{value:d}')
+        else:
+            text.set_text(f'{value:.2f}')
+
+    ax.tick_params(left=False, bottom=False)
+    ax.xaxis.set_tick_params(width=0)
+    ax.yaxis.set_tick_params(width=0)
+    ax.set_title(name, pad=10)
+    ax.xaxis.set_label_position('top')
+    ax.xaxis.tick_top()
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='left')
+
+
+def read_yaml(file_path):
+    """Parse score_uns.yaml into a wide-format DataFrame (dataset, model as index cols)."""
+    import yaml
+    with open(file_path) as f:
+        data = yaml.safe_load(f)
+    rows = []
+    for entry in data:
+        if not isinstance(entry, dict):
+            continue
+        dataset_id = entry.get('dataset_id', '')
+        method_id = entry.get('method_id', '')
+        if dataset_id == 'missing' or dataset_id == 'None':
+            continue
+        for mid, mval in zip(entry.get('metric_ids', []), entry.get('metric_values', [])):
+            if mval != 'None':
+                try:
+                    rows.append({'dataset': dataset_id, 'model': method_id,
+                                 'metric': mid, 'value': float(mval)})
+                except (ValueError, TypeError):
+                    pass
+    df = pd.DataFrame(rows)
+    if df.empty:
+        return df
+    wide = df.pivot_table(index=['dataset', 'model'], columns='metric',
+                          values='value').reset_index()
+    wide.columns.name = ''
+    return wide

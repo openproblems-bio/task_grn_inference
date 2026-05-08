@@ -17,6 +17,7 @@ state*
 trace*
 temp/
 tw*
+genernbi.egg*
 .ipynb_checkpoints
 __pycache__/
 

@@ -46,8 +46,9 @@
 <li class="toctree-l1"><a class="reference internal" href="dataset.html">Datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="inference.html">GRN Inference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">GRN evaluation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#running-grn-evaluation-without-docker">Running GRN evaluation without docker</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#running-grn-evaluation-using-standard-pipeline">Running GRN evaluation using standard pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-grn-evaluation-without-docker">Running GRN evaluation without Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-grn-evaluation-with-docker">Running GRN evaluation with Docker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#running-the-full-evaluation-pipeline">Running the full evaluation pipeline</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="extending.html">Extending</a></li>
@@ -94,44 +95,58 @@
 <a class="reference internal image-reference" href="_images/metric_quality_evaluation.png"><img alt="_images/metric_quality_evaluation.png" class="align-center" src="_images/metric_quality_evaluation.png" style="width: 100%;" />
 </a>
 <hr class="docutils" />
-<p>For a detailed description of each metric, refer to the geneRNIB paper. To map the naming conventions used in the code and this table, refer to <cite>surrogate_names</cite> in <cite>config.py</cite> file in the <cite>src/utils/</cite> directory.</p>
-<p>The evaluation metrics expect the inferred network to be in the form of an AnnData object with specific format as explained here.
-It should be noted that the metric currently evaluate only the <strong>top TF-gene pairs</strong>, currently limited to <strong>50,000 edges</strong>, ranked by their assigned weight.</p>
+<p>For a detailed description of each metric, refer to the geneRNIB paper. To map the naming conventions used in the code and this table, refer to <code class="docutils literal notranslate"><span class="pre">surrogate_names</span></code> in <code class="docutils literal notranslate"><span class="pre">src/utils/config.py</span></code>.</p>
+<p>The evaluation metrics expect the inferred network to be in the form of an AnnData object with a specific format as explained in the <a class="reference internal" href="inference.html"><span class="doc">GRN Inference</span></a> page.
+It should be noted that the metrics currently evaluate only the <strong>top TF-gene pairs</strong>, limited to <strong>50,000 edges</strong>, ranked by their assigned weight.</p>
 <p>The inferred network should have a tabular format with the following columns:</p>
 <blockquote>
 <div><ul class="simple">
-<li><p><cite>source</cite>: TF gene name</p></li>
-<li><p><cite>target</cite>: Target gene gene</p></li>
-<li><p><cite>weight</cite>: Regulatory importance/likelihood score/etc.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code>: TF gene name</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">target</span></code>: Target gene</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">weight</span></code>: Regulatory importance/likelihood score</p></li>
 </ul>
 </div></blockquote>
-<p>See <cite>resources/grn_benchmark/prior/collectri.h5ad</cite> for an example of the expected format.</p>
 <section id="running-grn-evaluation-without-docker">
-<h2>Running GRN evaluation without docker<a class="headerlink" href="#running-grn-evaluation-without-docker" title="Link to this heading"></a></h2>
-<p>Considering that Docker is not supported by certtain systems, you can run the evaluation without Docker by following these steps:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
-<span class="pre">bash</span> <span class="pre">src/metrics/all_metrics/run_local.sh</span> <span class="pre">--dataset</span> <span class="pre">&lt;dataset_name&gt;</span> <span class="pre">--prediction=&lt;inferred</span> <span class="pre">GRN</span> <span class="pre">(e.g.collectri.h5ad)&gt;</span> <span class="pre">--score</span> <span class="pre">&lt;output_score_file.h5ad&gt;</span> <span class="pre">--num_workers</span> <span class="pre">&lt;number_of_workers&gt;</span>
-<span class="pre">`</span></code></p>
-<p>example command:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
-<span class="pre">bash</span> <span class="pre">src/metrics/all_metrics/run_local.sh</span> <span class="pre">--dataset</span> <span class="pre">op</span> <span class="pre">--prediction=resources/grn_models/op/collectri.h5ad</span> <span class="pre">--score=output_score_file.h5ad</span> <span class="pre">--num_workers=20</span>
-<span class="pre">`</span></code></p>
-<p>If you are evaluating a new GRN model, which is not part of geneRNIB, make you to generate the consensus prior file for the dataset you are evaluating on.</p>
-<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
-<span class="pre">bash</span> <span class="pre">scripts/prior/run_consensus.sh</span> <span class="pre">--dataset</span> <span class="pre">op</span> <span class="pre">--new_model</span> <span class="pre">{new_grn_model_file.h5ad}</span>
-<span class="pre">`</span></code></p>
-<p>This will add your model to the previous ones and create the new consensus prior file needed for evaluation.</p>
+<h2>Running GRN evaluation without Docker<a class="headerlink" href="#running-grn-evaluation-without-docker" title="Link to this heading"></a></h2>
+<p>Considering that Docker is not supported by certain systems, you can run the evaluation without Docker:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bash<span class="w"> </span>src/metrics/all_metrics/run_local.sh<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dataset<span class="w"> </span>&lt;dataset_name&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--prediction<span class="w"> </span>&lt;inferred_grn.h5ad&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--score<span class="w"> </span>&lt;output_score_file.h5ad&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--num_workers<span class="w"> </span>&lt;number_of_workers&gt;
+</pre></div>
+</div>
+<p>Example:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bash<span class="w"> </span>src/metrics/all_metrics/run_local.sh<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dataset<span class="w"> </span>op<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--prediction<span class="w"> </span>resources/grn_models/op/collectri.h5ad<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--score<span class="w"> </span>output/score.h5ad<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--num_workers<span class="w"> </span><span class="m">20</span>
+</pre></div>
+</div>
+<p>If you are evaluating a new GRN model that is not part of geneRNIB, first generate the consensus prior file for the dataset you are evaluating on:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bash<span class="w"> </span>scripts/prior/run_consensus.sh<span class="w"> </span>--dataset<span class="w"> </span>op<span class="w"> </span>--new_model<span class="w"> </span>&lt;new_grn_model_file.h5ad&gt;
+</pre></div>
+</div>
+<p>This will incorporate your model into the consensus prior, which is required for a fair evaluation.</p>
 </section>
-<section id="running-grn-evaluation-using-standard-pipeline">
-<h2>Running GRN evaluation using standard pipeline<a class="headerlink" href="#running-grn-evaluation-using-standard-pipeline" title="Link to this heading"></a></h2>
-<p>To run the evalution for a given GRN and dataset, use the following command:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
-<span class="pre">bash</span> <span class="pre">scripts/run_grn_evaluation.sh</span> <span class="pre">--prediction=&lt;inferred</span> <span class="pre">GRN</span> <span class="pre">(e.g.collectri.h5ad)&gt;</span> <span class="pre">--save_dir=&lt;e.g.output/&gt;</span> <span class="pre">--dataset=&lt;e.g.</span> <span class="pre">replogle&gt;</span> <span class="pre">--build_images=&lt;true</span> <span class="pre">or</span> <span class="pre">false.</span> <span class="pre">true</span> <span class="pre">for</span> <span class="pre">the</span> <span class="pre">first</span> <span class="pre">time</span> <span class="pre">running&gt;</span>
-<span class="pre">`</span></code></p>
-<p>example command:</p>
-<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
-<span class="pre">bash</span> <span class="pre">scripts/run_grn_evaluation.sh</span> <span class="pre">--prediction=resources/grn_models/op/collectri.h5ad</span> <span class="pre">--save_dir=output/</span> <span class="pre">--dataset=op</span> <span class="pre">--build_images=true</span>
-<span class="pre">`</span></code></p>
+<section id="running-grn-evaluation-with-docker">
+<h2>Running GRN evaluation with Docker<a class="headerlink" href="#running-grn-evaluation-with-docker" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bash<span class="w"> </span>scripts/run_grn_evaluation.sh<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--prediction<span class="w"> </span>&lt;inferred_grn.h5ad&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--save_dir<span class="w"> </span>output/<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--dataset<span class="w"> </span>op<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--build_images<span class="w"> </span><span class="nb">true</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">--build_images</span> <span class="pre">true</span></code> is only needed on the first run. Outputs scores to <code class="docutils literal notranslate"><span class="pre">output/score_uns.yaml</span></code>.</p>
+</section>
+<section id="running-the-full-evaluation-pipeline">
+<h2>Running the full evaluation pipeline<a class="headerlink" href="#running-the-full-evaluation-pipeline" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bash<span class="w"> </span>scripts/run_grn_evaluation.sh<span class="w"> </span>--no_aws<span class="o">=</span><span class="nb">true</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">--no_aws=true</span></code> runs locally with Docker instead of submitting to AWS (the default).</p>
 </section>
 </section>
 

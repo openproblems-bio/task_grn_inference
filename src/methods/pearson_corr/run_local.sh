@@ -19,9 +19,9 @@ source "src/utils/parse_args.sh"
 parse_arguments "$@"
 
 # Pass arguments to Python script
-python_args="--rna $rna --prediction $prediction"
+python_args="--rna $rna --prediction $prediction --tf_all ${tf_all:-resources/grn_benchmark/prior/tf_all.csv}"
 if [ ! -z "$layer" ]; then
     python_args="$python_args --layer $layer"
 fi
 
-python src/methods/${method}/script.py $python_args
+conda run -n genernbi python src/methods/${method}/script.py $python_args

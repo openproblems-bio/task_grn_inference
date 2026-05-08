@@ -1,10 +1,10 @@
 # to run a single GRN evaluation, use the following command:
-# bash scripts/run_grn_evaluation.sh --prediction=<prediction file (e.g. prediction.h5ad)> --save_dir=<save dir> --dataset=<dataset (replogle)> --build_images=<true/false (building docker images-only needed one time)> --test_run=<true/false (to use test data)> --run_local=true>
+# bash scripts/run_grn_evaluation.sh --prediction=<prediction file (e.g. prediction.h5ad)> --save_dir=<save dir> --dataset=<dataset (replogle)> --build_images=<true/false (building docker images-only needed one time)> --test_run=<true/false (to use test data)> --no_aws=true
 
 
 set -e
 
-RUN_LOCAL="true"
+NO_AWS="true"
 RUN_TEST=false
 PREDICTION="none"
 SAVE_DIR="none"
@@ -36,8 +36,8 @@ for arg in "$@"; do
             BUILD_IMAGES="${arg#*=}"
             shift
             ;;
-        --run_local=*)
-            RUN_LOCAL="${arg#*=}"
+        --no_aws=*)
+            NO_AWS="${arg#*=}"
             shift
             ;;
         --reg_type=*)
@@ -60,16 +60,19 @@ echo "DATASET: $DATASET"
 echo "PREDICTION: $PREDICTION"
 echo "RUN_TEST: $RUN_TEST"
 echo "BUILD_IMAGES: $BUILD_IMAGES"
-echo "RUN_LOCAL: $RUN_LOCAL"
+echo "NO_AWS: $NO_AWS"
 echo "reg_type: $reg_type"
 
 if [ -z "${DATASET:-}" ]; then
-    echo "Error: DATASET must be provided. Use --dataset=<dataset_name>."
-    exit 1
+    python src/utils/config.py
+    source src/utils/config.env
+    ALL_DATASETS=(${DATASETS//,/ })
+    RUN_ID="all_evaluation"
+else
+    ALL_DATASETS=("$DATASET")
+    RUN_ID="${DATASET}_evaluation"
 fi
-
-RUN_ID="${DATASET}_evaluation"
-models_folder="${DATASET}/"
+echo "Datasets to run: ${ALL_DATASETS[*]}"
 apply_tf=true
 layer='lognorm'
 if [ "$RUN_TEST" = "false" ]; then
@@ -78,7 +81,7 @@ else
     resource_folder="resources_test/"
 fi
 
-if [ "$RUN_LOCAL" = true ]; then
+if [ "$NO_AWS" = true ]; then
   resources_dir="./${resource_folder}"
 else
   resources_dir="s3://openproblems-data/${resource_folder}/grn"
@@ -86,8 +89,10 @@ fi
 
 if [ "$SAVE_DIR" != "none" ]; then
   publish_dir="${SAVE_DIR}"
+elif [ ${#ALL_DATASETS[@]} -eq 1 ]; then
+  publish_dir="${resources_dir}/benchmark/results/${ALL_DATASETS[0]}/"
 else
-  publish_dir="${resources_dir}/results/${models_folder}"
+  publish_dir="${resources_dir}/benchmark/results/"
 fi
 
 mkdir -p "$publish_dir"
@@ -104,13 +109,7 @@ param_aws="s3://openproblems-data/resources/grn/results/params/${RUN_ID}_param_l
 > "$param_local"
 > "$param_file"
 
-# Generate and source config file
-echo "Generating dataset configuration..."
-python src/utils/config.py 
-source src/utils/config.env
-
-
-if [ "$RUN_LOCAL" = true ]; then
+if [ "$NO_AWS" = true ]; then
   cat >> "$param_local" << HERE
 param_list:
 HERE
@@ -179,29 +178,28 @@ HERE
 }
 
 if [ "$PREDICTION" != "none" ]; then
-  append_entry "single_run" $PREDICTION "$DATASET"
+  append_entry "single_run" $PREDICTION "${ALL_DATASETS[0]}"
 else
-  METHODS =(${METHODS//,/ })
-  grn_models_folder="${resources_dir}/results/${models_folder}/"
-  grn_models_folder_local="./resources/results/${models_folder}/" # just to control the hetergenity of the models for different datasets
-
-  # Iterate over GRN models
+  METHODS=(${METHODS//,/ })
   available_methods=()
-  for grn_name in "${METHODS[@]}"; do
-    prediction_file="${grn_models_folder_local}/${DATASET}.${grn_name}.${grn_name}.prediction.h5ad"
-    if [[ -f "${prediction_file}" ]]; then
-      prediction_file=${grn_models_folder}/${DATASET}.${grn_name}.${grn_name}.prediction.h5ad
-      append_entry "$grn_name" $prediction_file "$DATASET"
-      available_methods+=("$grn_name")
-    fi
+  for ds in "${ALL_DATASETS[@]}"; do
+    grn_models_folder="${resources_dir}/benchmark/results/${ds}/"
+    grn_models_folder_local="./resources/benchmark/results/${ds}/"
+    for grn_name in "${METHODS[@]}"; do
+      prediction_file="${grn_models_folder_local}/${ds}.${grn_name}.${grn_name}.prediction.h5ad"
+      if [[ -f "${prediction_file}" ]]; then
+        prediction_file=${grn_models_folder}/${ds}.${grn_name}.${grn_name}.prediction.h5ad
+        append_entry "$grn_name" $prediction_file "$ds"
+        available_methods+=("$grn_name")
+      fi
+    done
   done
   echo "Available methods:"
   printf '%s\n' "${available_methods[@]}" | sort -u
-
 fi
 
 # Append final fields
-if [ "$RUN_LOCAL" = true ]; then
+if [ "$NO_AWS" = true ]; then
   cat >> "$param_local" << HERE
 output_state: "state.yaml"
 publish_dir: "$publish_dir"

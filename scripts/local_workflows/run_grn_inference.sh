@@ -15,7 +15,7 @@ METHODS=('geneformer')
 methods_dir='src/methods/'
 ctr_methods_dir='src/methods/'
 resources_dir='resources'
-predictions_dir="$resources_dir/results/"
+predictions_dir="$resources_dir/results/benchmark/"
 
 
 MULTIOMICS_METHODS=("scenicplus" "scglue" "figr" "granie" "celloracle")

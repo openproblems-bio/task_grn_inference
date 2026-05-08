@@ -12,5 +12,5 @@
 
 singularity exec \
   --bind /vol/projects:/vol/projects \
-  ../../images/celloracle \
+  resources/singularity/celloracle \
   python3 src/process_data/main/MSCIC/script.py

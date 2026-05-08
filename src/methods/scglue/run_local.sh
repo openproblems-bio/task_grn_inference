@@ -27,4 +27,4 @@ if [ ! -z "$atac" ]; then
     python_args="$python_args --atac $atac"
 fi
 
-singularity run --nv ../../images/${method} python src/methods/${method}/script.py $python_args
+singularity run --nv resources/singularity/${method} python src/methods/${method}/script.py $python_args

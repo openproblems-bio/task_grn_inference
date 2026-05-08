@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GRN Inference &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
@@ -82,49 +82,61 @@
 <h1>GRN Inference<a class="headerlink" href="#grn-inference" title="Link to this heading"></a></h1>
 <section id="grn-inference-using-integrated-methods">
 <h2>GRN inference using integrated methods<a class="headerlink" href="#grn-inference-using-integrated-methods" title="Link to this heading"></a></h2>
-<p>To infer a GRN for a given dataset (e.g. op) using our integration methods, after installation of geneRNIB, run the following command (e.g. Pearson correlation):</p>
+<p>To infer a GRN for a given dataset using an integrated method, first download the test datasets:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>aws<span class="w"> </span>s3<span class="w"> </span>sync<span class="w"> </span>s3://openproblems-data/resources_test/grn/grn_benchmark<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>resources_test/grn_benchmark<span class="w"> </span>--no-sign-request
+</pre></div>
+</div>
+<p>Use <code class="docutils literal notranslate"><span class="pre">resources_test/</span></code> paths for development and testing. Switch to <code class="docutils literal notranslate"><span class="pre">resources/grn_benchmark/</span></code> for full-scale runs (requires downloading the main datasets — see <a class="reference internal" href="dataset.html"><span class="doc">Datasets</span></a>).</p>
+<p><strong>With Docker (Viash)</strong></p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>viash<span class="w"> </span>run<span class="w"> </span>src/methods/pearson_corr/config.vsh.yaml<span class="w"> </span>--<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--rna<span class="w"> </span>resources_test/grn_benchmark/inference_data/op_rna.h5ad<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--prediction<span class="w"> </span>output/net.h5ad<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--tf_all<span class="w"> </span>resources_test/grn_benchmark/prior/tf_all.csv
 </pre></div>
 </div>
-<p>See <cite>src/methods/</cite> for the list of currently integrated methods.</p>
+<p><strong>Without Docker (conda or Singularity)</strong></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>bash<span class="w"> </span>src/methods/pearson_corr/run_local.sh<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--rna<span class="w"> </span>resources_test/grn_benchmark/inference_data/op_rna.h5ad<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--tf_all<span class="w"> </span>resources_test/grn_benchmark/prior/tf_all.csv<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--prediction<span class="w"> </span>output/net.h5ad
+</pre></div>
+</div>
+<p>Replace <code class="docutils literal notranslate"><span class="pre">pearson_corr</span></code> with any method under <code class="docutils literal notranslate"><span class="pre">src/methods/</span></code>. Methods that require Singularity (e.g. GRNBoost2, scPRINT, Scenic/Scenic+, CellOracle) will invoke it automatically from their <code class="docutils literal notranslate"><span class="pre">run_local.sh</span></code> script.</p>
 </section>
 <section id="grn-inference-without-method-integration">
 <h2>GRN inference without method integration<a class="headerlink" href="#grn-inference-without-method-integration" title="Link to this heading"></a></h2>
-<p>Download the inference datasets from the <cite>dataset</cite> page. For each dataset, perform GRN inference using your algorithm. Consider the following:</p>
+<p>Download the inference datasets from the <a class="reference internal" href="dataset.html"><span class="doc">Datasets</span></a> page. For each dataset, perform GRN inference using your own algorithm. Consider the following:</p>
 <ul>
 <li><p>We evaluate only the <strong>top TF-gene pairs</strong>, currently limited to <strong>50,000 edges</strong>, ranked by their assigned weight.</p></li>
 <li><p>The inferred network should follow this format:</p>
 <p><strong>Columns:</strong></p>
 <ul class="simple">
-<li><p><cite>source</cite>: Transcription factor (TF)</p></li>
-<li><p><cite>target</cite>: Target gene</p></li>
-<li><p><cite>weight</cite>: Regulatory importance/likelihood score</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">source</span></code>: Transcription factor (TF)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">target</span></code>: Target gene</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">weight</span></code>: Regulatory importance/likelihood score</p></li>
 </ul>
 </li>
 </ul>
 <p>Since geneRNIB works with <strong>AnnData</strong>, your inferred network should be saved in this format.
-See <cite>resources/grn_benchmark/prior/collectri.h5ad</cite> for an example of the expected format.
-If your network is a pandas DataFrame with three columns (<cite>source</cite>, <cite>target</cite>, <cite>weight</cite>), you can save it as follows:</p>
+If your network is a pandas DataFrame with three columns (<code class="docutils literal notranslate"><span class="pre">source</span></code>, <code class="docutils literal notranslate"><span class="pre">target</span></code>, <code class="docutils literal notranslate"><span class="pre">weight</span></code>), you can save it as follows:</p>
+<p><strong>Python</strong></p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">anndata</span> <span class="k">as</span> <span class="nn">ad</span>
 
-<span class="n">net</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">net</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>  <span class="c1"># Ensure weight is stored as a string</span>
+<span class="n">net</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">net</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>  <span class="c1"># weight must be stored as a string</span>
 
 <span class="n">output</span> <span class="o">=</span> <span class="n">ad</span><span class="o">.</span><span class="n">AnnData</span><span class="p">(</span>
     <span class="n">X</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">uns</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;method_id&quot;</span><span class="p">:</span> <span class="s2">&quot;your_method_name&quot;</span><span class="p">,</span> <span class="c1"># e.g. &quot;grnboost2&quot;</span>
-        <span class="s2">&quot;dataset_id&quot;</span><span class="p">:</span> <span class="s2">&quot;dataset_name&quot;</span><span class="p">,</span>  <span class="c1">#e.g. &quot;replogle&quot;</span>
+        <span class="s2">&quot;method_id&quot;</span><span class="p">:</span> <span class="s2">&quot;your_method_name&quot;</span><span class="p">,</span>  <span class="c1"># e.g. &quot;grnboost2&quot;</span>
+        <span class="s2">&quot;dataset_id&quot;</span><span class="p">:</span> <span class="s2">&quot;dataset_name&quot;</span><span class="p">,</span>     <span class="c1"># e.g. &quot;replogle&quot;</span>
         <span class="s2">&quot;prediction&quot;</span><span class="p">:</span> <span class="n">net</span><span class="p">[[</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">]]</span>
     <span class="p">}</span>
 <span class="p">)</span>
-
-<span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;save_to_file.h5ad&quot;</span><span class="p">)</span>
+<span class="n">output</span><span class="o">.</span><span class="n">write_h5ad</span><span class="p">(</span><span class="s2">&quot;save_to_file.h5ad&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>For R, use the following approach:</p>
+<p><strong>R</strong></p>
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">zellkonverter</span><span class="p">)</span>
 
 <span class="n">net</span><span class="o">$</span><span class="n">weight</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.character</span><span class="p">(</span><span class="n">net</span><span class="o">$</span><span class="n">weight</span><span class="p">)</span>
@@ -132,16 +144,15 @@ If your network is a pandas DataFrame with three columns (<cite>source</cite>, <
 <span class="n">output</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">AnnData</span><span class="p">(</span>
 <span class="w">    </span><span class="n">X</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">matrix</span><span class="p">(</span><span class="n">nrow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">ncol</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">),</span>
 <span class="w">    </span><span class="n">uns</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span>
-<span class="w">        </span><span class="n">method_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;your_method_name&quot;</span><span class="p">,</span><span class="w"> </span><span class="c1"># e.g. &quot;grnboost2&quot;</span>
-<span class="w">        </span><span class="n">dataset_id</span><span class="w"> </span><span class="o">=</span><span class="s">&quot;dataset_name&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1"># e.g. &quot;replogle&quot;</span>
+<span class="w">        </span><span class="n">method_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;your_method_name&quot;</span><span class="p">,</span><span class="w">  </span><span class="c1"># e.g. &quot;grnboost2&quot;</span>
+<span class="w">        </span><span class="n">dataset_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;dataset_name&quot;</span><span class="p">,</span><span class="w">     </span><span class="c1"># e.g. &quot;replogle&quot;</span>
 <span class="w">        </span><span class="n">prediction</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">net</span><span class="p">[,</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;source&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;target&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;weight&quot;</span><span class="p">)]</span>
 <span class="w">    </span><span class="p">)</span>
 <span class="p">)</span>
-
 <span class="n">output</span><span class="o">$</span><span class="nf">write_h5ad</span><span class="p">(</span><span class="s">&quot;save_to_file.h5ad&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">compression</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;gzip&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Once you have inferred GRNs for one or more datasets, proceed to the next section to run the evaluation.</p>
+<p>Once you have inferred GRNs for one or more datasets, proceed to the <a class="reference internal" href="evaluation.html"><span class="doc">GRN evaluation</span></a> page to run the evaluation metrics.</p>
 </section>
 </section>
 

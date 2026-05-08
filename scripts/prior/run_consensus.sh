@@ -38,7 +38,7 @@ if [ -z "$DATASET" ]; then
   exit 1
 fi
 
-models_dir="resources/results/$DATASET"
+models_dir="resources/results/benchmark/$DATASET"
 models=("pearson_corr" "positive_control" "portia" "ppcor" "scenic" "scprint" "grnboost" "scenicplus" "scglue" "granie" "figr" "celloracle" "scgpt" "geneformer" "spearman_corr")
 python src/utils/config.py
 source src/utils/config.env
@@ -98,7 +98,7 @@ for dataset in "${datasets[@]}"; do
         --models_dir "$models_dir" \
         --ws_consensus "resources/grn_benchmark/prior/ws_consensus_${dataset}.csv" \
         --tf_all "resources/grn_benchmark/prior/tf_all.csv" \
-        --evaluation_data_sc "resources/processed_data/${dataset}_evaluation_sc.h5ad" \
-        --models "${models[@]}"
+        --evaluation_data_sc "resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad" \
+        --models "${METHODS[@]}"
 done
 

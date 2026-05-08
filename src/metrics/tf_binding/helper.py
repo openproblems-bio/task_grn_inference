@@ -161,8 +161,8 @@ def main(par):
     
     # Create single-row result with weighted averages and GT-specific scores
     final_result = {
-        'tfb_precision': tfb_precision_weighted,
-        'tfb_recall': tfb_recall_weighted,
+        # 'tfb_precision': tfb_precision_weighted,
+        # 'tfb_recall': tfb_recall_weighted,
         'tfb_f1': tfb_f1
     }
     if par['output_detailed_metrics']:

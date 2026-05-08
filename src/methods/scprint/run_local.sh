@@ -20,14 +20,14 @@ parse_arguments "$@"
 _lamin_home=$(mktemp -d /tmp/lamin_home_XXXXXX)
 _lamin_storage=$(mktemp -d /tmp/lamin_storage_XXXXXX)
 
-singularity exec ../../images/${method}.sif cp -r /root/.lamin/. ${_lamin_home}/.lamin/
-singularity exec ../../images/${method}.sif cp /workspace/main/63c3fd677cf055009fc56bed97323c1c.lndb ${_lamin_storage}/
+singularity exec resources/singularity/${method} cp -r /root/.lamin/. ${_lamin_home}/.lamin/
+singularity exec resources/singularity/${method} cp /workspace/main/63c3fd677cf055009fc56bed97323c1c.lndb ${_lamin_storage}/
 
 for f in ${_lamin_home}/.lamin/*.env; do
     sed -i "s|lamindb_instance_storage_root=/workspace/main|lamindb_instance_storage_root=${_lamin_storage}|g" "$f"
 done
 
-singularity exec --home ${_lamin_home} --bind $(pwd):$(pwd) ../../images/${method}.sif \
-    python src/methods/${method}/script.py --rna $rna --prediction $prediction
+singularity exec --home ${_lamin_home} --bind $(pwd):$(pwd) resources/singularity/${method} \
+    python src/methods/${method}/script.py --rna $rna --prediction $prediction --tf_all ${tf_all:-resources/grn_benchmark/prior/tf_all.csv}
 
 rm -rf ${_lamin_home} ${_lamin_storage}

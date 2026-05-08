@@ -28,8 +28,8 @@ print('Saved gene info cache to $GENE_INFO')
 "
 fi
 
-singularity run ../../images/${method} python src/methods/${method}/script.py \
+singularity run resources/singularity/${method} python src/methods/${method}/script.py \
     --rna $rna \
     --prediction $prediction \
-    --tf_all resources/grn_benchmark/prior/tf_all.csv \
+    --tf_all ${tf_all:-resources/grn_benchmark/prior/tf_all.csv} \
     --temp_dir output/${method}/

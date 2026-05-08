@@ -26,4 +26,4 @@ fi
 # Add scenicplus-specific arguments
 python_args="$python_args --num_workers 20"
 
-singularity run ../../images/${method} python src/methods/${method}/script.py $python_args
+singularity run resources/singularity/${method} python src/methods/${method}/script.py $python_args
