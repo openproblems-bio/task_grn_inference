@@ -4,23 +4,30 @@
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
-#SBATCH --time=20:00:00
-#SBATCH --mem=250GB
-#SBATCH --partition=gpu
-#SBATCH --gres gpu:1
+#SBATCH --time=5:00:00
+#SBATCH --mem=64GB
+#SBATCH --partition=cpu
 #SBATCH --qos long
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com  
 
-dataset=$1
 method="scprint"
 
-if [ -z "$dataset" ]; then
-    echo "Error: dataset not provided"
-    exit 1
-fi
+source "src/utils/parse_args.sh"
+parse_arguments "$@"
 
-rna="resources/grn_benchmark/inference_data/${dataset}_rna.h5ad"
-prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
+# Set up a writable lamindb home using the pre-built instance from the container
+_lamin_home=$(mktemp -d /tmp/lamin_home_XXXXXX)
+_lamin_storage=$(mktemp -d /tmp/lamin_storage_XXXXXX)
 
-singularity run ../../images/${method}.sif python src/methods/${method}/script.py --rna $rna --prediction $prediction
+singularity exec resources/singularity/${method} cp -r /root/.lamin/. ${_lamin_home}/.lamin/
+singularity exec resources/singularity/${method} cp /workspace/main/63c3fd677cf055009fc56bed97323c1c.lndb ${_lamin_storage}/
+
+for f in ${_lamin_home}/.lamin/*.env; do
+    sed -i "s|lamindb_instance_storage_root=/workspace/main|lamindb_instance_storage_root=${_lamin_storage}|g" "$f"
+done
+
+singularity exec --home ${_lamin_home} --bind $(pwd):$(pwd) resources/singularity/${method} \
+    python src/methods/${method}/script.py --rna $rna --prediction $prediction --tf_all ${tf_all:-resources/grn_benchmark/prior/tf_all.csv}
+
+rm -rf ${_lamin_home} ${_lamin_storage}

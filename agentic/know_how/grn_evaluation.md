@@ -169,5 +169,54 @@ print(score.uns)  # contains all metric scores
 ```
 
 ## Comparing your model's performance to previous results
-The previous benchmark scores are in resources/results/all_scores.csv for all methods, datasets, and metrics.
-Of note, many metrics are there but not actually used as the final evaluation metris (we use those in stability analysis). Use src/utils/config.py -> METRICS to take out relevant metrics.
+
+Pre-computed scores for all integrated methods are in `resources/results/benchmark/all_scores.csv`.
+
+```python
+import pandas as pd
+scores = pd.read_csv('resources/results/benchmark/all_scores.csv')
+# columns: dataset, method, + one column per metric
+# filter to final metrics only:
+from src.utils.config import METRICS
+scores = scores[['dataset', 'method'] + [m for m in METRICS if m in scores.columns]]
+```
+
+Of note: many metrics are computed but only those in `src/utils/config.py → METRICS` are used for final ranking. The others are retained for stability analysis.
+
+---
+
+## Post-evaluation analysis
+
+Run these scripts after all evaluations are complete to aggregate results and generate figures. All scripts run in the `genernbi` conda env from the repo root.
+
+**Step 1 — Aggregate score files into `all_scores.csv`**
+
+Collects all `resources/results/{dataset}/scores/{dataset}__{method}_score.h5ad` files:
+
+```bash
+python scripts/benchmark/aggregate_local_scores.py
+```
+
+Output: `resources/results/benchmark/all_scores.csv`
+
+**Step 2 — Evaluate metric applicability**
+
+Filters metrics per dataset based on coefficient of variation (CV ≥ 0.2) and metric-specific thresholds from `config.py → METRIC_THRESHOLDS`. This determines what appears on the leaderboard.
+
+```bash
+python scripts/benchmark/evaluate_metric_applicability.py
+```
+
+**Step 3 — Generate overview figure**
+
+Calls `compute_overall_scores` to rank methods, then produces the leaderboard summary plot:
+
+```bash
+python scripts/benchmark/create_overview_figure.py
+```
+
+**Step 4 — Generate per-dataset score heatmaps** *(optional)*
+
+```bash
+python scripts/benchmark/plot_raw_scores.py
+```

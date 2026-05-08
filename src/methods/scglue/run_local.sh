@@ -13,16 +13,18 @@
 #SBATCH --mail-user=jalil.nourisa@gmail.com  
 
 
-dataset=$1
 method="scglue"
 
-if [ -z "$dataset" ]; then
-    echo "Error: dataset not provided"
-    exit 1
+# Import argument parsing functionality
+source "src/utils/parse_args.sh"
+
+# Parse command line arguments
+parse_arguments "$@"
+
+# Pass arguments to Python script
+python_args="--rna $rna --prediction $prediction"
+if [ ! -z "$atac" ]; then
+    python_args="$python_args --atac $atac"
 fi
 
-rna="resources/grn_benchmark/inference_data/${dataset}_rna.h5ad"
-atac="resources/grn_benchmark/inference_data/${dataset}_atac.h5ad"
-prediction="resources/results/${dataset}/${dataset}.${method}.${method}.prediction.h5ad"
-
-singularity run --nv ../../images/${method} python src/methods/${method}/script.py --rna $rna --atac $atac --prediction $prediction
+singularity run --nv resources/singularity/${method} python src/methods/${method}/script.py $python_args

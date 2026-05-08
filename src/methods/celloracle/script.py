@@ -11,6 +11,7 @@ par = {
   "annotated_peaks": 'output/celloracle/annotated_peaks.csv',
   "temp_dir": 'output/celloracle/',
   "num_workers": 10,
+  "max_n_links": 50000,
   "prediction": "output/celloracle.h5ad"}
 ## VIASH END
 import argparse
@@ -19,6 +20,7 @@ argparser.add_argument('--rna', type=str, help='Path to the input RNA data in h5
 argparser.add_argument('--atac', type=str, help='Path to the input ATAC data in h5ad format.')
 argparser.add_argument('--prediction', type=str, help='Path to the output prediction in h5ad format.')
 argparser.add_argument('--annotated_peaks', type=str, default=par['annotated_peaks'], help='Path to store the annotated peaks.')
+argparser.add_argument('--temp_dir', type=str, default=par['temp_dir'], help='Temp directory for intermediate files.')
 args = argparser.parse_args()
 if args.rna is not None:
     par['rna'] = args.rna
@@ -26,6 +28,7 @@ if args.atac is not None:
     par['atac'] = args.atac
 if args.prediction is not None:
     par['prediction'] = args.prediction
+par['temp_dir'] = args.temp_dir
 
 
 try:

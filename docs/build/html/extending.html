@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" data-content_root="./">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Extending &mdash; OpenProblems GRN benchmarking 0.1 documentation</title>
@@ -47,9 +47,12 @@
 <li class="toctree-l1"><a class="reference internal" href="inference.html">GRN Inference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="evaluation.html">GRN evaluation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Extending</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#add-a-grn-inference-method">Add a GRN inference method</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#add-a-grn-inference-method">Add a GRN inference method</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#updating-the-leaderboard">Updating the leaderboard</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#add-a-grn-evaluation-metric">Add a GRN evaluation metric</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#add-a-grn-inference-and-evalaution-dataset">Add a GRN inference and evalaution dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#add-a-grn-inference-and-evaluation-dataset">Add a GRN inference and evaluation dataset</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="leaderboard.html">Leaderboard</a></li>
@@ -157,7 +160,7 @@ with a <cite>script.py</cite>. Additionally, the method can have extra files to 
          <span class="s2">&quot;prediction&quot;</span><span class="p">:</span> <span class="n">net</span><span class="p">[[</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="s2">&quot;target&quot;</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">]]</span>
      <span class="p">}</span>
  <span class="p">)</span>
- <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">params</span><span class="p">[</span><span class="s2">&quot;prediction&quot;</span><span class="p">])</span>
+ <span class="n">output</span><span class="o">.</span><span class="n">write_h5ad</span><span class="p">(</span><span class="n">par</span><span class="p">[</span><span class="s1">&#39;prediction&#39;</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -176,6 +179,18 @@ with a <cite>script.py</cite>. Additionally, the method can have extra files to 
 </div>
 <p>Once the test is successful, you can submit a pull request to the geneRNIB repository to integrate your method.
 See additional Viash commands in the <a class="reference external" href="https://viash.io/guide/">Viash documentation</a> to run your method with different parameters.</p>
+<section id="updating-the-leaderboard">
+<h3>Updating the leaderboard<a class="headerlink" href="#updating-the-leaderboard" title="Link to this heading"></a></h3>
+<p>After evaluation is complete, aggregate the raw scores into <code class="docutils literal notranslate"><span class="pre">all_scores.csv</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/benchmark/aggregate_local_scores.py
+</pre></div>
+</div>
+<p>Then regenerate the leaderboard figure, which re-runs normalization across all methods:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>scripts/benchmark/create_overview_figure.py
+</pre></div>
+</div>
+<p>The raw benchmark scores are also available for download on the <a class="reference internal" href="leaderboard.html"><span class="doc">Leaderboard</span></a> page.</p>
+</section>
 </section>
 <section id="add-a-grn-evaluation-metric">
 <h2>Add a GRN evaluation metric<a class="headerlink" href="#add-a-grn-evaluation-metric" title="Link to this heading"></a></h2>
@@ -203,8 +218,8 @@ The choice of the dataset depends on the evaluation metric.</p>
 </pre></div>
 </div>
 </section>
-<section id="add-a-grn-inference-and-evalaution-dataset">
-<h2>Add a GRN inference and evalaution dataset<a class="headerlink" href="#add-a-grn-inference-and-evalaution-dataset" title="Link to this heading"></a></h2>
+<section id="add-a-grn-inference-and-evaluation-dataset">
+<h2>Add a GRN inference and evaluation dataset<a class="headerlink" href="#add-a-grn-inference-and-evaluation-dataset" title="Link to this heading"></a></h2>
 <p>Here we explain how to integrate new datasets. All datasets are in h5ad, and the example structure of a inference or evaluation dataset can be found in <cite>resources/grn_benchmark/</cite>.
 The inference datasets are in <cite>resources/grn_benchmark/inference_data/</cite> and the evaluation datasets are in <cite>resources/grn_benchmark/evaluation_data/</cite>.
 Each dataset should have a unique <cite>dataset_id</cite>, stored in <cite>.uns[‘dataset_id’]</cite>, that will be used to identify it in the platform.

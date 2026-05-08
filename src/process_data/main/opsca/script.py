@@ -147,7 +147,7 @@ if __name__ == '__main__':
     print('evaluation_data', evaluation_data)
 
     evaluation_data.write(par['op_perturbation_bulk'])
-    evaluation_data.write('resources/extended_data/op_bulk.h5ad')
+    evaluation_data.write('resources/extended_data/op_rna_all.h5ad')
     rna.write(par['op_rna'])
     atac.write(par['op_atac'])
     

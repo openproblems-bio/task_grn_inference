@@ -88,6 +88,7 @@ def parse_args(par):
     parser.add_argument('--ws_consensus', type=str)
     parser.add_argument('--ws_distance_background', type=str)
     parser.add_argument('--group_specific', type=str)
+    parser.add_argument('--cv_groups', type=str, help='obs column to use as CV group labels (e.g. cell_type_orig)')
     parser.add_argument('--evaluation_data_de', type=str)
     parser.add_argument('--evaluation_data_sc', type=str)
     parser.add_argument('--ground_truth_unibind', type=str)
@@ -344,31 +345,33 @@ def add_gene_id(adata):
     adata.var = merged.loc[valid_genes]
     return adata
 def fetch_gene_info():
-    from pybiomart import Server
+    import os, pandas as pd
+    cache = 'resources/grn_benchmark/prior/gene_info_biomart.csv'
+    if os.path.exists(cache):
+        return pd.read_csv(cache, index_col=0)
 
-    # Connect to Ensembl server
-    server = Server(host="http://www.ensembl.org")
-
-    # Select the dataset for human genes
-    dataset = server.marts["ENSEMBL_MART_ENSEMBL"].datasets["hsapiens_gene_ensembl"]
-
-    # Query relevant attributes
-    df = dataset.query(
-        attributes=[
-            "ensembl_gene_id",  # Ensembl Gene ID
-            "external_gene_name",  # Gene Name
-            "chromosome_name",  # Chromosome
-            "start_position",  # Start site
-            "end_position",  # End site
-        ]
-    )
-    df.columns = ["gene_id", "gene_name", "chr", "start", "end"]
-    # df = df[df['chr'].isin(['X', 'Y']+list(map(str, range(1, 23))))]
-    # - keep those genes with one mapping
-    df = df.groupby("gene_name").filter(lambda x: len(x) == 1)
-    df.set_index("gene_name", inplace=True)
-
-    return df
+    try:
+        from pybiomart import Server
+        server = Server(host="http://www.ensembl.org")
+        dataset = server.marts["ENSEMBL_MART_ENSEMBL"].datasets["hsapiens_gene_ensembl"]
+        df = dataset.query(attributes=["ensembl_gene_id", "external_gene_name",
+                                        "chromosome_name", "start_position", "end_position"])
+        df.columns = ["gene_id", "gene_name", "chr", "start", "end"]
+        df = df.groupby("gene_name").filter(lambda x: len(x) == 1)
+        df.set_index("gene_name", inplace=True)
+        return df
+    except Exception:
+        import mygene
+        mg = mygene.MyGeneInfo()
+        res = mg.query('_exists_:symbol AND taxid:9606',
+                       fields='symbol,ensembl.gene', species='human',
+                       size=20000, as_dataframe=True)
+        res = res[['symbol', 'ensembl.gene']].dropna()
+        res = res[res['ensembl.gene'].apply(lambda x: isinstance(x, str))]
+        res = res.drop_duplicates('symbol').set_index('symbol')
+        res.index.name = 'gene_name'
+        res.columns = ['gene_id']
+        return res
 
 def download_annotation(par):
     import os
@@ -580,15 +583,22 @@ def create_grn_baseline(A):
 
 
 
-def compute_overall_scores(scores_all, final_metrics, datasets):
+def compute_overall_scores(scores_all, final_metrics, datasets, modality_groups=None):
     """
-    Compute doubly-normalized overall scores for ranking GRN models.
+    Compute overall scores for ranking GRN models.
 
-    Steps:
+    Display columns (per-metric and per-dataset):
       1. Per-dataset min-max normalization of each metric (negatives clipped to 0).
       2. Average normalized scores across datasets per metric, then re-normalize to [0,1].
       3. Average normalized scores across metrics per dataset, then re-normalize to [0,1].
-      4. overall_score = median over (applicability-filtered metric scores + per-dataset scores).
+
+    Overall score (modality-balanced):
+      1. For each (dataset, metric) pair, rank methods by percentile (1 = best).
+      2. Per modality group, take the median percentile rank across applicable pairs.
+      3. overall_score = mean of modality medians (only over modalities where method has data).
+      This ensures multiomics and transcriptomics datasets contribute equally regardless
+      of how many datasets exist in each modality.
+      If modality_groups is None, falls back to a flat median across all (dataset, metric) pairs.
 
     Parameters
     ----------
@@ -598,6 +608,10 @@ def compute_overall_scores(scores_all, final_metrics, datasets):
         Metrics that passed applicability criteria (used for overall_score).
     datasets : list of str
         Known dataset names.
+    modality_groups : dict, optional
+        Mapping of modality name -> list of dataset names, e.g.
+        {'Multiomics': ['op', 'MSCIC'], 'Transcriptomics': ['norman', ...]}.
+        If provided, overall_score is the mean of per-modality median ranks.
 
     Returns
     -------
@@ -621,7 +635,7 @@ def compute_overall_scores(scores_all, final_metrics, datasets):
 
     df_all_n = scores_all.groupby('dataset').apply(normalize_scores_per_dataset).reset_index()
 
-    # --- per-metric aggregation ---
+    # --- per-metric aggregation (for display) ---
     df_metrics = (
         df_all_n.groupby('model')
         .apply(lambda df: df.drop('dataset', axis=1).mean(skipna=True))
@@ -635,7 +649,7 @@ def compute_overall_scores(scores_all, final_metrics, datasets):
             df_metrics[col] = 0
         df_metrics.loc[original_nans, col] = float('nan')
 
-    # --- per-dataset aggregation ---
+    # --- per-dataset aggregation (for display) ---
     df_datasets = (
         df_all_n.groupby('model')
         .apply(lambda df: df.set_index('dataset')[all_metrics].T.mean(skipna=True))
@@ -657,8 +671,114 @@ def compute_overall_scores(scores_all, final_metrics, datasets):
     if df_scores.index.duplicated().any():
         df_scores = df_scores.groupby(df_scores.index).mean()
 
-    final_metrics_cols = [m for m in final_metrics if m in df_scores.columns]
-    dataset_cols = [c for c in df_scores.columns if c in datasets]
-    df_scores['overall_score'] = df_scores[final_metrics_cols + dataset_cols].median(axis=1, skipna=True)
+    # --- overall_score: modality-balanced median percentile rank ---
+    def _median_pct_rank(dataset_list):
+        """Return per-method median percentile rank across (dataset x metric) pairs."""
+        records = []
+        sub = scores_all[scores_all['dataset'].isin(dataset_list)]
+        for dataset, grp in sub.groupby('dataset'):
+            grp = grp.set_index('model')
+            for metric in final_metrics:
+                if metric not in grp.columns:
+                    continue
+                col = grp[metric].dropna()
+                if col.empty:
+                    continue
+                for method, r in col.rank(ascending=True, pct=True).items():
+                    records.append({'model': method, 'rank': r})
+        if not records:
+            return pd.Series(dtype=float)
+        return pd.DataFrame(records).groupby('model')['rank'].median()
 
+    if modality_groups is not None:
+        # Step 1: median rank per modality group
+        modality_medians = {
+            mod: _median_pct_rank(ds_list)
+            for mod, ds_list in modality_groups.items()
+        }
+        # Step 2: mean across modalities where method has data
+        all_methods = set().union(*[s.index for s in modality_medians.values()])
+        overall = {}
+        for method in all_methods:
+            scores = [s[method] for s in modality_medians.values()
+                      if method in s.index and pd.notna(s[method])]
+            if scores:
+                overall[method] = sum(scores) / len(scores)
+        overall = pd.Series(overall)
+    else:
+        overall = _median_pct_rank([d for d in scores_all['dataset'].unique() if d in datasets])
+
+    # normalize to [0,1]
+    r_min, r_max = overall.min(), overall.max()
+    if r_max > r_min:
+        overall = (overall - r_min) / (r_max - r_min)
+    df_scores['overall_score'] = overall
     return df_scores
+
+
+# ── Benchmark utilities ────────────────────────────────────────────────────────
+
+def plot_heatmap(scores, ax=None, name='', fmt='0.02f', cmap="viridis"):
+    import matplotlib.pyplot as plt
+    import seaborn
+
+    if ax is None:
+        _, ax = plt.subplots(1, 1, figsize=(4, 4))
+
+    scores = scores.apply(pd.to_numeric, errors='coerce')
+
+    def safe_normalize(x):
+        x_min, x_max = np.nanmin(x), np.nanmax(x)
+        if np.isnan(x_min) or np.isnan(x_max) or x_max == x_min:
+            return pd.Series([0.5] * len(x), index=x.index)
+        return (x - x_min) / (x_max - x_min)
+
+    scores_normalized = scores.apply(safe_normalize, axis=0).round(2)
+    seaborn.heatmap(scores_normalized, ax=ax, square=False, cbar=False,
+                    annot=True, fmt=fmt, vmin=0, vmax=1, cmap=cmap)
+
+    for text, (i, j) in zip(ax.texts, np.ndindex(scores.shape)):
+        value = scores.iloc[i, j]
+        if pd.isna(value):
+            text.set_text('NaN')
+        elif isinstance(value, (np.int64, int)):
+            text.set_text(f'{value:d}')
+        else:
+            text.set_text(f'{value:.2f}')
+
+    ax.tick_params(left=False, bottom=False)
+    ax.xaxis.set_tick_params(width=0)
+    ax.yaxis.set_tick_params(width=0)
+    ax.set_title(name, pad=10)
+    ax.xaxis.set_label_position('top')
+    ax.xaxis.tick_top()
+    ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha='left')
+
+
+def read_yaml(file_path):
+    """Parse score_uns.yaml into a wide-format DataFrame (dataset, model as index cols)."""
+    import yaml
+    with open(file_path) as f:
+        data = yaml.safe_load(f)
+    rows = []
+    for entry in data:
+        if not isinstance(entry, dict):
+            continue
+        dataset_id = entry.get('dataset_id', '')
+        method_id = entry.get('method_id', '')
+        if dataset_id == 'missing' or dataset_id == 'None':
+            continue
+        for mid, mval in zip(entry.get('metric_ids', []), entry.get('metric_values', [])):
+            if mval != 'None':
+                try:
+                    rows.append({'dataset': dataset_id, 'model': method_id,
+                                 'metric': mid, 'value': float(mval)})
+                except (ValueError, TypeError):
+                    pass
+    df = pd.DataFrame(rows)
+    if df.empty:
+        return df
+    wide = df.pivot_table(index=['dataset', 'model'], columns='metric',
+                          values='value').reset_index()
+    wide.columns.name = ''
+    return wide

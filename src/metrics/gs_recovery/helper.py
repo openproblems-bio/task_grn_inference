@@ -880,10 +880,10 @@ def main(par: dict) -> pd.DataFrame:
     # Calculate mean across all gene sets
     short_dict = {}
     if all_results:
-        short_dict['gs_precision'] = np.mean([r['precision'] for r in all_results])
-        short_dict['gs_recall'] = np.mean([r['recall'] for r in all_results])
+        # short_dict['gs_precision'] = np.mean([r['precision'] for r in all_results])
+        # short_dict['gs_recall'] = np.mean([r['recall'] for r in all_results])
         short_dict['gs_f1'] = np.mean([r['f1'] for r in all_results])
-        short_dict['gs_n_active'] = np.mean([r['n_active_pathways'] for r in all_results])
+        # short_dict['gs_n_active'] = np.mean([r['n_active_pathways'] for r in all_results])
     if par.get('output_detailed_metrics', False):
         final_dict = {**short_dict, **detailed_dict}
     else:

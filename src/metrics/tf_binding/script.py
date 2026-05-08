@@ -16,7 +16,7 @@ par = {
     'tf_all': 'resources/grn_benchmark/prior/tf_all.csv',    
     'score': 'output/score.h5ad',
     'genes_n': 5000,
-    'output_detailed_metrics': True
+    'output_detailed_metrics': False
 }
 ## VIASH END
 local_run = False

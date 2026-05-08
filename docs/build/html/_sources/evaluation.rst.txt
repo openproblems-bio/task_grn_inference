@@ -1,12 +1,13 @@
 
 GRN evaluation
 =================
-The evaluation metrics used in geneRNIB are summarized below. 
+The evaluation metrics used in geneRNIB are summarized below.
 
-  
+
 .. image:: images/metrics.png
    :width: 90%
    :align: center
+
 ----
 
 Each metric has particular implementation requirements that limit its applicability to certain datasets. The datasets applicable to each metric are listed in the following table.
@@ -21,58 +22,73 @@ A metric is retained for a given dataset only if it passes both criteria. Those 
 .. image:: images/metric_quality_evaluation.png
    :width: 100%
    :align: center
+
 ----
 
 
-For a detailed description of each metric, refer to the geneRNIB paper. To map the naming conventions used in the code and this table, refer to `surrogate_names` in `config.py` file in the `src/utils/` directory.
+For a detailed description of each metric, refer to the geneRNIB paper. To map the naming conventions used in the code and this table, refer to ``surrogate_names`` in ``src/utils/config.py``.
 
-The evaluation metrics expect the inferred network to be in the form of an AnnData object with specific format as explained here. 
-It should be noted that the metric currently evaluate only the **top TF-gene pairs**, currently limited to **50,000 edges**, ranked by their assigned weight.  
+The evaluation metrics expect the inferred network to be in the form of an AnnData object with a specific format as explained in the :doc:`inference` page.
+It should be noted that the metrics currently evaluate only the **top TF-gene pairs**, limited to **50,000 edges**, ranked by their assigned weight.
 
-The inferred network should have a tabular format with the following columns:  
+The inferred network should have a tabular format with the following columns:
 
-  - `source`: TF gene name
-  - `target`: Target gene gene  
-  - `weight`: Regulatory importance/likelihood score/etc.  
-
-See `resources/grn_benchmark/prior/collectri.h5ad` for an example of the expected format.
+  - ``source``: TF gene name
+  - ``target``: Target gene
+  - ``weight``: Regulatory importance/likelihood score
 
 
-
-Running GRN evaluation without docker
-----------------------------------------
-Considering that Docker is not supported by certtain systems, you can run the evaluation without Docker by following these steps:
-
-```bash
-bash src/metrics/all_metrics/run_local.sh --dataset <dataset_name> --prediction=<inferred GRN (e.g.collectri.h5ad)> --score <output_score_file.h5ad> --num_workers <number_of_workers>
-```
-
-example command:
-
-```bash
-bash src/metrics/all_metrics/run_local.sh --dataset op --prediction=resources/grn_models/op/collectri.h5ad --score=output_score_file.h5ad --num_workers=20
-```
-
-If you are evaluating a new GRN model, which is not part of geneRNIB, make you to generate the consensus prior file for the dataset you are evaluating on. 
-
-```bash
-bash scripts/prior/run_consensus.sh --dataset op --new_model {new_grn_model_file.h5ad}
-```
-
-This will add your model to the previous ones and create the new consensus prior file needed for evaluation.
-
-Running GRN evaluation using standard pipeline
+Running GRN evaluation without Docker
 ----------------------------------------
 
-To run the evalution for a given GRN and dataset, use the following command:
+Considering that Docker is not supported by certain systems, you can run the evaluation without Docker:
 
-```bash
-bash scripts/run_grn_evaluation.sh --prediction=<inferred GRN (e.g.collectri.h5ad)> --save_dir=<e.g.output/> --dataset=<e.g. replogle> --build_images=<true or false. true for the first time running> 
-```
+.. code-block:: bash
 
-example command:
+   bash src/metrics/all_metrics/run_local.sh \
+     --dataset <dataset_name> \
+     --prediction <inferred_grn.h5ad> \
+     --score <output_score_file.h5ad> \
+     --num_workers <number_of_workers>
 
-```bash
-bash scripts/run_grn_evaluation.sh --prediction=resources/grn_models/op/collectri.h5ad --save_dir=output/ --dataset=op --build_images=true 
-```
+Example:
 
+.. code-block:: bash
+
+   bash src/metrics/all_metrics/run_local.sh \
+     --dataset op \
+     --prediction resources/grn_models/op/collectri.h5ad \
+     --score output/score.h5ad \
+     --num_workers 20
+
+If you are evaluating a new GRN model that is not part of geneRNIB, first generate the consensus prior file for the dataset you are evaluating on:
+
+.. code-block:: bash
+
+   bash scripts/prior/run_consensus.sh --dataset op --new_model <new_grn_model_file.h5ad>
+
+This will incorporate your model into the consensus prior, which is required for a fair evaluation.
+
+
+Running GRN evaluation with Docker
+----------------------------------------
+
+.. code-block:: bash
+
+   bash scripts/run_grn_evaluation.sh \
+     --prediction <inferred_grn.h5ad> \
+     --save_dir output/ \
+     --dataset op \
+     --build_images true
+
+``--build_images true`` is only needed on the first run. Outputs scores to ``output/score_uns.yaml``.
+
+
+Running the full evaluation pipeline
+----------------------------------------
+
+.. code-block:: bash
+
+   bash scripts/run_grn_evaluation.sh --no_aws=true
+
+``--no_aws=true`` runs locally with Docker instead of submitting to AWS (the default).

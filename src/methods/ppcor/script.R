@@ -7,7 +7,8 @@ par <- list(
   rna = 'resources/grn_benchmark/inference_data/rna.h5ad',
   prediction = 'resources/grn_models/ppcor.h5ad',
   tf_all = 'resources/grn_benchmark/prior/tf_all.csv',
-  max_n_links = 50000
+  max_n_links = 50000,
+  layer = 'lognorm'
 )
 ## VIASH END
 args <- commandArgs(trailingOnly = TRUE)
@@ -33,6 +34,8 @@ dataset_id = ad$uns$dataset_id
 # Determine which layer to use
 if (dataset_id %in% c("nakatake", "norman", "adamson")) {
   layer <- "X_norm"
+} else if (!is.null(par$layer) && par$layer == "lognorm") {
+  layer <- "lognorm"
 } else if (!is.null(par$layer)) {
   layer <- par$layer
 } else {
@@ -59,6 +62,14 @@ if (is.null(inputExpr)) {
 geneNames <- colnames(inputExpr)
 colnames(inputExpr) <- c(geneNames)
 X <- as.matrix(inputExpr)
+
+# Subsample cells if too many — pcor is O(n_cells^2) in memory
+MAX_CELLS <- 25000
+if (nrow(X) > MAX_CELLS) {
+  set.seed(42)
+  X <- X[sample(nrow(X), MAX_CELLS), ]
+  cat(sprintf("Subsampled to %d cells for ppcor\n", MAX_CELLS))
+}
 
 # Run GRN inference method
 pcorResults = pcor(x = X, method="pearson")

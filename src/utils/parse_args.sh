@@ -25,6 +25,10 @@ parse_arguments() {
                 layer="$2"
                 shift 2
                 ;;
+            --tf_all)
+                tf_all="$2"
+                shift 2
+                ;;
             *)  # Ignore unknown arguments
                 shift
                 ;;

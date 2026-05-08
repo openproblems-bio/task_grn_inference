@@ -20,7 +20,8 @@ set -e
 # eval aws s3 sync resources/results/ s3://openproblems-data/resources/grn/results/ $EXCLUDES --delete
 
 
-# aws s3 sync resources/grn_benchmark s3://openproblems-data/resources/grn/grn_benchmark/ --delete
+aws s3 sync resources/grn_benchmark s3://openproblems-data/resources/grn/grn_benchmark/ --delete
+aws s3 sync resources/singularity s3://openproblems-data/resources/grn/singularity/ --delete
 
 # Sync raw datasets to S3, skipping files larger than 20GB
 EXCLUDES=$(find resources/datasets_raw/ -type f -size +19G \
