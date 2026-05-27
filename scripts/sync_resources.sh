@@ -13,13 +13,11 @@
 set -e
 
 # Push results to S3, skipping files larger than 1GB
-# EXCLUDES=$(find resources/results/ -type f -size +1G \
-#   | sed 's|resources/results/||' \
-#   | awk '{print "--exclude \"" $0 "\""}' \
-#   | tr '\n' ' ')
-# eval aws s3 sync resources/results/ s3://openproblems-data/resources/grn/results/ $EXCLUDES --delete
-
-
+EXCLUDES=$(find resources/results/ -type f -size +1G \
+  | sed 's|resources/results/||' \
+  | awk '{print "--exclude \"" $0 "\""}' \
+  | tr '\n' ' ')
+eval aws s3 sync resources/results/ s3://openproblems-data/resources/grn/results/ $EXCLUDES --delete
 aws s3 sync resources/grn_benchmark s3://openproblems-data/resources/grn/grn_benchmark/ --delete
 aws s3 sync resources/singularity s3://openproblems-data/resources/grn/singularity/ --delete
 
