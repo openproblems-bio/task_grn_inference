@@ -17,7 +17,7 @@ resources:
 
 engines:
   - type: docker
-    image: pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel
+    image: openproblems/base_pytorch_nvidia:1
     __merge__: /src/api/base_requirements.yaml
     setup:
       - type: python
