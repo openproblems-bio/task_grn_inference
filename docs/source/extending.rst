@@ -82,7 +82,7 @@ Your `script.py` should have the following structure:
             "prediction": net[["source", "target", "weight"]]
         }
     )
-    output.write(params["prediction"])
+    output.write_h5ad(par['prediction'])
 
 Once you have added your method, you can test it by running the following command. For this, download and place the test datasets in `resources_test/grn_benchmark`.
 
@@ -99,6 +99,22 @@ Once you have added your method, you can test it by running the following comman
 
 Once the test is successful, you can submit a pull request to the geneRNIB repository to integrate your method.
 See additional Viash commands in the `Viash documentation <https://viash.io/guide/>`_ to run your method with different parameters.
+
+Updating the leaderboard
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+After evaluation is complete, aggregate the raw scores into ``all_scores.csv``:
+
+.. code-block:: bash
+
+   python scripts/benchmark/aggregate_local_scores.py
+
+Then regenerate the leaderboard figure, which re-runs normalization across all methods:
+
+.. code-block:: bash
+
+   python scripts/benchmark/create_overview_figure.py
+
+The raw benchmark scores are also available for download on the :doc:`leaderboard` page.
 
 Add a GRN evaluation metric
 -----------------------------------
@@ -127,7 +143,7 @@ A few tips:
 
     format_save_score(results, method_id, dataset_id, score_file)
 
-Add a GRN inference and evalaution dataset
+Add a GRN inference and evaluation dataset
 -----------------------------------
 Here we explain how to integrate new datasets. All datasets are in h5ad, and the example structure of a inference or evaluation dataset can be found in `resources/grn_benchmark/`.
 The inference datasets are in `resources/grn_benchmark/inference_data/` and the evaluation datasets are in `resources/grn_benchmark/evaluation_data/`.

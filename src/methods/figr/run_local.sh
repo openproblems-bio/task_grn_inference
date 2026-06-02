@@ -27,4 +27,4 @@ if [ ! -z "$layer" ]; then
     r_args="$r_args --layer $layer"
 fi
 
-singularity run ../../images/${method} Rscript src/methods/${method}/script.R $r_args
+singularity run resources/singularity/${method} Rscript src/methods/${method}/script.R $r_args

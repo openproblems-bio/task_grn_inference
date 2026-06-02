@@ -4,9 +4,10 @@
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=20
-#SBATCH --time=25:00:00
-#SBATCH --mem=250GB
+#SBATCH --time=24:00:00
+#SBATCH --mem=128GB
 #SBATCH --partition=cpu
+#SBATCH --qos long
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com   
 
@@ -19,9 +20,9 @@ source "src/utils/parse_args.sh"
 parse_arguments "$@"
 
 # Pass arguments to Python script
-python_args="--rna $rna --prediction $prediction"
+python_args="--rna $rna --prediction $prediction --tf_all ${tf_all:-resources/grn_benchmark/prior/tf_all.csv}"
 if [ ! -z "$layer" ]; then
     python_args="$python_args --layer $layer"
 fi
 
-singularity run ../../images/geneformer python src/methods/${method}/script.py $python_args
+singularity run resources/singularity/geneformer python src/methods/${method}/script.py $python_args

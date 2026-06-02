@@ -3654,7 +3654,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/granie",
     "viash_version" : "0.9.4",
-    "git_commit" : "5bafb3063c0f6b2191f3b974f227e0e7b7eb3f14",
+    "git_commit" : "4403368db840ca91977fec6c64c6494c577d1780",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3771,6 +3771,7 @@ def innerWorkflowFactory(args) {
 tempscript=".viash_script.R"
 cat > "$tempscript" << VIASHMAIN
 set.seed(42)
+options(future.globals.maxSize = 8 * 1024^3)  # 8 GiB — needed for large datasets (e.g. DOGMA 79k cells)
 suppressPackageStartupMessages(library(Seurat))
 suppressPackageStartupMessages(library(Signac))
 suppressPackageStartupMessages(library(Matrix))
@@ -3869,6 +3870,8 @@ for (i in seq_along(args)) {
   } 
   else if (args[i] == "--prediction" && (i+1) <= length(args)) {
     par\\$prediction <- args[i+1]
+  } else if (args[i] == "--temp_dir" && (i+1) <= length(args)) {
+    par\\$temp_dir <- args[i+1]
   }
 }
 
@@ -3876,7 +3879,7 @@ cat("Content of par list:")
 str(par)
 
 #### STANDARD ASSIGNMENTS ###
-file_seurat = "seurat_granie.qs"
+file_seurat = paste0(par\\$temp_dir, "/seurat_granie.qs")
 
 
 if (!dir.exists(par\\$temp_dir)) {
@@ -4020,9 +4023,17 @@ GRaNIE_file_metadata = paste0(par\\$temp_dir, "/metadata_res", par\\$preprocessi
 
 if (file.exists(GRaNIE_file_peaks) & file.exists(GRaNIE_file_metadata) & file.exists(GRaNIE_file_rna) & !par\\$forceRerun) {
   
-  cat("Preprocessing skipped because all files already exist anf forceRerun = FALSE.")
+  cat("Preprocessing skipped because all files already exist anf forceRerun = TRUE.")
   
 } else {
+  # Subsample to 20k cells to stay within GRaNIEverse's hardcoded 2 GiB future.globals limit
+  max_cells <- 20000L
+  if (ncol(seurat_object) > max_cells) {
+    set.seed(42)
+    keep <- sample(colnames(seurat_object), max_cells)
+    seurat_object <- subset(seurat_object, cells = keep)
+    cat(sprintf("Subsampled Seurat object to %d cells for GRaNIE\\\\n", max_cells))
+  }
   seurat_object = prepareSeuratData_GRaNIE(seurat_object, 
                                            outputDir = par\\$temp_dir,
                                            saveSeuratObject = TRUE,
@@ -4036,7 +4047,7 @@ if (file.exists(GRaNIE_file_peaks) & file.exists(GRaNIE_file_metadata) & file.ex
                                            clusteringAlgorithm = par\\$preprocessing_clusteringMethod, 
                                            clusterResolutions = par\\$preprocessing_clusterResolution,
                                            minCellsPerCluster = 25,
-                                           forceRerun = FALSE
+                                           forceRerun = TRUE
       )
   
 }
@@ -4120,6 +4131,7 @@ output <- AnnData(
 print(output)
 cat("Checking output\\$uns\\$dataset_id:", output\\$uns\\$dataset_id, "\\\\n")
 output\\$write_h5ad(par\\$prediction, compression = "gzip")
+quit(status = 0)  # force clean exit before R/reticulate cleanup triggers harmless parse errors
 VIASHMAIN
 Rscript "$tempscript"
 '''

@@ -13,9 +13,9 @@ from scipy.sparse import csr_matrix
 ## VIASH START
 par = {
     'norman_raw': f'resources/datasets_raw/norman.h5ad',
-    'norman_bulk': f'resources/extended_data/norman_bulk.h5ad',
+    'norman_rna_all': f'resources/extended_data/norman_rna_all.h5ad',
     'norman_test_sc': f'resources/processed_data/norman_evaluation_sc.h5ad',
-    'norman_test_bulk': f'resources/grn_benchmark/evaluation_data/norman_bulk.h5ad',
+    'norman_test_rna_all': f'resources/grn_benchmark/evaluation_data/norman_bulk.h5ad',
     'norman_train_sc': f'resources/grn_benchmark/inference_data/norman_rna.h5ad'
 }
 ## VIASH END
@@ -109,9 +109,9 @@ if __name__ == '__main__':
         adata_test_sc.layers['X_norm'] = adata_test_sc.X.copy()
 
         # - clean infinity values from all layers
-        for adata_obj, name in [(norman_test_bulk, 'norman_test_bulk'), 
+        for adata_obj, name in [(norman_test_bulk, 'norman_test_rna_all'), 
                                 (adata_train_sc, 'adata_train_sc'), 
-                                (adata_bulk, 'adata_bulk'),
+                                (adata_bulk, 'adata_rna_all'),
                                 (adata_test_sc, 'adata_test_sc')]:
             for layer_name in adata_obj.layers.keys():
                 layer_data = adata_obj.layers[layer_name]
@@ -129,9 +129,9 @@ if __name__ == '__main__':
         adata_train_sc = add_metadata(adata_train_sc)
         # - save 
         print('saving...')
-        adata_bulk.write(par['norman_bulk'])
+        adata_bulk.write(par['norman_rna_all'])
         adata_test_sc.write(par['norman_test_sc'])
-        norman_test_bulk.write(par['norman_test_bulk'])
+        norman_test_bulk.write(par['norman_test_rna_all'])
         adata_train_sc.write(par['norman_train_sc'])
     else:
         adata = split_control_groups(adata, perturbation_col='perturbation', control_flag_col='is_control', new_col='control_split')

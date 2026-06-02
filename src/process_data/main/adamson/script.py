@@ -12,9 +12,9 @@ from scipy.sparse import csr_matrix
 ## VIASH START
 par = {
     'adamson_raw': f'resources/datasets_raw/adamson.h5ad',
-    'adamson_bulk': f'resources/extended_data/adamson_bulk.h5ad',
+    'adamson_rna_all': f'resources/extended_data/adamson_rna_all.h5ad',
     'adamson_test_sc': f'resources/processed_data/adamson_evaluation_sc.h5ad',
-    'adamson_test_bulk': f'resources/grn_benchmark/evaluation_data/adamson_bulk.h5ad',
+    'adamson_test_rna_all': f'resources/grn_benchmark/evaluation_data/adamson_bulk.h5ad',
     'adamson_train_sc': f'resources/grn_benchmark/inference_data/adamson_rna.h5ad',
     'adamson_train_sc_test': f'resources_test/grn_benchmark/inference_data/adamson_rna.h5ad',
     'adamson_test_bulk_test': f'resources_test/grn_benchmark/evaluation_data/adamson_bulk.h5ad',
@@ -111,14 +111,14 @@ def main(par):
 
 
     # - save 
-    adata_bulk.write(par['adamson_bulk'])
+    adata_bulk.write(par['adamson_rna_all'])
     adata_test_sc.write(par['adamson_test_sc'])
-    adata_test_bulk.write(par['adamson_test_bulk'])
+    adata_test_bulk.write(par['adamson_test_rna_all'])
     adata_train_sc.write(par['adamson_train_sc'])
 
 def create_test_data(par):
     adata_train_sc = ad.read_h5ad(par['adamson_train_sc'])
-    adata_test_bulk = ad.read_h5ad(par['adamson_test_bulk'])
+    adata_test_bulk = ad.read_h5ad(par['adamson_test_rna_all'])
     adata_test_sc = ad.read_h5ad(par['adamson_test_sc'])
 
     # - subset to 2000 genes

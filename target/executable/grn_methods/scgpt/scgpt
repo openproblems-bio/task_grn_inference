@@ -453,9 +453,9 @@ pip install ipykernel pandas scanpy numba "numpy<1.24" torchtext==0.17.0 scib "s
 cd scGPT && pip install -e . --no-deps
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scgpt"
-LABEL org.opencontainers.image.created="2026-04-13T11:51:12Z"
+LABEL org.opencontainers.image.created="2026-06-02T02:54:05Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="5bafb3063c0f6b2191f3b974f227e0e7b7eb3f14"
+LABEL org.opencontainers.image.revision="4403368db840ca91977fec6c64c6494c577d1780"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1414,8 +1414,10 @@ if __name__ == "__main__":
     if adata.layers is not None and "counts" in adata.layers:
         adata.X = adata.layers["counts"]
         del adata.layers["counts"]
-
-    if adata[0].X.sum() != int(adata[0].X.sum()):
+    elif adata.layers is not None and "lognorm" in adata.layers:
+        # X is already raw counts; lognorm stored in layers — skip expm1
+        print("lognorm layer found — X is already raw counts, skipping expm1")
+    elif adata[0].X.sum() != int(adata[0].X.sum()):
         print("WARNING: you are not using count data")
         print("reverting logp1")
         from scipy.sparse import issparse
@@ -1426,8 +1428,11 @@ if __name__ == "__main__":
 
     adata.var["symbol"] = adata.var.index
     if "gene_id" not in adata.var.columns:
-        from util import add_gene_id
-        adata = add_gene_id(adata)
+        if "gene_ids" in adata.var.columns:
+            adata.var["gene_id"] = adata.var["gene_ids"]
+        else:
+            from util import add_gene_id
+            adata = add_gene_id(adata)
     adata.var["ensembl_id"] = adata.var["gene_id"].values
     dataset_id = adata.uns["dataset_id"] if "dataset_id" in adata.uns else par["dataset_id"]
 

@@ -12,9 +12,9 @@ from scipy.sparse import csr_matrix
 ## VIASH START
 par = {
     'nakatake_raw': f'resources/datasets_raw/nakatake.h5ad',
-    'nakatake_bulk': f'resources/extended_data/nakatake_bulk.h5ad',
-    'nakatake_test_bulk': f'resources/grn_benchmark/evaluation_data/nakatake_bulk.h5ad',
-    'nakatake_train_bulk': f'resources/grn_benchmark/inference_data/nakatake_rna.h5ad'
+    'nakatake_rna_all': f'resources/extended_data/nakatake_rna_all.h5ad',
+    'nakatake_test_rna_all': f'resources/grn_benchmark/evaluation_data/nakatake_bulk.h5ad',
+    'nakatake_train_rna_all': f'resources/grn_benchmark/inference_data/nakatake_rna.h5ad'
 }
 ## VIASH END
 try:
@@ -103,9 +103,9 @@ def main(par):
     
     # - save 
     print('Saving...')
-    nakatake_bulk.write(par['nakatake_bulk'])
-    nakatake_test_bulk.write(par['nakatake_test_bulk'])
-    nakatake_train_bulk.write(par['nakatake_train_bulk'])
+    nakatake_bulk.write(par['nakatake_rna_all'])
+    nakatake_test_bulk.write(par['nakatake_test_rna_all'])
+    nakatake_train_bulk.write(par['nakatake_train_rna_all'])
 
 if __name__ == '__main__':
     main(par)

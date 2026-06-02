@@ -3,10 +3,9 @@
 #SBATCH --output=logs/%j.out
 #SBATCH --error=logs/%j.err
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=100
-#SBATCH --time=10:00:00
-#SBATCH --qos long
-#SBATCH --mem=1000GB
+#SBATCH --cpus-per-task=20
+#SBATCH --time=2:00:00
+#SBATCH --mem=250GB
 #SBATCH --partition=cpu
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com   
@@ -39,7 +38,7 @@ if [ -z "$DATASET" ]; then
   exit 1
 fi
 
-models_dir="resources/results/$DATASET"
+models_dir="resources/results/benchmark/$DATASET"
 models=("pearson_corr" "positive_control" "portia" "ppcor" "scenic" "scprint" "grnboost" "scenicplus" "scglue" "granie" "figr" "celloracle" "scgpt" "geneformer" "spearman_corr")
 python src/utils/config.py
 source src/utils/config.env
@@ -72,7 +71,7 @@ for dataset in "${datasets[@]}"; do
     python src/metrics/regression/consensus/script.py \
         --dataset "$dataset" \
         --regulators_consensus "resources/grn_benchmark/prior/regulators_consensus_${dataset}.json" \
-        --evaluation_data "resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad" \
+        --evaluation_data "resources/grn_benchmark/inference_data/${dataset}_rna.h5ad" \
         --predictions "${predictions[@]}"
 done
 
@@ -99,7 +98,7 @@ for dataset in "${datasets[@]}"; do
         --models_dir "$models_dir" \
         --ws_consensus "resources/grn_benchmark/prior/ws_consensus_${dataset}.csv" \
         --tf_all "resources/grn_benchmark/prior/tf_all.csv" \
-        --evaluation_data_sc "resources/processed_data/${dataset}_evaluation_sc.h5ad" \
-        --models "${models[@]}"
+        --evaluation_data_sc "resources/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad" \
+        --models "${METHODS[@]}"
 done
 

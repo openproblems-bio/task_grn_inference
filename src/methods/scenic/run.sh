@@ -10,7 +10,7 @@
 #SBATCH --mail-type=END,FAIL      
 #SBATCH --mail-user=jalil.nourisa@gmail.com   
 
-singularity run ../../images/scenic python src/methods/single_omics/scenic/script.py 
+singularity run resources/singularity/scenic python src/methods/single_omics/scenic/script.py 
 
 # viash run src/methods/single_omics/scenic/config.vsh.yaml -- \
 #     --rna resources_test/grn_benchmark/inference_data/op_rna.h5ad \

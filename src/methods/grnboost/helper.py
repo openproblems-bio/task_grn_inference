@@ -11,15 +11,17 @@ import anndata as ad
 
 def format_data(par):
   print('Read data')
-  adata_rna = anndata.read_h5ad(par['rna'])  
-  if False:
-    if 'perturbation' in adata_rna.obs.columns: #test
-      print('Subsample data... Testing:')
-      pertubs = adata_rna.obs['perturbation'].unique()[:10]
-      adata_rna = adata_rna[adata_rna.obs['perturbation'].isin(pertubs)]
-      print(adata_rna.shape)
+  adata_rna = anndata.read_h5ad(par['rna'])
   gene_names = adata_rna.var_names
-  
+
+  # Subsample cells if too many — pyscenic grn scales poorly beyond 25k cells
+  MAX_CELLS = 25000
+  if adata_rna.n_obs > MAX_CELLS:
+      np.random.seed(42)
+      idx = np.random.choice(adata_rna.n_obs, MAX_CELLS, replace=False)
+      adata_rna = adata_rna[idx]
+      print(f"Subsampled to {MAX_CELLS} cells for grnboost/scenic")
+
   from util import manage_layer
   layer = manage_layer(adata_rna, par)
   X = adata_rna.layers[layer]

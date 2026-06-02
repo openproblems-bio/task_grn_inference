@@ -57,7 +57,9 @@ def preprocess(par):
         rna, gtf=par['annotation_file'],
         gtf_by="gene_name"
     )
-    
+    # Drop duplicate var columns (e.g. gene_id present in both rna.var and GTF annotation)
+    rna.var = rna.var.loc[:, ~rna.var.columns.duplicated()]
+
     rna = rna[:, ~rna.var.chrom.isna()]
     
     split = atac.var_names.str.split(r"[:-]")

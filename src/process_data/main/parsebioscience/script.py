@@ -161,9 +161,9 @@ def main():
         adata = adata[:, [gene for gene in selected_genes if gene in adata.var_names]]
         adata.write_h5ad('resources/extended_data/parsebioscience_train_sc.h5ad', compression='gzip')
         print('Process bulk adata', flush=True)
-        adata = ad.read_h5ad('resources/extended_data/parsebioscience_bulk.h5ad')
+        adata = ad.read_h5ad('resources/extended_data/parsebioscience_rna_all.h5ad')
         adata = adata[:, [gene for gene in selected_genes if gene in adata.var_names]]
-        adata.write_h5ad('resources/extended_data/parsebioscience_bulk.h5ad', compression='gzip')
+        adata.write_h5ad('resources/extended_data/parsebioscience_rna_all.h5ad', compression='gzip')
 if __name__ == '__main__':
     main()
 

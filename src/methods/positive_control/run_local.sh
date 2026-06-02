@@ -19,7 +19,7 @@ source "src/utils/parse_args.sh"
 parse_arguments "$@"
 
 # Pass arguments to Python script
-python_args="--prediction $prediction"
+python_args="--prediction $prediction --tf_all ${tf_all:-resources/grn_benchmark/prior/tf_all.csv}"
 
 if [ ! -z "$rna_all" ]; then
     python_args="$python_args --rna_all $rna_all"
@@ -31,4 +31,4 @@ fi
 
 echo $python_args
 
-python src/methods/${method}/script.py $python_args
+conda run -n genernbi python src/methods/${method}/script.py $python_args

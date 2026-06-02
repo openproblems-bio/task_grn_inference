@@ -59,6 +59,16 @@ except NameError:
 def group_mapping(adata):
     adata.obs['donor_id'] = 'all_donors'
     adata.obs['donor_id'] = adata.obs['donor_id'].astype('category')
+    # SCENIC+ needs multiple cell type groups for pseudobulking/DAR.
+    # If cell_type has only one unique value, fall back to other columns.
+    fallback_cols = ['CT_Major', 'cell_type_orig', 'louvain', 'leiden']
+    if adata.obs['cell_type'].nunique() <= 1:
+        for col in fallback_cols:
+            if col in adata.obs.columns and adata.obs[col].nunique() > 1:
+                print(f"group_mapping: cell_type has 1 unique value, using '{col}' instead.")
+                adata.obs['cell_type'] = adata.obs[col].astype(str)
+                break
+    adata.obs['cell_type'] = adata.obs['cell_type'].astype('category')
     return adata
 def process_peak(par):
     # Get list of samples (e.g., donors)
@@ -238,10 +248,15 @@ def run_cistopic(par):
             '--ucsc', 'hg38'
         ], check=True)
     else:
-        aws_path = 's3://openproblems-data/resources/grn/supp_data/tss_h38.bed'
-        command = f'aws s3 cp {aws_path} {tss_bed} --no-sign-request'
-        subprocess.run(command, shell=True, check=True)
-    print('get tss completed', flush=True)
+        local_tss = 'resources/supp_data/tss_h38.bed'
+        if os.path.exists(local_tss):
+            print(f'Using local TSS bed: {local_tss}', flush=True)
+            tss_bed = os.path.abspath(local_tss)
+        else:
+            aws_path = 's3://openproblems-data/resources/grn/supp_data/tss_h38.bed'
+            command = f'aws s3 cp {aws_path} {tss_bed} --no-sign-request'
+            subprocess.run(command, shell=True, check=True)
+    par['tss_bed'] = tss_bed
 
     if par['qc']:  # Whether to perform quality control
         # Compute QC metrics
@@ -513,7 +528,7 @@ def process_topics(par):
 
     # Get gene activity
     pr_annotation = pd.read_table(
-        os.path.join(par['temp_dir'], 'qc', 'tss.bed')
+        par.get('tss_bed', os.path.join(par['temp_dir'], 'qc', 'tss.bed'))
     ).rename(
         {'Name': 'Gene', '# Chromosome': 'Chromosome'}, axis=1)
     pr_annotation['Transcription_Start_Site'] = pr_annotation['Start']
@@ -587,36 +602,66 @@ def download_databases(par):
             return
         print(f'Download {url}...')
         urlretrieve(url, filepath)
-    
+
+    SUPP_DATA = 'resources/supp_data'
+
+    # --- chromsizes ---
     if not os.path.exists(par['chromsizes']):
-        print('Download chromsizes ', flush=True)
+        print('Downloading chromsizes...', flush=True)
         response = requests.get('http://hgdownload.cse.ucsc.edu/goldenPath/hg38/bigZips/hg38.chrom.sizes')
-        with open(par['chromsizes'], "wb") as file:
-            file.write(response.content)
+        with open(par['chromsizes'], 'wb') as f:
+            f.write(response.content)
         chromsizes = pd.read_csv(par['chromsizes'], sep='\t', names=['Chromosome', 'End'])
         chromsizes.insert(1, 'Start', 0)
         chromsizes.to_csv(par['chromsizes'], sep='\t', index=False)
 
-    if not os.path.exists(par['annotation_file']):
-        print('Download annotation', flush=True)
-        download_annotation(par)
-        df = read_gtf_as_df(par['annotation_file'])
-        par['annotation_file'] = os.path.join(par['temp_dir'], 'gene_annotation.tsv')
-        df.to_csv(par['annotation_file'], sep='\t', index=False)
-    # Download list of blacklist regions
-    print('Download list of blacklist regions')
-    url = 'https://raw.githubusercontent.com/aertslab/pycisTopic/d6a2f8c832c14faae07def1d3ad8755531f50ad5/blacklist/hg38-blacklist.v2.bed'
-    if not os.path.exists(par['blacklist_path']):
-        download(url, par['blacklist_path'])
-    url = 'https://resources.aertslab.org/cistarget/motif_collections/v10nr_clust_public/snapshots/motifs-v10-nr.hgnc-m0.00001-o0.0.tbl'
-    if not os.path.exists(par['motif_annotation']):
-        download(url, par['motif_annotation'])
-    if not os.path.exists(par['SCORES_DB_PATH']):
-        url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.scores.feather'
-        download(url, par['SCORES_DB_PATH'])
-    if not os.path.exists(par['RANKINGS_DB_PATH']):
-        url = 'https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.rankings.feather'
-        download(url, par['RANKINGS_DB_PATH'])
+    # --- gene annotation GTF → TSV (read local GTF if available) ---
+    local_gtf = os.path.join(SUPP_DATA, 'gencode.v45.annotation.gtf.gz')
+    tsv_path = os.path.join(par['temp_dir'], 'gene_annotation.tsv')
+    if not os.path.exists(tsv_path):
+        if os.path.exists(local_gtf):
+            print(f'Using local annotation: {local_gtf}', flush=True)
+            src = local_gtf
+        else:
+            print('Downloading annotation...', flush=True)
+            download_annotation(par)
+            src = par['annotation_file']
+        df = read_gtf_as_df(src)
+        df.to_csv(tsv_path, sep='\t', index=False)
+        print(f'Annotation TSV written: {tsv_path}', flush=True)
+    par['annotation_file'] = tsv_path
+
+    # --- blacklist ---
+    local_bl = os.path.join(SUPP_DATA, 'databases', 'scenicplus', 'hg38-blacklist.v2.bed')
+    if os.path.exists(local_bl):
+        print(f'Using local blacklist: {local_bl}', flush=True)
+        par['blacklist_path'] = local_bl
+    else:
+        download('https://raw.githubusercontent.com/aertslab/pycisTopic/d6a2f8c832c14faae07def1d3ad8755531f50ad5/blacklist/hg38-blacklist.v2.bed', par['blacklist_path'])
+
+    # --- motif annotation table ---
+    local_motif = os.path.join(SUPP_DATA, 'databases', 'scenicplus', 'motifs-v10-nr.hgnc-m0.00001-o0.0.tbl')
+    if os.path.exists(local_motif):
+        print(f'Using local motif annotation: {local_motif}', flush=True)
+        par['motif_annotation'] = local_motif
+    else:
+        download('https://resources.aertslab.org/cistarget/motif_collections/v10nr_clust_public/snapshots/motifs-v10-nr.hgnc-m0.00001-o0.0.tbl', par['motif_annotation'])
+
+    # --- scores feather DB ---
+    local_scores = os.path.join(SUPP_DATA, 'databases', 'scenicplus', 'db.regions_vs_motifs.scores.feather')
+    if os.path.exists(local_scores):
+        print(f'Using local scores DB: {local_scores}', flush=True)
+        par['SCORES_DB_PATH'] = local_scores
+    else:
+        download('https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.scores.feather', par['SCORES_DB_PATH'])
+
+    # --- rankings feather DB ---
+    local_rankings = os.path.join(SUPP_DATA, 'databases', 'scenicplus', 'db.regions_vs_motifs.rankings.feather')
+    if os.path.exists(local_rankings):
+        print(f'Using local rankings DB: {local_rankings}', flush=True)
+        par['RANKINGS_DB_PATH'] = local_rankings
+    else:
+        download('https://resources.aertslab.org/cistarget/databases/homo_sapiens/hg38/screen/mc_v10_clust/region_based/hg38_screen_v10_clust.regions_vs_motifs.rankings.feather', par['RANKINGS_DB_PATH'])
     if False: # create custom databases
         if not (os.path.exists(RANKINGS_DB_PATH) and os.path.exists(SCORES_DB_PATH)):
 
@@ -746,13 +791,13 @@ def snakemake_pipeline(par):
     # Update settings
     cwd = os.getcwd()
         
-    settings['input_data']['cisTopic_obj_fname'] = f"{cwd}/{par['cistopic_object']}"
-    settings['input_data']['GEX_anndata_fname'] = f"{cwd}/{os.path.join(par['temp_dir'], 'rna.h5ad')}"
-    settings['input_data']['region_set_folder'] = f"{cwd}/{os.path.join(par['temp_dir'], 'region_sets')}"
-    settings['input_data']['ctx_db_fname'] = f"{cwd}/{par['RANKINGS_DB_PATH']}"
-    settings['input_data']['dem_db_fname'] = f"{cwd}/{par['SCORES_DB_PATH']}"
-    settings['input_data']['path_to_motif_annotations'] = f"{cwd}/{par['motif_annotation']}"
-    settings['params_general']['temp_dir'] = f"{cwd}/{os.path.join(par['temp_dir'], 'scplus_pipeline', 'temp')}"
+    settings['input_data']['cisTopic_obj_fname'] = os.path.abspath(par['cistopic_object'])
+    settings['input_data']['GEX_anndata_fname'] = os.path.abspath(os.path.join(par['temp_dir'], 'rna.h5ad'))
+    settings['input_data']['region_set_folder'] = os.path.abspath(os.path.join(par['temp_dir'], 'region_sets'))
+    settings['input_data']['ctx_db_fname'] = os.path.abspath(par['RANKINGS_DB_PATH'])
+    settings['input_data']['dem_db_fname'] = os.path.abspath(par['SCORES_DB_PATH'])
+    settings['input_data']['path_to_motif_annotations'] = os.path.abspath(par['motif_annotation'])
+    settings['params_general']['temp_dir'] = os.path.abspath(os.path.join(par['temp_dir'], 'scplus_pipeline', 'temp'))
     settings['params_general']['n_cpu'] = par['num_workers']
     settings['params_inference']['quantile_thresholds_region_to_gene'] = '0.7 0.8 0.9'
     settings['params_inference']['top_n_regionTogenes_per_gene'] = '10 15 25'
@@ -775,11 +820,10 @@ def snakemake_pipeline(par):
     settings['params_data_preparation']['key_to_group_by'] = ''
     settings['params_data_preparation']['nr_cells_per_metacells'] = 5
     settings['params_data_preparation']['species'] = 'hsapiens'
-    settings['output_data']['scplus_mdata'] = f"{cwd}/{par['scplus_mdata']}"
+    settings['output_data']['scplus_mdata'] = os.path.abspath(par['scplus_mdata'])
 
-
-    settings["output_data"]["chromsizes"] = f"{cwd}/{par['chromsizes']}"
-    settings["output_data"]["genome_annotation"] = f"{cwd}/{par['annotation_file']}"
+    settings["output_data"]["chromsizes"] = os.path.abspath(par['chromsizes'])
+    settings["output_data"]["genome_annotation"] = os.path.abspath(par['annotation_file'])
 
     # List of file paths to check
     file_paths = [

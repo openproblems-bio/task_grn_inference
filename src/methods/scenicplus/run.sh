@@ -19,4 +19,4 @@
 #     --temp_dir output/sp_test/ \
 #     --num_workers 10
 
-singularity run ../../images/scenicplus python src/methods/multi_omics/scenicplus/script.py
+singularity run resources/singularity/scenicplus python src/methods/multi_omics/scenicplus/script.py

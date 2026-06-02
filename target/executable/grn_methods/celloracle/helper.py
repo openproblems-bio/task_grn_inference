@@ -1,12 +1,9 @@
 import pandas as pd
 import os 
 from celloracle import motif_analysis as ma
-import pandas as pd
 import celloracle as co
-import anndata
-import numpy as np
 import anndata as ad
-from celloracle import motif_analysis as ma
+import numpy as np
 import genomepy
 import scanpy as sc
 
@@ -37,8 +34,11 @@ def base_grn(par) -> None:
                     ref_genome=ref_genome,
                     genomes_dir=genomes_dir) 
     print("Motif scan")
+    # Use celloracle's default (JASPAR-based) motifs — GIMME motifs (GM.5.0.* IDs)
+    # cannot be mapped to TF gene names by celloracle's internal mapper.
+    print("Using celloracle default motifs (bundled JASPAR)", flush=True)
     tfi.scan(fpr=0.05, 
-            motifs=None,  # If you enter None, default motifs will be loaded.
+            motifs=None,
             verbose=True)
     tfi.reset_filtering()
     print("Do filtering")

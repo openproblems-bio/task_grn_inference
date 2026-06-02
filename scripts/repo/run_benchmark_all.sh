@@ -58,7 +58,7 @@ append_entry() {
     metric_ids: $metrics
     method_ids: $methods
     rna: ${resources_dir}/grn_benchmark/inference_data/${dataset}_rna.h5ad
-    rna_all: ${resources_dir}/extended_data/${dataset}_bulk.h5ad
+    rna_all: ${resources_dir}/extended_data/${dataset}_rna_all.h5ad
     evaluation_data: ${resources_dir}/grn_benchmark/evaluation_data/${dataset}_bulk.h5ad
     tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
     regulators_consensus: ${resources_dir}/grn_benchmark/prior/regulators_consensus_${dataset}.json

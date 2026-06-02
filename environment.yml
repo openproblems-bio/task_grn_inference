@@ -1,0 +1,14 @@
+# Create environment:
+#   conda env create -f environment.yml
+#
+# Note: uses only conda-forge channel (repo.anaconda.com/defaults is blocked on this cluster)
+
+name: genernbi
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    - torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
+    - -e .

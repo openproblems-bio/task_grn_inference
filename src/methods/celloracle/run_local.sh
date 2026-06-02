@@ -33,4 +33,4 @@ if [ ! -z "$layer" ]; then
     python_args="$python_args --layer $layer"
 fi
 
-singularity run ../../images/celloracle python src/methods/${method}/script.py $python_args
+singularity run resources/singularity/celloracle python src/methods/${method}/script.py $python_args

@@ -4,9 +4,9 @@
 # 
 # set -e
 # Default parameters
-RUN_CONSENSUS=false
-RUN_METRICS=false
-TEMP_DIR="output/evaluation"
+RUN_CONSENSUS=true
+RUN_METRICS=true
+TEMP_DIR=""
 
 
 LAYER="lognorm"
@@ -21,8 +21,8 @@ while [[ $# -gt 0 ]]; do
         RUN_CONSENSUS=true
         shift
         ;;
-        --run_consensus)
-        RUN_CONSENSUS=true
+        --no_run_consensus)
+        RUN_CONSENSUS=false
         shift
         ;;
         --run_metrics)
@@ -55,12 +55,10 @@ echo "GRN Evaluation Configuration"
 echo "=========================================="
 echo "Run consensus: $RUN_CONSENSUS"
 echo "Run metrics: $RUN_METRICS"
-echo "Output directory: $TEMP_DIR"
+echo "Output directory: ${TEMP_DIR:-resources/results/benchmark/{dataset}/scores}"
 echo "Number of workers: $NUM_WORKERS"
 echo "=========================================="
 
-# Create output directory
-mkdir -p "$TEMP_DIR"
 
 # Generate and source dataset configuration
 echo "Generating dataset configuration..."
@@ -77,8 +75,10 @@ submit_metric_job() {
     local method=$2
     local prediction_file=$3
     
-    local job_name="${dataset}_${method}"
-    local score_file="${TEMP_DIR}/${dataset}_${method}_score.h5ad"
+    local job_name="${dataset}__${method}"
+    local score_dir="${TEMP_DIR:-resources/results/benchmark/${dataset}/scores}"
+    mkdir -p "$score_dir"
+    local score_file="${score_dir}/${dataset}__${method}_score.h5ad"
     
     # Skip if score file already exists
     if [[ -f "$score_file" ]]; then
@@ -129,7 +129,7 @@ if [[ "$RUN_METRICS" == "true" ]]; then
         echo "Dataset: $dataset"
         echo "----------------------------------------"
         
-        models_folder="resources/results/${dataset}/"
+        models_folder="resources/results/benchmark/${dataset}"
         # echo "Looking in: $models_folder"
         
         # Check each method for this dataset

@@ -7,7 +7,7 @@ RUN_TEST=false
 num_workers=20
 apply_tf_methods=true
 layer='lognorm'
-RUN_LOCAL=false
+NO_AWS=false
 # Parse arguments
 for arg in "$@"; do
     case $arg in
@@ -19,8 +19,8 @@ for arg in "$@"; do
             RUN_TEST="${arg#*=}"
             shift
             ;;
-        --run_local=*)
-            RUN_LOCAL="${arg#*=}"
+        --no_aws=*)
+            NO_AWS="${arg#*=}"
             shift
             ;;
         *)
@@ -30,23 +30,29 @@ for arg in "$@"; do
     esac
 done
 if [ -z "${DATASET:-}" ]; then
-    echo "Error: DATASET must be provided. Use --dataset=<dataset_name>."
-    exit 1
+    python src/utils/config.py
+    source src/utils/config.env
+    ALL_DATASETS=(${DATASETS//,/ })
+    RUN_ID="all_inference"
+else
+    ALL_DATASETS=("$DATASET")
+    RUN_ID="${DATASET}_inference"
 fi
-
-
-echo "DATASET is: $DATASET"
-RUN_ID="${DATASET}_inference"
+echo "Datasets to run: ${ALL_DATASETS[*]}"
 
 # --- Directories ---
 resources_folder=$([ "$RUN_TEST" = true ] && echo "resources_test" || echo "resources")
-if [ "$RUN_LOCAL" = true ]; then
+if [ "$NO_AWS" = true ]; then
   resources_dir="./${resources_folder}/"
 else
   resources_dir="s3://openproblems-data/${resources_folder}/grn"
 fi
 
-publish_dir="${resources_dir}/results/${DATASET}"
+if [ ${#ALL_DATASETS[@]} -eq 1 ]; then
+    publish_dir="${resources_dir}/benchmark/results/${ALL_DATASETS[0]}"
+else
+    publish_dir="${resources_dir}/benchmark/results/"
+fi
 
 
 params_dir="./params"
@@ -64,7 +70,7 @@ echo "Local param file: $param_local"
 > "$param_local"
 > "$param_file"
 
-if [ "$RUN_LOCAL" = true ]; then
+if [ "$NO_AWS" = true ]; then
   cat >> "$param_local" << HERE
 param_list:
 HERE
@@ -99,7 +105,7 @@ append_entry() {
   - id: ${group_id}
     method_ids: $methods
     rna: $rna_file
-    rna_all: ${resources_dir}/extended_data/${dataset}_bulk.h5ad
+    rna_all: ${resources_dir}/extended_data/${dataset}_rna_all.h5ad
     tf_all: ${resources_dir}/grn_benchmark/prior/tf_all.csv
     layer: $layer_
     num_workers: $num_workers
@@ -114,25 +120,24 @@ HERE
   fi
 }
 
-if [[ "$DATASET" =~ ^(replogle|parsebioscience|xaira_HEK293T|xaira_HCT116)$ ]]; then
-  methods="[pearson_corr, negative_control, positive_control, grnboost, portia, scenic, geneformer, scgpt, spearman_corr]"
-  # methods="[pearson_corr, negative_control, positive_control, portia, geneformer, scgpt, spearman_corr]"
-  append_entry "$DATASET" "$methods" 
-  append_entry "$DATASET" "[scprint]" "true"
-  
-  echo $methods 
-elif [ "$DATASET" = "op" ] || [ "$DATASET" = "ibd_cd" ] || [ "$DATASET" = "ibd_uc" ]; then
-  methods="[pearson_corr, spearman_corr, negative_control, positive_control, grnboost, portia, scenic, scprint, geneformer, scgpt, figr, scenicplus, celloracle, granie, scglue]" 
-  # methods="[celloracle, scglue]" 
-
-  append_entry "$DATASET" "$methods" 
-  echo $methods 
-
-else
-  methods="[pearson_corr, negative_control, positive_control, grnboost, portia, scenic, scprint, geneformer, scgpt, spearman_corr]"
-  append_entry "$DATASET" "$methods"
-  echo $methods
-fi
+for DATASET in "${ALL_DATASETS[@]}"; do
+  if [[ "$DATASET" =~ ^(replogle|parsebioscience|xaira_HEK293T|xaira_HCT116)$ ]]; then
+    methods="[pearson_corr, negative_control, positive_control, grnboost, portia, scenic, geneformer, scgpt, spearman_corr]"
+    # methods="[pearson_corr, negative_control, positive_control, portia, geneformer, scgpt, spearman_corr]"
+    append_entry "$DATASET" "$methods"
+    append_entry "$DATASET" "[scprint]" "true"
+    echo $methods
+  elif [ "$DATASET" = "op" ] || [ "$DATASET" = "ibd_cd" ] || [ "$DATASET" = "ibd_uc" ]; then
+    methods="[pearson_corr, spearman_corr, negative_control, positive_control, grnboost, portia, scenic, scprint, geneformer, scgpt, figr, scenicplus, celloracle, granie, scglue]"
+    # methods="[celloracle, scglue]"
+    append_entry "$DATASET" "$methods"
+    echo $methods
+  else
+    methods="[pearson_corr, negative_control, positive_control, grnboost, portia, scenic, scprint, geneformer, scgpt, spearman_corr]"
+    append_entry "$DATASET" "$methods"
+    echo $methods
+  fi
+done
 
 
 if [ "$RUN_TEST" = true ]; then
@@ -142,7 +147,7 @@ else
 fi
 echo "Labels config: $labels_config"
 # --- Final configuration ---
-if [ "$RUN_LOCAL" = true ]; then
+if [ "$NO_AWS" = true ]; then
   cat >> "$param_local" << HERE
 output_state: "state.yaml"
 publish_dir: "$publish_dir"

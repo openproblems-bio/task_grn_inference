@@ -100,9 +100,11 @@ def get_embs(
                 "EOS token present in token dictionary, excluding from average."
             )
 
+    device = next(model.parameters()).device
+
     overall_max_len = 0
     if get_avg_attentions:
-        avg_attentions = torch.zeros((len(genelist), len(genelist)), device="cuda")
+        avg_attentions = torch.zeros((len(genelist), len(genelist)), device=device)
         attention_counts = torch.zeros_like(avg_attentions)
 
     for i in trange(0, total_batch_length, forward_batch_size, leave=(not silent)):
@@ -111,17 +113,18 @@ def get_embs(
         minibatch = filtered_input_data.select([i for i in range(i, max_range)])
 
         max_len = int(max(minibatch["length"]))
-        original_lens = torch.tensor(minibatch["length"], device="cuda")
+        original_lens = torch.tensor(minibatch["length"], device=device)
         minibatch.set_format(type="torch")
 
         input_data_minibatch = minibatch["input_ids"]
         input_data_minibatch = pu.pad_tensor_list(
             input_data_minibatch, max_len, pad_token_id, model_input_size
         )
+        attention_mask = (input_data_minibatch != pad_token_id).long().to(device)
         with torch.no_grad():
             outputs = model(
-                input_ids=input_data_minibatch.to("cuda"),
-                attention_mask=pu.gen_attention_mask(minibatch),
+                input_ids=input_data_minibatch.to(device),
+                attention_mask=attention_mask,
                 output_attentions=get_avg_attentions,
             )
 
@@ -134,7 +137,8 @@ def get_embs(
             attentions = torch.mean(torch.stack(attentions), dim=(0, 2))
             attentions = attentions[:, 1:-1, 1:-1]
             del outputs
-            torch.cuda.empty_cache()
+            if device.type == "cuda":
+                torch.cuda.empty_cache()
             # Create a mapping from token IDs to genelist indices
 
             token_to_loc = {
@@ -224,7 +228,8 @@ def get_embs(
         del input_data_minibatch
         del embs_i
 
-        torch.cuda.empty_cache()
+        if device.type == "cuda":
+            torch.cuda.empty_cache()
 
     if summary_stat is None:
         if (emb_mode == "cell") or (emb_mode == "cls"):

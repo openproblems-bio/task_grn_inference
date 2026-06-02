@@ -27,16 +27,12 @@ def calculate_ulm_score(tf_mat, tf_grn, min_targets=3):
     adata.var_names = tf_mat.columns
     adata.obs_names = tf_mat.index
     
-    # Run ULM with new API (dc.mt.ulm modifies adata in place)
-    dc.mt.ulm(
-        adata,
-        tf_grn,
-        tmin=min_targets
-    )
+    try:
+        dc.mt.ulm(adata, tf_grn, tmin=min_targets)
+    except AssertionError:
+        return np.nan, np.nan
     act = adata.obsm['score_ulm'].iloc[0,0]
     pval = adata.obsm['padj_ulm'].iloc[0, 0]
-
-    
     return act, pval
 
 def create_random_network(tf, n_targets, all_genes):
@@ -94,7 +90,7 @@ def main(par):
         acts_random_in_net.append(act_random)
         pvals_random_in_net.append(pval_random)
     
-    median_random_act = np.median(acts_random_in_net)
+    median_random_act = np.nanmedian(acts_random_in_net) if acts_random_in_net else 0.0
     
     # Process all TFs in df_de ->recall
     acts_all, pvals_all, acts_random_all, pvals_random_all = [], [], [], []
@@ -143,8 +139,9 @@ def main(par):
         print(f"Side scores - Actual: precision={prc:.3f}, recall={rcl:.3f}")
         print(f"Side scores - Random: precision={prc_random:.3f}, recall={rcl_random:.3f}")
         
-        # Paired t-test on absolute values
-        t_stat, p_value = ttest_rel(np.abs(acts), np.abs(acts_random))
+        # Paired t-test on absolute values — drop NaN pairs first
+        valid = ~(np.isnan(acts) | np.isnan(acts_random))
+        t_stat, p_value = ttest_rel(np.abs(acts[valid]), np.abs(acts_random[valid])) if valid.sum() > 1 else (np.nan, np.nan)
         results[name] = {'t_stat': t_stat, 'p_value': p_value, 'count': len(acts)}
     print({
         'tfs_in_net_count': [results['in_net']['count']],
@@ -155,11 +152,7 @@ def main(par):
         'p_value_all': [results['all']['p_value']],
         'median_random_act': [median_random_act]
     })
-    df = pd.DataFrame({
-        't_rec_precision': [results['in_net']['t_stat']],
-        't_rec_recall': [results['all']['t_stat']]
-    })
-    
+
     # Calculate F1 score
     precision = results['in_net']['t_stat']
     recall = results['all']['t_stat']
@@ -167,7 +160,12 @@ def main(par):
     precision_norm = max(0, precision)
     recall_norm = max(0, recall)
     f1 = 2 * (precision_norm * recall_norm) / (precision_norm + recall_norm) if (precision_norm + recall_norm) > 0 else 0
-    df['t_rec_f1'] = f1
+
+    df = pd.DataFrame({
+        't_rec_precision': [precision],
+        't_rec_recall': [recall],
+    })
+    
     
     print(f"\n=== Final Results ===")
     print(df)

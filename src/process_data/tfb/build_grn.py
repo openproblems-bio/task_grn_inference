@@ -108,7 +108,7 @@ def build_grn(peaks_df, tss_file, genome='hg38', num_workers=None):
     rows = []
 
     # Use ProcessPoolExecutor for parallel processing
-    with ProcessPoolExecutor(num_workers=num_workers) as executor:
+    with ProcessPoolExecutor(max_workers=num_workers) as executor:
         futures = {executor.submit(_process_tf, tf, peaks_df, tss_file): tf for tf in tfs}
         for future in tqdm(as_completed(futures), total=len(futures)):
             result = future.result()

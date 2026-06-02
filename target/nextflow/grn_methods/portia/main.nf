@@ -3472,7 +3472,7 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/portia",
     "viash_version" : "0.9.4",
-    "git_commit" : "5bafb3063c0f6b2191f3b974f227e0e7b7eb3f14",
+    "git_commit" : "4403368db840ca91977fec6c64c6494c577d1780",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3658,6 +3658,14 @@ def main(par):
 
   gene_names = adata_rna.var_names
   X = adata_rna.X.toarray() if scipy.sparse.issparse(adata_rna.X) else adata_rna.X
+
+  # Subsample cells if too many
+  MAX_CELLS = 25000
+  if X.shape[0] > MAX_CELLS:
+      rng = np.random.default_rng(42)
+      idx = rng.choice(X.shape[0], MAX_CELLS, replace=False)
+      X = X[idx]
+      print(f"Subsampled to {MAX_CELLS} cells for portia")
 
   # Load list of putative TFs
   tfs = np.loadtxt(par['tf_all'], dtype=str)

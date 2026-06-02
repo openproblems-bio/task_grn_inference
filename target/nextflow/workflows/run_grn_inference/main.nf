@@ -3317,12 +3317,6 @@ meta = [
       }
     },
     {
-      "name" : "grn_methods/dictys",
-      "repository" : {
-        "type" : "local"
-      }
-    },
-    {
       "name" : "methods/pearson_corr",
       "repository" : {
         "type" : "local"
@@ -3414,7 +3408,7 @@ meta = [
     "engine" : "native",
     "output" : "target/nextflow/workflows/run_grn_inference",
     "viash_version" : "0.9.4",
-    "git_commit" : "5bafb3063c0f6b2191f3b974f227e0e7b7eb3f14",
+    "git_commit" : "4403368db840ca91977fec6c64c6494c577d1780",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
@@ -3537,7 +3531,6 @@ include { scglue } from "${meta.resources_dir}/../../../nextflow/grn_methods/scg
 include { figr } from "${meta.resources_dir}/../../../nextflow/grn_methods/figr/main.nf"
 include { scenicplus } from "${meta.resources_dir}/../../../nextflow/grn_methods/scenicplus/main.nf"
 include { granie } from "${meta.resources_dir}/../../../nextflow/grn_methods/granie/main.nf"
-include { dictys } from "${meta.resources_dir}/../../../nextflow/grn_methods/dictys/main.nf"
 include { pearson_corr } from "${meta.resources_dir}/../../../nextflow/methods/pearson_corr/main.nf"
 include { negative_control } from "${meta.resources_dir}/../../../nextflow/methods/negative_control/main.nf"
 include { positive_control } from "${meta.resources_dir}/../../../nextflow/methods/positive_control/main.nf"
