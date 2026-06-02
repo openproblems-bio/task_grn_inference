@@ -3479,7 +3479,7 @@ meta = [
         {
           "type" : "docker",
           "run" : [
-            "git clone https://github.com/bowang-lab/scGPT && \\\\\npip install torch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu121 && \\\\\npip install \\"flash-attn<1.0.5\\" --no-build-isolation && \\\\\npip install pybiomart && \\\\\npip install ipykernel pandas scanpy numba \\"numpy<1.24\\" torchtext==0.17.0 scib \\"scvi-tools<1.0\\" datasets==2.14.5 transformers==4.33.2 wandb \\"cell-gears<0.0.3\\" torch_geometric pyarrow==15.0.0 gdown && \\\\\ncd scGPT && pip install -e . --no-deps\n"
+            "git clone https://github.com/bowang-lab/scGPT && \\\\\npip install pybiomart && \\\\\npip install ipykernel pandas scanpy numba torchtext==0.17.2 scib \\"scvi-tools<1.0\\" datasets==2.14.5 transformers>=4.35.0 wandb \\"cell-gears<0.0.3\\" torch_geometric pyarrow==15.0.0 gdown && \\\\\ncd scGPT && pip install -e . --no-deps\n"
           ]
         }
       ]
@@ -3491,7 +3491,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scgpt",
     "viash_version" : "0.9.4",
-    "git_commit" : "4403368db840ca91977fec6c64c6494c577d1780",
+    "git_commit" : "c84bf1ea80b6368736307bb2aeb6cb23fb8f4026",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {

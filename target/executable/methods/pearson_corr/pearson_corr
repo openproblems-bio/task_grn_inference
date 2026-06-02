@@ -456,9 +456,9 @@ RUN pip install --upgrade pip && \
 RUN pip install --upgrade pip
 
 LABEL org.opencontainers.image.description="Companion container for running component methods pearson_corr"
-LABEL org.opencontainers.image.created="2026-06-02T02:54:04Z"
+LABEL org.opencontainers.image.created="2026-06-02T06:26:20Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="4403368db840ca91977fec6c64c6494c577d1780"
+LABEL org.opencontainers.image.revision="c84bf1ea80b6368736307bb2aeb6cb23fb8f4026"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

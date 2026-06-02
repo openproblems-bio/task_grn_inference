@@ -446,16 +446,14 @@ function ViashDockerfile {
 FROM openproblems/base_pytorch_nvidia:1
 ENTRYPOINT []
 RUN git clone https://github.com/bowang-lab/scGPT && \
-pip install torch==2.2.0 torchvision==0.17.0 torchaudio==2.2.0 --index-url https://download.pytorch.org/whl/cu121 && \
-pip install "flash-attn<1.0.5" --no-build-isolation && \
 pip install pybiomart && \
-pip install ipykernel pandas scanpy numba "numpy<1.24" torchtext==0.17.0 scib "scvi-tools<1.0" datasets==2.14.5 transformers==4.33.2 wandb "cell-gears<0.0.3" torch_geometric pyarrow==15.0.0 gdown && \
+pip install ipykernel pandas scanpy numba torchtext==0.17.2 scib "scvi-tools<1.0" datasets==2.14.5 transformers>=4.35.0 wandb "cell-gears<0.0.3" torch_geometric pyarrow==15.0.0 gdown && \
 cd scGPT && pip install -e . --no-deps
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods scgpt"
-LABEL org.opencontainers.image.created="2026-06-02T02:54:05Z"
+LABEL org.opencontainers.image.created="2026-06-02T06:26:21Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="4403368db840ca91977fec6c64c6494c577d1780"
+LABEL org.opencontainers.image.revision="c84bf1ea80b6368736307bb2aeb6cb23fb8f4026"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

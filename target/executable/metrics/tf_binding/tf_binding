@@ -457,9 +457,9 @@ RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "numpy==1.26.4"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics tf_binding"
-LABEL org.opencontainers.image.created="2026-06-02T02:54:04Z"
+LABEL org.opencontainers.image.created="2026-06-02T06:26:20Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="4403368db840ca91977fec6c64c6494c577d1780"
+LABEL org.opencontainers.image.revision="c84bf1ea80b6368736307bb2aeb6cb23fb8f4026"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

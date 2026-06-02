@@ -3491,7 +3491,7 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/grn_methods/scglue",
     "viash_version" : "0.9.4",
-    "git_commit" : "4403368db840ca91977fec6c64c6494c577d1780",
+    "git_commit" : "c84bf1ea80b6368736307bb2aeb6cb23fb8f4026",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
   },
   "package_config" : {
