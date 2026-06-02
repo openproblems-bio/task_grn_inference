@@ -107,7 +107,6 @@ dependencies:
   - name: grn_methods/figr
   - name: grn_methods/scenicplus
   - name: grn_methods/granie
-  - name: grn_methods/dictys
   # ---- baselines
   - name: methods/pearson_corr
   - name: methods/negative_control
