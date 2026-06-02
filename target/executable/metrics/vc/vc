@@ -450,16 +450,16 @@ RUN apt-get update && \
   rm -rf /var/lib/apt/lists/*
 
 RUN pip install --upgrade pip && \
-  pip install --upgrade --no-cache-dir "anndata~=0.10.0" "scanpy~=1.10.0" "pyyaml" "requests" "jsonschema" && \
+  pip install --upgrade --no-cache-dir "anndata~=0.10.0" "scanpy~=1.10.0" "requests" "jsonschema" && \
   pip install --upgrade --no-cache-dir "git+https://github.com/openproblems-bio/core#subdirectory=packages/python/openproblems"
 
 RUN pip install --upgrade pip && \
   pip install --upgrade --no-cache-dir "torch==2.4.1"
 
 LABEL org.opencontainers.image.description="Companion container for running component metrics vc"
-LABEL org.opencontainers.image.created="2026-06-02T06:26:20Z"
+LABEL org.opencontainers.image.created="2026-06-02T07:18:56Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="c84bf1ea80b6368736307bb2aeb6cb23fb8f4026"
+LABEL org.opencontainers.image.revision="5d3af498c0c5825b75eb619056182f24c022e518"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER

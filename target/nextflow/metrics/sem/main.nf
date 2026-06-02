@@ -3544,7 +3544,7 @@ meta = [
     {
       "type" : "docker",
       "id" : "docker",
-      "image" : "pytorch/pytorch:2.0.1-cuda11.7-cudnn8-devel",
+      "image" : "openproblems/base_pytorch_nvidia:1",
       "namespace_separator" : "/",
       "setup" : [
         {
@@ -3561,7 +3561,6 @@ meta = [
           "packages" : [
             "anndata~=0.10.0",
             "scanpy~=1.10.0",
-            "pyyaml",
             "requests",
             "jsonschema"
           ],
@@ -3584,8 +3583,9 @@ meta = [
     "engine" : "docker",
     "output" : "target/nextflow/metrics/sem",
     "viash_version" : "0.9.4",
-    "git_commit" : "c84bf1ea80b6368736307bb2aeb6cb23fb8f4026",
-    "git_remote" : "https://github.com/openproblems-bio/task_grn_inference"
+    "git_commit" : "5d3af498c0c5825b75eb619056182f24c022e518",
+    "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
+    "git_tag" : "v1.0.1-2-g5d3af498c"
   },
   "package_config" : {
     "name" : "task_grn_inference",

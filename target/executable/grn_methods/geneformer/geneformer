@@ -450,9 +450,9 @@ RUN pip install --upgrade pip && \
 
 RUN GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 https://huggingface.co/ctheodoris/Geneformer.git /tmp/geneformer && pip install --no-cache-dir /tmp/geneformer && rm -rf /tmp/geneformer
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods geneformer"
-LABEL org.opencontainers.image.created="2026-06-02T06:26:19Z"
+LABEL org.opencontainers.image.created="2026-06-02T07:18:55Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="c84bf1ea80b6368736307bb2aeb6cb23fb8f4026"
+LABEL org.opencontainers.image.revision="5d3af498c0c5825b75eb619056182f24c022e518"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
