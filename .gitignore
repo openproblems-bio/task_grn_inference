@@ -21,6 +21,7 @@ tw*
 genernbi.egg*
 .ipynb_checkpoints
 __pycache__/
+dockers/
 
 .$*
 bin*
@@ -36,11 +37,6 @@ work
 
 # agentic secrets
 agentic/.env
-agentic/.index_cache/
-agentic/.biomni_data/
 
 # generated docs build output
 docs/build/
-
-# large vendored notebooks
-src/methods/dictys/repo/*.ipynb

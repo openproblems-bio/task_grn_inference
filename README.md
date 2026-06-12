@@ -13,7 +13,6 @@
 A living benchmark for gene regulatory network (GRN) inference.  
 Paper: [geneRNIB (bioRxiv)](https://www.biorxiv.org/content/10.1101/2025.02.25.640181v1) | [Leaderboard](https://genernib-documentation.readthedocs.io/en/latest/leaderboard.html) | [Full docs](https://genernib-documentation.readthedocs.io/en/latest/)
 
-Integrated GRN inference methods: GRNBoost2, scPRINT, GeneFormer, scGPT, Scenic/Scenic+, CellOracle, PPCOR, Portia, scGLUE, GRaNIE, FigR + Baseline correlation-based methods
 
 ## Agentic AI assistance
 
@@ -161,13 +160,13 @@ bash scripts/local_workflows/run_grn_evaluation.sh
 If you use this framework, please cite
 ```
 @article{nourisa2025genernib,
-    title={geneRNIB: a living benchmark for gene regulatory network inference},
-    author={Nourisa, Jalil and Passemiers, Antoine and Stock, Marco and Zeller-Plumhoff, Berit and Cannoodt, Robrecht and Arnold, Christian and Tong, Alexander and Hartford, Jason and Scialdone, Antonio and Moreau, Yves and others},
-    journal={bioRxiv},
-    pages={2025--02},
-    year={2025},
-    publisher={Cold Spring Harbor Laboratory}
-  }
+  title={geneRNIB: a living benchmark for gene regulatory network inference},
+  author={Nourisa, Jalil and Passemiers, Antoine and Kalfon, Jeremie and Stock, Marco and Zeller-Plumhoff, Berit and Cannoodt, Robrecht and Arnold, Christian and Tong, Alexander and Hartford, Jason and Netea, Mihai G and others},
+  journal={bioRxiv},
+  pages={2025--02},
+  year={2025},
+  publisher={Cold Spring Harbor Laboratory}
+}
 ```
 
 ## API

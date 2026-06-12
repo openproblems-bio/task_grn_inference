@@ -63,8 +63,10 @@ engines:
         pip:
           - pyarrow<15.0.0a0,>=14.0.1
           - huggingface_hub
-          - git+https://huggingface.co/ctheodoris/Geneformer.git
           - pybiomart
+      - type: docker
+        run:
+          - GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 https://huggingface.co/ctheodoris/Geneformer.git /tmp/geneformer && pip install --no-cache-dir /tmp/geneformer && rm -rf /tmp/geneformer
 
 runners:
   - type: executable

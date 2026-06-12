@@ -91,7 +91,7 @@ cv_groups_var="CV_GROUPS_${dataset}"
 cv_groups="${!cv_groups_var:-}"
 
 # Run metrics
-conda run -p /home/jnourisa/miniconda3/envs/genernbi python src/metrics/all_metrics/script.py \
+conda run -p genernbi python src/metrics/all_metrics/script.py \
   --prediction "${prediction}" \
   --evaluation_data "${eval_data}" \
   --evaluation_data_sc "resources/grn_benchmark/evaluation_data/${dataset}_sc.h5ad" \
