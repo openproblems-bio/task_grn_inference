@@ -66,7 +66,8 @@ python src/utils/config.py
 source src/utils/config.env
 
 # Get list of datasets from config
-DATASETS=(${DATASETS//,/ })
+# DATASETS=(${DATASETS//,/ })
+DATASETS=('norman')
 METHODS=(${METHODS//,/ })
 
 # Function to submit a metric evaluation job

@@ -11,12 +11,12 @@ from pathlib import Path
 matplotlib.rcParams["font.family"] = "Arial"
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from src.helper import load_env, surrogate_names
+from genernbi_supp.src.helper import load_env, surrogate_names
 
 env = load_env()
 TASK_GRN_INFERENCE_DIR = env["TASK_GRN_INFERENCE_DIR"]
 sys.path.insert(0, TASK_GRN_INFERENCE_DIR)
-from task_grn_inference.src.utils.config import METRICS
+from genernbi.src.utils.config import METRICS
 
 CATEGORY_TO_METRICS = {
     "Regression":            ["r_precision", "r_recall"],

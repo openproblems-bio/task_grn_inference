@@ -10,7 +10,7 @@ import anndata as ad
 import pandas as pd
 from pathlib import Path
 
-from src.utils.config import DATASETS_METRICS
+from genernbi.src.utils.config import DATASETS_METRICS, METRICS
 
 RESULTS_DIR = Path("resources/results")
 BENCHMARK_DIR = Path("resources/results/benchmark")
@@ -59,10 +59,10 @@ def aggregate_score_files(results_file: Path, known_datasets: list) -> pd.DataFr
             continue
 
         for mid, mval in zip(metric_ids, metric_values):
-            try:
-                score = float(mval)
-            except (ValueError, TypeError):
-                score = np.nan
+            if mid not in METRICS:
+                continue
+            print(mid)
+            score = float(mval)
             all_results.append({"dataset": dataset, "method": method, "metric": mid, "score": score})
 
         print(f"  Processed: {dataset} / {method}  ({len(metric_ids)} metrics)")

@@ -359,7 +359,8 @@ def process_single_cell_data(adata, covariates, add_metadata, save_name, split_f
                             qc_perturbation_effect=True,
                             group='perturbation',
                             save_data=True,
-                            cell_count_t=10):
+                            cell_count_t=10,
+                            sc_inference=False):
     """
     Process single-cell perturbation data: normalization, QC, splitting, and saving.
     
@@ -444,6 +445,10 @@ def process_single_cell_data(adata, covariates, add_metadata, save_name, split_f
     print('Shape of adata_train_sc: ', adata_train_sc.shape, flush=True)
     if save_data:
         adata_train_sc.write(f'resources/extended_data/{save_name}_train_sc.h5ad', compression='gzip')
+        if sc_inference:
+            # Use the single-cell train split as the benchmark inference data
+            adata_train_sc.write(f'resources/grn_benchmark/inference_data/{save_name}_rna.h5ad', compression='gzip')
+            print(f'Saved single-cell inference data to: resources/grn_benchmark/inference_data/{save_name}_rna.h5ad', flush=True)
     del adata_train_sc
     gc.collect()
 
@@ -474,7 +479,8 @@ def process_single_cell_data(adata, covariates, add_metadata, save_name, split_f
 def process_pseudobulk_data(save_name, covariates, add_metadata,
                             group='perturbation',
                             save_data=True,
-                            cell_count_t=10):
+                            cell_count_t=10,
+                            sc_inference=False):
     """
     Process pseudobulk data from saved single-cell input: pseudobulking, normalization, splitting, and saving.
     
@@ -535,16 +541,19 @@ def process_pseudobulk_data(save_name, covariates, add_metadata,
     del adata_test_bulk
     gc.collect()
     
-    # Process bulk train
-    print('Process adata bulk train...', flush=True)
-    adata_train_bulk = adata_bulk[adata_bulk.obs[group].isin(train_group)].copy()
-    assert adata_train_bulk.shape[0] > 0, "No training bulk data found after splitting"
-    print('Shape of adata_train_bulk: ', adata_train_bulk.shape, flush=True)
-    adata_train_bulk = add_metadata(adata_train_bulk)
-    if save_data:
-        adata_train_bulk.write(f'resources/grn_benchmark/inference_data/{save_name}_rna.h5ad', compression='gzip')
-    del adata_train_bulk
-    gc.collect()
+    # Process bulk train — skipped when single-cell is used as the inference data
+    if not sc_inference:
+        print('Process adata bulk train...', flush=True)
+        adata_train_bulk = adata_bulk[adata_bulk.obs[group].isin(train_group)].copy()
+        assert adata_train_bulk.shape[0] > 0, "No training bulk data found after splitting"
+        print('Shape of adata_train_bulk: ', adata_train_bulk.shape, flush=True)
+        adata_train_bulk = add_metadata(adata_train_bulk)
+        if save_data:
+            adata_train_bulk.write(f'resources/grn_benchmark/inference_data/{save_name}_rna.h5ad', compression='gzip')
+        del adata_train_bulk
+        gc.collect()
+    else:
+        print('Skipping train pseudobulk (single-cell used as inference data)', flush=True)
     
     print('Pseudobulk data processing completed successfully!', flush=True)
 
@@ -554,7 +563,8 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
                                     qc_perturbation_effect=True,
                                     group='perturbation',
                                     save_data=True,
-                                    cell_count_t=10):
+                                    cell_count_t=10,
+                                    sc_inference=False):
     """
     Wrapper function to process large perturbation datasets (single-cell and pseudobulk).
     
@@ -584,7 +594,11 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
         Whether to save processed data (default: True)
     cell_count_t : int
         Minimum cell count threshold (default: 10)
-        
+    sc_inference : bool
+        If True, the inference data (resources/grn_benchmark/inference_data/{save_name}_rna.h5ad)
+        is the single-cell train split and no train pseudobulk is written. Evaluation data
+        stays pseudobulk. (default: False)
+
     Returns
     -------
     None
@@ -601,7 +615,8 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
             qc_perturbation_effect=qc_perturbation_effect,
             group=group,
             save_data=save_data,
-            cell_count_t=cell_count_t
+            cell_count_t=cell_count_t,
+            sc_inference=sc_inference
         )
     if True:
         # Process pseudobulk data (loads from disk)
@@ -611,14 +626,15 @@ def wrapper_large_perturbation_data(adata, covariates, add_metadata, save_name, 
             add_metadata=add_metadata,
             group=group,
             save_data=save_data,
-            cell_count_t=cell_count_t
+            cell_count_t=cell_count_t,
+            sc_inference=sc_inference
         )
     
     print('Data processing completed successfully!', flush=True)
 
 
 def bulkify_func(adata, cell_count_t=10, covariates=['cell_type', 'donor_id', 'age']):
-    from task_grn_inference.src.process_data.helper_data import sum_by
+    from genernbi.src.process_data.helper_data import sum_by
     adata.obs['sum_by'] = ''
     for covariate in covariates:
         adata.obs['sum_by'] += '_' + adata.obs[covariate].astype(str)

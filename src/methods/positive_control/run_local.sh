@@ -31,4 +31,10 @@ fi
 
 echo $python_args
 
-conda run -n genernbi python src/methods/${method}/script.py $python_args
+# Initialize conda in the (non-interactive) batch shell, then activate the env.
+# py10 is itself a conda install, so on PATH `conda` resolves to py10's conda whose
+# base lacks genernbi. $CONDA_EXE (exported on activation) points to the outer conda;
+# use it to source the right conda.sh so `conda activate genernbi` resolves correctly.
+source "$("$CONDA_EXE" info --base)/etc/profile.d/conda.sh"
+conda activate genernbi
+python src/methods/${method}/script.py $python_args
