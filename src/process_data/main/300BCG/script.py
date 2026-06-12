@@ -9,7 +9,7 @@ meta = {
 }
 
 sys.path.append(meta['resource_dir'])
-from src.process_data.helper_data import wrapper_large_perturbation_data
+from genernbi.src.process_data.helper_data import wrapper_large_perturbation_data
 
 
 def add_metadata(adata):

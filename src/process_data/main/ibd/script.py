@@ -56,7 +56,7 @@ def add_interval_from_gtf(adata, gtf_path):
 
 
 sys.path.append(meta['resource_dir'])
-from src.process_data.helper_data import qc_perturbation, pseudobulk_sum_func, normalize_func
+from genernbi.src.process_data.helper_data import qc_perturbation, pseudobulk_sum_func, normalize_func
 
 
 def add_metadata(adata):

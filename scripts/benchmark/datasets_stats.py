@@ -27,14 +27,14 @@ os.makedirs(figs_dir, exist_ok=True)
 
 
 sys.path.append(env['genernbi_supp_DIR'])
-from src.helper import plot_heatmap, surrogate_names, custom_jointplot, palette_celltype, \
+from genernbi_supp.src.helper import plot_heatmap, surrogate_names, custom_jointplot, palette_celltype, \
                        palette_methods, \
                        palette_datasets, colors_blind, linestyle_methods, palette_datasets, CONTROLS3, linestyle_methods, retrieve_grn_path, \
                         plot_raw_scores
 
 TASK_GRN_INFERENCE_DIR = env['TASK_GRN_INFERENCE_DIR']
 sys.path.append(TASK_GRN_INFERENCE_DIR)
-from src.utils.config import DATASETS_METRICS, DATASETS_CELLTYPES, DATASETS, DATASET_INFO
+from genernbi.src.utils.config import DATASETS_METRICS, DATASETS_CELLTYPES, DATASETS, DATASET_INFO
 DOCS_IMAGES_DIR = env['DOCS_IMAGES_DIR']
 
 def plot_table(summary, figsize=(6,6)):

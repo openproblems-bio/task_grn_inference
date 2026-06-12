@@ -31,16 +31,13 @@ tf_names <- scan(par$tf_all, what = "", sep = "\n")
 ad <- anndata::read_h5ad(par$rna)
 dataset_id = ad$uns$dataset_id
 
-# Determine which layer to use
-if (dataset_id %in% c("nakatake", "norman", "adamson")) {
-  layer <- "X_norm"
-} else if (!is.null(par$layer) && par$layer == "lognorm") {
+# Determine which layer to use: prefer 'lognorm', fall back to 'X_norm', else error
+if (!is.null(ad$layers[["lognorm"]])) {
   layer <- "lognorm"
-} else if (!is.null(par$layer)) {
-  layer <- par$layer
+} else if (!is.null(ad$layers[["X_norm"]])) {
+  layer <- "X_norm"
 } else {
-  # Default to using X if no layer specified
-  layer <- NULL
+  stop(paste0("Error in dataset '", dataset_id, "': Neither 'lognorm' nor 'X_norm' layer found in AnnData object."))
 }
 
 # Get expression data

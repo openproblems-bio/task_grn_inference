@@ -12,7 +12,7 @@ from pathlib import Path
 from collections import defaultdict
 import argparse
 
-from src.utils.config import DATASETS, METRICS, METRIC_THRESHOLDS, METRICS_DATASETS, surrogate_names
+from genernbi.src.utils.config import DATASETS, METRICS, METRIC_THRESHOLDS, METRICS_DATASETS, surrogate_names
 
 RESULTS_DIR = Path("resources/results")
 BENCHMARK_DIR = Path("resources/results/benchmark")
@@ -398,7 +398,7 @@ def evaluate_all_datasets(datasets=None, metrics=None, cv_threshold=0.2, output_
     ).to_dict()
     
     # Add additional metadata from METRICS_DATASETS
-    from src.utils.config import METRICS_DATASETS
+    from genernbi.src.utils.config import METRICS_DATASETS
   
     
     # Create metadata for each metric group
@@ -672,7 +672,7 @@ def plot_metric_applicability():
     dataset_order = list(DATASETS)
     metric_order = METRICS  # as defined in config
 
-    from src.utils.config import DATASETS_METRICS
+    from genernbi.src.utils.config import DATASETS_METRICS
     applicable = pd.DataFrame(False, index=metric_order, columns=dataset_order)
     for dataset, categories in DATASETS_METRICS.items():
         if dataset not in dataset_order:
