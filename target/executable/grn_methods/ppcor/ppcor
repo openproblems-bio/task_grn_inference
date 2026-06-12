@@ -457,9 +457,9 @@ RUN Rscript -e 'options(warn = 2); if (!requireNamespace("remotes", quietly = TR
   Rscript -e 'options(warn = 2); remotes::install_cran(c("ppcor", "anndata", "dplyr"), repos = "https://cran.rstudio.com")'
 
 LABEL org.opencontainers.image.description="Companion container for running component grn_methods ppcor"
-LABEL org.opencontainers.image.created="2026-06-02T07:18:55Z"
+LABEL org.opencontainers.image.created="2026-06-12T08:57:57Z"
 LABEL org.opencontainers.image.source="https://github.com/openproblems-bio/task_grn_inference"
-LABEL org.opencontainers.image.revision="5d3af498c0c5825b75eb619056182f24c022e518"
+LABEL org.opencontainers.image.revision="6dfede5495b4ca21c6229f7900e0f331b6b2174e"
 LABEL org.opencontainers.image.version="build_main"
 
 VIASHDOCKER
@@ -1309,16 +1309,13 @@ tf_names <- scan(par\$tf_all, what = "", sep = "\\n")
 ad <- anndata::read_h5ad(par\$rna)
 dataset_id = ad\$uns\$dataset_id
 
-# Determine which layer to use
-if (dataset_id %in% c("nakatake", "norman", "adamson")) {
-  layer <- "X_norm"
-} else if (!is.null(par\$layer) && par\$layer == "lognorm") {
+# Determine which layer to use: prefer 'lognorm', fall back to 'X_norm', else error
+if (!is.null(ad\$layers[["lognorm"]])) {
   layer <- "lognorm"
-} else if (!is.null(par\$layer)) {
-  layer <- par\$layer
+} else if (!is.null(ad\$layers[["X_norm"]])) {
+  layer <- "X_norm"
 } else {
-  # Default to using X if no layer specified
-  layer <- NULL
+  stop(paste0("Error in dataset '", dataset_id, "': Neither 'lognorm' nor 'X_norm' layer found in AnnData object."))
 }
 
 # Get expression data

@@ -137,7 +137,8 @@ if __name__ == '__main__':
         adata = split_control_groups(adata, perturbation_col='perturbation', control_flag_col='is_control', new_col='control_split')
 
         wrapper_large_perturbation_data(adata, split_func=split_data_gene_perturbation,
-            covariates=['perturbation', 'control_split'], 
+            covariates=['perturbation', 'control_split'],
             qc_perturbation_effect=False,
             add_metadata=add_metadata,
-            save_name='norman')
+            save_name='norman',
+            sc_inference=True)

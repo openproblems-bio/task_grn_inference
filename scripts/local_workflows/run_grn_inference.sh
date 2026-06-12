@@ -1,16 +1,16 @@
 
 #!/bin/bash
 set -e
-
+#CRITICAL deactivate any active env before running this
 run_prefix=${run_prefix:-'sbatch'}
 python src/utils/config.py
 source src/utils/config.env
 
 # DATASETS=(${DATASETS//,/ })
-DATASETS=('soundlife' 'soundlife_vaccine') #'op' 'adamson' 'replogle' 'norman' 'nakatake' 'parsebioscience'  '300BCG' 'xaira_HCT116' 'xaira_HEK293T' 'ibd_uc' 'ibd_cd'
+DATASETS=('norman') #'op' 'adamson' 'replogle' 'norman' 'nakatake' 'parsebioscience'  '300BCG' 'xaira_HCT116' 'xaira_HEK293T' 'ibd_uc' 'ibd_cd'
 
 # METHODS=(${METHODS//,/ })
-METHODS=('geneformer')
+METHODS=('ppcor')
 
 methods_dir='src/methods/'
 ctr_methods_dir='src/methods/'

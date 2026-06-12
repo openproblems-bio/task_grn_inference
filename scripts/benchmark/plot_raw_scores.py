@@ -14,8 +14,8 @@ from pathlib import Path
 warnings.filterwarnings("ignore")
 matplotlib.rcParams["font.family"] = "Arial"
 
-from src.utils.util import plot_heatmap
-from src.utils.config import DATASETS_METRICS, METHODS, METRICS, surrogate_names
+from genernbi.src.utils.util import plot_heatmap
+from genernbi.src.utils.config import DATASETS_METRICS, METHODS, METRICS, surrogate_names
 
 RESULTS_DIR = Path("resources/results")
 BENCHMARK_DIR = Path("resources/results/benchmark")

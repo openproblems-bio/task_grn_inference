@@ -4,6 +4,7 @@
 
 
 # related to files
+docs/build/
 .pybiomart.sqlite
 logs/
 params*

@@ -28,6 +28,11 @@ dependencies = [
     #   pip install torch==2.4.1 --index-url https://download.pytorch.org/whl/cpu
 ]
 
-[tool.setuptools.packages.find]
-where = ["."]
-exclude = ["resources*", "output*", "temp*", "logs*", "params*", "docs*"]
+# The repo folder is installed as the `genernbi` package: map the package name
+# onto the current directory. This makes `import genernbi.src...` resolve after an
+# editable install, without enumerating subpackages.
+[tool.setuptools]
+packages = ["genernbi"]
+
+[tool.setuptools.package-dir]
+genernbi = "."

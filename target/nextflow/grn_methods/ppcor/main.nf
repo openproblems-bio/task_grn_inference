@@ -3469,9 +3469,9 @@ meta = [
     "engine" : "docker|native",
     "output" : "target/nextflow/grn_methods/ppcor",
     "viash_version" : "0.9.4",
-    "git_commit" : "5d3af498c0c5825b75eb619056182f24c022e518",
+    "git_commit" : "6dfede5495b4ca21c6229f7900e0f331b6b2174e",
     "git_remote" : "https://github.com/openproblems-bio/task_grn_inference",
-    "git_tag" : "v1.0.1-2-g5d3af498c"
+    "git_tag" : "v1.0.1-5-g6dfede549"
   },
   "package_config" : {
     "name" : "task_grn_inference",
@@ -3658,16 +3658,13 @@ tf_names <- scan(par\\$tf_all, what = "", sep = "\\\\n")
 ad <- anndata::read_h5ad(par\\$rna)
 dataset_id = ad\\$uns\\$dataset_id
 
-# Determine which layer to use
-if (dataset_id %in% c("nakatake", "norman", "adamson")) {
-  layer <- "X_norm"
-} else if (!is.null(par\\$layer) && par\\$layer == "lognorm") {
+# Determine which layer to use: prefer 'lognorm', fall back to 'X_norm', else error
+if (!is.null(ad\\$layers[["lognorm"]])) {
   layer <- "lognorm"
-} else if (!is.null(par\\$layer)) {
-  layer <- par\\$layer
+} else if (!is.null(ad\\$layers[["X_norm"]])) {
+  layer <- "X_norm"
 } else {
-  # Default to using X if no layer specified
-  layer <- NULL
+  stop(paste0("Error in dataset '", dataset_id, "': Neither 'lognorm' nor 'X_norm' layer found in AnnData object."))
 }
 
 # Get expression data

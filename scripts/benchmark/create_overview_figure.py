@@ -10,8 +10,8 @@ import yaml
 from pathlib import Path
 import argparse
 
-from src.utils.util import compute_overall_scores
-from src.utils.config import DATASETS, METHODS, METRICS, DATASET_INFO, surrogate_names
+from genernbi.src.utils.util import compute_overall_scores
+from genernbi.src.utils.config import DATASETS, METHODS, METRICS, DATASET_INFO, surrogate_names
 
 
 def _rank_on_datasets(scores_all, dataset_list, final_metrics):
@@ -263,7 +263,7 @@ def main(local_run=True, methods=None, datasets=None):
     print(f"\n4. Saved summary to: {summary_file}")
 
     print("\n5. Calling R script to create figure...")
-    r_script = GENERNBI_SUPP_DIR / "src" / "summary_figure.R"
+    r_script = Path(__file__).parent / "summary_figure.R"
     summary_figure = RESULTS_DIR / "benchmark" / "summary_figure"
     result = subprocess.run(f"Rscript {r_script} {summary_file} {summary_figure}",
                             shell=True, capture_output=True, text=True)

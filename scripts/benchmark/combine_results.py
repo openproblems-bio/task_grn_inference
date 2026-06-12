@@ -15,7 +15,7 @@ import argparse
 RESULTS_DIR = Path('resources/results')
 BENCHMARK_DIR = Path('resources/results/benchmark')
 
-from src.utils.config import DATASETS, METRICS
+from genernbi.src.utils.config import DATASETS, METRICS
 
 def combine_results(local_run=False):
     """Combine results from individual dataset folders into all_new folder."""
