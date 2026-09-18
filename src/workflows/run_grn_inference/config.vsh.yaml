@@ -112,6 +112,7 @@ dependencies:
   - name: methods/negative_control
   - name: methods/positive_control
   - name: methods/spearman_corr
+  - name: grn_methods/shoko
 
 runners:
   - type: executable
