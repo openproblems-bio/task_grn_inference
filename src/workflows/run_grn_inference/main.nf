@@ -15,8 +15,8 @@ methods = [
   figr,
   celloracle,
   scgpt,
-  dictys,
-  geneformer
+  geneformer,
+  shoko
 ]
 
 // construct list of metrics

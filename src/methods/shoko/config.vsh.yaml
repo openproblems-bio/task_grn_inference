@@ -1,0 +1,51 @@
+__merge__: ../../api/comp_method.yaml
+
+name: shoko
+namespace: "grn_methods"
+info:
+  label: CovLayer
+  summary: "Fully automatic coverage-layered GRN: perturbation-response + cell-level correlation fusion with contrast auto-routing"
+  description: |
+    GRN inference from (pseudo)bulk or single-cell RNA-seq with no
+    dataset-specific configuration. The expression layer is auto-detected
+    ('lognorm' else 'X_norm'). A contrast gate routes each dataset
+    automatically: with obs['is_control'] (or a derivable control group such
+    as 'pre_*' perturbation labels) the full method runs — per-donor (when
+    obs['donor_id'] exists) control-subtracted response profiles, gene
+    exclusions (near-constant and exact-duplicate columns), response-profile
+    |Pearson| with self-environment downdate, rank fusion with the
+    standardized cell-level |Pearson| network, a 2M-edge candidate pool with
+    pair-identity filter (|corr| < 0.99) and self-loop exclusion, rule-R
+    post-processing, a TF-coverage layer (quota 10 targets per TF, layer cap
+    5,000, 50,000 edges total) and a retention (W) gate. Without any control
+    annotation the em-only reference arm (cell-level |Pearson| with the same
+    candidate machinery) is emitted. Deterministic; seed is unused.
+
+resources:
+  - type: python_script
+    path: script.py
+  - path: /src/methods/shoko/resources/gen_final_fast.py
+    dest: gen_final_fast.py
+  - path: /src/methods/shoko/resources/gen_cov_variant_v2.py
+    dest: gen_cov_variant_v2.py
+  - path: /src/methods/shoko/resources/stream_core.py
+    dest: stream_core.py
+
+engines:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    __merge__: /src/api/base_requirements.yaml
+    setup:
+      - type: python
+        packages:
+          - anndata
+          - pandas
+          - numpy
+          - scipy
+          - h5py
+  - type: native
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [midtime, midmem, midcpu]
