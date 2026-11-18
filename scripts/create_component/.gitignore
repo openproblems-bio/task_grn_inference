@@ -1,0 +1,2 @@
+# if users change the scripts, the changes should not be committed.
+/create_*_*.sh
