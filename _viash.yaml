@@ -77,11 +77,11 @@ authors:
       github: janursa
       orcid: 0000-0002-7539-4396
   - name: Robrecht Cannoodt
-    roles: [ author, maintainer ]
+    roles: [ author ]
     info:
       github: rcannood
       orcid: "0000-0003-3641-729X"
-  - name: Jeremie Kalfon  
+  - name: Jérémie Kalfon  
     roles: [ contributor ]
     info:
       github: jkobject
