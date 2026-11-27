@@ -40,3 +40,12 @@ agentic/.env
 
 # generated docs build output
 docs/build/
+CLAUDE*
+rebuttal/
+plans/
+analysis/
+src/methods/new_method/
+/work
+/.nextflow*
+/target
+/.vscode
