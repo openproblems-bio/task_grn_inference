@@ -1,68 +1,50 @@
-namespace: methods
+namespace: control_methods
 info:
   type: control_method
   type_info:
     label: Control Method
-    summary: Quality control methods for verifying the pipeline.
+    summary: Controls for verifying the benchmark.
     description: |
-      This folder contains control components for the task. 
-      These components have the same interface as the regular methods
-      but serve to verify the benchmark. They are either simply methods that 
-      are expected to be outperformed by actual GRN inference methods or they 
-      get evaluation data in addition to the inference data to yiled a higher performance,
-      aiming to outperform the actual GRN inference methods. 
+      Same interface as the regular methods, plus the solution as input.
+      They are either baselines expected to be outperformed by actual methods,
+      or use evaluation data to yield a higher performance.
 arguments:
-  - name: --rna
-    __merge__: file_rna_h5ad.yaml
+  - name: --input_train
+    __merge__: file_train.yaml
     required: true
     direction: input
-  - name: --rna_all
-    type: file
+  - name: --input_train_atac
+    __merge__: file_train_atac.yaml
     required: false
-    summary: RNA expression data that contains all variability. Only used for positive control.
     direction: input
-    example: resources_test/grn_benchmark/evaluation_data/op_bulk.h5ad
-  - name: --prediction
-    __merge__: file_prediction_h5ad.yaml
+  - name: --input_tf_all
+    __merge__: file_tf_all.yaml
+    required: true
+    direction: input
+  - name: --input_solution
+    __merge__: file_solution.yaml
     required: false
+    direction: input
+  - name: --output
+    __merge__: file_prediction.yaml
+    required: true
     direction: output
-  - name: --tf_all
-    type: file
-    required: true
-    direction: input
-    example: resources_test/grn_benchmark/prior/tf_all.csv
-    default: resources_test/grn_benchmark/prior/tf_all.csv
   - name: --max_n_links
     type: integer
     default: 50000
   - name: --num_workers
     type: integer
-    direction: input
-    default: 20
+    default: 2
   - name: --temp_dir
     type: string
-    direction: input
-    default: output/temdir
-  - name: --layer
-    type: string
-    direction: input
-    default: lognorm
+    default: output/tempdir
   - name: --seed
     type: integer
-    direction: input
     default: 32
-  - name: --dataset_id
-    type: string
-    direction: input
-    required: false
-    default: op
-  - name: --apply_tf_methods
-    type: boolean 
-    required: false
-    default: true
-
 test_resources:
   - type: python_script
     path: /common/component_tests/run_and_check_output.py
-  - path: /resources_test/
-    dest: resources_test/
+  - type: python_script
+    path: /common/component_tests/check_config.py
+  - path: /resources_test/task_grn_inference
+    dest: resources_test/task_grn_inference

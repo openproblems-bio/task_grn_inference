@@ -1,0 +1,7 @@
+type: file
+example: resources_test/task_grn_inference/norman/ws_consensus.csv
+label: WS consensus
+summary: "Consensus of WS-distance based links across methods (columns: source, theta, value)."
+info:
+  format:
+    type: csv

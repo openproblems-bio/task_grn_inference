@@ -1,0 +1,20 @@
+type: file
+example: resources_test/task_grn_inference/op/train.h5ad
+label: Training data (RNA)
+summary: RNA expression data for GRN inference.
+info:
+  format:
+    type: h5ad
+    layers:
+      - {type: integer, name: counts, description: "Raw counts. Absent in datasets that only provide normalized values", required: false}
+      - {type: double, name: normalized, description: "Normalized expression", required: true}
+    obs:
+      - {type: string, name: cell_type, description: "Cell type", required: false}
+      - {type: string, name: donor_id, description: "Donor id", required: false}
+      - {type: string, name: perturbation, description: "Perturbation name (perturbation datasets)", required: false}
+    uns:
+      - {type: string, name: dataset_id, description: "A unique identifier for the dataset", required: true}
+      - {type: string, name: normalization_id, description: "Which normalization was used", required: true}
+      - {type: string, name: dataset_name, description: "Nicely formatted name", required: false}
+      - {type: string, name: dataset_summary, description: "Short description of the dataset", required: false}
+      - {type: string, name: dataset_organism, description: "The organism of the sample", required: false}

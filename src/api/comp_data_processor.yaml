@@ -1,0 +1,67 @@
+namespace: data_processors
+info:
+  type: data_processor
+  type_info:
+    label: Data processor
+    summary: Converts the existing grn_benchmark files of one dataset into the task API.
+    description: |
+      Reads the inference, evaluation and prior files of a dataset and writes
+      the standardised train, solution and background files.
+arguments:
+  - name: --dataset_id
+    type: string
+    required: true
+    direction: input
+  - name: --input_rna
+    type: file
+    required: true
+    direction: input
+  - name: --input_atac
+    type: file
+    required: false
+    direction: input
+  - name: --input_evaluation
+    type: file
+    required: true
+    direction: input
+  - name: --input_evaluation_de
+    type: file
+    required: false
+    direction: input
+  - name: --input_evaluation_sc
+    type: file
+    required: false
+    direction: input
+  - name: --input_ws_background
+    type: file
+    required: false
+    direction: input
+  - name: --output_train
+    __merge__: file_train.yaml
+    required: true
+    direction: output
+  - name: --output_train_atac
+    __merge__: file_train_atac.yaml
+    required: false
+    direction: output
+  - name: --output_solution
+    __merge__: file_solution.yaml
+    required: true
+    direction: output
+  - name: --output_solution_de
+    __merge__: file_solution_de.yaml
+    required: false
+    direction: output
+  - name: --output_solution_sc
+    __merge__: file_solution_sc.yaml
+    required: false
+    direction: output
+  - name: --output_ws_background
+    __merge__: file_ws_background.yaml
+    required: false
+    direction: output
+test_resources:
+  - type: python_script
+    path: /common/component_tests/run_and_check_output.py
+  - path: /resources_test/grn_benchmark
+    dest: resources_test/grn_benchmark

@@ -1,56 +1,76 @@
-namespace: "metrics"
+namespace: metrics
 info:
-  type: metrics
+  type: metric
   type_info:
-    label: metrics
-    summary: A metric to evaluate the performance of the inferred GRN
+    label: Metric
+    summary: A metric to evaluate the inferred GRN.
     description: |
-      A metric to evaluate the performance of the inferred GRN
-arguments: 
-  - name: --prediction
-    __merge__: file_prediction_h5ad.yaml
+      A metric for evaluating the performance of an inferred GRN. Metrics
+      exit with code 99 when an input they need is missing.
+arguments:
+  - name: --input_prediction
+    __merge__: file_prediction.yaml
     required: true
     direction: input
-  - name: --evaluation_data
-    __merge__: file_evaluation_bulk_h5ad.yaml
+  - name: --input_solution
+    __merge__: file_solution.yaml
+    required: true
+    direction: input
+  - name: --input_solution_de
+    __merge__: file_solution_de.yaml
     required: false
     direction: input
-  - name: --evaluation_data_sc
-    __merge__: file_evaluation_sc_h5ad.yaml
+  - name: --input_solution_sc
+    __merge__: file_solution_sc.yaml
     required: false
     direction: input
-  - name: --evaluation_data_de
-    __merge__: file_evaluation_de_h5ad.yaml
+  - name: --input_tf_all
+    __merge__: file_tf_all.yaml
     required: false
     direction: input
-  - name: --score
-    __merge__: file_score_h5ad.yaml
+  - name: --input_consensus
+    __merge__: file_consensus.yaml
+    required: false
+    direction: input
+  - name: --input_ws_consensus
+    __merge__: file_ws_consensus.yaml
+    required: false
+    direction: input
+  - name: --input_ws_background
+    __merge__: file_ws_background.yaml
+    required: false
+    direction: input
+  - name: --input_ground_truth_unibind
+    __merge__: file_ground_truth.yaml
+    required: false
+    direction: input
+  - name: --input_ground_truth_chipatlas
+    __merge__: file_ground_truth.yaml
+    required: false
+    direction: input
+  - name: --input_ground_truth_remap
+    __merge__: file_ground_truth.yaml
+    required: false
+    direction: input
+  - name: --input_genesets
+    __merge__: file_genesets.yaml
+    required: false
+    multiple: true
+    direction: input
+  - name: --output
+    __merge__: file_score.yaml
     required: true
     direction: output
-  - name: --layer
-    type: string
-    direction: input
-    required: false
-    default: lognorm
   - name: --max_n_links
     type: integer
     default: 50000
-  - name: --tf_all
-    type: file
-    direction: input
-    required: false
-    example: resources_test/grn_benchmark/prior/tf_all.csv
   - name: --num_workers
     type: integer
-    direction: input
     default: 20
-  - name: --n_top_genes
-    type: integer
-    direction: input
-    default: 3000
-
 test_resources:
   - type: python_script
     path: /common/component_tests/run_and_check_output.py
-  - path: /resources_test/
-    dest: resources_test/
+  - type: python_script
+    path: /common/component_tests/check_config.py
+  - path: /resources_test/task_grn_inference
+    dest: resources_test/task_grn_inference

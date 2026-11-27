@@ -1,0 +1,7 @@
+type: file
+example: resources_test/task_grn_inference/norman/ws_background.csv
+label: WS distance background
+summary: "Background Wasserstein distances for all TF-target pairs (columns: source, target, ws_distance). Independent of predictions."
+info:
+  format:
+    type: csv
