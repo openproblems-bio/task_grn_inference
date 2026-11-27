@@ -1,0 +1,45 @@
+namespace: consensus
+info:
+  type: consensus
+  type_info:
+    label: Consensus
+    summary: Builds the consensus of all inferred GRNs of a dataset.
+    description: |
+      Takes the predictions of all methods for one dataset and produces the
+      regulators consensus and the WS-distance consensus used by the metrics.
+arguments:
+  - name: --input_predictions
+    __merge__: file_prediction.yaml
+    required: true
+    multiple: true
+    direction: input
+  - name: --input_train
+    __merge__: file_train.yaml
+    required: true
+    direction: input
+  - name: --input_solution_sc
+    __merge__: file_solution_sc.yaml
+    required: false
+    direction: input
+  - name: --input_tf_all
+    __merge__: file_tf_all.yaml
+    required: true
+    direction: input
+  - name: --output_consensus
+    __merge__: file_consensus.yaml
+    required: true
+    direction: output
+  - name: --output_ws_consensus
+    __merge__: file_ws_consensus.yaml
+    required: false
+    direction: output
+  - name: --num_workers
+    type: integer
+    default: 20
+test_resources:
+  - type: python_script
+    path: /common/component_tests/run_and_check_output.py
+  - type: python_script
+    path: /common/component_tests/check_config.py
+  - path: /resources_test/task_grn_inference
+    dest: resources_test/task_grn_inference

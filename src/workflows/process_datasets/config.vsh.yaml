@@ -1,0 +1,72 @@
+name: process_datasets
+namespace: workflows
+
+argument_groups:
+  - name: Inputs
+    arguments:
+      - name: --dataset_id
+        type: string
+        required: true
+        direction: input
+      - name: --input_rna
+        type: file
+        required: true
+        direction: input
+      - name: --input_atac
+        type: file
+        required: false
+        direction: input
+      - name: --input_evaluation
+        type: file
+        required: true
+        direction: input
+      - name: --input_evaluation_de
+        type: file
+        required: false
+        direction: input
+      - name: --input_evaluation_sc
+        type: file
+        required: false
+        direction: input
+      - name: --input_ws_background
+        type: file
+        required: false
+        direction: input
+  - name: Outputs
+    arguments:
+      - name: --output_train
+        __merge__: /src/api/file_train.yaml
+        required: true
+        direction: output
+      - name: --output_train_atac
+        __merge__: /src/api/file_train_atac.yaml
+        required: false
+        direction: output
+      - name: --output_solution
+        __merge__: /src/api/file_solution.yaml
+        required: true
+        direction: output
+      - name: --output_solution_de
+        __merge__: /src/api/file_solution_de.yaml
+        required: false
+        direction: output
+      - name: --output_solution_sc
+        __merge__: /src/api/file_solution_sc.yaml
+        required: false
+        direction: output
+      - name: --output_ws_background
+        __merge__: /src/api/file_ws_background.yaml
+        required: false
+        direction: output
+
+resources:
+  - type: nextflow_script
+    path: main.nf
+    entrypoint: run_wf
+  - path: /common/nextflow_helpers/helper.nf
+
+dependencies:
+  - name: data_processors/process_dataset
+
+runners:
+  - type: nextflow

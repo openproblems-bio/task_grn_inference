@@ -1,0 +1,7 @@
+type: file
+example: resources_test/task_grn_inference/ground_truth/PBMC_unibind.csv
+label: TF-binding ground truth
+summary: "Edge list with columns source, target."
+info:
+  format:
+    type: csv

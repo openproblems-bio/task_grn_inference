@@ -1,0 +1,7 @@
+type: file
+example: resources_test/task_grn_inference/prior/tf_all.csv
+label: TF list
+summary: List of transcription factors, one per line.
+info:
+  format:
+    type: csv

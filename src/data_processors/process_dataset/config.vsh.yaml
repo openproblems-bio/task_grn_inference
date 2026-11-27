@@ -1,0 +1,23 @@
+__merge__: ../../api/comp_data_processor.yaml
+name: process_dataset
+arguments:
+  - name: --metric_ids
+    type: string
+    multiple: true
+    required: false
+    description: Metrics applicable to the dataset. Defaults to the mapping in script.py.
+resources:
+  - type: python_script
+    path: script.py
+engines:
+  - type: docker
+    image: ghcr.io/openproblems-bio/base_python:1.0.4
+    setup:
+      - type: python
+        packages: [anndata, scipy, pandas, numpy]
+  - type: native
+runners:
+  - type: executable
+  - type: nextflow
+    directives:
+      label: [highmem, midcpu, midtime]

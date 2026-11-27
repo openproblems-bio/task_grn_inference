@@ -1,0 +1,7 @@
+type: file
+example: resources_test/task_grn_inference/norman/consensus.json
+label: Regulators consensus
+summary: Per-gene regulator counts across methods and thresholds.
+info:
+  format:
+    type: json

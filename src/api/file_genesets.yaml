@@ -1,0 +1,7 @@
+type: file
+example: resources_test/task_grn_inference/prior/pathways/hallmark_2020.gmt
+label: Gene sets
+summary: Pathway gene sets in GMT format.
+info:
+  format:
+    type: gmt

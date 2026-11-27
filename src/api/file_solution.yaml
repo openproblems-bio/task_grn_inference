@@ -1,0 +1,22 @@
+type: file
+example: resources_test/task_grn_inference/op/solution.h5ad
+label: Solution (bulk)
+summary: Bulk evaluation data.
+info:
+  format:
+    type: h5ad
+    layers:
+      - {type: double, name: normalized, description: "Normalized expression", required: true}
+    obs:
+      - {type: string, name: cell_type, description: "Cell type", required: false}
+      - {type: string, name: donor_id, description: "Donor id", required: false}
+      - {type: string, name: perturbation, description: "Perturbation name", required: false}
+      - {type: string, name: perturbation_type, description: "Perturbation type", required: false}
+      - {type: boolean, name: is_control, description: "Whether the sample is a control", required: false}
+    uns:
+      - {type: string, name: dataset_id, description: "A unique identifier for the dataset", required: true}
+      - {type: string, name: normalization_id, description: "Which normalization was used", required: true}
+      - {type: string, name: dataset_name, description: "Nicely formatted name", required: false}
+      - {type: string, name: dataset_summary, description: "Short description of the dataset", required: false}
+      - {type: string, name: dataset_organism, description: "The organism of the sample", required: false}
+      - {type: string, name: metric_ids, description: "Metrics applicable to this dataset", multiple: true, required: true}

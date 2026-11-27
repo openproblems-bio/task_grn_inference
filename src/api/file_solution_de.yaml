@@ -1,0 +1,13 @@
+type: file
+example: resources_test/task_grn_inference/norman/solution_de.h5ad
+label: Solution (DE)
+summary: Differential expression statistics, one row per perturbation (row names), one column per gene.
+info:
+  format:
+    type: h5ad
+    uns:
+      - {type: string, name: dataset_id, description: "A unique identifier for the dataset", required: true}
+      - {type: string, name: normalization_id, description: "Which normalization was used", required: true}
+      - {type: string, name: dataset_name, description: "Nicely formatted name", required: false}
+      - {type: string, name: dataset_summary, description: "Short description of the dataset", required: false}
+      - {type: string, name: dataset_organism, description: "The organism of the sample", required: false}
